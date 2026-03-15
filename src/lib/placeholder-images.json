@@ -1,0 +1,50 @@
+{
+  "login-background": {
+    "src": "https://images.pexels.com/photos/14146828/pexels-photo-14146828.jpeg",
+    "width": 1200,
+    "height": 800,
+    "hint": "clothing store"
+  },
+  "hero-banner": {
+    "src": "https://lh3.googleusercontent.com/aida-public/AB6AXuBGHxO8ultApDYQaPdb2B63KR4cgKeN93NgeHzteMIGNsFfPP-JryL9ewYRgaHNmpAFhoFE8h0T230McDLu7aYKGoRz7sfj9wlf1t9bqRiKAGsa8eDknRLTAHyEcSz1FN7PN29ht3cp90uXP1Jl6kxoJ7hXHqcpuqSTrblOzwOIyRj-Nkd0uRbBhItdZmm8mSKLS1TjO-qtcM-5azNwTNULkwuz2ziUFM4OfYWVKIjBdDCdFqoCNDiTHnNISz7Lzp1aEPoVkuZ2o0w",
+    "width": 1920,
+    "height": 600,
+    "hint": "clothing store"
+  },
+  "hero-banner-2": {
+    "src": "https://images.pexels.com/photos/102129/pexels-photo-102129.jpeg",
+    "width": 1920,
+    "height": 600,
+    "hint": "summer fashion sale"
+  },
+  "hero-banner-3": {
+    "src": "https://images.pexels.com/photos/3645222/pexels-photo-3645222.jpeg",
+    "width": 1920,
+    "height": 600,
+    "hint": "fashion accessories"
+  },
+  "womenswear": {
+    "src": "https://lh3.googleusercontent.com/aida-public/AB6AXuBTlnaSLFTAcZZIF5rJAyLCZ9OquSx4mE3SbtPZ8bZkZLfIcWcFiUweWLv-78-_HnxGuejWQjVIEyaYBlpLmQ5lgj9oZUDIWUDvMQQfUoY2c9pMcraUqQMSbdgZ67fy2giyJHUMyFcpuih1DoUPe5we6xOgHeiZqXKteySnvzawQTnwa73PwEpv6RvCGUe4JCQhPXXqriEAM95jS22_TYSVBc0Sl46SLVe1XWdEJVa8ZnIaqxvj-xqsX6tq4wadUNTIsKTFIRmzpVw",
+    "width": 400,
+    "height": 400,
+    "hint": "woman fashion"
+  },
+  "menswear": {
+    "src": "https://lh3.googleusercontent.com/aida-public/AB6AXuB3CPJ-uMSc-A0FbPRZjTcDHazXE7X3kUD3PVq6yaK-Cv3KXe0hy9GdLyKxB5kOuxqbfGwY0C4YVpi7qkurIDbYAUZBIg_rhLJUaCQTOGX1JCcMczwhn3cCa-wTx1wtb6hB-6OCOQKwhZ6fRuMKXrb8cBBZ8gZzL6V6Gu8p-9qxuTLSP7fHEsl0DgIYKOvhwcHg4lRp3KpfblFmo1kIp_NOVI4JQ6LB-Q_wRaKDziO9aGweByRNiJv-2b06MazY8dZUOoDQrtx1HCA",
+    "width": 400,
+    "height": 400,
+    "hint": "man fashion"
+  },
+  "accessories": {
+    "src": "https://lh3.googleusercontent.com/aida-public/AB6AXuB_uJse8eBb1kmA4Ya1vHYTyx87HwduI7J09OgxCANc_C0DOYpyaTq5tfngxbt6MLOm7gCjM-gbbPF7SbmBwCIOY-eu2XMaggMq0ZAtKsAXZd6yG7b9Vxm9V5IvGHt0P2SJbXzN8i90Svaoite8O4OI4m1GRNzOvEvF9JmQbfcXbjG_WaNYxHv9S-es6r21BXAzV2k85UFhpDJ84xcKiiMaiZssn6jqR0mXlg2tHAeG0HaA3RouRWdWGuaeQdgIrj588PUVp-mG9hc",
+    "width": 400,
+    "height": 400,
+    "hint": "luxury watch"
+  },
+  "home-decor": {
+    "src": "https://lh3.googleusercontent.com/aida-public/AB6AXuBCBYxXVUKS52xqz7EA1I4D-JS6XR47lb0JZ_e-4sx1JaM6hFri7mFtJbWdgboqJexs2iA7mNyNROleduhIrrX8uBoaD6fkBhBON0AOZcebqOXbtb6yQ6IiBfIg48lA_FV1KGnSYSGadwZ8Yh9HXU08-yQ63CLiMAgzCj4MbIhFeHQ9bWRCp3ijuzPcs1G7wl9PvKeBbwMjSlKeQLF8vnJbKhwahzaxj7mEmf1PybvFXOmmquJT1WyhI4WHif4tKoOQ2TOR9MbgjAw",
+    "width": 400,
+    "height": 400,
+    "hint": "modern livingroom"
+  }
+}

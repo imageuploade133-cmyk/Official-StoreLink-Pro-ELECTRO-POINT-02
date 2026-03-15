@@ -1,0 +1,227 @@
+
+'use client';
+
+import React, { useMemo } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Mail, Phone, Link as LinkIcon, MapPin } from 'lucide-react';
+import { ElysiumLogo } from '@/components/icons';
+import { useSettings } from '@/contexts/settings-context';
+import { useFirestore, useCollection } from '@/firebase';
+import { collection, query, orderBy, where } from 'firebase/firestore';
+import type { Category, PublicPage } from '@/lib/types';
+import { Skeleton } from '../ui/skeleton';
+import { cn } from '@/lib/utils';
+
+export function PublicFooter() {
+  const { settings } = useSettings();
+  const firestore = useFirestore();
+  const storeName = settings?.storeName || 'StoreLink-Pro';
+  const logoUrl = settings?.invoiceLogoUrl;
+  const storePhone = settings?.storePhone;
+  const storeEmail = settings?.storeEmail;
+  const storeAddress = settings?.storeAddress;
+  const showFooterDescription = settings?.showFooterDescription ?? true;
+  const footerDescription = settings?.footerDescription || '';
+  const footerLogoWidth = settings?.footerLogoWidth || 100;
+  const logoContainerHeight = Math.max(24, (footerLogoWidth || 100) / 3.5);
+
+  const categoriesQuery = useMemo(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'categories'), orderBy('name'));
+  }, [firestore]);
+
+  const publicPagesQuery = useMemo(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'publicPages'), where('published', '==', true), orderBy('createdAt', 'asc'));
+  }, [firestore]);
+
+  const { data: categories, isLoading: isLoadingCategories } = useCollection<Category>(categoriesQuery);
+  const { data: publicPages, isLoading: isLoadingPages } = useCollection<PublicPage>(publicPagesQuery);
+
+  const supportPages = useMemo(() => publicPages?.filter(p => p.footerSection === 'Support') || [], [publicPages]);
+  const companyPages = useMemo(() => publicPages?.filter(p => p.footerSection === 'Company') || [], [publicPages]);
+
+  const footerStyle = useMemo(() => {
+    if (settings?.footerBackgroundStyle === 'gradient' && settings.footerBackgroundGradientStart && settings.footerBackgroundGradientEnd) {
+      return { 
+        backgroundImage: `linear-gradient(to bottom right, ${settings.footerBackgroundGradientStart}, ${settings.footerBackgroundGradientEnd})`,
+        color: settings.footerTextColor || '#94a3b8'
+      };
+    }
+    if (settings?.footerColorBackground) {
+      return { 
+        backgroundColor: settings.footerColorBackground,
+        color: settings.footerTextColor || '#94a3b8'
+      };
+    }
+    return { color: '#94a3b8' };
+  }, [settings]);
+
+  const hasCustomBg = !!(settings?.footerColorBackground || (settings?.footerBackgroundStyle === 'gradient' && settings.footerBackgroundGradientStart));
+  const textColor = settings?.footerTextColor || '#94a3b8';
+
+  return (
+    <footer 
+        className={cn("pt-20 pb-10 transition-all duration-700 relative overflow-hidden", !hasCustomBg && "bg-background-dark text-slate-400")} 
+        style={footerStyle}
+    >
+      {/* Brand Watermark Overlay */}
+      {settings?.webWatermarkEnabled && (
+        <div className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden select-none">
+          <div 
+            style={{ 
+              opacity: settings.webWatermarkOpacity ?? 0.1, 
+              transform: `rotate(${settings.webWatermarkRotation ?? -30}deg)`,
+              width: settings.webWatermarkType === 'text' ? 'auto' : `${settings.webWatermarkImageWidth ?? 400}px`,
+            }}
+            className="transition-all duration-1000 ease-in-out"
+          >
+            {settings.webWatermarkType === 'text' ? (
+              <span 
+                className="font-black whitespace-nowrap leading-none tracking-tighter"
+                style={{ fontSize: `${settings.webWatermarkFontSize ?? 120}px` }}
+              >
+                {settings.webWatermarkText || 'STORELINK PRO'}
+              </span>
+            ) : (
+              settings.webWatermarkImageUrl && (
+                <img 
+                  src={settings.webWatermarkImageUrl} 
+                  alt="" 
+                  className="w-full h-auto object-contain"
+                  draggable={false}
+                />
+              )
+            )}
+          </div>
+        </div>
+      )}
+
+      <div className="max-w-site-container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+          {/* Company Info */}
+          <div className="col-span-1">
+            <Link href="/store" className="flex items-center gap-3 text-lg font-semibold mb-6">
+              {logoUrl ? (
+                 <div style={{ width: `${footerLogoWidth}px`, height: `${logoContainerHeight}px` }} className="relative">
+                    <Image 
+                        src={logoUrl} 
+                        alt={storeName}
+                        fill
+                        sizes={`${footerLogoWidth}px`}
+                        style={{ objectFit: 'contain' }}
+                        unoptimized
+                    />
+                </div>
+              ) : (
+                <ElysiumLogo className="h-6 w-6" style={{ color: textColor }} />
+              )}
+              <span className={'font-extrabold tracking-tighter text-2xl'} style={{ color: 'inherit' }}>{storeName}</span>
+            </Link>
+            {showFooterDescription && footerDescription && <p className="text-sm mb-6" style={{ color: textColor }}>{footerDescription}</p>}
+            
+            {(storePhone || storeEmail || storeAddress) && (
+              <div className="space-y-3 mb-6">
+                {storePhone && (
+                  <a href={`tel:${storePhone}`} className="flex items-center text-sm hover:opacity-80 transition-colors" style={{ color: textColor }}>
+                    <Phone className="h-4 w-4 mr-3 flex-shrink-0 opacity-70" /> <span>{storePhone}</span>
+                  </a>
+                )}
+                {storeEmail && (
+                   <a href={`mailto:${storeEmail}`} className="flex items-center text-sm hover:opacity-80 transition-colors" style={{ color: textColor }}>
+                    <Mail className="h-4 w-4 mr-3 flex-shrink-0 opacity-70" /> <span>{storeEmail}</span>
+                  </a>
+                )}
+                {storeAddress && (
+                   <p className="flex items-start text-sm" style={{ color: textColor }}>
+                    <MapPin className="h-4 w-4 mr-3 mt-1 flex-shrink-0 opacity-70" /> <span>{storeAddress}</span>
+                  </p>
+                )}
+              </div>
+            )}
+            
+            <div className="flex space-x-4">
+               {settings?.socialMediaLinks?.map((link) => (
+                <a
+                  key={link.id}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={link.name}
+                  className="hover:opacity-80 transition-opacity"
+                  style={{ color: textColor }}
+                >
+                  {link.iconUrl ? (
+                    <Image src={link.iconUrl} alt={link.name} width={24} height={24} className="h-6 w-6 object-contain" unoptimized />
+                  ) : (
+                    <LinkIcon className="h-6 w-6 opacity-70" />
+                  )}
+                </a>
+              ))}
+            </div>
+          </div>
+          {/* Shop Links */}
+          <div>
+            <h4 className="font-bold text-sm uppercase tracking-widest mb-6" style={{ color: 'inherit', opacity: 0.9 }}>Shop</h4>
+            <ul className="space-y-4 text-sm">
+              <li><Link className="hover:opacity-80 transition-colors" href="/store/shop" style={{ color: textColor }}>All Products</Link></li>
+              <li><Link className="hover:opacity-80 transition-colors" href="/store/categories" style={{ color: textColor }}>All Categories</Link></li>
+              {isLoadingCategories ? (
+                <>
+                  <li className="mt-4"><Skeleton className="h-4 w-2/3 opacity-20" /></li>
+                  <li><Skeleton className="h-4 w-1/2 opacity-20" /></li>
+                </>
+              ) : (
+                categories?.slice(0, 4).map((category) => (
+                  <li key={category.id}>
+                    <Link className="hover:opacity-80 transition-colors" href={`/store/shop?category=${category.id}`} style={{ color: textColor }}>
+                      {category.name}
+                    </Link>
+                  </li>
+                ))
+              )}
+            </ul>
+          </div>
+          {/* Support Links */}
+          <div>
+            <h4 className="font-bold text-sm uppercase tracking-widest mb-6" style={{ color: 'inherit', opacity: 0.9 }}>Support</h4>
+            <ul className="space-y-4 text-sm">
+              <li><Link className="hover:opacity-80 transition-colors" href="/store/logistics" style={{ color: textColor }}>Logistics & Shipping</Link></li>
+              <li><Link className="hover:opacity-80 transition-colors" href="/store/logistics" style={{ color: textColor }}>Returns Policy</Link></li>
+              {isLoadingPages ? (
+                <>
+                   <li className="mt-4"><Skeleton className="h-4 w-2/3 opacity-20" /></li>
+                </>
+              ) : (
+                supportPages.map(page => (
+                  <li key={page.id}><Link className="hover:opacity-80 transition-colors" href={`/store/pages/${page.slug}`} style={{ color: textColor }}>{page.title}</Link></li>
+                ))
+              )}
+            </ul>
+          </div>
+          {/* Company Links */}
+          <div>
+            <h4 className="font-bold text-sm uppercase tracking-widest mb-6" style={{ color: 'inherit', opacity: 0.9 }}>Company</h4>
+            <ul className="space-y-4 text-sm">
+               {isLoadingPages ? (
+                <>
+                   <li className="mt-4"><Skeleton className="h-4 w-2/3 opacity-20" /></li>
+                </>
+              ) : (
+                companyPages.map(page => (
+                  <li key={page.id}><Link className="hover:opacity-80 transition-colors" href={`/store/pages/${page.slug}`} style={{ color: textColor }}>{page.title}</Link></li>
+                ))
+              )}
+            </ul>
+          </div>
+        </div>
+        <div className="pt-8 flex flex-col md:flex-row justify-between items-center border-t" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
+          <p className="text-xs mb-4 md:mb-0" style={{ color: textColor, opacity: 0.6 }}>© {new Date().getFullYear()} {storeName}. All rights reserved.</p>
+          <div className="flex items-center gap-4">
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}

@@ -1,0 +1,68 @@
+/* This file contains styles for both thermal receipts (max-width: 80mm) and A4 invoices. */
+
+/* A4 Invoice Print Styles */
+@media print {
+    body { font-family: 'Lato', sans-serif; font-size: 10pt; color: #333; line-height: 1.5; }
+    @page { size: A4; margin: 20mm; }
+    .invoice-container { max-width: 190mm; margin: auto; padding: 0; border: none; box-shadow: none; position: relative; }
+    .invoice-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 2px solid #eee; }
+    .invoice-header-left { flex-grow: 1; }
+    .invoice-header img { max-height: 80px; max-width: 180px; object-fit: contain; margin-bottom: 12px; }
+    .invoice-header h1 { font-family: 'Montserrat', sans-serif; font-size: 26pt; margin: 0; color: #222; font-weight: 700; }
+    .invoice-header p { margin: 2px 0; font-size: 9.5pt; color: #555; }
+    .invoice-title-main { font-family: 'Montserrat', sans-serif; font-size: 24pt; font-weight: 900; text-align: right; margin-left: 20px; line-height: 1.2; display: block; color: #1A73E8; }
+    
+    .invoice-meta-container { display: flex; justify-content: space-between; margin-bottom: 30px; }
+    .invoice-meta-table { width: 48%; border-collapse: collapse; font-size: 10pt; }
+    .invoice-meta-table td { padding: 4px 0; }
+    .invoice-meta-table .meta-label { font-weight: 700; color: #555; width: 120px; padding-right: 10px; }
+    .invoice-meta-table .meta-value { font-weight: 600; color: #333; }
+
+    .invoice-summary-container { display: flex; justify-content: flex-end; margin-top: 20px; }
+    .invoice-summary { width: 50%; }
+    .invoice-summary-table { width: 100%; border-collapse: collapse; }
+    .invoice-summary-table td { padding: 6px 0; }
+    .invoice-summary-table td:first-child { text-align: right; font-weight: 700; color: #555; padding-right: 20px; }
+    .invoice-summary-table td:last-child { text-align: right; font-weight: 600; font-family: 'Space Mono', monospace; width: 150px; }
+    .invoice-summary-table .grand-total td { font-size: 1.25em; font-weight: 700; color: #222; border-top: 2px solid #bbb; padding-top: 10px; }
+
+    .invoice-items-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; font-size: 9.5pt; }
+    .invoice-items-table th, .invoice-items-table td { border-bottom: 1px solid #eee; padding: 12px 5px; text-align: left; }
+    .invoice-items-table th { background-color: #f9f9f9; font-weight: 700; color: #555; text-transform: uppercase; font-size: 8.5pt;}
+    .invoice-items-table td:nth-child(2), .invoice-items-table td:nth-child(3), .invoice-items-table td:nth-child(4) { text-align: right; font-family: 'Space Mono', monospace; }
+    .invoice-notes { margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee; font-size: 9pt; }
+    .invoice-footer { text-align: center; margin-top: 50px; padding-top: 10px; border-top: 1px solid #eee; font-size: 9pt; color: #777; }
+    
+}
+
+/* Small Receipt Print Styles (80mm) */
+@media print {
+    @page { size: 76mm auto; margin: 4mm 2mm; }
+    body.receipt { width: 72mm; margin: 0; font-family: 'Space Mono', monospace; font-size: 8.5pt; color: #000; line-height: 1.4; }
+    .receipt-container { width: 100%; padding: 0; }
+    .receipt-header { text-align: center; margin-bottom: 10px; }
+    .receipt-header img { max-height: 30px; max-width: 80%; margin: 0 auto 5px auto; display: block; object-fit: contain; }
+    .receipt-header h2 { font-size: 10.5pt; margin: 0 0 1px 0; text-transform: uppercase; }
+    .receipt-header p { margin: 0; font-size: 7.5pt; }
+    .receipt-title { font-size: 9.5pt; font-weight: bold; text-align: center; margin: 10px 0; border-top: 1px dashed #999; border-bottom: 1px dashed #999; padding: 4px 0;}
+    .section-title { font-weight: bold; margin-top: 10px; margin-bottom: 4px; border-bottom: 1px dashed #999; text-align: center; padding-bottom: 2px; font-size: 8pt; text-transform: uppercase;}
+    .info-table { width: 100%; font-size: 7.5pt; }
+    .info-table td { padding: 1px 0; }
+    .info-table td:first-child { text-align: left; padding-right: 5px; }
+    .info-table td:last-child { text-align: right; font-weight: bold; }
+    .items-table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 8pt; }
+    .items-table th { border-bottom: 1px solid #555; font-weight: bold; text-align: left; padding-bottom: 3px; }
+    .items-table td { border-bottom: 1px dashed #ccc; padding: 4px 0; vertical-align: top; }
+    .items-table .item-name { width: 48%; padding-right: 3px; word-break: break-word; }
+    .items-table .qty { text-align: center; width: 12%; }
+    .items-table .price { text-align: right; width: 20%; padding-left: 3px;}
+    .items-table .total { text-align: right; width: 20%; padding-left: 3px; font-weight: bold;}
+    .summary-table { width: 100%; margin-top: 8px; font-size: 8.5pt; }
+    .summary-table td { padding: 1px 0; }
+    .summary-table td:first-child { text-align: left; padding-right: 10px; }
+    .summary-table td:last-child { text-align: right; font-weight: bold; }
+    .summary-table .grand-total td { font-size: 10.5pt; font-weight: bold; border-top: 1px solid #555; padding-top: 5px; margin-top: 5px; }
+    .return-section { margin-top: 10px; padding-top: 5px; border-top: 1px dashed #999; }
+    .receipt-footer { margin-top: 15px; padding-top: 8px; border-top: 1px solid #555; text-align: center; font-size: 7pt; color: #333; }
+    .barcode { font-family: 'Libre Barcode 128', cursive; font-size: 28px; line-height: 1; margin: 5px 0; }
+}

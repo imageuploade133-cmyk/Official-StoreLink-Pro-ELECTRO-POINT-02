@@ -1,0 +1,261 @@
+
+'use client';
+
+import Image from "next/image"
+import Link from "next/link";
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { ElysiumLogo } from "@/components/icons";
+import { useState, useEffect } from "react";
+import { Loader2, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import placeholderImages from '@/lib/placeholder-images.json';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { useAuth, useUser } from "@/firebase";
+import { useRouter } from "next/navigation";
+import { signInWithEmailAndPassword, sendPasswordResetEmail, AuthError } from "firebase/auth";
+import { useSettings } from "@/contexts/settings-context";
+import { Skeleton } from "@/components/ui/skeleton";
+
+export default function StoreLoginPage() {
+    const [isLoading, setIsLoading] = useState(false);
+    const { toast } = useToast();
+    const loginImagePlaceholder = placeholderImages['login-background'];
+
+    const [isResetLoading, setIsResetLoading] = useState(false);
+    const [resetError, setResetError] = useState('');
+    const [isForgotPassOpen, setIsForgotPassOpen] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+
+    const auth = useAuth();
+    const router = useRouter();
+    const { user, isLoading: isUserLoading } = useUser();
+    const { settings, isLoading: isLoadingSettings } = useSettings();
+
+    const storeName = settings?.storeName || 'Welcome';
+    const storeLogo = settings?.invoiceLogoUrl;
+    const storeDescription = settings?.footerDescription || 'The ultimate all-in-one solution for managing your e-commerce business with unparalleled efficiency and insight.';
+    const loginImage = settings?.loginImageUrl || loginImagePlaceholder.src;
+
+
+    useEffect(() => {
+        // Handle redirect reactively based on auth state
+        if (!isUserLoading && user) {
+          router.replace('/store/account');
+        }
+    }, [user, isUserLoading, router]);
+
+    const handleLogin = (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+        
+        const email = (document.getElementById('email') as HTMLInputElement).value;
+        const password = (document.getElementById('password') as HTMLInputElement).value;
+
+        signInWithEmailAndPassword(auth, email, password)
+            .then(() => {
+                toast({
+                    title: "Login Successful",
+                    description: "Redirecting to your account...",
+                });
+                // Redirection is handled by the useEffect watching the 'user' object
+            })
+            .catch((error: AuthError) => {
+                let description = "An unknown error occurred. Please try again.";
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    description = "Invalid email or password. Please try again.";
+                }
+                toast({
+                    variant: "destructive",
+                    title: "Login Failed",
+                    description: description,
+                });
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
+    }
+
+    const handlePasswordReset = (e: React.FormEvent) => {
+        e.preventDefault();
+        setResetError('');
+        setIsResetLoading(true);
+
+        const email = (document.getElementById('reset-email') as HTMLInputElement).value;
+        if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+            setResetError('Please enter a valid email address.');
+            setIsResetLoading(false);
+            return;
+        }
+
+        sendPasswordResetEmail(auth, email)
+            .then(() => {
+                toast({
+                    title: "Password Reset Link Sent",
+                    description: `If an account with that email exists, a reset link has been sent.`,
+                });
+                setIsForgotPassOpen(false);
+            })
+            .catch((error: AuthError) => {
+                setResetError(error.message);
+            })
+            .finally(() => {
+                setIsResetLoading(false);
+            });
+    }
+
+    if (isUserLoading || isLoadingSettings) {
+        return (
+            <div className="flex h-screen w-full items-center justify-center">
+                <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            </div>
+        );
+    }
+
+    if (user) {
+        return (
+            <div className="flex h-screen w-full items-center justify-center">
+                <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            </div>
+        );
+    }
+
+  return (
+    <div className="w-full min-h-screen grid lg:grid-cols-2">
+      <div className="hidden bg-muted lg:block relative">
+        <Image
+          src={loginImage}
+          alt="A beautiful storefront"
+          {...(loginImage === loginImagePlaceholder.src && { 'data-ai-hint': loginImagePlaceholder.hint })}
+          fill
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+        <div className="absolute bottom-10 left-10 text-white">
+            <h2 className="text-4xl font-bold font-headline">{storeName}</h2>
+            <p className="text-white/80 mt-2 max-w-lg">
+                {storeDescription}
+            </p>
+        </div>
+      </div>
+      <div className="flex items-center justify-center py-12">
+        <div className="mx-auto grid w-[350px] gap-6">
+          <div className="grid gap-2 text-center">
+             <div className="flex justify-center mb-4 h-10">
+                {storeLogo ? (
+                    <Image src={storeLogo} alt={storeName} width={40} height={40} className="h-10 w-auto object-contain" />
+                ) : (
+                    <ElysiumLogo className="h-10 w-10 text-primary" />
+                )}
+            </div>
+            <h1 className="text-4xl font-bold font-headline">Welcome Back</h1>
+            <p className="text-balance text-muted-foreground">
+              Sign in to your account to view your orders and manage your profile.
+            </p>
+          </div>
+          <form onSubmit={handleLogin} className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  required
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <Label htmlFor="password">Password</Label>
+                <Dialog open={isForgotPassOpen} onOpenChange={setIsForgotPassOpen}>
+                  <DialogTrigger asChild>
+                    <button
+                        type="button"
+                        onClick={() => setResetError('')}
+                        className="ml-auto inline-block text-sm text-muted-foreground hover:underline"
+                    >
+                        Forgot your password?
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <form onSubmit={handlePasswordReset}>
+                        <DialogHeader>
+                          <DialogTitle>Reset Password</DialogTitle>
+                          <DialogDescription>
+                            Enter your email and we'll send a link to get back into your account.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="reset-email">Email</Label>
+                                <div className="relative">
+                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        id="reset-email"
+                                        type="email"
+                                        placeholder="name@example.com"
+                                        required
+                                        className="pl-10"
+                                    />
+                                </div>
+                            </div>
+                            {resetError && <p className="text-sm font-medium text-destructive">{resetError}</p>}
+                        </div>
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setIsForgotPassOpen(false)}>
+                                Cancel
+                            </Button>
+                            <Button type="submit" disabled={isResetLoading}>
+                                {isResetLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Send reset link
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input id="password" type={showPassword ? "text" : "password"} required placeholder="Password" className="pl-10 pr-10" />
+                <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                    {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                    ) : (
+                        <Eye className="h-4 w-4" />
+                    )}
+                </button>
+              </div>
+            </div>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Login
+            </Button>
+            <div className="text-center text-sm">
+                Don&apos;t have an account?{" "}
+                <Link href="/store/signup" className="underline text-primary">
+                    Sign up
+                </Link>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  )
+}

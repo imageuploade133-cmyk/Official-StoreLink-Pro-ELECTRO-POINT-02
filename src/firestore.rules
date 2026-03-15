@@ -1,0 +1,191 @@
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isStaff() {
+      return isSignedIn() && exists(/databases/$(database)/documents/staff/$(request.auth.uid));
+    }
+
+    function isCustomer() {
+      return isSignedIn() && exists(/databases/$(database)/documents/customers/$(request.auth.uid));
+    }
+
+    function isAdmin() {
+      // A "super admin" is an authenticated user who is neither a registered staff member nor a registered customer.
+      return isSignedIn() && !isStaff() && !isCustomer();
+    }
+
+    function getStaffRole() {
+        // Return the role of the user from the /staff collection.
+        return get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role;
+    }
+    
+    // Checks if the user is a staff member with one of the provided roles.
+    function isStaffWithOneOfRoles(roles) {
+        return isStaff() && getStaffRole() in roles;
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Rules for collections that are publicly readable
+    match /products/{doc} {
+      allow read: if true;
+      allow write: if isStaffWithOneOfRoles(['admin', 'manager', 'inventory_manager']) || isAdmin();
+    }
+
+    match /products/{productId}/voiceSignatures/{voiceId} {
+      allow read: if true;
+      allow write: if isStaffWithOneOfRoles(['admin', 'manager', 'inventory_manager']) || isAdmin();
+    }
+
+    match /products/{productId}/reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && request.auth.uid == resource.data.userId;
+    }
+
+    match /categories/{doc} {
+      allow read: if true;
+      allow write: if isStaffWithOneOfRoles(['admin', 'manager', 'inventory_manager']) || isAdmin();
+    }
+
+    match /coupons/{doc} {
+      allow read: if true;
+      allow write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+    }
+    
+    match /publicPages/{pageId} {
+      allow read: if true;
+      allow write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+    }
+
+    match /slideShows/{slideId} {
+      allow read: if true;
+      allow write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+    }
+    
+    match /homepageSections/{sectionId} {
+      allow read: if true;
+      allow write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+    }
+    
+    // Rules for settings - only super admin or staff admins
+    match /settings/{doc} {
+      allow read: if true;
+      allow write: if isAdmin() || isStaffWithOneOfRoles(['admin']);
+    }
+    
+    // Rules for user-specific data
+    match /users/{userId} {
+      allow read, write: if isOwner(userId) || isStaff() || isAdmin();
+    }
+
+    match /users/{userId}/{document=**} {
+      allow read, write: if isOwner(userId) || isStaff() || isAdmin();
+    }
+    
+    // Rules for staff and branch management
+    match /staff/{userId} {
+      allow get: if isOwner(userId) || isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+      allow list: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+      allow write: if isAdmin() || isStaffWithOneOfRoles(['admin']);
+    }
+    
+    match /branches/{doc} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin() || isStaffWithOneOfRoles(['admin']);
+    }
+    
+    // Rules for transactions and financial records
+    match /saleTransactions/{transactionId} {
+      allow get, list: if isStaff() || isAdmin();
+      allow create: if isStaff() || isAdmin(); 
+      allow update: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin(); 
+      allow delete: if isStaffWithOneOfRoles(['admin']) || isAdmin(); 
+    }
+
+    match /customers/{doc} {
+      allow read, write: if isOwner(doc) || isStaff() || isAdmin();
+    }
+    
+    match /restockEntries/{doc} {
+      allow read: if isStaff() || isAdmin();
+      allow create: if isStaff() || isAdmin();
+    }
+
+    match /heldSales/{saleId} {
+      allow read, write: if isStaff() || isAdmin();
+    }
+
+    match /creditPayments/{paymentId} {
+      allow get, list: if isStaff() || isAdmin();
+      allow create: if isStaff() || isAdmin();
+      allow write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+    }
+
+    match /customerHistory/{doc} {
+      allow read, create: if isStaff() || isAdmin();
+      allow update, delete: if false; 
+    }
+    
+    match /expenses/{expenseId} {
+      allow read: if isStaff() || isAdmin();
+      allow create: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+      allow update, delete: if isAdmin() || isStaffWithOneOfRoles(['admin']);
+    }
+
+    match /reversals/{reversalId} {
+      allow read, create: if isAdmin() || isStaffWithOneOfRoles(['admin']);
+      allow update, delete: if false;
+    }
+    
+    match /stockTransfers/{transferId} {
+        allow read: if isStaff() || isAdmin();
+        allow write: if isStaffWithOneOfRoles(['admin', 'manager', 'inventory_manager']) || isAdmin();
+    }
+
+    match /whatsappMessageLogs/{logId} {
+        allow read: if isStaff() || isAdmin();
+        allow write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+    }
+
+    match /stockAudit/{auditId} {
+      allow read: if isStaff() || isAdmin();
+      allow create: if isStaff() || isAdmin();
+      allow update, delete: if false; 
+    }
+
+    match /orders/{orderId} {
+      allow create: if true;
+      allow read: if (isSignedIn() && (request.auth.uid == resource.data.userId)) || isStaff() || isAdmin();
+      allow update, delete: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+    }
+
+    match /orderAudit/{auditId} {
+      allow read: if isStaff() || isAdmin();
+      allow create: if isStaff() || isAdmin();
+      allow update, delete: if false;
+    }
+
+    match /invoices/{invoiceId} {
+      allow read, write: if isStaff() || isAdmin();
+    }
+
+    match /analytics/websiteTraffic {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,431 @@
+
+'use client';
+
+import Link from 'next/link';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  Menu,
+  Settings,
+  LayoutDashboard,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  Package,
+  FolderTree,
+  Users,
+  Shield,
+  Printer,
+  ShoppingCart,
+  AlertTriangle,
+  BarChart3,
+  TrendingUp,
+  List,
+  Undo2,
+  Receipt,
+  Globe,
+  MessageSquare,
+  UserCircle,
+  FilePlus,
+  BookCopy,
+  GalleryHorizontal,
+  Columns,
+  ListChecks,
+  History,
+  Landmark,
+  ShoppingBag,
+  UsersRound,
+  BellRing,
+  Truck,
+  Sparkles,
+  PackagePlus,
+  LayoutGrid,
+  MousePointerClick,
+  Ticket,
+  Wallet,
+  Activity,
+  Zap,
+  Volume2,
+  ClipboardList,
+  SquarePlus,
+  FileText,
+  FileCog,
+  Coins
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetTrigger,
+} from '@/components/ui/sheet';
+import { UserNav } from '@/components/UserNav';
+import { useAuth } from '@/contexts/auth-context';
+import { useRouter, usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
+import { ElysiumLogo } from '@/components/icons';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import { useFirestore, useCollection } from '@/firebase';
+import { collection, query, where } from 'firebase/firestore';
+import type { Order } from '@/lib/types';
+import { Badge } from '@/components/ui/badge';
+
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { user, permissions, isLoading, isCustomer } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const [isMinimized, setIsMinimized] = useState(false);
+
+  const firestore = useFirestore();
+  const pendingOrdersQuery = useMemo(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'orders'), where('status', '==', 'pending'));
+  }, [firestore]);
+  const { data: pendingOrders } = useCollection<Order>(pendingOrdersQuery);
+  const pendingCount = pendingOrders?.length || 0;
+  
+  const navItems = [
+    { heading: 'Core' },
+    { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', perm: 'view_dashboard' },
+    { href: '/pos', icon: ShoppingCart, label: 'POS', perm: 'canAccessPOS' },
+    { href: '/dashboard/profile', icon: UserCircle, label: 'My Profile', perm: 'view_dashboard' }, 
+    { heading: 'Invoicing' },
+    { href: '/dashboard/invoices', icon: FileText, label: 'Manage Invoices', perm: 'manage_settings' },
+    { href: '/dashboard/invoices/generate', icon: FilePlus, label: 'Generate Invoice', perm: 'manage_settings' },
+    { href: '/dashboard/invoicing-settings', icon: FileCog, label: 'Invoicing Settings', perm: 'manage_settings' },
+    { heading: 'Reports' },
+    { href: '/dashboard/my-sales', icon: History, label: 'My Sales', perm: 'view_my_sales' },
+    { href: '/dashboard/sales-history', icon: BarChart3, label: 'Sales History', perm: 'view_sales_history' },
+    { href: '/dashboard/returns', icon: Undo2, label: 'Refunds', perm: 'canProcessReturns' },
+    { href: '/dashboard/product-sales', icon: TrendingUp, label: 'Product Sales', perm: 'canViewProductSales' },
+    { href: '/dashboard/expenses', icon: Receipt, label: 'Expense Management', perm: 'canManageExpenses' },
+    { heading: 'Financials' },
+    { href: '/dashboard/flexible-payments', icon: Wallet, label: 'Pay Small Small', perm: 'manage_flexible_payments' },
+    { heading: 'E-Commerce' },
+    { href: '/dashboard/orders', icon: ShoppingBag, label: 'Website Orders', perm: 'manage_orders' },
+    { href: '/dashboard/order-alerts', icon: BellRing, label: 'Order Alerts', perm: 'manage_settings' },
+    { href: '/dashboard/online-customers', icon: UsersRound, label: 'Online Customers', perm: 'view_online_customers' },
+    { heading: 'Inventory' },
+    { href: '/dashboard/inventory', icon: Package, label: 'Inventory', perm: 'view_inventory' },
+    { href: '/dashboard/categories', icon: FolderTree, label: 'Categories', perm: 'view_categories' },
+    { href: '/dashboard/stock-audit', icon: ClipboardList, label: 'Stock Audit Log', perm: 'view_stock_audit' },
+    { href: '/dashboard/stock-alerts', icon: AlertTriangle, label: 'View Stock Alerts', perm: 'view_stock_alerts' },
+    { href: '/dashboard/restock-history', icon: ListChecks, label: 'Restock History', perm: 'transfer_stock' },
+    { href: '/dashboard/print-barcodes', icon: Printer, label: 'Print Barcodes', perm: 'canPrintBarcodes' },
+    { href: '/dashboard/bulk-add-products', icon: List, label: 'Bulk Import', perm: 'canBulkAddProducts' },
+    { heading: 'Management' },
+    { href: '/dashboard/customers', icon: Users, label: 'Customers', perm: 'canViewCustomers' },
+    { href: '/dashboard/staff', icon: Users, label: 'Staff', perm: 'manage_staff' },
+    { heading: 'Marketing' },
+    { href: '/dashboard/welcome-credit-settings', icon: Coins, label: 'Welcome Bonus', perm: 'manage_settings' },
+    { href: '/dashboard/whatsapp', icon: MessageSquare, label: 'WhatsApp', perm: 'canSendMarketingWhatsapp' },
+    { heading: 'Website' },
+    { href: '/dashboard/flash-hub-manager', icon: Zap, label: 'Flash Hub Manager', perm: 'manage_website_content' },
+    { href: '/dashboard/category-gallery-settings', icon: LayoutGrid, label: 'Category Section Settings', perm: 'manage_settings' },
+    { href: '/dashboard/voice-settings', icon: Volume2, label: 'Voice Experience Settings', perm: 'manage_settings' },
+    { href: '/dashboard/add-store-product', icon: PackagePlus, label: 'Add Store Product', perm: 'manage_website_content' },
+    { href: '/dashboard/manage-web-catalog', icon: LayoutGrid, label: 'Manage Web Catalog', perm: 'manage_website_content' },
+    { href: '/dashboard/manage-coupons', icon: Ticket, label: 'Promo Codes', perm: 'manage_coupons' },
+    { href: '/dashboard/stock-bar-settings', icon: Activity, label: 'Stock Bar Settings', perm: 'manage_settings' },
+    { href: '/dashboard/public-web-settings', icon: Globe, label: 'General Web Settings', perm: 'manage_settings' },
+    { href: '/dashboard/shopping-experience-settings', icon: MousePointerClick, label: 'Shopping Buttons', perm: 'manage_settings' },
+    { href: '/dashboard/website-payment', icon: Landmark, label: 'Website Payment Method', perm: 'manage_settings' },
+    { href: '/dashboard/logistics-settings', icon: Truck, label: 'Logistics Settings', perm: 'manage_settings' },
+    { href: '/dashboard/recommendations-settings', icon: Sparkles, label: 'Product Recommendations', perm: 'manage_settings' },
+    { href: '/dashboard/create-web-page', icon: FilePlus, label: 'Create Web Page', perm: 'manage_website_content' },
+    { href: '/dashboard/manage-web-pages', icon: BookCopy, label: 'Manage Web Pages', perm: 'manage_website_content' },
+    { href: '/dashboard/web-slide-show', icon: GalleryHorizontal, label: 'Web Slide Show', perm: 'manage_website_content' },
+    { href: '/dashboard/homepage-sections', icon: Columns, label: 'Homepage Sections', perm: 'manage_website_content' },
+    { href: '/dashboard/add-ui-section', icon: SquarePlus, label: 'Add UI Section', perm: 'manage_website_content' },
+    { heading: 'Administration' },
+    { href: '/dashboard/settings', icon: Settings, label: 'Settings', perm: 'manage_settings' },
+    { href: '/dashboard/permissions', icon: Shield, label: 'Permissions', perm: 'view_permissions' },
+  ];
+
+  const permissibleLinks = useMemo(() => {
+    return navItems.filter(item => {
+      if (item.heading) return false;
+      if (item.href === '/dashboard/profile') return !!user;
+      return !!permissions[item.perm as keyof typeof permissions];
+    });
+  }, [permissions, user]);
+
+  const showSidebar = useMemo(() => permissibleLinks.length > 1, [permissibleLinks]);
+
+  const visibleNavItems = useMemo(() => {
+    if (!showSidebar) return [];
+    
+    const finalNavItems: (typeof navItems[0])[] = [];
+
+    navItems.forEach((item, index) => {
+      if (item.heading) {
+        const nextHeadingIndex = navItems.findIndex((nextItem, nextIndex) => nextIndex > index && nextItem.heading);
+        const sectionItems = navItems.slice(index + 1, nextHeadingIndex === -1 ? navItems.length : nextHeadingIndex);
+        
+        const hasVisibleLinkInSection = sectionItems.some(sectionItem => 
+          permissibleLinks.some(permissibleLink => permissibleLink.href === sectionItem.href)
+        );
+
+        if (hasVisibleLinkInSection) {
+          finalNavItems.push(item);
+        }
+      } else {
+        if (permissibleLinks.some(permissibleLink => permissibleLink.href === item.href)) {
+          finalNavItems.push(item);
+        }
+      }
+    });
+
+    return finalNavItems;
+  }, [permissions, user, showSidebar, permissibleLinks]);
+
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (!user) {
+        router.replace('/login');
+      } else if (isCustomer) {
+        // Explicitly block customers from the dashboard
+        router.replace('/store');
+      }
+    }
+  }, [user, isLoading, isCustomer, router]);
+
+  if (isLoading || !user || isCustomer) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={cn(
+        'grid h-screen w-full overflow-hidden',
+        showSidebar && 'transition-[grid-template-columns] duration-300 ease-in-out',
+        showSidebar && (isMinimized
+          ? 'md:grid-cols-[80px_1fr]'
+          : 'md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]'),
+        !showSidebar && 'grid-cols-1'
+      )}
+    >
+      {/* Sidebar */}
+      {showSidebar && (
+        <aside className="hidden border-r bg-muted/40 md:flex md:flex-col overflow-hidden">
+          <div
+            className={cn(
+              'flex h-14 shrink-0 items-center border-b lg:h-[60px]',
+              isMinimized ? 'justify-center px-2' : 'px-4 lg:px-6'
+            )}
+          >
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-2 text-lg font-semibold"
+            >
+              <ElysiumLogo className="h-6 w-6" />
+              <span className={cn(isMinimized && 'sr-only')}>
+                StoreLink-Pro
+              </span>
+            </Link>
+          </div>
+
+          <ScrollArea className="flex-1">
+            <TooltipProvider delayDuration={0}>
+              <nav
+                className={cn(
+                  'grid items-start gap-1 py-4 text-sm font-medium',
+                  isMinimized ? 'justify-center px-2' : 'px-4'
+                )}
+              >
+                {visibleNavItems.map((item, index) => {
+
+                  if (item.heading) {
+                    return (<React.Fragment key={`heading-${index}`}>
+                        {index > 0 && <Separator className={cn('my-2', isMinimized && 'mx-auto w-3/4')} />}
+                        {!isMinimized && (
+                          <h4 className="px-3 py-2 text-xs font-semibold uppercase text-muted-foreground tracking-wider">
+                            {item.heading}
+                          </h4>
+                        )}
+                      </React.Fragment>);
+                  }
+                  
+                  const isOrdersLink = item.href === '/dashboard/orders';
+                  const showBadge = isOrdersLink && pendingCount > 0;
+
+                  if (isMinimized) {
+                    return (
+                      <Tooltip key={item.href}>
+                        <TooltipTrigger asChild>
+                          <Link
+                            href={item.href!}
+                            className={cn(
+                              'relative flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-primary',
+                              (pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href!))) ? 'bg-muted text-primary' : ''
+                            )}
+                          >
+                            <item.icon className="h-5 w-5" />
+                            {showBadge && (
+                              <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-3 w-3 bg-destructive"></span>
+                              </span>
+                            )}
+                            <span className="sr-only">{item.label}</span>
+                          </Link>
+                        </TooltipTrigger>
+                        <TooltipContent side="right">
+                          {item.label} {showBadge && `(${pendingCount} pending)`}
+                        </TooltipContent>
+                      </Tooltip>
+                    );
+                  }
+
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href!}
+                      className={cn(
+                        'flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:bg-muted hover:text-primary',
+                        (pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href!))) ? 'bg-muted text-primary' : ''
+                      )}
+                    >
+                      <item.icon className="h-4 w-4" />
+                      {item.label}
+                      {showBadge && (
+                        <Badge 
+                          variant="destructive" 
+                          className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full px-0 text-[10px] animate-pulse"
+                        >
+                          {pendingCount}
+                        </Badge>
+                      )}
+                    </Link>
+                  );
+                })}
+              </nav>
+            </TooltipProvider>
+          </ScrollArea>
+        </aside>
+      )}
+
+      {/* Content Area */}
+      <div className="flex flex-col overflow-hidden">
+        {/* Header */}
+        <header className="flex h-14 shrink-0 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
+          {showSidebar && (
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="shrink-0 md:hidden"
+                >
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Open navigation menu</span>
+                </Button>
+              </SheetTrigger>
+
+              <SheetContent side="left" className="flex flex-col p-0">
+                <SheetHeader>
+                  <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                  <SheetDescription className="sr-only">
+                    A list of links to navigate to different parts of the application.
+                  </SheetDescription>
+                </SheetHeader>
+                <div className="flex h-14 items-center border-b px-6">
+                  <Link
+                    href="/dashboard"
+                    className="flex items-center gap-2 text-lg font-semibold"
+                  >
+                    <ElysiumLogo className="h-6 w-6" />
+                    <span>StoreLink-Pro</span>
+                  </Link>
+                </div>
+
+                <ScrollArea className="flex-1">
+                  <nav className="grid gap-2 p-6 text-lg font-medium">
+                    {visibleNavItems.map((item, index) => {
+                      if (item.heading) {
+                          return (<React.Fragment key={`mobile-heading-${index}`}>
+                            {index > 0 && <Separator className="my-4" />}
+                            <h4 className="px-3 text-sm font-semibold uppercase text-muted-foreground tracking-wider">
+                              {item.heading}
+                            </h4>
+                          </React.Fragment>);
+                        }
+                        
+                        const isOrdersLink = item.href === '/dashboard/orders';
+                        const showBadge = isOrdersLink && pendingCount > 0;
+
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href!}
+                            className={cn(
+                              'flex items-center justify-between gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:bg-muted hover:text-foreground',
+                              (pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href!))) ? 'bg-muted text-foreground' : ''
+                            )}
+                          >
+                            <div className="flex items-center gap-4">
+                              <item.icon className="h-5 w-5" />
+                              {item.label}
+                            </div>
+                            {showBadge && (
+                              <Badge 
+                                variant="destructive" 
+                                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full px-0 text-xs animate-pulse"
+                              >
+                                {pendingCount}
+                              </Badge>
+                            )}
+                          </Link>
+                        );
+                    })}
+                  </nav>
+                </ScrollArea>
+              </SheetContent>
+            </Sheet>
+          )}
+
+          {showSidebar && (
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => setIsMinimized(!isMinimized)}
+              className="hidden md:flex"
+            >
+              {isMinimized ? (
+                <ChevronRight className="h-5 w-5" />
+              ) : (
+                <ChevronLeft className="h-5 w-5" />
+              )}
+            </Button>
+          )}
+
+          <div className="flex-1" />
+          <UserNav />
+        </header>
+
+        {/* Main Content (ONLY SCROLL HERE) */}
+        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}
