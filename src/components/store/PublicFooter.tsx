@@ -25,6 +25,8 @@ export function PublicFooter() {
   const footerDescription = settings?.footerDescription || '';
   const footerLogoWidth = settings?.footerLogoWidth || 100;
   const logoContainerHeight = Math.max(24, (footerLogoWidth || 100) / 3.5);
+  const showPublicStoreName = settings?.showPublicStoreName ?? true;
+  const showMainSiteLogo = settings?.showMainSiteLogo ?? true;
 
   const categoriesQuery = useMemo(() => {
     if (!firestore) return null;
@@ -103,7 +105,7 @@ export function PublicFooter() {
           {/* Company Info */}
           <div className="col-span-1">
             <Link href="/store" className="flex items-center gap-3 text-lg font-semibold mb-6">
-              {logoUrl ? (
+              {showMainSiteLogo && logoUrl ? (
                  <div style={{ width: `${footerLogoWidth}px`, height: `${logoContainerHeight}px` }} className="relative">
                     <Image 
                         src={logoUrl} 
@@ -114,10 +116,12 @@ export function PublicFooter() {
                         unoptimized
                     />
                 </div>
-              ) : (
+              ) : showMainSiteLogo ? (
                 <ElysiumLogo className="h-6 w-6" style={{ color: textColor }} />
+              ) : null}
+              {showPublicStoreName && (
+                <span className={'font-extrabold tracking-tighter text-2xl'} style={{ color: 'inherit' }}>{storeName}</span>
               )}
-              <span className={'font-extrabold tracking-tighter text-2xl'} style={{ color: 'inherit' }}>{storeName}</span>
             </Link>
             {showFooterDescription && footerDescription && <p className="text-sm mb-6" style={{ color: textColor }}>{footerDescription}</p>}
             
@@ -217,7 +221,7 @@ export function PublicFooter() {
           </div>
         </div>
         <div className="pt-8 flex flex-col md:flex-row justify-between items-center border-t" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
-          <p className="text-xs mb-4 md:mb-0" style={{ color: textColor, opacity: 0.6 }}>© {new Date().getFullYear()} {storeName}. All rights reserved.</p>
+          <p className="text-xs mb-4 md:mb-0" style={{ color: textColor, opacity: 0.6 }}>© {new Date().getFullYear()} {showPublicStoreName ? `${storeName}. All rights reserved.` : 'All rights reserved.'}</p>
           <div className="flex items-center gap-4">
           </div>
         </div>
