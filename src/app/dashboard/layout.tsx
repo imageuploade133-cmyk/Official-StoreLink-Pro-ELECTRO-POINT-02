@@ -215,7 +215,7 @@ export default function DashboardLayout({
   return (
     <div
       className={cn(
-        'grid h-screen w-full overflow-hidden',
+        'grid h-[100dvh] w-full overflow-hidden',
         showSidebar && 'transition-[grid-template-columns] duration-300 ease-in-out',
         showSidebar && (isMinimized
           ? 'md:grid-cols-[80px_1fr]'
@@ -422,9 +422,11 @@ export default function DashboardLayout({
         </header>
 
         {/* Main Content (ONLY SCROLL HERE) */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-          {children}
-        </main>
+        <ScrollArea className="flex-1 h-full" viewportProps={{ style: { scrollBehavior: 'smooth' } }}>
+          <main className="p-4 lg:p-6 pb-20">
+            {children}
+          </main>
+        </ScrollArea>
       </div>
     </div>
   );
