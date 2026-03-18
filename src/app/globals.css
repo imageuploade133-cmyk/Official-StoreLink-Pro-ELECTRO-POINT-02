@@ -83,9 +83,15 @@
   * {
     @apply border-border;
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary) / 0.2) transparent;
+    scrollbar-gutter: stable;
   }
 }
 
@@ -101,8 +107,8 @@
 
   /* Custom Scrollbar Styles */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 10px;
+    height: 10px;
   }
 
   ::-webkit-scrollbar-track {
@@ -110,13 +116,15 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: hsl(var(--primary) / 0.3);
-    border-radius: 10px;
+    background-color: hsl(var(--primary) / 0.15);
+    border-radius: 20px;
+    border: 3px solid transparent;
+    background-clip: content-box;
     transition: background-color 0.3s;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background-color: hsl(var(--primary) / 0.5);
+    background-color: hsl(var(--primary) / 0.3);
   }
 
   /* Border Glow Animation */
