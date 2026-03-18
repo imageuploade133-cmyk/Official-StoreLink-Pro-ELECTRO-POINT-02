@@ -161,6 +161,17 @@ export function PublicNavbar() {
         };
     }, [scrolled]);
 
+    // Prevent body scroll when search is focused
+    useEffect(() => {
+        if (isSearchFocused) {
+            const originalStyle = window.getComputedStyle(document.body).overflow;
+            document.body.style.overflow = 'hidden';
+            return () => {
+                document.body.style.overflow = originalStyle;
+            };
+        }
+    }, [isSearchFocused]);
+
     const storeName = settings?.storeName || 'StoreLink-Pro';
     const logoUrl = settings?.invoiceLogoUrl;
     const storeLogoWidth = settings?.storeLogoWidth || 120;
