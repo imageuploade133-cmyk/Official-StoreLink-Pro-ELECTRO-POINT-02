@@ -168,9 +168,11 @@ export function PublicNavbar() {
     const showPublicStoreName = settings?.showPublicStoreName ?? true;
     const showMainSiteLogo = settings?.showMainSiteLogo ?? true;
     
-    const logoContainerHeight = Math.max(40, (storeLogoWidth || 120) * (40 / 120));
-    const navbarPadding = Math.max(28, Math.round(Math.max(logoContainerHeight, storeNameFontSize) * 0.7));
-    const navbarHeight = Math.max(logoContainerHeight, storeNameFontSize) + navbarPadding;
+    // Proportional scaling: Logo height is ~33% of width (typical logo aspect ratio)
+    // Navbar padding scales with logo height to maintain visual balance
+    const logoContainerHeight = Math.max(32, Math.round(storeLogoWidth * 0.33));
+    const navbarPadding = Math.max(16, Math.round(logoContainerHeight * 0.5));
+    const navbarHeight = logoContainerHeight + (navbarPadding * 2);
 
     const handleNavbarSearch = (e: React.FormEvent) => {
         e.preventDefault();

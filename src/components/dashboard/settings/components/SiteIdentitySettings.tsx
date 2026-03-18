@@ -16,9 +16,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, Building, Upload } from 'lucide-react';
+import { Loader2, Building, Upload, MonitorUp, ArrowUpDown, Ruler } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 
 const siteIdentitySchema = z.object({
@@ -212,29 +215,97 @@ export function SiteIdentitySettings({ settingsData, isLoading }: SiteIdentitySe
                   )}
                 />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Logo Size Settings with Live Preview */}
+            <div className="rounded-xl border bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-4">
                 <FormField
-                control={form.control}
-                name="storeLogoWidth"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Header Logo Display Width ({field.value || 120}px)</FormLabel>
-                    <FormControl>
-                        <Input
-                        type="number"
-                        placeholder="e.g., 120"
-                        min="20"
-                        {...field}
-                        value={field.value ?? ''}
-                        onChange={(e) => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
-                        disabled={isSaving || !!uploadingField}
-                        />
-                    </FormControl>
-                    <FormDescription>Controls the width of the main logo in the public website header.</FormDescription>
-                    <FormMessage />
-                    </FormItem>
-                )}
+                    control={form.control}
+                    name="storeLogoWidth"
+                    render={({ field }) => {
+                        const logoWidth = field.value || 120;
+                        // Calculate proportional navbar height based on logo width
+                        const logoHeight = Math.max(32, Math.round(logoWidth * 0.33));
+                        const navbarPadding = Math.max(16, Math.round(logoHeight * 0.5));
+                        const navbarHeight = logoHeight + (navbarPadding * 2);
+                        
+                        return (
+                        <FormItem className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <MonitorUp className="h-4 w-4 text-primary" />
+                                    <FormLabel className="font-bold">Header Logo Size</FormLabel>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Badge variant="outline" className="font-mono cursor-help">{logoWidth}px</Badge>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Current logo width</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
+                                <span className="text-[10px] text-muted-foreground">
+                                    Header Height: ~{navbarHeight}px
+                                </span>
+                            </div>
+                            
+                            {/* Live Preview */}
+                            <div className="bg-white dark:bg-slate-950 rounded-lg border-2 border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center transition-all duration-300 overflow-hidden"
+                                style={{ height: `${Math.min(navbarHeight, 120)}px` }}
+                            >
+                                {form.watch('invoiceLogoUrl') ? (
+                                    <div 
+                                        className="relative transition-all duration-300"
+                                        style={{ width: `${Math.min(logoWidth, 200)}px`, height: `${Math.min(logoHeight, 80)}px` }}
+                                    >
+                                        <Image
+                                            src={form.watch('invoiceLogoUrl')}
+                                            alt="Logo Preview"
+                                            fill
+                                            className="object-contain"
+                                            unoptimized
+                                        />
+                                    </div>
+                                ) : (
+                                    <div 
+                                        className="bg-primary/10 rounded flex items-center justify-center transition-all duration-300"
+                                        style={{ width: `${Math.min(logoWidth, 200)}px`, height: `${Math.min(logoHeight, 80)}px` }}
+                                    >
+                                        <span className="text-[10px] font-bold text-primary">{logoWidth}px</span>
+                                    </div>
+                                )}
+                            </div>
+
+                            <FormControl>
+                                <Slider
+                                    value={[logoWidth]}
+                                    onValueChange={(value) => field.onChange(value[0])}
+                                    min={40}
+                                    max={250}
+                                    step={5}
+                                    disabled={isSaving || !!uploadingField}
+                                    className="py-2"
+                                />
+                            </FormControl>
+                            <div className="flex justify-between text-[10px] text-muted-foreground px-1">
+                                <span>40px</span>
+                                <span className="flex items-center gap-1 text-primary">
+                                    <ArrowUpDown className="h-3 w-3" />
+                                    Auto-scales with header height
+                                </span>
+                                <span>250px</span>
+                            </div>
+                            <FormDescription className="text-xs">
+                                Adjust your store logo size. The header top bar automatically scales proportionally to maintain visual balance.
+                            </FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                        );
+                    }}
                 />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                 control={form.control}
                 name="footerLogoWidth"

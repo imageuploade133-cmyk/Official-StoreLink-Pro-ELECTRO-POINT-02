@@ -16,12 +16,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, Building, Upload, Maximize } from 'lucide-react';
+import { Loader2, Building, Upload, Maximize, MonitorUp, ArrowUpDown, Ruler } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 
 const siteIdentitySchema = z.object({
@@ -187,27 +188,96 @@ export function SiteIdentitySettings({ settingsData, isLoading }: SiteIdentitySe
                 <FormField
                     control={form.control}
                     name="storeLogoWidth"
-                    render={({ field }) => (
-                    <FormItem className="space-y-4">
-                        <div className="flex justify-between items-center">
-                            <FormLabel className="font-bold">Header Logo Width</FormLabel>
-                            <Badge variant="outline" className="font-mono">{field.value || 120}px</Badge>
-                        </div>
-                        <FormControl>
-                        <Slider
-                            value={[field.value || 120]}
-                            onValueChange={(value) => field.onChange(value[0])}
-                            min={20}
-                            max={200}
-                            step={5}
-                            disabled={isSaving || !!uploadingField}
-                            className="py-4"
-                        />
-                        </FormControl>
-                        <FormDescription className="text-[10px]">Controls the logo dimensions in the main header.</FormDescription>
-                        <FormMessage />
-                    </FormItem>
-                    )}
+                    render={({ field }) => {
+                        const logoWidth = field.value || 120;
+                        // Calculate proportional navbar height based on logo width
+                        const logoHeight = Math.max(32, Math.round(logoWidth * 0.33));
+                        const navbarPadding = Math.max(16, Math.round(logoHeight * 0.5));
+                        const navbarHeight = logoHeight + (navbarPadding * 2);
+                        
+                        return (
+                        <FormItem className="space-y-4">
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center gap-2">
+                                    <MonitorUp className="h-4 w-4 text-primary" />
+                                    <FormLabel className="font-bold">Header Logo Width</FormLabel>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Badge variant="outline" className="font-mono cursor-help">{logoWidth}px</Badge>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Current logo width</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
+                            </div>
+                            
+                            {/* Live Preview */}
+                            <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 rounded-xl p-4 border">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                                        <Ruler className="h-3 w-3" /> Live Preview
+                                    </span>
+                                    <span className="text-[10px] text-muted-foreground">
+                                        Header Height: ~{navbarHeight}px
+                                    </span>
+                                </div>
+                                <div 
+                                    className="bg-white dark:bg-slate-950 rounded-lg border-2 border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center transition-all duration-300 overflow-hidden"
+                                    style={{ height: `${navbarHeight}px` }}
+                                >
+                                    {form.watch('invoiceLogoUrl') ? (
+                                        <div 
+                                            className="relative transition-all duration-300"
+                                            style={{ width: `${logoWidth}px`, height: `${logoHeight}px` }}
+                                        >
+                                            <Image
+                                                src={form.watch('invoiceLogoUrl')}
+                                                alt="Logo Preview"
+                                                fill
+                                                className="object-contain"
+                                                unoptimized
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div 
+                                            className="bg-primary/10 rounded flex items-center justify-center transition-all duration-300"
+                                            style={{ width: `${logoWidth}px`, height: `${logoHeight}px` }}
+                                        >
+                                            <span className="text-[10px] font-bold text-primary">{logoWidth}px</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <FormControl>
+                                <Slider
+                                    value={[logoWidth]}
+                                    onValueChange={(value) => field.onChange(value[0])}
+                                    min={40}
+                                    max={250}
+                                    step={5}
+                                    disabled={isSaving || !!uploadingField}
+                                    className="py-2"
+                                />
+                            </FormControl>
+                            <div className="flex justify-between text-[10px] text-muted-foreground px-1">
+                                <span>40px</span>
+                                <span className="flex items-center gap-1 text-primary">
+                                    <ArrowUpDown className="h-3 w-3" />
+                                    Auto-scales with header height
+                                </span>
+                                <span>250px</span>
+                            </div>
+                            <FormDescription className="text-xs">
+                                Adjust your store logo size. The header top bar automatically scales proportionally to maintain visual balance.
+                            </FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                        );
+                    }}
                 />
             </div>
 
