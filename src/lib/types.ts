@@ -254,6 +254,9 @@ export interface Settings {
   welcomePopupIconColor?: string;
   welcomePopupBgColor?: string;
   welcomePopupTextColor?: string;
+  // Logo and Store Name visibility toggles
+  showPublicStoreName?: boolean;
+  showMainSiteLogo?: boolean;
 }
 
 export type AppSettings = Settings;

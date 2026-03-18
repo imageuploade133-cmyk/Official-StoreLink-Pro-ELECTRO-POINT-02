@@ -32,6 +32,8 @@ const siteIdentitySchema = z.object({
   webMaxContainerWidth: z.coerce.number().min(1000).max(2500).default(1520),
   footerDescription: z.string().max(200, "Description is too long (max 200 chars).").optional(),
   showFooterDescription: z.boolean().optional(),
+  showPublicStoreName: z.boolean().optional(),
+  showMainSiteLogo: z.boolean().optional(),
 });
 
 type FormValues = z.infer<typeof siteIdentitySchema>;
@@ -57,6 +59,8 @@ export function SiteIdentitySettings({ settingsData, isLoading }: SiteIdentitySe
       webMaxContainerWidth: 1520,
       footerDescription: '',
       showFooterDescription: true,
+      showPublicStoreName: true,
+      showMainSiteLogo: true,
     }
   });
 
@@ -70,6 +74,8 @@ export function SiteIdentitySettings({ settingsData, isLoading }: SiteIdentitySe
         webMaxContainerWidth: settingsData.webMaxContainerWidth || 1520,
         footerDescription: settingsData.footerDescription || '',
         showFooterDescription: settingsData.showFooterDescription ?? true,
+        showPublicStoreName: settingsData.showPublicStoreName ?? true,
+        showMainSiteLogo: settingsData.showMainSiteLogo ?? true,
       });
     }
   }, [settingsData, form]);
@@ -274,6 +280,48 @@ export function SiteIdentitySettings({ settingsData, isLoading }: SiteIdentitySe
                     <FormLabel>Show Footer Description</FormLabel>
                     <FormDescription>
                       Display the short description below your logo in the site footer.
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={isSaving}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="showPublicStoreName"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/10">
+                  <div className="space-y-0.5">
+                    <FormLabel>Show Public Store Name</FormLabel>
+                    <FormDescription>
+                      Display the store name text in the public website header and footer.
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={isSaving}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="showMainSiteLogo"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/10">
+                  <div className="space-y-0.5">
+                    <FormLabel>Show Main Site Logo</FormLabel>
+                    <FormDescription>
+                      Display the main site logo in the public website header and footer.
                     </FormDescription>
                   </div>
                   <FormControl>

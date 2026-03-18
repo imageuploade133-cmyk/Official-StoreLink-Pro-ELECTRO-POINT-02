@@ -165,6 +165,8 @@ export function PublicNavbar() {
     const logoUrl = settings?.invoiceLogoUrl;
     const storeLogoWidth = settings?.storeLogoWidth || 120;
     const storeNameFontSize = settings?.storeNameFontSize || 24;
+    const showPublicStoreName = settings?.showPublicStoreName ?? true;
+    const showMainSiteLogo = settings?.showMainSiteLogo ?? true;
     
     const logoContainerHeight = Math.max(40, (storeLogoWidth || 120) * (40 / 120));
     const navbarPadding = Math.max(28, Math.round(Math.max(logoContainerHeight, storeNameFontSize) * 0.7));
@@ -181,7 +183,7 @@ export function PublicNavbar() {
 
     const Logo = () => (
       <Link href="/store" className="flex items-center gap-3 text-lg font-semibold group" onClick={() => setIsMenuOpen(false)}>
-        {logoUrl ? (
+        {showMainSiteLogo && logoUrl ? (
           <div style={{ width: `${storeLogoWidth}px`, height: `${logoContainerHeight}px` }} className="relative flex items-center">
             <Image 
                 src={logoUrl} 
@@ -192,15 +194,17 @@ export function PublicNavbar() {
                 unoptimized
             />
         </div>
-        ) : (
+        ) : showMainSiteLogo ? (
           <ElysiumLogo className="h-8 w-8 text-primary" />
+        ) : null}
+        {showPublicStoreName && (
+          <span 
+              className={'font-black tracking-tighter text-primary group-hover:opacity-80 transition-opacity'}
+              style={{ fontSize: `${storeNameFontSize}px` }}
+          >
+            {storeName}
+          </span>
         )}
-        <span 
-            className={'font-black tracking-tighter text-primary group-hover:opacity-80 transition-opacity'}
-            style={{ fontSize: `${storeNameFontSize}px` }}
-        >
-          {storeName}
-        </span>
       </Link>
     );
 
