@@ -62,9 +62,11 @@ export default function PublicLayout({
   const { settings } = useSettings();
 
   const storeLogoWidth = settings?.storeLogoWidth || 120;
-  const logoContainerHeight = Math.max(40, (storeLogoWidth || 120) * (40 / 120));
-  const navbarPadding = Math.round(logoContainerHeight * 0.6);
-  const navbarHeight = logoContainerHeight + navbarPadding;
+  // Proportional scaling: Logo height is ~33% of width (typical logo aspect ratio)
+  // Navbar padding scales with logo height to maintain visual balance
+  const logoContainerHeight = Math.max(32, Math.round(storeLogoWidth * 0.33));
+  const navbarPadding = Math.max(16, Math.round(logoContainerHeight * 0.5));
+  const navbarHeight = logoContainerHeight + (navbarPadding * 2);
 
   if (!isInitialLoadComplete) {
     return <PublicPageSkeleton />;
