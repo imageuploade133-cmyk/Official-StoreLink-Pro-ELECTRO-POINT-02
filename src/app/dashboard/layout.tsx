@@ -113,9 +113,22 @@ export default function DashboardLayout({
     }
   }, []);
 
-  // Apply zoom level to document
+  // Apply zoom level to document using CSS transform
   useEffect(() => {
-    document.documentElement.style.zoom = `${zoomLevel}%`;
+    const zoomScale = zoomLevel / 100;
+    const htmlElement = document.documentElement;
+    
+    // Apply transform for smooth scaling
+    htmlElement.style.transformOrigin = '0 0';
+    htmlElement.style.transform = `scale(${zoomScale})`;
+    
+    // Adjust width to prevent horizontal scrollbar
+    htmlElement.style.width = `${100 / zoomScale}%`;
+    htmlElement.style.height = `${100 / zoomScale}%`;
+    
+    // Adjust body overflow
+    document.body.style.overflow = 'hidden';
+    
     localStorage.setItem('dashboard-zoom', zoomLevel.toString());
   }, [zoomLevel]);
   
