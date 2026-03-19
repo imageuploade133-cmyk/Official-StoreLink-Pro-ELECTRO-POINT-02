@@ -31,6 +31,7 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${spaceGrotesk.variable} h-full`}
       suppressHydrationWarning
+      data-scroll-behavior="smooth"
     >
       <head>
         <script
