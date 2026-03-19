@@ -32,7 +32,23 @@ export default function RootLayout({
       className={`${inter.variable} ${spaceGrotesk.variable} h-full`}
       suppressHydrationWarning
     >
-      <head />
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                const savedZoom = localStorage.getItem('dashboard-zoom');
+                if (savedZoom) {
+                  const zoomLevel = parseInt(savedZoom, 10);
+                  const baseFontSize = 16;
+                  const newFontSize = (baseFontSize * zoomLevel) / 100;
+                  document.documentElement.style.fontSize = newFontSize + 'px';
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body
         className="bg-background text-foreground antialiased font-display h-full"
         suppressHydrationWarning={true}
