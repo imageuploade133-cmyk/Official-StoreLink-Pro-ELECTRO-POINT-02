@@ -72,6 +72,7 @@ import { PromoCountdown } from '@/components/store/PromoCountdown';
 import { RecentlyViewedSection } from '@/components/store/RecentlyViewedSection';
 import { ProductVideoGallery } from '@/components/store/ProductVideoGallery';
 import { StockBar } from '@/components/store/StockBar';
+import { StickyProductBar } from '@/components/store/StickyProductBar';
 
 const iconMap = {
   Truck,
@@ -533,6 +534,17 @@ export default function ProductDetailsPage() {
 
   return (
     <div className="bg-background-light dark:bg-background-dark min-h-screen">
+      {/* Sticky Product Action Bar */}
+      <StickyProductBar
+        productName={product.name}
+        productPrice={formatCurrency(effectivePrice, currencySymbol)}
+        isInWishlist={isInWishlist}
+        isOutOfStock={isOutOfStock}
+        onAddToCart={handleAddToCart}
+        onToggleWishlist={handleToggleWishlist}
+        addToCartText={addToCartText}
+      />
+      
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <nav className="flex items-center gap-2 text-sm text-slate-500 mb-8 overflow-hidden">
           <Link href="/store" className="hover:text-primary transition-colors flex-shrink-0">Home</Link>
