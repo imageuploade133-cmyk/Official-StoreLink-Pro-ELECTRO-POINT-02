@@ -105,31 +105,45 @@ export default function DashboardLayout({
   const { data: pendingOrders } = useCollection<Order>(pendingOrdersQuery);
   const pendingCount = pendingOrders?.length || 0;
 
-  // Persist zoom level to localStorage
+  // Restore zoom level from localStorage on mount
   useEffect(() => {
     const savedZoom = localStorage.getItem('dashboard-zoom');
     if (savedZoom) {
-      setZoomLevel(parseInt(savedZoom, 10));
+      const parsedZoom = parseInt(savedZoom, 10);
+      if (!isNaN(parsedZoom) && parsedZoom >= 0 && parsedZoom <= 200) {
+        setZoomLevel(parsedZoom);
+      }
     }
   }, []);
 
-  // Apply zoom level to document using CSS transform
+  // Apply zoom level to document using CSS transform with throttling
   useEffect(() => {
-    const zoomScale = zoomLevel / 100;
-    const htmlElement = document.documentElement;
+    const applyZoom = () => {
+      const zoomScale = zoomLevel / 100;
+      const htmlElement = document.documentElement;
+      
+      // Apply transform for smooth scaling
+      htmlElement.style.transformOrigin = '0 0';
+      htmlElement.style.transform = `scale(${zoomScale})`;
+      
+      // Adjust width and height to prevent scrollbars
+      const inverseScale = 100 / zoomScale;
+      htmlElement.style.width = `${inverseScale}%`;
+      htmlElement.style.height = `${inverseScale}%`;
+      
+      // Prevent overflow
+      document.body.style.overflow = 'hidden';
+      document.body.style.margin = '0';
+      document.body.style.padding = '0';
+      
+      // Persist to localStorage
+      localStorage.setItem('dashboard-zoom', zoomLevel.toString());
+    };
+
+    // Use requestAnimationFrame for smooth updates
+    const rafId = requestAnimationFrame(applyZoom);
     
-    // Apply transform for smooth scaling
-    htmlElement.style.transformOrigin = '0 0';
-    htmlElement.style.transform = `scale(${zoomScale})`;
-    
-    // Adjust width to prevent horizontal scrollbar
-    htmlElement.style.width = `${100 / zoomScale}%`;
-    htmlElement.style.height = `${100 / zoomScale}%`;
-    
-    // Adjust body overflow
-    document.body.style.overflow = 'hidden';
-    
-    localStorage.setItem('dashboard-zoom', zoomLevel.toString());
+    return () => cancelAnimationFrame(rafId);
   }, [zoomLevel]);
   
   const navItems = [

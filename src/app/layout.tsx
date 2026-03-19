@@ -32,7 +32,27 @@ export default function RootLayout({
       className={`${inter.variable} ${spaceGrotesk.variable} h-full`}
       suppressHydrationWarning
     >
-      <head />
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                const savedZoom = localStorage.getItem('dashboard-zoom');
+                if (savedZoom) {
+                  const zoomLevel = parseInt(savedZoom, 10);
+                  const zoomScale = zoomLevel / 100;
+                  const html = document.documentElement;
+                  html.style.transformOrigin = '0 0';
+                  html.style.transform = 'scale(' + zoomScale + ')';
+                  html.style.width = (100 / zoomScale) + '%';
+                  html.style.height = (100 / zoomScale) + '%';
+                  document.body.style.overflow = 'hidden';
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body
         className="bg-background text-foreground antialiased font-display h-full"
         suppressHydrationWarning={true}
