@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Heart, ShoppingCart } from 'lucide-react';
+import { Heart, ShoppingCart, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -25,23 +25,27 @@ export function StickyProductBar({
   addToCartText = 'Add to Bag'
 }: StickyProductBarProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const scrollTimeoutRef = useRef<NodeJS.Timeout>();
 
   const handleScroll = useCallback(() => {
-    // Clear previous timeout
+    const currentScrollY = window.scrollY;
+    
+    // Show bar when scrolling up (lastScrollY > currentScrollY) and we're past 400px
+    const isScrollingUp = currentScrollY < lastScrollY;
+    const shouldShow = currentScrollY > 400 && isScrollingUp;
+    
+    setIsVisible(shouldShow);
+    setLastScrollY(currentScrollY);
+
+    // Debounce to reduce updates
     if (scrollTimeoutRef.current) {
       clearTimeout(scrollTimeoutRef.current);
     }
-
-    // Show bar if scrolled more than 400px
-    const shouldShow = window.scrollY > 400;
-    setIsVisible(shouldShow);
-
-    // Debounce scroll handler to prevent excessive updates
     scrollTimeoutRef.current = setTimeout(() => {
-      // Cleanup after scroll ends
-    }, 150);
-  }, []);
+      // Small delay for smoother transitions
+    }, 100);
+  }, [lastScrollY]);
 
   useEffect(() => {
     // Use passive listener for better scroll performance
@@ -56,63 +60,60 @@ export function StickyProductBar({
   }, [handleScroll]);
 
   return (
-    <>
-      {/* Spacer to prevent layout shift */}
-      <div className={cn(
-        "h-0 transition-all duration-300",
-        isVisible && "h-20"
-      )} />
+    /* Overlay bar - no spacer needed, content scrolls under it */
+    <div className={cn(
+      "fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 transition-all duration-300 ease-out",
+      isVisible ? "translate-y-0 opacity-100 shadow-lg shadow-slate-900/10" : "translate-y-full opacity-0 pointer-events-none"
+    )}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between gap-3 sm:gap-4">
+        {/* Product Info */}
+        <div className="flex-1 min-w-0">
+          <p className="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-400 truncate uppercase tracking-wide">
+            {productName}
+          </p>
+          <p className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+            {productPrice}
+          </p>
+        </div>
 
-      {/* Sticky Bar */}
-      <div className={cn(
-        "fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 transition-all duration-300 ease-out",
-        isVisible ? "translate-y-0 opacity-100 shadow-2xl" : "translate-y-full opacity-0 pointer-events-none"
-      )}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4">
-          {/* Product Info */}
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-black text-slate-900 dark:text-white truncate">
-              {productName}
-            </p>
-            <p className="text-xl sm:text-2xl font-black text-primary tracking-tight">
-              {productPrice}
-            </p>
-          </div>
+        {/* Actions */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Wishlist Button */}
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={onToggleWishlist}
+            className={cn(
+              "h-10 w-10 rounded-full transition-all duration-300 hover:bg-slate-100 dark:hover:bg-slate-800",
+              isInWishlist ? "text-rose-500" : "text-slate-600 dark:text-slate-400"
+            )}
+          >
+            <Heart className={cn(
+              "h-5 w-5 transition-all duration-300",
+              isInWishlist && "fill-current"
+            )} />
+          </Button>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* Wishlist Button */}
-            <Button
-              size="icon"
-              variant="outline"
-              onClick={onToggleWishlist}
-              className={cn(
-                "h-11 w-11 sm:h-12 sm:w-12 rounded-full transition-all duration-300",
-                isInWishlist ? "bg-rose-50 dark:bg-rose-950 border-rose-200 dark:border-rose-800" : ""
-              )}
-            >
-              <Heart className={cn(
-                "h-5 w-5 sm:h-6 sm:w-6 transition-colors duration-300",
-                isInWishlist ? "fill-rose-500 text-rose-500" : "text-slate-600 dark:text-slate-400"
-              )} />
-            </Button>
-
-            {/* Add to Cart Button */}
-            <Button
-              onClick={onAddToCart}
-              disabled={isOutOfStock}
-              className={cn(
-                "px-4 sm:px-6 py-2 sm:py-3 rounded-full font-black text-xs sm:text-sm uppercase tracking-wider transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
-                isOutOfStock && "opacity-50 cursor-not-allowed"
-              )}
-            >
-              <ShoppingCart className="h-5 w-5" />
-              <span className="hidden sm:inline">{addToCartText}</span>
-              <span className="sm:hidden">Add</span>
-            </Button>
-          </div>
+          {/* Add to Cart Button */}
+          <Button
+            onClick={onAddToCart}
+            disabled={isOutOfStock}
+            className={cn(
+              "px-3 sm:px-5 py-2 rounded-lg font-black text-xs sm:text-sm uppercase tracking-wide transition-all duration-300 flex items-center gap-1.5 shrink-0",
+              isOutOfStock && "opacity-50 cursor-not-allowed"
+            )}
+          >
+            <ShoppingCart className="h-4 w-4" />
+            <span className="hidden sm:inline">{addToCartText}</span>
+            <span className="sm:hidden text-xs">Add</span>
+          </Button>
         </div>
       </div>
-    </>
+      
+      {/* Visual indicator */}
+      <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 flex justify-center">
+        <ChevronUp className="h-4 w-4 text-slate-400 dark:text-slate-600 animate-bounce" />
+      </div>
+    </div>
   );
 }
