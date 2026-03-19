@@ -1,0 +1,253 @@
+/* Card Container */
+.cardContainer {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cardContainer:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+}
+
+/* Media Area */
+.mediaArea {
+  position: relative;
+  transition: all 0.5s ease;
+}
+
+.productImage {
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cardContainer:hover .productImage {
+  transform: scale(1.08);
+}
+
+/* Badges with Slide Animation */
+.badgeSlide {
+  animation: slideInLeft 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+}
+
+.badgeSlide:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Discount Badge Pulse */
+.discountBadge {
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.02);
+  }
+}
+
+/* Wishlist Button Pulse */
+.wishlistPulse {
+  animation: heartPulse 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes heartPulse {
+  0% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Quick Add Bar */
+.quickAddBar {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.4) 100%);
+  backdrop-filter: blur(8px);
+}
+
+/* Cart Button with Ripple */
+.cartButton {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cartButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.cartButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.cartIcon {
+  animation: cartShake 0.3s ease-in-out;
+}
+
+.cartButton:hover .cartIcon {
+  animation: cartBounce 0.5s ease-in-out infinite;
+}
+
+@keyframes cartBounce {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-3px);
+  }
+  75% {
+    transform: translateX(3px);
+  }
+}
+
+@keyframes cartShake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-2px);
+  }
+  75% {
+    transform: translateX(2px);
+  }
+}
+
+/* Content Area */
+.contentArea {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Category Text Animation */
+.categoryText {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cardContainer:hover .categoryText {
+  color: var(--color-primary, #3b82f6);
+}
+
+/* Product Name Animation */
+.productName {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cardContainer:hover .productName {
+  color: var(--color-primary, #3b82f6);
+}
+
+/* Badge Animations */
+.badgeNew {
+  animation: slideInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+}
+
+.badgePopular {
+  animation: slideInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s backwards;
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Price Section */
+.priceSection {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.originalPrice {
+  transition: all 0.3s ease;
+}
+
+.cardContainer:hover .originalPrice {
+  opacity: 0.7;
+}
+
+/* Mobile Cart Button */
+.mobileCartButton {
+  background: linear-gradient(135deg, var(--color-primary, #3b82f6), var(--color-primary-dark, #1e40af));
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobileCartButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+}
+
+.mobileCartIcon {
+  transition: all 0.3s ease;
+}
+
+.mobileCartButton:active:not(:disabled) .mobileCartIcon {
+  animation: cartPop 0.4s ease-out;
+}
+
+@keyframes cartPop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Dark Mode Adjustments */
+@media (prefers-color-scheme: dark) {
+  .cardContainer:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  }
+
+  .quickAddBar {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.6) 100%);
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .cardContainer,
+  .mediaArea,
+  .productImage,
+  .badgeSlide,
+  .discountBadge,
+  .wishlistPulse,
+  .contentArea,
+  .cartButton,
+  .mobileCartButton {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .cardContainer:hover {
+    transform: none;
+  }
+
+  .cardContainer:hover .productImage {
+    transform: none;
+  }
+}
