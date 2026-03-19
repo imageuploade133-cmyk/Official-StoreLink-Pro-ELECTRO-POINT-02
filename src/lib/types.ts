@@ -257,6 +257,9 @@ export interface Settings {
   // Logo and Store Name visibility toggles
   showPublicStoreName?: boolean;
   showMainSiteLogo?: boolean;
+  // Product Review Settings
+  showProductReviews?: boolean;
+  showReviewRatingOnCard?: boolean;
 }
 
 export type AppSettings = Settings;

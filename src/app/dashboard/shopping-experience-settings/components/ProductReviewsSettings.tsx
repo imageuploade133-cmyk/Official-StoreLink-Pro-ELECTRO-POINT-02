@@ -1,0 +1,165 @@
+'use client';
+
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Firestore } from 'firebase/firestore';
+import { saveGlobalSettings } from '@/firebase/firestore/settings';
+import type { AppSettings } from '@/lib/types';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Loader2, Save, Star, Info } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+
+const reviewsSchema = z.object({
+  showProductReviews: z.boolean().default(true),
+  showReviewRatingOnCard: z.boolean().default(true),
+});
+
+type FormValues = z.infer<typeof reviewsSchema>;
+
+interface ProductReviewsSettingsProps {
+  settingsData: AppSettings | null;
+  firestore: Firestore;
+}
+
+export function ProductReviewsSettings({ settingsData, firestore }: ProductReviewsSettingsProps) {
+  const { toast } = useToast();
+  const [isSaving, setIsSaving] = useState(false);
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(reviewsSchema),
+    defaultValues: {
+      showProductReviews: settingsData?.showProductReviews ?? true,
+      showReviewRatingOnCard: settingsData?.showReviewRatingOnCard ?? true,
+    }
+  });
+
+  React.useEffect(() => {
+    if (settingsData) {
+      form.reset({
+        showProductReviews: settingsData.showProductReviews ?? true,
+        showReviewRatingOnCard: settingsData.showReviewRatingOnCard ?? true,
+      });
+    }
+  }, [settingsData, form]);
+
+  const onSubmit = async (data: FormValues) => {
+    if (!firestore) return;
+    setIsSaving(true);
+    try {
+      await saveGlobalSettings(firestore, data);
+      toast({ 
+        title: 'Settings Updated', 
+        description: 'Product review settings have been saved.' 
+      });
+    } catch (e) {
+      toast({ 
+        variant: 'destructive', 
+        title: 'Error', 
+        description: 'Failed to update review settings.' 
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <Card className="shadow-lg border-none ring-1 ring-border">
+      <CardHeader className="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-lg bg-yellow-100 dark:bg-yellow-900/40">
+              <Star className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+            </div>
+            <div>
+              <CardTitle className="text-lg">Product Reviews & Ratings</CardTitle>
+              <CardDescription>Display customer review ratings on your store</CardDescription>
+            </div>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className="pt-6">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* Show Product Reviews */}
+            <FormField
+              control={form.control}
+              name="showProductReviews"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border border-slate-200 dark:border-slate-800 p-4 bg-slate-50/50 dark:bg-slate-900/20">
+                  <div className="space-y-0.5 flex-1">
+                    <FormLabel className="text-base font-bold">Enable Product Reviews</FormLabel>
+                    <FormDescription className="text-sm">
+                      Allow customers to leave reviews and ratings on product pages
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      className="ml-4"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            {/* Show Rating on Card */}
+            <FormField
+              control={form.control}
+              name="showReviewRatingOnCard"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border border-slate-200 dark:border-slate-800 p-4 bg-slate-50/50 dark:bg-slate-900/20">
+                  <div className="space-y-0.5 flex-1">
+                    <FormLabel className="text-base font-bold">Show Rating on Product Cards</FormLabel>
+                    <FormDescription className="text-sm">
+                      Display average star ratings and review count on product grid cards and product listings
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      className="ml-4"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            {/* Info Box */}
+            <div className="rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/30 p-4 flex gap-3">
+              <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                <p className="font-semibold">How Product Ratings Work</p>
+                <ul className="list-disc list-inside space-y-1 text-xs opacity-90">
+                  <li>Ratings are calculated from verified customer reviews</li>
+                  <li>Star ratings build trust and increase conversion rates</li>
+                  <li>Reviews can be moderated before appearing on your site</li>
+                  <li>Higher-rated products naturally get more visibility</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-4 pt-4">
+              <Button 
+                type="submit" 
+                disabled={isSaving} 
+                size="lg" 
+                className="min-w-[200px] h-12 text-base font-bold shadow-lg shadow-yellow-500/20"
+              >
+                {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                Save Review Settings
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
+  );
+}

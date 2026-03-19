@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ProductReviewsSettings } from './components/ProductReviewsSettings';
 
 const iconOptions = [
   { name: 'ShoppingCart', icon: ShoppingCart },
@@ -136,9 +137,16 @@ export default function ShoppingExperienceSettingsPage() {
     <div className="space-y-6">
       <PageHeader
         icon={MousePointerClick}
-        title="Shopping Buttons & CTAs"
-        description="Customize the labels and icons for all purchase-related buttons on your public website."
+        title="Shopping Experience & Product Ratings"
+        description="Customize buttons, CTAs, and enable customer review ratings on your public website."
       />
+
+      {/* Product Reviews Section */}
+      <div className="mt-8">
+        {firestore && (
+          <ProductReviewsSettings settingsData={settingsData} firestore={firestore} />
+        )}
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
