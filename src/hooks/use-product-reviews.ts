@@ -1,16 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useFirestore } from '@/firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
 import type { ProductReview } from '@/lib/types';
 
 export function useProductReviews(productId: string) {
-  const firestore = useFirestore();
   const [reviews, setReviews] = useState<ProductReview[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (!firestore || !productId) {
+    if (!productId) {
       setReviews([]);
       setIsLoading(false);
       return;
@@ -20,15 +17,15 @@ export function useProductReviews(productId: string) {
       try {
         setIsLoading(true);
         setError(null);
-        const reviewsRef = collection(firestore, 'productReviews');
-        const q = query(
-          reviewsRef,
-          where('productId', '==', productId),
-          where('isApproved', '==', true)
-        );
-        const snapshot = await getDocs(q);
-        const reviewsData = snapshot.docs.map(doc => doc.data() as ProductReview);
-        setReviews(reviewsData);
+
+        const response = await fetch(`/api/reviews/${productId}`);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch reviews: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        setReviews(data.data || []);
       } catch (err) {
         console.error('[ProductReviews] Failed to fetch reviews:', err);
         setReviews([]);
@@ -39,7 +36,7 @@ export function useProductReviews(productId: string) {
     };
 
     fetchReviews();
-  }, [firestore, productId]);
+  }, [productId]);
 
   return { reviews, isLoading, error };
 }
