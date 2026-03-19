@@ -14,8 +14,11 @@ import { useSettings } from '@/contexts/settings-context';
 import { formatCurrency } from '@/lib/formatUtils';
 import { calculateEffectivePrice } from '@/lib/pos-utils';
 import { StockBar } from './StockBar';
+import { ProductRating } from './ProductRating';
 import type { Product, Category } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { calculateRatingStats } from '@/lib/rating-utils';
+import { useProductReviews } from '@/hooks/use-product-reviews';
 import styles from './ProductCard.module.css';
 
 interface ProductCardProps {
@@ -29,12 +32,16 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
   const { isProductInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const { settings } = useSettings();
   const [today, setToday] = useState<Date | null>(null);
+  const { reviews } = useProductReviews(product.id);
 
   useEffect(() => {
     setToday(new Date());
   }, []);
 
   const isInWishlist = isProductInWishlist(product.id);
+
+  // Calculate rating stats from reviews
+  const ratingStats = calculateRatingStats(reviews);
 
   // Pricing Engine logic
   const effectivePrice = useMemo(() => 
@@ -147,6 +154,18 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
           <h3 className={`text-sm sm:text-base font-black text-slate-900 dark:text-white line-clamp-2 leading-snug tracking-tight transition-colors duration-300 h-12 break-words ${styles.productName}`}>
             {product.name}
           </h3>
+
+          {/* Product Rating Display */}
+          {settings?.showReviewRatingOnCard && ratingStats.totalReviews > 0 && (
+            <div className="flex items-center -ml-2">
+              <ProductRating
+                averageRating={ratingStats.averageRating}
+                totalReviews={ratingStats.totalReviews}
+                size="sm"
+                showLabel={true}
+              />
+            </div>
+          )}
           
           <div className="flex flex-wrap gap-2">
             {product.isNewArrival && (

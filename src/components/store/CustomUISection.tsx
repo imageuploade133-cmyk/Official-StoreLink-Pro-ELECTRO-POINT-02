@@ -40,7 +40,7 @@ export function CustomUISection({ section }: CustomUISectionProps) {
                         src={section.imageUrl} 
                         alt={section.title} 
                         fill 
-                        className="object-cover transition-transform duration-[2000ms] group-hover:scale-110" 
+                        className="object-cover transition-transform duration-700 group-hover:scale-110" 
                         unoptimized
                     />
                     <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] transition-opacity group-hover:opacity-40" />

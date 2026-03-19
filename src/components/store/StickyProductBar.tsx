@@ -31,9 +31,8 @@ export function StickyProductBar({
   const handleScroll = useCallback(() => {
     const currentScrollY = window.scrollY;
     
-    // Show bar when scrolling up (lastScrollY > currentScrollY) and we're past 400px
-    const isScrollingUp = currentScrollY < lastScrollY;
-    const shouldShow = currentScrollY > 400 && isScrollingUp;
+    // Show bar when scrolling down past 400px or anytime after that
+    const shouldShow = currentScrollY > 400;
     
     setIsVisible(shouldShow);
     setLastScrollY(currentScrollY);
@@ -62,10 +61,10 @@ export function StickyProductBar({
   return (
     /* Overlay bar - no spacer needed, content scrolls under it */
     <div className={cn(
-      "fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 transition-all duration-300 ease-out",
+      "fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 transition-all duration-300 ease-out",
       isVisible ? "translate-y-0 opacity-100 shadow-lg shadow-slate-900/10" : "translate-y-full opacity-0 pointer-events-none"
     )}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between gap-3 sm:gap-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex items-center justify-between gap-3 sm:gap-4">
         {/* Product Info */}
         <div className="flex-1 min-w-0">
           <p className="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-400 truncate uppercase tracking-wide">
@@ -84,7 +83,7 @@ export function StickyProductBar({
             variant="ghost"
             onClick={onToggleWishlist}
             className={cn(
-              "h-10 w-10 rounded-full transition-all duration-300 hover:bg-slate-100 dark:hover:bg-slate-800",
+              "h-12 w-12 rounded-2xl transition-all duration-300 hover:bg-slate-100 dark:hover:bg-slate-800",
               isInWishlist ? "text-rose-500" : "text-slate-600 dark:text-slate-400"
             )}
           >
@@ -99,7 +98,7 @@ export function StickyProductBar({
             onClick={onAddToCart}
             disabled={isOutOfStock}
             className={cn(
-              "px-3 sm:px-5 py-2 rounded-lg font-black text-xs sm:text-sm uppercase tracking-wide transition-all duration-300 flex items-center gap-1.5 shrink-0",
+              "px-4 sm:px-6 py-3 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wide transition-all duration-300 flex items-center gap-1.5 shrink-0",
               isOutOfStock && "opacity-50 cursor-not-allowed"
             )}
           >
