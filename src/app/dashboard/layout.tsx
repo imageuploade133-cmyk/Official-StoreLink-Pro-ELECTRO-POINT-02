@@ -116,34 +116,14 @@ export default function DashboardLayout({
     }
   }, []);
 
-  // Apply zoom level to document using CSS transform with throttling
+  // Apply zoom level using font-size scaling (affects all rem/em units proportionally)
   useEffect(() => {
-    const applyZoom = () => {
-      const zoomScale = zoomLevel / 100;
-      const htmlElement = document.documentElement;
-      
-      // Apply transform for smooth scaling
-      htmlElement.style.transformOrigin = '0 0';
-      htmlElement.style.transform = `scale(${zoomScale})`;
-      
-      // Adjust width and height to prevent scrollbars
-      const inverseScale = 100 / zoomScale;
-      htmlElement.style.width = `${inverseScale}%`;
-      htmlElement.style.height = `${inverseScale}%`;
-      
-      // Prevent overflow
-      document.body.style.overflow = 'hidden';
-      document.body.style.margin = '0';
-      document.body.style.padding = '0';
-      
-      // Persist to localStorage
-      localStorage.setItem('dashboard-zoom', zoomLevel.toString());
-    };
-
-    // Use requestAnimationFrame for smooth updates
-    const rafId = requestAnimationFrame(applyZoom);
+    const baseFontSize = 16;
+    const newFontSize = (baseFontSize * zoomLevel) / 100;
+    document.documentElement.style.fontSize = newFontSize + 'px';
     
-    return () => cancelAnimationFrame(rafId);
+    // Persist to localStorage
+    localStorage.setItem('dashboard-zoom', zoomLevel.toString());
   }, [zoomLevel]);
   
   const navItems = [

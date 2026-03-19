@@ -40,13 +40,9 @@ export default function RootLayout({
                 const savedZoom = localStorage.getItem('dashboard-zoom');
                 if (savedZoom) {
                   const zoomLevel = parseInt(savedZoom, 10);
-                  const zoomScale = zoomLevel / 100;
-                  const html = document.documentElement;
-                  html.style.transformOrigin = '0 0';
-                  html.style.transform = 'scale(' + zoomScale + ')';
-                  html.style.width = (100 / zoomScale) + '%';
-                  html.style.height = (100 / zoomScale) + '%';
-                  document.body.style.overflow = 'hidden';
+                  const baseFontSize = 16;
+                  const newFontSize = (baseFontSize * zoomLevel) / 100;
+                  document.documentElement.style.fontSize = newFontSize + 'px';
                 }
               })();
             `,
