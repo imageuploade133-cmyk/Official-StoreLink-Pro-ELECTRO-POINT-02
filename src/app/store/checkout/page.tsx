@@ -430,7 +430,7 @@ export default function CheckoutPage() {
                                         <div className="space-y-1"><Label className="text-[10px] font-black uppercase text-muted-foreground">Account Name</Label><p className="font-bold text-lg">{selectedBankAccount.accountName}</p></div>
                                         <div className="space-y-1">
                                             <Label className="text-[10px] font-black uppercase text-muted-foreground">Account Number</Label>
-                                            <div className="flex items-center gap-2"><p className="font-black text-xl tracking-tighter">{selectedBankAccount.accountNumber}</p><Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => copyToClipboard(selectedBankAccount.accountNumber, 'Account Number')}><Copy className="h-4 w-4"/></Button></div>
+                                            <div className="flex items-center gap-2"><p className="font-black text-xl tracking-tighter">{selectedBankAccount.accountNumber}</p><Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => copyToClipboard(selectedBankAccount.accountNumber, 'Account Number')}><Copy className="h-4 w-4" /></Button></div>
                                         </div>
                                         <div className="space-y-1">
                                             <Label className="text-[10px] font-black uppercase text-primary">Payment Reference</Label>
