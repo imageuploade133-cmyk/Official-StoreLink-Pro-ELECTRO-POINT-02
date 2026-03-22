@@ -147,8 +147,9 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                 </div>
             </header>
 
-            <ScrollArea className="flex-1 overflow-hidden">
-                <div className="px-6 pt-12 space-y-8">
+            <div className="flex flex-col h-full">
+                {/* Fixed Header */}
+                <div className="px-6 pt-12 pb-6 space-y-4 flex-shrink-0 bg-background-light dark:bg-background-dark border-b border-slate-100 dark:border-slate-800">
                     <div className="space-y-2">
                         <div className="flex items-center gap-2 font-black text-[10px] uppercase tracking-[0.3em] text-primary">
                             <Sparkles className="h-3.5 w-3.5" />
@@ -158,7 +159,7 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                         <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Robust substring discovery across the entire catalog.</p>
                     </div>
 
-                    <div className="relative group sticky top-0 z-40 pt-2 pb-4 bg-gradient-to-b from-background-light dark:from-background-dark to-transparent">
+                    <div className="relative group pt-2">
                         <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 z-10 transition-colors group-focus-within:text-primary">
                             <SearchIcon className="h-6 w-6" strokeWidth={3} />
                         </div>
@@ -180,7 +181,7 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                     </div>
 
                     {selectedCategoryId && (
-                        <div className="flex items-center gap-2 animate-in slide-in-from-left-2 duration-300 -mt-4">
+                        <div className="flex items-center gap-2 animate-in slide-in-from-left-2 duration-300">
                             <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 px-4 py-2 rounded-xl flex items-center gap-2 font-black text-[10px] uppercase tracking-widest shadow-sm">
                                 <Filter className="h-3 w-3" />
                                 {categories?.find(c => c.id === selectedCategoryId)?.name || 'Filtered Collection'}
@@ -196,8 +197,12 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                             </Badge>
                         </div>
                     )}
+                </div>
 
-                    <div className="pb-32 space-y-6">
+                {/* Scrollable Content */}
+                <ScrollArea className="flex-1">
+                    <div className="px-6 pt-6 space-y-6">
+                        <div className="pb-32 space-y-6">
                     <div className="flex items-center justify-between px-1">
                         <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">
                             {searchQuery || selectedCategoryId ? 'Top Match Results' : 'Trending Registry'}
@@ -276,9 +281,10 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                             </Button>
                         </div>
                     )}
+                        </div>
                     </div>
-                </div>
-            </ScrollArea>
+                </ScrollArea>
+            </div>
         </div>
     );
 }
