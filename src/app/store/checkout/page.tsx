@@ -412,15 +412,9 @@ export default function CheckoutPage() {
                                         <div key={acc.id} className="flex items-center space-x-3 p-4 rounded-xl border-2 border-muted hover:border-primary/30 cursor-pointer transition-colors" onClick={() => setSelectedBankAccount(acc)}>
                                             <RadioGroupItem value={acc.id} id={acc.id} className="peer sr-only" />
                                             <Label htmlFor={acc.id} className="flex items-center gap-4 cursor-pointer flex-1">
-                                                {acc.bankName === 'Bank Transfer' ? (
-                                                    <div className="w-10 h-10 rounded-md border bg-muted flex items-center justify-center text-muted-foreground flex-shrink-0">
-                                                        <Landmark className="h-5 w-5" />
-                                                    </div>
-                                                ) : (
-                                                    <div className="w-10 h-10 rounded-md border bg-muted flex items-center justify-center text-muted-foreground flex-shrink-0">
-                                                        <Landmark className="h-5 w-5" />
-                                                    </div>
-                                                )}
+                                                <div className="w-10 h-10 rounded-md border bg-muted flex items-center justify-center text-muted-foreground flex-shrink-0">
+                                                    <Landmark className="h-5 w-5" />
+                                                </div>
                                                 <div className="min-w-0">
                                                     <span className="font-bold block truncate">{acc.bankName}</span>
                                                     <span className="text-[10px] text-muted-foreground block truncate">{acc.accountName}</span>

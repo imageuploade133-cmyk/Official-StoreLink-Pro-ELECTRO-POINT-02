@@ -147,58 +147,57 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                 </div>
             </header>
 
-            <div className="px-6 pt-12 space-y-8">
-                <div className="space-y-2">
-                    <div className="flex items-center gap-2 font-black text-[10px] uppercase tracking-[0.3em] text-primary">
-                        <Sparkles className="h-3.5 w-3.5" />
-                        Discovery Suite
+            <ScrollArea className="flex-1 overflow-hidden">
+                <div className="px-6 pt-12 space-y-8">
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2 font-black text-[10px] uppercase tracking-[0.3em] text-primary">
+                            <Sparkles className="h-3.5 w-3.5" />
+                            Discovery Suite
+                        </div>
+                        <h2 className="text-4xl font-black tracking-tighter uppercase leading-none">Search</h2>
+                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Robust substring discovery across the entire catalog.</p>
                     </div>
-                    <h2 className="text-4xl font-black tracking-tighter uppercase leading-none">Search</h2>
-                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Robust substring discovery across the entire catalog.</p>
-                </div>
 
-                <div className="relative group">
-                    <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 z-10 transition-colors group-focus-within:text-primary">
-                        <SearchIcon className="h-6 w-6" strokeWidth={3} />
-                    </div>
-                    <Input 
-                        autoFocus={!initialCategoryId}
-                        placeholder="Type name, iron, solar, etc..." 
-                        className="h-16 pl-14 pr-12 rounded-[1.5rem] bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 shadow-2xl text-lg font-bold tracking-tight focus-visible:ring-4 focus-visible:ring-primary/10 transition-all"
-                        value={searchQuery}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                    {searchQuery && (
-                        <button 
-                            onClick={() => setSearchTerm('')}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-slate-100 dark:bg-slate-700 rounded-xl hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
-                        >
-                            <X className="h-4 w-4" strokeWidth={3} />
-                        </button>
-                    )}
-                </div>
-
-                {selectedCategoryId && (
-                    <div className="flex items-center gap-2 animate-in slide-in-from-left-2 duration-300">
-                        <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 px-4 py-2 rounded-xl flex items-center gap-2 font-black text-[10px] uppercase tracking-widest shadow-sm">
-                            <Filter className="h-3 w-3" />
-                            {categories?.find(c => c.id === selectedCategoryId)?.name || 'Filtered Collection'}
+                    <div className="relative group sticky top-0 z-40 pt-2 pb-4 bg-gradient-to-b from-background-light dark:from-background-dark to-transparent">
+                        <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 z-10 transition-colors group-focus-within:text-primary">
+                            <SearchIcon className="h-6 w-6" strokeWidth={3} />
+                        </div>
+                        <Input 
+                            autoFocus={!initialCategoryId}
+                            placeholder="Type name, iron, solar, etc..." 
+                            className="h-16 pl-14 pr-12 rounded-[1.5rem] bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 shadow-2xl text-lg font-bold tracking-tight focus-visible:ring-4 focus-visible:ring-primary/10 transition-all"
+                            value={searchQuery}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        {searchQuery && (
                             <button 
-                                onClick={() => {
-                                    setSelectedCategoryId(null);
-                                    if (onClearCategory) onClearCategory();
-                                }}
-                                className="ml-2 p-0.5 hover:bg-primary/20 rounded-md transition-colors"
+                                onClick={() => setSearchTerm('')}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-slate-100 dark:bg-slate-700 rounded-xl hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
                             >
-                                <X className="h-3 w-3" strokeWidth={3} />
+                                <X className="h-4 w-4" strokeWidth={3} />
                             </button>
-                        </Badge>
+                        )}
                     </div>
-                )}
-            </div>
 
-            <ScrollArea className="flex-1 mt-10">
-                <div className="px-6 pb-32 space-y-6">
+                    {selectedCategoryId && (
+                        <div className="flex items-center gap-2 animate-in slide-in-from-left-2 duration-300 -mt-4">
+                            <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 px-4 py-2 rounded-xl flex items-center gap-2 font-black text-[10px] uppercase tracking-widest shadow-sm">
+                                <Filter className="h-3 w-3" />
+                                {categories?.find(c => c.id === selectedCategoryId)?.name || 'Filtered Collection'}
+                                <button 
+                                    onClick={() => {
+                                        setSelectedCategoryId(null);
+                                        if (onClearCategory) onClearCategory();
+                                    }}
+                                    className="ml-2 p-0.5 hover:bg-primary/20 rounded-md transition-colors"
+                                >
+                                    <X className="h-3 w-3" strokeWidth={3} />
+                                </button>
+                            </Badge>
+                        </div>
+                    )}
+
+                    <div className="pb-32 space-y-6">
                     <div className="flex items-center justify-between px-1">
                         <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">
                             {searchQuery || selectedCategoryId ? 'Top Match Results' : 'Trending Registry'}
@@ -277,6 +276,7 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                             </Button>
                         </div>
                     )}
+                    </div>
                 </div>
             </ScrollArea>
         </div>
