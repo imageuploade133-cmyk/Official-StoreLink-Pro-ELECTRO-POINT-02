@@ -6,11 +6,9 @@ import { useFirestore, useDoc } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { Settings } from '@/lib/types';
 import { hexToHslString } from '@/lib/color-utils';
-import { useTheme } from '@/contexts/theme-context';
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const firestore = useFirestore();
-  const { theme } = useTheme();
 
   const settingsRef = useMemo(
     () => (firestore ? doc(firestore, 'settings', 'global') : null),
@@ -24,12 +22,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const body = window.document.body;
 
     const applyTheme = () => {
-      // Use the user-selected theme from context (no system preference detection)
-      const effectiveTheme = theme; // 'light' or 'dark'
-
-      // Apply the correct theme class to the root element
-      root.classList.remove('light', 'dark');
-      root.classList.add(effectiveTheme);
+      // Theme is managed by ThemeContextProvider, we only handle color settings here
 
       // Apply Global Layout Width regardless of theme
       if (settings?.webMaxContainerWidth) {
@@ -50,13 +43,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       body.style.backgroundPosition = '';
       body.style.backgroundAttachment = '';
 
-      // Apply or remove custom styles based on the effective theme
-      if (effectiveTheme === 'dark') {
-        // In dark mode, we want to use the CSS variables defined in the .dark block in globals.css.
-        // So, we must remove any inline styles that might have been set for light mode.
-        customColorVars.forEach(v => root.style.removeProperty(v));
-      } else {
-        // In light mode, apply custom colors from Firestore settings.
+      // Apply custom colors from Firestore settings - theme is handled by ThemeContextProvider
+      {
         if (settings) {
             // Accent colors
             const colors: { key: keyof Settings, cssVar: string }[] = [
@@ -114,9 +102,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     };
     
     applyTheme();
-
-    // No need to listen to system theme changes anymore since we're using user preference
-  }, [settings, theme]);
+  }, [settings]);
 
   return <>{children}</>;
 }
