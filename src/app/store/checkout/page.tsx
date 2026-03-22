@@ -11,6 +11,7 @@ import { doc, collection, runTransaction, serverTimestamp, addDoc, increment } f
 import { useToast } from '@/hooks/use-toast';
 import { formatCurrency } from '@/lib/formatUtils';
 import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -406,31 +407,28 @@ export default function CheckoutPage() {
                                 <div className="flex items-center gap-3 text-primary"><Info className="h-5 w-5" /><h3 className="font-bold text-lg">Bank Transfer Instructions</h3></div>
                                 <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">{settings?.bankTransferInstructions}</p>
 
-                                <div className="space-y-4">
-                                    <Label className="text-xs font-bold uppercase tracking-wider">Select Bank</Label>
-                                    <RadioGroup value={selectedBankId} onValueChange={setSelectedBankId} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                        {bankAccounts.map(acc => (
-                                            <div key={acc.id} className="relative">
-                                                <RadioGroupItem value={acc.id} id={acc.id} className="peer sr-only" />
-                                                <Label htmlFor={acc.id} className="flex items-center gap-4 p-4 border rounded-xl bg-background cursor-pointer hover:bg-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:ring-1 peer-data-[state=checked]:ring-primary transition-all">
-                                                    {acc.logoUrl ? (
-                                                    <div className="relative w-10 h-10 overflow-hidden rounded-md border bg-white flex-shrink-0">
-                                                        <Image src={acc.logoUrl} alt={acc.bankName} fill className="object-contain p-1" />
-                                                    </div>
-                                                    ) : (
+                                <RadioGroup className="space-y-3">
+                                    {bankAccounts.map((acc) => (
+                                        <div key={acc.id} className="flex items-center space-x-3 p-4 rounded-xl border-2 border-muted hover:border-primary/30 cursor-pointer transition-colors" onClick={() => setSelectedBankAccount(acc)}>
+                                            <RadioGroupItem value={acc.id} id={acc.id} className="peer sr-only" />
+                                            <Label htmlFor={acc.id} className="flex items-center gap-4 cursor-pointer flex-1">
+                                                {acc.bankName === 'Bank Transfer' ? (
                                                     <div className="w-10 h-10 rounded-md border bg-muted flex items-center justify-center text-muted-foreground flex-shrink-0">
                                                         <Landmark className="h-5 w-5" />
                                                     </div>
-                                                    )}
-                                                    <div className="min-w-0">
+                                                ) : (
+                                                    <div className="w-10 h-10 rounded-md border bg-muted flex items-center justify-center text-muted-foreground flex-shrink-0">
+                                                        <Landmark className="h-5 w-5" />
+                                                    </div>
+                                                )}
+                                                <div className="min-w-0">
                                                     <span className="font-bold block truncate">{acc.bankName}</span>
                                                     <span className="text-[10px] text-muted-foreground block truncate">{acc.accountName}</span>
-                                                    </div>
-                                                </Label>
-                                            </div>
-                                        ))}
-                                    </RadioGroup>
-                                </div>
+                                                </div>
+                                            </Label>
+                                        </div>
+                                    ))}
+                                </RadioGroup>
 
                                 {selectedBankAccount && (
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-background p-6 rounded-xl border shadow-sm">
@@ -466,10 +464,17 @@ export default function CheckoutPage() {
               {step === 'payment' && (
                 <CardFooter className="flex justify-between border-t pt-6">
                   <Button variant="ghost" onClick={() => setStep('details')}>Back to Details</Button>
-                  <Button onClick={handlePlaceOrder} disabled={step === 'processing' || (paymentMethod === 'Bank Transfer' && !hasConfirmedTransfer) || availablePaymentMethods.length === 0} size="lg" className="px-10">
-                    {step === 'processing' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ShieldCheck className="mr-2 h-4 w-4" />}
+                  <LoadingButton 
+                    onClick={handlePlaceOrder} 
+                    isLoading={step === 'processing'}
+                    disabled={(paymentMethod === 'Bank Transfer' && !hasConfirmedTransfer) || availablePaymentMethods.length === 0}
+                    size="lg" 
+                    className="px-10"
+                    loadingText="Processing..."
+                  >
+                    <ShieldCheck className="mr-2 h-4 w-4" />
                     {paymentMethod === 'Bank Transfer' ? 'Submit Order' : 'Complete Purchase'}
-                  </Button>
+                  </LoadingButton>
                 </CardFooter>
               )}
             </Card>

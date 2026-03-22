@@ -9,6 +9,7 @@ import { doc, collection, runTransaction, serverTimestamp, addDoc, increment } f
 import { useToast } from '@/hooks/use-toast';
 import { formatCurrency } from '@/lib/formatUtils';
 import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -495,14 +496,26 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
 
         {step !== 'processing' && (
             <footer className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border-t border-slate-100 dark:border-slate-800 p-8 rounded-t-[3rem] shadow-[0_-20px_50px_rgba(0,0,0,0.1)] z-50 pb-10">
-                <Button 
-                    onClick={step === 'details' ? () => setStep('payment') : handlePlaceOrder}
-                    disabled={step === 'payment' && paymentMethod === 'Bank Transfer' && !hasConfirmedTransfer}
-                    className="w-full h-16 rounded-[1.5rem] bg-primary text-white font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-primary/30 group transition-all active:scale-[0.98]"
-                >
-                    {step === 'details' ? 'Proceed to Payment' : 'Complete Purchase'}
-                    <ChevronRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={3} />
-                </Button>
+                {step === 'details' ? (
+                    <Button 
+                        onClick={() => setStep('payment')}
+                        className="w-full h-16 rounded-[1.5rem] bg-primary text-white font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-primary/30 group transition-all active:scale-[0.98]"
+                    >
+                        Proceed to Payment
+                        <ChevronRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={3} />
+                    </Button>
+                ) : (
+                    <LoadingButton 
+                        onClick={handlePlaceOrder}
+                        isLoading={step === 'processing'}
+                        disabled={paymentMethod === 'Bank Transfer' && !hasConfirmedTransfer}
+                        loadingText="Processing..."
+                        className="w-full h-16 rounded-[1.5rem] bg-primary text-white font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-primary/30 group transition-all active:scale-[0.98]"
+                    >
+                        Complete Purchase
+                        <ChevronRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={3} />
+                    </LoadingButton>
+                )}
             </footer>
         )}
     </div>
