@@ -433,12 +433,23 @@ export default function CheckoutPage() {
                                             <div className="flex items-center gap-2"><p className="font-black text-xl tracking-tighter">{selectedBankAccount.accountNumber}</p><Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => copyToClipboard(selectedBankAccount.accountNumber, 'Account Number')}><Copy className="h-4 w-4" /></Button></div>
                                         </div>
                                         <div className="space-y-1">
-                                            <Label className="text-[10px] font-black uppercase text-primary">Payment Reference</Label>
+                                            <Label className="text-[10px] font-black uppercase text-muted-foreground">Payment Reference</Label>
                                             <div className="flex items-center gap-2"><p className="font-black text-2xl text-primary tracking-widest">{paymentReference}</p><Button variant="ghost" size="icon" className="h-8 w-8 text-primary" onClick={() => copyToClipboard(paymentReference, 'Reference Code')}><Copy className="h-4 w-4"/></Button></div>
                                             <p className="text-[10px] text-orange-600 font-bold">Enter this code in your transfer description.</p>
                                         </div>
+                                        <div className="space-y-1">
+                                            <Label className="text-[10px] font-black uppercase text-muted-foreground">Confirm Transfer</Label>
+                                            <label className="flex items-center gap-3 cursor-pointer p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-primary/30 transition-all">
+                                                <Checkbox 
+                                                    checked={hasConfirmedTransfer}
+                                                    onCheckedChange={(checked) => setHasConfirmedTransfer(!!checked)}
+                                                    className="h-5 w-5"
+                                                />
+                                                <span className="text-sm font-bold">I've successfully transferred the funds</span>
+                                            </label>
+                                        </div>
                                     </div>
-                                )}
+                                }
 
                                 <div className="flex items-center space-x-3 p-4 bg-background border rounded-xl">
                                     <input type="checkbox" id="confirm-transfer" className="h-5 w-5 rounded border-gray-300 text-primary cursor-pointer" checked={hasConfirmedTransfer} onChange={(e) => setHasConfirmedTransfer(e.target.checked)}/>
