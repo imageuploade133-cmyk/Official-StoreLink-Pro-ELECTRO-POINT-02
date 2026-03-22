@@ -51,7 +51,8 @@ import {
   Volume2,
   Square,
   AudioWaveform,
-  FastForward
+  FastForward,
+  ArrowLeft
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -545,8 +546,22 @@ export default function ProductDetailsPage() {
         addToCartText={addToCartText}
       />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <nav className="flex items-center gap-2 text-sm text-slate-500 mb-8 overflow-hidden">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 md:py-8">
+        {/* Mobile Back Button - Sticky on Mobile */}
+        <div className="md:hidden mb-4 sticky top-0 z-40 bg-background-light dark:bg-background-dark pb-2">
+          <Button 
+            onClick={() => router.back()}
+            variant="ghost" 
+            size="sm"
+            className="gap-2 text-primary hover:bg-primary/10 h-10 px-3 rounded-lg font-semibold transition-all active:scale-95"
+          >
+            <ArrowLeft className="h-5 w-5" />
+            <span>Back</span>
+          </Button>
+        </div>
+
+        {/* Breadcrumb Navigation - Hidden on small mobile, visible on sm+ */}
+        <nav className="hidden sm:flex items-center gap-2 text-xs sm:text-sm text-slate-500 mb-6 md:mb-8 overflow-x-auto pb-2">
           <Link href="/store" className="hover:text-primary transition-colors flex-shrink-0">Home</Link>
           <ChevronRight className="h-4 w-4 flex-shrink-0" />
           <Link href="/store/shop" className="hover:text-primary transition-colors flex-shrink-0">Shop</Link>
@@ -557,13 +572,13 @@ export default function ProductDetailsPage() {
             </>
           )}
           <ChevronRight className="h-4 w-4 flex-shrink-0" />
-          <span className="text-slate-900 dark:text-slate-100 font-bold truncate">{product.name}</span>
+          <span className="text-slate-900 dark:text-slate-100 font-bold truncate max-w-[200px]">{product.name}</span>
         </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8 lg:gap-10">
           <div className="lg:col-span-7">
-            <div className="sticky top-24 space-y-6">
-              <div className="aspect-square bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800 ring-1 ring-slate-200 dark:ring-slate-700 relative">
+            <div className="sticky top-20 md:top-24 space-y-3 md:space-y-6">
+              <div className="aspect-square bg-white dark:bg-slate-900 rounded-xl md:rounded-2xl lg:rounded-[2.5rem] overflow-hidden shadow-lg md:shadow-2xl border-2 md:border-4 border-white dark:border-slate-800 ring-1 ring-slate-200 dark:ring-slate-700 relative">
                 {showVideo && product.videoUrl ? (
                     <div className="relative w-full h-full bg-black group">
                         <video ref={videoRef} src={product.videoUrl} autoPlay loop muted playsInline poster={product.videoPosterUrl || ''} className="w-full h-full object-cover" />
@@ -593,40 +608,40 @@ export default function ProductDetailsPage() {
                     )}
                 </div>
               </div>
-              <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+              <div className="flex flex-wrap gap-2 md:gap-3 lg:gap-4 justify-center md:justify-start overflow-x-auto pb-2">
                 {galleryImages.map((url, idx) => (
-                <button key={url + idx} onClick={() => { setActiveImage(url); setShowVideo(false); }} className={cn("relative w-20 h-20 rounded-2xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 active:scale-95", !showVideo && activeImage === url ? "border-primary shadow-lg ring-2 ring-primary/20 scale-110" : "border-slate-200 dark:border-slate-800 opacity-60 hover:opacity-100")}>
+                <button key={url + idx} onClick={() => { setActiveImage(url); setShowVideo(false); }} className={cn("relative w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg md:rounded-2xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 active:scale-95", !showVideo && activeImage === url ? "border-primary shadow-lg ring-2 ring-primary/20 scale-110" : "border-slate-200 dark:border-slate-800 opacity-60 hover:opacity-100")}>
                     <Image src={url} alt={`View ${idx + 1}`} fill className="object-cover" unoptimized />
                 </button>
                 ))}
                 {product.videoEnabled && product.videoUrl && (
-                    <button onClick={() => setShowVideo(true)} className={cn("relative w-20 h-20 rounded-2xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 active:scale-95 bg-slate-900 group", showVideo ? "border-primary shadow-lg ring-2 ring-primary/20 scale-110" : "border-slate-200 dark:border-slate-800 opacity-60 hover:opacity-100")}>
+                    <button onClick={() => setShowVideo(true)} className={cn("relative w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg md:rounded-2xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 active:scale-95 bg-slate-900 group", showVideo ? "border-primary shadow-lg ring-2 ring-primary/20 scale-110" : "border-slate-200 dark:border-slate-800 opacity-60 hover:opacity-100")}>
                         {product.videoPosterUrl && <Image src={product.videoPosterUrl} alt="" fill className="object-cover opacity-40" unoptimized />}
-                        <div className="absolute inset-0 flex flex-col items-center justify-center text-white"><VideoIcon className="h-6 w-6 mb-1" /><span className="text-[8px] font-black uppercase">Play</span></div>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center text-white"><VideoIcon className="h-5 md:h-6 w-5 md:w-6 mb-1" /><span className="text-[7px] md:text-[8px] font-black uppercase">Play</span></div>
                     </button>
                 )}
               </div>
             </div>
           </div>
 
-          <div className="lg:col-span-5 flex flex-col gap-8">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
+          <div className="lg:col-span-5 flex flex-col gap-4 md:gap-6 lg:gap-8">
+            <div className="space-y-3 md:space-y-4">
+              <div className="flex items-center gap-2 flex-wrap">
                 <div className="flex text-amber-400">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className={cn("h-4 w-4 fill-current", i >= Math.floor(reviewStats.avg) && "text-slate-200 dark:text-slate-700")} />
+                    <Star key={i} className={cn("h-3.5 md:h-4 w-3.5 md:w-4 fill-current", i >= Math.floor(reviewStats.avg) && "text-slate-200 dark:text-slate-700")} />
                   ))}
                 </div>
-                <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{reviewStats.avg} / 5.0 ({reviewStats.count} Reviews)</span>
+                <span className="text-[9px] md:text-[10px] text-slate-500 font-black uppercase tracking-widest">{reviewStats.avg} / 5.0 ({reviewStats.count})</span>
               </div>
-              <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-slate-900 dark:text-white leading-[1.1]">{product.name}</h1>
-              <div className="flex items-start gap-4 pt-2">
-                <div className="flex flex-col gap-1.5">
-                  {!today ? <Skeleton className="h-10 w-32" /> : (
-                    <><span className={cn("text-3xl font-black tracking-tighter", isDiscounted ? "text-amber-600 dark:text-amber-400" : "text-slate-900 dark:text-white")}>{formatCurrency(effectivePrice, currencySymbol)}</span>
-                    {isDiscounted && <span className="text-sm text-slate-400 line-through font-bold">Original: {formatCurrency(product.sellingPrice, currencySymbol)}</span>}</>
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter text-slate-900 dark:text-white leading-[1.2]">{product.name}</h1>
+              <div className="flex items-start gap-3 pt-2">
+                <div className="flex flex-col gap-1 md:gap-1.5">
+                  {!today ? <Skeleton className="h-8 md:h-10 w-32" /> : (
+                    <><span className={cn("text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter", isDiscounted ? "text-amber-600 dark:text-amber-400" : "text-slate-900 dark:text-white")}>{formatCurrency(effectivePrice, currencySymbol)}</span>
+                    {isDiscounted && <span className="text-xs md:text-sm text-slate-400 line-through font-bold">Original: {formatCurrency(product.sellingPrice, currencySymbol)}</span>}</>
                   )}
-                  <div className="pt-1"><Badge variant={isOutOfStock ? "destructive" : "secondary"} className="h-7 px-3 font-black uppercase text-[9px] tracking-widest">{isOutOfStock ? 'Currently Sold Out' : 'Ready for Shipping'}</Badge></div>
+                  <div className="pt-0.5 md:pt-1"><Badge variant={isOutOfStock ? "destructive" : "secondary"} className="h-6 md:h-7 px-2 md:px-3 font-black uppercase text-[8px] md:text-[9px] tracking-widest">{isOutOfStock ? 'Sold Out' : 'Ready'}</Badge></div>
                 </div>
               </div>
             </div>
@@ -651,43 +666,43 @@ export default function ProductDetailsPage() {
             )}
 
             {!isOutOfStock && (
-              <div className="space-y-4 p-8 bg-white dark:bg-slate-900/50 rounded-[2.5rem] border-2 border-primary/20 hover:border-primary/40 transition-all duration-500 shadow-2xl shadow-primary/5 ring-1 ring-primary/5">
+              <div className="space-y-3 md:space-y-4 p-4 md:p-6 lg:p-8 bg-white dark:bg-slate-900/50 rounded-xl md:rounded-2xl lg:rounded-[2.5rem] border-2 border-primary/20 hover:border-primary/40 transition-all duration-500 shadow-lg md:shadow-2xl shadow-primary/5 ring-1 ring-primary/5">
                 {(activeSectionPromo?.endDate || (isDiscounted && product.promo?.endDate)) && (
                   <PromoCountdown endDate={activeSectionPromo?.endDate || convertToDateSafely(product.promo!.endDate)!} />
                 )}
-                <div className="flex items-center justify-between mb-2"><label className="text-sm font-black uppercase tracking-[0.2em] text-slate-400">Inventory Status</label></div>
-                <StockBar stock={product.stock} lowStockThreshold={lowStockThreshold} className="mb-6" />
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-2xl p-1">
-                    <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl" onClick={() => setQuantity(Math.max(1, quantity - 1))}><Minus className="h-5 w-5" /></Button>
-                    <span className="w-12 text-center text-xl font-black">{quantity}</span>
-                    <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl" onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}><Plus className="h-5 w-5" /></Button>
+                <div className="flex items-center justify-between mb-1 md:mb-2"><label className="text-xs md:text-sm font-black uppercase tracking-[0.2em] text-slate-400">Inventory</label></div>
+                <StockBar stock={product.stock} lowStockThreshold={lowStockThreshold} className="mb-4 md:mb-6" />
+                <div className="flex items-center gap-2 md:gap-4">
+                  <div className="flex items-center bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-lg md:rounded-2xl p-0.5 md:p-1">
+                    <Button variant="ghost" size="icon" className="h-10 md:h-12 w-10 md:w-12 rounded-md md:rounded-xl" onClick={() => setQuantity(Math.max(1, quantity - 1))}><Minus className="h-4 md:h-5 w-4 md:w-5" /></Button>
+                    <span className="w-10 md:w-12 text-center text-lg md:text-xl font-black">{quantity}</span>
+                    <Button variant="ghost" size="icon" className="h-10 md:h-12 w-10 md:w-12 rounded-md md:rounded-xl" onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}><Plus className="h-4 md:h-5 w-4 md:w-5" /></Button>
                   </div>
-                  <Button onClick={handleAddToCart} size="lg" className="flex-1 bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-widest h-14 rounded-2xl shadow-xl transition-all group">
-                    <AddToCartIcon className="mr-3 h-5 w-5 group-hover:animate-bounce" /> {addToCartText}
+                  <Button onClick={handleAddToCart} size="lg" className="flex-1 bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-widest h-12 md:h-14 rounded-lg md:rounded-2xl shadow-xl transition-all group text-xs md:text-sm">
+                    <AddToCartIcon className="mr-2 md:mr-3 h-4 md:h-5 w-4 md:w-5 group-hover:animate-bounce" /> {addToCartText}
                   </Button>
                 </div>
               </div>
             )}
 
-            <div className="flex gap-4">
-              <Button variant="outline" size="lg" className={cn("flex-1 h-14 rounded-2xl font-black uppercase text-xs tracking-widest transition-all", isInWishlist && "text-rose-500 border-rose-200 bg-rose-50 dark:bg-rose-950/20")} onClick={handleToggleWishlist}>
-                <Heart className={cn("h-5 w-5 mr-2", isInWishlist && "fill-current")} /> {isInWishlist ? "Saved to Favorites" : "Save for Later"}
+            <div className="flex gap-2 md:gap-4">
+              <Button variant="outline" size="lg" className={cn("flex-1 h-11 md:h-13 lg:h-14 rounded-lg md:rounded-2xl font-black uppercase text-[10px] md:text-xs tracking-widest transition-all", isInWishlist && "text-rose-500 border-rose-200 bg-rose-50 dark:bg-rose-950/20")} onClick={handleToggleWishlist}>
+                <Heart className={cn("h-4 md:h-5 w-4 md:w-5 mr-1 md:mr-2", isInWishlist && "fill-current")} /> <span className="hidden sm:inline">{isInWishlist ? "Saved" : "Save"}</span><span className="sm:hidden">{isInWishlist ? "Saved" : "Save"}</span>
               </Button>
-              <Button variant="outline" size="icon" className="h-14 w-14 rounded-2xl group hover:border-primary transition-all" onClick={handleShare}><Share2 className="h-5 w-5 group-hover:text-primary" /></Button>
+              <Button variant="outline" size="icon" className="h-11 md:h-13 lg:h-14 w-11 md:w-13 lg:w-14 rounded-lg md:rounded-2xl group hover:border-primary transition-all" onClick={handleShare}><Share2 className="h-4 md:h-5 w-4 md:w-5 group-hover:text-primary" /></Button>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 pt-6 border-t border-slate-200 dark:border-slate-800">
+            <div className="grid grid-cols-2 gap-2 md:gap-3 lg:gap-4 pt-4 md:pt-6 border-t border-slate-200 dark:border-slate-800">
               {(product.badge1Enabled !== false) && (
-                <div className="flex items-center gap-3 text-[10px] font-black uppercase text-slate-500 tracking-wider">
-                  <div className="h-10 w-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-primary"><Badge1Icon className="h-5 w-5" /></div>
-                  <span>{product.badge1Title || 'Free Express'}<br/>{product.badge1Sub || 'Fulfillment'}</span>
+                <div className="flex items-center gap-2 md:gap-3 text-[8px] md:text-[9px] lg:text-[10px] font-black uppercase text-slate-500 tracking-wider">
+                  <div className="h-8 md:h-10 w-8 md:w-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-primary flex-shrink-0"><Badge1Icon className="h-4 md:h-5 w-4 md:w-5" /></div>
+                  <span className="leading-tight">{product.badge1Title || 'Free Express'}<br/>{product.badge1Sub || 'Fulfillment'}</span>
                 </div>
               )}
               {(product.badge2Enabled !== false) && (
-                <div className="flex items-center gap-3 text-[10px] font-black uppercase text-slate-500 tracking-wider">
-                  <div className="h-10 w-10 rounded-full bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-green-600"><Badge2Icon className="h-5 w-5" /></div>
-                  <span>{product.badge2Title || '2-Year Warranty'}<br/>{product.badge2Sub || 'Protection'}</span>
+                <div className="flex items-center gap-2 md:gap-3 text-[8px] md:text-[9px] lg:text-[10px] font-black uppercase text-slate-500 tracking-wider">
+                  <div className="h-8 md:h-10 w-8 md:w-10 rounded-full bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-green-600 flex-shrink-0"><Badge2Icon className="h-4 md:h-5 w-4 md:w-5" /></div>
+                  <span className="leading-tight">{product.badge2Title || '2-Year Warranty'}<br/>{product.badge2Sub || 'Protection'}</span>
                 </div>
               )}
             </div>
