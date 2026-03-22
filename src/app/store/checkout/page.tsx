@@ -449,12 +449,7 @@ export default function CheckoutPage() {
                                             </label>
                                         </div>
                                     </div>
-                                }
-
-                                <div className="flex items-center space-x-3 p-4 bg-background border rounded-xl">
-                                    <input type="checkbox" id="confirm-transfer" className="h-5 w-5 rounded border-gray-300 text-primary cursor-pointer" checked={hasConfirmedTransfer} onChange={(e) => setHasConfirmedTransfer(e.target.checked)}/>
-                                    <Label htmlFor="confirm-transfer" className="text-sm font-bold cursor-pointer select-none">I have successfully transferred {formatCurrency(total, currencySymbol)} to the account above.</Label>
-                                </div>
+                                )}
                             </div>
                         </div>
                     )}
