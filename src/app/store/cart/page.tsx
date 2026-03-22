@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useCart } from '@/contexts/cart-context';
 import { useSettings } from '@/contexts/settings-context';
 import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading-button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Trash2, Plus, Minus, ShoppingCart, ArrowRight, ArrowLeft, Tag, AlertTriangle, Loader2, CheckCircle2, X } from 'lucide-react';
@@ -297,14 +298,16 @@ export default function CartPage() {
                                     )}
                                   </div>
                                   {!appliedCoupon && (
-                                    <Button 
+                                    <LoadingButton 
                                         variant="outline" 
                                         className="h-11" 
                                         onClick={handleApplyCoupon}
-                                        disabled={!couponCode.trim() || isValidatingCoupon}
+                                        isLoading={isValidatingCoupon}
+                                        disabled={!couponCode.trim()}
+                                        loadingText="Validating..."
                                     >
-                                        {isValidatingCoupon ? <Loader2 className="h-4 w-4 animate-spin" /> : "Apply"}
-                                    </Button>
+                                        Apply
+                                    </LoadingButton>
                                   )}
                               </div>
                               {appliedCoupon && (

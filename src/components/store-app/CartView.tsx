@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useCart } from '@/contexts/cart-context';
 import { useSettings } from '@/contexts/settings-context';
 import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading-button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -218,14 +219,16 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
                                         {appliedCoupon && <CheckCircle2 className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-green-500 animate-in zoom-in duration-300" />}
                                     </div>
                                     {!appliedCoupon ? (
-                                        <Button 
+                                        <LoadingButton 
                                             onClick={handleApplyCoupon} 
-                                            disabled={isValidatingCoupon || !couponCode.trim()} 
+                                            disabled={!couponCode.trim()} 
+                                            isLoading={isValidatingCoupon}
                                             variant="secondary" 
                                             className="h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest px-8 shadow-lg active:scale-95 transition-all"
+                                            loadingText="Checking..."
                                         >
-                                            {isValidatingCoupon ? <Loader2 className="h-4 w-4 animate-spin" /> : "Apply"}
-                                        </Button>
+                                            Apply
+                                        </LoadingButton>
                                     ) : (
                                         <Button 
                                             onClick={() => setAppliedCoupon(null)} 
@@ -271,7 +274,7 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
                             onClick={onStartCheckout} 
                             className="w-full h-16 rounded-[1.5rem] bg-primary text-white font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-primary/30 group transition-all active:scale-[0.98]"
                         >
-                            Checkout Protocol <ArrowRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={3} />
+                            Proceed to Checkout <ArrowRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={3} />
                         </Button>
                         <div className="flex items-center justify-center gap-3 text-[8px] font-black uppercase tracking-[0.3em] text-slate-400 opacity-60">
                             <ShieldCheck className="h-3 w-3 text-green-500" /> Secure Transaction Encrypted

@@ -11,6 +11,7 @@ import { doc, collection, runTransaction, serverTimestamp, addDoc, increment } f
 import { useToast } from '@/hooks/use-toast';
 import { formatCurrency } from '@/lib/formatUtils';
 import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -406,17 +407,24 @@ export default function CheckoutPage() {
                                 <div className="flex items-center gap-3 text-primary"><Info className="h-5 w-5" /><h3 className="font-bold text-lg">Bank Transfer Instructions</h3></div>
                                 <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">{settings?.bankTransferInstructions}</p>
 
-                                <div className="space-y-4">
-                                    <Label className="text-xs font-bold uppercase tracking-wider">Select Bank</Label>
-                                    <RadioGroup value={selectedBankId} onValueChange={setSelectedBankId} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                        {bankAccounts.map(acc => (
-                                            <div key={acc.id} className="relative">
-                                                <RadioGroupItem value={acc.id} id={acc.id} className="peer sr-only" />
-                                                <Label htmlFor={acc.id} className="flex items-center gap-4 p-4 border rounded-xl bg-background cursor-pointer hover:bg-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:ring-1 peer-data-[state=checked]:ring-primary transition-all">
-                                                    {acc.logoUrl ? (
-                                                    <div className="relative w-10 h-10 overflow-hidden rounded-md border bg-white flex-shrink-0">
-                                                        <Image src={acc.logoUrl} alt={acc.bankName} fill className="object-contain p-1" />
-                                                    </div>
+                              <div className="space-y-4">
+                                  {step === 'payment' && (
+                                      <>
+                                          <LoadingButton 
+                                              onClick={handlePlaceOrder} 
+                                              size="lg" 
+                                              className="w-full h-14 text-lg font-bold shadow-lg shadow-primary/20"
+                                              isLoading={step === 'processing'}
+                                              loadingText="Processing Order..."
+                                          >
+                                              Place Order <ShoppingBag className="ml-2 h-5 w-5" />
+                                          </LoadingButton>
+                                          <div className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                                              <ShieldCheck className="h-3 w-3 text-green-600" /> Secure Payment Powered by StoreLink
+                                          </div>
+                                      </>
+                                  )}
+                              </div>
                                                     ) : (
                                                     <div className="w-10 h-10 rounded-md border bg-muted flex items-center justify-center text-muted-foreground flex-shrink-0">
                                                         <Landmark className="h-5 w-5" />
