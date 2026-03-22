@@ -407,38 +407,28 @@ export default function CheckoutPage() {
                                 <div className="flex items-center gap-3 text-primary"><Info className="h-5 w-5" /><h3 className="font-bold text-lg">Bank Transfer Instructions</h3></div>
                                 <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">{settings?.bankTransferInstructions}</p>
 
-                              <div className="space-y-4">
-                                  {step === 'payment' && (
-                                      <>
-                                          <LoadingButton 
-                                              onClick={handlePlaceOrder} 
-                                              size="lg" 
-                                              className="w-full h-14 text-lg font-bold shadow-lg shadow-primary/20"
-                                              isLoading={step === 'processing'}
-                                              loadingText="Processing Order..."
-                                          >
-                                              Place Order <ShoppingBag className="ml-2 h-5 w-5" />
-                                          </LoadingButton>
-                                          <div className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                                              <ShieldCheck className="h-3 w-3 text-green-600" /> Secure Payment Powered by StoreLink
-                                          </div>
-                                      </>
-                                  )}
-                              </div>
-                                                    ) : (
+                                <RadioGroup className="space-y-3">
+                                    {bankAccounts.map((acc) => (
+                                        <div key={acc.id} className="flex items-center space-x-3 p-4 rounded-xl border-2 border-muted hover:border-primary/30 cursor-pointer transition-colors" onClick={() => setSelectedBankAccount(acc)}>
+                                            <RadioGroupItem value={acc.id} id={acc.id} className="peer sr-only" />
+                                            <Label htmlFor={acc.id} className="flex items-center gap-4 cursor-pointer flex-1">
+                                                {acc.bankName === 'Bank Transfer' ? (
                                                     <div className="w-10 h-10 rounded-md border bg-muted flex items-center justify-center text-muted-foreground flex-shrink-0">
                                                         <Landmark className="h-5 w-5" />
                                                     </div>
-                                                    )}
-                                                    <div className="min-w-0">
+                                                ) : (
+                                                    <div className="w-10 h-10 rounded-md border bg-muted flex items-center justify-center text-muted-foreground flex-shrink-0">
+                                                        <Landmark className="h-5 w-5" />
+                                                    </div>
+                                                )}
+                                                <div className="min-w-0">
                                                     <span className="font-bold block truncate">{acc.bankName}</span>
                                                     <span className="text-[10px] text-muted-foreground block truncate">{acc.accountName}</span>
-                                                    </div>
-                                                </Label>
-                                            </div>
-                                        ))}
-                                    </RadioGroup>
-                                </div>
+                                                </div>
+                                            </Label>
+                                        </div>
+                                    ))}
+                                </RadioGroup>
 
                                 {selectedBankAccount && (
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-background p-6 rounded-xl border shadow-sm">
@@ -474,10 +464,17 @@ export default function CheckoutPage() {
               {step === 'payment' && (
                 <CardFooter className="flex justify-between border-t pt-6">
                   <Button variant="ghost" onClick={() => setStep('details')}>Back to Details</Button>
-                  <Button onClick={handlePlaceOrder} disabled={step === 'processing' || (paymentMethod === 'Bank Transfer' && !hasConfirmedTransfer) || availablePaymentMethods.length === 0} size="lg" className="px-10">
-                    {step === 'processing' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ShieldCheck className="mr-2 h-4 w-4" />}
+                  <LoadingButton 
+                    onClick={handlePlaceOrder} 
+                    isLoading={step === 'processing'}
+                    disabled={(paymentMethod === 'Bank Transfer' && !hasConfirmedTransfer) || availablePaymentMethods.length === 0}
+                    size="lg" 
+                    className="px-10"
+                    loadingText="Processing..."
+                  >
+                    <ShieldCheck className="mr-2 h-4 w-4" />
                     {paymentMethod === 'Bank Transfer' ? 'Submit Order' : 'Complete Purchase'}
-                  </Button>
+                  </LoadingButton>
                 </CardFooter>
               )}
             </Card>
