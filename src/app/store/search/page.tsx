@@ -238,17 +238,30 @@ function SearchPageContent() {
         </div>
       </div>
 
+      {/* Mobile Filter Overlay Backdrop */}
+      {showFilters && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setShowFilters(false)}
+        />
+      )}
+
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="flex flex-col lg:flex-row gap-12">
-          {/* Sidebar Filters - Hidden on mobile unless toggled */}
+          {/* Sidebar Filters - Modal on mobile, sidebar on desktop */}
           <aside className={cn(
-            "w-full lg:w-72 shrink-0 space-y-10 transition-all duration-300",
-            "hidden lg:block",
-            showFilters && "block lg:block"
+            "fixed lg:relative inset-y-0 left-0 w-80 lg:w-72 shrink-0 space-y-10 z-50 lg:z-auto",
+            "transition-transform duration-300 ease-in-out transform",
+            "bg-background-light dark:bg-background-dark lg:bg-transparent",
+            "overflow-y-auto lg:overflow-visible",
+            "p-6 lg:p-0 top-0 pt-20 lg:pt-0",
+            "lg:block",
+            "-translate-x-full lg:translate-x-0",
+            showFilters && "translate-x-0"
           )}>
             {/* Mobile Filter Close Button */}
             {showFilters && (
-              <div className="flex lg:hidden items-center justify-between mb-4">
+              <div className="flex lg:hidden items-center justify-between mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
                 <h2 className="font-black text-lg">Filters</h2>
                 <button 
                   onClick={() => setShowFilters(false)}
@@ -346,7 +359,7 @@ function SearchPageContent() {
             )}
           </aside>
 
-          <div className="flex-1 w-full">
+          <div className="flex-1 w-full min-h-screen overflow-y-auto">
             {isLoading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {[...Array(6)].map((_, i) => <ProductCardSkeleton key={i} />)}
