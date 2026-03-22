@@ -35,7 +35,8 @@ import {
   ChevronLeft, 
   X,
   Sparkles,
-  LayoutGrid
+  LayoutGrid,
+  SlidersHorizontal
 } from 'lucide-react';
 import { ProductCard } from '@/components/store/ProductCard';
 import { ProductCardSkeleton } from '@/components/store/ProductCardSkeleton';
@@ -67,6 +68,7 @@ function SearchPageContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLastPage, setIsLastPage] = useState(false);
   const [totalFilteredCount, setTotalFilteredCount] = useState(0);
+  const [showFilters, setShowFilters] = useState(false);
 
   // Sync state with URL
   useEffect(() => {
@@ -193,7 +195,29 @@ function SearchPageContent() {
               </p>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 flex-wrap">
+              {/* Filter count badge for mobile */}
+              {(() => {
+                const activeFilters = (selectedCategories.length > 0 ? 1 : 0) + 
+                                    (priceRange[0] > 0 || priceRange[1] < 5000000 ? 1 : 0) + 
+                                    (onlyOnSale ? 1 : 0);
+                return (
+                  <Button 
+                    variant={showFilters ? "default" : "outline"} 
+                    size="sm" 
+                    onClick={() => setShowFilters(!showFilters)} 
+                    className="lg:hidden h-11 rounded-xl px-4 gap-2 relative"
+                  >
+                    <SlidersHorizontal className="h-4 w-4" />
+                    {showFilters ? 'Hide' : 'Show'} Filters
+                    {activeFilters > 0 && (
+                      <span className="absolute -top-2 -right-2 h-5 w-5 bg-amber-500 text-white text-[10px] font-black rounded-full flex items-center justify-center">
+                        {activeFilters}
+                      </span>
+                    )}
+                  </Button>
+                );
+              })()}
               <Button variant="outline" size="sm" onClick={() => { setCurrentPage(1); fetchFilteredProducts(); }} className="h-11 rounded-xl px-4">
                 <RotateCcw className={cn("h-4 w-4 mr-2", isLoading && "animate-spin")} /> Resync
               </Button>
@@ -216,8 +240,24 @@ function SearchPageContent() {
 
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="flex flex-col lg:flex-row gap-12">
-          {/* Sidebar Filters */}
-          <aside className="w-full lg:w-72 shrink-0 space-y-10">
+          {/* Sidebar Filters - Hidden on mobile unless toggled */}
+          <aside className={cn(
+            "w-full lg:w-72 shrink-0 space-y-10 transition-all duration-300",
+            "hidden lg:block",
+            showFilters && "block lg:block"
+          )}>
+            {/* Mobile Filter Close Button */}
+            {showFilters && (
+              <div className="flex lg:hidden items-center justify-between mb-4">
+                <h2 className="font-black text-lg">Filters</h2>
+                <button 
+                  onClick={() => setShowFilters(false)}
+                  className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            )}
             <div className="space-y-4">
                 <Label className="text-xs font-black uppercase tracking-[0.2em] text-primary">Direct Search</Label>
                 <div className="relative group">
@@ -294,16 +334,26 @@ function SearchPageContent() {
             >
               Flush All Filters
             </Button>
+
+            {/* Mobile - Close filters after selection */}
+            {showFilters && (
+              <Button 
+                className="w-full lg:hidden h-12 rounded-xl font-black text-[10px] uppercase tracking-widest"
+                onClick={() => setShowFilters(false)}
+              >
+                View Products
+              </Button>
+            )}
           </aside>
 
-          <div className="flex-1">
+          <div className="flex-1 w-full">
             {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {[...Array(6)].map((_, i) => <ProductCardSkeleton key={i} />)}
               </div>
             ) : products.length > 0 ? (
               <div className="space-y-12">
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {products.map(product => (
                     <ProductCard 
                       key={product.id} 
