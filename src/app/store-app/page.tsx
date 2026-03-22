@@ -40,6 +40,7 @@ import { doc } from 'firebase/firestore';
 import type { Customer } from '@/lib/types';
 import { formatCurrency } from '@/lib/formatUtils';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { ProductLoadingOverlay } from '@/components/store/ProductLoadingOverlay';
 
 type AppTab = 'home' | 'collections' | 'search' | 'cart' | 'profile' | 'recently-viewed' | 'checkout' | 'wishlist' | 'orders' | 'profile-settings' | 'notifications' | 'login' | 'signup';
 
@@ -47,6 +48,7 @@ export default function StoreAppPage() {
     const [activeTab, setActiveTab] = useState<AppTab>('home');
     const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
     const [preSelectedCategoryId, setPreSelectedCategoryId] = useState<string | null>(null);
+    const [isLoadingProduct, setIsLoadingProduct] = useState(false);
     
     const { settings, isLoadingSettings } = useSettings();
     const { cartCount } = useCart();
@@ -59,7 +61,10 @@ export default function StoreAppPage() {
     const { data: customer } = useDoc<Customer>(customerRef);
 
     const onSelectProduct = (id: string) => {
+        setIsLoadingProduct(true);
         setSelectedProductId(id);
+        // Hide loading after transition completes
+        setTimeout(() => setIsLoadingProduct(false), 500);
     };
 
     const onNavigateToHome = () => {
@@ -108,8 +113,10 @@ export default function StoreAppPage() {
     const showNav = !selectedProductId && activeTab !== 'checkout' && !isFocusedSubView;
 
     return (
-        <div className="bg-background-light dark:bg-background-dark min-h-screen">
-          <div className="relative flex flex-col max-w-md mx-auto bg-background-light dark:bg-background-dark shadow-2xl min-h-screen border-x">
+        <>
+            <ProductLoadingOverlay isVisible={isLoadingProduct} />
+            <div className="bg-background-light dark:bg-background-dark min-h-screen">
+              <div className="relative flex flex-col max-w-md mx-auto bg-background-light dark:bg-background-dark shadow-2xl min-h-screen border-x">
             
             {showNav && (
                 <header className="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-xl transition-all duration-500 border-b border-slate-200/50 dark:border-slate-800/50">
@@ -335,5 +342,6 @@ export default function StoreAppPage() {
             body { overscroll-behavior-y: contain; }
           `}</style>
         </div>
+        </>
     );
 }

@@ -15,6 +15,7 @@ import { formatCurrency } from '@/lib/formatUtils';
 import { calculateEffectivePrice } from '@/lib/pos-utils';
 import { StockBar } from './StockBar';
 import { ProductRating } from './ProductRating';
+import { ProductLoadingOverlay } from './ProductLoadingOverlay';
 import type { Product, Category } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { calculateRatingStats } from '@/lib/rating-utils';
@@ -32,6 +33,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
   const { isProductInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const { settings } = useSettings();
   const [today, setToday] = useState<Date | null>(null);
+  const [isLoadingProduct, setIsLoadingProduct] = useState(false);
   const { reviews } = useProductReviews(product.id);
 
   useEffect(() => {
@@ -73,10 +75,16 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
     }
   };
 
+  const handleProductClick = () => {
+    setIsLoadingProduct(true);
+  };
+
   return (
-    <div className={`group relative flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all duration-500 hover:border-primary/30 overflow-hidden h-full ${styles.cardContainer}`}>
-      {/* Media Area with Enhanced Hover */}
-      <Link href={`/store/product/${product.id}`} className={`block relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 ${styles.mediaArea}`}>
+    <>
+      <ProductLoadingOverlay isVisible={isLoadingProduct} productName={product.name} />
+      <div className={`group relative flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all duration-500 hover:border-primary/30 overflow-hidden h-full ${styles.cardContainer}`}>
+        {/* Media Area with Enhanced Hover */}
+        <Link href={`/store/product/${product.id}`} onClick={handleProductClick} className={`block relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 ${styles.mediaArea}`}>
         <Image
           src={product.imageUrl || settings?.defaultProductImageUrl || 'https://placehold.co/600x600.png'}
           alt={product.name}
@@ -223,5 +231,6 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
         </div>
       </div>
     </div>
+    </>
   );
 }
