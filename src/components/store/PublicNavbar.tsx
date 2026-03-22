@@ -32,6 +32,7 @@ import { cn, convertToDateSafely } from '@/lib/utils';
 import { useSettings } from '@/contexts/settings-context';
 import { useAuth as useFirebaseAuthInstance, useFirestore, useCollection, useDoc } from '@/firebase';
 import { useAuth } from '@/contexts/auth-context';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { collection, query, orderBy, where, limit, doc } from 'firebase/firestore';
 import type { Category, Product, HomepageSection, Customer } from '@/lib/types';
 import {
@@ -364,6 +365,8 @@ export function PublicNavbar() {
                             )}
                         </Link>
                         </Button>
+
+                        <ThemeToggle className="h-11 w-11 rounded-2xl text-slate-600 dark:text-slate-300 hover:text-primary hover:bg-primary/5 transition-all" />
                         
                         <div className="md:hidden">
                         <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>

@@ -39,6 +39,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { doc } from 'firebase/firestore';
 import type { Customer } from '@/lib/types';
 import { formatCurrency } from '@/lib/formatUtils';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 type AppTab = 'home' | 'collections' | 'search' | 'cart' | 'profile' | 'recently-viewed' | 'checkout' | 'wishlist' | 'orders' | 'profile-settings' | 'notifications' | 'login' | 'signup';
 
@@ -158,15 +159,22 @@ export default function StoreAppPage() {
                             </h1>
                         </div>
 
-                        {/* Right Action: Notifications */}
-                        <div className="relative">
-                            <button 
-                                onClick={() => setActiveTab('notifications')}
-                                className="flex items-center justify-center size-10 rounded-2xl bg-white dark:bg-slate-800 shadow-lg border-2 border-primary/30 animate-border-glow hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
-                            >
-                                <Bell className="h-5 w-5" strokeWidth={2.5} />
-                            </button>
-                            <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full border-2 border-background-light dark:border-background-dark animate-pulse"></span>
+                        {/* Right Actions: Theme Toggle & Notifications */}
+                        <div className="flex items-center gap-2">
+                            <ThemeToggle 
+                                variant="ghost"
+                                size="icon"
+                                className="size-10 rounded-2xl bg-white dark:bg-slate-800 shadow-lg border-2 border-primary/30 hover:bg-primary/10 hover:text-primary"
+                            />
+                            <div className="relative">
+                                <button 
+                                    onClick={() => setActiveTab('notifications')}
+                                    className="flex items-center justify-center size-10 rounded-2xl bg-white dark:bg-slate-800 shadow-lg border-2 border-primary/30 animate-border-glow hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
+                                >
+                                    <Bell className="h-5 w-5" strokeWidth={2.5} />
+                                </button>
+                                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full border-2 border-background-light dark:border-background-dark animate-pulse"></span>
+                            </div>
                         </div>
                     </div>
                 </header>

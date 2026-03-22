@@ -6,9 +6,11 @@ import { useFirestore, useDoc } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { Settings } from '@/lib/types';
 import { hexToHslString } from '@/lib/color-utils';
+import { useTheme } from '@/contexts/theme-context';
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const firestore = useFirestore();
+  const { theme } = useTheme();
 
   const settingsRef = useMemo(
     () => (firestore ? doc(firestore, 'settings', 'global') : null),
@@ -21,12 +23,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const root = window.document.documentElement;
     const body = window.document.body;
 
-    const userThemeSetting = settings?.theme || 'system';
-
     const applyTheme = () => {
-      // Determine the effective theme (light or dark)
-      const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const effectiveTheme = userThemeSetting === 'system' ? (isSystemDark ? 'dark' : 'light') : userThemeSetting;
+      // Use the user-selected theme from context (no system preference detection)
+      const effectiveTheme = theme; // 'light' or 'dark'
 
       // Apply the correct theme class to the root element
       root.classList.remove('light', 'dark');
@@ -116,14 +115,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     
     applyTheme();
 
-    // Add listener for system theme changes to re-apply the theme logic
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    mediaQuery.addEventListener('change', applyTheme);
-
-    return () => {
-      mediaQuery.removeEventListener('change', applyTheme);
-    };
-  }, [settings]);
+    // No need to listen to system theme changes anymore since we're using user preference
+  }, [settings, theme]);
 
   return <>{children}</>;
 }
