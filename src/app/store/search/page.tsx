@@ -167,6 +167,13 @@ function SearchPageContent() {
                         (priceRange[0] > 0 || priceRange[1] < 5000000 ? 1 : 0) + 
                         (onlyOnSale ? 1 : 0);
 
+  // Loading state messaging
+  const getLoadingMessage = () => {
+    if (searchTerm && !isLoading) return `Searched for "${searchTerm}"`;
+    if (activeFilters > 0 && !isLoading) return `${activeFilters} filter${activeFilters > 1 ? 's' : ''} applied`;
+    return 'Loading products';
+  };
+
   return (
     <div className="bg-background-light dark:bg-background-dark min-h-screen pb-20">
       {/* Header Section */}
@@ -185,9 +192,17 @@ function SearchPageContent() {
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tighter text-slate-900 dark:text-white uppercase break-words">
                 {queryParam ? `Matches: "${queryParam}"` : 'Universal Registry'}
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-2">
-                Showing <span className="text-primary font-bold">{totalFilteredCount}</span> items found
-              </p>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-2">
+                <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                  Showing <span className="text-primary font-bold">{totalFilteredCount}</span> items found
+                </p>
+                {isLoading && (
+                  <div className="flex items-center gap-2 text-xs text-slate-400 sm:ml-4 sm:pl-4 sm:border-l border-slate-200 dark:border-slate-700">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    <span className="font-medium">{getLoadingMessage()}</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Controls Bar - Responsive Layout */}
@@ -213,10 +228,11 @@ function SearchPageContent() {
                 variant="outline" 
                 size="sm" 
                 onClick={() => { setCurrentPage(1); fetchFilteredProducts(); }} 
-                className="h-10 rounded-lg px-4 text-sm flex-shrink-0"
+                disabled={isLoading}
+                className="h-10 rounded-lg px-4 text-sm flex-shrink-0 transition-all"
               >
                 <RotateCcw className={cn("h-4 w-4 mr-2", isLoading && "animate-spin")} /> 
-                <span className="hidden sm:inline">Resync</span>
+                <span className="hidden sm:inline">{isLoading ? 'Searching' : 'Resync'}</span>
               </Button>
 
               {/* Sort Dropdown */}
@@ -277,12 +293,17 @@ function SearchPageContent() {
             <div className="space-y-3">
               <Label className="text-xs font-black uppercase tracking-[0.2em] text-primary">Direct Search</Label>
               <div className="relative group">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors flex-shrink-0" />
+                {isLoading ? (
+                  <Loader2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary animate-spin flex-shrink-0" />
+                ) : (
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors flex-shrink-0" />
+                )}
                 <Input 
                   placeholder="Keyword or SKU..." 
                   value={searchTerm}
                   onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                   className="pl-10 h-10 rounded-lg text-sm"
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -366,7 +387,19 @@ function SearchPageContent() {
           </aside>
 
           {/* Products Grid */}
-          <div className="lg:col-span-3 w-full">
+          <div className="lg:col-span-3 w-full relative">
+            {isLoading && (
+              <div className="absolute inset-0 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm z-10 rounded-2xl flex items-center justify-center">
+                <div className="text-center">
+                  <div className="flex justify-center mb-4">
+                    <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                  </div>
+                  <p className="text-sm font-bold text-slate-600 dark:text-slate-300">
+                    {searchTerm ? `Searching for "${searchTerm}"...` : 'Filtering products...'}
+                  </p>
+                </div>
+              </div>
+            )}
             {isLoading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {[...Array(6)].map((_, i) => <ProductCardSkeleton key={i} />)}
