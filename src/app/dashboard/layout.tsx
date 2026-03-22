@@ -66,6 +66,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { ElysiumLogo } from '@/components/icons';
+import { ThemeToggle } from '@/components/theme-toggle';
 import {
   Tooltip,
   TooltipContent,
@@ -555,6 +556,8 @@ export default function DashboardLayout({
               </div>
             </PopoverContent>
           </Popover>
+
+          <ThemeToggle variant="outline" className="hidden md:inline-flex" />
 
           <UserNav />
         </header>

@@ -21,16 +21,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const root = window.document.documentElement;
     const body = window.document.body;
 
-    const userThemeSetting = settings?.theme || 'system';
-
     const applyTheme = () => {
-      // Determine the effective theme (light or dark)
-      const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const effectiveTheme = userThemeSetting === 'system' ? (isSystemDark ? 'dark' : 'light') : userThemeSetting;
-
-      // Apply the correct theme class to the root element
-      root.classList.remove('light', 'dark');
-      root.classList.add(effectiveTheme);
+      // Theme is managed by ThemeContextProvider, we only handle color settings here
 
       // Apply Global Layout Width regardless of theme
       if (settings?.webMaxContainerWidth) {
@@ -51,13 +43,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       body.style.backgroundPosition = '';
       body.style.backgroundAttachment = '';
 
-      // Apply or remove custom styles based on the effective theme
-      if (effectiveTheme === 'dark') {
-        // In dark mode, we want to use the CSS variables defined in the .dark block in globals.css.
-        // So, we must remove any inline styles that might have been set for light mode.
-        customColorVars.forEach(v => root.style.removeProperty(v));
-      } else {
-        // In light mode, apply custom colors from Firestore settings.
+      // Apply custom colors from Firestore settings - theme is handled by ThemeContextProvider
+      {
         if (settings) {
             // Accent colors
             const colors: { key: keyof Settings, cssVar: string }[] = [
@@ -115,14 +102,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     };
     
     applyTheme();
-
-    // Add listener for system theme changes to re-apply the theme logic
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    mediaQuery.addEventListener('change', applyTheme);
-
-    return () => {
-      mediaQuery.removeEventListener('change', applyTheme);
-    };
   }, [settings]);
 
   return <>{children}</>;
