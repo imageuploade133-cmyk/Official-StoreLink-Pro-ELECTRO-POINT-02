@@ -54,6 +54,12 @@ function ShopPageContent() {
     const [showHeader, setShowHeader] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
 
+    // Search suggestions state
+    const [searchSuggestions, setSearchSuggestions] = useState<Product[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+    const searchInputRef = useRef<HTMLInputElement>(null);
+
     const firstDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
     const lastDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
 
@@ -65,6 +71,55 @@ function ShopPageContent() {
         if (!categories) return new Map();
         return new Map(categories.map(c => [c.id, c.name]));
     }, [categories]);
+
+    // Fetch search suggestions
+    const fetchSuggestions = useCallback(async (term: string) => {
+        if (!firestore || !term.trim() || term.length < 1) {
+            setSearchSuggestions([]);
+            setShowSuggestions(false);
+            return;
+        }
+
+        setIsLoadingSuggestions(true);
+        try {
+            const searchTerm = term.toLowerCase().trim();
+            let q = query(
+                collection(firestore, 'products'),
+                where('isVisibleOnWeb', '==', true),
+                orderBy('name'),
+                limit(5)
+            );
+
+            const snapshot = await getDocs(q);
+            const allProducts = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Product));
+            
+            // Filter by search term locally
+            const filtered = allProducts.filter(p =>
+                p.name.toLowerCase().includes(searchTerm) ||
+                p.sku?.toLowerCase().includes(searchTerm) ||
+                p.description?.toLowerCase().includes(searchTerm)
+            ).slice(0, 5);
+
+            setSearchSuggestions(filtered);
+            setShowSuggestions(filtered.length > 0);
+        } catch (error) {
+            console.error('Error fetching suggestions:', error);
+            setSearchSuggestions([]);
+        } finally {
+            setIsLoadingSuggestions(false);
+        }
+    }, [firestore]);
+
+    // Debounce search suggestions
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (searchTerm.trim()) {
+                fetchSuggestions(searchTerm);
+            }
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [searchTerm, fetchSuggestions]);
 
     const fetchProducts = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
         if (!firestore) return;
@@ -199,13 +254,73 @@ function ShopPageContent() {
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-8 sm:mb-12">
                     <form onSubmit={handleSearchSubmit} className="relative w-full sm:max-w-xs">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground flex-shrink-0 z-10" />
                         <Input
+                            ref={searchInputRef}
                             placeholder="Search products..."
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-10 h-10 rounded-lg text-sm"
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                                if (!e.target.value.trim()) {
+                                    setShowSuggestions(false);
+                                }
+                            }}
+                            onFocus={() => searchTerm.trim() && setShowSuggestions(true)}
+                            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                            className="pl-10 h-10 rounded-lg text-sm w-full"
                         />
+                        
+                        {/* Search Suggestions Dropdown */}
+                        {showSuggestions && searchSuggestions.length > 0 && (
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
+                                <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                                    {searchSuggestions.map(product => (
+                                        <button
+                                            key={product.id}
+                                            onClick={() => {
+                                                setSearchTerm(product.name);
+                                                setShowSuggestions(false);
+                                                handleSearchSubmit({ preventDefault: () => {} } as any);
+                                            }}
+                                            className="w-full px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-3 group"
+                                        >
+                                            {product.imageUrl && (
+                                                <img 
+                                                    src={product.imageUrl} 
+                                                    alt={product.name}
+                                                    className="h-10 w-10 rounded object-cover flex-shrink-0"
+                                                />
+                                            )}
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-semibold text-slate-900 dark:text-white truncate group-hover:text-primary transition-colors">
+                                                    {product.name}
+                                                </p>
+                                                <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                                                    {currencySymbol}{product.sellingPrice.toLocaleString()}
+                                                </p>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                                <div className="px-4 py-2 bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500 text-center">
+                                    {searchSuggestions.length} product{searchSuggestions.length !== 1 ? 's' : ''} found
+                                </div>
+                            </div>
+                        )}
+
+                        {/* No suggestions message */}
+                        {showSuggestions && searchSuggestions.length === 0 && !isLoadingSuggestions && searchTerm.trim() && (
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 p-4 text-center">
+                                <p className="text-sm text-slate-500 dark:text-slate-400">No products match "{searchTerm}"</p>
+                            </div>
+                        )}
+
+                        {/* Loading state */}
+                        {isLoadingSuggestions && (
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 p-4 text-center">
+                                <Loader2 className="h-4 w-4 animate-spin mx-auto text-primary" />
+                            </div>
+                        )}
                     </form>
                     <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
                         <Select value={categoryFromUrl} onValueChange={handleCategoryChange} disabled={isLoadingCategories}>
