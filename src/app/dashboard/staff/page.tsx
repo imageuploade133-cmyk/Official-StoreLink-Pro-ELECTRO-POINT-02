@@ -38,8 +38,8 @@ import { convertToDateSafely, cn } from '@/lib/utils';
 import { ActionModal } from '@/components/dialogs/ActionModal';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { PageHeader } from '@/components/PageHeader';
-
-const ITEMS_PER_PAGE = 10;
+import { AdvancedPagination } from '@/components/pagination/AdvancedPagination';
+import { Separator } from '@/components/ui/separator';
 
 export default function StaffManagementPage() {
   const { user, permissions, isLoading: isAuthLoading } = useAuth();
@@ -56,6 +56,7 @@ export default function StaffManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLastPage, setIsLastPage] = useState(false);
   const [totalStaffCount, setTotalStaffCount] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const firstDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
   const lastDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
 
@@ -82,11 +83,11 @@ export default function StaffManagementPage() {
 
       // 2. Apply cursors
       if (direction === 'next' && lastDocRef.current) {
-        q = query(q, startAfter(lastDocRef.current), limit(ITEMS_PER_PAGE));
+        q = query(q, startAfter(lastDocRef.current), limit(itemsPerPage));
       } else if (direction === 'prev' && firstDocRef.current) {
-        q = query(q, endBefore(firstDocRef.current), limitToLast(ITEMS_PER_PAGE));
+        q = query(q, endBefore(firstDocRef.current), limitToLast(itemsPerPage));
       } else {
-        q = query(q, limit(ITEMS_PER_PAGE));
+        q = query(q, limit(itemsPerPage));
       }
 
       const snapshot = await getDocs(q);
@@ -95,7 +96,7 @@ export default function StaffManagementPage() {
       if (docs.length > 0) {
         firstDocRef.current = docs[0];
         lastDocRef.current = docs[docs.length - 1];
-        setIsLastPage(docs.length < ITEMS_PER_PAGE);
+        setIsLastPage(docs.length < itemsPerPage);
 
         const basicStaffData = docs.map(d => ({ id: d.id, ...d.data() } as StaffMember));
         const staffUids = basicStaffData.map(s => s.uid).filter(Boolean) as string[];
@@ -154,7 +155,7 @@ export default function StaffManagementPage() {
     } finally {
       setIsLoadingData(false);
     }
-  }, [firestore, user, toast]);
+  }, [firestore, user, toast, itemsPerPage]);
 
   useEffect(() => {
     if (!isAuthLoading && permissions.manage_staff) {
@@ -272,6 +273,13 @@ export default function StaffManagementPage() {
       setIsSendingReset(false);
     }
   };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+    firstDocRef.current = null;
+    lastDocRef.current = null;
+  };
   
   if (isAuthLoading) {
     return <div className="flex h-screen w-full items-center justify-center"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>;
@@ -313,18 +321,21 @@ export default function StaffManagementPage() {
             roles={roles}
           />
         </CardContent>
-        <CardFooter className="py-4 border-t flex flex-col sm:flex-row sm:justify-between items-center bg-muted/5 gap-4">
-            <div className="text-xs font-black uppercase text-muted-foreground tracking-widest">
-                Page {currentPage} <span className="mx-2">|</span> {totalStaffCount} Total Members
-            </div>
-            <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => fetchStaffData('prev')} disabled={currentPage === 1 || isLoadingData} className="font-bold">
-                    <ChevronLeft className="h-4 w-4 mr-1" /> Previous
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => fetchStaffData('next')} disabled={isLastPage || isLoadingData} className="font-bold">
-                    Next <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
-            </div>
+        <CardFooter className="py-4 border-t bg-muted/5">
+            <AdvancedPagination
+              currentPage={currentPage}
+              totalPages={Math.ceil(totalStaffCount / itemsPerPage) || 1}
+              itemsPerPage={itemsPerPage}
+              totalItems={totalStaffCount}
+              onPageChange={(page) => {
+                setCurrentPage(page);
+                if (page > currentPage) fetchStaffData('next');
+                else if (page < currentPage) fetchStaffData('prev');
+              }}
+              onItemsPerPageChange={handleItemsPerPageChange}
+              isLoading={isLoadingData}
+              itemsPerPageOptions={[5, 10, 15, 25, 50]}
+            />
         </CardFooter>
       </Card>
       
