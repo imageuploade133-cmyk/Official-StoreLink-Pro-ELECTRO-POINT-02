@@ -42,49 +42,76 @@
   }
  
   .dark {
-    --background: 0 0% 11.8%;
-    --foreground: 0 0% 95%;
-    --card: 0 0% 15%;
-    --card-foreground: 0 0% 95%;
-    --popover: 0 0% 15%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 0 0% 5%;
-    --secondary: 0 0% 25%;
-    --secondary-foreground: 0 0% 95%;
-    --muted: 0 0% 35%;
-    --muted-foreground: 0 0% 70%;
-    --accent: 0 0% 25%;
-    --accent-foreground: 0 0% 95%;
+    /* Professional Dark Mode Palette */
+    /* Base: Deep charcoal with blue undertone for sophistication */
+    --background: 217 33% 7.8%;
+    --foreground: 210 40% 96%;
+    
+    /* Cards: Slightly elevated from background with subtle contrast */
+    --card: 217 32% 11.2%;
+    --card-foreground: 210 40% 96%;
+    
+    /* Popovers: Elevated with refined appearance */
+    --popover: 217 32% 13.5%;
+    --popover-foreground: 210 40% 96%;
+    
+    /* Primary: Vibrant blue accent with excellent contrast */
+    --primary: 217 91% 60%;
+    --primary-foreground: 217 33% 7.8%;
+    
+    /* Secondary: Muted blue-gray for supporting elements */
+    --secondary: 217 28% 22%;
+    --secondary-foreground: 210 40% 96%;
+    
+    /* Muted: Subtle grays for disabled/secondary content */
+    --muted: 217 28% 26%;
+    --muted-foreground: 210 40% 70%;
+    
+    /* Accent: Cyan for interactive elements */
+    --accent: 188 94% 48%;
+    --accent-foreground: 217 33% 7.8%;
+    
+    /* Destructive: Clear red for dangerous actions */
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 100%;
-    --success: 142 76% 45%;
-    --success-foreground: 0 0% 100%;
-    --border: 0 0% 25%;
-    --input: 0 0% 25%;
-    --ring: 217.2 91.2% 59.8%;
-    --chart-1: 220 70% 60%;
-    --chart-2: 160 60% 55%;
-    --chart-3: 30 80% 65%;
-    --chart-4: 280 65% 70%;
-    --chart-5: 340 75% 65%;
-    --sidebar-background: 0 0% 12%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 217.2 91.2% 59.8%;
-    --sidebar-primary-foreground: 0 0% 5%;
-    --sidebar-accent: 0 0% 25%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 0 0% 25%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --destructive-foreground: 210 40% 98%;
+    
+    /* Success: Professional green */
+    --success: 142 71% 45%;
+    --success-foreground: 210 40% 98%;
+    
+    /* Border: Subtle but visible separation */
+    --border: 217 28% 20%;
+    --input: 217 28% 18%;
+    
+    /* Ring: Focus state with primary color */
+    --ring: 217 91% 60%;
+    
+    /* Chart colors: Vibrant and distinguishable */
+    --chart-1: 12 100% 62%;
+    --chart-2: 160 84% 45%;
+    --chart-3: 220 90% 56%;
+    --chart-4: 280 85% 55%;
+    --chart-5: 40 92% 50%;
+    
+    /* Sidebar: Integrated with dark theme */
+    --sidebar-background: 217 32% 10%;
+    --sidebar-foreground: 210 40% 96%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 217 33% 7.8%;
+    --sidebar-accent: 188 94% 48%;
+    --sidebar-accent-foreground: 217 33% 7.8%;
+    --sidebar-border: 217 28% 20%;
+    --sidebar-ring: 217 91% 60%;
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border transition-colors duration-300 ease-in-out;
   }
   html {
     scroll-behavior: smooth;
+    color-scheme: light dark;
   }
   body {
     @apply bg-background text-foreground antialiased;
@@ -92,20 +119,42 @@
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--primary) / 0.2) transparent;
     scrollbar-gutter: stable;
+    transition: background-color 0.4s ease-in-out, color 0.4s ease-in-out;
+  }
+  
+  /* Smooth transitions for theme-aware elements */
+  button, a, input, textarea, select {
+    @apply transition-colors duration-200 ease-in-out;
   }
 }
 
 @layer utilities {
-  /* Premium Glassmorphism Utility */
+  /* Premium Glassmorphism Utilities - Dark Mode Optimized */
   .glass-card {
-    @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/20 dark:border-slate-800/20 shadow-2xl;
+    @apply backdrop-blur-xl transition-all duration-300;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+  }
+  
+  .dark .glass-card {
+    background: rgba(23, 23, 35, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   }
 
   .glass-nav {
-    @apply bg-white/80 dark:bg-slate-950/80 backdrop-blur-3xl border-b border-white/10 dark:border-slate-800/10;
+    @apply backdrop-blur-3xl transition-all duration-300 border-b;
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+  
+  .dark .glass-nav {
+    background: rgba(20, 20, 30, 0.75);
+    border-color: rgba(255, 255, 255, 0.06);
   }
 
-  /* Custom Scrollbar Styles */
+  /* Custom Scrollbar Styles - Smart Dark Mode */
   ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -116,15 +165,24 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: hsl(var(--primary) / 0.15);
+    background-color: hsl(var(--primary) / 0.2);
     border-radius: 20px;
     border: 3px solid transparent;
     background-clip: content-box;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s ease;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background-color: hsl(var(--primary) / 0.3);
+    background-color: hsl(var(--primary) / 0.4);
+  }
+
+  /* Dark mode specific scrollbar */
+  .dark ::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--primary) / 0.25);
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--primary) / 0.5);
   }
 
   /* Border Glow Animation */
