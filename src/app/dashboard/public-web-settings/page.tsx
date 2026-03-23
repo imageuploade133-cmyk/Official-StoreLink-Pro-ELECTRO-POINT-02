@@ -19,6 +19,7 @@ import { ImageUploadSettings } from './components/ImageUploadSettings';
 import { WatermarkSettings } from './components/WatermarkSettings';
 import { HeroCarouselSettings } from './components/HeroCarouselSettings';
 import { WebStoreGridSettings } from '@/components/dashboard/settings/WebStoreGridSettings';
+import { ProductCardSizeSettings } from '@/components/dashboard/settings/ProductCardSizeSettings';
 
 export default function PublicWebSettingsPage() {
     const firestore = useFirestore();
@@ -55,6 +56,7 @@ export default function PublicWebSettingsPage() {
                 <WatermarkSettings settingsData={settingsData} isLoading={isLoading} />
                 <ColorSettings settingsData={settingsData} isLoading={isLoading} />
                 <WebStoreGridSettings settingsData={settingsData} isLoading={isLoading} />
+                <ProductCardSizeSettings settingsData={settingsData} isLoading={isLoading} />
                 <BrandValuesSettings settingsData={settingsData} isLoading={isLoading} />
                 <FooterSettings settingsData={settingsData} isLoading={isLoading} />
                 <NewsletterSettings settingsData={settingsData} isLoading={isLoading} />

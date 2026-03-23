@@ -105,37 +105,53 @@ export function WebStoreGridSettings({ settingsData, isLoading }: WebStoreGridSe
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center gap-3">
-          <LayoutGrid className="h-5 w-5 text-primary" />
-          <div>
-            <CardTitle>Web Store Product Grid Layout</CardTitle>
-            <CardDescription>
-              Configure how products display in grid on your web store
-            </CardDescription>
+    <Card className="border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
+      <CardHeader className="pb-4">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-3 flex-1">
+            <div className="p-2 rounded-lg bg-primary/10 flex-shrink-0">
+              <LayoutGrid className="h-5 w-5 text-primary" />
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg font-bold">Web Store Product Grid Layout</CardTitle>
+              <CardDescription className="mt-1">
+                Customize how many products display per row on different screen sizes. Changes apply instantly across your entire store.
+              </CardDescription>
+            </div>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-8">
+      <CardContent className="space-y-10">
+        {/* Device Type Info Box */}
+        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <p className="text-xs font-semibold text-blue-900 dark:text-blue-200 uppercase tracking-wide">Device Breakpoints</p>
+          <p className="text-sm text-blue-800 dark:text-blue-300 mt-1">
+            Configure grid columns for each device size: extra small phones (xs) → small phones (sm) → tablets (md) → desktops (lg)
+          </p>
+        </div>
+
         {/* Default (xs) Grid Columns */}
         <div className="space-y-4">
-          <Label className="text-base font-semibold block">Default Layout (xs screens - phones)</Label>
+          <div className="flex items-baseline gap-2">
+            <Label className="text-base font-semibold">Default Layout</Label>
+            <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 px-2 py-1 rounded">XS screens (extra small phones)</span>
+          </div>
+          <p className="text-sm text-slate-600 dark:text-slate-400">Smallest mobile devices for maximum readability</p>
           <div className="grid grid-cols-2 gap-3 max-w-xs">
             {[2, 3].map((cols) => (
               <button
                 key={cols}
                 onClick={() => setDefaultColumns(cols as 2 | 3)}
                 className={cn(
-                  'p-4 rounded-lg border-2 transition-all',
+                  'p-4 rounded-lg border-2 transition-all duration-200 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-slate-950',
                   defaultColumns === cols
-                    ? 'border-primary bg-primary/10'
-                    : 'border-slate-200 dark:border-slate-700 hover:border-primary/50'
+                    ? 'border-primary bg-primary/10 shadow-sm'
+                    : 'border-slate-200 dark:border-slate-700 hover:border-primary/50 hover:shadow-sm'
                 )}
               >
                 <div className={cn('grid gap-1', cols === 2 ? 'grid-cols-2' : 'grid-cols-3')}>
                   {[...Array(cols)].map((_, i) => (
-                    <div key={i} className="aspect-square bg-slate-300 dark:bg-slate-600 rounded" />
+                    <div key={i} className={cn('aspect-square rounded', defaultColumns === cols ? 'bg-primary/30' : 'bg-slate-300 dark:bg-slate-600 group-hover:bg-slate-400 dark:group-hover:bg-slate-500')} />
                   ))}
                 </div>
                 <p className="text-sm font-semibold mt-2">{cols} Columns</p>
@@ -145,8 +161,12 @@ export function WebStoreGridSettings({ settingsData, isLoading }: WebStoreGridSe
         </div>
 
         {/* Small (sm) Grid Columns */}
-        <div className="space-y-4">
-          <Label className="text-base font-semibold block">Small Layout (sm screens - small phones)</Label>
+        <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+          <div className="flex items-baseline gap-2">
+            <Label className="text-base font-semibold">Small Layout</Label>
+            <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 px-2 py-1 rounded">SM screens (small phones)</span>
+          </div>
+          <p className="text-sm text-slate-600 dark:text-slate-400">Compact devices like older smartphones</p>
           <div className="grid grid-cols-2 gap-3 max-w-xs">
             {[2, 3].map((cols) => (
               <button
@@ -171,8 +191,12 @@ export function WebStoreGridSettings({ settingsData, isLoading }: WebStoreGridSe
         </div>
 
         {/* Medium (md) Grid Columns */}
-        <div className="space-y-4">
-          <Label className="text-base font-semibold block">Medium Layout (md screens - tablets)</Label>
+        <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+          <div className="flex items-baseline gap-2">
+            <Label className="text-base font-semibold">Medium Layout</Label>
+            <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 px-2 py-1 rounded">MD screens (tablets)</span>
+          </div>
+          <p className="text-sm text-slate-600 dark:text-slate-400">Tablets and larger phones for balanced browsing</p>
           <div className="grid grid-cols-3 gap-3 max-w-md">
             {[2, 3, 4].map((cols) => (
               <button
@@ -202,8 +226,12 @@ export function WebStoreGridSettings({ settingsData, isLoading }: WebStoreGridSe
         </div>
 
         {/* Large (lg) Grid Columns */}
-        <div className="space-y-4">
-          <Label className="text-base font-semibold block">Large Layout (lg screens - desktop)</Label>
+        <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+          <div className="flex items-baseline gap-2">
+            <Label className="text-base font-semibold">Large Layout</Label>
+            <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 px-2 py-1 rounded">LG screens (desktop)</span>
+          </div>
+          <p className="text-sm text-slate-600 dark:text-slate-400">Desktop computers and large monitors for maximum product showcase</p>
           <div className="grid grid-cols-5 gap-3">
             {[2, 3, 4].map((cols) => (
               <button

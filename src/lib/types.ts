@@ -266,6 +266,8 @@ export interface Settings {
   storeGridColumnsMd?: 2 | 3 | 4;
   storeGridColumnsLg?: 2 | 3 | 4 | 'custom';
   storeGridColumnsCustom?: number;
+  // Product Card Size Settings
+  productCardHeight?: number;
 }
 
 export type AppSettings = Settings;
