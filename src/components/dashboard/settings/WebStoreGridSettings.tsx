@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useFirestore } from '@/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, setDoc } from 'firebase/firestore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { LayoutGrid } from 'lucide-react';
+import { LayoutGrid, Check, AlertCircle, Loader2 } from 'lucide-react';
 import type { AppSettings } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
@@ -19,6 +19,8 @@ interface WebStoreGridSettingsProps {
 export function WebStoreGridSettings({ settingsData, isLoading }: WebStoreGridSettingsProps) {
   const firestore = useFirestore();
   const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState<string>('');
   
   const [gridColumns, setGridColumns] = useState<2 | 3 | 4 | 'custom'>(
     settingsData?.storeGridColumns || 2
@@ -42,20 +44,56 @@ export function WebStoreGridSettings({ settingsData, isLoading }: WebStoreGridSe
     }
   }, [settingsData]);
 
+  // Reset status message after 4 seconds
+  useEffect(() => {
+    if (saveStatus !== 'idle') {
+      const timer = setTimeout(() => setSaveStatus('idle'), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [saveStatus]);
+
   const handleSave = async () => {
-    if (!firestore) return;
+    if (!firestore) {
+      setSaveStatus('error');
+      setErrorMessage('Firestore not available');
+      console.log("[v0] Firestore not available");
+      return;
+    }
     
     setIsSaving(true);
+    setSaveStatus('idle');
+    setErrorMessage('');
+    
     try {
       const settingsRef = doc(firestore, 'settings', 'global');
-      await updateDoc(settingsRef, {
+      const updateData = {
         storeGridColumns: gridColumns,
-        storeGridCustomColumns: gridColumns === 'custom' ? customColumns : undefined,
         storeGridColumnsMobile: mobileColumns,
         storeGridColumnsTablet: tabletColumns,
-      });
-    } catch (error) {
-      console.error('Error saving grid settings:', error);
+        ...(gridColumns === 'custom' && { storeGridCustomColumns: customColumns })
+      };
+
+      console.log("[v0] Saving grid settings:", updateData);
+
+      // Try updateDoc first, if it fails (document doesn't exist), use setDoc
+      try {
+        await updateDoc(settingsRef, updateData);
+        console.log("[v0] Settings updated successfully");
+      } catch (updateError: any) {
+        if (updateError.code === 'not-found') {
+          console.log("[v0] Document doesn't exist, creating new one");
+          await setDoc(settingsRef, updateData, { merge: true });
+        } else {
+          throw updateError;
+        }
+      }
+
+      setSaveStatus('success');
+      console.log("[v0] Grid settings saved successfully");
+    } catch (error: any) {
+      console.error("[v0] Error saving grid settings:", error);
+      setSaveStatus('error');
+      setErrorMessage(error?.message || 'Failed to save settings. Please try again.');
     } finally {
       setIsSaving(false);
     }
@@ -206,12 +244,47 @@ export function WebStoreGridSettings({ settingsData, isLoading }: WebStoreGridSe
           </ul>
         </div>
 
+        {/* Status Messages */}
+        {saveStatus === 'success' && (
+          <div className="flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+            <Check className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+            <p className="text-sm font-medium text-green-800 dark:text-green-200">
+              Grid layout saved successfully!
+            </p>
+          </div>
+        )}
+
+        {saveStatus === 'error' && (
+          <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+            <p className="text-sm font-medium text-red-800 dark:text-red-200">
+              {errorMessage || 'Failed to save grid layout. Please try again.'}
+            </p>
+          </div>
+        )}
+
         <Button 
           onClick={handleSave} 
           disabled={isSaving || isLoading}
-          className="w-full"
+          className={cn(
+            "w-full transition-all",
+            saveStatus === 'success' && 'bg-green-600 hover:bg-green-700',
+            saveStatus === 'error' && 'bg-red-600 hover:bg-red-700'
+          )}
         >
-          {isSaving ? 'Saving...' : 'Save Grid Layout'}
+          {isSaving ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Saving Grid Layout...
+            </>
+          ) : saveStatus === 'success' ? (
+            <>
+              <Check className="h-4 w-4 mr-2" />
+              Saved
+            </>
+          ) : (
+            'Save Grid Layout'
+          )}
         </Button>
       </CardContent>
     </Card>
