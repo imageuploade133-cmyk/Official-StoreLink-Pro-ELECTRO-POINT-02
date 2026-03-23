@@ -40,68 +40,76 @@
     --sidebar-border: 214.3 31.8% 91.4%;
     --sidebar-ring: 222.2 84% 4.9%;
   }
+  
+  html.light {
+    color-scheme: light;
+  }
+  
+  html.dark {
+    color-scheme: dark;
+  }
  
   .dark {
-    /* Pure Black & White Dark Mode */
-    /* Base: Pure black background */
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
+    /* Deep Dark Mode - Robust and Professional */
+    /* Base: Deep charcoal background */
+    --background: 222 11% 7%;
+    --foreground: 210 40% 98%;
     
-    /* Cards: Slightly elevated from black */
-    --card: 0 0% 5%;
-    --card-foreground: 0 0% 100%;
+    /* Cards: Slightly elevated from background */
+    --card: 222 13% 12%;
+    --card-foreground: 210 40% 98%;
     
-    /* Popovers: Elevated appearance */
-    --popover: 0 0% 8%;
-    --popover-foreground: 0 0% 100%;
+    /* Popovers: More elevated */
+    --popover: 222 13% 15%;
+    --popover-foreground: 210 40% 98%;
     
-    /* Primary: Bright cyan for maximum contrast */
-    --primary: 188 100% 50%;
-    --primary-foreground: 0 0% 0%;
+    /* Primary: Vibrant blue for strong contrast */
+    --primary: 221 83% 53%;
+    --primary-foreground: 222 11% 7%;
     
-    /* Secondary: Dark gray for supporting elements */
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 100%;
+    /* Secondary: Medium gray */
+    --secondary: 222 13% 25%;
+    --secondary-foreground: 210 40% 98%;
     
-    /* Muted: Medium gray for disabled/secondary content */
-    --muted: 0 0% 40%;
-    --muted-foreground: 0 0% 100%;
+    /* Muted: Muted gray for secondary content */
+    --muted: 222 13% 35%;
+    --muted-foreground: 210 30% 80%;
     
-    /* Accent: Bright cyan accent */
+    /* Accent: Bright accent color */
     --accent: 188 100% 50%;
-    --accent-foreground: 0 0% 0%;
+    --accent-foreground: 222 11% 7%;
     
     /* Destructive: Bright red for dangerous actions */
-    --destructive: 0 100% 50%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
     
-    /* Success: Bright green */
-    --success: 142 100% 45%;
-    --success-foreground: 0 0% 100%;
+    /* Success: Vibrant green */
+    --success: 142 76% 36%;
+    --success-foreground: 210 40% 98%;
     
-    /* Border: Dark gray visible on black */
-    --border: 0 0% 20%;
-    --input: 0 0% 10%;
+    /* Border: Subtle gray border visible on dark */
+    --border: 222 13% 20%;
+    --input: 222 13% 15%;
     
-    /* Ring: Bright cyan focus state */
-    --ring: 188 100% 50%;
+    /* Ring: Blue focus state */
+    --ring: 221 83% 53%;
     
     /* Chart colors: Vibrant and highly visible */
-    --chart-1: 0 100% 50%;
-    --chart-2: 188 100% 50%;
-    --chart-3: 60 100% 50%;
-    --chart-4: 280 100% 50%;
-    --chart-5: 20 100% 50%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
     
-    /* Sidebar: Integrated with black theme */
-    --sidebar-background: 0 0% 2%;
-    --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 188 100% 50%;
-    --sidebar-primary-foreground: 0 0% 0%;
+    /* Sidebar: Integrated with dark theme */
+    --sidebar-background: 222 11% 5%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 221 83% 53%;
+    --sidebar-primary-foreground: 222 11% 7%;
     --sidebar-accent: 188 100% 50%;
-    --sidebar-accent-foreground: 0 0% 0%;
-    --sidebar-border: 0 0% 20%;
-    --sidebar-ring: 188 100% 50%;
+    --sidebar-accent-foreground: 222 11% 7%;
+    --sidebar-border: 222 13% 18%;
+    --sidebar-ring: 221 83% 53%;
   }
 }
 
@@ -120,11 +128,22 @@
     scrollbar-color: hsl(var(--primary) / 0.2) transparent;
     scrollbar-gutter: stable;
     transition: background-color 0.4s ease-in-out, color 0.4s ease-in-out;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
   }
   
   /* Smooth transitions for theme-aware elements */
   button, a, input, textarea, select {
     @apply transition-colors duration-200 ease-in-out;
+  }
+  
+  /* Ensure dark mode background is applied */
+  html.dark body {
+    background-color: hsl(var(--background));
+  }
+  
+  html.light body {
+    background-color: hsl(var(--background));
   }
 }
 
