@@ -61,6 +61,10 @@ function SearchPageContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalFilteredCount, setTotalFilteredCount] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Scroll state for header hide/show
+  const [showHeader, setShowHeader] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   // Sync state with URL
   useEffect(() => {
@@ -174,12 +178,34 @@ function SearchPageContent() {
     return 'Loading products';
   };
 
-  // No need to manage scrollbar - let browser handle it naturally
+  // Handle header visibility on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Show header when scrolling up or at the top
+      if (currentScrollY < lastScrollY || currentScrollY < 100) {
+        setShowHeader(true);
+      } 
+      // Hide header when scrolling down
+      else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setShowHeader(false);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   return (
     <div className="bg-background-light dark:bg-background-dark min-h-screen pb-20">
       {/* Header Section */}
-      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30">
+      <div className={cn(
+        "bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 transition-all duration-300 ease-in-out overflow-hidden",
+        showHeader ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
+      )}>
         <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-xs font-black uppercase text-slate-400 tracking-widest mb-4 sm:mb-6">
