@@ -174,15 +174,16 @@ function SearchPageContent() {
     return 'Loading products';
   };
 
-  // Handle body overflow when modal is open
+  // Handle scrollbar visibility when modal is open (allow scroll but hide scrollbar)
   useEffect(() => {
     if (showFilters) {
-      document.body.style.overflow = 'hidden';
+      // Hide scrollbar while allowing scroll by applying CSS class
+      document.documentElement.classList.add('hide-scrollbar');
     } else {
-      document.body.style.overflow = 'unset';
+      document.documentElement.classList.remove('hide-scrollbar');
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.documentElement.classList.remove('hide-scrollbar');
     };
   }, [showFilters]);
 
