@@ -60,6 +60,9 @@ function ShopPageContent() {
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
     const searchInputRef = useRef<HTMLInputElement>(null);
 
+    // Category auto-switch notification
+    const [categoryNotification, setCategoryNotification] = useState<{ show: boolean; message: string }>({ show: false, message: '' });
+
     const firstDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
     const lastDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
 
@@ -227,16 +230,16 @@ function ShopPageContent() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [lastScrollY]);
 
-    const handleCategoryChange = (value: string) => {
-        const params = new URLSearchParams(searchParams.toString());
-        if (value === 'all') {
-            params.delete('category');
-        } else {
-            params.set('category', value);
+    const handleCategoryChange = (value: string, isAutoSwitch: boolean = false) => {
+        if (isAutoSwitch && value !== 'all') {
+            const categoryName = categoryMap.get(value) || 'Category';
+            setCategoryNotification({ 
+                show: true, 
+                message: `Auto-switched to ${categoryName}` 
+            });
+            setTimeout(() => setCategoryNotification({ show: false, message: '' }), 3000);
         }
-        // Reset page on filter change
-        params.delete('page'); 
-        router.push(`/store/shop?${params.toString()}`);
+        router.push(`?category=${value}`);
     };
 
     const handleSearchSubmit = (e: React.FormEvent) => {
@@ -256,6 +259,16 @@ function ShopPageContent() {
 
     return (
         <div className="bg-background min-h-screen">
+            {/* Category Auto-Switch Notification */}
+            {categoryNotification.show && (
+                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-40 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3">
+                        <div className="h-2 w-2 bg-white rounded-full animate-pulse"></div>
+                        <span className="text-sm font-semibold">{categoryNotification.message}</span>
+                    </div>
+                </div>
+            )}
+
             <header className={cn(
                 "sticky top-0 z-30 transition-all duration-300 ease-in-out overflow-hidden",
                 "py-8 sm:py-12 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800",
@@ -301,11 +314,16 @@ function ShopPageContent() {
                                             {searchSuggestions.map(product => (
                                                 <button
                                                     key={product.id}
-                                                    onClick={() => {
-                                                        setSearchTerm(product.name);
-                                                        setShowSuggestions(false);
-                                                        handleSearchSubmit({ preventDefault: () => {} } as any);
-                                                    }}
+                            onClick={() => {
+                                                setSearchTerm(product.name);
+                                                setShowSuggestions(false);
+                                                // Auto-switch category if product is in a different category
+                                                if (product.categoryId && product.categoryId !== categoryFromUrl) {
+                                                    handleCategoryChange(product.categoryId, true);
+                                                } else {
+                                                    handleSearchSubmit({ preventDefault: () => {} } as any);
+                                                }
+                                            }}
                                                     className="w-full px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-3 group"
                                                 >
                                                     {product.imageUrl && (
