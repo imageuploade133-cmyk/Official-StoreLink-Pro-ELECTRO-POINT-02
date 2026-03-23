@@ -41,12 +41,34 @@ function ShopPageContent() {
     const { settings } = useSettings();
     const currencySymbol = settings?.currency || '$';
     
-    // Get grid column settings
-    const gridColumnsDesktop = settings?.storeGridColumns === 'custom' 
-        ? settings?.storeGridCustomColumns || 4 
-        : settings?.storeGridColumns || 2;
-    const gridColumnsTablet = settings?.storeGridColumnsTablet || 3;
-    const gridColumnsMobile = settings?.storeGridColumnsMobile || 2;
+    // Get grid column settings and convert to Tailwind classes
+    const getGridClasses = () => {
+        const mobileGridClass = settings?.storeGridColumnsMobile === 3 ? 'grid-cols-3' : 'grid-cols-2';
+        const tabletGridClass = (() => {
+            const cols = settings?.storeGridColumnsTablet || 3;
+            if (cols === 2) return 'md:grid-cols-2';
+            if (cols === 4) return 'md:grid-cols-4';
+            return 'md:grid-cols-3';
+        })();
+        const desktopGridClass = (() => {
+            const cols = settings?.storeGridColumns;
+            if (cols === 3) return 'lg:grid-cols-3';
+            if (cols === 4) return 'lg:grid-cols-4';
+            if (cols === 'custom') {
+                const customCols = settings?.storeGridCustomColumns || 4;
+                if (customCols === 2) return 'lg:grid-cols-2';
+                if (customCols === 3) return 'lg:grid-cols-3';
+                if (customCols === 5) return 'lg:grid-cols-5';
+                if (customCols === 6) return 'lg:grid-cols-6';
+                if (customCols === 7) return 'lg:grid-cols-7';
+                if (customCols === 8) return 'lg:grid-cols-8';
+            }
+            return 'lg:grid-cols-4';
+        })();
+        return `${mobileGridClass} sm:grid-cols-2 ${tabletGridClass} ${desktopGridClass}`;
+    };
+    
+    const gridClasses = getGridClasses();
 
     const [searchTerm, setSearchTerm] = useState(qFromUrl);
     
@@ -384,26 +406,14 @@ function ShopPageContent() {
                 </div>
 
                 {isLoading && products.length === 0 ? (
-                    <div className={cn(
-                        "grid gap-4 sm:gap-6",
-                        `grid-cols-${gridColumnsMobile}`,
-                        `sm:grid-cols-${gridColumnsMobile}`,
-                        `md:grid-cols-${gridColumnsTablet}`,
-                        `lg:grid-cols-${gridColumnsDesktop}`
-                    )}>
+                    <div className={cn("grid gap-4 sm:gap-6", gridClasses)}>
                         {Array.from({ length: 8 }).map((_, i) => (
                            <ProductCardSkeleton key={i} />
                         ))}
                     </div>
                 ) : products.length > 0 ? (
                     <div className="space-y-8 sm:space-y-12">
-                        <div className={cn(
-                            "grid gap-4 sm:gap-6",
-                            `grid-cols-${gridColumnsMobile}`,
-                            `sm:grid-cols-${gridColumnsMobile}`,
-                            `md:grid-cols-${gridColumnsTablet}`,
-                            `lg:grid-cols-${gridColumnsDesktop}`
-                        )}>
+                        <div className={cn("grid gap-4 sm:gap-6", gridClasses)}>
                             {products.map(product => (
                                 <ProductCard 
                                   key={product.id} 
