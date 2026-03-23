@@ -105,15 +105,6 @@
     @apply bg-white/80 dark:bg-slate-950/80 backdrop-blur-3xl border-b border-white/10 dark:border-slate-800/10;
   }
 
-  /* Hide Scrollbar Utility - Keep scroll functionality but hide the bar */
-  html.hide-scrollbar {
-    scrollbar-width: none;
-  }
-
-  html.hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-
   /* Custom Scrollbar Styles */
   ::-webkit-scrollbar {
     width: 10px;

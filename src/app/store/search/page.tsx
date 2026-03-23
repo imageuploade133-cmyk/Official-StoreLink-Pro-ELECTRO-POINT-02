@@ -174,18 +174,7 @@ function SearchPageContent() {
     return 'Loading products';
   };
 
-  // Handle scrollbar visibility when modal is open (allow scroll but hide scrollbar)
-  useEffect(() => {
-    if (showFilters) {
-      // Hide scrollbar while allowing scroll by applying CSS class
-      document.documentElement.classList.add('hide-scrollbar');
-    } else {
-      document.documentElement.classList.remove('hide-scrollbar');
-    }
-    return () => {
-      document.documentElement.classList.remove('hide-scrollbar');
-    };
-  }, [showFilters]);
+  // No need to manage scrollbar - let browser handle it naturally
 
   return (
     <div className="bg-background-light dark:bg-background-dark min-h-screen pb-20">
@@ -269,13 +258,14 @@ function SearchPageContent() {
       {/* Mobile Filter Backdrop */}
       {showFilters && (
         <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/30 z-40 lg:hidden backdrop-blur-sm"
           onClick={() => setShowFilters(false)}
+          style={{ pointerEvents: 'auto' }}
         />
       )}
 
       {/* Main Content */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 relative" style={{ pointerEvents: showFilters ? 'none' : 'auto' }}>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
           {/* Sidebar Filters - Modal on mobile, sidebar on desktop */}
           <aside className={cn(
@@ -283,12 +273,12 @@ function SearchPageContent() {
             "fixed lg:relative inset-y-0 left-0 w-full sm:w-80 lg:w-auto lg:sticky lg:top-32",
             "transition-transform duration-300 ease-in-out",
             "bg-white dark:bg-slate-900 lg:bg-transparent",
-            "overflow-y-auto lg:overflow-visible",
+            "overflow-y-auto lg:overflow-visible overscroll-contain",
             "p-6 sm:p-8 lg:p-0 z-50 lg:z-auto",
-            "top-0 h-full sm:h-auto lg:h-auto",
+            "top-0 h-screen sm:h-auto lg:h-auto",
             "-translate-x-full lg:translate-x-0",
             showFilters && "translate-x-0",
-            "lg:overflow-y-visible"
+            "touch-pan-y"
           )}>
             {/* Mobile Close Button */}
             {showFilters && (
@@ -317,7 +307,6 @@ function SearchPageContent() {
                   value={searchTerm}
                   onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                   className="pl-10 h-10 rounded-lg text-sm"
-                  disabled={isLoading}
                 />
               </div>
             </div>
