@@ -42,66 +42,66 @@
   }
  
   .dark {
-    /* Professional Dark Mode Palette */
-    /* Base: Deep charcoal with blue undertone for sophistication */
-    --background: 217 33% 7.8%;
-    --foreground: 210 40% 96%;
+    /* Pure Black & White Dark Mode */
+    /* Base: Pure black background */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
     
-    /* Cards: Slightly elevated from background with subtle contrast */
-    --card: 217 32% 11.2%;
-    --card-foreground: 210 40% 96%;
+    /* Cards: Slightly elevated from black */
+    --card: 0 0% 5%;
+    --card-foreground: 0 0% 100%;
     
-    /* Popovers: Elevated with refined appearance */
-    --popover: 217 32% 13.5%;
-    --popover-foreground: 210 40% 96%;
+    /* Popovers: Elevated appearance */
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 100%;
     
-    /* Primary: Vibrant blue accent with excellent contrast */
-    --primary: 217 91% 60%;
-    --primary-foreground: 217 33% 7.8%;
+    /* Primary: Bright cyan for maximum contrast */
+    --primary: 188 100% 50%;
+    --primary-foreground: 0 0% 0%;
     
-    /* Secondary: Muted blue-gray for supporting elements */
-    --secondary: 217 28% 22%;
-    --secondary-foreground: 210 40% 96%;
+    /* Secondary: Dark gray for supporting elements */
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 100%;
     
-    /* Muted: Subtle grays for disabled/secondary content */
-    --muted: 217 28% 26%;
-    --muted-foreground: 210 40% 70%;
+    /* Muted: Medium gray for disabled/secondary content */
+    --muted: 0 0% 40%;
+    --muted-foreground: 0 0% 100%;
     
-    /* Accent: Cyan for interactive elements */
-    --accent: 188 94% 48%;
-    --accent-foreground: 217 33% 7.8%;
+    /* Accent: Bright cyan accent */
+    --accent: 188 100% 50%;
+    --accent-foreground: 0 0% 0%;
     
-    /* Destructive: Clear red for dangerous actions */
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Destructive: Bright red for dangerous actions */
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 100%;
     
-    /* Success: Professional green */
-    --success: 142 71% 45%;
-    --success-foreground: 210 40% 98%;
+    /* Success: Bright green */
+    --success: 142 100% 45%;
+    --success-foreground: 0 0% 100%;
     
-    /* Border: Subtle but visible separation */
-    --border: 217 28% 20%;
-    --input: 217 28% 18%;
+    /* Border: Dark gray visible on black */
+    --border: 0 0% 20%;
+    --input: 0 0% 10%;
     
-    /* Ring: Focus state with primary color */
-    --ring: 217 91% 60%;
+    /* Ring: Bright cyan focus state */
+    --ring: 188 100% 50%;
     
-    /* Chart colors: Vibrant and distinguishable */
-    --chart-1: 12 100% 62%;
-    --chart-2: 160 84% 45%;
-    --chart-3: 220 90% 56%;
-    --chart-4: 280 85% 55%;
-    --chart-5: 40 92% 50%;
+    /* Chart colors: Vibrant and highly visible */
+    --chart-1: 0 100% 50%;
+    --chart-2: 188 100% 50%;
+    --chart-3: 60 100% 50%;
+    --chart-4: 280 100% 50%;
+    --chart-5: 20 100% 50%;
     
-    /* Sidebar: Integrated with dark theme */
-    --sidebar-background: 217 32% 10%;
-    --sidebar-foreground: 210 40% 96%;
-    --sidebar-primary: 217 91% 60%;
-    --sidebar-primary-foreground: 217 33% 7.8%;
-    --sidebar-accent: 188 94% 48%;
-    --sidebar-accent-foreground: 217 33% 7.8%;
-    --sidebar-border: 217 28% 20%;
-    --sidebar-ring: 217 91% 60%;
+    /* Sidebar: Integrated with black theme */
+    --sidebar-background: 0 0% 2%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 188 100% 50%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 188 100% 50%;
+    --sidebar-accent-foreground: 0 0% 0%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 188 100% 50%;
   }
 }
 
@@ -138,9 +138,9 @@
   }
   
   .dark .glass-card {
-    background: rgba(23, 23, 35, 0.65);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    background: rgba(10, 10, 10, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
   }
 
   .glass-nav {
@@ -150,8 +150,8 @@
   }
   
   .dark .glass-nav {
-    background: rgba(20, 20, 30, 0.75);
-    border-color: rgba(255, 255, 255, 0.06);
+    background: rgba(5, 5, 5, 0.85);
+    border-color: rgba(255, 255, 255, 0.12);
   }
 
   /* Custom Scrollbar Styles - Smart Dark Mode */
@@ -223,7 +223,7 @@
 
 /* Base rich text styles */
 .rich-content {
-  @apply text-slate-700 dark:text-slate-300;
+  @apply text-slate-700 dark:text-white;
 }
 .rich-content h1, .rich-content h2, .rich-content h3 {
   @apply font-black tracking-tight text-slate-900 dark:text-white mt-8 mb-4;
@@ -236,4 +236,9 @@
 }
 .rich-content a {
   @apply text-primary font-bold hover:underline;
+}
+
+/* Ensure all text is white in dark mode */
+.dark {
+  color: #ffffff;
 }
