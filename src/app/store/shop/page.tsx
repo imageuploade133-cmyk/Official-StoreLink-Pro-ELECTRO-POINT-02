@@ -126,49 +126,61 @@ function ShopPageContent() {
         setIsLoadingProducts(true);
 
         try {
+            // Build base query with only required filters
             let q = query(
                 collection(firestore, 'products'), 
-                where('isVisibleOnWeb', '==', true),
-                orderBy('createdAt', 'desc')
+                where('isVisibleOnWeb', '==', true)
             );
 
             if (categoryFromUrl !== 'all') {
-                q = query(q, where('categoryId', '==', categoryFromUrl));
+                q = query(
+                    collection(firestore, 'products'),
+                    where('isVisibleOnWeb', '==', true),
+                    where('categoryId', '==', categoryFromUrl)
+                );
             }
 
+            // Fetch a larger batch for local filtering
+            const snapshot = await getDocs(query(q, limit(1000)));
+            let allProducts = snapshot.docs.map(d => ({
+                id: d.id,
+                ...d.data()
+            } as Product));
+
+            // Apply search filter locally for flexible matching
             if (searchTerm.trim()) {
                 const term = searchTerm.toLowerCase().trim();
-                q = query(q, where('name', '>=', term), where('name', '<=', term + '\uf8ff'));
+                allProducts = allProducts.filter(p =>
+                    p.name.toLowerCase().includes(term) ||
+                    p.sku?.toLowerCase().includes(term) ||
+                    p.description?.toLowerCase().includes(term)
+                );
             }
 
-            if (direction === 'initial') {
-                const countSnap = await getCountFromServer(q);
-                setTotalProductsCount(countSnap.data().count);
-            }
+            // Sort by creation date descending
+            allProducts.sort((a, b) => {
+                const aDate = a.createdAt instanceof Date ? a.createdAt.getTime() : 
+                             typeof a.createdAt === 'string' ? new Date(a.createdAt).getTime() : 0;
+                const bDate = b.createdAt instanceof Date ? b.createdAt.getTime() : 
+                             typeof b.createdAt === 'string' ? new Date(b.createdAt).getTime() : 0;
+                return bDate - aDate;
+            });
 
-            if (direction === 'next' && lastDocRef.current) {
-                q = query(q, startAfter(lastDocRef.current), limit(ITEMS_PER_PAGE));
-            } else if (direction === 'prev' && firstDocRef.current) {
-                q = query(q, endBefore(firstDocRef.current), limitToLast(ITEMS_PER_PAGE));
-            } else {
-                q = query(q, limit(ITEMS_PER_PAGE));
-            }
+            setTotalProductsCount(allProducts.length);
 
-            const snapshot = await getDocs(q);
-            const docs = snapshot.docs;
+            // Handle pagination
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const paginatedProducts = allProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-            if (docs.length > 0) {
-                firstDocRef.current = docs[0];
-                lastDocRef.current = docs[docs.length - 1];
-                setIsLastPage(docs.length < ITEMS_PER_PAGE);
-
-                const list = docs.map(d => ({
-                    id: d.id,
-                    ...d.data(),
-                    categoryName: categoryMap.get(d.data().categoryId || '') || 'Uncategorized'
-                } as Product));
+            if (paginatedProducts.length > 0) {
+                const list = paginatedProducts.map(product => ({
+                    ...product,
+                    categoryName: categoryMap.get(product.categoryId || '') || 'Uncategorized'
+                }));
 
                 setProducts(list);
+                setIsLastPage(startIndex + ITEMS_PER_PAGE >= allProducts.length);
+                
                 if (direction === 'next') setCurrentPage(p => p + 1);
                 else if (direction === 'prev') setCurrentPage(p => Math.max(1, p - 1));
                 else setCurrentPage(1);
@@ -183,7 +195,7 @@ function ShopPageContent() {
         } finally {
             setIsLoadingProducts(false);
         }
-    }, [firestore, categoryFromUrl, searchTerm, categoryMap]);
+    }, [firestore, categoryFromUrl, searchTerm, categoryMap, currentPage]);
 
     useEffect(() => {
         fetchProducts('initial');
