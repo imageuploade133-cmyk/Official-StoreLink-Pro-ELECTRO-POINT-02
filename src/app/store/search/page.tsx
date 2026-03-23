@@ -174,6 +174,18 @@ function SearchPageContent() {
     return 'Loading products';
   };
 
+  // Handle body overflow when modal is open
+  useEffect(() => {
+    if (showFilters) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showFilters]);
+
   return (
     <div className="bg-background-light dark:bg-background-dark min-h-screen pb-20">
       {/* Header Section */}
@@ -272,9 +284,10 @@ function SearchPageContent() {
             "bg-white dark:bg-slate-900 lg:bg-transparent",
             "overflow-y-auto lg:overflow-visible",
             "p-6 sm:p-8 lg:p-0 z-50 lg:z-auto",
-            "top-0 h-screen sm:h-auto lg:h-auto",
+            "top-0 h-full sm:h-auto lg:h-auto",
             "-translate-x-full lg:translate-x-0",
-            showFilters && "translate-x-0"
+            showFilters && "translate-x-0",
+            "lg:overflow-y-visible"
           )}>
             {/* Mobile Close Button */}
             {showFilters && (
