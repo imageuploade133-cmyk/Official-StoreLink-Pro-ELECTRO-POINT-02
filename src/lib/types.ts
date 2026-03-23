@@ -260,6 +260,11 @@ export interface Settings {
   // Product Review Settings
   showProductReviews?: boolean;
   showReviewRatingOnCard?: boolean;
+  // Web Store Grid Layout Settings
+  storeGridColumns?: 2 | 3 | 4 | 'custom';
+  storeGridCustomColumns?: number;
+  storeGridColumnsMobile?: 2 | 3;
+  storeGridColumnsTablet?: 2 | 3 | 4;
 }
 
 export type AppSettings = Settings;

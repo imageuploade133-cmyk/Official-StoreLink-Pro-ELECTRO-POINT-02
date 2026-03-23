@@ -43,6 +43,13 @@ function SearchPageContent() {
   const firestore = useFirestore();
   const { settings } = useSettings();
   const currencySymbol = settings?.currency || '$';
+  
+  // Get grid column settings
+  const gridColumnsDesktop = settings?.storeGridColumns === 'custom' 
+    ? settings?.storeGridCustomColumns || 4 
+    : settings?.storeGridColumns || 2;
+  const gridColumnsTablet = settings?.storeGridColumnsTablet || 3;
+  const gridColumnsMobile = settings?.storeGridColumnsMobile || 2;
 
   // URL State
   const queryParam = searchParams.get('q') || '';
@@ -430,12 +437,24 @@ function SearchPageContent() {
               </div>
             )}
             {isLoading ? (
-              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className={cn(
+                "grid gap-4 sm:gap-6",
+                `grid-cols-${gridColumnsMobile}`,
+                `sm:grid-cols-${gridColumnsMobile}`,
+                `md:grid-cols-${gridColumnsTablet}`,
+                `lg:grid-cols-${gridColumnsDesktop}`
+              )}>
                 {[...Array(6)].map((_, i) => <ProductCardSkeleton key={i} />)}
               </div>
             ) : products.length > 0 ? (
               <div className="space-y-8">
-                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                <div className={cn(
+                  "grid gap-4 sm:gap-6",
+                  `grid-cols-${gridColumnsMobile}`,
+                  `sm:grid-cols-${gridColumnsMobile}`,
+                  `md:grid-cols-${gridColumnsTablet}`,
+                  `lg:grid-cols-${gridColumnsDesktop}`
+                )}>
                   {products.map(product => (
                     <ProductCard 
                       key={product.id} 

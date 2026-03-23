@@ -40,6 +40,13 @@ function ShopPageContent() {
 
     const { settings } = useSettings();
     const currencySymbol = settings?.currency || '$';
+    
+    // Get grid column settings
+    const gridColumnsDesktop = settings?.storeGridColumns === 'custom' 
+        ? settings?.storeGridCustomColumns || 4 
+        : settings?.storeGridColumns || 2;
+    const gridColumnsTablet = settings?.storeGridColumnsTablet || 3;
+    const gridColumnsMobile = settings?.storeGridColumnsMobile || 2;
 
     const [searchTerm, setSearchTerm] = useState(qFromUrl);
     
@@ -377,14 +384,26 @@ function ShopPageContent() {
                 </div>
 
                 {isLoading && products.length === 0 ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                    <div className={cn(
+                        "grid gap-4 sm:gap-6",
+                        `grid-cols-${gridColumnsMobile}`,
+                        `sm:grid-cols-${gridColumnsMobile}`,
+                        `md:grid-cols-${gridColumnsTablet}`,
+                        `lg:grid-cols-${gridColumnsDesktop}`
+                    )}>
                         {Array.from({ length: 8 }).map((_, i) => (
                            <ProductCardSkeleton key={i} />
                         ))}
                     </div>
                 ) : products.length > 0 ? (
                     <div className="space-y-8 sm:space-y-12">
-                        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                        <div className={cn(
+                            "grid gap-4 sm:gap-6",
+                            `grid-cols-${gridColumnsMobile}`,
+                            `sm:grid-cols-${gridColumnsMobile}`,
+                            `md:grid-cols-${gridColumnsTablet}`,
+                            `lg:grid-cols-${gridColumnsDesktop}`
+                        )}>
                             {products.map(product => (
                                 <ProductCard 
                                   key={product.id} 
