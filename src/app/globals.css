@@ -42,49 +42,76 @@
   }
  
   .dark {
-    --background: 0 0% 11.8%;
-    --foreground: 0 0% 95%;
-    --card: 0 0% 15%;
-    --card-foreground: 0 0% 95%;
-    --popover: 0 0% 15%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 0 0% 5%;
-    --secondary: 0 0% 25%;
-    --secondary-foreground: 0 0% 95%;
-    --muted: 0 0% 35%;
-    --muted-foreground: 0 0% 70%;
-    --accent: 0 0% 25%;
-    --accent-foreground: 0 0% 95%;
-    --destructive: 0 84.2% 60.2%;
+    /* Pure Black & White Dark Mode */
+    /* Base: Pure black background */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    
+    /* Cards: Slightly elevated from black */
+    --card: 0 0% 5%;
+    --card-foreground: 0 0% 100%;
+    
+    /* Popovers: Elevated appearance */
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 100%;
+    
+    /* Primary: Bright cyan for maximum contrast */
+    --primary: 188 100% 50%;
+    --primary-foreground: 0 0% 0%;
+    
+    /* Secondary: Dark gray for supporting elements */
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 100%;
+    
+    /* Muted: Medium gray for disabled/secondary content */
+    --muted: 0 0% 40%;
+    --muted-foreground: 0 0% 100%;
+    
+    /* Accent: Bright cyan accent */
+    --accent: 188 100% 50%;
+    --accent-foreground: 0 0% 0%;
+    
+    /* Destructive: Bright red for dangerous actions */
+    --destructive: 0 100% 50%;
     --destructive-foreground: 0 0% 100%;
-    --success: 142 76% 45%;
+    
+    /* Success: Bright green */
+    --success: 142 100% 45%;
     --success-foreground: 0 0% 100%;
-    --border: 0 0% 25%;
-    --input: 0 0% 25%;
-    --ring: 217.2 91.2% 59.8%;
-    --chart-1: 220 70% 60%;
-    --chart-2: 160 60% 55%;
-    --chart-3: 30 80% 65%;
-    --chart-4: 280 65% 70%;
-    --chart-5: 340 75% 65%;
-    --sidebar-background: 0 0% 12%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 217.2 91.2% 59.8%;
-    --sidebar-primary-foreground: 0 0% 5%;
-    --sidebar-accent: 0 0% 25%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 0 0% 25%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Border: Dark gray visible on black */
+    --border: 0 0% 20%;
+    --input: 0 0% 10%;
+    
+    /* Ring: Bright cyan focus state */
+    --ring: 188 100% 50%;
+    
+    /* Chart colors: Vibrant and highly visible */
+    --chart-1: 0 100% 50%;
+    --chart-2: 188 100% 50%;
+    --chart-3: 60 100% 50%;
+    --chart-4: 280 100% 50%;
+    --chart-5: 20 100% 50%;
+    
+    /* Sidebar: Integrated with black theme */
+    --sidebar-background: 0 0% 2%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 188 100% 50%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 188 100% 50%;
+    --sidebar-accent-foreground: 0 0% 0%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 188 100% 50%;
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border transition-colors duration-300 ease-in-out;
   }
   html {
     scroll-behavior: smooth;
+    color-scheme: light dark;
   }
   body {
     @apply bg-background text-foreground antialiased;
@@ -92,20 +119,42 @@
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--primary) / 0.2) transparent;
     scrollbar-gutter: stable;
+    transition: background-color 0.4s ease-in-out, color 0.4s ease-in-out;
+  }
+  
+  /* Smooth transitions for theme-aware elements */
+  button, a, input, textarea, select {
+    @apply transition-colors duration-200 ease-in-out;
   }
 }
 
 @layer utilities {
-  /* Premium Glassmorphism Utility */
+  /* Premium Glassmorphism Utilities - Dark Mode Optimized */
   .glass-card {
-    @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/20 dark:border-slate-800/20 shadow-2xl;
+    @apply backdrop-blur-xl transition-all duration-300;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+  }
+  
+  .dark .glass-card {
+    background: rgba(10, 10, 10, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
   }
 
   .glass-nav {
-    @apply bg-white/80 dark:bg-slate-950/80 backdrop-blur-3xl border-b border-white/10 dark:border-slate-800/10;
+    @apply backdrop-blur-3xl transition-all duration-300 border-b;
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+  
+  .dark .glass-nav {
+    background: rgba(5, 5, 5, 0.85);
+    border-color: rgba(255, 255, 255, 0.12);
   }
 
-  /* Custom Scrollbar Styles */
+  /* Custom Scrollbar Styles - Smart Dark Mode */
   ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -116,15 +165,24 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: hsl(var(--primary) / 0.15);
+    background-color: hsl(var(--primary) / 0.2);
     border-radius: 20px;
     border: 3px solid transparent;
     background-clip: content-box;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s ease;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background-color: hsl(var(--primary) / 0.3);
+    background-color: hsl(var(--primary) / 0.4);
+  }
+
+  /* Dark mode specific scrollbar */
+  .dark ::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--primary) / 0.25);
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--primary) / 0.5);
   }
 
   /* Border Glow Animation */
@@ -165,7 +223,7 @@
 
 /* Base rich text styles */
 .rich-content {
-  @apply text-slate-700 dark:text-slate-300;
+  @apply text-slate-700 dark:text-white;
 }
 .rich-content h1, .rich-content h2, .rich-content h3 {
   @apply font-black tracking-tight text-slate-900 dark:text-white mt-8 mb-4;
@@ -178,4 +236,9 @@
 }
 .rich-content a {
   @apply text-primary font-bold hover:underline;
+}
+
+/* Ensure all text is white in dark mode */
+.dark {
+  color: #ffffff;
 }
