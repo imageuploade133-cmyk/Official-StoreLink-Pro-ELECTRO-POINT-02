@@ -79,12 +79,19 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
     setIsLoadingProduct(true);
   };
 
+  // Calculate media area height based on card height setting (60% of total height)
+  const totalCardHeight = settings?.productCardHeight || 380;
+  const mediaHeight = Math.round((totalCardHeight * 60) / 100);
+
   return (
     <>
       <ProductLoadingOverlay isVisible={isLoadingProduct} productName={product.name} />
-      <div className={`group relative flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all duration-500 hover:border-primary/30 overflow-hidden h-full ${styles.cardContainer}`}>
+      <div 
+        className={`group relative flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all duration-500 hover:border-primary/30 overflow-hidden h-full ${styles.cardContainer}`}
+        style={{ height: `${totalCardHeight}px` }}
+      >
         {/* Media Area with Enhanced Hover */}
-        <Link href={`/store/product/${product.id}`} onClick={handleProductClick} className={`block relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 ${styles.mediaArea}`}>
+        <Link href={`/store/product/${product.id}`} onClick={handleProductClick} className={`block relative overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 ${styles.mediaArea}`} style={{ height: `${mediaHeight}px` }}>
         <Image
           src={product.imageUrl || settings?.defaultProductImageUrl || 'https://placehold.co/600x600.png'}
           alt={product.name}

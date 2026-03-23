@@ -260,6 +260,14 @@ export interface Settings {
   // Product Review Settings
   showProductReviews?: boolean;
   showReviewRatingOnCard?: boolean;
+  // Web Store Grid Layout Settings
+  storeGridColumnsDefault?: 2 | 3;
+  storeGridColumnsSm?: 2 | 3;
+  storeGridColumnsMd?: 2 | 3 | 4;
+  storeGridColumnsLg?: 2 | 3 | 4 | 'custom';
+  storeGridColumnsCustom?: number;
+  // Product Card Size Settings
+  productCardHeight?: number;
 }
 
 export type AppSettings = Settings;
