@@ -21,14 +21,12 @@ import { PaymentMethodsSettings } from './components/PaymentMethodsSettings';
 import { SocialMediaSettings } from './components/SocialMediaSettings';
 import { LogoSizeSettings } from '@/components/dashboard/settings/LogoSizeSettings';
 import { PosProductSizeSettings } from '@/components/dashboard/settings/PosProductSizeSettings';
-import { WebStoreGridSettings } from '@/components/dashboard/settings/WebStoreGridSettings';
 
 // Keyword mapping for search functionality
 const settingsKeywords = {
   general: ['currency', 'country', 'region', 'phone', 'localization', 'identity', 'business'],
   api: ['api', 'key', 'keys', 'imgbb', 'integration', 'third-party'],
-  pos: ['pos', 'receipt', 'printer', 'invoice', 'price modification', 'logo size', 'product size'],
-  webstore: ['web store', 'store grid', 'product grid', 'grid layout', 'columns', 'grid columns', 'mobile layout', 'tablet layout'],
+  pos: ['pos', 'receipt', 'printer', 'invoice', 'price modification', 'logo size', 'product size', 'columns', 'grid', 'layout'],
   inventory: ['inventory', 'stock', 'alert', 'product image', 'deduction', 'threshold', 'wastage'],
   messaging: ['messaging', 'sms', 'whatsapp', 'webhook', 'notifications', 'messages'],
   payment: ['payment methods', 'cash', 'card', 'transfer', 'payment options', 'gateways'],
@@ -53,16 +51,15 @@ export default function SettingsPage() {
   const visibleSections = useMemo(() => {
     const lowercasedTerm = searchTerm.toLowerCase().trim();
     if (!lowercasedTerm) {
-        return { general: true, api: true, pos: true, webstore: true, inventory: true, messaging: true, payment: true, social: true };
+        return { general: true, api: true, pos: true, inventory: true, messaging: true, payment: true, social: true };
     }
     
-    const visible: Record<string, boolean> = { general: false, api: false, pos: false, webstore: false, inventory: false, messaging: false, payment: false, social: false };
+    const visible: Record<string, boolean> = { general: false, api: false, pos: false, inventory: false, messaging: false, payment: false, social: false };
     
     // Check card titles and descriptions
     if ('business & regional settings'.includes(lowercasedTerm)) visible.general = true;
     if ('api keys'.includes(lowercasedTerm)) visible.api = true;
     if ('pos & receipt settings'.includes(lowercasedTerm)) visible.pos = true;
-    if ('web store'.includes(lowercasedTerm) || 'product grid'.includes(lowercasedTerm)) visible.webstore = true;
     if ('inventory & stock alerts'.includes(lowercasedTerm)) visible.inventory = true;
     if ('messaging & webhooks'.includes(lowercasedTerm)) visible.messaging = true;
     if ('payment methods'.includes(lowercasedTerm)) visible.payment = true;
@@ -126,7 +123,6 @@ export default function SettingsPage() {
         {visibleSections.payment && <PaymentMethodsSettings settingsData={settingsData} isLoading={isLoading} />}
         {visibleSections.social && <SocialMediaSettings settingsData={settingsData} isLoading={isLoading} />}
         {visibleSections.api && <ApiKeysSettings settingsData={settingsData} isLoading={isLoading} />}
-        {visibleSections.webstore && <WebStoreGridSettings settingsData={settingsData} isLoading={isLoading} />}
         {visibleSections.pos && (
             <>
                 <PosProductSizeSettings settingsData={settingsData} isLoading={isLoading} />
