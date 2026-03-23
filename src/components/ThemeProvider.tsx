@@ -93,11 +93,19 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
             } else {
                 // No specific background setting, remove custom property to use default from CSS
                 root.style.removeProperty('--background');
+                // Ensure body gets the CSS variable background in dark mode
+                body.style.backgroundColor = '';
             }
         } else {
             // If there are no settings, ensure all custom styles are removed to fall back to defaults.
             customColorVars.forEach(v => root.style.removeProperty(v));
+            body.style.backgroundColor = '';
         }
+      }
+      
+      // Always ensure the body uses the CSS variable background as fallback
+      if (!body.style.backgroundImage) {
+        body.style.backgroundColor = '';
       }
     };
     

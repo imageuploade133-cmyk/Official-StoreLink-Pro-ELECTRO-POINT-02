@@ -47,8 +47,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/auth-context';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
-
-const ITEMS_PER_PAGE = 15;
+import { AdvancedPagination } from '@/components/pagination/AdvancedPagination';
 
 export default function InventoryPage() {
   const router = useRouter();
@@ -71,6 +70,7 @@ export default function InventoryPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLastPage, setIsLastPage] = useState(false);
   const [totalProductCount, setTotalProductCount] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(15);
 
   // Stable cursors using refs to avoid infinite loops in useEffect
   const firstDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
@@ -100,11 +100,11 @@ export default function InventoryPage() {
 
       // 2. Apply cursors from refs
       if (direction === 'next' && lastDocRef.current) {
-        q = query(q, startAfter(lastDocRef.current), limit(ITEMS_PER_PAGE));
+        q = query(q, startAfter(lastDocRef.current), limit(itemsPerPage));
       } else if (direction === 'prev' && firstDocRef.current) {
-        q = query(q, endBefore(firstDocRef.current), limitToLast(ITEMS_PER_PAGE));
+        q = query(q, endBefore(firstDocRef.current), limitToLast(itemsPerPage));
       } else {
-        q = query(q, limit(ITEMS_PER_PAGE));
+        q = query(q, limit(itemsPerPage));
       }
 
       const snapshot = await getDocs(q);
@@ -115,7 +115,7 @@ export default function InventoryPage() {
         firstDocRef.current = docs[0];
         lastDocRef.current = docs[docs.length - 1];
         
-        setIsLastPage(docs.length < ITEMS_PER_PAGE);
+        setIsLastPage(docs.length < itemsPerPage);
 
         const productsData = docs.map(d => ({ id: d.id, ...d.data() } as Product));
         setProducts(productsData);
@@ -137,7 +137,7 @@ export default function InventoryPage() {
     } finally {
       setIsLoadingProducts(false);
     }
-  }, [firestore, toast]);
+  }, [firestore, toast, itemsPerPage]);
 
   useEffect(() => {
     if (firestore && !isLoadingSettings) {
@@ -227,6 +227,13 @@ export default function InventoryPage() {
 
   const handlePrevPage = () => fetchProducts('prev');
   const handleNextPage = () => fetchProducts('next');
+  
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+    firstDocRef.current = null;
+    lastDocRef.current = null;
+  };
 
   return (
     <div className="space-y-6">
@@ -277,18 +284,21 @@ export default function InventoryPage() {
             />
           )}
         </CardContent>
-        <CardFooter className="py-4 border-t flex flex-col sm:flex-row sm:justify-between items-center bg-muted/5 gap-4">
-            <div className="text-xs font-black uppercase text-muted-foreground tracking-widest">
-                Page {currentPage} <span className="mx-2">|</span> {totalProductCount} Items Cataloged
-            </div>
-            <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={handlePrevPage} disabled={currentPage === 1 || isLoadingProducts} className="font-bold">
-                    <ChevronLeft className="h-4 w-4 mr-1" /> Previous
-                </Button>
-                <Button variant="outline" size="sm" onClick={handleNextPage} disabled={isLastPage || isLoadingProducts} className="font-bold">
-                    Next <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
-            </div>
+        <CardFooter className="py-4 border-t bg-muted/5">
+            <AdvancedPagination
+              currentPage={currentPage}
+              totalPages={Math.ceil(totalProductCount / itemsPerPage) || 1}
+              itemsPerPage={itemsPerPage}
+              totalItems={totalProductCount}
+              onPageChange={(page) => {
+                setCurrentPage(page);
+                if (page > currentPage) fetchProducts('next');
+                else if (page < currentPage) fetchProducts('prev');
+              }}
+              onItemsPerPageChange={handleItemsPerPageChange}
+              isLoading={isLoadingProducts}
+              itemsPerPageOptions={[10, 15, 25, 50, 100]}
+            />
         </CardFooter>
       </Card>
 
