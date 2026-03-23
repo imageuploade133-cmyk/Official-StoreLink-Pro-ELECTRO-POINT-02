@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, Palette, RotateCcw, Upload, Video } from 'lucide-react';
+import { Loader2, Palette, RotateCcw, Upload, Video, Info, CheckCircle2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
@@ -208,120 +208,247 @@ export function ColorSettings({ settingsData, isLoading }: ColorSettingsProps) {
                 <FormField control={form.control} name="colorDestructive" render={({ field }) => <ColorInput field={field} label="Destructive Color" />} />
              </div>
             <Separator />
-            <h4 className="font-semibold text-base">Background Style</h4>
-            
-            <FormField
-              control={form.control}
-              name="backgroundStyle"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Background Type</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      className="grid grid-cols-2 lg:grid-cols-4 gap-1 rounded-lg bg-muted p-1"
-                    >
-                      <FormItem className="flex-1">
-                        <FormControl><RadioGroupItem value="solid" id="style-solid" className="sr-only"/></FormControl>
-                        <FormLabel htmlFor="style-solid" className="flex cursor-pointer items-center justify-center whitespace-nowrap rounded-md px-3 py-2 text-sm font-semibold transition-all hover:bg-accent/50 peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-primary-foreground peer-data-[state=checked]:shadow-sm">Solid Color</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex-1">
-                        <FormControl><RadioGroupItem value="gradient" id="style-gradient" className="sr-only"/></FormControl>
-                        <FormLabel htmlFor="style-gradient" className="flex cursor-pointer items-center justify-center whitespace-nowrap rounded-md px-3 py-2 text-sm font-semibold transition-all hover:bg-accent/50 peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-primary-foreground peer-data-[state=checked]:shadow-sm">Gradient</FormLabel>
-                      </FormItem>
-                       <FormItem className="flex-1">
-                        <FormControl><RadioGroupItem value="image" id="style-image" className="sr-only"/></FormControl>
-                        <FormLabel htmlFor="style-image" className="flex cursor-pointer items-center justify-center whitespace-nowrap rounded-md px-3 py-2 text-sm font-semibold transition-all hover:bg-accent/50 peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-primary-foreground peer-data-[state=checked]:shadow-sm">Image</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex-1">
-                        <FormControl><RadioGroupItem value="video" id="style-video" className="sr-only"/></FormControl>
-                        <FormLabel htmlFor="style-video" className="flex cursor-pointer items-center justify-center whitespace-nowrap rounded-md px-3 py-2 text-sm font-semibold transition-all hover:bg-accent/50 peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-primary-foreground peer-data-[state=checked]:shadow-sm">Video</FormLabel>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            
-            {backgroundStyle === 'solid' && (
-                <FormField control={form.control} name="colorBackground" render={({ field }) => <ColorInput field={field} label="Background Color" />} />
-            )}
-            
-            {backgroundStyle === 'gradient' && (
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField control={form.control} name="backgroundGradientStart" render={({ field }) => <ColorInput field={field} label="Gradient Start" />} />
-                    <FormField control={form.control} name="backgroundGradientEnd" render={({ field }) => <ColorInput field={field} label="Gradient End" />} />
-                 </div>
-            )}
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-semibold text-base mb-1">Background Style</h4>
+                <p className="text-sm text-muted-foreground">Choose how you want to style your background</p>
+              </div>
+              
+              <FormField
+                control={form.control}
+                name="backgroundStyle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        className="grid grid-cols-2 lg:grid-cols-4 gap-3"
+                      >
+                        {/* Solid Color Option */}
+                        <FormItem className="flex-1">
+                          <FormControl>
+                            <RadioGroupItem value="solid" id="style-solid" className="sr-only"/>
+                          </FormControl>
+                          <FormLabel 
+                            htmlFor="style-solid" 
+                            className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 p-4 text-center transition-all ${
+                              field.value === 'solid' 
+                                ? 'border-primary bg-primary/5' 
+                                : 'border-slate-200 dark:border-slate-700 hover:border-primary/50'
+                            }`}
+                          >
+                            <div className="h-8 w-8 rounded-lg bg-blue-500 mb-2" />
+                            <span className="text-sm font-semibold">Solid Color</span>
+                            {field.value === 'solid' && <CheckCircle2 className="h-4 w-4 text-primary mt-1" />}
+                          </FormLabel>
+                        </FormItem>
+                        
+                        {/* Gradient Option */}
+                        <FormItem className="flex-1">
+                          <FormControl>
+                            <RadioGroupItem value="gradient" id="style-gradient" className="sr-only"/>
+                          </FormControl>
+                          <FormLabel 
+                            htmlFor="style-gradient"
+                            className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 p-4 text-center transition-all ${
+                              field.value === 'gradient'
+                                ? 'border-primary bg-primary/5'
+                                : 'border-slate-200 dark:border-slate-700 hover:border-primary/50'
+                            }`}
+                          >
+                            <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-purple-400 to-pink-400 mb-2" />
+                            <span className="text-sm font-semibold">Gradient</span>
+                            {field.value === 'gradient' && <CheckCircle2 className="h-4 w-4 text-primary mt-1" />}
+                          </FormLabel>
+                        </FormItem>
+                        
+                        {/* Image Option */}
+                        <FormItem className="flex-1">
+                          <FormControl>
+                            <RadioGroupItem value="image" id="style-image" className="sr-only"/>
+                          </FormControl>
+                          <FormLabel 
+                            htmlFor="style-image"
+                            className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 p-4 text-center transition-all ${
+                              field.value === 'image'
+                                ? 'border-primary bg-primary/5'
+                                : 'border-slate-200 dark:border-slate-700 hover:border-primary/50'
+                            }`}
+                          >
+                            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-orange-300 to-yellow-300 mb-2" />
+                            <span className="text-sm font-semibold">Image</span>
+                            {field.value === 'image' && <CheckCircle2 className="h-4 w-4 text-primary mt-1" />}
+                          </FormLabel>
+                        </FormItem>
+                        
+                        {/* Video Option */}
+                        <FormItem className="flex-1">
+                          <FormControl>
+                            <RadioGroupItem value="video" id="style-video" className="sr-only"/>
+                          </FormControl>
+                          <FormLabel 
+                            htmlFor="style-video"
+                            className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 p-4 text-center transition-all ${
+                              field.value === 'video'
+                                ? 'border-primary bg-primary/5'
+                                : 'border-slate-200 dark:border-slate-700 hover:border-primary/50'
+                            }`}
+                          >
+                            <div className="h-8 w-8 rounded-lg bg-gradient-to-b from-cyan-400 to-teal-400 mb-2" />
+                            <span className="text-sm font-semibold">Video</span>
+                            {field.value === 'video' && <CheckCircle2 className="h-4 w-4 text-primary mt-1" />}
+                          </FormLabel>
+                        </FormItem>
+                      </RadioGroup>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
 
-            {backgroundStyle === 'image' && (
-              <div className="space-y-4">
-                 <FormField
+              {/* Solid Color Configuration */}
+              {backgroundStyle === 'solid' && (
+                <div className="space-y-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800">
+                  <div className="flex items-start gap-2">
+                    <Info className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-muted-foreground">Choose a solid color for your website background</p>
+                  </div>
+                  <FormField control={form.control} name="colorBackground" render={({ field }) => <ColorInput field={field} label="Background Color" />} />
+                </div>
+              )}
+
+              {/* Gradient Configuration */}
+              {backgroundStyle === 'gradient' && (
+                <div className="space-y-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800">
+                  <div className="flex items-start gap-2">
+                    <Info className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-muted-foreground">Select two colors for a smooth gradient transition</p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField control={form.control} name="backgroundGradientStart" render={({ field }) => <ColorInput field={field} label="Gradient Start Color" />} />
+                    <FormField control={form.control} name="backgroundGradientEnd" render={({ field }) => <ColorInput field={field} label="Gradient End Color" />} />
+                  </div>
+                  <div className="h-24 rounded-lg border border-slate-300 dark:border-slate-600" style={{
+                    background: `linear-gradient(135deg, ${form.watch('backgroundGradientStart')} 0%, ${form.watch('backgroundGradientEnd')} 100%)`
+                  }} />
+                </div>
+              )}
+
+              {/* Image Configuration */}
+              {backgroundStyle === 'image' && (
+                <div className="space-y-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800">
+                  <div className="flex items-start gap-2">
+                    <Info className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-muted-foreground">Upload or paste an image URL. For best results, use high-quality, optimized images (2-5MB)</p>
+                  </div>
+                  <FormField
                     control={form.control}
                     name="backgroundImageUrl"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Background Image URL</FormLabel>
+                        <FormLabel>Background Image</FormLabel>
                         <div className="flex items-center gap-2">
-                            <FormControl><Input {...field} value={field.value ?? ''} placeholder="https://example.com/background.png" disabled={isUploading}/></FormControl>
-                            <Button asChild variant="outline" disabled={isUploading}>
-                                <label htmlFor="image-upload" className="cursor-pointer">
-                                  {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Upload className="mr-2 h-4 w-4" />}
-                                  Upload
-                                  <Input id="image-upload" type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'backgroundImageUrl')} disabled={isUploading} />
-                                </label>
-                            </Button>
+                          <FormControl>
+                            <Input 
+                              {...field} 
+                              value={field.value ?? ''} 
+                              placeholder="https://example.com/background.png" 
+                              disabled={isUploading}
+                            />
+                          </FormControl>
+                          <Button asChild variant="outline" disabled={isUploading} className="flex-shrink-0">
+                            <label htmlFor="image-upload" className="cursor-pointer">
+                              {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Upload className="mr-2 h-4 w-4" />}
+                              Upload
+                              <Input 
+                                id="image-upload" 
+                                type="file" 
+                                accept="image/*" 
+                                className="hidden" 
+                                onChange={(e) => handleImageUpload(e, 'backgroundImageUrl')} 
+                                disabled={isUploading} 
+                              />
+                            </label>
+                          </Button>
                         </div>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <p className="text-xs text-muted-foreground">For best results, use a high-quality, optimized image. You can paste a URL or upload your own.</p>
                   <FormField control={form.control} name="colorBackground" render={({ field }) => <ColorInput field={field} label="UI Background Color" />} />
-                   <p className="text-xs text-muted-foreground">This color is used for cards and popovers when a background image is active.</p>
-
-              </div>
-            )}
-
-            {backgroundStyle === 'video' && (
-                <div className="space-y-4 p-4 border rounded-md">
-                    <FormField
-                        control={form.control}
-                        name="backgroundVideoUrl"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Background Video URL</FormLabel>
-                            <FormControl><Input {...field} value={field.value ?? ''} placeholder="https://example.com/background.mp4" disabled={isUploading} /></FormControl>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="backgroundVideoImageUrl"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Video Poster Image URL (Optional)</FormLabel>
-                            <div className="flex items-center gap-2">
-                                <FormControl><Input {...field} value={field.value ?? ''} placeholder="https://example.com/poster.jpg" disabled={isUploading} /></FormControl>
-                                <Button asChild variant="outline" disabled={isUploading}>
-                                    <label htmlFor="video-poster-upload" className="cursor-pointer">
-                                        {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Upload className="mr-2 h-4 w-4" />}
-                                        Upload
-                                    </label>
-                                </Button>
-                                <Input id="video-poster-upload" type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'backgroundVideoImageUrl')} disabled={isUploading} />
-                            </div>
-                            <FormDescription className="text-xs">Image shown while the video is loading.</FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-                    <FormField control={form.control} name="colorBackground" render={({ field }) => <ColorInput field={field} label="UI Component Background" />} />
-                    <p className="text-xs text-muted-foreground">This color is used for cards and popovers when a background video is active.</p>
+                  <p className="text-xs text-muted-foreground italic">The UI color is used for cards, modals, and popovers displayed over the background image</p>
                 </div>
-            )}
+              )}
+
+              {/* Video Configuration */}
+              {backgroundStyle === 'video' && (
+                <div className="space-y-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800">
+                  <div className="flex items-start gap-2">
+                    <Info className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-muted-foreground">Add a background video with an optional poster image for faster loading</p>
+                  </div>
+                  
+                  <FormField
+                    control={form.control}
+                    name="backgroundVideoUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Background Video URL</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            value={field.value ?? ''} 
+                            placeholder="https://example.com/background.mp4" 
+                            disabled={isUploading} 
+                          />
+                        </FormControl>
+                        <p className="text-xs text-muted-foreground">Recommended: MP4 format, 5-15MB, 1920x1080 resolution</p>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="backgroundVideoImageUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Video Poster Image (Optional)</FormLabel>
+                        <div className="flex items-center gap-2">
+                          <FormControl>
+                            <Input 
+                              {...field} 
+                              value={field.value ?? ''} 
+                              placeholder="https://example.com/poster.jpg" 
+                              disabled={isUploading} 
+                            />
+                          </FormControl>
+                          <Button asChild variant="outline" disabled={isUploading} className="flex-shrink-0">
+                            <label htmlFor="video-poster-upload" className="cursor-pointer">
+                              {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Upload className="mr-2 h-4 w-4" />}
+                              Upload
+                            </label>
+                          </Button>
+                          <Input 
+                            id="video-poster-upload" 
+                            type="file" 
+                            accept="image/*" 
+                            className="hidden" 
+                            onChange={(e) => handleImageUpload(e, 'backgroundVideoImageUrl')} 
+                            disabled={isUploading} 
+                          />
+                        </div>
+                        <p className="text-xs text-muted-foreground">Shown while the video is loading. Same dimensions as video recommended</p>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField control={form.control} name="colorBackground" render={({ field }) => <ColorInput field={field} label="UI Background Color" />} />
+                  <p className="text-xs text-muted-foreground italic">The UI color is used for cards, modals, and popovers displayed over the video</p>
+                </div>
+              )}
+            </div>
             
           </CardContent>
           <CardFooter className="flex justify-between items-center">
