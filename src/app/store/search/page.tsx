@@ -46,19 +46,29 @@ function SearchPageContent() {
   
   // Get grid column settings and convert to Tailwind classes
   const getGridClasses = () => {
-    const mobileGridClass = settings?.storeGridColumnsMobile === 3 ? 'grid-cols-3' : 'grid-cols-2';
-    const tabletGridClass = (() => {
-      const cols = settings?.storeGridColumnsTablet || 3;
+    const defaultClass = (() => {
+      const cols = settings?.storeGridColumnsDefault || 2;
+      return cols === 3 ? 'grid-cols-3' : 'grid-cols-2';
+    })();
+    
+    const smClass = (() => {
+      const cols = settings?.storeGridColumnsSm || 2;
+      return cols === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2';
+    })();
+    
+    const mdClass = (() => {
+      const cols = settings?.storeGridColumnsMd || 3;
       if (cols === 2) return 'md:grid-cols-2';
       if (cols === 4) return 'md:grid-cols-4';
       return 'md:grid-cols-3';
     })();
-    const desktopGridClass = (() => {
-      const cols = settings?.storeGridColumns;
+    
+    const lgClass = (() => {
+      const cols = settings?.storeGridColumnsLg;
       if (cols === 3) return 'lg:grid-cols-3';
       if (cols === 4) return 'lg:grid-cols-4';
       if (cols === 'custom') {
-        const customCols = settings?.storeGridCustomColumns || 4;
+        const customCols = settings?.storeGridColumnsCustom || 4;
         if (customCols === 2) return 'lg:grid-cols-2';
         if (customCols === 3) return 'lg:grid-cols-3';
         if (customCols === 5) return 'lg:grid-cols-5';
@@ -68,7 +78,8 @@ function SearchPageContent() {
       }
       return 'lg:grid-cols-4';
     })();
-    return `${mobileGridClass} sm:grid-cols-2 ${tabletGridClass} ${desktopGridClass}`;
+    
+    return `${defaultClass} ${smClass} ${mdClass} ${lgClass}`;
   };
   
   const gridClasses = getGridClasses();

@@ -261,10 +261,11 @@ export interface Settings {
   showProductReviews?: boolean;
   showReviewRatingOnCard?: boolean;
   // Web Store Grid Layout Settings
-  storeGridColumns?: 2 | 3 | 4 | 'custom';
-  storeGridCustomColumns?: number;
-  storeGridColumnsMobile?: 2 | 3;
-  storeGridColumnsTablet?: 2 | 3 | 4;
+  storeGridColumnsDefault?: 2 | 3;
+  storeGridColumnsSm?: 2 | 3;
+  storeGridColumnsMd?: 2 | 3 | 4;
+  storeGridColumnsLg?: 2 | 3 | 4 | 'custom';
+  storeGridColumnsCustom?: number;
 }
 
 export type AppSettings = Settings;
