@@ -263,12 +263,60 @@
     box-shadow: 0 4px 12px hsl(0 0% 0% / 0.2);
   }
 
-  /* Clean input focus state */
+  /* Dark mode input styling - Complete */
+  .dark input,
+  .dark textarea,
+  .dark select {
+    background-color: hsl(var(--popover));
+    border-color: hsl(var(--border));
+    color: hsl(var(--foreground));
+    transition: all 0.25s ease;
+  }
+
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    color: hsl(var(--muted-foreground));
+  }
+
+  .dark input:hover,
+  .dark textarea:hover,
+  .dark select:hover {
+    border-color: hsl(var(--border) / 0.8);
+    background-color: hsl(225 19% 16%);
+  }
+
   .dark input:focus,
   .dark textarea:focus,
   .dark select:focus {
-    border-color: hsl(217 100% 56% / 0.6);
-    box-shadow: 0 0 0 3px hsl(217 100% 56% / 0.1);
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1), inset 0 0 0 1px hsl(var(--primary) / 0.2);
+    outline: none;
+    background-color: hsl(225 19% 16%);
+  }
+
+  .dark input:disabled,
+  .dark textarea:disabled,
+  .dark select:disabled {
+    background-color: hsl(var(--muted) / 0.3);
+    color: hsl(var(--muted-foreground));
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .dark input[type="file"] {
+    cursor: pointer;
+  }
+
+  .dark input[type="checkbox"],
+  .dark input[type="radio"] {
+    cursor: pointer;
+    border-color: hsl(var(--border));
+  }
+
+  .dark input[type="checkbox"]:checked,
+  .dark input[type="radio"]:checked {
+    background-color: hsl(var(--primary));
+    border-color: hsl(var(--primary));
   }
 }
 
@@ -513,4 +561,81 @@
 .dark [role="dialog"] nav a.active {
   background-color: hsl(var(--popover));
   color: hsl(var(--primary));
+}
+
+/* Form elements dark mode styling */
+.dark label {
+  color: hsl(var(--foreground));
+  font-weight: 500;
+}
+
+.dark label.text-sm {
+  color: hsl(var(--foreground) / 0.9);
+}
+
+/* Form field container */
+.dark [class*="flex flex-col gap"],
+.dark [class*="space-y-2"] {
+  color: hsl(var(--foreground));
+}
+
+/* Form description text */
+.dark [class*="text-xs"][class*="text-muted-foreground"] {
+  color: hsl(var(--muted-foreground));
+}
+
+/* Required field indicator */
+.dark .text-destructive {
+  color: hsl(var(--destructive));
+}
+
+/* Error message styling */
+.dark .text-red-500,
+.dark .text-destructive {
+  color: hsl(var(--destructive));
+  font-size: 0.875rem;
+}
+
+/* Success message styling */
+.dark .text-green-500,
+.dark .text-success {
+  color: hsl(var(--success));
+  font-size: 0.875rem;
+}
+
+/* Input group styling for dark mode */
+.dark .input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dark .input-group svg {
+  color: hsl(var(--muted-foreground));
+  flex-shrink: 0;
+}
+
+.dark input:focus ~ .input-group svg {
+  color: hsl(var(--primary));
+}
+
+/* Search input dark mode */
+.dark input[type="search"],
+.dark input[placeholder*="search"],
+.dark input[placeholder*="Search"] {
+  background-color: hsl(var(--popover));
+  border-color: hsl(var(--border));
+}
+
+.dark input[type="search"]::placeholder,
+.dark input[placeholder*="search"]::placeholder,
+.dark input[placeholder*="Search"]::placeholder {
+  color: hsl(var(--muted-foreground));
+}
+
+.dark input[type="search"]:focus,
+.dark input[placeholder*="search"]:focus,
+.dark input[placeholder*="Search"]:focus {
+  border-color: hsl(var(--primary));
+  background-color: hsl(225 19% 16%);
 }
