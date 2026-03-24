@@ -262,7 +262,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
   const handlePrevPage = () => fetchProducts('prev');
 
   return (
-    <section ref={sectionRef} className="py-12 md:py-24 overflow-hidden relative" style={backgroundColor ? { backgroundColor } : {}}>
+    <section ref={sectionRef} className="py-12 md:py-24 overflow-hidden relative dark:bg-black" style={backgroundColor ? { backgroundColor } : {}}>
       <div className={cn("max-w-site-container mx-auto px-4 sm:px-6 lg:px-8")}>
         <Carousel 
             opts={{ 

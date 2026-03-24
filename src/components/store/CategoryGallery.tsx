@@ -118,7 +118,7 @@ export function CategoryGallery() {
 
   return (
     <section 
-        className="py-20 md:py-28 border-y border-slate-100 dark:border-slate-900 overflow-hidden group/gallery transition-colors duration-500" 
+        className="py-20 md:py-28 border-y border-slate-100 dark:border-slate-900 dark:bg-black overflow-hidden group/gallery transition-colors duration-500" 
         style={{ backgroundColor: sectionBgColor }}
     >
       <div className="max-w-site-container mx-auto px-6 mb-12 md:mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
