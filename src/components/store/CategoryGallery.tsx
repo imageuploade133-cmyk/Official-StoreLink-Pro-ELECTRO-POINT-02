@@ -145,9 +145,9 @@ export function CategoryGallery() {
                 {sectionDescription}
             </p>
         </div>
-        <Button asChild variant="ghost" className="font-black text-[10px] uppercase tracking-[0.2em] gap-3 hover:bg-primary/5 p-0 h-auto group/btn self-start md:self-auto animate-in fade-in zoom-in-95 duration-1000 delay-200" style={{ color: sectionTextColor }}>
+        <Button asChild variant="ghost" className="font-black text-[10px] uppercase tracking-[0.2em] gap-3 hover:bg-primary/5 p-0 h-auto group/btn self-start md:self-auto animate-in fade-in zoom-in-95 duration-1000 delay-200 dark:text-black" style={{ color: sectionTextColor }}>
             <Link href="/store/categories">
-                View All Collections <ChevronRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" strokeWidth={3} />
+                View All Collections <ChevronRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1 dark:text-black" strokeWidth={3} />
             </Link>
         </Button>
       </div>
