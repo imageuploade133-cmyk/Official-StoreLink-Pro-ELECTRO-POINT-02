@@ -50,72 +50,72 @@
   }
  
   .dark {
-    /* Professional Dark Theme - GitHub/Modern Style */
-    /* Base: Primary dark background #0d1117 */
-    --background: 225 21% 6%;
-    --foreground: 210 18% 90%;
+    /* Clean Professional Dark Theme - GitHub Style */
+    /* Base: Very dark blue-black */
+    --background: 220 20% 8%;
+    --foreground: 210 16% 93%;
     
-    /* Cards: Secondary elevated surface #161b22 */
-    --card: 225 20% 10%;
-    --card-foreground: 210 18% 90%;
+    /* Cards: Elevated from background with subtle blue tint */
+    --card: 215 22% 13%;
+    --card-foreground: 210 16% 93%;
     
-    /* Popovers: Tertiary elevated #21262d */
-    --popover: 225 19% 16%;
-    --popover-foreground: 210 18% 90%;
+    /* Popovers: More elevated for depth */
+    --popover: 215 23% 18%;
+    --popover-foreground: 210 16% 93%;
     
-    /* Primary: Bright professional blue #3b82f6 */
-    --primary: 217 91% 60%;
-    --primary-foreground: 225 21% 6%;
+    /* Primary: Bright professional blue */
+    --primary: 217 100% 56%;
+    --primary-foreground: 210 16% 93%;
     
-    /* Secondary: Secondary surface */
-    --secondary: 225 20% 10%;
-    --secondary-foreground: 210 18% 90%;
+    /* Secondary: Elevated surface */
+    --secondary: 215 22% 13%;
+    --secondary-foreground: 210 16% 93%;
     
-    /* Muted: Muted text #9da7b3 */
-    --muted: 215 15% 62%;
-    --muted-foreground: 215 13% 43%;
+    /* Muted: Gray for secondary content */
+    --muted: 210 10% 68%;
+    --muted-foreground: 210 8% 50%;
     
-    /* Accent: Bright accent for interactive elements */
-    --accent: 217 91% 60%;
-    --accent-foreground: 225 21% 6%;
+    /* Accent: Secondary blue accent */
+    --accent: 217 100% 56%;
+    --accent-foreground: 210 16% 93%;
     
-    /* Destructive: Bright red #ef4444 */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 18% 90%;
+    /* Destructive: Bright red */
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 210 16% 93%;
     
-    /* Success: Clean green #22c55e */
-    --success: 142 76% 36%;
-    --success-foreground: 210 18% 90%;
+    /* Success: Clean green */
+    --success: 142 71% 45%;
+    --success-foreground: 210 16% 93%;
     
-    /* Border: Subtle gray border #30363d */
-    --border: 225 18% 20%;
-    --input: 225 19% 16%;
+    /* Border: Subtle gray border */
+    --border: 215 21% 23%;
+    --input: 215 23% 18%;
     
     /* Ring: Blue focus state */
-    --ring: 217 91% 60%;
+    --ring: 217 100% 56%;
     
     /* Chart colors: Professional palette */
-    --chart-1: 217 91% 60%;
-    --chart-2: 142 76% 36%;
-    --chart-3: 0 84% 60%;
+    --chart-1: 217 100% 56%;
+    --chart-2: 142 71% 45%;
+    --chart-3: 0 100% 50%;
     --chart-4: 210 50% 50%;
     --chart-5: 30 80% 50%;
     
     /* Sidebar: Integrated dark theme */
-    --sidebar-background: 225 21% 6%;
-    --sidebar-foreground: 210 18% 90%;
-    --sidebar-primary: 217 91% 60%;
-    --sidebar-primary-foreground: 225 21% 6%;
-    --sidebar-accent: 225 20% 10%;
-    --sidebar-accent-foreground: 210 18% 90%;
-    --sidebar-border: 225 18% 20%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-background: 220 20% 8%;
+    --sidebar-foreground: 210 16% 93%;
+    --sidebar-primary: 217 100% 56%;
+    --sidebar-primary-foreground: 210 16% 93%;
+    --sidebar-accent: 215 22% 13%;
+    --sidebar-accent-foreground: 210 16% 93%;
+    --sidebar-border: 215 21% 23%;
+    --sidebar-ring: 217 100% 56%;
   }
 }
 
 @layer base {
   * {
-    @apply border-border transition-colors duration-250 ease;
+    @apply border-border transition-colors duration-300 ease-in-out;
   }
   html {
     scroll-behavior: smooth;
@@ -134,7 +134,7 @@
   
   /* Smooth transitions for theme-aware elements */
   button, a, input, textarea, select {
-    @apply transition-colors duration-250 ease;
+    @apply transition-colors duration-200 ease-in-out;
   }
   
   /* Ensure dark mode background is applied */
@@ -157,28 +157,21 @@
   }
   
   .dark .glass-card {
-    background: rgba(22, 27, 34, 0.8);
-    border: 1px solid rgba(48, 54, 61, 1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    transition: all 0.25s ease;
-  }
-
-  .dark .glass-card:hover {
-    background: rgba(33, 38, 45, 0.9);
-    border-color: rgba(59, 130, 246, 0.3);
-    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.1);
+    background: rgba(22, 27, 34, 0.75);
+    border: 1px solid rgba(48, 54, 61, 0.8);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   }
 
   .glass-nav {
-    @apply backdrop-blur-3xl transition-all duration-250 border-b;
+    @apply backdrop-blur-3xl transition-all duration-300 border-b;
     background: rgba(255, 255, 255, 0.85);
     border-color: rgba(255, 255, 255, 0.12);
   }
   
   .dark .glass-nav {
-    background: rgba(22, 27, 34, 1);
-    border-color: rgba(48, 54, 61, 1);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    background: rgba(22, 27, 34, 0.9);
+    border-color: rgba(48, 54, 61, 0.8);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
 
   /* Custom Scrollbar Styles - Anderd Dark Mood */
@@ -203,28 +196,28 @@
     background-color: hsl(var(--primary) / 0.4);
   }
 
-  /* Dark mode specific scrollbar - matches reference */
+  /* Dark mode specific scrollbar - refined */
   .dark ::-webkit-scrollbar-thumb {
-    background-color: hsl(217 91% 60% / 0.3);
+    background-color: hsl(190 70% 48% / 0.2);
   }
 
   .dark ::-webkit-scrollbar-thumb:hover {
-    background-color: hsl(217 91% 60% / 0.5);
+    background-color: hsl(190 70% 48% / 0.4);
   }
 
   /* Clean Border Focus Animation */
   @keyframes border-glow {
     0%, 100% { 
-      border-color: hsl(217 91% 60% / 0.3);
-      box-shadow: 0 0 0 0px hsl(217 91% 60% / 0);
+      border-color: hsl(217 100% 56% / 0.3);
+      box-shadow: 0 0 0 0px hsl(217 100% 56% / 0);
     }
     50% { 
-      border-color: hsl(217 91% 60% / 0.6);
-      box-shadow: 0 0 12px 2px hsl(217 91% 60% / 0.15);
+      border-color: hsl(217 100% 56% / 0.6);
+      box-shadow: 0 0 12px 2px hsl(217 100% 56% / 0.15);
     }
   }
   .animate-border-glow {
-    animation: border-glow 2s ease-in-out infinite;
+    animation: border-glow 3s ease-in-out infinite;
   }
 
   /* Subtle pulse */
@@ -233,7 +226,7 @@
     50% { opacity: 0.9; transform: scale(0.995); }
   }
   .animate-pulse-soft {
-    animation: pulse-soft 2.5s ease-in-out infinite;
+    animation: pulse-soft 3s ease-in-out infinite;
   }
 
   /* Fade animation for subtle elements */
@@ -242,7 +235,7 @@
     50% { opacity: 0.8; }
   }
   .animate-fade-glow {
-    animation: fade-glow 2s ease-in-out infinite;
+    animation: fade-glow 2.5s ease-in-out infinite;
   }
 
   /* Toast Countdown Bar Animation */
@@ -270,27 +263,12 @@
     box-shadow: 0 4px 12px hsl(0 0% 0% / 0.2);
   }
 
-  /* Clean input styling */
-  .dark input,
-  .dark textarea,
-  .dark select {
-    background-color: hsl(225 19% 16%);
-    border-color: hsl(225 18% 20%);
-    color: hsl(var(--foreground));
-    transition: all 0.25s ease;
-  }
-
-  .dark input::placeholder,
-  .dark textarea::placeholder {
-    color: hsl(var(--muted-foreground));
-  }
-
+  /* Clean input focus state */
   .dark input:focus,
   .dark textarea:focus,
   .dark select:focus {
-    border-color: hsl(217 91% 60%);
-    box-shadow: 0 0 0 3px hsl(217 91% 60% / 0.1);
-    outline: none;
+    border-color: hsl(217 100% 56% / 0.6);
+    box-shadow: 0 0 0 3px hsl(217 100% 56% / 0.1);
   }
 }
 
@@ -385,12 +363,6 @@
 
 .dark aside a {
   color: hsl(var(--sidebar-foreground));
-  transition: all 0.25s ease;
-}
-
-.dark aside a:hover {
-  color: hsl(var(--sidebar-primary));
-  background-color: rgba(59, 130, 246, 0.08);
 }
 
 .dark aside a.active,
@@ -428,69 +400,4 @@
 /* Shadow and depth for dark cards */
 .dark [class*="shadow"] {
   box-shadow: 0 4px 12px hsl(0 0% 0% / 0.3);
-}
-
-/* Icon visibility in dark mode */
-.dark svg {
-  color: hsl(var(--foreground));
-  fill: currentColor;
-}
-
-.dark svg.text-muted-foreground {
-  color: hsl(var(--muted-foreground));
-}
-
-.dark svg.text-primary {
-  color: hsl(var(--primary));
-}
-
-.dark svg.text-accent {
-  color: hsl(var(--accent));
-}
-
-.dark svg.text-destructive {
-  color: hsl(var(--destructive));
-}
-
-.dark svg.text-success {
-  color: hsl(var(--success));
-}
-
-/* Icon hover states for interactive elements */
-.dark button svg,
-.dark a svg {
-  transition: color 0.25s ease, transform 0.25s ease;
-}
-
-.dark button:hover svg,
-.dark a:hover svg {
-  color: hsl(var(--primary));
-}
-
-.dark [disabled] svg {
-  color: hsl(var(--muted-foreground));
-  opacity: 0.6;
-}
-
-/* Badge styling for dark mode */
-.dark .badge {
-  background-color: rgba(59, 130, 246, 0.15);
-  color: hsl(217 91% 60%);
-  border: 1px solid rgba(59, 130, 246, 0.3);
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-}
-
-.dark .badge.success {
-  background-color: rgba(34, 197, 94, 0.15);
-  color: hsl(142 76% 36%);
-  border-color: rgba(34, 197, 94, 0.3);
-}
-
-.dark .badge.error,
-.dark .badge.danger {
-  background-color: rgba(239, 68, 68, 0.15);
-  color: hsl(0 84% 60%);
-  border-color: rgba(239, 68, 68, 0.3);
 }
