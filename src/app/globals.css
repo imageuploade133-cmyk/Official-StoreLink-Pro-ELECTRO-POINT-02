@@ -777,3 +777,164 @@
   border-color: hsl(var(--primary));
   background-color: hsl(225 19% 16%);
 }
+
+/* ========================================
+   PUBLIC STORE APP - GLOBAL DARK THEME
+   ======================================== */
+
+/* Public Store - Global Container Styling */
+.dark [class*="bg-background-light"] {
+  background-color: #000000 !important;
+}
+
+.dark [class*="bg-background-dark"] {
+  background-color: #000000 !important;
+}
+
+/* Store View Containers - Black Background */
+.dark [class*="store-app"],
+.dark [class*="SearchView"],
+.dark [class*="CartView"],
+.dark [class*="ProductView"],
+.dark [class*="CheckoutView"],
+.dark [class*="WishlistView"],
+.dark [class*="LoginView"],
+.dark [class*="SignupView"],
+.dark [class*="OrdersView"],
+.dark [class*="ProfileView"],
+.dark [class*="NotificationsView"],
+.dark [class*="CollectionsView"] {
+  background-color: #000000 !important;
+}
+
+/* All SVG and Icon Styling in Dark Mode */
+.dark svg {
+  color: #f1f5f9;
+  fill: currentColor;
+  transition: all 0.25s ease;
+}
+
+/* Icon button styling */
+.dark button svg,
+.dark [role="button"] svg {
+  color: #f1f5f9;
+  stroke: currentColor;
+  fill: currentColor;
+}
+
+.dark button:hover svg,
+.dark [role="button"]:hover svg {
+  color: hsl(var(--primary));
+}
+
+/* Navigation icon styling */
+.dark nav svg {
+  color: #f1f5f9;
+}
+
+.dark nav a:hover svg,
+.dark nav button:hover svg {
+  color: hsl(var(--primary));
+}
+
+/* Card and section icon styling */
+.dark [class*="rounded-lg"] svg,
+.dark [class*="bg-card"] svg {
+  color: #f1f5f9;
+}
+
+/* Badge and label icon styling */
+.dark .badge svg,
+.dark label svg,
+.dark [class*="badge"] svg {
+  color: #f1f5f9;
+}
+
+/* Interactive element icon styling */
+.dark [class*="cursor-pointer"] svg,
+.dark [class*="hover:"] svg {
+  color: #f1f5f9;
+  transition: color 0.25s ease;
+}
+
+/* Disabled icon styling */
+.dark [disabled] svg,
+.dark [class*="opacity-50"] svg {
+  color: #8892a0;
+  opacity: 0.5;
+}
+
+/* Icon color classes in dark mode */
+.dark .text-white,
+.dark .fill-white {
+  color: #f1f5f9 !important;
+  fill: #f1f5f9 !important;
+}
+
+.dark .text-gray-400,
+.dark .text-slate-400 {
+  color: #cbd5e1 !important;
+}
+
+.dark .text-gray-600,
+.dark .text-slate-600 {
+  color: #94a3b8 !important;
+}
+
+.dark .text-primary svg {
+  color: hsl(var(--primary)) !important;
+}
+
+/* Store sections and containers */
+.dark [class*="flex-col"][class*="h-full"] {
+  background-color: #000000 !important;
+}
+
+.dark header,
+.dark [role="banner"] {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.dark nav,
+.dark [role="navigation"] {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+.dark main,
+.dark [role="main"] {
+  background-color: #000000 !important;
+}
+
+.dark footer,
+.dark [role="contentinfo"] {
+  background-color: rgba(0, 0, 0, 0.95);
+}
+
+/* Product cards and grid items */
+.dark [class*="grid"] [class*="rounded"] {
+  background-color: #1a1a1a;
+}
+
+.dark [class*="product"] {
+  background-color: transparent;
+}
+
+/* Store section styling */
+.dark section,
+.dark [role="region"] {
+  background-color: transparent;
+}
+
+.dark [class*="space-y"] > * {
+  background-color: inherit;
+}
+
+/* Background color fixes only */
+.dark .bg-background-light {
+  background-color: #000000 !important;
+}
+
+.dark .dark\:bg-background-dark,
+.dark [class*="dark:bg"] {
+  background-color: #000000 !important;
+}
