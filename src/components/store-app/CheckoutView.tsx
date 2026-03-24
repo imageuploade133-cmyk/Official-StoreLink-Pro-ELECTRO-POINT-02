@@ -254,8 +254,8 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-background-light dark:bg-background-dark animate-in slide-in-from-right-4 fade-in duration-500">
-        <header className="sticky top-0 z-50 flex flex-col bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-4 py-6 justify-between border-b border-slate-200 dark:border-slate-800">
+    <div className="flex flex-col h-full bg-background-light dark:bg-black animate-in slide-in-from-right-4 fade-in duration-500">
+        <header className="sticky top-0 z-50 flex flex-col bg-background-light/80 dark:bg-black/80 backdrop-blur-md px-4 py-6 justify-between border-b border-slate-200 dark:border-slate-800">
             <div className="flex items-center justify-between px-6 py-6">
                 <button onClick={step === 'details' ? onClose : () => setStep('details')} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-800 active:scale-90 transition-transform"><ArrowLeft className="h-6 w-6" /></button>
                 <h1 className="text-xl font-black tracking-tighter uppercase">Checkout</h1>

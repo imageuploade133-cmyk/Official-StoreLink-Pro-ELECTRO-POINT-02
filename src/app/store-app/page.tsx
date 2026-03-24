@@ -115,11 +115,11 @@ export default function StoreAppPage() {
     return (
         <>
             <ProductLoadingOverlay isVisible={isLoadingProduct} />
-            <div className="bg-background-light dark:bg-background-dark min-h-screen">
-              <div className="relative flex flex-col max-w-md mx-auto bg-background-light dark:bg-background-dark shadow-2xl min-h-screen border-x">
+            <div className="bg-background-light dark:bg-black min-h-screen">
+              <div className="relative flex flex-col max-w-md mx-auto bg-background-light dark:bg-black shadow-2xl min-h-screen border-x dark:border-slate-800/50">
             
             {showNav && (
-                <header className="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-xl transition-all duration-500 border-b border-slate-200/50 dark:border-slate-800/50">
+                <header className="sticky top-0 z-50 bg-background-light/80 dark:bg-black/80 backdrop-blur-xl transition-all duration-500 border-b border-slate-200/50 dark:border-slate-800/50">
                     <div className="flex items-center justify-between px-6 py-4">
                         {/* Left Action: Search */}
                         <div className="flex items-center gap-3">
@@ -187,7 +187,7 @@ export default function StoreAppPage() {
                 </header>
             )}
 
-            <main className={cn("flex-1 overflow-y-auto hide-scrollbar", showNav && "pb-24")}>
+            <main className={cn("flex-1 overflow-y-auto hide-scrollbar dark:bg-black", showNav && "pb-24")}>
                 {selectedProductId ? (
                     <ProductDetailView 
                         id={selectedProductId} 
@@ -277,7 +277,7 @@ export default function StoreAppPage() {
             </main>
 
             {showNav && (
-                <nav className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[calc(100%-2.5rem)] max-w-[420px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border border-slate-200/50 dark:border-slate-800/50 rounded-[2.5rem] px-2 py-2 flex items-center justify-around z-[100] shadow-[0_20px_50px_rgba(0,0,0,0.2)] transition-all">
+                <nav className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[calc(100%-2.5rem)] max-w-[420px] bg-white/80 dark:bg-slate-950/90 backdrop-blur-2xl border border-slate-200/50 dark:border-slate-800/50 rounded-[2.5rem] px-2 py-2 flex items-center justify-around z-[100] shadow-[0_20px_50px_rgba(0,0,0,0.2)] transition-all">
                 {[
                     { id: 'home', icon: Home, label: 'Home' },
                     { id: 'collections', icon: LayoutGrid, label: 'Registry' },

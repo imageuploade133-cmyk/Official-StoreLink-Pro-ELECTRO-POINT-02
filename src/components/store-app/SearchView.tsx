@@ -134,8 +134,8 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
     }, [initialCategoryId]);
 
     return (
-        <div className="flex flex-col h-full bg-background-light dark:bg-background-dark animate-in fade-in duration-500">
-            <header className="sticky top-0 z-50 flex items-center bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-4 py-6 justify-between border-b border-slate-200 dark:border-slate-800">
+            <div className="flex flex-col h-full bg-background-light dark:bg-black animate-in fade-in duration-500">
+            <header className="sticky top-0 z-50 flex items-center bg-background-light/80 dark:bg-black/80 backdrop-blur-md px-4 py-6 justify-between border-b border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-4">
                     <button 
                         onClick={onClose}
@@ -149,7 +149,7 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
 
             <div className="flex flex-col h-full">
                 {/* Fixed Header */}
-                <div className="px-6 pt-12 pb-6 space-y-4 flex-shrink-0 bg-background-light dark:bg-background-dark border-b border-slate-100 dark:border-slate-800">
+                <div className="px-6 pt-12 pb-6 space-y-4 flex-shrink-0 bg-background-light dark:bg-black border-b border-slate-100 dark:border-slate-800">
                     <div className="space-y-2">
                         <div className="flex items-center gap-2 font-black text-[10px] uppercase tracking-[0.3em] text-primary">
                             <Sparkles className="h-3.5 w-3.5" />
