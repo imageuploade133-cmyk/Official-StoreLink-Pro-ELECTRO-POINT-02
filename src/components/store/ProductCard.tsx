@@ -131,12 +131,12 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
         {/* Enhanced Wishlist Button with Pulse */}
         <button
           className={cn(
-            `absolute top-4 right-4 h-11 w-11 flex items-center justify-center rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-lg transition-all duration-300 z-10 border border-white/30 hover:scale-110 active:scale-95`,
+            `absolute top-4 right-4 h-11 w-11 flex items-center justify-center rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-lg transition-all duration-300 z-10 border border-white/30 dark:border-slate-700/50 hover:scale-110 active:scale-95`,
             isInWishlist && `text-rose-500 ${styles.wishlistPulse}`
           )}
           onClick={handleWishlistToggle}
         >
-          <Heart className={cn("h-5.5 w-5.5 transition-all duration-300", isInWishlist && "fill-current")} />
+          <Heart className={cn("h-5.5 w-5.5 transition-all duration-300 dark:text-slate-300", isInWishlist && "fill-current text-rose-500")} />
         </button>
 
         {/* Enhanced Quick Add Bottom Bar (MD+) */}
@@ -146,7 +146,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
             disabled={isOutOfStock}
             className={`w-full bg-gradient-to-r from-slate-950 to-slate-900 dark:from-white dark:to-slate-100 text-white dark:text-slate-950 font-black text-sm uppercase tracking-wide py-3 rounded-xl shadow-xl transition-all active:scale-95 ${styles.cartButton} hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed`}
           >
-            <ShoppingCart className={`h-5 w-5 mr-2 transition-all ${styles.cartIcon}`} />
+            <ShoppingCart className={`h-5 w-5 mr-2 transition-all dark:text-slate-950 ${styles.cartIcon}`} />
             {settings?.storeGridCartText || 'Add to Bag'}
           </Button>
         </div>
@@ -231,7 +231,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
               >
-                <ShoppingCart className={`h-5 w-5 transition-all ${styles.mobileCartIcon}`} />
+                <ShoppingCart className={`h-5 w-5 transition-all dark:text-white ${styles.mobileCartIcon}`} />
               </Button>
             </div>
           </div>

@@ -257,8 +257,8 @@ export function PublicNavbar() {
                   
                   <div className="hidden lg:flex flex-1 max-w-lg mx-12 relative" ref={searchContainerRef}>
                     <div className="w-full relative group">
-                        <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-slate-400">
-                            <Search className="h-5 w-5" strokeWidth={2.5} />
+                        <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-slate-400 dark:text-slate-400">
+                            <Search className="h-5 w-5 dark:text-slate-300" strokeWidth={2.5} />
                         </div>
                         <Input 
                             readOnly
@@ -288,9 +288,9 @@ export function PublicNavbar() {
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="hover:text-primary transition-colors p-0 m-0 h-auto font-black text-xs uppercase tracking-[0.2em] flex items-center gap-2">
+                                <Button variant="ghost" className="hover:text-primary transition-colors p-0 m-0 h-auto font-black text-xs uppercase tracking-[0.2em] flex items-center gap-2 dark:text-slate-300">
                                     Collections
-                                    <ChevronDown className="h-3.5 w-3.5 opacity-50" strokeWidth={3} />
+                                    <ChevronDown className="h-3.5 w-3.5 opacity-50 dark:opacity-60" strokeWidth={3} />
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-72 p-2 rounded-3xl shadow-2xl border-slate-200 dark:border-slate-800">
@@ -335,18 +335,18 @@ export function PublicNavbar() {
                         {user && customer && (
                             <Link 
                                 href="/store/account"
-                                className="hidden md:flex items-center gap-2.5 bg-primary/10 text-primary px-4 py-1.5 rounded-full border border-primary/20 shadow-sm hover:bg-primary hover:text-white transition-all duration-500 group/credit active:scale-95"
+                                className="hidden md:flex items-center gap-2.5 bg-primary/10 text-primary px-4 py-1.5 rounded-full border border-primary/20 shadow-sm hover:bg-primary hover:text-white transition-all duration-500 group/credit active:scale-95 dark:bg-primary/20"
                             >
-                                <Coins className="h-3.5 w-3.5 group-hover/credit:rotate-12 transition-transform" strokeWidth={3} />
+                                <Coins className="h-3.5 w-3.5 group-hover/credit:rotate-12 transition-transform dark:text-primary" strokeWidth={3} />
                                 <span className="text-[10px] font-black uppercase tracking-widest">
                                     Bonus: {formatCurrency(customer.creditBalance || 0, settings?.currency || '$')}
                                 </span>
                             </Link>
                         )}
                         <UserButton isLoading={isLoading} user={user} staffMember={staffMember} router={router} handleLogout={handleLogout} getInitials={getInitials} />
-                        <Button asChild variant="ghost" size="icon" className="group hidden sm:inline-flex h-11 w-11 rounded-2xl text-slate-600 dark:text-slate-300 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 relative transition-all">
+                        <Button asChild variant="ghost" size="icon" className="group hidden sm:inline-flex h-11 w-11 rounded-2xl text-slate-600 dark:text-slate-200 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 relative transition-all">
                             <Link href="/store/wishlist">
-                                <Heart className={cn("h-5.5 w-5.5 transition-transform duration-300 group-hover:scale-110", wishlistCount > 0 && "fill-current text-rose-500")} />
+                                <Heart className={cn("h-5.5 w-5.5 transition-transform duration-300 group-hover:scale-110 dark:text-slate-200", wishlistCount > 0 && "fill-current text-rose-500")} />
                                 {wishlistCount > 0 && (
                                     <span className="absolute top-1.5 right-1.5 h-4 w-4 bg-rose-500 text-white text-[9px] flex items-center justify-center rounded-full font-black border-2 border-white dark:border-slate-900 animate-in zoom-in duration-300">
                                         {wishlistCount}
@@ -354,9 +354,9 @@ export function PublicNavbar() {
                                 )}
                             </Link>
                         </Button>
-                        <Button asChild variant="ghost" size="icon" className="group h-11 w-11 rounded-2xl text-slate-600 dark:text-slate-300 hover:text-primary hover:bg-primary/5 relative transition-all">
+                        <Button asChild variant="ghost" size="icon" className="group h-11 w-11 rounded-2xl text-slate-600 dark:text-slate-200 hover:text-primary hover:bg-primary/5 relative transition-all">
                         <Link href="/store/cart">
-                            <ShoppingBag className={cn("h-5.5 w-5.5 transition-transform duration-300 group-hover:scale-110", cartCount > 0 && "text-primary")} />
+                            <ShoppingBag className={cn("h-5.5 w-5.5 transition-transform duration-300 group-hover:scale-110 dark:text-slate-200", cartCount > 0 && "text-primary dark:text-primary")} />
                             {cartCount > 0 && (
                                 <span className="absolute top-1.5 right-1.5 h-4 w-4 bg-primary text-white text-[9px] flex items-center justify-center rounded-full font-black border-2 border-white dark:border-slate-900 animate-in zoom-in duration-300">
                                     {cartCount}
@@ -370,8 +370,8 @@ export function PublicNavbar() {
                         <div className="md:hidden">
                         <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
                             <SheetTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-11 w-11 rounded-2xl hover:bg-primary/5 hover:text-primary">
-                                <Menu className="h-6 w-6" strokeWidth={2.5} />
+                            <Button variant="ghost" size="icon" className="h-11 w-11 rounded-2xl hover:bg-primary/5 hover:text-primary dark:text-slate-300">
+                                <Menu className="h-6 w-6 dark:text-slate-300" strokeWidth={2.5} />
                                 <span className="sr-only">Open menu</span>
                             </Button>
                             </SheetTrigger>
