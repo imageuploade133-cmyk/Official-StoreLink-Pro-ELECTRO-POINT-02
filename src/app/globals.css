@@ -50,66 +50,66 @@
   }
  
   .dark {
-    /* Anderd Dark Mood - Sophisticated & Atmospheric */
-    /* Base: Near-pure black for premium feel */
-    --background: 220 13% 3%;
-    --foreground: 210 20% 92%;
+    /* Clean Professional Dark Theme - GitHub Style */
+    /* Base: Very dark blue-black */
+    --background: 220 20% 8%;
+    --foreground: 210 16% 93%;
     
-    /* Cards: Subtle elevation with minimal contrast */
-    --card: 220 15% 8%;
-    --card-foreground: 210 20% 92%;
+    /* Cards: Elevated from background with subtle blue tint */
+    --card: 215 22% 13%;
+    --card-foreground: 210 16% 93%;
     
-    /* Popovers: Slightly more elevated */
-    --popover: 220 15% 11%;
-    --popover-foreground: 210 20% 92%;
+    /* Popovers: More elevated for depth */
+    --popover: 215 23% 18%;
+    --popover-foreground: 210 16% 93%;
     
-    /* Primary: Premium soft cyan-blue */
-    --primary: 190 70% 48%;
-    --primary-foreground: 220 13% 3%;
+    /* Primary: Bright professional blue */
+    --primary: 217 100% 56%;
+    --primary-foreground: 210 16% 93%;
     
-    /* Secondary: Subtle gray-blue for UI elements */
-    --secondary: 220 12% 18%;
-    --secondary-foreground: 210 20% 92%;
+    /* Secondary: Elevated surface */
+    --secondary: 215 22% 13%;
+    --secondary-foreground: 210 16% 93%;
     
-    /* Muted: Very subtle gray for secondary content */
-    --muted: 220 12% 28%;
-    --muted-foreground: 210 15% 75%;
+    /* Muted: Gray for secondary content */
+    --muted: 210 10% 68%;
+    --muted-foreground: 210 8% 50%;
     
-    /* Accent: Sophisticated silver-white accent */
-    --accent: 210 10% 85%;
-    --accent-foreground: 220 13% 3%;
+    /* Accent: Secondary blue accent */
+    --accent: 217 100% 56%;
+    --accent-foreground: 210 16% 93%;
     
-    /* Destructive: Soft red for warnings */
-    --destructive: 0 72% 50%;
-    --destructive-foreground: 210 20% 92%;
+    /* Destructive: Bright red */
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 210 16% 93%;
     
-    /* Success: Muted green for positive actions */
-    --success: 140 60% 45%;
-    --success-foreground: 210 20% 92%;
+    /* Success: Clean green */
+    --success: 142 71% 45%;
+    --success-foreground: 210 16% 93%;
     
-    /* Border: Ultra-subtle divider visible only on close inspection */
-    --border: 220 12% 14%;
-    --input: 220 15% 9%;
+    /* Border: Subtle gray border */
+    --border: 215 21% 23%;
+    --input: 215 23% 18%;
     
-    /* Ring: Soft cyan focus state for accessibility */
-    --ring: 190 70% 48%;
+    /* Ring: Blue focus state */
+    --ring: 217 100% 56%;
     
-    /* Chart colors: Refined, professional palette */
-    --chart-1: 190 80% 55%;
-    --chart-2: 200 70% 50%;
-    --chart-3: 210 60% 45%;
-    --chart-4: 180 65% 52%;
-    --chart-5: 220 75% 58%;
+    /* Chart colors: Professional palette */
+    --chart-1: 217 100% 56%;
+    --chart-2: 142 71% 45%;
+    --chart-3: 0 100% 50%;
+    --chart-4: 210 50% 50%;
+    --chart-5: 30 80% 50%;
     
-    /* Sidebar: Seamlessly integrated */
-    --sidebar-background: 220 13% 4%;
-    --sidebar-foreground: 210 20% 92%;
-    --sidebar-primary: 190 70% 48%;
-    --sidebar-primary-foreground: 220 13% 3%;
-    --sidebar-accent: 210 10% 85%;
-    --sidebar-accent-foreground: 220 13% 3%;
-    --sidebar-border: 220 12% 12%;
-    --sidebar-ring: 190 70% 48%;
+    /* Sidebar: Integrated dark theme */
+    --sidebar-background: 220 20% 8%;
+    --sidebar-foreground: 210 16% 93%;
+    --sidebar-primary: 217 100% 56%;
+    --sidebar-primary-foreground: 210 16% 93%;
+    --sidebar-accent: 215 22% 13%;
+    --sidebar-accent-foreground: 210 16% 93%;
+    --sidebar-border: 215 21% 23%;
+    --sidebar-ring: 217 100% 56%;
   }
 }
 
@@ -157,21 +157,21 @@
   }
   
   .dark .glass-card {
-    background: rgba(13, 15, 25, 0.65);
-    border: 1px solid rgba(190, 200, 220, 0.08);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 0 32px rgba(190, 200, 220, 0.02);
+    background: rgba(22, 27, 34, 0.75);
+    border: 1px solid rgba(48, 54, 61, 0.8);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   }
 
   .glass-nav {
-    @apply backdrop-blur-3xl transition-all duration-500 border-b;
+    @apply backdrop-blur-3xl transition-all duration-300 border-b;
     background: rgba(255, 255, 255, 0.85);
     border-color: rgba(255, 255, 255, 0.12);
   }
   
   .dark .glass-nav {
-    background: rgba(8, 10, 18, 0.8);
-    border-color: rgba(190, 200, 220, 0.06);
-    box-shadow: inset 0 0 20px rgba(190, 200, 220, 0.01);
+    background: rgba(22, 27, 34, 0.9);
+    border-color: rgba(48, 54, 61, 0.8);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
 
   /* Custom Scrollbar Styles - Anderd Dark Mood */
@@ -205,37 +205,37 @@
     background-color: hsl(190 70% 48% / 0.4);
   }
 
-  /* Refined Glow Animation - Anderd Dark Mood */
+  /* Clean Border Focus Animation */
   @keyframes border-glow {
     0%, 100% { 
-      border-color: hsl(190 70% 48% / 0.15);
-      box-shadow: 0 0 0 0px hsl(190 70% 48% / 0);
+      border-color: hsl(217 100% 56% / 0.3);
+      box-shadow: 0 0 0 0px hsl(217 100% 56% / 0);
     }
     50% { 
-      border-color: hsl(190 70% 48% / 0.35);
-      box-shadow: 0 0 15px 2px hsl(190 70% 48% / 0.1);
+      border-color: hsl(217 100% 56% / 0.6);
+      box-shadow: 0 0 12px 2px hsl(217 100% 56% / 0.15);
     }
   }
   .animate-border-glow {
-    animation: border-glow 4s ease-in-out infinite;
+    animation: border-glow 3s ease-in-out infinite;
   }
 
-  /* Soft atmospheric pulse */
+  /* Subtle pulse */
   @keyframes pulse-soft {
     0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.85; transform: scale(0.99); }
+    50% { opacity: 0.9; transform: scale(0.995); }
   }
   .animate-pulse-soft {
-    animation: pulse-soft 4s ease-in-out infinite;
+    animation: pulse-soft 3s ease-in-out infinite;
   }
 
-  /* Subtle fade animation for atmospheric elements */
+  /* Fade animation for subtle elements */
   @keyframes fade-glow {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 0.6; }
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.8; }
   }
   .animate-fade-glow {
-    animation: fade-glow 3s ease-in-out infinite;
+    animation: fade-glow 2.5s ease-in-out infinite;
   }
 
   /* Toast Countdown Bar Animation */
@@ -250,24 +250,25 @@
     animation-play-state: running;
   }
 
-  /* Anderd Dark Mood specific card hover effect */
+  /* Clean card hover effect */
   .dark .anderd-card {
-    @apply transition-all duration-500;
-    background: hsl(220 15% 8%);
-    border: 1px solid hsl(220 12% 14%);
+    @apply transition-all duration-300;
+    background: hsl(215 22% 13%);
+    border: 1px solid hsl(215 21% 23%);
   }
 
   .dark .anderd-card:hover {
-    border-color: hsl(190 70% 48% / 0.4);
-    box-shadow: 0 0 20px hsl(190 70% 48% / 0.1), inset 0 0 20px hsl(190 70% 48% / 0.02);
+    background: hsl(215 23% 18%);
+    border-color: hsl(217 100% 56% / 0.3);
+    box-shadow: 0 4px 12px hsl(0 0% 0% / 0.2);
   }
 
-  /* Refined input focus state */
+  /* Clean input focus state */
   .dark input:focus,
   .dark textarea:focus,
   .dark select:focus {
-    border-color: hsl(190 70% 48% / 0.5);
-    box-shadow: 0 0 0 3px hsl(190 70% 48% / 0.1), inset 0 0 0 1px hsl(190 70% 48% / 0.15);
+    border-color: hsl(217 100% 56% / 0.6);
+    box-shadow: 0 0 0 3px hsl(217 100% 56% / 0.1);
   }
 }
 
