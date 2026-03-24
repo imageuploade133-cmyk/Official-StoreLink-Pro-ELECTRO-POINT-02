@@ -938,3 +938,46 @@
 .dark [class*="dark:bg"] {
   background-color: #000000 !important;
 }
+
+/* ========================================
+   SECTION HEADERS & DESCRIPTIONS PROTECTION
+   ======================================== */
+
+/* Protect section headers and descriptions from dark mode color override */
+.dark h2:where([class*="text-3xl"], [class*="text-5xl"], [class*="font-black"]) {
+  color: #ffffff !important;
+}
+
+.dark p:where([class*="text-slate-300"], [class*="dark:text-slate"]) {
+  color: #cbd5e1 !important;
+}
+
+/* Hero and Custom UI section text protection */
+.dark [class*="overlayTitle"],
+.dark [class*="overlaySubtitle"] {
+  color: #ffffff !important;
+}
+
+.dark h2:where([class*="text-white"]) {
+  color: #ffffff !important;
+}
+
+.dark p:where([class*="text-white"]) {
+  color: #ffffff !important;
+}
+
+/* Slideshow and carousel section protection */
+.dark section h2,
+.dark section h3 {
+  color: #ffffff !important;
+}
+
+.dark section p {
+  color: #cbd5e1 !important;
+}
+
+/* Ensure description text has proper contrast */
+.dark [class*="description"],
+.dark [class*="subtitle"] {
+  color: #cbd5e1 !important;
+}
