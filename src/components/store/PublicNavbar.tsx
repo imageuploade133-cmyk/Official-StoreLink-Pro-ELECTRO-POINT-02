@@ -258,7 +258,7 @@ export function PublicNavbar() {
                   <div className="hidden lg:flex flex-1 max-w-lg mx-12 relative" ref={searchContainerRef}>
                     <div className="w-full relative group">
                         <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-slate-400 dark:text-slate-400">
-                            <Search className="h-5 w-5 dark:text-slate-300" strokeWidth={2.5} />
+                            <Search className="h-5 w-5 dark:text-slate-300 dark:p-1 dark:border dark:border-slate-600 dark:rounded-lg" strokeWidth={2.5} />
                         </div>
                         <Input 
                             readOnly
@@ -344,7 +344,7 @@ export function PublicNavbar() {
                             </Link>
                         )}
                         <UserButton isLoading={isLoading} user={user} staffMember={staffMember} router={router} handleLogout={handleLogout} getInitials={getInitials} />
-                        <Button asChild variant="ghost" size="icon" className="group hidden sm:inline-flex h-11 w-11 rounded-2xl text-slate-600 dark:text-slate-200 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 relative transition-all">
+                        <Button asChild variant="ghost" size="icon" className="group hidden sm:inline-flex h-11 w-11 rounded-2xl text-slate-600 dark:text-slate-200 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 relative transition-all dark:border dark:border-slate-700 dark:hover:border-rose-600">
                             <Link href="/store/wishlist">
                                 <Heart className={cn("h-5.5 w-5.5 transition-transform duration-300 group-hover:scale-110 dark:text-slate-200", wishlistCount > 0 && "fill-current text-rose-500")} />
                                 {wishlistCount > 0 && (
@@ -354,7 +354,7 @@ export function PublicNavbar() {
                                 )}
                             </Link>
                         </Button>
-                        <Button asChild variant="ghost" size="icon" className="group h-11 w-11 rounded-2xl text-slate-600 dark:text-slate-200 hover:text-primary hover:bg-primary/5 relative transition-all">
+                        <Button asChild variant="ghost" size="icon" className="group h-11 w-11 rounded-2xl text-slate-600 dark:text-slate-200 hover:text-primary hover:bg-primary/5 relative transition-all dark:border dark:border-slate-700 dark:hover:border-slate-600">
                         <Link href="/store/cart">
                             <ShoppingBag className={cn("h-5.5 w-5.5 transition-transform duration-300 group-hover:scale-110 dark:text-slate-200", cartCount > 0 && "text-primary dark:text-primary")} />
                             {cartCount > 0 && (
@@ -365,12 +365,12 @@ export function PublicNavbar() {
                         </Link>
                         </Button>
 
-                        <ThemeToggle className="h-11 w-11 rounded-2xl text-slate-600 dark:text-slate-300 hover:text-primary hover:bg-primary/5 transition-all" />
+                        <ThemeToggle className="h-11 w-11 rounded-2xl text-slate-600 dark:text-slate-300 hover:text-primary hover:bg-primary/5 transition-all dark:border dark:border-slate-700 dark:hover:border-slate-600" />
                         
                         <div className="md:hidden">
                         <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
                             <SheetTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-11 w-11 rounded-2xl hover:bg-primary/5 hover:text-primary dark:text-slate-300">
+                            <Button variant="ghost" size="icon" className="h-11 w-11 rounded-2xl hover:bg-primary/5 hover:text-primary dark:text-slate-300 dark:border dark:border-slate-700 dark:hover:border-slate-600">
                                 <Menu className="h-6 w-6 dark:text-slate-300" strokeWidth={2.5} />
                                 <span className="sr-only">Open menu</span>
                             </Button>

@@ -131,7 +131,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
         {/* Enhanced Wishlist Button with Pulse */}
         <button
           className={cn(
-            `absolute top-4 right-4 h-11 w-11 flex items-center justify-center rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-lg transition-all duration-300 z-10 border border-white/30 dark:border-slate-700/50 hover:scale-110 active:scale-95`,
+            `absolute top-4 right-4 h-11 w-11 flex items-center justify-center rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-lg transition-all duration-300 z-10 border border-white/30 dark:border-slate-600 hover:scale-110 active:scale-95 dark:hover:border-rose-500`,
             isInWishlist && `text-rose-500 ${styles.wishlistPulse}`
           )}
           onClick={handleWishlistToggle}
@@ -227,7 +227,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
             <div className="md:hidden shrink-0">
               <Button 
                 size="icon" 
-                className={`h-11 w-11 rounded-full shadow-lg shadow-primary/30 active:scale-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${styles.mobileCartButton}`}
+                className={`h-11 w-11 rounded-full shadow-lg shadow-primary/30 active:scale-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed dark:border dark:border-slate-600 ${styles.mobileCartButton}`}
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
               >

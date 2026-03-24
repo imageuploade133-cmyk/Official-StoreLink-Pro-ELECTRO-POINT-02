@@ -129,17 +129,17 @@ export function PublicFooter() {
               <div className="space-y-3 mb-6">
                 {storePhone && (
                   <a href={`tel:${storePhone}`} className="flex items-center text-sm hover:opacity-80 transition-colors dark:text-slate-300" style={{ color: textColor }}>
-                    <Phone className="h-4 w-4 mr-3 flex-shrink-0 opacity-70 dark:text-slate-400" /> <span>{storePhone}</span>
+                    <Phone className="h-4 w-4 mr-3 flex-shrink-0 opacity-70 dark:text-slate-400 dark:p-0.5 dark:border dark:border-slate-600 dark:rounded-md" /> <span>{storePhone}</span>
                   </a>
                 )}
                 {storeEmail && (
                    <a href={`mailto:${storeEmail}`} className="flex items-center text-sm hover:opacity-80 transition-colors dark:text-slate-300" style={{ color: textColor }}>
-                    <Mail className="h-4 w-4 mr-3 flex-shrink-0 opacity-70 dark:text-slate-400" /> <span>{storeEmail}</span>
+                    <Mail className="h-4 w-4 mr-3 flex-shrink-0 opacity-70 dark:text-slate-400 dark:p-0.5 dark:border dark:border-slate-600 dark:rounded-md" /> <span>{storeEmail}</span>
                   </a>
                 )}
                 {storeAddress && (
                    <p className="flex items-start text-sm dark:text-slate-300" style={{ color: textColor }}>
-                    <MapPin className="h-4 w-4 mr-3 mt-1 flex-shrink-0 opacity-70 dark:text-slate-400" /> <span>{storeAddress}</span>
+                    <MapPin className="h-4 w-4 mr-3 mt-1 flex-shrink-0 opacity-70 dark:text-slate-400 dark:p-0.5 dark:border dark:border-slate-600 dark:rounded-md" /> <span>{storeAddress}</span>
                   </p>
                 )}
               </div>
@@ -153,7 +153,7 @@ export function PublicFooter() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={link.name}
-                  className="hover:opacity-80 transition-opacity dark:text-slate-300"
+                  className="hover:opacity-80 transition-opacity dark:text-slate-300 dark:border dark:border-slate-600 dark:p-1.5 dark:rounded-lg inline-flex items-center justify-center dark:hover:border-slate-500"
                   style={{ color: textColor }}
                 >
                   {link.iconUrl ? (
