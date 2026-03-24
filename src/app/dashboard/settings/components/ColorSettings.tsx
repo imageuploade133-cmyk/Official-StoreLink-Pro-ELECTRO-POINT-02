@@ -218,10 +218,11 @@ export function ColorSettings({ settingsData, isLoading }: ColorSettingsProps) {
                           { value: 'gradient', label: 'Gradient', icon: '⊔' },
                           { value: 'image', label: 'Image', icon: '🖼' }
                         ].map((option) => (
-                          <div
+                          <button
                             key={option.value}
+                            type="button"
                             onClick={() => field.onChange(option.value)}
-                            className={`relative flex items-center justify-center gap-2 rounded-lg border-2 p-3 sm:p-4 cursor-pointer transition-all ${
+                            className={`flex items-center justify-center gap-2 rounded-lg border-2 p-3 sm:p-4 cursor-pointer transition-all ${
                               field.value === option.value
                                 ? 'border-primary bg-primary/10 shadow-md'
                                 : 'border-border hover:border-primary/50 hover:bg-card/50'
@@ -231,8 +232,7 @@ export function ColorSettings({ settingsData, isLoading }: ColorSettingsProps) {
                               <span className="text-xl">{option.icon}</span>
                               <span className="text-sm font-medium">{option.label}</span>
                             </div>
-                            <RadioGroupItem value={option.value} id={`style-${option.value}`} className="sr-only" />
-                          </div>
+                          </button>
                         ))}
                       </div>
                     </FormControl>
