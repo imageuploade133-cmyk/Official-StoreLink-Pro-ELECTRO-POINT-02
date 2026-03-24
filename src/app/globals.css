@@ -401,3 +401,53 @@
 .dark [class*="shadow"] {
   box-shadow: 0 4px 12px hsl(0 0% 0% / 0.3);
 }
+
+/* Header icon dark mode - Ensure icons are visible */
+.dark header {
+  background-color: hsl(var(--card));
+  border-color: hsl(var(--border));
+}
+
+.dark header [class*="h-5"][class*="w-5"],
+.dark header svg {
+  color: hsl(var(--foreground));
+  stroke: currentColor;
+  fill: none;
+}
+
+/* Outline button icons in header */
+.dark header button[class*="outline"] svg {
+  color: hsl(var(--foreground));
+}
+
+.dark header button[class*="outline"]:hover svg {
+  color: hsl(var(--primary));
+}
+
+/* Button icon visibility */
+.dark button svg {
+  color: currentColor;
+}
+
+.dark button[class*="outline"] {
+  color: hsl(var(--foreground));
+}
+
+.dark button[class*="outline"]:hover {
+  color: hsl(var(--primary));
+}
+
+.dark button[class*="ghost"] {
+  color: hsl(var(--foreground));
+}
+
+.dark button[class*="ghost"]:hover {
+  color: hsl(var(--primary));
+}
+
+/* Icon contrast for interactive elements */
+.dark a svg,
+.dark [role="button"] svg {
+  color: inherit;
+  fill: currentColor;
+}
