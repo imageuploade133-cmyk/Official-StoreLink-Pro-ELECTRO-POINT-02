@@ -50,66 +50,66 @@
   }
  
   .dark {
-    /* Deep Dark Mode - Robust and Professional */
-    /* Base: Deep charcoal background */
-    --background: 222 11% 7%;
-    --foreground: 210 40% 98%;
+    /* Clean Professional Dark Theme - Pure Black Background */
+    /* Base: Pure black background */
+    --background: 0 0% 0%;
+    --foreground: 210 16% 93%;
     
-    /* Cards: Slightly elevated from background */
-    --card: 222 13% 12%;
-    --card-foreground: 210 40% 98%;
+    /* Cards: Elevated from background with subtle blue tint */
+    --card: 215 22% 13%;
+    --card-foreground: 210 16% 93%;
     
-    /* Popovers: More elevated */
-    --popover: 222 13% 15%;
-    --popover-foreground: 210 40% 98%;
+    /* Popovers: More elevated for depth */
+    --popover: 215 23% 18%;
+    --popover-foreground: 210 16% 93%;
     
-    /* Primary: Vibrant blue for strong contrast */
-    --primary: 221 83% 53%;
-    --primary-foreground: 222 11% 7%;
+    /* Primary: Bright professional blue */
+    --primary: 217 100% 56%;
+    --primary-foreground: 210 16% 93%;
     
-    /* Secondary: Medium gray */
-    --secondary: 222 13% 25%;
-    --secondary-foreground: 210 40% 98%;
+    /* Secondary: Elevated surface */
+    --secondary: 215 22% 13%;
+    --secondary-foreground: 210 16% 93%;
     
-    /* Muted: Muted gray for secondary content */
-    --muted: 222 13% 35%;
-    --muted-foreground: 210 30% 80%;
+    /* Muted: Gray for secondary content */
+    --muted: 210 10% 68%;
+    --muted-foreground: 210 8% 50%;
     
-    /* Accent: Bright accent color */
-    --accent: 188 100% 50%;
-    --accent-foreground: 222 11% 7%;
+    /* Accent: Secondary blue accent */
+    --accent: 217 100% 56%;
+    --accent-foreground: 210 16% 93%;
     
-    /* Destructive: Bright red for dangerous actions */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    /* Destructive: Bright red */
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 210 16% 93%;
     
-    /* Success: Vibrant green */
-    --success: 142 76% 36%;
-    --success-foreground: 210 40% 98%;
+    /* Success: Clean green */
+    --success: 142 71% 45%;
+    --success-foreground: 210 16% 93%;
     
-    /* Border: Subtle gray border visible on dark */
-    --border: 222 13% 20%;
-    --input: 222 13% 15%;
+    /* Border: Subtle gray border */
+    --border: 215 21% 23%;
+    --input: 215 23% 18%;
     
     /* Ring: Blue focus state */
-    --ring: 221 83% 53%;
+    --ring: 217 100% 56%;
     
-    /* Chart colors: Vibrant and highly visible */
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    /* Chart colors: Professional palette */
+    --chart-1: 217 100% 56%;
+    --chart-2: 142 71% 45%;
+    --chart-3: 0 100% 50%;
+    --chart-4: 210 50% 50%;
+    --chart-5: 30 80% 50%;
     
-    /* Sidebar: Integrated with dark theme */
-    --sidebar-background: 222 11% 5%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 221 83% 53%;
-    --sidebar-primary-foreground: 222 11% 7%;
-    --sidebar-accent: 188 100% 50%;
-    --sidebar-accent-foreground: 222 11% 7%;
-    --sidebar-border: 222 13% 18%;
-    --sidebar-ring: 221 83% 53%;
+    /* Sidebar: Pure black background */
+    --sidebar-background: 0 0% 0%;
+    --sidebar-foreground: 210 16% 93%;
+    --sidebar-primary: 217 100% 56%;
+    --sidebar-primary-foreground: 210 16% 93%;
+    --sidebar-accent: 215 22% 13%;
+    --sidebar-accent-foreground: 210 16% 93%;
+    --sidebar-border: 215 21% 23%;
+    --sidebar-ring: 217 100% 56%;
   }
 }
 
@@ -145,21 +145,70 @@
   html.light body {
     background-color: hsl(var(--background));
   }
+
+  /* Dark theme headers - All heading levels */
+  .dark h1,
+  .dark h2,
+  .dark h3,
+  .dark h4,
+  .dark h5,
+  .dark h6 {
+    color: #f1f5f9;
+  }
+
+  .dark h1 {
+    color: #f1f5f9;
+    font-weight: 600;
+  }
+
+  .dark h2 {
+    color: #f1f5f9;
+    font-weight: 600;
+  }
+
+  .dark h3 {
+    color: #f1f5f9;
+    font-weight: 500;
+  }
+
+  .dark h4 {
+    color: #f1f5f9;
+    font-weight: 500;
+  }
+
+  .dark h5 {
+    color: #f1f5f9;
+    font-weight: 500;
+  }
+
+  .dark h6 {
+    color: #f1f5f9;
+    font-weight: 500;
+  }
+
+  /* Dark theme labels and text elements */
+  .dark label {
+    color: #f1f5f9;
+  }
+
+  .dark strong {
+    color: #f1f5f9;
+  }
 }
 
 @layer utilities {
-  /* Premium Glassmorphism Utilities - Dark Mode Optimized */
+  /* Premium Glassmorphism Utilities - Anderd Dark Mood */
   .glass-card {
-    @apply backdrop-blur-xl transition-all duration-300;
+    @apply backdrop-blur-xl transition-all duration-500;
     background: rgba(255, 255, 255, 0.75);
     border: 1px solid rgba(255, 255, 255, 0.18);
     box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
   }
   
   .dark .glass-card {
-    background: rgba(10, 10, 10, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    background: rgba(22, 27, 34, 0.75);
+    border: 1px solid rgba(48, 54, 61, 0.8);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   }
 
   .glass-nav {
@@ -169,11 +218,12 @@
   }
   
   .dark .glass-nav {
-    background: rgba(5, 5, 5, 0.85);
-    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(22, 27, 34, 0.9);
+    border-color: rgba(48, 54, 61, 0.8);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
 
-  /* Custom Scrollbar Styles - Smart Dark Mode */
+  /* Custom Scrollbar Styles - Anderd Dark Mood */
   ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -195,36 +245,46 @@
     background-color: hsl(var(--primary) / 0.4);
   }
 
-  /* Dark mode specific scrollbar */
+  /* Dark mode specific scrollbar - refined */
   .dark ::-webkit-scrollbar-thumb {
-    background-color: hsl(var(--primary) / 0.25);
+    background-color: hsl(190 70% 48% / 0.2);
   }
 
   .dark ::-webkit-scrollbar-thumb:hover {
-    background-color: hsl(var(--primary) / 0.5);
+    background-color: hsl(190 70% 48% / 0.4);
   }
 
-  /* Border Glow Animation */
+  /* Clean Border Focus Animation */
   @keyframes border-glow {
     0%, 100% { 
-      border-color: hsl(var(--primary) / 0.2);
-      box-shadow: 0 0 0 0px hsl(var(--primary) / 0);
+      border-color: hsl(217 100% 56% / 0.3);
+      box-shadow: 0 0 0 0px hsl(217 100% 56% / 0);
     }
     50% { 
-      border-color: hsl(var(--primary) / 0.8);
-      box-shadow: 0 0 20px 4px hsl(var(--primary) / 0.15);
+      border-color: hsl(217 100% 56% / 0.6);
+      box-shadow: 0 0 12px 2px hsl(217 100% 56% / 0.15);
     }
   }
   .animate-border-glow {
     animation: border-glow 3s ease-in-out infinite;
   }
 
+  /* Subtle pulse */
   @keyframes pulse-soft {
     0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.8; transform: scale(0.98); }
+    50% { opacity: 0.9; transform: scale(0.995); }
   }
   .animate-pulse-soft {
     animation: pulse-soft 3s ease-in-out infinite;
+  }
+
+  /* Fade animation for subtle elements */
+  @keyframes fade-glow {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.8; }
+  }
+  .animate-fade-glow {
+    animation: fade-glow 2.5s ease-in-out infinite;
   }
 
   /* Toast Countdown Bar Animation */
@@ -238,14 +298,125 @@
     animation-fill-mode: forwards;
     animation-play-state: running;
   }
+
+  /* Clean card hover effect */
+  .dark .anderd-card {
+    @apply transition-all duration-300;
+    background: hsl(215 22% 13%);
+    border: 1px solid hsl(215 21% 23%);
+  }
+
+  .dark .anderd-card:hover {
+    background: hsl(215 23% 18%);
+    border-color: hsl(217 100% 56% / 0.3);
+    box-shadow: 0 4px 12px hsl(0 0% 0% / 0.2);
+  }
+
+  /* Dark mode input styling - Complete with custom dark colors */
+  .dark input,
+  .dark textarea,
+  .dark select {
+    background-color: #2a2f3a;
+    border: 1px solid #3a3f4b;
+    color: #f1f5f9;
+    transition: all 0.25s ease;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    color: rgba(241, 245, 249, 0.5);
+  }
+
+  .dark input:hover,
+  .dark textarea:hover,
+  .dark select:hover {
+    border-color: #4a5059;
+    background-color: #323849;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  .dark input:focus,
+  .dark textarea:focus,
+  .dark select:focus {
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.15), inset 0 1px 3px rgba(0, 0, 0, 0.3);
+    outline: none;
+    background-color: #323849;
+  }
+
+  .dark input:disabled,
+  .dark textarea:disabled,
+  .dark select:disabled {
+    background-color: rgba(42, 47, 58, 0.6);
+    color: rgba(241, 245, 249, 0.5);
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .dark input[type="file"] {
+    cursor: pointer;
+  }
+
+  .dark input[type="checkbox"],
+  .dark input[type="radio"] {
+    cursor: pointer;
+    border-color: #3a3f4b;
+    background-color: #2a2f3a;
+  }
+
+  .dark input[type="checkbox"]:checked,
+  .dark input[type="radio"]:checked {
+    background-color: hsl(var(--primary));
+    border-color: hsl(var(--primary));
+  }
+
+  /* Nice border for input groups */
+  .dark .input-wrapper {
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    background-color: hsl(var(--popover));
+    transition: all 0.25s ease;
+  }
+
+  .dark .input-wrapper:focus-within {
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
+  }
+
+  .dark .input-wrapper input {
+    border: none;
+    background: transparent;
+    outline: none;
+    color: hsl(var(--foreground));
+  }
+
+  /* Select dropdown styling with nice borders */
+  .dark [class*="SelectTrigger"] {
+    border: 1px solid hsl(var(--border)) !important;
+    box-shadow: inset 0 1px 2px hsl(0 0% 0% / 0.05) !important;
+  }
+
+  .dark [class*="SelectTrigger"]:hover {
+    border-color: hsl(var(--border) / 0.7) !important;
+  }
+
+  .dark [class*="SelectTrigger"]:focus,
+  .dark [class*="SelectTrigger"][data-state="open"] {
+    border-color: hsl(var(--primary)) !important;
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1), inset 0 1px 2px hsl(0 0% 0% / 0.08) !important;
+  }
 }
 
-/* Base rich text styles */
+/* Base rich text styles - Anderd Dark Mood */
 .rich-content {
-  @apply text-slate-700 dark:text-white;
+  @apply text-slate-700 dark:text-foreground;
 }
 .rich-content h1, .rich-content h2, .rich-content h3 {
-  @apply font-black tracking-tight text-slate-900 dark:text-white mt-8 mb-4;
+  @apply font-black tracking-tight text-slate-900 dark:text-foreground mt-8 mb-4;
 }
 .rich-content p {
   @apply mb-4 leading-relaxed;
@@ -257,7 +428,556 @@
   @apply text-primary font-bold hover:underline;
 }
 
-/* Ensure all text is white in dark mode */
+/* Anderd Dark Mood - Refined text hierarchy and spacing */
 .dark {
-  color: #ffffff;
+  color: hsl(var(--foreground));
+}
+
+/* Smooth transitions for theme switching */
+.dark * {
+  @apply transition-colors duration-500 ease-in-out;
+}
+
+/* Card and container refinements for dark mode */
+.dark .card,
+.dark [role="region"] {
+  border-color: hsl(220 12% 14%);
+}
+
+/* Table refinements for dark mode */
+.dark table {
+  border-collapse: collapse;
+}
+
+.dark table tbody tr {
+  border-bottom-color: hsl(220 12% 14%);
+  @apply transition-colors duration-300;
+}
+
+.dark table tbody tr:hover {
+  background-color: hsl(220 15% 10%);
+}
+
+/* Dialog and modal refinements */
+.dark [role="dialog"],
+.dark .modal {
+  background-color: hsl(var(--card));
+  border-color: hsl(220 12% 14%);
+}
+
+/* Button refinements - Anderd Dark Mood aesthetic */
+.dark button {
+  @apply transition-all duration-300;
+}
+
+.dark button:not(.ghost):not(.link) {
+  border-color: transparent;
+}
+
+.dark button:focus-visible {
+  outline: 2px solid hsl(190 70% 48% / 0.5);
+  outline-offset: 2px;
+}
+
+/* Dark theme card styling - GitHub Dark Style */
+.dark .rounded-lg {
+  background-color: hsl(var(--card));
+  border-color: hsl(var(--border));
+}
+
+.dark [role="region"],
+.dark [role="presentation"] {
+  background-color: hsl(var(--card));
+}
+
+/* Sidebar specific dark mode styling */
+.dark aside {
+  background-color: hsl(var(--sidebar-background));
+  border-color: hsl(var(--sidebar-border));
+}
+
+.dark aside h4 {
+  color: hsl(var(--muted-foreground));
+}
+
+.dark aside a {
+  color: hsl(var(--sidebar-foreground));
+}
+
+.dark aside a.active,
+.dark aside a[aria-current="page"] {
+  color: hsl(var(--sidebar-primary));
+  background-color: hsl(var(--sidebar-accent));
+}
+
+/* Header specific dark mode styling */
+.dark header {
+  background-color: hsl(var(--card));
+  border-color: hsl(var(--border));
+}
+
+/* Sheet/Modal dark mode */
+.dark [role="dialog"] {
+  background-color: hsl(var(--card));
+  border-color: hsl(var(--border));
+}
+
+/* Ensure all cards have proper dark styling */
+.dark .bg-card {
+  background-color: hsl(var(--card)) !important;
+  color: hsl(var(--card-foreground)) !important;
+}
+
+.dark .bg-muted {
+  background-color: hsl(var(--muted)) !important;
+}
+
+.dark .bg-popover {
+  background-color: hsl(var(--popover)) !important;
+}
+
+/* Shadow and depth for dark cards */
+.dark [class*="shadow"] {
+  box-shadow: 0 4px 12px hsl(0 0% 0% / 0.3);
+}
+
+/* Header icon dark mode - Ensure icons are visible */
+.dark header {
+  background-color: hsl(var(--card));
+  border-color: hsl(var(--border));
+}
+
+.dark header [class*="h-5"][class*="w-5"],
+.dark header svg {
+  color: hsl(var(--foreground));
+  stroke: currentColor;
+  fill: none;
+}
+
+/* Outline button icons in header */
+.dark header button[class*="outline"] svg {
+  color: hsl(var(--foreground));
+}
+
+.dark header button[class*="outline"]:hover svg {
+  color: hsl(var(--primary));
+}
+
+/* Button icon visibility */
+.dark button svg {
+  color: currentColor;
+}
+
+.dark button[class*="outline"] {
+  color: hsl(var(--foreground));
+}
+
+.dark button[class*="outline"]:hover {
+  color: hsl(var(--primary));
+}
+
+.dark button[class*="ghost"] {
+  color: hsl(var(--foreground));
+}
+
+.dark button[class*="ghost"]:hover {
+  color: hsl(var(--primary));
+}
+
+/* Icon contrast for interactive elements */
+.dark a svg,
+.dark [role="button"] svg {
+  color: inherit;
+  fill: currentColor;
+}
+
+/* Sidebar navigation dark mode - Enhanced icon visibility */
+.dark aside nav a {
+  color: hsl(var(--foreground) / 0.7);
+  transition: all 0.25s ease;
+}
+
+.dark aside nav a svg {
+  color: hsl(var(--foreground) / 0.7);
+  stroke-width: 2;
+}
+
+.dark aside nav a:hover {
+  color: hsl(var(--primary));
+  background-color: hsl(var(--popover));
+}
+
+.dark aside nav a:hover svg {
+  color: hsl(var(--primary));
+}
+
+.dark aside nav a[aria-current="page"],
+.dark aside nav a.active {
+  background-color: hsl(var(--popover));
+  color: hsl(var(--primary));
+}
+
+.dark aside nav a[aria-current="page"] svg,
+.dark aside nav a.active svg {
+  color: hsl(var(--primary));
+}
+
+/* Minimize sidebar icons - Better visibility */
+.dark aside a.relative.flex.h-9 {
+  color: hsl(var(--foreground) / 0.7);
+}
+
+.dark aside a.relative.flex.h-9:hover {
+  background-color: hsl(var(--popover));
+  color: hsl(var(--primary));
+}
+
+/* Separator styling in dark mode */
+.dark aside .separator {
+  background-color: hsl(var(--border));
+}
+
+/* Mobile sheet navigation dark mode */
+.dark [role="dialog"] nav a {
+  color: hsl(var(--foreground) / 0.7);
+  transition: all 0.25s ease;
+}
+
+.dark [role="dialog"] nav a:hover {
+  background-color: hsl(var(--popover));
+  color: hsl(var(--primary));
+}
+
+  .dark [role="dialog"] nav a[aria-current="page"],
+  .dark [role="dialog"] nav a.active {
+    background-color: hsl(var(--popover));
+    color: hsl(var(--primary));
+  }
+
+  /* Pure black background for all dark mode pages and containers */
+  .dark body {
+    background-color: #000000;
+  }
+
+  .dark [class*="min-h-screen"] {
+    background-color: #000000;
+  }
+
+  .dark [class*="flex-1"] {
+    background-color: #000000;
+  }
+
+  .dark main {
+    background-color: #000000;
+  }
+
+  .dark [class*="grid"] {
+    background-color: transparent;
+  }
+
+  /* Ensure smooth transitions to black background */
+  .dark {
+    background-color: #000000;
+    transition: background-color 0.3s ease;
+  }
+
+  .dark * {
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* ON/OFF text styling for dark mode - Pure black for visibility */
+  .dark label {
+    color: #000000;
+    font-weight: 500;
+  }
+
+  /* ON/OFF badge/label text in dark mode - uppercase variant */
+  .dark label[class*="uppercase"],
+  .dark label[class*="font-black"] {
+    color: #000000 !important;
+  }
+
+  /* Small text labels (like 10px) */
+  .dark label.text-\[10px\] {
+    color: #000000 !important;
+  }
+
+  /* Watermark and toggle text styling */
+  .dark label.font-black.uppercase {
+    color: #000000 !important;
+  }
+
+.dark label.text-sm {
+  color: hsl(var(--foreground) / 0.9);
+}
+
+/* Form field container */
+.dark [class*="flex flex-col gap"],
+.dark [class*="space-y-2"] {
+  color: hsl(var(--foreground));
+}
+
+/* Form description text */
+.dark [class*="text-xs"][class*="text-muted-foreground"] {
+  color: hsl(var(--muted-foreground));
+}
+
+/* Required field indicator */
+.dark .text-destructive {
+  color: hsl(var(--destructive));
+}
+
+/* Error message styling */
+.dark .text-red-500,
+.dark .text-destructive {
+  color: hsl(var(--destructive));
+  font-size: 0.875rem;
+}
+
+/* Success message styling */
+.dark .text-green-500,
+.dark .text-success {
+  color: hsl(var(--success));
+  font-size: 0.875rem;
+}
+
+/* Input group styling for dark mode */
+.dark .input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dark .input-group svg {
+  color: hsl(var(--muted-foreground));
+  flex-shrink: 0;
+}
+
+.dark input:focus ~ .input-group svg {
+  color: hsl(var(--primary));
+}
+
+/* Search input dark mode */
+.dark input[type="search"],
+.dark input[placeholder*="search"],
+.dark input[placeholder*="Search"] {
+  background-color: hsl(var(--popover));
+  border-color: hsl(var(--border));
+}
+
+.dark input[type="search"]::placeholder,
+.dark input[placeholder*="search"]::placeholder,
+.dark input[placeholder*="Search"]::placeholder {
+  color: hsl(var(--muted-foreground));
+}
+
+.dark input[type="search"]:focus,
+.dark input[placeholder*="search"]:focus,
+.dark input[placeholder*="Search"]:focus {
+  border-color: hsl(var(--primary));
+  background-color: hsl(225 19% 16%);
+}
+
+/* ========================================
+   PUBLIC STORE APP - GLOBAL DARK THEME
+   ======================================== */
+
+/* Public Store - Global Container Styling */
+.dark [class*="bg-background-light"] {
+  background-color: #000000 !important;
+}
+
+.dark [class*="bg-background-dark"] {
+  background-color: #000000 !important;
+}
+
+/* Store View Containers - Black Background */
+.dark [class*="store-app"],
+.dark [class*="SearchView"],
+.dark [class*="CartView"],
+.dark [class*="ProductView"],
+.dark [class*="CheckoutView"],
+.dark [class*="WishlistView"],
+.dark [class*="LoginView"],
+.dark [class*="SignupView"],
+.dark [class*="OrdersView"],
+.dark [class*="ProfileView"],
+.dark [class*="NotificationsView"],
+.dark [class*="CollectionsView"] {
+  background-color: #000000 !important;
+}
+
+/* All SVG and Icon Styling in Dark Mode */
+.dark svg {
+  color: #f1f5f9;
+  fill: currentColor;
+  transition: all 0.25s ease;
+}
+
+/* Icon button styling */
+.dark button svg,
+.dark [role="button"] svg {
+  color: #f1f5f9;
+  stroke: currentColor;
+  fill: currentColor;
+}
+
+.dark button:hover svg,
+.dark [role="button"]:hover svg {
+  color: hsl(var(--primary));
+}
+
+/* Navigation icon styling */
+.dark nav svg {
+  color: #f1f5f9;
+}
+
+.dark nav a:hover svg,
+.dark nav button:hover svg {
+  color: hsl(var(--primary));
+}
+
+/* Card and section icon styling */
+.dark [class*="rounded-lg"] svg,
+.dark [class*="bg-card"] svg {
+  color: #f1f5f9;
+}
+
+/* Badge and label icon styling */
+.dark .badge svg,
+.dark label svg,
+.dark [class*="badge"] svg {
+  color: #f1f5f9;
+}
+
+/* Interactive element icon styling */
+.dark [class*="cursor-pointer"] svg,
+.dark [class*="hover:"] svg {
+  color: #f1f5f9;
+  transition: color 0.25s ease;
+}
+
+/* Disabled icon styling */
+.dark [disabled] svg,
+.dark [class*="opacity-50"] svg {
+  color: #8892a0;
+  opacity: 0.5;
+}
+
+/* Icon color classes in dark mode */
+.dark .text-white,
+.dark .fill-white {
+  color: #f1f5f9 !important;
+  fill: #f1f5f9 !important;
+}
+
+.dark .text-gray-400,
+.dark .text-slate-400 {
+  color: #cbd5e1 !important;
+}
+
+.dark .text-gray-600,
+.dark .text-slate-600 {
+  color: #94a3b8 !important;
+}
+
+.dark .text-primary svg {
+  color: hsl(var(--primary)) !important;
+}
+
+/* Store sections and containers */
+.dark [class*="flex-col"][class*="h-full"] {
+  background-color: #000000 !important;
+}
+
+.dark header,
+.dark [role="banner"] {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.dark nav,
+.dark [role="navigation"] {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+.dark main,
+.dark [role="main"] {
+  background-color: #000000 !important;
+}
+
+.dark footer,
+.dark [role="contentinfo"] {
+  background-color: rgba(0, 0, 0, 0.95);
+}
+
+/* Product cards and grid items */
+.dark [class*="grid"] [class*="rounded"] {
+  background-color: #1a1a1a;
+}
+
+.dark [class*="product"] {
+  background-color: transparent;
+}
+
+/* Store section styling */
+.dark section,
+.dark [role="region"] {
+  background-color: transparent;
+}
+
+.dark [class*="space-y"] > * {
+  background-color: inherit;
+}
+
+/* Background color fixes only */
+.dark .bg-background-light {
+  background-color: #000000 !important;
+}
+
+.dark .dark\:bg-background-dark,
+.dark [class*="dark:bg"] {
+  background-color: #000000 !important;
+}
+
+/* ========================================
+   SECTION HEADERS & DESCRIPTIONS PROTECTION
+   ======================================== */
+
+/* Protect section headers and descriptions from dark mode color override */
+.dark h2:where([class*="text-3xl"], [class*="text-5xl"], [class*="font-black"]) {
+  color: #ffffff !important;
+}
+
+.dark p:where([class*="text-slate-300"], [class*="dark:text-slate"]) {
+  color: #cbd5e1 !important;
+}
+
+/* Hero and Custom UI section text protection */
+.dark [class*="overlayTitle"],
+.dark [class*="overlaySubtitle"] {
+  color: #ffffff !important;
+}
+
+.dark h2:where([class*="text-white"]) {
+  color: #ffffff !important;
+}
+
+.dark p:where([class*="text-white"]) {
+  color: #ffffff !important;
+}
+
+/* Slideshow and carousel section protection */
+.dark section h2,
+.dark section h3 {
+  color: #ffffff !important;
+}
+
+.dark section p {
+  color: #cbd5e1 !important;
+}
+
+/* Ensure description text has proper contrast */
+.dark [class*="description"],
+.dark [class*="subtitle"] {
+  color: #cbd5e1 !important;
 }

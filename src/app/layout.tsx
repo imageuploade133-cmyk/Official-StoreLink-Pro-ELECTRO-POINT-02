@@ -51,7 +51,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className="bg-background text-foreground antialiased font-display h-full"
+        className="bg-background text-foreground antialiased font-display h-full dark:bg-black dark:text-foreground"
         suppressHydrationWarning={true}
       >
         <ClientProviders>

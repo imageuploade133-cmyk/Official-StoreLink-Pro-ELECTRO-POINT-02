@@ -322,7 +322,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
                         </h2>
                         {section.description && (
                             <p className={cn(
-                                "text-sm md:text-lg text-slate-500 max-w-2xl font-medium leading-relaxed opacity-80",
+                                "text-sm md:text-lg text-slate-500 dark:text-slate-300 max-w-2xl font-medium leading-relaxed opacity-90 dark:opacity-90",
                                 alignment === 'center' && "mx-auto"
                             )}>
                                 {section.description}

@@ -64,7 +64,7 @@ export function LoginView({ onClose, onNavigate }: LoginViewProps) {
     };
 
     return (
-        <div className="flex flex-col h-full bg-background-light dark:bg-background-dark animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="flex flex-col h-full bg-background-light dark:bg-black animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="px-6 pt-12 pb-8 space-y-10">
                 <div className="flex items-center justify-between">
                     <button 

@@ -255,10 +255,10 @@ export default function DashboardLayout({
     >
       {/* Sidebar */}
       {showSidebar && (
-        <aside className="hidden border-r bg-muted/40 md:flex md:flex-col overflow-hidden">
+        <aside className="hidden border-r bg-sidebar-background md:flex md:flex-col overflow-hidden dark:bg-sidebar-background dark:border-sidebar-border">
           <div
             className={cn(
-              'flex h-14 shrink-0 items-center border-b lg:h-[60px]',
+              'flex h-14 shrink-0 items-center border-b dark:border-sidebar-border lg:h-[60px]',
               isMinimized ? 'justify-center px-2' : 'px-4 lg:px-6'
             )}
           >
@@ -304,11 +304,11 @@ export default function DashboardLayout({
                           <Link
                             href={item.href!}
                             className={cn(
-                              'relative flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-primary',
-                              (pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href!))) ? 'bg-muted text-primary' : ''
+                              'relative flex h-9 w-9 items-center justify-center rounded-lg transition-colors dark:text-foreground/70 dark:hover:text-primary dark:hover:bg-popover',
+                              (pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href!))) ? 'bg-muted text-primary dark:bg-popover dark:text-primary' : 'text-muted-foreground hover:text-primary'
                             )}
                           >
-                            <item.icon className="h-5 w-5" />
+                            <item.icon className="h-5 w-5 dark:text-foreground/70 dark:[&.active]:text-primary" />
                             {showBadge && (
                               <span className="absolute -top-1 -right-1 flex h-3 w-3">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75"></span>
@@ -330,11 +330,11 @@ export default function DashboardLayout({
                       key={item.href}
                       href={item.href!}
                       className={cn(
-                        'flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:bg-muted hover:text-primary',
-                        (pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href!))) ? 'bg-muted text-primary' : ''
+                        'flex items-center gap-3 rounded-lg px-3 py-2 transition-all dark:text-foreground/70 dark:hover:bg-popover dark:hover:text-primary',
+                        (pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href!))) ? 'bg-muted text-primary dark:bg-popover dark:text-primary' : 'text-muted-foreground hover:bg-muted hover:text-primary'
                       )}
                     >
-                      <item.icon className="h-4 w-4" />
+                      <item.icon className="h-4 w-4 dark:text-foreground/70" />
                       {item.label}
                       {showBadge && (
                         <Badge 
@@ -354,9 +354,9 @@ export default function DashboardLayout({
       )}
 
       {/* Content Area */}
-      <div className="flex flex-col overflow-hidden">
+      <div className="flex flex-col overflow-hidden dark:bg-black">
         {/* Header */}
-        <header className="flex h-14 shrink-0 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
+        <header className="flex h-14 shrink-0 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6 dark:bg-card dark:border-border/50">
           {showSidebar && (
             <Sheet>
               <SheetTrigger asChild>
@@ -377,7 +377,7 @@ export default function DashboardLayout({
                     A list of links to navigate to different parts of the application.
                   </SheetDescription>
                 </SheetHeader>
-                <div className="flex h-14 items-center border-b px-6">
+                <div className="flex h-14 items-center border-b dark:border-sidebar-border px-6">
                   <Link
                     href="/dashboard"
                     className="flex items-center gap-2 text-lg font-semibold"
@@ -563,8 +563,8 @@ export default function DashboardLayout({
         </header>
 
         {/* Main Content (ONLY SCROLL HERE) */}
-        <ScrollArea className="flex-1 h-full" viewportProps={{ style: { scrollBehavior: 'smooth' } }}>
-          <main className="p-4 lg:p-6 pb-20">
+        <ScrollArea className="flex-1 h-full dark:bg-black" viewportProps={{ style: { scrollBehavior: 'smooth' } }}>
+          <main className="p-4 lg:p-6 pb-20 dark:bg-black">
             {children}
           </main>
         </ScrollArea>

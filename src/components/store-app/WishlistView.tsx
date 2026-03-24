@@ -73,8 +73,8 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
     };
 
     return (
-        <div className="flex flex-col h-full bg-background-light dark:bg-background-dark animate-in slide-in-from-right-4 duration-500">
-            <header className="sticky top-0 z-50 flex items-center bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-4 py-6 justify-between border-b border-slate-200 dark:border-slate-800">
+        <div className="flex flex-col h-full bg-background-light dark:bg-black animate-in slide-in-from-right-4 duration-500">
+            <header className="sticky top-0 z-50 flex items-center bg-background-light/80 dark:bg-black/80 backdrop-blur-md px-4 py-6 justify-between border-b border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-4">
                     <button 
                         onClick={onClose}
