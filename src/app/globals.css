@@ -685,10 +685,55 @@
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
+  /* ON/OFF text styling for dark mode - Pure black for visibility */
+  .dark label:has-text("ON"),
+  .dark label:has-text("OFF"),
+  .dark:contains("ON"),
+  .dark:contains("OFF") {
+    color: #000000 !important;
+  }
+
+  /* Watermark ON/OFF text - Black color for better visibility */
+  .dark [class*="font-black"][class*="uppercase"]:contains("Watermark") {
+    color: #000000 !important;
+  }
+
 /* Form elements dark mode styling */
 .dark label {
   color: hsl(var(--foreground));
   font-weight: 500;
+}
+
+/* ON/OFF badge/label text in dark mode */
+.dark label.text-\[10px\] {
+  color: #000000;
+}
+
+/* ON/OFF text styling - All variants for dark mode */
+.dark label:where([class*="uppercase"]) {
+  color: #000000 !important;
+}
+
+.dark label:where([class*="font-black"]) {
+  color: #000000 !important;
+}
+
+.dark p:where([class*="text-xs"]):where([class*="muted-foreground"]) {
+  color: #000000 !important;
+}
+
+/* Ensure toggle switch labels are always black in dark mode */
+.dark [class*="FormLabel"]:where([class*="uppercase"]) {
+  color: #000000 !important;
+}
+
+/* Text describing ON/OFF functionality */
+.dark:where(p, span, label):has-text("Turn ON") {
+  color: #000000 !important;
+}
+
+.dark:where(p, span, label):has-text("Turn OFF") {
+  color: #000000 !important;
 }
 
 .dark label.text-sm {

@@ -143,7 +143,7 @@ export function WatermarkSettings({ settingsData, isLoading }: WatermarkSettings
                     <FormItem className="flex flex-row items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background shadow-lg">
                         <div className="flex items-center gap-2">
                             {field.value ? <Eye className="h-4 w-4 text-green-600" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
-                            <FormLabel className="text-[10px] font-black uppercase tracking-widest">{field.value ? 'Watermark ON' : 'Watermark OFF'}</FormLabel>
+                            <FormLabel className="text-[10px] font-black uppercase tracking-widest dark:text-black">{field.value ? 'Watermark ON' : 'Watermark OFF'}</FormLabel>
                         </div>
                         <FormControl>
                         <Switch

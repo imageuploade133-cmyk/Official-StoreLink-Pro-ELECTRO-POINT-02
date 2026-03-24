@@ -132,7 +132,7 @@ export function PosReceiptSettings({ settingsData, isLoading }: PosReceiptSettin
                 <FormItem className="flex items-center justify-between rounded-lg border p-4 bg-muted/10">
                   <div>
                       <FormLabel className="font-semibold">Enable Dedicated Thermal Printer Mode</FormLabel>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-muted-foreground dark:text-black">
                       Turn ON for dedicated 80mm printers. Turn OFF for standard browser PDF printing.
                       </p>
                   </div>
