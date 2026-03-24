@@ -255,10 +255,10 @@ export default function DashboardLayout({
     >
       {/* Sidebar */}
       {showSidebar && (
-        <aside className="hidden border-r bg-muted/40 md:flex md:flex-col overflow-hidden">
+        <aside className="hidden border-r bg-sidebar-background md:flex md:flex-col overflow-hidden dark:bg-sidebar-background dark:border-sidebar-border">
           <div
             className={cn(
-              'flex h-14 shrink-0 items-center border-b lg:h-[60px]',
+              'flex h-14 shrink-0 items-center border-b dark:border-sidebar-border lg:h-[60px]',
               isMinimized ? 'justify-center px-2' : 'px-4 lg:px-6'
             )}
           >
@@ -356,7 +356,7 @@ export default function DashboardLayout({
       {/* Content Area */}
       <div className="flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="flex h-14 shrink-0 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
+        <header className="flex h-14 shrink-0 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6 dark:bg-card dark:border-border/50">
           {showSidebar && (
             <Sheet>
               <SheetTrigger asChild>
@@ -377,7 +377,7 @@ export default function DashboardLayout({
                     A list of links to navigate to different parts of the application.
                   </SheetDescription>
                 </SheetHeader>
-                <div className="flex h-14 items-center border-b px-6">
+                <div className="flex h-14 items-center border-b dark:border-sidebar-border px-6">
                   <Link
                     href="/dashboard"
                     className="flex items-center gap-2 text-lg font-semibold"

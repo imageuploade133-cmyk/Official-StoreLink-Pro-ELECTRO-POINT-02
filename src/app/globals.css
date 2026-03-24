@@ -339,3 +339,65 @@
   outline: 2px solid hsl(190 70% 48% / 0.5);
   outline-offset: 2px;
 }
+
+/* Dark theme card styling - GitHub Dark Style */
+.dark .rounded-lg {
+  background-color: hsl(var(--card));
+  border-color: hsl(var(--border));
+}
+
+.dark [role="region"],
+.dark [role="presentation"] {
+  background-color: hsl(var(--card));
+}
+
+/* Sidebar specific dark mode styling */
+.dark aside {
+  background-color: hsl(var(--sidebar-background));
+  border-color: hsl(var(--sidebar-border));
+}
+
+.dark aside h4 {
+  color: hsl(var(--muted-foreground));
+}
+
+.dark aside a {
+  color: hsl(var(--sidebar-foreground));
+}
+
+.dark aside a.active,
+.dark aside a[aria-current="page"] {
+  color: hsl(var(--sidebar-primary));
+  background-color: hsl(var(--sidebar-accent));
+}
+
+/* Header specific dark mode styling */
+.dark header {
+  background-color: hsl(var(--card));
+  border-color: hsl(var(--border));
+}
+
+/* Sheet/Modal dark mode */
+.dark [role="dialog"] {
+  background-color: hsl(var(--card));
+  border-color: hsl(var(--border));
+}
+
+/* Ensure all cards have proper dark styling */
+.dark .bg-card {
+  background-color: hsl(var(--card)) !important;
+  color: hsl(var(--card-foreground)) !important;
+}
+
+.dark .bg-muted {
+  background-color: hsl(var(--muted)) !important;
+}
+
+.dark .bg-popover {
+  background-color: hsl(var(--popover)) !important;
+}
+
+/* Shadow and depth for dark cards */
+.dark [class*="shadow"] {
+  box-shadow: 0 4px 12px hsl(0 0% 0% / 0.3);
+}
