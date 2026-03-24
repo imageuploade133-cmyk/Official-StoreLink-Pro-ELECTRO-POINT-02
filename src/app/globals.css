@@ -50,9 +50,9 @@
   }
  
   .dark {
-    /* Clean Professional Dark Theme - GitHub Style */
-    /* Base: Very dark blue-black */
-    --background: 220 20% 8%;
+    /* Clean Professional Dark Theme - Pure Black Background */
+    /* Base: Pure black background */
+    --background: 0 0% 0%;
     --foreground: 210 16% 93%;
     
     /* Cards: Elevated from background with subtle blue tint */
@@ -101,8 +101,8 @@
     --chart-4: 210 50% 50%;
     --chart-5: 30 80% 50%;
     
-    /* Sidebar: Integrated dark theme */
-    --sidebar-background: 220 20% 8%;
+    /* Sidebar: Pure black background */
+    --sidebar-background: 0 0% 0%;
     --sidebar-foreground: 210 16% 93%;
     --sidebar-primary: 217 100% 56%;
     --sidebar-primary-foreground: 210 16% 93%;
@@ -648,11 +648,42 @@
   color: hsl(var(--primary));
 }
 
-.dark [role="dialog"] nav a[aria-current="page"],
-.dark [role="dialog"] nav a.active {
-  background-color: hsl(var(--popover));
-  color: hsl(var(--primary));
-}
+  .dark [role="dialog"] nav a[aria-current="page"],
+  .dark [role="dialog"] nav a.active {
+    background-color: hsl(var(--popover));
+    color: hsl(var(--primary));
+  }
+
+  /* Pure black background for all dark mode pages and containers */
+  .dark body {
+    background-color: #000000;
+  }
+
+  .dark [class*="min-h-screen"] {
+    background-color: #000000;
+  }
+
+  .dark [class*="flex-1"] {
+    background-color: #000000;
+  }
+
+  .dark main {
+    background-color: #000000;
+  }
+
+  .dark [class*="grid"] {
+    background-color: transparent;
+  }
+
+  /* Ensure smooth transitions to black background */
+  .dark {
+    background-color: #000000;
+    transition: background-color 0.3s ease;
+  }
+
+  .dark * {
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
 
 /* Form elements dark mode styling */
 .dark label {

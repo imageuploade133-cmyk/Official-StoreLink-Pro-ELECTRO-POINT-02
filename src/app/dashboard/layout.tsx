@@ -354,7 +354,7 @@ export default function DashboardLayout({
       )}
 
       {/* Content Area */}
-      <div className="flex flex-col overflow-hidden">
+      <div className="flex flex-col overflow-hidden dark:bg-black">
         {/* Header */}
         <header className="flex h-14 shrink-0 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6 dark:bg-card dark:border-border/50">
           {showSidebar && (
@@ -563,8 +563,8 @@ export default function DashboardLayout({
         </header>
 
         {/* Main Content (ONLY SCROLL HERE) */}
-        <ScrollArea className="flex-1 h-full" viewportProps={{ style: { scrollBehavior: 'smooth' } }}>
-          <main className="p-4 lg:p-6 pb-20">
+        <ScrollArea className="flex-1 h-full dark:bg-black" viewportProps={{ style: { scrollBehavior: 'smooth' } }}>
+          <main className="p-4 lg:p-6 pb-20 dark:bg-black">
             {children}
           </main>
         </ScrollArea>
