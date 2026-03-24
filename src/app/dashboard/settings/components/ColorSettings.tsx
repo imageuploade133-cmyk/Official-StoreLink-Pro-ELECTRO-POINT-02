@@ -202,77 +202,140 @@ export function ColorSettings({ settingsData, isLoading }: ColorSettingsProps) {
                 <FormField control={form.control} name="colorDestructive" render={({ field }) => <ColorInput field={field} label="Destructive Color" />} />
              </div>
             <Separator />
-            <h4 className="font-semibold text-base">Background Style</h4>
-            
-            <FormField
-              control={form.control}
-              name="backgroundStyle"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Background Type</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      className="grid grid-cols-3 gap-1 rounded-lg bg-muted p-1"
-                    >
-                      <FormItem className="flex-1">
-                        <FormControl><RadioGroupItem value="solid" id="style-solid" className="sr-only"/></FormControl>
-                        <FormLabel htmlFor="style-solid" className="flex cursor-pointer items-center justify-center whitespace-nowrap rounded-md px-3 py-2 text-sm font-semibold transition-all hover:bg-accent/50 peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-primary-foreground peer-data-[state=checked]:shadow-sm">Solid Color</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex-1">
-                        <FormControl><RadioGroupItem value="gradient" id="style-gradient" className="sr-only"/></FormControl>
-                        <FormLabel htmlFor="style-gradient" className="flex cursor-pointer items-center justify-center whitespace-nowrap rounded-md px-3 py-2 text-sm font-semibold transition-all hover:bg-accent/50 peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-primary-foreground peer-data-[state=checked]:shadow-sm">Gradient</FormLabel>
-                      </FormItem>
-                       <FormItem className="flex-1">
-                        <FormControl><RadioGroupItem value="image" id="style-image" className="sr-only"/></FormControl>
-                        <FormLabel htmlFor="style-image" className="flex cursor-pointer items-center justify-center whitespace-nowrap rounded-md px-3 py-2 text-sm font-semibold transition-all hover:bg-accent/50 peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-primary-foreground peer-data-[state=checked]:shadow-sm">Image</FormLabel>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            
-            {backgroundStyle === 'solid' && (
-                <FormField control={form.control} name="colorBackground" render={({ field }) => <ColorInput field={field} label="Background Color" />} />
-            )}
-            
-            {backgroundStyle === 'gradient' && (
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField control={form.control} name="backgroundGradientStart" render={({ field }) => <ColorInput field={field} label="Gradient Start" />} />
-                    <FormField control={form.control} name="backgroundGradientEnd" render={({ field }) => <ColorInput field={field} label="Gradient End" />} />
-                 </div>
-            )}
+            <div className="space-y-4">
+              <h4 className="font-semibold text-base">Background Style</h4>
+              
+              <FormField
+                control={form.control}
+                name="backgroundStyle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Select Background Type</FormLabel>
+                    <FormControl>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        {[
+                          { value: 'solid', label: 'Solid Color', icon: '■' },
+                          { value: 'gradient', label: 'Gradient', icon: '⊔' },
+                          { value: 'image', label: 'Image', icon: '🖼' }
+                        ].map((option) => (
+                          <div
+                            key={option.value}
+                            onClick={() => field.onChange(option.value)}
+                            className={`relative flex items-center justify-center gap-2 rounded-lg border-2 p-3 sm:p-4 cursor-pointer transition-all ${
+                              field.value === option.value
+                                ? 'border-primary bg-primary/10 shadow-md'
+                                : 'border-border hover:border-primary/50 hover:bg-card/50'
+                            }`}
+                          >
+                            <div className="flex flex-col items-center gap-1">
+                              <span className="text-xl">{option.icon}</span>
+                              <span className="text-sm font-medium">{option.label}</span>
+                            </div>
+                            <RadioGroupItem value={option.value} id={`style-${option.value}`} className="sr-only" />
+                          </div>
+                        ))}
+                      </div>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
 
-            {backgroundStyle === 'image' && (
-              <div className="space-y-4">
-                 <FormField
+              {/* Solid Color Options */}
+              {backgroundStyle === 'solid' && (
+                <div className="rounded-lg border border-border bg-card/50 p-4 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <div className="h-3 w-3 rounded-full bg-primary" />
+                    <span className="text-sm font-medium">Solid Color Settings</span>
+                  </div>
+                  <FormField 
+                    control={form.control} 
+                    name="colorBackground" 
+                    render={({ field }) => <ColorInput field={field} label="Background Color" />} 
+                  />
+                </div>
+              )}
+
+              {/* Gradient Options */}
+              {backgroundStyle === 'gradient' && (
+                <div className="rounded-lg border border-border bg-card/50 p-4 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <div className="h-3 w-3 rounded-full bg-gradient-to-r from-primary to-secondary" />
+                    <span className="text-sm font-medium">Gradient Settings</span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormField 
+                      control={form.control} 
+                      name="backgroundGradientStart" 
+                      render={({ field }) => <ColorInput field={field} label="Gradient Start Color" />} 
+                    />
+                    <FormField 
+                      control={form.control} 
+                      name="backgroundGradientEnd" 
+                      render={({ field }) => <ColorInput field={field} label="Gradient End Color" />} 
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Image Options */}
+              {backgroundStyle === 'image' && (
+                <div className="rounded-lg border border-border bg-card/50 p-4 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">🖼 Image Settings</span>
+                  </div>
+                  
+                  <FormField
                     control={form.control}
                     name="backgroundImageUrl"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Background Image URL</FormLabel>
-                        <div className="flex items-center gap-2">
-                            <FormControl><Input {...field} placeholder="https://example.com/background.png" disabled={isUploading}/></FormControl>
-                            <Button asChild variant="outline" disabled={isUploading}>
-                                <label htmlFor="image-upload" className="cursor-pointer">
-                                  {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Upload className="mr-2 h-4 w-4" />}
-                                  Upload
-                                  <Input id="image-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isUploading} />
-                                </label>
-                            </Button>
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                          <FormControl className="flex-1">
+                            <Input 
+                              {...field} 
+                              placeholder="https://example.com/background.png" 
+                              disabled={isUploading}
+                              className="dark:bg-popover dark:border-border"
+                            />
+                          </FormControl>
+                          <Button 
+                            asChild 
+                            variant="outline" 
+                            disabled={isUploading}
+                            className="w-full sm:w-auto"
+                          >
+                            <label htmlFor="image-upload" className="cursor-pointer justify-center">
+                              {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Upload className="mr-2 h-4 w-4" />}
+                              {isUploading ? 'Uploading...' : 'Upload'}
+                              <Input 
+                                id="image-upload" 
+                                type="file" 
+                                accept="image/*" 
+                                className="hidden" 
+                                onChange={handleImageUpload} 
+                                disabled={isUploading} 
+                              />
+                            </label>
+                          </Button>
                         </div>
+                        <p className="text-xs text-muted-foreground">Paste a URL or click Upload to add your image</p>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <p className="text-xs text-muted-foreground">For best results, use a high-quality, optimized image. You can paste a URL or upload your own.</p>
-                  <FormField control={form.control} name="colorBackground" render={({ field }) => <ColorInput field={field} label="UI Background Color" />} />
-                   <p className="text-xs text-muted-foreground">This color is used for cards and popovers when a background image is active.</p>
-
-              </div>
-            )}
+                  
+                  <Separator />
+                  
+                  <FormField 
+                    control={form.control} 
+                    name="colorBackground" 
+                    render={({ field }) => <ColorInput field={field} label="UI Overlay Color" />} 
+                  />
+                  <p className="text-xs text-muted-foreground">This color is used for cards and popovers on top of your background image for better readability.</p>
+                </div>
+              )}
+            </div>
             
           </CardContent>
           <CardFooter className="flex justify-between items-center">
