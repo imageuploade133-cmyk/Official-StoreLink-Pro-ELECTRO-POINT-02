@@ -451,3 +451,66 @@
   color: inherit;
   fill: currentColor;
 }
+
+/* Sidebar navigation dark mode - Enhanced icon visibility */
+.dark aside nav a {
+  color: hsl(var(--foreground) / 0.7);
+  transition: all 0.25s ease;
+}
+
+.dark aside nav a svg {
+  color: hsl(var(--foreground) / 0.7);
+  stroke-width: 2;
+}
+
+.dark aside nav a:hover {
+  color: hsl(var(--primary));
+  background-color: hsl(var(--popover));
+}
+
+.dark aside nav a:hover svg {
+  color: hsl(var(--primary));
+}
+
+.dark aside nav a[aria-current="page"],
+.dark aside nav a.active {
+  background-color: hsl(var(--popover));
+  color: hsl(var(--primary));
+}
+
+.dark aside nav a[aria-current="page"] svg,
+.dark aside nav a.active svg {
+  color: hsl(var(--primary));
+}
+
+/* Minimize sidebar icons - Better visibility */
+.dark aside a.relative.flex.h-9 {
+  color: hsl(var(--foreground) / 0.7);
+}
+
+.dark aside a.relative.flex.h-9:hover {
+  background-color: hsl(var(--popover));
+  color: hsl(var(--primary));
+}
+
+/* Separator styling in dark mode */
+.dark aside .separator {
+  background-color: hsl(var(--border));
+}
+
+/* Mobile sheet navigation dark mode */
+.dark [role="dialog"] nav a {
+  color: hsl(var(--foreground) / 0.7);
+  transition: all 0.25s ease;
+}
+
+.dark [role="dialog"] nav a:hover {
+  background-color: hsl(var(--popover));
+  color: hsl(var(--primary));
+}
+
+.dark [role="dialog"] nav a[aria-current="page"],
+.dark [role="dialog"] nav a.active {
+  background-color: hsl(var(--popover));
+  color: hsl(var(--primary));
+}

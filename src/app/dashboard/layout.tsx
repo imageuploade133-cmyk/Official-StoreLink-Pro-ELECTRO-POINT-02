@@ -304,11 +304,11 @@ export default function DashboardLayout({
                           <Link
                             href={item.href!}
                             className={cn(
-                              'relative flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-primary',
-                              (pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href!))) ? 'bg-muted text-primary' : ''
+                              'relative flex h-9 w-9 items-center justify-center rounded-lg transition-colors dark:text-foreground/70 dark:hover:text-primary dark:hover:bg-popover',
+                              (pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href!))) ? 'bg-muted text-primary dark:bg-popover dark:text-primary' : 'text-muted-foreground hover:text-primary'
                             )}
                           >
-                            <item.icon className="h-5 w-5" />
+                            <item.icon className="h-5 w-5 dark:text-foreground/70 dark:[&.active]:text-primary" />
                             {showBadge && (
                               <span className="absolute -top-1 -right-1 flex h-3 w-3">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75"></span>
@@ -330,11 +330,11 @@ export default function DashboardLayout({
                       key={item.href}
                       href={item.href!}
                       className={cn(
-                        'flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:bg-muted hover:text-primary',
-                        (pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href!))) ? 'bg-muted text-primary' : ''
+                        'flex items-center gap-3 rounded-lg px-3 py-2 transition-all dark:text-foreground/70 dark:hover:bg-popover dark:hover:text-primary',
+                        (pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href!))) ? 'bg-muted text-primary dark:bg-popover dark:text-primary' : 'text-muted-foreground hover:bg-muted hover:text-primary'
                       )}
                     >
-                      <item.icon className="h-4 w-4" />
+                      <item.icon className="h-4 w-4 dark:text-foreground/70" />
                       {item.label}
                       {showBadge && (
                         <Badge 
