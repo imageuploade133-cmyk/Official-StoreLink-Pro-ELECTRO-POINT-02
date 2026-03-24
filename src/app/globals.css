@@ -145,6 +145,55 @@
   html.light body {
     background-color: hsl(var(--background));
   }
+
+  /* Dark theme headers - All heading levels */
+  .dark h1,
+  .dark h2,
+  .dark h3,
+  .dark h4,
+  .dark h5,
+  .dark h6 {
+    color: #f1f5f9;
+  }
+
+  .dark h1 {
+    color: #f1f5f9;
+    font-weight: 600;
+  }
+
+  .dark h2 {
+    color: #f1f5f9;
+    font-weight: 600;
+  }
+
+  .dark h3 {
+    color: #f1f5f9;
+    font-weight: 500;
+  }
+
+  .dark h4 {
+    color: #f1f5f9;
+    font-weight: 500;
+  }
+
+  .dark h5 {
+    color: #f1f5f9;
+    font-weight: 500;
+  }
+
+  .dark h6 {
+    color: #f1f5f9;
+    font-weight: 500;
+  }
+
+  /* Dark theme labels and text elements */
+  .dark label {
+    color: #f1f5f9;
+  }
+
+  .dark strong {
+    color: #f1f5f9;
+  }
 }
 
 @layer utilities {
