@@ -368,7 +368,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                             <DescriptionIcon className="h-4 w-4 text-primary" />
                             <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500">{product.descriptionTitle || 'Product Story'}</h3>
                         </div>
-                        <div className="prose dark:prose-invert prose-sm max-w-none text-slate-600 leading-relaxed [&_p]:dark:text-white [&_li]:dark:text-white [&_h1]:dark:text-white [&_h2]:dark:text-white [&_h3]:dark:text-white [&_h4]:dark:text-white [&_h5]:dark:text-white [&_h6]:dark:text-white">
+                        <div className="prose dark:prose-invert prose-sm max-w-none text-slate-600 leading-relaxed [&_*]:dark:!text-white dark:!text-white">
                             <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{product.description}</ReactMarkdown>
                         </div>
                     </div>
