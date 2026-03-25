@@ -262,7 +262,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
   const handlePrevPage = () => fetchProducts('prev');
 
   return (
-    <section ref={sectionRef} className="py-12 md:py-24 overflow-hidden relative" style={backgroundColor ? { backgroundColor } : {}}>
+    <section ref={sectionRef} className="py-12 md:py-24 overflow-hidden relative dark:bg-black" style={backgroundColor ? { backgroundColor } : {}}>
       <div className={cn("max-w-site-container mx-auto px-4 sm:px-6 lg:px-8")}>
         <Carousel 
             opts={{ 
@@ -362,8 +362,8 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
                                 className={cn(
                                     "static translate-y-0 h-14 w-14 rounded-full border-[3px] transition-all duration-300 shadow-xl hover:scale-110 active:scale-95",
                                     isPromoActive 
-                                        ? "bg-white/10 text-white border-white/60 hover:bg-white hover:text-black" 
-                                        : "bg-background border-primary/20 hover:bg-primary hover:text-white"
+                                        ? "bg-white/10 text-white border-white/60 hover:bg-white hover:text-black dark:text-white dark:hover:text-black" 
+                                        : "bg-background border-primary/20 hover:bg-primary hover:text-white dark:text-black dark:hover:text-white"
                                 )} 
                                 style={isPromoActive ? { color: 'inherit' } : {}}
                             />
@@ -372,8 +372,8 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
                                 className={cn(
                                     "static translate-y-0 h-14 w-14 rounded-full border-[3px] transition-all duration-300 shadow-xl hover:scale-110 active:scale-95",
                                     isPromoActive 
-                                        ? "bg-white/10 text-white border-white/60 hover:bg-white hover:text-black" 
-                                        : "bg-background border-primary/20 hover:bg-primary hover:text-white"
+                                        ? "bg-white/10 text-white border-white/60 hover:bg-white hover:text-black dark:text-white dark:hover:text-black" 
+                                        : "bg-background border-primary/20 hover:bg-primary hover:text-white dark:text-black dark:hover:text-white"
                                 )}
                                 style={isPromoActive ? { color: 'inherit' } : {}}
                             />
@@ -411,8 +411,8 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
                                 className={cn(
                                     "static translate-y-0 h-14 w-14 rounded-full border-[3px] transition-all duration-300 shadow-xl hover:scale-110",
                                     isPromoActive 
-                                        ? "bg-white/10 text-white border-white/60 hover:bg-white hover:text-black" 
-                                        : "bg-background border-primary/20 hover:bg-primary hover:text-white"
+                                        ? "bg-white/10 text-white border-white/60 hover:bg-white hover:text-black dark:text-white dark:hover:text-black" 
+                                        : "bg-background border-primary/20 hover:bg-primary hover:text-white dark:text-black dark:hover:text-white"
                                 )}
                             >
                                 <ChevronLeft className="h-6 w-6" />
@@ -425,8 +425,8 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
                                 className={cn(
                                     "static translate-y-0 h-14 w-14 rounded-full border-[3px] transition-all duration-300 shadow-xl hover:scale-110",
                                     isPromoActive 
-                                        ? "bg-white/10 text-white border-white/60 hover:bg-white hover:text-black" 
-                                        : "bg-background border-primary/20 hover:bg-primary hover:text-white"
+                                        ? "bg-white/10 text-white border-white/60 hover:bg-white hover:text-black dark:text-white dark:hover:text-black" 
+                                        : "bg-background border-primary/20 hover:bg-primary hover:text-white dark:text-black dark:hover:text-white"
                                 )}
                             >
                                 <ChevronRight className="h-6 w-6" />

@@ -78,7 +78,7 @@ export default function PublicLayout({
       {settings?.backgroundStyle === 'video' && settings.backgroundVideoUrl && <BackgroundVideoPlayer />}
       <PublicNavbar />
       
-      <main className="relative z-10" style={{ paddingTop: `${navbarHeight}px` }}>{children}</main>
+      <main className="relative z-10 dark:bg-black" style={{ paddingTop: `${navbarHeight}px` }}>{children}</main>
 
       <PublicFooter />
     </>

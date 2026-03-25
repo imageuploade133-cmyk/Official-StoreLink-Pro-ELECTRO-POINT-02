@@ -128,18 +128,18 @@ export function PublicFooter() {
             {(storePhone || storeEmail || storeAddress) && (
               <div className="space-y-3 mb-6">
                 {storePhone && (
-                  <a href={`tel:${storePhone}`} className="flex items-center text-sm hover:opacity-80 transition-colors" style={{ color: textColor }}>
-                    <Phone className="h-4 w-4 mr-3 flex-shrink-0 opacity-70" /> <span>{storePhone}</span>
+                  <a href={`tel:${storePhone}`} className="flex items-center text-sm hover:opacity-80 transition-colors dark:text-slate-300" style={{ color: textColor }}>
+                    <Phone className="h-4 w-4 mr-3 flex-shrink-0 opacity-70 dark:text-slate-400 dark:p-0.5 dark:border dark:border-slate-600 dark:rounded-md" /> <span>{storePhone}</span>
                   </a>
                 )}
                 {storeEmail && (
-                   <a href={`mailto:${storeEmail}`} className="flex items-center text-sm hover:opacity-80 transition-colors" style={{ color: textColor }}>
-                    <Mail className="h-4 w-4 mr-3 flex-shrink-0 opacity-70" /> <span>{storeEmail}</span>
+                   <a href={`mailto:${storeEmail}`} className="flex items-center text-sm hover:opacity-80 transition-colors dark:text-slate-300" style={{ color: textColor }}>
+                    <Mail className="h-4 w-4 mr-3 flex-shrink-0 opacity-70 dark:text-slate-400 dark:p-0.5 dark:border dark:border-slate-600 dark:rounded-md" /> <span>{storeEmail}</span>
                   </a>
                 )}
                 {storeAddress && (
-                   <p className="flex items-start text-sm" style={{ color: textColor }}>
-                    <MapPin className="h-4 w-4 mr-3 mt-1 flex-shrink-0 opacity-70" /> <span>{storeAddress}</span>
+                   <p className="flex items-start text-sm dark:text-slate-300" style={{ color: textColor }}>
+                    <MapPin className="h-4 w-4 mr-3 mt-1 flex-shrink-0 opacity-70 dark:text-slate-400 dark:p-0.5 dark:border dark:border-slate-600 dark:rounded-md" /> <span>{storeAddress}</span>
                   </p>
                 )}
               </div>
@@ -153,13 +153,13 @@ export function PublicFooter() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={link.name}
-                  className="hover:opacity-80 transition-opacity"
+                  className="hover:opacity-80 transition-opacity dark:text-slate-300 dark:border dark:border-slate-600 dark:p-1.5 dark:rounded-lg inline-flex items-center justify-center dark:hover:border-slate-500"
                   style={{ color: textColor }}
                 >
                   {link.iconUrl ? (
-                    <Image src={link.iconUrl} alt={link.name} width={24} height={24} className="h-6 w-6 object-contain" unoptimized />
+                    <Image src={link.iconUrl} alt={link.name} width={24} height={24} className="h-6 w-6 object-contain dark:brightness-150" unoptimized />
                   ) : (
-                    <LinkIcon className="h-6 w-6 opacity-70" />
+                    <LinkIcon className="h-6 w-6 opacity-70 dark:opacity-90 dark:text-slate-300" />
                   )}
                 </a>
               ))}

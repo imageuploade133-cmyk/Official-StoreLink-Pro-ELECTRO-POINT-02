@@ -118,7 +118,7 @@ export function CategoryGallery() {
 
   return (
     <section 
-        className="py-20 md:py-28 border-y border-slate-100 dark:border-slate-900 overflow-hidden group/gallery transition-colors duration-500" 
+        className="py-20 md:py-28 border-y border-slate-100 dark:border-slate-900 dark:bg-black overflow-hidden group/gallery transition-colors duration-500" 
         style={{ backgroundColor: sectionBgColor }}
     >
       <div className="max-w-site-container mx-auto px-6 mb-12 md:mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -145,9 +145,9 @@ export function CategoryGallery() {
                 {sectionDescription}
             </p>
         </div>
-        <Button asChild variant="ghost" className="font-black text-[10px] uppercase tracking-[0.2em] gap-3 hover:bg-primary/5 p-0 h-auto group/btn self-start md:self-auto animate-in fade-in zoom-in-95 duration-1000 delay-200" style={{ color: sectionTextColor }}>
+        <Button asChild variant="ghost" className="font-black text-[10px] uppercase tracking-[0.2em] gap-3 hover:bg-primary/5 p-0 h-auto group/btn self-start md:self-auto animate-in fade-in zoom-in-95 duration-1000 delay-200 dark:text-black" style={{ color: sectionTextColor }}>
             <Link href="/store/categories">
-                View All Collections <ChevronRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" strokeWidth={3} />
+                View All Collections <ChevronRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1 dark:text-black" strokeWidth={3} />
             </Link>
         </Button>
       </div>
