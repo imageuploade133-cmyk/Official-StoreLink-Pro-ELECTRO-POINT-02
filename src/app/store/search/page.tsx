@@ -207,43 +207,14 @@ function SearchPageContent() {
 
   const totalPages = Math.ceil(totalFilteredCount / ITEMS_PER_PAGE);
   
-  const totalActiveFilters = (selectedCategories.length > 0 ? 1 : 0) + 
+  const activeFilters = (selectedCategories.length > 0 ? 1 : 0) + 
                         (priceRange[0] > 0 || priceRange[1] < 5000000 ? 1 : 0) + 
                         (onlyOnSale ? 1 : 0);
-
-  // Min/Max price inputs
-  const [minPriceInput, setMinPriceInput] = useState(priceRange[0].toString());
-  const [maxPriceInput, setMaxPriceInput] = useState(priceRange[1].toString());
-
-  useEffect(() => {
-    setMinPriceInput(priceRange[0].toString());
-    setMaxPriceInput(priceRange[1].toString());
-  }, [priceRange]);
-
-  const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    setMinPriceInput(val);
-    const num = parseInt(val) || 0;
-    if (num <= priceRange[1]) {
-      setPriceRange([num, priceRange[1]]);
-      setCurrentPage(1);
-    }
-  };
-
-  const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    setMaxPriceInput(val);
-    const num = parseInt(val) || 5000000;
-    if (num >= priceRange[0]) {
-      setPriceRange([priceRange[0], num]);
-      setCurrentPage(1);
-    }
-  };
 
   // Loading state messaging
   const getLoadingMessage = () => {
     if (searchTerm && !isLoading) return `Searched for "${searchTerm}"`;
-    if (totalActiveFilters > 0 && !isLoading) return `${totalActiveFilters} filter${totalActiveFilters > 1 ? 's' : ''} applied`;
+    if (activeFilters > 0 && !isLoading) return `${activeFilters} filter${activeFilters > 1 ? 's' : ''} applied`;
     return 'Loading products';
   };
 
@@ -313,9 +284,9 @@ function SearchPageContent() {
               >
                 <SlidersHorizontal className="h-4 w-4 flex-shrink-0" />
                 <span className="truncate">{showFilters ? 'Hide' : 'Show'} Filters</span>
-                {totalActiveFilters > 0 && (
+                {activeFilters > 0 && (
                   <span className="absolute -top-2 -right-2 h-5 w-5 bg-amber-500 text-white text-[10px] font-black rounded-full flex items-center justify-center flex-shrink-0">
-                    {totalActiveFilters}
+                    {activeFilters}
                   </span>
                 )}
               </Button>
@@ -333,16 +304,16 @@ function SearchPageContent() {
               </Button>
 
               {/* Sort Dropdown */}
-              <div className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm flex-shrink-0 hover:border-primary/40 dark:hover:border-primary/40 transition-colors">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 hidden sm:inline">Sort by:</span>
+              <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm flex-shrink-0">
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 hidden sm:inline">Sort:</span>
                 <select 
                   value={sortBy} 
                   onChange={(e) => { setSortBy(e.target.value); setCurrentPage(1); }}
-                  className="bg-transparent border-none p-0 text-sm font-semibold focus:ring-0 cursor-pointer text-slate-900 dark:text-white"
+                  className="bg-transparent border-none p-0 text-sm font-bold focus:ring-0 cursor-pointer"
                 >
-                  <option value="newest">Latest Arrivals</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
+                  <option value="newest">Latest</option>
+                  <option value="price-low">Low Price</option>
+                  <option value="price-high">High Price</option>
                 </select>
               </div>
             </div>
@@ -408,69 +379,26 @@ function SearchPageContent() {
 
             {/* Categories Filter */}
             <div className="space-y-3 border-t border-slate-200 dark:border-slate-800 pt-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white">Collections</h3>
-                {selectedCategories.length > 0 && (
-                  <span className="text-[10px] font-bold bg-primary/10 text-primary px-2 py-1 rounded-full">
-                    {selectedCategories.length} selected
-                  </span>
-                )}
-              </div>
-              <div className="space-y-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
-                {categories && categories.length > 0 ? (
-                  categories.map(cat => (
-                    <label key={cat.id} className="flex items-center gap-3 cursor-pointer group p-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                      <Checkbox 
-                        checked={selectedCategories.includes(cat.id)}
-                        onCheckedChange={() => handleCategoryToggle(cat.id)}
-                        className="border-slate-300 dark:border-slate-700 data-[state=checked]:bg-primary flex-shrink-0"
-                      />
-                      <span className="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-primary transition-colors truncate flex-1">
-                        {cat.name}
-                      </span>
-                      {selectedCategories.includes(cat.id) && (
-                        <ChevronRight className="h-4 w-4 text-primary flex-shrink-0" />
-                      )}
-                    </label>
-                  ))
-                ) : (
-                  <p className="text-sm text-slate-500 py-4 text-center">No categories available</p>
-                )}
+              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white">Collections</h3>
+              <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
+                {categories?.map(cat => (
+                  <label key={cat.id} className="flex items-center gap-3 cursor-pointer group">
+                    <Checkbox 
+                      checked={selectedCategories.includes(cat.id)}
+                      onCheckedChange={() => handleCategoryToggle(cat.id)}
+                      className="border-slate-300 dark:border-slate-700 data-[state=checked]:bg-primary flex-shrink-0"
+                    />
+                    <span className="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-primary transition-colors truncate">
+                      {cat.name}
+                    </span>
+                  </label>
+                ))}
               </div>
             </div>
 
             {/* Price Filter */}
             <div className="space-y-4 border-t border-slate-200 dark:border-slate-800 pt-6">
-              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white flex items-center gap-2">
-                <span>Price Range</span>
-                <span className="text-[10px] font-medium text-slate-500 uppercase">({currencySymbol})</span>
-              </h3>
-              
-              {/* Price Inputs */}
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] font-semibold uppercase text-slate-600 dark:text-slate-400">Min</Label>
-                  <Input 
-                    type="number"
-                    value={minPriceInput}
-                    onChange={handleMinPriceChange}
-                    placeholder="0"
-                    className="h-9 text-sm rounded-lg border-slate-300 dark:border-slate-600"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] font-semibold uppercase text-slate-600 dark:text-slate-400">Max</Label>
-                  <Input 
-                    type="number"
-                    value={maxPriceInput}
-                    onChange={handleMaxPriceChange}
-                    placeholder="5000000"
-                    className="h-9 text-sm rounded-lg border-slate-300 dark:border-slate-600"
-                  />
-                </div>
-              </div>
-
-              {/* Price Slider */}
+              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white">Price Range</h3>
               <Slider
                 value={priceRange}
                 onValueChange={(val) => { setPriceRange(val as [number, number]); setCurrentPage(1); }}
@@ -478,86 +406,51 @@ function SearchPageContent() {
                 step={1000}
                 className="py-4"
               />
-              
-              {/* Price Summary */}
-              <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
-                <div className="text-center flex-1">
-                  <span className="text-[10px] font-semibold uppercase text-slate-500 block">Min</span>
-                  <span className="font-black text-primary text-sm">{currencySymbol}{priceRange[0].toLocaleString()}</span>
-                </div>
-                <div className="h-6 border-r border-slate-200 dark:border-slate-700"></div>
-                <div className="text-center flex-1">
-                  <span className="text-[10px] font-semibold uppercase text-slate-500 block">Max</span>
-                  <span className="font-black text-primary text-sm">{currencySymbol}{priceRange[1].toLocaleString()}</span>
-                </div>
+              <div className="flex items-center justify-between text-xs gap-2">
+                <span className="font-black text-primary truncate">{currencySymbol}{priceRange[0].toLocaleString()}</span>
+                <span className="font-black text-primary truncate">{currencySymbol}{priceRange[1].toLocaleString()}+</span>
               </div>
             </div>
 
             {/* Sale Filter */}
             <div className="space-y-3 border-t border-slate-200 dark:border-slate-800 pt-6">
-              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white flex items-center gap-2">
-                <Zap className="h-3.5 w-3.5 text-amber-500" />
-                Flash Deals
-              </h3>
-              <label className="flex items-center gap-3 cursor-pointer p-3.5 rounded-lg bg-gradient-to-r from-amber-50 to-amber-50/50 dark:from-amber-950/30 dark:to-amber-950/10 border border-amber-200 dark:border-amber-900/40 hover:border-amber-300 dark:hover:border-amber-800/60 transition-all group">
+              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white">Flash Deals</h3>
+              <label className="flex items-center gap-3 cursor-pointer p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30 transition-all">
                 <Checkbox 
                   checked={onlyOnSale}
                   onCheckedChange={(checked) => { setOnlyOnSale(!!checked); setCurrentPage(1); }}
-                  className="flex-shrink-0 border-amber-300 dark:border-amber-700 group-hover:border-amber-400"
+                  className="flex-shrink-0"
                 />
                 <div className="flex flex-col flex-1 min-w-0">
-                  <span className="text-sm font-black text-amber-700 dark:text-amber-400 uppercase tracking-wide">On Sale Only</span>
-                  <span className="text-[10px] font-medium text-amber-600 dark:text-amber-500">Limited time offers</span>
+                  <span className="text-sm font-black text-amber-700 dark:text-amber-400 uppercase truncate">On Sale Only</span>
                 </div>
-                <Zap className="h-4 w-4 text-amber-500 fill-current flex-shrink-0 group-hover:scale-110 transition-transform" />
+                <Zap className="h-4 w-4 text-amber-500 fill-current flex-shrink-0" />
               </label>
             </div>
 
-            {/* Filter Summary Stats */}
-            <div className="space-y-3 border-t border-slate-200 dark:border-slate-800 pt-6">
-              <div className="bg-slate-50 dark:bg-slate-800/30 rounded-lg p-4 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-semibold uppercase text-slate-600 dark:text-slate-400">Results Found</span>
-                  <span className="text-lg font-black text-primary">{totalFilteredCount}</span>
-                </div>
-                {totalActiveFilters > 0 && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-semibold uppercase text-slate-600 dark:text-slate-400">Active Filters</span>
-                    <span className="inline-flex items-center gap-1 bg-primary/10 text-primary px-2 py-1 rounded-full text-xs font-bold">
-                      <SlidersHorizontal className="h-3 w-3" />
-                      {totalActiveFilters}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Action Buttons */}
+            {/* Reset Button */}
             <div className="space-y-2 border-t border-slate-200 dark:border-slate-800 pt-6">
-              {totalActiveFilters > 0 && (
-                <Button 
-                  variant="outline" 
-                  className="w-full h-10 rounded-lg font-semibold text-xs uppercase tracking-widest border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-                  onClick={() => {
-                    setSelectedCategories([]);
-                    setPriceRange([0, 5000000]);
-                    setOnlyOnSale(false);
-                    setSearchTerm('');
-                    setCurrentPage(1);
-                    router.push('/store/search');
-                  }}
-                >
-                  <X className="h-3.5 w-3.5 mr-2" />
-                  Clear All Filters
-                </Button>
-              )}
+              <Button 
+                variant="outline" 
+                className="w-full h-10 rounded-lg font-black text-xs uppercase tracking-widest"
+                onClick={() => {
+                  setSelectedCategories([]);
+                  setPriceRange([0, 5000000]);
+                  setOnlyOnSale(false);
+                  setSearchTerm('');
+                  setCurrentPage(1);
+                  router.push('/store/search');
+                }}
+              >
+                Reset Filters
+              </Button>
 
               {/* Mobile Close After Filters */}
               <Button 
-                className="w-full lg:hidden h-10 rounded-lg font-black text-xs uppercase tracking-widest bg-primary hover:bg-primary/90"
+                className="w-full lg:hidden h-10 rounded-lg font-black text-xs uppercase tracking-widest"
                 onClick={() => setShowFilters(false)}
               >
-                View {totalFilteredCount} Products
+                View Products
               </Button>
             </div>
           </aside>
