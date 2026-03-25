@@ -144,9 +144,9 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
           <Button 
             onClick={handleAddToCart}
             disabled={isOutOfStock}
-            className={`w-full bg-gradient-to-r from-slate-950 to-slate-900 dark:from-white dark:to-slate-100 text-white dark:text-black font-black text-sm uppercase tracking-wide py-3 rounded-xl shadow-xl transition-all active:scale-95 ${styles.cartButton} hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed`}
+            className={`w-full bg-gradient-to-r from-slate-950 to-slate-900 dark:from-white dark:to-slate-100 text-white dark:text-slate-950 font-black text-sm uppercase tracking-wide py-3 rounded-xl shadow-xl transition-all active:scale-95 ${styles.cartButton} hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed`}
           >
-            <ShoppingCart className={`h-5 w-5 mr-2 transition-all dark:text-black ${styles.cartIcon}`} />
+            <ShoppingCart className={`h-5 w-5 mr-2 transition-all dark:text-slate-950 ${styles.cartIcon}`} />
             {settings?.storeGridCartText || 'Add to Bag'}
           </Button>
         </div>
