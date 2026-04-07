@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ElysiumLogo } from "@/components/icons";
 import { useState, useEffect } from "react";
-import { Loader2, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { PageSpinner, Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/hooks/use-toast";
 import placeholderImages from '@/lib/placeholder-images.json';
 import {
@@ -24,6 +25,8 @@ import { useAuth as useFirebaseAuthInstance, useUser, useFirestore } from "@/fir
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword, sendPasswordResetEmail, AuthError, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function AdminLoginPage() {
     const [isLoading, setIsLoading] = useState(false);
@@ -121,23 +124,18 @@ export default function AdminLoginPage() {
     }
 
     if (isUserLoading) {
-        return (
-            <div className="flex h-screen w-full items-center justify-center">
-                <Loader2 className="h-12 w-12 animate-spin text-primary" />
-            </div>
-        );
+        return <PageSpinner label="Staff Portal" subLabel="Verifying your credentials…" />;
     }
 
     if (user) {
-        return (
-             <div className="flex h-screen w-full items-center justify-center">
-                <Loader2 className="h-12 w-12 animate-spin text-primary" />
-            </div>
-        );
+        return <PageSpinner label="Staff Portal" subLabel="Redirecting to dashboard…" />;
     }
 
   return (
-    <div className="w-full min-h-screen grid lg:grid-cols-2">
+    <div className="w-full min-h-screen grid lg:grid-cols-2 relative">
+      <div className="absolute top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
       <div className="hidden bg-muted lg:block relative">
         <Image
           src={loginImage.src}
@@ -221,7 +219,7 @@ export default function AdminLoginPage() {
                                 Cancel
                             </Button>
                             <Button type="submit" disabled={isResetLoading}>
-                                {isResetLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                {isResetLoading && <Spinner size="sm" className="mr-2 text-primary-foreground" />}
                                 Send reset link
                             </Button>
                         </DialogFooter>
@@ -247,7 +245,7 @@ export default function AdminLoginPage() {
               </div>
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isLoading && <Spinner size="sm" className="mr-2 text-primary-foreground" />}
               Login
             </Button>
           </form>

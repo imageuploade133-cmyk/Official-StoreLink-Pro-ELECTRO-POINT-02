@@ -41,6 +41,7 @@ import type { Customer } from '@/lib/types';
 import { formatCurrency } from '@/lib/formatUtils';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { ProductLoadingOverlay } from '@/components/store/ProductLoadingOverlay';
+import { PageSpinner } from '@/components/ui/spinner';
 
 type AppTab = 'home' | 'collections' | 'search' | 'cart' | 'profile' | 'recently-viewed' | 'checkout' | 'wishlist' | 'orders' | 'profile-settings' | 'notifications' | 'login' | 'signup';
 
@@ -101,11 +102,7 @@ export default function StoreAppPage() {
     };
 
     if (isLoadingSettings) {
-        return (
-            <div className="flex h-screen w-full items-center justify-center bg-background-light dark:bg-background-dark">
-                <Loader2 className="h-10 w-10 animate-spin text-primary" />
-            </div>
-        );
+        return <PageSpinner label="Loading Store" subLabel="Preparing your shopping experience…" />;
     }
 
     // Navigation visibility logic

@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label"
 import { ElysiumLogo } from "@/components/icons";
 import { useState, useEffect, useMemo } from "react";
 import { 
-    Loader2, 
     Mail, 
     Lock, 
     Eye, 
@@ -28,6 +27,7 @@ import {
     Trophy,
     ArrowRight
 } from "lucide-react";
+import { PageSpinner, Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/hooks/use-toast";
 import placeholderImages from '@/lib/placeholder-images.json';
 import { useAuth, useUser, useFirestore } from "@/firebase";
@@ -257,11 +257,11 @@ export default function StoreSignupPage() {
     };
 
     if (isUserLoading || isLoadingSettings) {
-        return <div className="flex h-screen w-full items-center justify-center"><Loader2 className="h-12 w-12 animate-spin text-primary" /></div>;
+        return <PageSpinner label="Create Account" subLabel="Setting up registration…" />;
     }
 
     if (user && !isCongratulationOpen) {
-         return <div className="flex h-screen w-full items-center justify-center"><Loader2 className="h-12 w-12 animate-spin text-primary" /></div>;
+        return <PageSpinner label="Account Created!" subLabel="Taking you to your account…" />;
     }
 
   return (
@@ -330,7 +330,7 @@ export default function StoreSignupPage() {
                 )}/>
 
                 <Button type="submit" className="w-full mt-2 h-12 font-bold" disabled={isSubmitting}>
-                    {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Create Account'}
+                    {isSubmitting ? <><Spinner size="sm" className="mr-2 text-primary-foreground" />Creating Account…</> : 'Create Account'}
                 </Button>
                 <div className="text-center text-sm">
                     Already have an account?{" "}

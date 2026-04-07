@@ -1,13 +1,28 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/firebase';
-import { Loader2 } from 'lucide-react';
+import { PageSpinner } from '@/components/ui/spinner';
+
+const loadingStates = [
+  { label: 'StoreLink Pro', subLabel: 'Initializing your workspace…' },
+  { label: 'StoreLink Pro', subLabel: 'Checking your session…' },
+  { label: 'StoreLink Pro', subLabel: 'Almost ready…' },
+];
 
 export default function HomePage() {
   const { user, isLoading } = useUser();
   const router = useRouter();
+  const [stateIndex, setStateIndex] = useState(0);
+
+  // Cycle through loading messages every 1.8s for a lively feel
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStateIndex((prev) => (prev + 1) % loadingStates.length);
+    }, 1800);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (!isLoading) {
@@ -19,9 +34,12 @@ export default function HomePage() {
     }
   }, [user, isLoading, router]);
 
+  const current = loadingStates[stateIndex];
+
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-background">
-      <Loader2 className="h-12 w-12 animate-spin text-primary" />
-    </div>
+    <PageSpinner
+      label={current.label}
+      subLabel={current.subLabel}
+    />
   );
 }

@@ -52,6 +52,7 @@ import {
   Coins,
   ZoomIn
 } from 'lucide-react';
+import { PageSpinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -235,11 +236,7 @@ export default function DashboardLayout({
   }, [user, isLoading, isCustomer, router]);
 
   if (isLoading || !user || isCustomer) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-      </div>
-    );
+    return <PageSpinner label="StoreLink Pro" subLabel="Authenticating your account…" />;
   }
 
   return (

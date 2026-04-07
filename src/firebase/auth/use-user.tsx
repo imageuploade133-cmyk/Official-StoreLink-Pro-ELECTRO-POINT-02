@@ -13,9 +13,19 @@ export function useUser() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setIsLoading(false);
+    }, (error) => {
+      console.error("Firebase auth error:", error);
+      setIsLoading(false);
     });
 
-    return () => unsubscribe();
+    const timeout = setTimeout(() => {
+      setIsLoading(false);
+    }, 4000);
+
+    return () => {
+      unsubscribe();
+      clearTimeout(timeout);
+    };
   }, [auth]);
 
   return { user, isLoading };

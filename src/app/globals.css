@@ -50,66 +50,73 @@
   }
  
   .dark {
-    /* Clean Professional Dark Theme - Pure Black Background */
-    /* Base: Pure black background */
-    --background: 0 0% 0%;
-    --foreground: 210 16% 93%;
-    
-    /* Cards: Elevated from background with subtle blue tint */
-    --card: 215 22% 13%;
-    --card-foreground: 210 16% 93%;
-    
-    /* Popovers: More elevated for depth */
-    --popover: 215 23% 18%;
-    --popover-foreground: 210 16% 93%;
-    
-    /* Primary: Bright professional blue */
-    --primary: 217 100% 56%;
-    --primary-foreground: 210 16% 93%;
-    
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    /* PREMIUM DARK THEME — Deep Space Edition            */
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+    /* Base: Deep navy-black, not pure black (easier on eyes) */
+    --background: 222 30% 5%;
+    --foreground: 213 31% 91%;
+
+    /* Cards: Elevated with deep blue-gray */
+    --card: 220 25% 10%;
+    --card-foreground: 213 31% 91%;
+
+    /* Popovers: Slightly more elevated */
+    --popover: 220 26% 14%;
+    --popover-foreground: 213 31% 91%;
+
+    /* Primary: Electric blue */
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 11%;
+
     /* Secondary: Elevated surface */
-    --secondary: 215 22% 13%;
-    --secondary-foreground: 210 16% 93%;
-    
-    /* Muted: Gray for secondary content */
-    --muted: 210 10% 68%;
-    --muted-foreground: 210 8% 50%;
-    
-    /* Accent: Secondary blue accent */
-    --accent: 217 100% 56%;
-    --accent-foreground: 210 16% 93%;
-    
-    /* Destructive: Bright red */
-    --destructive: 0 100% 50%;
-    --destructive-foreground: 210 16% 93%;
-    
-    /* Success: Clean green */
-    --success: 142 71% 45%;
-    --success-foreground: 210 16% 93%;
-    
-    /* Border: Subtle gray border */
-    --border: 215 21% 23%;
-    --input: 215 23% 18%;
-    
-    /* Ring: Blue focus state */
-    --ring: 217 100% 56%;
-    
-    /* Chart colors: Professional palette */
-    --chart-1: 217 100% 56%;
-    --chart-2: 142 71% 45%;
-    --chart-3: 0 100% 50%;
-    --chart-4: 210 50% 50%;
-    --chart-5: 30 80% 50%;
-    
-    /* Sidebar: Pure black background */
-    --sidebar-background: 0 0% 0%;
-    --sidebar-foreground: 210 16% 93%;
-    --sidebar-primary: 217 100% 56%;
-    --sidebar-primary-foreground: 210 16% 93%;
-    --sidebar-accent: 215 22% 13%;
-    --sidebar-accent-foreground: 210 16% 93%;
-    --sidebar-border: 215 21% 23%;
-    --sidebar-ring: 217 100% 56%;
+    --secondary: 220 25% 14%;
+    --secondary-foreground: 210 40% 98%;
+
+    /* Muted: Subtle blue-gray */
+    --muted: 215 20% 18%;
+    --muted-foreground: 215 16% 57%;
+
+    /* Accent: Indigo accent */
+    --accent: 220 25% 16%;
+    --accent-foreground: 210 40% 98%;
+
+    /* Destructive: Vivid red */
+    --destructive: 0 90% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Success: Vivid emerald */
+    --success: 152 76% 44%;
+    --success-foreground: 152 76% 95%;
+
+    /* Warning: Amber */
+    --warning: 38 92% 50%;
+    --warning-foreground: 38 92% 10%;
+
+    /* Border: Subtle blue tint */
+    --border: 217 20% 19%;
+    --input: 220 26% 14%;
+
+    /* Ring: Electric blue focus */
+    --ring: 224 76% 65%;
+
+    /* Chart: Vibrant distinct colors */
+    --chart-1: 217 91% 60%;
+    --chart-2: 152 76% 44%;
+    --chart-3: 280 80% 65%;
+    --chart-4: 38 92% 50%;
+    --chart-5: 340 82% 62%;
+
+    /* Sidebar: Slightly darker than main bg */
+    --sidebar-background: 222 33% 4%;
+    --sidebar-foreground: 213 31% 82%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 222 47% 11%;
+    --sidebar-accent: 220 25% 12%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 20% 12%;
+    --sidebar-ring: 217 91% 60%;
   }
 }
 
@@ -285,6 +292,33 @@
   }
   .animate-fade-glow {
     animation: fade-glow 2.5s ease-in-out infinite;
+  }
+
+  /* Spinner pulse dots */
+  @keyframes pulse-dot {
+    0%, 80%, 100% {
+      transform: scale(0.6);
+      opacity: 0.3;
+    }
+    40% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  /* Native spin (for inline style references) */
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* Premium spinner ring glow */
+  @keyframes ring-glow {
+    0%, 100% { filter: drop-shadow(0 0 3px hsl(217 91% 60% / 0.3)); }
+    50% { filter: drop-shadow(0 0 8px hsl(217 91% 60% / 0.7)); }
+  }
+  .animate-ring-glow {
+    animation: ring-glow 2s ease-in-out infinite;
   }
 
   /* Toast Countdown Bar Animation */
@@ -976,8 +1010,361 @@
   color: #cbd5e1 !important;
 }
 
+
 /* Ensure description text has proper contrast */
 .dark [class*="description"],
 .dark [class*="subtitle"] {
   color: #cbd5e1 !important;
+}
+
+/* ╔══════════════════════════════════════════════════════════════╗
+   ║  PREMIUM DARK MODE — Deep Space Icon System                 ║
+   ║  Category-colored icons for clear visual hierarchy          ║
+   ╚══════════════════════════════════════════════════════════════╝ */
+
+/* ── Base icon reset for dark mode ── */
+.dark svg {
+  transition: color 0.2s ease, filter 0.2s ease, transform 0.2s ease;
+}
+
+/* ── Core nav section: Electric Blue ── */
+.dark aside nav a[href="/dashboard"] svg,
+.dark aside nav a[href="/pos"] svg,
+.dark aside nav a[href="/dashboard/profile"] svg {
+  color: #60a5fa;
+  filter: drop-shadow(0 0 4px rgba(96, 165, 250, 0));
+  transition: all 0.25s ease;
+}
+
+/* ── Invoicing section: Violet ── */
+.dark aside nav a[href^="/dashboard/invoice"] svg,
+.dark aside nav a[href="/dashboard/invoicing-settings"] svg {
+  color: #a78bfa;
+  filter: drop-shadow(0 0 4px rgba(167, 139, 250, 0));
+}
+
+/* ── Reports section: Emerald Green ── */
+.dark aside nav a[href="/dashboard/my-sales"] svg,
+.dark aside nav a[href="/dashboard/sales-history"] svg,
+.dark aside nav a[href="/dashboard/returns"] svg,
+.dark aside nav a[href="/dashboard/product-sales"] svg,
+.dark aside nav a[href="/dashboard/expenses"] svg {
+  color: #34d399;
+  filter: drop-shadow(0 0 4px rgba(52, 211, 153, 0));
+}
+
+/* ── Financials section: Gold ── */
+.dark aside nav a[href="/dashboard/flexible-payments"] svg {
+  color: #fbbf24;
+  filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0));
+}
+
+/* ── E-Commerce section: Rose Pink ── */
+.dark aside nav a[href="/dashboard/orders"] svg,
+.dark aside nav a[href="/dashboard/order-alerts"] svg,
+.dark aside nav a[href="/dashboard/online-customers"] svg {
+  color: #fb7185;
+  filter: drop-shadow(0 0 4px rgba(251, 113, 133, 0));
+}
+
+/* ── Inventory section: Amber/Orange ── */
+.dark aside nav a[href="/dashboard/inventory"] svg,
+.dark aside nav a[href="/dashboard/categories"] svg,
+.dark aside nav a[href="/dashboard/stock-audit"] svg,
+.dark aside nav a[href="/dashboard/stock-alerts"] svg,
+.dark aside nav a[href="/dashboard/restock-history"] svg,
+.dark aside nav a[href="/dashboard/print-barcodes"] svg,
+.dark aside nav a[href="/dashboard/bulk-add-products"] svg {
+  color: #fb923c;
+  filter: drop-shadow(0 0 4px rgba(251, 146, 60, 0));
+}
+
+/* ── Management section: Sky Blue ── */
+.dark aside nav a[href="/dashboard/customers"] svg,
+.dark aside nav a[href="/dashboard/staff"] svg {
+  color: #38bdf8;
+  filter: drop-shadow(0 0 4px rgba(56, 189, 248, 0));
+}
+
+/* ── Marketing section: Fuchsia/Purple ── */
+.dark aside nav a[href="/dashboard/welcome-credit-settings"] svg,
+.dark aside nav a[href="/dashboard/whatsapp"] svg {
+  color: #e879f9;
+  filter: drop-shadow(0 0 4px rgba(232, 121, 249, 0));
+}
+
+/* ── Website section: Cyan ── */
+.dark aside nav a[href^="/dashboard/flash-hub"] svg,
+.dark aside nav a[href^="/dashboard/category-gallery"] svg,
+.dark aside nav a[href^="/dashboard/voice-settings"] svg,
+.dark aside nav a[href^="/dashboard/add-store-product"] svg,
+.dark aside nav a[href^="/dashboard/manage-web"] svg,
+.dark aside nav a[href^="/dashboard/manage-coupons"] svg,
+.dark aside nav a[href^="/dashboard/stock-bar"] svg,
+.dark aside nav a[href^="/dashboard/public-web"] svg,
+.dark aside nav a[href^="/dashboard/shopping-experience"] svg,
+.dark aside nav a[href^="/dashboard/website-payment"] svg,
+.dark aside nav a[href^="/dashboard/logistics"] svg,
+.dark aside nav a[href^="/dashboard/recommendations"] svg,
+.dark aside nav a[href^="/dashboard/create-web-page"] svg,
+.dark aside nav a[href^="/dashboard/web-slide"] svg,
+.dark aside nav a[href^="/dashboard/homepage-sections"] svg,
+.dark aside nav a[href^="/dashboard/add-ui-section"] svg {
+  color: #22d3ee;
+  filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0));
+}
+
+/* ── Administration section: Red/Slate ── */
+.dark aside nav a[href="/dashboard/settings"] svg,
+.dark aside nav a[href="/dashboard/permissions"] svg {
+  color: #94a3b8;
+  filter: drop-shadow(0 0 4px rgba(148, 163, 184, 0));
+}
+
+/* ══ ICON GLOW on hover — beautiful effect ══ */
+.dark aside nav a:hover svg {
+  filter: drop-shadow(0 0 6px currentColor) !important;
+  transform: scale(1.15);
+}
+
+/* ══ Active link icon: full brightness + strong glow ══ */
+.dark aside nav a.active svg,
+.dark aside nav a[aria-current="page"] svg {
+  filter: drop-shadow(0 0 8px currentColor) !important;
+  transform: scale(1.1);
+  opacity: 1 !important;
+}
+
+/* ═══════════════════════════════════════════════
+   SIDEBAR SECTION HEADERS — Gradient text labels
+   ═══════════════════════════════════════════════ */
+.dark aside nav h4 {
+  background: linear-gradient(90deg, #4f6ef7 0%, #7c8ff5 50%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.65rem;
+  opacity: 0.9;
+}
+
+/* ═══════════════════════════════════════════════
+   SIDEBAR LINK — Premium hover & active state
+   ═══════════════════════════════════════════════ */
+.dark aside nav a {
+  border-radius: 0.6rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.dark aside nav a::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: transparent;
+  border-radius: 0 4px 4px 0;
+  transition: all 0.2s ease;
+}
+
+.dark aside nav a:hover {
+  background: rgba(96, 165, 250, 0.07) !important;
+  border-color: rgba(96, 165, 250, 0.15) !important;
+  transform: translateX(2px);
+}
+
+.dark aside nav a:hover::before {
+  background: hsl(var(--primary) / 0.5);
+}
+
+.dark aside nav a[data-active="true"],
+.dark aside nav a.active {
+  background: rgba(96, 165, 250, 0.12) !important;
+  border: 1px solid rgba(96, 165, 250, 0.15) !important;
+}
+
+.dark aside nav a.active::before {
+  background: hsl(var(--primary));
+}
+
+/* ═══════════════════════════════════════════════
+   SIDEBAR ITSELF — Glass border effect
+   ═══════════════════════════════════════════════ */
+.dark aside {
+  border-right: 1px solid hsl(217 20% 12%) !important;
+  background: linear-gradient(180deg, hsl(222 33% 5%) 0%, hsl(222 30% 4%) 100%) !important;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* ═══════════════════════════════════════════════
+   HEADER — Frosted glass panel
+   ═══════════════════════════════════════════════ */
+.dark header {
+  background: rgba(15, 18, 28, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-bottom: 1px solid rgba(96, 165, 250, 0.1) !important;
+  box-shadow: 0 1px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* ═══════════════════════════════════════════════
+   CARDS — Refined dark card look
+   ═══════════════════════════════════════════════ */
+.dark .card,
+.dark [class*="rounded-lg"]:not(button):not(a):not(nav *) {
+  background: hsl(220 25% 10%) !important;
+  border: 1px solid hsl(217 20% 17%) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.dark .card:hover {
+  border-color: hsl(217 40% 25%) !important;
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* ═══════════════════════════════════════════════
+   STAT CARD — Colored left border accent
+   ═══════════════════════════════════════════════ */
+.dark [class*="StatCard"],
+.dark [class*="stat-card"] {
+  border-left: 3px solid hsl(var(--primary)) !important;
+}
+
+/* ═══════════════════════════════════════════════
+   BODY / MAIN — Rich dark background
+   ═══════════════════════════════════════════════ */
+.dark body,
+.dark main,
+.dark [class*="min-h-screen"],
+.dark [class*="flex-1"]:not(aside *) {
+  background-color: hsl(222 30% 5%) !important;
+}
+
+/* ═══════════════════════════════════════════════
+   SCROLLBAR — Themed for dark mode
+   ═══════════════════════════════════════════════ */
+.dark ::-webkit-scrollbar-track {
+  background: hsl(222 30% 5%);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background-color: hsl(217 30% 22%);
+  border: 2px solid hsl(222 30% 5%);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(217 60% 35%);
+}
+
+/* ═══════════════════════════════════════════════
+   BADGE — Vibrant in dark mode
+   ═══════════════════════════════════════════════ */
+.dark .badge,
+.dark [class*="badge"] {
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+/* ═══════════════════════════════════════════════
+   TABLE — Cleaner dark rows
+   ═══════════════════════════════════════════════ */
+.dark table thead tr {
+  background: hsl(220 25% 12%);
+  border-bottom: 1px solid hsl(217 20% 19%);
+}
+
+.dark table thead th {
+  color: hsl(215 20% 65%);
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.dark table tbody tr {
+  border-bottom: 1px solid hsl(217 20% 13%);
+  transition: background 0.15s ease;
+}
+
+.dark table tbody tr:hover {
+  background: hsl(220 25% 12%) !important;
+}
+
+/* ═══════════════════════════════════════════════
+   INPUTS — Deep, focused look
+   ═══════════════════════════════════════════════ */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: hsl(220 26% 12%) !important;
+  border: 1px solid hsl(217 20% 19%) !important;
+  color: hsl(213 31% 91%) !important;
+  transition: all 0.2s ease !important;
+}
+
+.dark input:hover,
+.dark textarea:hover,
+.dark select:hover {
+  border-color: hsl(217 30% 28%) !important;
+}
+
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  border-color: hsl(217 91% 60%) !important;
+  box-shadow: 0 0 0 3px hsl(217 91% 60% / 0.15), inset 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+  outline: none !important;
+  background-color: hsl(220 26% 14%) !important;
+}
+
+/* ═══════════════════════════════════════════════
+   BUTTONS — Polished states
+   ═══════════════════════════════════════════════ */
+.dark button[class*="outline"] {
+  border-color: hsl(217 20% 22%) !important;
+  background: transparent !important;
+  color: hsl(213 31% 82%) !important;
+}
+
+.dark button[class*="outline"]:hover {
+  border-color: hsl(217 50% 45%) !important;
+  background: hsl(217 40% 15%) !important;
+  color: hsl(217 91% 70%) !important;
+  box-shadow: 0 0 12px hsl(217 91% 60% / 0.15) !important;
+}
+
+/* ═══════════════════════════════════════════════
+   LOGO AREA — Shimmering brand accent
+   ═══════════════════════════════════════════════ */
+.dark aside .flex.items-center.gap-2 span {
+  background: linear-gradient(135deg, #e2e8f0 0%, #93c5fd 50%, #818cf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+/* ═══════════════════════════════════════════════
+   LOGO DIVIDER LINE — gradient line
+   ═══════════════════════════════════════════════ */
+.dark aside > div:first-child {
+  background: linear-gradient(180deg, hsl(222 33% 5%) 0%, hsl(222 30% 6%) 100%);
+  border-bottom: 1px solid rgba(96, 165, 250, 0.12) !important;
+}
+
+/* label fix in dark mode — don't override form labels black */
+.dark label {
+  color: hsl(213 31% 82%) !important;
+  -webkit-text-fill-color: hsl(213 31% 82%) !important;
+}
+
+.dark label.text-sm,
+.dark label.font-medium {
+  color: hsl(213 31% 82%) !important;
+  -webkit-text-fill-color: hsl(213 31% 82%) !important;
 }

@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ElysiumLogo } from "@/components/icons";
 import { useState, useEffect } from "react";
-import { Loader2, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { PageSpinner, Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/hooks/use-toast";
 import placeholderImages from '@/lib/placeholder-images.json';
 import {
@@ -114,19 +115,11 @@ export default function StoreLoginPage() {
     }
 
     if (isUserLoading || isLoadingSettings) {
-        return (
-            <div className="flex h-screen w-full items-center justify-center">
-                <Loader2 className="h-12 w-12 animate-spin text-primary" />
-            </div>
-        );
+        return <PageSpinner label="Welcome Back" subLabel="Loading your store experience…" />;
     }
 
     if (user) {
-        return (
-            <div className="flex h-screen w-full items-center justify-center">
-                <Loader2 className="h-12 w-12 animate-spin text-primary" />
-            </div>
-        );
+        return <PageSpinner label="Welcome Back" subLabel="Redirecting to your account…" />;
     }
 
   return (
@@ -218,7 +211,7 @@ export default function StoreLoginPage() {
                                 Cancel
                             </Button>
                             <Button type="submit" disabled={isResetLoading}>
-                                {isResetLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                {isResetLoading && <Spinner size="sm" className="mr-2 text-primary-foreground" />}
                                 Send reset link
                             </Button>
                         </DialogFooter>
@@ -244,7 +237,7 @@ export default function StoreLoginPage() {
               </div>
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isLoading && <Spinner size="sm" className="mr-2 text-primary-foreground" />}
               Login
             </Button>
             <div className="text-center text-sm">

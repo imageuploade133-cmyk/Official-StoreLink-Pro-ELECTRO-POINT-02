@@ -57,6 +57,7 @@ import type {
 
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Loader2, Store } from 'lucide-react';
+import { PageSpinner } from '@/components/ui/spinner';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { CustomerManagementModal } from '@/components/pos/customer-management-modal';
@@ -762,11 +763,7 @@ export default function POSPage() {
   };
 
   if (authLoading || !permissions) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-background">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-      </div>
-    );
+    return <PageSpinner label="Point of Sale" subLabel="Loading your POS terminal…" />;
   }
 
   if (!permissions.canAccessPOS) {
