@@ -1,14 +1,9 @@
-# Task: Run StoreLink-Pro2 Locally and on LAN ✅ COMPLETED
+# Fix Invoice Settings "type is not defined" Error
 
 ## Steps:
-- [x] Step 1: Install dependencies (`npm install`)
-- [x] Step 2: Run dev server with LAN support (`npm run dev -- --hostname 0.0.0.0`)
-- [x] Step 3: Verify running (localhost:9002 and LAN IP:9002) - Ready in 76s!
-- [x] Step 4: Complete task
-
-**Access:**
-- Local: http://localhost:9002
-- LAN/Network: http://0.0.0.0:9002 or http://[your-ip]:9002 (e.g., 192.168.0.9:9002)
-
-Dev server active in terminal (Next.js 15.5.9).
+- [ ] 1. Create TODO.md (done)
+- [x] 2. Edit src/app/dashboard/invoicing-settings/page.tsx to replace `type ===` with `watermarkType ===` in watermark Slider min/max
+- [x] 3. Update TODO.md after edit
+- [ ] 4. Verify no errors (restart dev server if needed, test page)
+- [ ] 5. Complete task
 

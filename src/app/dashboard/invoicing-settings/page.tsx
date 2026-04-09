@@ -708,8 +708,8 @@ export default function InvoicingSettingsPage() {
                                             <Slider
                                                 value={[field.value ?? (watermarkType === 'text' ? 120 : 400)]}
                                                 onValueChange={(val) => field.onChange(val[0])}
-                                                min={type === 'text' ? 20 : 50}
-                                                max={type === 'text' ? 300 : 1000}
+min={watermarkType === 'text' ? 20 : 50}
+                                                max={watermarkType === 'text' ? 300 : 1000}
                                                 step={5}
                                             />
                                         </FormControl>

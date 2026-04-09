@@ -28,6 +28,8 @@ const generalSettingsSchema = z.object({
   currency: z.string().optional(),
   country: z.string().optional(),
   countryCode: z.string().optional(),
+  footerLogoUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
+  footerLogoWidth: z.coerce.number().min(50).max(300).default(120),
 });
 
 type FormValues = z.infer<typeof generalSettingsSchema>;
@@ -52,6 +54,8 @@ export function GeneralSettings({ settingsData, isLoading }: GeneralSettingsProp
       currency: '$',
       country: 'US',
       countryCode: '+1',
+      footerLogoUrl: '',
+      footerLogoWidth: 120,
     },
   });
 
@@ -70,6 +74,8 @@ export function GeneralSettings({ settingsData, isLoading }: GeneralSettingsProp
         currency: settingsData.currency || '$',
         country: settingsData.country || 'US',
         countryCode: settingsData.countryCode || '+1',
+        footerLogoUrl: settingsData.footerLogoUrl || '',
+        footerLogoWidth: settingsData.footerLogoWidth || 120,
       });
     }
   }, [settingsData, form]);
@@ -188,6 +194,37 @@ export function GeneralSettings({ settingsData, isLoading }: GeneralSettingsProp
                         </FormItem>
                       )}
                     />
+                  <FormField
+                      control={form.control}
+                      name="footerLogoUrl"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-bold">Footer Logo URL</FormLabel>
+                          <FormControl><Input placeholder="https://example.com/footer-logo.png" {...field} value={field.value ?? ''} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                  />
+                  <FormField
+                      control={form.control}
+                      name="footerLogoWidth"
+                      render={({ field }) => (
+                        <FormItem className="space-y-4">
+                          <div className="flex justify-between items-center">
+                            <FormLabel className="text-[10px] font-black uppercase tracking-widest">Footer Logo Width ({field.value}px)</FormLabel>
+                          </div>
+                          <FormControl>
+                            <Slider
+                              value={[field.value ?? 120]}
+                              onValueChange={(val) => field.onChange(val[0])}
+                              min={50}
+                              max={300}
+                              step={5}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                  />
               </div>
             </CardContent>
             <CardFooter className="bg-muted/30 border-t p-6">

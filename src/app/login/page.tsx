@@ -244,7 +244,7 @@ export default function AdminLoginPage() {
                 </button>
               </div>
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full border-2 border-border dark:border-border hover:border-primary/75" disabled={isLoading}>
                 {isLoading && <Spinner size="sm" className="mr-2 text-primary-foreground" />}
               Login
             </Button>

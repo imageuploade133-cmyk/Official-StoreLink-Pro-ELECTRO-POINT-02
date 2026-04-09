@@ -31,6 +31,11 @@ import {
   DialogDescription,
   DialogClose
 } from "@/components/ui/dialog";
+import { CameraCaptureModal } from '@/components/media/CameraCaptureModal';
+import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Camera } from 'lucide-react';
 
 interface ProductImageGalleryProps {
   primaryUrl: string;
@@ -174,20 +179,46 @@ export function ProductImageGallery({
                 First image is your Hero. Max size: {settings?.imageMaxFileSizeMb || 5}MB.
             </p>
         </div>
-        <Button asChild variant="outline" size="sm" className="rounded-full h-10 px-6 font-bold gap-2" disabled={disabled || isUploading}>
-          <label className="cursor-pointer">
-            {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-            Import Media
-            <input 
-              type="file" 
-              multiple 
-              accept="image/*" 
-              className="hidden" 
-              onChange={handleFileUpload} 
-              disabled={disabled || isUploading}
-            />
-          </label>
-        </Button>
+        <div className="flex gap-2">
+          <Button asChild variant="outline" size="sm" className="rounded-full h-10 px-6 font-bold gap-2 flex-1" disabled={disabled || isUploading}>
+            <label className="cursor-pointer w-full">
+              {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+              Import Media
+              <input 
+                type="file" 
+                multiple 
+                accept="image/*" 
+                className="hidden" 
+                onChange={handleFileUpload} 
+                disabled={disabled || isUploading}
+              />
+            </label>
+          </Button>
+          <CameraCaptureModal
+            isOpen={isPhotoCaptureOpen}
+            onClose={() => setIsPhotoCaptureOpen(false)}
+            onImageCaptured={(url) => {
+              // Add as primary if none, else additional
+              if (!primaryUrl) {
+                onPrimaryChange(url);
+              } else {
+                onAdditionalChange([...additionalUrls, url]);
+              }
+              toast({ title: 'Photo Added', description: 'Captured image uploaded successfully.' });
+            }}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-10 w-10 rounded-full p-0"
+            onClick={() => setIsPhotoCaptureOpen(true)}
+            disabled={disabled}
+            title="Take photo with camera"
+          >
+            <Camera className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">

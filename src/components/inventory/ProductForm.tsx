@@ -79,6 +79,8 @@ import { ProductImageGallery } from './ProductImageGallery';
 import { PromoSettings } from './PromoSettings';
 import { AdvancedVideoManager } from './AdvancedVideoManager';
 import { ProductVoiceRecorder } from './ProductVoiceRecorder';
+import { CameraScannerModal } from '@/components/media/CameraScannerModal';
+import { CameraCaptureModal } from '@/components/media/CameraCaptureModal';
 import { StoreMerchandisingSettings } from './StoreMerchandisingSettings';
 
 const badgeIcons = [
@@ -222,6 +224,8 @@ export function ProductForm({
   const [isVariationsTitleLocked, setIsVariationsTitleLocked] = useState(true);
   const [isDescriptionTitleLocked, setIsDescriptionTitleLocked] = useState(true);
   const [isVideosTitleLocked, setIsVideosTitleLocked] = useState(true);
+  const [isBarcodeScannerOpen, setIsBarcodeScannerOpen] = useState(false);
+  const [isPhotoCaptureOpen, setIsPhotoCaptureOpen] = useState(false);
 
   const isEditing = !!defaultValues?.id;
 
@@ -591,9 +595,33 @@ export function ProductForm({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="font-bold">Barcode</FormLabel>
-                      <FormControl><Input placeholder="Scan or type barcode" {...field} value={field.value || ''} /></FormControl>
+                      <div className="flex gap-2">
+                        <FormControl>
+                          <Input 
+                            placeholder="Scan or type barcode" 
+                            {...field} 
+                            value={field.value || ''} 
+                          />
+                        </FormControl>
+                        <CameraScannerModal 
+                          isOpen={isBarcodeScannerOpen}
+                          onClose={() => setIsBarcodeScannerOpen(false)}
+                          onBarcodeScanned={(code) => {
+                            form.setValue('barcode', code);
+                            toast({ title: 'Barcode Captured', description: code });
+                          }}
+                        />
+                      </div>
                       <FormDescription className="text-xs">
-                          Enter barcode manually or scan.
+                          Enter manually or <Button 
+                            type="button" 
+                            variant="link" 
+                            size="sm" 
+                            onClick={() => setIsBarcodeScannerOpen(true)}
+                            className="h-auto p-0 text-xs font-normal -mt-1 ml-1"
+                          >
+                            scan with camera
+                          </Button>
                       </FormDescription>
                       <FormMessage />
                     </FormItem>

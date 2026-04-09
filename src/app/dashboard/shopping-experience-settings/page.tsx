@@ -51,10 +51,22 @@ const iconOptions = [
 const shoppingExpSchema = z.object({
   storeAddToCartText: z.string().min(2, 'Label too short.').max(30, 'Label too long.'),
   storeAddToCartIcon: z.string().default('ShoppingCart'),
+  storeAddToCartStyle: z.enum(['standard', 'gradient']).default('standard'),
+  storeAddToCartColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#3b82f6'),
+  storeAddToCartGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#3b82f6'),
+  storeAddToCartGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#1d4ed8'),
   storeGridCartText: z.string().min(2, 'Label too short.').max(20, 'Label too long.'),
   storeGridCartIcon: z.string().default('ShoppingCart'),
+  storeGridCartStyle: z.enum(['standard', 'gradient']).default('standard'),
+  storeGridCartColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#10b981'),
+  storeGridCartGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#10b981'),
+  storeGridCartGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#059669'),
   storeHeroBtnText: z.string().min(2, 'Label too short.').max(30, 'Label too long.'),
   storeHeroBtnIcon: z.string().default('ArrowRight'),
+  storeHeroBtnStyle: z.enum(['standard', 'gradient']).default('gradient'),
+  storeHeroBtnColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#8b5cf6'),
+  storeHeroBtnGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#8b5cf6'),
+  storeHeroBtnGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#7c3aed'),
 });
 
 type FormValues = z.infer<typeof shoppingExpSchema>;
@@ -74,26 +86,50 @@ export default function ShoppingExperienceSettingsPage() {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(shoppingExpSchema),
-    defaultValues: {
-      storeAddToCartText: 'Secure Purchase',
-      storeAddToCartIcon: 'ShoppingCart',
-      storeGridCartText: 'Add to Bag',
-      storeGridCartIcon: 'ShoppingCart',
-      storeHeroBtnText: 'Shop Collection',
-      storeHeroBtnIcon: 'ArrowRight',
-    }
+  defaultValues: {
+    storeAddToCartText: 'Secure Purchase',
+    storeAddToCartIcon: 'ShoppingCart',
+    storeAddToCartStyle: 'standard',
+    storeAddToCartColor: '#3b82f6',
+    storeAddToCartGradientStart: '#3b82f6',
+    storeAddToCartGradientEnd: '#1d4ed8',
+    storeGridCartText: 'Add to Bag',
+    storeGridCartIcon: 'ShoppingCart',
+    storeGridCartStyle: 'standard',
+    storeGridCartColor: '#10b981',
+    storeGridCartGradientStart: '#10b981',
+    storeGridCartGradientEnd: '#059669',
+    storeHeroBtnText: 'Shop Collection',
+    storeHeroBtnIcon: 'ArrowRight',
+    storeHeroBtnStyle: 'gradient',
+    storeHeroBtnColor: '#8b5cf6',
+    storeHeroBtnGradientStart: '#8b5cf6',
+    storeHeroBtnGradientEnd: '#7c3aed',
+  }
   });
 
   useEffect(() => {
     if (settingsData) {
-      form.reset({
-        storeAddToCartText: settingsData.storeAddToCartText || 'Secure Purchase',
-        storeAddToCartIcon: settingsData.storeAddToCartIcon || 'ShoppingCart',
-        storeGridCartText: settingsData.storeGridCartText || 'Add to Bag',
-        storeGridCartIcon: settingsData.storeGridCartIcon || 'ShoppingCart',
-        storeHeroBtnText: settingsData.storeHeroBtnText || 'Shop Collection',
-        storeHeroBtnIcon: settingsData.storeHeroBtnIcon || 'ArrowRight',
-      });
+        form.reset({
+          storeAddToCartText: settingsData.storeAddToCartText || 'Secure Purchase',
+          storeAddToCartIcon: settingsData.storeAddToCartIcon || 'ShoppingCart',
+          storeAddToCartStyle: settingsData.storeAddToCartStyle || 'standard',
+          storeAddToCartColor: settingsData.storeAddToCartColor || '#3b82f6',
+          storeAddToCartGradientStart: settingsData.storeAddToCartGradientStart || '#3b82f6',
+          storeAddToCartGradientEnd: settingsData.storeAddToCartGradientEnd || '#1d4ed8',
+          storeGridCartText: settingsData.storeGridCartText || 'Add to Bag',
+          storeGridCartIcon: settingsData.storeGridCartIcon || 'ShoppingCart',
+          storeGridCartStyle: settingsData.storeGridCartStyle || 'standard',
+          storeGridCartColor: settingsData.storeGridCartColor || '#10b981',
+          storeGridCartGradientStart: settingsData.storeGridCartGradientStart || '#10b981',
+          storeGridCartGradientEnd: settingsData.storeGridCartGradientEnd || '#059669',
+          storeHeroBtnText: settingsData.storeHeroBtnText || 'Shop Collection',
+          storeHeroBtnIcon: settingsData.storeHeroBtnIcon || 'ArrowRight',
+          storeHeroBtnStyle: settingsData.storeHeroBtnStyle || 'gradient',
+          storeHeroBtnColor: settingsData.storeHeroBtnColor || '#8b5cf6',
+          storeHeroBtnGradientStart: settingsData.storeHeroBtnGradientStart || '#8b5cf6',
+          storeHeroBtnGradientEnd: settingsData.storeHeroBtnGradientEnd || '#7c3aed',
+        });
     }
   }, [settingsData, form]);
 

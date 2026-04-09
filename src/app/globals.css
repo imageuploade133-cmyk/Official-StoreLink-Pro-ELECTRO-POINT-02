@@ -721,8 +721,20 @@
 
   /* ON/OFF text styling for dark mode - Pure black for visibility */
   .dark label {
-    color: #000000;
+    color: hsl(var(--foreground));
     font-weight: 500;
+  }
+
+  .dark .font-black.uppercase.text-\[8px\] {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  .dark button {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  .dark button[class*="outline"] {
+    color: hsl(var(--foreground)) !important;
   }
 
   /* ON/OFF badge/label text in dark mode - uppercase variant */

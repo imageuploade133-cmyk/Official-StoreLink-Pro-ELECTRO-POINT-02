@@ -407,6 +407,7 @@ export default function DashboardLayout({
                               'flex items-center justify-between gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:bg-muted hover:text-foreground',
                               (pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href!))) ? 'bg-muted text-foreground' : ''
                             )}
+                            onClick={() => setIsMenuOpen(false)}
                           >
                             <div className="flex items-center gap-4">
                               <item.icon className="h-5 w-5" />
