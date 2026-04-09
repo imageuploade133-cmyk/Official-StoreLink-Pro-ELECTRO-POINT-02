@@ -75,7 +75,7 @@ import { CategoryForm, type CategoryFormValues } from './CategoryForm';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
-import { ProductImageGallery } from './ProductImageGallery';
+import { ProductImageGallery } from './ProductImageGallery-fixed';
 import { PromoSettings } from './PromoSettings';
 import { AdvancedVideoManager } from './AdvancedVideoManager';
 import { ProductVoiceRecorder } from './ProductVoiceRecorder';
