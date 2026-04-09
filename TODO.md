@@ -1,9 +1,16 @@
-# Fix Invoice Settings "type is not defined" Error
+# Git Push & Vercel Build Fix Tracker
 
-## Steps:
-- [ ] 1. Create TODO.md (done)
-- [x] 2. Edit src/app/dashboard/invoicing-settings/page.tsx to replace `type ===` with `watermarkType ===` in watermark Slider min/max
-- [x] 3. Update TODO.md after edit
-- [ ] 4. Verify no errors (restart dev server if needed, test page)
-- [ ] 5. Complete task
+## Current Status:
+- [x] Push project to GitHub main (dfdbf2d)
+- [ ] Fix Vercel build error in ProductImageGallery.tsx
+  - [ ] Remove duplicate imports  
+  - [ ] Fix malformed Dialog import
+  - [ ] Add missing camera state
+- [ ] Commit & push fixes
+- [ ] Verify Vercel deployment success
+- [ ] Test inventory/add page locally (`npm run dev`)
+
+## Notes:
+- Error: Duplicate `useState` declaration + malformed quotes/paths
+- Files: src/components/inventory/ProductImageGallery.tsx
 

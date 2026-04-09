@@ -31,10 +31,6 @@ import {
   DialogDescription,
   DialogClose
 } from "@/components/ui/dialog";
-import { CameraCaptureModal } from '@/components/media/CameraCaptureModal';
-import { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
 import { Camera } from 'lucide-react';
 
 interface ProductImageGalleryProps {
@@ -52,10 +48,7 @@ export function ProductImageGallery({
   onAdditionalChange, 
   disabled 
 }: ProductImageGalleryProps) {
-  const [isUploading, setIsUploading] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const { toast } = useToast();
-  const { settings } = useSettings();
+  const [isUploading, setIsUploading] = useState(false);\n  const [previewUrl, setPreviewUrl] = useState<string | null>(null);\n  const [isPhotoCaptureOpen, setIsPhotoCaptureOpen] = useState(false);\n  const { toast } = useToast();\n  const { settings } = useSettings();
 
   const allImages = React.useMemo(() => {
     const list = [];
@@ -194,30 +187,7 @@ export function ProductImageGallery({
               />
             </label>
           </Button>
-          <CameraCaptureModal
-            isOpen={isPhotoCaptureOpen}
-            onClose={() => setIsPhotoCaptureOpen(false)}
-            onImageCaptured={(url) => {
-              // Add as primary if none, else additional
-              if (!primaryUrl) {
-                onPrimaryChange(url);
-              } else {
-                onAdditionalChange([...additionalUrls, url]);
-              }
-              toast({ title: 'Photo Added', description: 'Captured image uploaded successfully.' });
-            }}
-          />
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="h-10 w-10 rounded-full p-0"
-            onClick={() => setIsPhotoCaptureOpen(true)}
-            disabled={disabled}
-            title="Take photo with camera"
-          >
-            <Camera className="h-4 w-4" />
-          </Button>
+          <Button\n            type="button"\n            variant="outline"\n            size="sm"\n            className="h-10 w-10 rounded-full p-0"\n            onClick={() => setIsPhotoCaptureOpen(true)}\n            disabled={disabled}\n            title="Take photo with camera"\n          >\n            <Camera className="h-4 w-4" />\n          </Button>
         </div>
       </div>
 
