@@ -15,7 +15,8 @@ import {
   ChevronRight,
   CheckCircle2,
   Maximize2,
-  X
+  X,
+  Camera
 } from 'lucide-react';
 import { uploadImage } from '@/ai/flows/image-upload-flow';
 import { useToast } from '@/hooks/use-toast';
@@ -28,10 +29,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
-  DialogClose
+  DialogDescription
 } from "@/components/ui/dialog";
-import { Camera } from 'lucide-react';
 
 interface ProductImageGalleryProps {
   primaryUrl: string;
@@ -48,7 +47,11 @@ export function ProductImageGallery({
   onAdditionalChange, 
   disabled 
 }: ProductImageGalleryProps) {
-  const [isUploading, setIsUploading] = useState(false);\n  const [previewUrl, setPreviewUrl] = useState<string | null>(null);\n  const [isPhotoCaptureOpen, setIsPhotoCaptureOpen] = useState(false);\n  const { toast } = useToast();\n  const { settings } = useSettings();
+  const [isUploading, setIsUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isPhotoCaptureOpen, setIsPhotoCaptureOpen] = useState(false);
+  const { toast } = useToast();
+  const { settings } = useSettings();
 
   const allImages = React.useMemo(() => {
     const list = [];
@@ -187,7 +190,17 @@ export function ProductImageGallery({
               />
             </label>
           </Button>
-          <Button\n            type="button"\n            variant="outline"\n            size="sm"\n            className="h-10 w-10 rounded-full p-0"\n            onClick={() => setIsPhotoCaptureOpen(true)}\n            disabled={disabled}\n            title="Take photo with camera"\n          >\n            <Camera className="h-4 w-4" />\n          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-10 w-10 rounded-full p-0"
+            onClick={() => setIsPhotoCaptureOpen(true)}
+            disabled={disabled}
+            title="Take photo with camera"
+          >
+            <Camera className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 
@@ -329,3 +342,4 @@ export function ProductImageGallery({
     </div>
   );
 }
+
