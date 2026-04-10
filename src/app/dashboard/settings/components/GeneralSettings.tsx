@@ -17,6 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Slider } from '@/components/ui/slider';
 import { Loader2, Store, Globe, Smartphone, Copy, CheckCircle2, Info } from 'lucide-react';
 import regions from '@/lib/regions.json';
 import { Separator } from '@/components/ui/separator';
