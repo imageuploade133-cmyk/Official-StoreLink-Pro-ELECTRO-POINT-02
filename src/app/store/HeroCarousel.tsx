@@ -97,19 +97,62 @@ export function HeroCarousel() {
   const HeroBtnIcon = iconMap[settings?.storeHeroBtnIcon as keyof typeof iconMap] || ArrowRight;
 
   const buttonStyle = useMemo(() => {
-    const style = settings?.storeBtnStyle || 'standard';
-    if (style === 'gradient') {
+    const useIndividual = settings?.useIndividualBtnSettings !== false;
+    const style = useIndividual 
+      ? (settings?.storeHeroBtnStyle || 'gradient')
+      : (settings?.storeBtnStyle || 'standard');
+    
+    const getColor = () => {
+      if (useIndividual) {
+        if (style === 'gradient') {
+          return {
+            background: `linear-gradient(135deg, ${settings?.storeHeroBtnGradientStart || '#8b5cf6'}, ${settings?.storeHeroBtnGradientEnd || '#7c3aed'})`,
+            color: 'white',
+            border: 'none'
+          };
+        }
+        return {
+          backgroundColor: settings?.storeHeroBtnColor || '#8b5cf6',
+          color: 'white',
+          border: 'none'
+        };
+      }
+      // Global settings
+      if (style === 'gradient') {
+        return {
+          background: `linear-gradient(135deg, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
+          color: 'white',
+          border: 'none'
+        };
+      }
       return {
-        background: `linear-gradient(to right, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
+        backgroundColor: settings?.storeBtnColor || '#3b82f6',
         color: 'white',
         border: 'none'
       };
-    }
-    return {
-      backgroundColor: settings?.storeBtnColor || '#3b82f6',
-      color: 'white',
-      border: 'none'
     };
+    
+    return getColor();
+  }, [settings]);
+
+  // Button shape and size classes
+  const buttonClasses = useMemo(() => {
+    const useIndividual = settings?.useIndividualBtnSettings !== false;
+    const shape = useIndividual 
+      ? (settings?.storeHeroBtnShape || 'rounded-full')
+      : (settings?.storeBtnShape || 'rounded-xl');
+    const size = useIndividual
+      ? (settings?.storeHeroBtnSize || 'lg')
+      : (settings?.storeBtnSize || 'md');
+    
+    const sizeClasses = {
+      sm: 'px-4 py-2 text-xs',
+      md: 'px-6 py-3 text-sm',
+      lg: 'px-8 py-4 text-base',
+      xl: 'px-10 py-5 text-lg'
+    };
+    
+    return `${shape} ${sizeClasses[size]}`;
   }, [settings]);
 
   if (isLoading) {
@@ -195,7 +238,7 @@ export function HeroCarousel() {
                       )}
                       {slide.showActionButton && (
                         <div className="pt-2 md:pt-10 animate-in fade-in zoom-in-95 duration-1000 delay-300">
-                          <Button asChild size="lg" style={buttonStyle} className="group relative overflow-hidden px-4 md:px-14 py-2 md:py-8 font-black text-[10px] md:text-sm tracking-widest md:tracking-[0.25em] uppercase transition-all duration-500 rounded-full shadow-2xl active:scale-95 h-8 md:h-auto border-none">
+                          <Button asChild style={buttonStyle} className={`group relative overflow-hidden font-black shadow-2xl active:scale-95 border-none transition-all duration-500 ${buttonClasses}`}>
                             <Link href="/store/shop">
                               <span className="relative z-10 flex items-center gap-2 md:gap-4">
                                 {heroBtnText}

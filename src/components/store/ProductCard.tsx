@@ -81,19 +81,62 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
 
   // Dynamic Button Style
   const buttonStyle = useMemo(() => {
-    const style = settings?.storeBtnStyle || 'standard';
-    if (style === 'gradient') {
+    const useIndividual = settings?.useIndividualBtnSettings !== false;
+    const style = useIndividual 
+      ? (settings?.storeGridCartStyle || 'standard')
+      : (settings?.storeBtnStyle || 'standard');
+    
+    const getColor = () => {
+      if (useIndividual) {
+        if (style === 'gradient') {
+          return {
+            background: `linear-gradient(135deg, ${settings?.storeGridCartGradientStart || '#10b981'}, ${settings?.storeGridCartGradientEnd || '#059669'})`,
+            color: 'white',
+            border: 'none'
+          };
+        }
+        return {
+          backgroundColor: settings?.storeGridCartColor || '#10b981',
+          color: 'white',
+          border: 'none'
+        };
+      }
+      // Global settings
+      if (style === 'gradient') {
+        return {
+          background: `linear-gradient(135deg, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
+          color: 'white',
+          border: 'none'
+        };
+      }
       return {
-        background: `linear-gradient(to right, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
+        backgroundColor: settings?.storeBtnColor || '#3b82f6',
         color: 'white',
         border: 'none'
       };
-    }
-    return {
-      backgroundColor: settings?.storeBtnColor || '#3b82f6',
-      color: 'white',
-      border: 'none'
     };
+    
+    return getColor();
+  }, [settings]);
+
+  // Button shape and size classes
+  const buttonClasses = useMemo(() => {
+    const useIndividual = settings?.useIndividualBtnSettings !== false;
+    const shape = useIndividual 
+      ? (settings?.storeGridCartShape || 'rounded-lg')
+      : (settings?.storeBtnShape || 'rounded-xl');
+    const size = useIndividual
+      ? (settings?.storeGridCartSize || 'md')
+      : (settings?.storeBtnSize || 'md');
+    
+    const sizeClasses = {
+      sm: 'px-3 py-1.5 text-xs',
+      md: 'px-4 py-2 text-sm',
+      lg: 'px-5 py-2.5 text-sm',
+      xl: 'px-6 py-3 text-base'
+    };
+    
+    return `${shape} ${sizeClasses[size]}`;
   }, [settings]);
 
   // Calculate media area height based on card height setting (60% of total height)
@@ -162,7 +205,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
             onClick={handleAddToCart}
             disabled={isOutOfStock}
             style={buttonStyle}
-            className={`w-full font-black text-sm uppercase tracking-wide py-3 rounded-xl shadow-xl transition-all active:scale-95 ${styles.cartButton} hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed`}
+            className={`w-full font-black text-sm uppercase tracking-wide shadow-xl transition-all active:scale-95 ${styles.cartButton} ${buttonClasses} hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             <ShoppingCart className={`h-5 w-5 mr-2 transition-all ${styles.cartIcon}`} />
             {settings?.storeGridCartText || 'Add to Bag'}
@@ -246,7 +289,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
               <Button 
                 size="icon" 
                 style={buttonStyle}
-                className={`h-11 w-11 rounded-full shadow-lg shadow-primary/30 active:scale-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${styles.mobileCartButton}`}
+                className={`shadow-lg shadow-primary/30 active:scale-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${buttonClasses} ${styles.mobileCartButton}`}
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
               >
