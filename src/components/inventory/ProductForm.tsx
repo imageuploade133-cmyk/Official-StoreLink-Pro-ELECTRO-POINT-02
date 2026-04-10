@@ -46,7 +46,8 @@ import {
   ChevronUp,
   ChevronDown,
   AlertTriangle,
-  Sparkles
+  Sparkles,
+  Camera
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Timestamp, addDoc, collection, doc, updateDoc } from 'firebase/firestore';
@@ -595,7 +596,7 @@ export function ProductForm({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="font-bold">Barcode</FormLabel>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 items-center">
                         <FormControl>
                           <Input 
                             placeholder="Scan or type barcode" 
@@ -603,25 +604,19 @@ export function ProductForm({
                             value={field.value || ''} 
                           />
                         </FormControl>
-                        <CameraScannerModal 
-                          isOpen={isBarcodeScannerOpen}
-                          onClose={() => setIsBarcodeScannerOpen(false)}
-                          onBarcodeScanned={(code) => {
-                            form.setValue('barcode', code);
-                            toast({ title: 'Barcode Captured', description: code });
-                          }}
-                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="h-10 w-10 rounded-lg shadow-sm hover:shadow-md transition-all border-primary/50"
+                          onClick={() => setIsBarcodeScannerOpen(true)}
+                          title="Scan barcode with camera"
+                        >
+                          <Camera className="h-4 w-4" />
+                        </Button>
                       </div>
                       <FormDescription className="text-xs">
-                          Enter manually or <Button 
-                            type="button" 
-                            variant="link" 
-                            size="sm" 
-                            onClick={() => setIsBarcodeScannerOpen(true)}
-                            className="h-auto p-0 text-xs font-normal -mt-1 ml-1"
-                          >
-                            scan with camera
-                          </Button>
+                          Enter manually or use the camera icon above.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>

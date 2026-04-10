@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Barcode Scanner Test</title>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+    .container { text-align: center; }
+    #reader { width: 100%; height: 300px; margin: 20px 0; }
+    input { padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; width: 100%; max-width: 300px; margin: 10px 0; }
+    button { background: #007bff; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 8px; cursor: pointer; margin: 10px; }
+    button:hover { background: #0056b3; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+    .status { margin: 10px 0; font-weight: bold; }
+    .success { color: green; }
+    .error { color: red; }
+    @media (max-width: 768px) { #reader { height: 250px; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Barcode Scanner Test</h1>
+    <p>Click "Start Scanner" → point camera at barcode → result auto-fills input. Continuous scan (no stop).</p>
+    
+    <div class="status" id="status"></div>
+    
+    <input type="text" id="barcode-input" placeholder="Scanned barcode will appear here" readonly>
+    
+    <br>
+    <button id="start-btn">📷 Start Scanner (Back Camera)</button>
+    <button id="stop-btn" disabled>Stop Scanner</button>
+    
+    <div id="reader"></div>
+    
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const html5QrCode = new Html5Qrcode("reader");
+    const barcodeInput = document.getElementById('barcode-input');
+    const statusEl = document.getElementById('status');
+    const startBtn = document.getElementById('start-btn');
+    const stopBtn = document.getElementById('stop-btn');
+    const resultEl = document.getElementById('result');
+
+    let scanning = false;
+
+    const config = {
+      fps: 10,
+      qrbox: { width: 250, height: 250 },
+      aspectRatio: 1.0,
+      supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
+    };
+
+    startBtn.onclick = async () => {
+      try {
+        statusEl.textContent = '🔍 Starting scanner...';
+        statusEl.className = 'status';
+        
+        // Prefer back camera, fallback to any
+        const cameras = await html5QrCode.getCameras();
+        const backCamera = cameras.find(cam => cam.facingMode === "environment") || cameras[0];
+        
+        if (!backCamera) {
+          throw new Error('No camera found');
+        }
+
+        await html5QrCode.start(
+          backCamera.id,
+          config,
+          (decodedText, decodedResult) => {
+            // Auto-fill input
+            barcodeInput.value = decodedText;
+            barcodeInput.removeAttribute('readonly'); // Allow editing
+            barcodeInput.focus();
+            
+            // Visual feedback
+            resultEl.innerHTML = `<div class="success">✅ Scanned: <strong>${decodedText}</strong></div>`;
+            
+            console.log('Scan result:', decodedText, decodedResult);
+            // Continue scanning - do NOT call stop()
+          },
+          (error) => {
+            // Silent error for empty scans
+            console.log('Scan failed:', error);
+          }
+        );
+
+        scanning = true;
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        statusEl.textContent = `📱 Scanning with ${backCamera.label || 'camera'}...`;
+        statusEl.className = 'status success';
+
+      } catch (err) {
+        statusEl.textContent = `❌ Error: ${err}`;
+        statusEl.className = 'status error';
+        console.error(err);
+      }
+    };
+
+    stopBtn.onclick = async () => {
+      try {
+        await html5QrCode.stop();
+        scanning = false;
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        statusEl.textContent = '⏹️ Scanner stopped';
+        statusEl.className = 'status';
+        resultEl.innerHTML = '';
+      } catch (err) {
+        console.error('Stop error:', err);
+      }
+    };
+
+    // Clear input on click
+    barcodeInput.onclick = () => {
+      barcodeInput.value = '';
+      barcodeInput.removeAttribute('readonly');
+    };
+
+    // HTTPS warning
+    if (location.protocol !== 'https:') {
+      statusEl.textContent = '⚠️ HTTPS required for camera access. Use localhost or deploy.';
+      statusEl.className = 'status error';
+    }
+  </script>
+</body>
+</html>
