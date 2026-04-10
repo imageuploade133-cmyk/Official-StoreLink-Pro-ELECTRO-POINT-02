@@ -28,7 +28,7 @@ export default function AddStoreProductPage() {
           title="Add Web Store Product" 
           description="Create a premium entry for your public-facing storefront."
         />
-        <Button variant="ghost" asChild className="gap-2">
+        <Button variant="ghost" asChild className="gap-2 btn-back">
           <Link href="/dashboard/inventory"><ArrowLeft className="h-4 w-4" /> Back to Inventory</Link>
         </Button>
       </div>

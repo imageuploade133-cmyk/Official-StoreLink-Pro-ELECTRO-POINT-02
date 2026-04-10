@@ -189,7 +189,7 @@ export default function EditWebPage() {
             title={`Edit: ${pageData?.title || 'Page'}`}
             description="Update the content, settings, and visibility of this page using our visual designer."
         />
-        <Button variant="ghost" asChild className="gap-2">
+        <Button variant="ghost" asChild className="gap-2 btn-back">
             <Link href="/dashboard/manage-web-pages"><ArrowLeft className="h-4 w-4" /> Back to Pages</Link>
         </Button>
       </div>

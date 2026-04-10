@@ -220,7 +220,7 @@ export default function EditUISectionPage() {
             title="Edit UI Section"
             description={`Refining: ${section.title} | Selection Mode: ${section.selectionType}`}
         />
-        <Button variant="ghost" asChild className="gap-2">
+        <Button variant="ghost" asChild className="gap-2 btn-back">
             <Link href="/dashboard/homepage-sections"><ArrowLeft className="h-4 w-4" /> Back to Sections</Link>
         </Button>
       </div>

@@ -1528,7 +1528,7 @@ export function ProductForm({
                   <StoreMerchandisingSettings />
               </CardContent>
               <CardFooter className="flex flex-col gap-4 border-t pt-6 bg-muted/10">
-                  <Button type="submit" disabled={isSubmitting || isUploadingSizeGuide || isUploadingPoster} className="w-full h-14 text-lg font-bold shadow-lg shadow-primary/20">
+                  <Button type="submit" disabled={isSubmitting || isUploadingSizeGuide || isUploadingPoster} className="w-full h-14 text-lg font-bold shadow-lg shadow-primary/20 btn-save">
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
