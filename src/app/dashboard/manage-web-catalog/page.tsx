@@ -5,17 +5,18 @@ import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import Link from 'next/link';
 import Image from 'next/image';
 import { useFirestore, useCollection } from '@/firebase';
-import { 
-  collection, 
-  query, 
-  where, 
-  orderBy, 
-  doc, 
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  doc,
   updateDoc,
   getDocs,
+  getDoc,
   limit,
   startAfter,
-  endBefore, 
+  endBefore,
   limitToLast,
   getCountFromServer,
   writeBatch,
@@ -27,13 +28,13 @@ import type { Product, Category } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context';
 import { useSettings } from '@/contexts/settings-context';
 import { PageHeader } from '@/components/PageHeader';
-import { 
-  Globe, 
-  Search, 
-  Edit, 
-  Eye, 
-  EyeOff, 
-  Loader2, 
+import {
+  Globe,
+  Search,
+  Edit,
+  Eye,
+  EyeOff,
+  Loader2,
   ExternalLink,
   ShoppingBag,
   Tag,
@@ -47,7 +48,8 @@ import {
   Mic,
   Zap,
   Trash2,
-  MoreHorizontal
+  MoreHorizontal,
+  Copy
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -85,6 +87,7 @@ export default function ManageWebCatalogPage() {
   const [selectedProductForActions, setSelectedProductForActions] = useState<Product | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isCloning, setIsCloning] = useState(false);
 
   useEffect(() => {
     setToday(new Date());
@@ -218,7 +221,7 @@ export default function ManageWebCatalogPage() {
   const confirmDeleteProduct = async () => {
     if (!selectedProductForActions || !firestore || !user) return;
     setIsDeleting(true);
-    
+
     const batch = writeBatch(firestore);
     const productRef = doc(firestore, 'products', selectedProductForActions.id);
     const auditRef = doc(collection(firestore, 'stockAudit'));
@@ -259,6 +262,92 @@ export default function ManageWebCatalogPage() {
       .finally(() => {
         setIsDeleting(false);
       });
+  };
+
+  const handleCloneProduct = async () => {
+    if (!selectedProductForActions || !firestore) return;
+    setIsCloning(true);
+
+    try {
+      const batch = writeBatch(firestore);
+
+      // 1. Create the cloned product document
+      const newProductRef = doc(collection(firestore, 'products'));
+      const originalProductData = await getDoc(doc(firestore, 'products', selectedProductForActions.id));
+
+      if (!originalProductData.exists()) {
+        throw new Error('Original product not found');
+      }
+
+      const originalData = originalProductData.data();
+
+      // Prepare cloned product data
+      const clonedData: any = {
+        ...originalData,
+        // Update fields that should change
+        name: `${originalData.name} (Copy)`,
+        sku: originalData.sku ? `${originalData.sku}-COPY` : undefined,
+        barcode: undefined, // Remove barcode for clone
+        barcodeGenerated: false,
+        stock: 0, // Start with 0 stock
+        // Preserve timestamps (new ones will be set)
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        // Clear fields that shouldn't be copied
+        id: undefined,
+      };
+
+      // Remove id from cloned data (it's set by Firebase)
+      delete clonedData.id;
+
+      // Set the cloned product
+      batch.set(newProductRef, clonedData);
+
+      // 2. Clone voice signatures sub-collection
+      const voiceSignaturesQuery = query(collection(firestore, 'products', selectedProductForActions.id, 'voiceSignatures'));
+      const voiceSignaturesSnapshot = await getDocs(voiceSignaturesQuery);
+
+      voiceSignaturesSnapshot.forEach((voiceDoc) => {
+        const newVoiceRef = doc(collection(firestore, 'products', newProductRef.id, 'voiceSignatures'));
+        batch.set(newVoiceRef, voiceDoc.data());
+      });
+
+      // 3. Create audit entry for the clone
+      const auditRef = doc(collection(firestore, 'stockAudit'));
+      batch.set(auditRef, {
+        productId: newProductRef.id,
+        productName: clonedData.name,
+        type: 'ADJUSTMENT',
+        referenceId: 'CLONE-' + newProductRef.id.substring(0, 8).toUpperCase(),
+        beforeStock: 0,
+        afterStock: 0,
+        change: 0,
+        staffId: user?.uid || 'SYSTEM',
+        staffName: user?.displayName || user?.email || 'Staff',
+        timestamp: serverTimestamp(),
+        details: `Cloned from product: ${selectedProductForActions.name}`
+      });
+
+      await batch.commit();
+
+      toast({
+        title: 'Product Cloned Successfully',
+        description: `"${clonedData.name}" has been created as a copy of "${selectedProductForActions.name}".`,
+      });
+
+      setIsActionModalOpen(false);
+      setSelectedProductForActions(null);
+      fetchWebProducts('initial');
+    } catch (error: any) {
+      console.error('Error cloning product:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Clone Failed',
+        description: error.message || 'Failed to clone product. Please try again.',
+      });
+    } finally {
+      setIsCloning(false);
+    }
   };
 
   const handleNextPage = () => fetchWebProducts('next');
@@ -503,6 +592,15 @@ export default function ManageWebCatalogPage() {
       >
         {selectedProductForActions && (
           <div className="space-y-2 flex flex-col">
+            <Button
+              variant="outline"
+              className="justify-start h-11 font-bold"
+              onClick={() => handleCloneProduct()}
+              disabled={isCloning}
+            >
+              {isCloning ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Copy className="mr-2 h-4 w-4" />}
+              Clone Product
+            </Button>
             <Button variant="outline" className="justify-start h-11 font-bold" asChild>
               <Link href={`/dashboard/manage-web-catalog/edit/${selectedProductForActions.id}`}>
                 <Edit className="mr-2 h-4 w-4 text-blue-500" /> Edit Web Details
@@ -514,9 +612,9 @@ export default function ManageWebCatalogPage() {
               </Link>
             </Button>
             <Separator className="my-2" />
-            <Button 
-              variant="ghost" 
-              className="justify-start h-11 font-black uppercase text-[10px] tracking-widest text-destructive hover:bg-destructive/5" 
+            <Button
+              variant="ghost"
+              className="justify-start h-11 font-black uppercase text-[10px] tracking-widest text-destructive hover:bg-destructive/5"
               onClick={() => handleDeleteProductClick()}
             >
               <Trash2 className="mr-2 h-4 w-4" /> Delete Product Permanently
