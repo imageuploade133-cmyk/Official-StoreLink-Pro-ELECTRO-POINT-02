@@ -80,8 +80,8 @@ import { ProductImageGallery } from './ProductImageGallery';
 import { PromoSettings } from './PromoSettings';
 import { AdvancedVideoManager } from './AdvancedVideoManager';
 import { ProductVoiceRecorder } from './ProductVoiceRecorder';
-import { CameraScannerModal } from '@/components/media/CameraScannerModal';
 import { CameraCaptureModal } from '@/components/media/CameraCaptureModal';
+import { CameraScannerModal } from '@/components/media/CameraScannerModal';
 import { StoreMerchandisingSettings } from './StoreMerchandisingSettings';
 
 const badgeIcons = [
@@ -227,6 +227,12 @@ export function ProductForm({
   const [isVideosTitleLocked, setIsVideosTitleLocked] = useState(true);
   const [isBarcodeScannerOpen, setIsBarcodeScannerOpen] = useState(false);
   const [isPhotoCaptureOpen, setIsPhotoCaptureOpen] = useState(false);
+
+  const handleBarcodeScanned = (barcode: string) => {
+    form.setValue('barcode', barcode);
+    toast({ title: "Barcode Scanned!", description: `Set to: ${barcode}` });
+    setIsBarcodeScannerOpen(false);
+  };
 
   const isEditing = !!defaultValues?.id;
 
@@ -616,8 +622,13 @@ export function ProductForm({
                         </Button>
                       </div>
                       <FormDescription className="text-xs">
-                          Enter manually or use the camera icon above.
+                          Enter manually or use the camera icon above (works on mobile/desktop).
                       </FormDescription>
+                      <CameraScannerModal 
+                        isOpen={isBarcodeScannerOpen} 
+                        onClose={() => setIsBarcodeScannerOpen(false)} 
+                        onBarcodeScanned={handleBarcodeScanned} 
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -1612,5 +1623,7 @@ export function ProductForm({
         </DialogContent>
     </Dialog>
     </>
+  );
+};
   );
 }

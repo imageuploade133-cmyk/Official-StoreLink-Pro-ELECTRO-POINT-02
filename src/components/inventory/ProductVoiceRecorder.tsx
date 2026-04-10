@@ -82,22 +82,43 @@ export function ProductVoiceRecorder() {
   }, [durations, isRecording, recordingIndex, stopRecording]);
 
   const getSupportedMimeType = () => {
+    // iOS Safari prefers isotype=webm
     const types = [
       'audio/webm;codecs=opus',
-      'audio/ogg;codecs=opus',
       'audio/webm',
-      'audio/aac',
       'audio/mp4',
+      'audio/aac',
+      'audio/ogg;codecs=opus'
     ];
     for (const type of types) {
-      if (MediaRecorder.isTypeSupported(type)) return type;
+      if (MediaRecorder.isTypeSupported(type)) {
+        console.log('✅ Using MIME type:', type);
+        return type;
+      }
     }
-    return '';
+    console.warn('No optimal MIME type found');
+    return 'audio/webm';
   };
 
-  const startRecording = async (index: number) => {
+const startRecording = async (index: number) => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      console.log('🎤 Starting voice recording on:', navigator.userAgent);
+      
+      // iOS Safari requires HTTPS + user gesture
+      if (typeof window !== 'undefined') {
+        const isSecure = window.location.protocol === 'https:' || window.location.hostname === 'localhost';
+        if (!isSecure) {
+          throw new Error('Microphone requires HTTPS or localhost for iPhone/iOS.');
+        }
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: { 
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 44100
+        } 
+      });
       
       const options: MediaRecorderOptions = {
         audioBitsPerSecond: 64000
@@ -155,8 +176,25 @@ export function ProductVoiceRecorder() {
         });
       }, 1000);
 
-    } catch (err) {
-      toast({ variant: "destructive", title: "Mic Access Denied", description: "Mic permissions are required for the session." });
+    } catch (err: any) {
+      console.error('🎤 Voice recorder error:', err.name, err.message);
+      let errorMsg = 'Microphone access failed.';
+      
+      if (err.name === 'NotAllowedError') {
+        errorMsg = 'Microphone permission denied. Please enable in browser settings.';
+      } else if (err.name === 'NotFoundError') {
+        errorMsg = 'No microphone found on this device.';
+      } else if (err.message.includes('HTTPS')) {
+        errorMsg = 'iPhone requires HTTPS connection. Use ngrok or deploy.';
+      } else {
+        errorMsg = err.message || errorMsg;
+      }
+      
+      toast({ 
+        variant: "destructive", 
+        title: "Microphone Error", 
+        description: errorMsg 
+      });
     }
   };
 
