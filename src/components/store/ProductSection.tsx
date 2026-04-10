@@ -258,6 +258,22 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
   const hubIconColor = settings?.flashHubIconColor || '#fbbf24';
   const cornerRadius = settings?.flashHubCornerRadius ?? 24;
 
+  const buttonStyle = useMemo(() => {
+    const style = settings?.storeBtnStyle || 'standard';
+    if (style === 'gradient') {
+      return {
+        background: `linear-gradient(to right, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
+        color: 'white',
+        border: 'none'
+      };
+    }
+    return {
+      backgroundColor: settings?.storeBtnColor || '#3b82f6',
+      color: 'white',
+      border: 'none'
+    };
+  }, [settings]);
+
   const handleNextPage = () => fetchProducts('next');
   const handlePrevPage = () => fetchProducts('prev');
 
@@ -440,16 +456,16 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
         
         {section.selectionType === 'category' && section.categoryId && (
              <div className={cn("mt-12 md:mt-20", alignment === 'left' ? 'text-left' : 'text-center')}>
-                <Button 
-                    asChild 
-                    size="lg" 
+                <Button
+                    asChild
+                    size="lg"
                     className={cn(
-                        "rounded-full px-12 font-black uppercase text-[10px] md:text-xs tracking-[0.25em] h-14 md:h-16 shadow-2xl transition-all hover:-translate-y-1 active:translate-y-0"
+                        "rounded-full px-12 font-black uppercase text-[10px] md:text-xs tracking-[0.25em] h-14 md:h-16 shadow-2xl transition-all hover:-translate-y-1 active:translate-y-0 border-none"
                     )}
-                    style={isPromoActive ? { 
+                    style={isPromoActive ? {
                         backgroundColor: hubColor,
                         boxShadow: `0 20px 40px -5px ${hubColor}44`
-                    } : {}}
+                    } : buttonStyle}
                 >
                     <Link href={`/store/shop?category=${section.categoryId}`}>
                         {isPromoActive ? `Enter the ${section.title} Event` : `Explore ${section.title}`} <ArrowRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={3} />

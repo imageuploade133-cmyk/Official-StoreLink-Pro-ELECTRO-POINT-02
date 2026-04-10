@@ -150,6 +150,22 @@ export default function CartPage() {
   const shippingCost = subtotal > 0 ? 10 : 0;
   const total = Math.max(0, subtotal - discountAmount + shippingCost);
 
+  const buttonStyle = useMemo(() => {
+    const style = settings?.storeBtnStyle || 'standard';
+    if (style === 'gradient') {
+      return {
+        background: `linear-gradient(to right, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
+        color: 'white',
+        border: 'none'
+      };
+    }
+    return {
+      backgroundColor: settings?.storeBtnColor || '#3b82f6',
+      color: 'white',
+      border: 'none'
+    };
+  }, [settings]);
+
   if (cartItems.length === 0) {
     return (
       <div className="max-w-4xl mx-auto py-24 px-4 text-center">
@@ -324,7 +340,7 @@ export default function CartPage() {
                               <span className="text-3xl font-black text-primary tracking-tighter">{formatCurrency(total, currencySymbol)}</span>
                           </div>
                           
-                          <Button asChild size="lg" className="w-full h-14 text-lg font-bold shadow-lg shadow-primary/20" disabled={hasIssues || subtotal === 0}>
+                          <Button asChild size="lg" style={buttonStyle} className="w-full h-14 text-lg font-bold shadow-lg shadow-primary/20 border-none" disabled={hasIssues || subtotal === 0}>
                              <Link href="/store/checkout">
                                Checkout Now <ArrowRight className="ml-2 h-5 w-5" />
                              </Link>

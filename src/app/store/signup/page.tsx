@@ -190,6 +190,22 @@ export default function StoreSignupPage() {
         }
     }
 
+    const buttonStyle = useMemo(() => {
+        const style = settings?.storeBtnStyle || 'standard';
+        if (style === 'gradient') {
+          return {
+            background: `linear-gradient(to right, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
+            color: 'white',
+            border: 'none'
+          };
+        }
+        return {
+          backgroundColor: settings?.storeBtnColor || '#3b82f6',
+          color: 'white',
+          border: 'none'
+        };
+    }, [settings]);
+
     const CongratulationModal = () => {
         if (!settings) return null;
         const SelectedIcon = iconMap[settings.welcomePopupIcon as keyof typeof iconMap] || PartyPopper;
@@ -329,7 +345,7 @@ export default function StoreSignupPage() {
                     <FormItem><FormLabel>Delivery Address</FormLabel><FormControl><Textarea placeholder="Full street address..." {...field} disabled={isSubmitting} className="min-h-[100px]" /></FormControl><FormMessage /></FormItem>
                 )}/>
 
-                <Button type="submit" className="w-full mt-2 h-12 font-bold" disabled={isSubmitting}>
+                <Button type="submit" style={buttonStyle} className="w-full mt-2 h-12 font-bold border-none" disabled={isSubmitting}>
                     {isSubmitting ? <><Spinner size="sm" className="mr-2 text-primary-foreground" />Creating Account…</> : 'Create Account'}
                 </Button>
                 <div className="text-center text-sm">
