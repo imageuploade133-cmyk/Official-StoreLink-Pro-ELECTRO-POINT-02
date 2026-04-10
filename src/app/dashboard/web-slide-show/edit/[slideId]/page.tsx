@@ -213,7 +213,7 @@ export default function EditSlidePage() {
             title={`Edit Slide: ${slideData?.title || '...'}`}
             description="Update the content, settings, and visibility of this visual asset."
         />
-        <Button variant="ghost" asChild className="gap-2">
+        <Button variant="ghost" asChild className="gap-2 btn-back">
             <Link href={slideData?.placement === 'flash-hub' ? '/dashboard/flash-hub-manager' : '/dashboard/web-slide-show'}>
                 <ArrowLeft className="h-4 w-4" /> Back to Registry
             </Link>

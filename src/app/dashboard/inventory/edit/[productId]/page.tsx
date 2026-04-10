@@ -180,7 +180,7 @@ export default function EditProductPage() {
           title="Edit Product"
           description={`Modifying: ${product.name} | Multi-Part Sync Active`}
         />
-        <Button variant="ghost" asChild className="gap-2">
+        <Button variant="ghost" asChild className="gap-2 btn-back">
           <Link href="/dashboard/inventory">
             <ArrowLeft className="h-4 w-4" /> Back to Inventory
           </Link>

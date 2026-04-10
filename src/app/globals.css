@@ -693,6 +693,34 @@
     background-color: #000000;
   }
 
+  /* Specific styling for Back and Save buttons in Dark Mode */
+  .dark .btn-back {
+    background-color: #334155 !important;
+    border: 1px solid #64748b !important;
+    color: #ffffff !important;
+  }
+
+  .dark .btn-back:hover {
+    background-color: #475569 !important;
+    border-color: #94a3b8 !important;
+  }
+
+  .dark .btn-save {
+    background-color: #059669 !important;
+    border: 1px solid #10b981 !important;
+    color: #ffffff !important;
+  }
+
+  .dark .btn-save:hover {
+    background-color: #10b981 !important;
+    border-color: #34d399 !important;
+  }
+
+  .dark .btn-back svg, 
+  .dark .btn-save svg {
+    color: #ffffff !important;
+  }
+
   .dark [class*="min-h-screen"] {
     background-color: #000000;
   }
@@ -1241,7 +1269,7 @@
 
 /* ═══════════════════════════════════════════════
    STAT CARD — Colored left border accent
-   ═══════════════════════════════════════════════ */
+   ═══════════════════════════════���═══════════════ */
 .dark [class*="StatCard"],
 .dark [class*="stat-card"] {
   border-left: 3px solid hsl(var(--primary)) !important;

@@ -133,7 +133,7 @@ export default function AddProductPage() {
           title="Create Product"
           description="Distributed multimedia storage active. Handle unlimited data parts perfectly."
         />
-        <Button variant="ghost" asChild className="gap-2">
+        <Button variant="ghost" asChild className="gap-2 btn-back">
           <Link href="/dashboard/inventory">
             <ArrowLeft className="h-4 w-4" /> Back to Inventory
           </Link>

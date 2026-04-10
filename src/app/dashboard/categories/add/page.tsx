@@ -68,7 +68,7 @@ export default function AddCategoryPage() {
           title="Add New Category"
           description="Create a new classification for your inventory and storefront."
         />
-        <Button variant="ghost" asChild className="gap-2">
+        <Button variant="ghost" asChild className="gap-2 btn-back">
           <Link href="/dashboard/categories">
             <ArrowLeft className="h-4 w-4" /> Back to Categories
           </Link>

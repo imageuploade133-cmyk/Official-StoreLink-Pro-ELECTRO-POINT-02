@@ -40,14 +40,35 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, children, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
+
+    // Heuristic for back button: check children for "Back" text
+    const getText = (node: React.ReactNode): string => {
+      if (typeof node === 'string') return node;
+      if (typeof node === 'number') return String(node);
+      if (Array.isArray(node)) return node.map(getText).join('');
+      if (React.isValidElement(node)) return getText(node.props.children);
+      return '';
+    };
+    
+    // Auto-apply special styles for Save buttons (submit type or "Save" text)
+    // and Back buttons (containing "Back" text)
+    const textContent = getText(children);
+    const isSave = props.type === "submit" || (/\bsave\b/i.test(textContent) && !/wishlist/i.test(textContent));
+    
+    const isBack = /\bback\b/i.test(textContent) || (typeof className === 'string' && className.includes("btn-back"));
+    
+    const specialClass = isSave ? "btn-save" : (isBack ? "btn-back" : "");
+
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant, size, className }), specialClass)}
         ref={ref}
         {...props}
-      />
+      >
+        {children}
+      </Comp>
     )
   }
 )
