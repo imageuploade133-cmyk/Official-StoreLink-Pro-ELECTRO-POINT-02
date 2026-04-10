@@ -54,14 +54,25 @@ const iconOptions = [
 
 const ColorInput = ({ field, label }: { field: any; label: string }) => (
   <FormItem>
-      <FormLabel className="font-bold">{label}</FormLabel>
-      <div className="relative flex items-center gap-3">
-           <FormControl>
-              <Input type="color" {...field} className="p-1 h-10 w-12 cursor-pointer rounded-lg border-2" />
-          </FormControl>
-          <span className="text-sm font-mono bg-muted px-2 py-1 rounded border">{field.value}</span>
+    <FormLabel className="font-bold">{label}</FormLabel>
+    <div className="flex items-center gap-3">
+      <div className="relative">
+        <input
+          type="color"
+          {...field}
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          style={{ width: '48px', height: '40px' }}
+        />
+        <div 
+          className="w-12 h-10 cursor-pointer rounded-lg border-2 border-input bg-background flex items-center justify-center"
+          style={{ backgroundColor: field.value }}
+        >
+          <div className="w-4 h-4 rounded-full bg-white/80 shadow-sm" />
+        </div>
       </div>
-      <FormMessage />
+      <span className="text-sm font-mono bg-muted px-2 py-1 rounded border">{field.value}</span>
+    </div>
+    <FormMessage />
   </FormItem>
 );
 
