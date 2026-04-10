@@ -53,13 +53,16 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
     
     // Auto-apply special styles for Save buttons (submit type or "Save" text)
-    // and Back buttons (containing "Back" text)
+    // Back buttons (containing "Back" text)
+    // and Add buttons (containing "Add" text)
     const textContent = getText(children);
     const isSave = props.type === "submit" || (/\bsave\b/i.test(textContent) && !/wishlist/i.test(textContent));
-    
+
     const isBack = /\bback\b/i.test(textContent) || (typeof className === 'string' && className.includes("btn-back"));
-    
-    const specialClass = isSave ? "btn-save" : (isBack ? "btn-back" : "");
+
+    const isAdd = /\badd\b/i.test(textContent) || (typeof className === 'string' && className.includes("btn-add"));
+
+    const specialClass = isSave ? "btn-save" : (isBack ? "btn-back" : (isAdd ? "btn-add" : ""));
 
     return (
       <Comp

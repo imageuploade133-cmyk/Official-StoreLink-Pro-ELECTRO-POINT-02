@@ -1269,7 +1269,7 @@
 
 /* ═══════════════════════════════════════════════
    STAT CARD — Colored left border accent
-   ═══════════════════════════════���═══════════════ */
+   ═══���═══════════════════════════���═══════════════ */
 .dark [class*="StatCard"],
 .dark [class*="stat-card"] {
   border-left: 3px solid hsl(var(--primary)) !important;
@@ -1407,4 +1407,150 @@
 .dark label.font-medium {
   color: hsl(213 31% 82%) !important;
   -webkit-text-fill-color: hsl(213 31% 82%) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ADD BUTTONS - Dark mode custom styling with white text and border
+   ═══════════════════════════════════════════════════════════════ */
+
+.dark .btn-add,
+.dark button:has(.lucide-plus-circle),
+.dark button:has(.lucide-plus),
+.dark button:has(.lucide-plus-square),
+.dark a:has(.lucide-plus-circle),
+.dark a:has(.lucide-plus),
+.dark a:has(.lucide-plus-square),
+.dark button[class*="add"],
+.dark a[href*="/add"] {
+  background-color: #22c55e !important;
+  border: 2px solid #16a34a !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.dark .btn-add:hover,
+.dark button:has(.lucide-plus-circle):hover,
+.dark button:has(.lucide-plus):hover,
+.dark button:has(.lucide-plus-square):hover,
+.dark a:has(.lucide-plus-circle):hover,
+.dark a:has(.lucide-plus):hover,
+.dark a:has(.lucide-plus-square):hover,
+.dark button[class*="add"]:hover,
+.dark a[href*="/add"]:hover {
+  background-color: #16a34a !important;
+  border-color: #15803d !important;
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
+  transform: translateY(-1px);
+}
+
+.dark .btn-add svg,
+.dark button:has(.lucide-plus-circle) svg,
+.dark button:has(.lucide-plus) svg,
+.dark button:has(.lucide-plus-square) svg,
+.dark a:has(.lucide-plus-circle) svg,
+.dark a:has(.lucide-plus) svg,
+.dark a:has(.lucide-plus-square) svg,
+.dark button[class*="add"] svg,
+.dark a[href*="/add"] svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* Add buttons with PlusCircle icon specifically */
+.dark button .lucide-plus-circle,
+.dark a .lucide-plus-circle {
+  color: #ffffff !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DELETE BUTTONS & ICONS - Dark mode red styling
+   ═══════════════════════════════════════════════════════════════ */
+
+.dark button[variant="destructive"],
+.dark button.btn-delete,
+.dark button:has(.lucide-trash-2),
+.dark button:has(.lucide-trash),
+.dark button:has(.lucide-trash2),
+.dark .text-destructive:hover button,
+.dark button[class*="delete"] {
+  color: #ef4444 !important;
+  background-color: rgba(239, 68, 68, 0.1) !important;
+  border: 1px solid #ef4444 !important;
+  transition: all 0.3s ease;
+}
+
+.dark button[variant="destructive"]:hover,
+.dark button.btn-delete:hover,
+.dark button:has(.lucide-trash-2):hover,
+.dark button:has(.lucide-trash):hover,
+.dark button:has(.lucide-trash2):hover,
+.dark .text-destructive:hover button:hover,
+.dark button[class*="delete"]:hover {
+  color: #ffffff !important;
+  background-color: #ef4444 !important;
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+}
+
+.dark button[variant="destructive"] svg,
+.dark button.btn-delete svg,
+.dark button:has(.lucide-trash-2) svg,
+.dark button:has(.lucide-trash) svg,
+.dark button:has(.lucide-trash2) svg,
+.dark button[class*="delete"] svg {
+  color: #ef4444 !important;
+}
+
+.dark button[variant="destructive"]:hover svg,
+.dark button.btn-delete:hover svg,
+.dark button:has(.lucide-trash-2):hover svg,
+.dark button:has(.lucide-trash):hover svg,
+.dark button:has(.lucide-trash2):hover svg,
+.dark button[class*="delete"]:hover svg {
+  color: #ffffff !important;
+}
+
+/* Ghost variant with destructive intent in dark mode */
+.dark button[variant="ghost"].text-destructive,
+.dark button[variant="ghost"]:has(.lucide-trash-2),
+.dark button[variant="ghost"]:has(.lucide-trash),
+.dark button[variant="ghost"]:has(.lucide-trash2) {
+  color: #ef4444 !important;
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+}
+
+.dark button[variant="ghost"].text-destructive:hover,
+.dark button[variant="ghost"]:has(.lucide-trash-2):hover,
+.dark button[variant="ghost"]:has(.lucide-trash):hover,
+.dark button[variant="ghost"]:has(.lucide-trash2):hover {
+  color: #ffffff !important;
+  background-color: #ef4444 !important;
+  border-color: #dc2626 !important;
+}
+
+/* Icon-only delete buttons */
+.dark button[variant="ghost"][class*="icon"]:has(.lucide-trash-2),
+.dark button[variant="ghost"][class*="icon"]:has(.lucide-trash),
+.dark button[variant="ghost"][class*="icon"]:has(.lucide-trash2) {
+  color: #ef4444 !important;
+  border-color: #ef4444 !important;
+}
+
+.dark button[variant="ghost"][class*="icon"]:has(.lucide-trash-2):hover,
+.dark button[variant="ghost"][class*="icon"]:has(.lucide-trash):hover,
+.dark button[variant="ghost"][class*="icon"]:has(.lucide-trash2):hover {
+  color: #ffffff !important;
+  background-color: #ef4444 !important;
+  border-color: #dc2626 !important;
+}
+
+/* Button variants override for destructive actions in dark mode */
+.dark .button-destructive,
+.dark [class*="bg-destructive"] button,
+.dark [class*="bg-destructive"] a {
+  background-color: #ef4444 !important;
+  color: #ffffff !important;
+  border-color: #dc2626 !important;
 }
