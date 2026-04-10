@@ -31,6 +31,7 @@ import {
   DialogTitle,
   DialogDescription
 } from "@/components/ui/dialog";
+import { CameraCaptureModal } from '@/components/media/CameraCaptureModal';
 
 interface ProductImageGalleryProps {
   primaryUrl: string;
@@ -201,6 +202,47 @@ export function ProductImageGallery({
           >
             <Camera className="h-4 w-4" />
           </Button>
+
+          {/* Camera Modal */}
+          <CameraCaptureModal 
+            isOpen={isPhotoCaptureOpen}
+            onClose={() => setIsPhotoCaptureOpen(false)}
+            onImageCaptured={async (imageBlob) => {
+              try {
+                setIsUploading(true);
+                const imageDataUri = await new Promise<string>((resolve) => {
+                  const reader = new FileReader();
+                  reader.readAsDataURL(imageBlob);
+                  reader.onload = () => resolve(reader.result as string);
+                });
+                
+                const optimized = await compressAndResizeImage(
+                  imageDataUri, 
+                  settings?.imageUploadQuality || 80, 
+                  settings?.imageMaxWidth || 1920
+                );
+                
+                const result = await uploadImage({ imageDataUri: optimized });
+                
+                if (!primaryUrl) {
+                  onPrimaryChange(result.display_url);
+                } else {
+                  onAdditionalChange([...additionalUrls, result.display_url]);
+                }
+                
+                toast({ title: "Photo Captured!", description: "Added to gallery successfully." });
+              } catch (error: any) {
+                console.error('Camera capture failed:', error);
+                toast({ 
+                  variant: "destructive", 
+                  title: "Capture Failed", 
+                  description: error.message || "Could not process photo." 
+                });
+              } finally {
+                setIsUploading(false);
+              }
+            }}
+          />
         </div>
       </div>
 
