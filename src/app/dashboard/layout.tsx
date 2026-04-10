@@ -50,7 +50,8 @@ import {
   FileText,
   FileCog,
   Coins,
-  ZoomIn
+  ZoomIn,
+  Palette
 } from 'lucide-react';
 import { PageSpinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
@@ -171,6 +172,7 @@ export default function DashboardLayout({
     { href: '/dashboard/manage-web-catalog', icon: LayoutGrid, label: 'Manage Web Catalog', perm: 'manage_website_content' },
     { href: '/dashboard/manage-coupons', icon: Ticket, label: 'Promo Codes', perm: 'manage_coupons' },
     { href: '/dashboard/stock-bar-settings', icon: Activity, label: 'Stock Bar Settings', perm: 'manage_settings' },
+    { href: '/dashboard/product-card-designer', icon: Palette, label: 'Product Card Designer', perm: 'manage_settings' },
     { href: '/dashboard/public-web-settings', icon: Globe, label: 'General Web Settings', perm: 'manage_settings' },
     { href: '/dashboard/shopping-experience-settings', icon: MousePointerClick, label: 'Shopping Buttons', perm: 'manage_settings' },
     { href: '/dashboard/website-payment', icon: Landmark, label: 'Website Payment Method', perm: 'manage_settings' },

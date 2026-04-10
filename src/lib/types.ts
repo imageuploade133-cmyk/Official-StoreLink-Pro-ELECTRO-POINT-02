@@ -297,6 +297,25 @@ export interface Settings {
   storeGridColumnsCustom?: number;
   // Product Card Size Settings
   productCardHeight?: number;
+  // Product Card Designer Settings
+  productCardStyle?: 'default' | 'minimal' | 'classic' | 'modern' | 'custom';
+  productCardCustomHtml?: string;
+  productCardBorderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  productCardShadow?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
+  productCardBorderWidth?: 'none' | 'thin' | 'medium' | 'thick';
+  productCardBorderColor?: string;
+  productCardBgColor?: string;
+  productCardShowImage?: boolean;
+  productCardImageRatio?: 'square' | 'portrait' | 'landscape';
+  productCardShowBadges?: boolean;
+  productCardShowRating?: boolean;
+  productCardShowStockBar?: boolean;
+  productCardShowWishlist?: boolean;
+  productCardShowQuickAdd?: boolean;
+  productCardTitleLines?: 1 | 2 | 3;
+  productCardTitleAlign?: 'left' | 'center';
+  productCardPriceAlign?: 'left' | 'center';
+  productCardHoverEffect?: 'none' | 'lift' | 'zoom' | 'glow' | 'border';
 }
 
 export type AppSettings = Settings;
