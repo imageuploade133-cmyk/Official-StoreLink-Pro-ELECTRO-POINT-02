@@ -1625,5 +1625,3 @@ export function ProductForm({
     </>
   );
 };
-  );
-}
