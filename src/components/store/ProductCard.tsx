@@ -143,14 +143,102 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
   const totalCardHeight = settings?.productCardHeight || 380;
   const mediaHeight = Math.round((totalCardHeight * 60) / 100);
 
+  // Get card designer settings with defaults
+  const cardStyle = settings?.productCardStyle || 'default';
+  const borderRadius = settings?.productCardBorderRadius || 'lg';
+  const shadow = settings?.productCardShadow || 'md';
+  const borderWidth = settings?.productCardBorderWidth || 'thin';
+  const borderColor = settings?.productCardBorderColor || '#e2e8f0';
+  const bgColor = settings?.productCardBgColor || '#ffffff';
+  const hoverEffect = settings?.productCardHoverEffect || 'lift';
+  const showImage = settings?.productCardShowImage !== false;
+  const showBadges = settings?.productCardShowBadges !== false;
+  const showRating = settings?.productCardShowRating !== false;
+  const showStockBar = settings?.productCardShowStockBar !== false;
+  const showWishlist = settings?.productCardShowWishlist !== false;
+  const showQuickAdd = settings?.productCardShowQuickAdd !== false;
+  const titleLines = settings?.productCardTitleLines || 2;
+
+  // Map border radius to Tailwind class
+  const borderRadiusClass = {
+    'none': 'rounded-none',
+    'sm': 'rounded-sm',
+    'md': 'rounded-md',
+    'lg': 'rounded-lg',
+    'xl': 'rounded-xl',
+    'full': 'rounded-3xl',
+  }[borderRadius] || 'rounded-lg';
+
+  // Map shadow to Tailwind class
+  const shadowClass = {
+    'none': 'shadow-none',
+    'sm': 'shadow-sm',
+    'md': 'shadow-md',
+    'lg': 'shadow-lg',
+    'xl': 'shadow-xl',
+  }[shadow] || 'shadow-md';
+
+  // Map border width to Tailwind class
+  const borderWidthClass = {
+    'none': 'border-0',
+    'thin': 'border',
+    'medium': 'border-2',
+    'thick': 'border-4',
+  }[borderWidth] || 'border';
+
+  // Hover effect classes
+  const hoverEffectClass = {
+    'none': '',
+    'lift': 'hover:-translate-y-2',
+    'zoom': '',
+    'glow': 'hover:shadow-2xl hover:shadow-primary/20',
+    'border': 'hover:border-primary',
+  }[hoverEffect] || 'hover:-translate-y-2';
+
+  // Custom HTML template rendering
+  if (cardStyle === 'custom' && settings?.productCardCustomHtml) {
+    return (
+      <>
+        <ProductLoadingOverlay isVisible={isLoadingProduct} productName={product.name} />
+        <CustomHtmlCard
+          html={settings.productCardCustomHtml}
+          product={product}
+          category={category}
+          currencySymbol={currencySymbol}
+          effectivePrice={effectivePrice}
+          isDiscounted={isDiscounted}
+          discountPercentage={discountPercentage}
+          isOutOfStock={isOutOfStock}
+          isInWishlist={isInWishlist}
+          onWishlistToggle={handleWishlistToggle}
+          onAddToCart={handleAddToCart}
+          onProductClick={handleProductClick}
+          ratingStats={ratingStats}
+          settings={settings}
+        />
+      </>
+    );
+  }
+
   return (
     <>
       <ProductLoadingOverlay isVisible={isLoadingProduct} productName={product.name} />
       <div 
-        className={`group relative flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all duration-500 hover:border-primary/30 overflow-hidden h-full ${styles.cardContainer}`}
-        style={{ height: `${totalCardHeight}px` }}
+        className={cn(
+          `group relative flex flex-col dark:bg-slate-900 transition-all duration-500 overflow-hidden h-full ${styles.cardContainer}`,
+          borderRadiusClass,
+          shadowClass,
+          borderWidthClass,
+          hoverEffectClass
+        )}
+        style={{ 
+          height: `${totalCardHeight}px`,
+          borderColor: borderColor,
+          backgroundColor: bgColor,
+        }}
       >
         {/* Media Area with Enhanced Hover */}
+        {showImage && (
         <Link href={`/store/product/${product.id}`} onClick={handleProductClick} className={`block relative overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 ${styles.mediaArea}`} style={{ height: `${mediaHeight}px` }}>
         <Image
           src={product.imageUrl || settings?.defaultProductImageUrl || 'https://placehold.co/600x600.png'}
@@ -158,12 +246,14 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
           fill
           className={cn(
             `object-cover transition-all duration-700 ${styles.productImage}`,
-            isOutOfStock && "opacity-40 grayscale"
+            isOutOfStock && "opacity-40 grayscale",
+            hoverEffect === 'zoom' && 'group-hover:scale-110'
           )}
           unoptimized
         />
         
         {/* Enhanced Badges with Animations */}
+        {showBadges && (
         <div className="absolute top-4 left-4 flex flex-col gap-2 z-10 pointer-events-none">
           {product.isOfficialBrand && (
             <Badge className={`bg-gradient-to-r from-blue-600 to-blue-700 text-white font-black text-[9px] uppercase tracking-widest px-3 py-1.5 shadow-lg border-none rounded-full w-fit ${styles.badgeSlide}`}>
@@ -187,8 +277,10 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
             </Badge>
           )}
         </div>
+        )}
 
         {/* Enhanced Wishlist Button with Pulse */}
+        {showWishlist && (
         <button
           className={cn(
             `absolute top-4 right-4 h-11 w-11 flex items-center justify-center rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-lg transition-all duration-300 z-10 border border-white/30 dark:border-slate-600 hover:scale-110 active:scale-95 dark:hover:border-rose-500`,
@@ -198,8 +290,10 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
         >
           <Heart className={cn("h-5.5 w-5.5 transition-all duration-300 dark:text-slate-300", isInWishlist && "fill-current text-rose-500")} />
         </button>
+        )}
 
         {/* Enhanced Quick Add Bottom Bar (MD+) */}
+        {showQuickAdd && (
         <div className={`absolute inset-x-0 bottom-0 p-5 translate-y-full group-hover:translate-y-0 transition-all duration-500 hidden md:block z-20 ${styles.quickAddBar}`}>
           <Button 
             onClick={handleAddToCart}
@@ -211,7 +305,9 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
             {settings?.storeGridCartText || 'Add to Bag'}
           </Button>
         </div>
+        )}
       </Link>
+        )}
 
       {/* Content Area with Smooth Transitions */}
       <div className={`flex flex-col flex-1 p-5 space-y-4 ${styles.contentArea}`}>
@@ -227,12 +323,17 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
             )}
           </div>
           
-          <h3 className={`text-sm sm:text-base font-black text-slate-900 dark:text-white line-clamp-2 leading-snug tracking-tight transition-colors duration-300 h-12 break-words ${styles.productName}`}>
+          <h3 className={cn(
+            `text-sm sm:text-base font-black text-slate-900 dark:text-white leading-snug tracking-tight transition-colors duration-300 break-words ${styles.productName}`,
+            titleLines === 1 && 'line-clamp-1',
+            titleLines === 2 && 'line-clamp-2',
+            titleLines === 3 && 'line-clamp-3'
+          )}>
             {product.name}
           </h3>
 
           {/* Product Rating Display */}
-          {settings?.showReviewRatingOnCard && ratingStats.totalReviews > 0 && (
+          {showRating && settings?.showReviewRatingOnCard && ratingStats.totalReviews > 0 && (
             <div className="flex items-center -ml-2">
               <ProductRating
                 averageRating={ratingStats.averageRating}
@@ -258,10 +359,12 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
         </div>
 
         <div className={`space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800 ${styles.priceSection}`}>
+          {showStockBar && (
           <StockBar 
             stock={product.stock} 
             lowStockThreshold={product.lowStockThreshold || 10} 
           />
+          )}
 
           <div className="flex items-end justify-between">
             <div className="flex flex-col flex-1 min-w-0 pr-3">
@@ -301,5 +404,78 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
       </div>
     </div>
     </>
+  );
+}
+
+// Custom HTML Card Component
+interface CustomHtmlCardProps {
+  html: string;
+  product: Product;
+  category?: Category;
+  currencySymbol: string;
+  effectivePrice: number;
+  isDiscounted: boolean;
+  discountPercentage: number;
+  isOutOfStock: boolean;
+  isInWishlist: boolean;
+  onWishlistToggle: (e: React.MouseEvent) => void;
+  onAddToCart: (e: React.MouseEvent) => void;
+  onProductClick: () => void;
+  ratingStats: { averageRating: number; totalReviews: number };
+  settings: any;
+}
+
+function CustomHtmlCard({
+  html,
+  product,
+  category,
+  currencySymbol,
+  effectivePrice,
+  isDiscounted,
+  discountPercentage,
+  isOutOfStock,
+  isInWishlist,
+  onWishlistToggle,
+  onAddToCart,
+  onProductClick,
+  ratingStats,
+  settings,
+}: CustomHtmlCardProps) {
+  // Simple placeholder replacement
+  const processedHtml = html
+    .replace(/\{\{product\.id\}\}/g, product.id)
+    .replace(/\{\{product\.name\}\}/g, product.name)
+    .replace(/\{\{product\.price\}\}/g, effectivePrice.toFixed(2))
+    .replace(/\{\{product\.originalPrice\}\}/g, product.sellingPrice.toFixed(2))
+    .replace(/\{\{product\.imageUrl\}\}/g, product.imageUrl || settings?.defaultProductImageUrl || 'https://placehold.co/600x600.png')
+    .replace(/\{\{product\.category\}\}/g, category?.name || product.categoryName || 'General')
+    .replace(/\{\{product\.stock\}\}/g, product.stock.toString())
+    .replace(/\{\{product\.isNew\}\}/g, product.isNewArrival ? 'true' : 'false')
+    .replace(/\{\{product\.isPopular\}\}/g, product.isPopular ? 'true' : 'false')
+    .replace(/\{\{product\.isOfficial\}\}/g, product.isOfficialBrand ? 'true' : 'false')
+    .replace(/\{\{product\.isOutOfStock\}\}/g, isOutOfStock ? 'true' : 'false')
+    .replace(/\{\{product\.discount\}\}/g, discountPercentage.toString())
+    .replace(/\{\{product\.rating\}\}/g, ratingStats.averageRating.toFixed(1))
+    .replace(/\{\{product\.reviewCount\}\}/g, ratingStats.totalReviews.toString())
+    .replace(/\{\{currency\}\}/g, currencySymbol)
+    .replace(/\{\{cardHeight\}\}/g, (settings?.productCardHeight || 380).toString())
+    .replace(/\{\{isInWishlist\}\}/g, isInWishlist ? 'true' : 'false');
+
+  return (
+    <div 
+      className="custom-html-card-wrapper"
+      onClick={(e) => {
+        // Handle custom HTML click events
+        const target = e.target as HTMLElement;
+        if (target.closest('[data-action="wishlist"]')) {
+          onWishlistToggle(e);
+        } else if (target.closest('[data-action="add-to-cart"]')) {
+          onAddToCart(e);
+        } else if (target.closest('[data-action="view-product"]')) {
+          onProductClick();
+        }
+      }}
+      dangerouslySetInnerHTML={{ __html: processedHtml }}
+    />
   );
 }
