@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useSettings } from '@/contexts/settings-context';
 
 export function NewsletterSection() {
@@ -10,6 +10,22 @@ export function NewsletterSection() {
   const title = settings?.newsletterSectionTitle || 'Join Our Newsletter';
   const description = settings?.newsletterSectionDescription || 'Subscribe to receive updates, access to exclusive deals, and more.';
   const backgroundColor = settings?.newsletterSectionBackgroundColor || '#f1f5f9'; // fallback to a light gray
+
+  const buttonStyle = useMemo(() => {
+    const style = settings?.storeBtnStyle || 'standard';
+    if (style === 'gradient') {
+      return {
+        background: `linear-gradient(to right, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
+        color: 'white',
+        border: 'none'
+      };
+    }
+    return {
+      backgroundColor: settings?.storeBtnColor || '#3b82f6',
+      color: 'white',
+      border: 'none'
+    };
+  }, [settings]);
 
   if (!showNewsletterSection) {
     return null;
@@ -36,7 +52,7 @@ export function NewsletterSection() {
             <p className={`${textColorClass} mb-8`}>{description}</p>
             <form className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
                 <input className="flex-1 px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-primary focus:border-primary bg-white dark:bg-slate-800 outline-none" placeholder="Enter your email" type="email"/>
-                <button className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-lg font-bold transition-colors" type="submit">Subscribe</button>
+                <button style={buttonStyle} className="px-8 py-3 rounded-lg font-bold transition-colors" type="submit">Subscribe</button>
             </form>
             <p className="text-[10px] text-slate-500 mt-4">By subscribing, you agree to our Terms of Service and Privacy Policy.</p>
         </div>

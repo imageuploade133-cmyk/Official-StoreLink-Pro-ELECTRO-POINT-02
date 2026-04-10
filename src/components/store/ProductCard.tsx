@@ -79,6 +79,23 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
     setIsLoadingProduct(true);
   };
 
+  // Dynamic Button Style
+  const buttonStyle = useMemo(() => {
+    const style = settings?.storeBtnStyle || 'standard';
+    if (style === 'gradient') {
+      return {
+        background: `linear-gradient(to right, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
+        color: 'white',
+        border: 'none'
+      };
+    }
+    return {
+      backgroundColor: settings?.storeBtnColor || '#3b82f6',
+      color: 'white',
+      border: 'none'
+    };
+  }, [settings]);
+
   // Calculate media area height based on card height setting (60% of total height)
   const totalCardHeight = settings?.productCardHeight || 380;
   const mediaHeight = Math.round((totalCardHeight * 60) / 100);
@@ -144,9 +161,10 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
           <Button 
             onClick={handleAddToCart}
             disabled={isOutOfStock}
-            className={`w-full bg-gradient-to-r from-slate-950 to-slate-900 dark:from-white dark:to-slate-100 text-white dark:text-black font-black text-sm uppercase tracking-wide py-3 rounded-xl shadow-xl transition-all active:scale-95 ${styles.cartButton} hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed`}
+            style={buttonStyle}
+            className={`w-full font-black text-sm uppercase tracking-wide py-3 rounded-xl shadow-xl transition-all active:scale-95 ${styles.cartButton} hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed`}
           >
-            <ShoppingCart className={`h-5 w-5 mr-2 transition-all dark:text-black ${styles.cartIcon}`} />
+            <ShoppingCart className={`h-5 w-5 mr-2 transition-all ${styles.cartIcon}`} />
             {settings?.storeGridCartText || 'Add to Bag'}
           </Button>
         </div>
@@ -227,11 +245,12 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
             <div className="md:hidden shrink-0">
               <Button 
                 size="icon" 
-                className={`h-11 w-11 rounded-full shadow-lg shadow-primary/30 active:scale-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed dark:border dark:border-slate-600 ${styles.mobileCartButton}`}
+                style={buttonStyle}
+                className={`h-11 w-11 rounded-full shadow-lg shadow-primary/30 active:scale-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${styles.mobileCartButton}`}
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
               >
-                <ShoppingCart className={`h-5 w-5 transition-all dark:text-white ${styles.mobileCartIcon}`} />
+                <ShoppingCart className={`h-5 w-5 transition-all ${styles.mobileCartIcon}`} />
               </Button>
             </div>
           </div>

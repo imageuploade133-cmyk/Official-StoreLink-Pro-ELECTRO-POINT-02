@@ -17,6 +17,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 import { 
   MousePointerClick, 
   Loader2, 
@@ -30,7 +33,8 @@ import {
   ArrowRight,
   Package,
   CheckCircle2,
-  Info
+  Info,
+  Palette
 } from 'lucide-react';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -47,6 +51,19 @@ const iconOptions = [
   { name: 'ArrowRight', icon: ArrowRight },
   { name: 'Package', icon: Package },
 ];
+
+const ColorInput = ({ field, label }: { field: any; label: string }) => (
+  <FormItem>
+      <FormLabel className="font-bold">{label}</FormLabel>
+      <div className="relative flex items-center gap-3">
+           <FormControl>
+              <Input type="color" {...field} className="p-1 h-10 w-12 cursor-pointer rounded-lg border-2" />
+          </FormControl>
+          <span className="text-sm font-mono bg-muted px-2 py-1 rounded border">{field.value}</span>
+      </div>
+      <FormMessage />
+  </FormItem>
+);
 
 const shoppingExpSchema = z.object({
   storeAddToCartText: z.string().min(2, 'Label too short.').max(30, 'Label too long.'),
@@ -67,6 +84,10 @@ const shoppingExpSchema = z.object({
   storeHeroBtnColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#8b5cf6'),
   storeHeroBtnGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#8b5cf6'),
   storeHeroBtnGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#7c3aed'),
+  storeBtnStyle: z.enum(['standard', 'gradient']).default('standard'),
+  storeBtnColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#3b82f6'),
+  storeBtnGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#3b82f6'),
+  storeBtnGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#1d4ed8'),
 });
 
 type FormValues = z.infer<typeof shoppingExpSchema>;
@@ -105,6 +126,10 @@ export default function ShoppingExperienceSettingsPage() {
     storeHeroBtnColor: '#8b5cf6',
     storeHeroBtnGradientStart: '#8b5cf6',
     storeHeroBtnGradientEnd: '#7c3aed',
+    storeBtnStyle: 'standard',
+    storeBtnColor: '#3b82f6',
+    storeBtnGradientStart: '#3b82f6',
+    storeBtnGradientEnd: '#1d4ed8',
   }
   });
 
@@ -129,6 +154,10 @@ export default function ShoppingExperienceSettingsPage() {
           storeHeroBtnColor: settingsData.storeHeroBtnColor || '#8b5cf6',
           storeHeroBtnGradientStart: settingsData.storeHeroBtnGradientStart || '#8b5cf6',
           storeHeroBtnGradientEnd: settingsData.storeHeroBtnGradientEnd || '#7c3aed',
+          storeBtnStyle: settingsData.storeBtnStyle || 'standard',
+          storeBtnColor: settingsData.storeBtnColor || '#3b82f6',
+          storeBtnGradientStart: settingsData.storeBtnGradientStart || '#3b82f6',
+          storeBtnGradientEnd: settingsData.storeBtnGradientEnd || '#1d4ed8',
         });
     }
   }, [settingsData, form]);
@@ -188,7 +217,103 @@ export default function ShoppingExperienceSettingsPage() {
         <div className="lg:col-span-2">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              
+
+              {/* Global Button Branding */}
+              <Card className="shadow-lg border-primary/20 ring-1 ring-primary/10 overflow-hidden">
+                <CardHeader className="bg-primary/10">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-primary rounded-lg">
+                      <Palette className="h-5 w-5 text-primary-foreground" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl font-black">Global Button Branding</CardTitle>
+                      <CardDescription>This setting applies a consistent color style across ALL buttons in your store.</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-6 space-y-8">
+                  <FormField
+                    control={form.control}
+                    name="storeBtnStyle"
+                    render={({ field }) => (
+                      <FormItem className="space-y-3">
+                        <FormLabel className="text-base font-black">Overall Button Theme</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                          >
+                            <div>
+                              <RadioGroupItem value="standard" id="global-standard" className="peer sr-only" />
+                              <Label
+                                htmlFor="global-standard"
+                                className="flex flex-col items-center justify-between rounded-xl border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer transition-all"
+                              >
+                                <div className="h-10 w-full rounded-lg bg-primary mb-2 shadow-sm" />
+                                <span className="font-bold">Solid Primary</span>
+                              </Label>
+                            </div>
+                            <div>
+                              <RadioGroupItem value="gradient" id="global-gradient" className="peer sr-only" />
+                              <Label
+                                htmlFor="global-gradient"
+                                className="flex flex-col items-center justify-between rounded-xl border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer transition-all"
+                              >
+                                <div className="h-10 w-full rounded-lg bg-gradient-to-r from-primary to-blue-700 mb-2 shadow-sm" />
+                                <span className="font-bold">Modern Gradient</span>
+                              </Label>
+                            </div>
+                          </RadioGroup>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  {form.watch('storeBtnStyle') === 'standard' ? (
+                    <div className="animate-in fade-in slide-in-from-top-4 duration-300">
+                      <FormField
+                        control={form.control}
+                        name="storeBtnColor"
+                        render={({ field }) => <ColorInput field={field} label="Global Button Color" />}
+                      />
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-top-4 duration-300">
+                      <FormField
+                        control={form.control}
+                        name="storeBtnGradientStart"
+                        render={({ field }) => <ColorInput field={field} label="Gradient Start" />}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="storeBtnGradientEnd"
+                        render={({ field }) => <ColorInput field={field} label="Gradient End" />}
+                      />
+                    </div>
+                  )}
+
+                  {/* Live Preview */}
+                  <div className="mt-8 p-6 rounded-2xl border-2 border-dashed border-primary/20 flex flex-col items-center gap-4 bg-muted/5">
+                    <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">Live Global Preview</span>
+                    <Button 
+                      type="button" 
+                      style={form.watch('storeBtnStyle') === 'standard' ? { backgroundColor: form.watch('storeBtnColor') } : { background: `linear-gradient(to right, ${form.watch('storeBtnGradientStart')}, ${form.watch('storeBtnGradientEnd')})` }}
+                      className="h-14 px-10 rounded-xl font-black text-lg shadow-xl border-none text-white pointer-events-none"
+                    >
+                      Sample Store Button
+                    </Button>
+                  </div>
+
+                  <div className="bg-amber-50 dark:bg-amber-950/20 p-4 rounded-xl border border-amber-200 dark:border-amber-900 flex gap-3 items-start">
+                    <Info className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                    <p className="text-xs text-amber-800 dark:text-amber-200 leading-relaxed font-medium">
+                      <strong>Note:</strong> While text and icons can be customized for each button type below, the color and gradient defined here will be used globally for a unified brand experience.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Product Details Button */}
               <Card className="shadow-lg border-none ring-1 ring-border">
                 <CardHeader className="bg-primary/5">

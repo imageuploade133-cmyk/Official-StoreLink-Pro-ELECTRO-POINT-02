@@ -309,6 +309,22 @@ export default function CheckoutPage() {
     toast({ title: 'Copied', description: `${label} copied to clipboard.` });
   };
 
+  const buttonStyle = useMemo(() => {
+    const style = settings?.storeBtnStyle || 'standard';
+    if (style === 'gradient') {
+      return {
+        background: `linear-gradient(to right, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
+        color: 'white',
+        border: 'none'
+      };
+    }
+    return {
+      backgroundColor: settings?.storeBtnColor || '#3b82f6',
+      color: 'white',
+      border: 'none'
+    };
+  }, [settings]);
+
   if (isAuthLoading || isLoadingSettings || isProfileLoading) {
     return (
       <div className="flex h-[60vh] items-center justify-center">
@@ -376,7 +392,7 @@ export default function CheckoutPage() {
                     <Label htmlFor="address">Delivery Address</Label>
                     <div className="relative"><MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Textarea id="address" name="address" placeholder="Enter your full street address..." className="pl-10 min-h-[100px]" value={formData.address} onChange={handleInputChange} required disabled={step !== 'details'} /></div>
                   </div>
-                  {step === 'details' && <Button type="submit">Continue to Payment</Button>}
+                  {step === 'details' && <Button type="submit" style={buttonStyle} className="border-none font-bold">Continue to Payment</Button>}
                 </form>
               </CardContent>
             </Card>
@@ -469,7 +485,8 @@ export default function CheckoutPage() {
                     isLoading={step === 'processing'}
                     disabled={(paymentMethod === 'Bank Transfer' && !hasConfirmedTransfer) || availablePaymentMethods.length === 0}
                     size="lg" 
-                    className="px-10"
+                    style={buttonStyle}
+                    className="px-10 border-none font-bold"
                     loadingText="Processing..."
                   >
                     <ShieldCheck className="mr-2 h-4 w-4" />

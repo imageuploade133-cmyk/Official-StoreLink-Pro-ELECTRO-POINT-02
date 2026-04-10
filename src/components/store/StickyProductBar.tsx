@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Heart, ShoppingCart, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useSettings } from '@/contexts/settings-context';
 
 interface StickyProductBarProps {
   productName: string;
@@ -24,6 +25,7 @@ export function StickyProductBar({
   onToggleWishlist,
   addToCartText = 'Add to Bag'
 }: StickyProductBarProps) {
+  const { settings } = useSettings();
   const [isVisible, setIsVisible] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const scrollTimeoutRef = useRef<NodeJS.Timeout>();
@@ -57,6 +59,23 @@ export function StickyProductBar({
       }
     };
   }, [handleScroll]);
+
+  // Dynamic Button Style
+  const buttonStyle = React.useMemo(() => {
+    const style = settings?.storeBtnStyle || 'standard';
+    if (style === 'gradient') {
+      return {
+        background: `linear-gradient(to right, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
+        color: 'white',
+        border: 'none'
+      };
+    }
+    return {
+      backgroundColor: settings?.storeBtnColor || '#3b82f6',
+      color: 'white',
+      border: 'none'
+    };
+  }, [settings]);
 
   return (
     /* Overlay bar - no spacer needed, content scrolls under it */
@@ -97,8 +116,9 @@ export function StickyProductBar({
           <Button
             onClick={onAddToCart}
             disabled={isOutOfStock}
+            style={buttonStyle}
             className={cn(
-              "px-4 sm:px-6 py-3 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wide transition-all duration-300 flex items-center gap-1.5 shrink-0",
+              "px-4 sm:px-6 py-3 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wide transition-all duration-300 flex items-center gap-1.5 shrink-0 border-none",
               isOutOfStock && "opacity-50 cursor-not-allowed"
             )}
           >

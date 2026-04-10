@@ -114,6 +114,22 @@ export default function StoreLoginPage() {
             });
     }
 
+    const buttonStyle = useMemo(() => {
+        const style = settings?.storeBtnStyle || 'standard';
+        if (style === 'gradient') {
+          return {
+            background: `linear-gradient(to right, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
+            color: 'white',
+            border: 'none'
+          };
+        }
+        return {
+          backgroundColor: settings?.storeBtnColor || '#3b82f6',
+          color: 'white',
+          border: 'none'
+        };
+    }, [settings]);
+
     if (isUserLoading || isLoadingSettings) {
         return <PageSpinner label="Welcome Back" subLabel="Loading your store experience…" />;
     }
@@ -236,7 +252,7 @@ export default function StoreLoginPage() {
                 </button>
               </div>
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" style={buttonStyle} className="w-full border-none font-bold" disabled={isLoading}>
                 {isLoading && <Spinner size="sm" className="mr-2 text-primary-foreground" />}
               Login
             </Button>

@@ -212,6 +212,11 @@ export interface Settings {
   storeHeroBtnColor?: string;
   storeHeroBtnGradientStart?: string;
   storeHeroBtnGradientEnd?: string;
+  // Global Store Button Style
+  storeBtnStyle?: 'standard' | 'gradient';
+  storeBtnColor?: string;
+  storeBtnGradientStart?: string;
+  storeBtnGradientEnd?: string;
   imageUploadQuality?: number;
   imageMaxWidth?: number;
   imageMaxFileSizeMb?: number;

@@ -492,6 +492,22 @@ export default function ProductDetailsPage() {
     }
   };
 
+  const buttonStyle = useMemo(() => {
+    const style = settings?.storeBtnStyle || 'standard';
+    if (style === 'gradient') {
+      return {
+        background: `linear-gradient(to right, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
+        color: 'white',
+        border: 'none'
+      };
+    }
+    return {
+      backgroundColor: settings?.storeBtnColor || '#3b82f6',
+      color: 'white',
+      border: 'none'
+    };
+  }, [settings]);
+
   if (isLoadingProduct) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -678,7 +694,12 @@ export default function ProductDetailsPage() {
                     <span className="w-10 md:w-12 text-center text-lg md:text-xl font-black">{quantity}</span>
                     <Button variant="ghost" size="icon" className="h-10 md:h-12 w-10 md:w-12 rounded-md md:rounded-xl" onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}><Plus className="h-4 md:h-5 w-4 md:w-5" /></Button>
                   </div>
-                  <Button onClick={handleAddToCart} size="lg" className="flex-1 bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-widest h-12 md:h-14 rounded-lg md:rounded-2xl shadow-xl transition-all group text-xs md:text-sm">
+                  <Button 
+                    onClick={handleAddToCart} 
+                    size="lg" 
+                    style={buttonStyle}
+                    className="flex-1 text-white font-black uppercase tracking-widest h-12 md:h-14 rounded-lg md:rounded-2xl shadow-xl transition-all group text-xs md:text-sm"
+                  >
                     <AddToCartIcon className="mr-2 md:mr-3 h-4 md:h-5 w-4 md:w-5 group-hover:animate-bounce" /> {addToCartText}
                   </Button>
                 </div>

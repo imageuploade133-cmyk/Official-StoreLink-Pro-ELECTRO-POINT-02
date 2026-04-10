@@ -96,6 +96,22 @@ export function HeroCarousel() {
   const heroBtnText = settings?.storeHeroBtnText || 'Shop Collection';
   const HeroBtnIcon = iconMap[settings?.storeHeroBtnIcon as keyof typeof iconMap] || ArrowRight;
 
+  const buttonStyle = useMemo(() => {
+    const style = settings?.storeBtnStyle || 'standard';
+    if (style === 'gradient') {
+      return {
+        background: `linear-gradient(to right, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
+        color: 'white',
+        border: 'none'
+      };
+    }
+    return {
+      backgroundColor: settings?.storeBtnColor || '#3b82f6',
+      color: 'white',
+      border: 'none'
+    };
+  }, [settings]);
+
   if (isLoading) {
     return (
       <div className="max-w-site-container mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -179,7 +195,7 @@ export function HeroCarousel() {
                       )}
                       {slide.showActionButton && (
                         <div className="pt-2 md:pt-10 animate-in fade-in zoom-in-95 duration-1000 delay-300">
-                          <Button asChild size="lg" className="group relative overflow-hidden bg-white text-slate-950 px-4 md:px-14 py-2 md:py-8 font-black text-[10px] md:text-sm tracking-widest md:tracking-[0.25em] uppercase transition-all duration-500 hover:bg-primary hover:text-white rounded-full shadow-2xl active:scale-95 h-8 md:h-auto">
+                          <Button asChild size="lg" style={buttonStyle} className="group relative overflow-hidden px-4 md:px-14 py-2 md:py-8 font-black text-[10px] md:text-sm tracking-widest md:tracking-[0.25em] uppercase transition-all duration-500 rounded-full shadow-2xl active:scale-95 h-8 md:h-auto border-none">
                             <Link href="/store/shop">
                               <span className="relative z-10 flex items-center gap-2 md:gap-4">
                                 {heroBtnText}
