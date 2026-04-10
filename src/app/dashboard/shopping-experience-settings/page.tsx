@@ -55,9 +55,9 @@ const iconOptions = [
 const ColorInput = ({ field, label }: { field: any; label: string }) => (
   <FormItem>
       <FormLabel className="font-bold">{label}</FormLabel>
-      <div className="relative flex items-center gap-3">
+      <div className="flex items-center gap-3">
            <FormControl>
-              <Input type="color" {...field} className="p-1 h-10 w-12 cursor-pointer rounded-lg border-2" />
+              <Input type="color" {...field} className="p-1 h-10 w-12 cursor-pointer shrink-0" />
           </FormControl>
           <span className="text-sm font-mono bg-muted px-2 py-1 rounded border">{field.value}</span>
       </div>
@@ -219,17 +219,13 @@ export default function ShoppingExperienceSettingsPage() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
 
               {/* Global Button Branding */}
-              <Card className="shadow-lg border-primary/20 ring-1 ring-primary/10 overflow-hidden">
-                <CardHeader className="bg-primary/10">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-primary rounded-lg">
-                      <Palette className="h-5 w-5 text-primary-foreground" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-xl font-black">Global Button Branding</CardTitle>
-                      <CardDescription>This setting applies a consistent color style across ALL buttons in your store.</CardDescription>
-                    </div>
-                  </div>
+              <Card className="shadow-lg border-none ring-1 ring-border">
+                <CardHeader className="bg-muted/30 border-b">
+                  <CardTitle className="flex items-center gap-2">
+                    <Palette className="h-5 w-5 text-primary" />
+                    Global Button Branding
+                  </CardTitle>
+                  <CardDescription>This setting applies a consistent color style across ALL buttons in your store.</CardDescription>
                 </CardHeader>
                 <CardContent className="pt-6 space-y-8">
                   <FormField
