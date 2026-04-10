@@ -232,7 +232,6 @@ export default function InventoryPage() {
         ...originalData,
         // Update fields that should change
         name: `${originalData.name} (Copy)`,
-        sku: originalData.sku ? `${originalData.sku}-COPY` : undefined,
         barcode: undefined, // Remove barcode for clone
         barcodeGenerated: false,
         stock: 0, // Start with 0 stock
@@ -242,6 +241,11 @@ export default function InventoryPage() {
         // Clear fields that shouldn't be copied
         id: undefined,
       };
+
+      // Only include SKU if original had one
+      if (originalData.sku) {
+        clonedData.sku = `${originalData.sku}-COPY`;
+      }
 
       // Remove id from cloned data (it's set by Firebase)
       delete clonedData.id;
