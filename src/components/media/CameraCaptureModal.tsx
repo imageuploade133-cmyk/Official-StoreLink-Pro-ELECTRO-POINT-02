@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { Camera, Image, Zap, X, Check, RotateCcw, Circle } from 'lucide-react';
+import { Camera, Image, Zap, X, Check, RotateCcw, Circle, Wand2, Image as ImageIcon } from 'lucide-react';
 import { uploadImage } from '@/ai/flows/image-upload-flow';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -107,6 +107,34 @@ export function CameraCaptureModal({ isOpen, onClose, onImageCaptured }: CameraC
     }
   };
 
+  const removeBackgroundFromImage = async () => {
+    if (!capturedImage) return;
+
+    setIsUploading(true);
+    try {
+      const { removeBackground } = await import('@/ai/flows/background-removal-flow');
+      const result = await removeBackground({ imageDataUri: capturedImage });
+
+      // Upload the background-removed image
+      const uploadResult = await uploadImage({ imageDataUri: result.display_url });
+      onImageCaptured(uploadResult.display_url);
+      toast({ 
+        title: 'Background Removed!', 
+        description: 'Product mockup created and uploaded successfully.' 
+      });
+      onClose();
+    } catch (err: any) {
+      console.error('Background removal error:', err);
+      toast({ 
+        variant: 'destructive', 
+        title: 'Background Removal Failed', 
+        description: err.message || 'Could not remove background. API key may not be configured.' 
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const retakePhoto = () => {
     setCapturedImage(null);
     startCamera();
@@ -130,7 +158,7 @@ export function CameraCaptureModal({ isOpen, onClose, onImageCaptured }: CameraC
             Capture Product Photo
           </DialogTitle>
           <DialogDescription className="text-sm">
-            Take a clear photo of your product. Rear camera auto-selected on mobile.
+            Take a clear photo of your product. Rear camera auto-selected on mobile. Remove background to create professional mockups.
           </DialogDescription>
         </DialogHeader>
 
@@ -158,17 +186,32 @@ export function CameraCaptureModal({ isOpen, onClose, onImageCaptured }: CameraC
               </div>
               <div className="text-center space-y-2">
                 <p className="text-sm font-bold text-muted-foreground">Perfect capture!</p>
-                <p className="text-xs text-muted-foreground">Ready to upload as product image.</p>
+                <p className="text-xs text-muted-foreground">Choose how to process your product image.</p>
               </div>
-              <div className="flex gap-3 w-full">
-                <Button variant="outline" onClick={retakePhoto} className="flex-1 gap-2">
-                  <RotateCcw className="h-4 w-4" />
-                  Retake
+              <div className="flex flex-col gap-3 w-full">
+                <Button 
+                  className="w-full gap-2 font-bold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70" 
+                  onClick={removeBackgroundFromImage} 
+                  disabled={isUploading}
+                >
+                  {isUploading ? <Circle className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+                  Remove Background (Make Mockup)
                 </Button>
-                <Button className="flex-1 gap-2 font-bold" onClick={uploadCapturedImage} disabled={isUploading}>
-                  {isUploading ? <Circle className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-                  Upload Photo
-                </Button>
+                <div className="flex gap-3 w-full">
+                  <Button variant="outline" onClick={retakePhoto} className="flex-1 gap-2">
+                    <RotateCcw className="h-4 w-4" />
+                    Retake
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="flex-1 gap-2 font-bold" 
+                    onClick={uploadCapturedImage} 
+                    disabled={isUploading}
+                  >
+                    {isUploading ? <Circle className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                    Keep Background
+                  </Button>
+                </div>
               </div>
             </div>
           ) : isCapturing ? (

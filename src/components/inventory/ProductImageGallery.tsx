@@ -16,9 +16,11 @@ import {
   CheckCircle2,
   Maximize2,
   X,
-  Camera
+  Camera,
+  Wand2
 } from 'lucide-react';
 import { uploadImage } from '@/ai/flows/image-upload-flow';
+import { removeBackground } from '@/ai/flows/background-removal-flow';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
@@ -154,7 +156,7 @@ export function ProductImageGallery({
   const movePosition = (index: number, direction: 'left' | 'right') => {
     const newItems = [...allImages];
     const targetIndex = direction === 'left' ? index - 1 : index + 1;
-    
+
     if (targetIndex < 0 || targetIndex >= newItems.length) return;
 
     const temp = newItems[index];
@@ -163,6 +165,50 @@ export function ProductImageGallery({
 
     onPrimaryChange(newItems[0].url);
     onAdditionalChange(newItems.slice(1).map(item => item.url));
+  };
+
+  const handleRemoveBackground = async (imageUrl: string, index: number) => {
+    setIsUploading(true);
+    try {
+      // Convert image URL to data URI
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const imageDataUri = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+
+      // Remove background
+      const result = await removeBackground({ imageDataUri });
+
+      // Upload the background-removed image
+      const uploadResult = await uploadImage({ imageDataUri: result.display_url });
+
+      // Update the image in the correct position
+      if (allImages[index].isPrimary) {
+        onPrimaryChange(uploadResult.display_url);
+      } else {
+        const updatedUrls = [...additionalUrls];
+        const urlIndex = updatedUrls.indexOf(imageUrl);
+        if (urlIndex !== -1) {
+          updatedUrls[urlIndex] = uploadResult.display_url;
+          onAdditionalChange(updatedUrls);
+        }
+      }
+
+      toast({ title: 'Background Removed!', description: 'Product mockup created successfully.' });
+    } catch (error: any) {
+      console.error('Background removal failed:', error);
+      toast({ 
+        variant: "destructive", 
+        title: "Background Removal Failed", 
+        description: error.message || "Could not remove background. API key may not be configured." 
+      });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -207,27 +253,16 @@ export function ProductImageGallery({
           <CameraCaptureModal 
             isOpen={isPhotoCaptureOpen}
             onClose={() => setIsPhotoCaptureOpen(false)}
-            onImageCaptured={async (imageBlob) => {
+            onImageCaptured={async (imageUrl) => {
               try {
                 setIsUploading(true);
-                const imageDataUri = await new Promise<string>((resolve) => {
-                  const reader = new FileReader();
-                  reader.readAsDataURL(imageBlob);
-                  reader.onload = () => resolve(reader.result as string);
-                });
                 
-                const optimized = await compressAndResizeImage(
-                  imageDataUri, 
-                  settings?.imageUploadQuality || 80, 
-                  settings?.imageMaxWidth || 1920
-                );
-                
-                const result = await uploadImage({ imageDataUri: optimized });
-                
+                // The image is already uploaded and optimized by CameraCaptureModal
+                // imageUrl is a string URL, not a Blob
                 if (!primaryUrl) {
-                  onPrimaryChange(result.display_url);
+                  onPrimaryChange(imageUrl);
                 } else {
-                  onAdditionalChange([...additionalUrls, result.display_url]);
+                  onAdditionalChange([...additionalUrls, imageUrl]);
                 }
                 
                 toast({ title: "Photo Captured!", description: "Added to gallery successfully." });
@@ -271,24 +306,37 @@ export function ProductImageGallery({
                     {item.isPrimary ? <CheckCircle2 className="h-2 w-2 mr-1" /> : null}
                     {item.isPrimary ? 'Primary' : 'Gallery'}
                 </Badge>
-                
+
                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button 
-                        type="button" 
-                        variant="secondary" 
-                        size="icon" 
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        size="icon"
+                        className="h-6 w-6 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600"
+                        onClick={() => handleRemoveBackground(item.url, index)}
+                        disabled={disabled || isUploading}
+                        title="Remove Background (Make Mockup)"
+                    >
+                        <Wand2 className="h-3 w-3" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        size="icon"
                         className="h-6 w-6 rounded-full bg-white/90 text-black hover:bg-white"
                         onClick={() => setPreviewUrl(item.url)}
+                        title="Preview"
                     >
                         <Maximize2 className="h-3 w-3" />
                     </Button>
-                    <Button 
-                        type="button" 
-                        variant="destructive" 
-                        size="icon" 
+                    <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
                         className="h-6 w-6 rounded-full"
                         onClick={() => removeImage(index)}
                         disabled={disabled || isUploading}
+                        title="Remove"
                     >
                         <Trash2 className="h-3 w-3" />
                     </Button>
