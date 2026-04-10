@@ -99,8 +99,8 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
             const isOutOfStock = product.stock <= 0;
 
             return (
-              <TableRow 
-                key={product.id} 
+              <TableRow
+                key={product.id}
                 className={cn(
                     "transition-colors group",
                     isOutOfStock && "bg-red-50/50 hover:bg-red-50 dark:bg-red-950/10 dark:hover:bg-red-950/20",
@@ -109,10 +109,10 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
               >
                 <TableCell>
                     <div className="relative w-12 h-12 rounded-lg overflow-hidden border-2 border-background shadow-sm bg-muted flex items-center justify-center shrink-0">
-                        <Image 
-                            src={(product.imageUrl && product.imageUrl.trim() !== "") ? product.imageUrl : defaultProductImageUrl} 
-                            alt={product.name} 
-                            fill 
+                        <Image
+                            src={(product.imageUrl && product.imageUrl.trim() !== "") ? product.imageUrl : defaultProductImageUrl}
+                            alt={product.name}
+                            fill
                             className="object-cover transition-transform group-hover:scale-110 duration-300"
                             unoptimized
                         />

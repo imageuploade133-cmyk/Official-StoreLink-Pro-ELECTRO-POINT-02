@@ -232,7 +232,8 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
           hoverEffectClass
         )}
         style={{ 
-          height: `${totalCardHeight}px`,
+          minHeight: `${totalCardHeight}px`,
+          height: 'auto',
           borderColor: borderColor,
           backgroundColor: bgColor,
         }}
