@@ -493,19 +493,62 @@ export default function ProductDetailsPage() {
   };
 
   const buttonStyle = useMemo(() => {
-    const style = settings?.storeBtnStyle || 'standard';
-    if (style === 'gradient') {
+    const useIndividual = settings?.useIndividualBtnSettings !== false;
+    const style = useIndividual 
+      ? (settings?.storeAddToCartStyle || 'standard')
+      : (settings?.storeBtnStyle || 'standard');
+    
+    const getColor = () => {
+      if (useIndividual) {
+        if (style === 'gradient') {
+          return {
+            background: `linear-gradient(135deg, ${settings?.storeAddToCartGradientStart || '#3b82f6'}, ${settings?.storeAddToCartGradientEnd || '#1d4ed8'})`,
+            color: 'white',
+            border: 'none'
+          };
+        }
+        return {
+          backgroundColor: settings?.storeAddToCartColor || '#3b82f6',
+          color: 'white',
+          border: 'none'
+        };
+      }
+      // Global settings
+      if (style === 'gradient') {
+        return {
+          background: `linear-gradient(135deg, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
+          color: 'white',
+          border: 'none'
+        };
+      }
       return {
-        background: `linear-gradient(to right, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
+        backgroundColor: settings?.storeBtnColor || '#3b82f6',
         color: 'white',
         border: 'none'
       };
-    }
-    return {
-      backgroundColor: settings?.storeBtnColor || '#3b82f6',
-      color: 'white',
-      border: 'none'
     };
+    
+    return getColor();
+  }, [settings]);
+
+  // Button shape and size classes
+  const buttonClasses = useMemo(() => {
+    const useIndividual = settings?.useIndividualBtnSettings !== false;
+    const shape = useIndividual 
+      ? (settings?.storeAddToCartShape || 'rounded-xl')
+      : (settings?.storeBtnShape || 'rounded-xl');
+    const size = useIndividual
+      ? (settings?.storeAddToCartSize || 'lg')
+      : (settings?.storeBtnSize || 'md');
+    
+    const sizeClasses = {
+      sm: 'px-3 py-2 text-xs',
+      md: 'px-4 py-2.5 text-sm',
+      lg: 'px-6 py-3 text-sm',
+      xl: 'px-8 py-4 text-base'
+    };
+    
+    return `${shape} ${sizeClasses[size]}`;
   }, [settings]);
 
   if (isLoadingProduct) {
@@ -696,9 +739,8 @@ export default function ProductDetailsPage() {
                   </div>
                   <Button 
                     onClick={handleAddToCart} 
-                    size="lg" 
                     style={buttonStyle}
-                    className="flex-1 text-white font-black uppercase tracking-widest h-12 md:h-14 rounded-lg md:rounded-2xl shadow-xl transition-all group text-xs md:text-sm"
+                    className={`flex-1 text-white font-black uppercase tracking-widest shadow-xl transition-all group ${buttonClasses}`}
                   >
                     <AddToCartIcon className="mr-2 md:mr-3 h-4 md:h-5 w-4 md:w-5 group-hover:animate-bounce" /> {addToCartText}
                   </Button>

@@ -62,19 +62,62 @@ export function StickyProductBar({
 
   // Dynamic Button Style
   const buttonStyle = React.useMemo(() => {
-    const style = settings?.storeBtnStyle || 'standard';
-    if (style === 'gradient') {
+    const useIndividual = settings?.useIndividualBtnSettings !== false;
+    const style = useIndividual 
+      ? (settings?.storeAddToCartStyle || 'standard')
+      : (settings?.storeBtnStyle || 'standard');
+    
+    const getColor = () => {
+      if (useIndividual) {
+        if (style === 'gradient') {
+          return {
+            background: `linear-gradient(135deg, ${settings?.storeAddToCartGradientStart || '#3b82f6'}, ${settings?.storeAddToCartGradientEnd || '#1d4ed8'})`,
+            color: 'white',
+            border: 'none'
+          };
+        }
+        return {
+          backgroundColor: settings?.storeAddToCartColor || '#3b82f6',
+          color: 'white',
+          border: 'none'
+        };
+      }
+      // Global settings
+      if (style === 'gradient') {
+        return {
+          background: `linear-gradient(135deg, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
+          color: 'white',
+          border: 'none'
+        };
+      }
       return {
-        background: `linear-gradient(to right, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
+        backgroundColor: settings?.storeBtnColor || '#3b82f6',
         color: 'white',
         border: 'none'
       };
-    }
-    return {
-      backgroundColor: settings?.storeBtnColor || '#3b82f6',
-      color: 'white',
-      border: 'none'
     };
+    
+    return getColor();
+  }, [settings]);
+
+  // Button shape and size classes
+  const buttonClasses = React.useMemo(() => {
+    const useIndividual = settings?.useIndividualBtnSettings !== false;
+    const shape = useIndividual 
+      ? (settings?.storeAddToCartShape || 'rounded-xl')
+      : (settings?.storeBtnShape || 'rounded-xl');
+    const size = useIndividual
+      ? (settings?.storeAddToCartSize || 'lg')
+      : (settings?.storeBtnSize || 'md');
+    
+    const sizeClasses = {
+      sm: 'px-3 py-2 text-xs',
+      md: 'px-4 py-2.5 text-sm',
+      lg: 'px-5 py-3 text-sm',
+      xl: 'px-6 py-4 text-base'
+    };
+    
+    return `${shape} ${sizeClasses[size]}`;
   }, [settings]);
 
   return (
@@ -118,7 +161,8 @@ export function StickyProductBar({
             disabled={isOutOfStock}
             style={buttonStyle}
             className={cn(
-              "px-4 sm:px-6 py-3 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wide transition-all duration-300 flex items-center gap-1.5 shrink-0 border-none",
+              "font-black text-xs sm:text-sm uppercase tracking-wide transition-all duration-300 flex items-center gap-1.5 shrink-0 border-none",
+              buttonClasses,
               isOutOfStock && "opacity-50 cursor-not-allowed"
             )}
           >
