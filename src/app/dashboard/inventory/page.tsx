@@ -10,7 +10,8 @@ import {
   MoreHorizontal, 
   ChevronLeft, 
   ChevronRight, 
-  RotateCcw 
+  RotateCcw,
+  Copy 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/PageHeader';
@@ -29,6 +30,8 @@ import {
   endBefore, 
   limitToLast, 
   serverTimestamp,
+  addDoc,
+  getDoc,
   type QueryDocumentSnapshot, 
   type DocumentData, 
   getCountFromServer 
@@ -56,6 +59,7 @@ export default function InventoryPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
+  const [isCloning, setIsCloning] = useState(false);
 
   const firestore = useFirestore();
   const { user } = useAuth();
@@ -163,7 +167,7 @@ export default function InventoryPage() {
   const confirmDeleteProduct = async () => {
     if (!selectedProductForActions || !firestore) return;
     setIsDeleting(true);
-    
+
     const batch = writeBatch(firestore);
     const productRef = doc(firestore, 'products', selectedProductForActions.id);
     const auditRef = doc(collection(firestore, 'stockAudit'));
@@ -204,6 +208,92 @@ export default function InventoryPage() {
       .finally(() => {
         setIsDeleting(false);
       });
+  };
+
+  const handleCloneProduct = async () => {
+    if (!selectedProductForActions || !firestore) return;
+    setIsCloning(true);
+
+    try {
+      const batch = writeBatch(firestore);
+
+      // 1. Create the cloned product document
+      const newProductRef = doc(collection(firestore, 'products'));
+      const originalProductData = await getDoc(doc(firestore, 'products', selectedProductForActions.id));
+
+      if (!originalProductData.exists()) {
+        throw new Error('Original product not found');
+      }
+
+      const originalData = originalProductData.data();
+
+      // Prepare cloned product data
+      const clonedData: any = {
+        ...originalData,
+        // Update fields that should change
+        name: `${originalData.name} (Copy)`,
+        sku: originalData.sku ? `${originalData.sku}-COPY` : undefined,
+        barcode: undefined, // Remove barcode for clone
+        barcodeGenerated: false,
+        stock: 0, // Start with 0 stock
+        // Preserve timestamps (new ones will be set)
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        // Clear fields that shouldn't be copied
+        id: undefined,
+      };
+
+      // Remove id from cloned data (it's set by Firebase)
+      delete clonedData.id;
+
+      // Set the cloned product
+      batch.set(newProductRef, clonedData);
+
+      // 2. Clone voice signatures sub-collection
+      const voiceSignaturesQuery = query(collection(firestore, 'products', selectedProductForActions.id, 'voiceSignatures'));
+      const voiceSignaturesSnapshot = await getDocs(voiceSignaturesQuery);
+
+      voiceSignaturesSnapshot.forEach((voiceDoc) => {
+        const newVoiceRef = doc(collection(firestore, 'products', newProductRef.id, 'voiceSignatures'));
+        batch.set(newVoiceRef, voiceDoc.data());
+      });
+
+      // 3. Create audit entry for the clone
+      const auditRef = doc(collection(firestore, 'stockAudit'));
+      batch.set(auditRef, {
+        productId: newProductRef.id,
+        productName: clonedData.name,
+        type: 'ADJUSTMENT',
+        referenceId: 'CLONE-' + newProductRef.id.substring(0, 8).toUpperCase(),
+        beforeStock: 0,
+        afterStock: 0,
+        change: 0,
+        staffId: user?.uid || 'SYSTEM',
+        staffName: user?.displayName || user?.email || 'Staff',
+        timestamp: serverTimestamp(),
+        details: `Cloned from product: ${selectedProductForActions.name}`
+      });
+
+      await batch.commit();
+
+      toast({
+        title: 'Product Cloned Successfully',
+        description: `"${clonedData.name}" has been created as a copy of "${selectedProductForActions.name}".`,
+      });
+
+      setIsActionModalOpen(false);
+      setSelectedProductForActions(null);
+      fetchProducts('initial');
+    } catch (error: any) {
+      console.error('Error cloning product:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Clone Failed',
+        description: error.message || 'Failed to clone product. Please try again.',
+      });
+    } finally {
+      setIsCloning(false);
+    }
   };
 
   const isLoading = isLoadingProducts || isLoadingCategories || isLoadingSettings;
@@ -309,6 +399,15 @@ export default function InventoryPage() {
             title={selectedProductForActions.name}
             description={`SKU: ${selectedProductForActions.sku || 'N/A'}`}
         >
+            <Button
+              variant="outline"
+              className="justify-start h-11"
+              onClick={() => handleCloneProduct()}
+              disabled={isCloning}
+            >
+                {isCloning ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Copy className="mr-2 h-4 w-4" />}
+                Clone Product
+            </Button>
             <Button variant="outline" className="justify-start h-11" onClick={() => handleEditProduct(selectedProductForActions.id)}>
                 <Edit className="mr-2 h-4 w-4" /> Edit Master Details
             </Button>
