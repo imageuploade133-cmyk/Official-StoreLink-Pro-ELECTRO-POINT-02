@@ -147,7 +147,22 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
                     )}
                 </TableCell>
                 <TableCell className="font-mono text-xs">{product.sku || 'N/A'}</TableCell>
-                <TableCell className="text-right font-black">{formatCurrency(product.sellingPrice || 0, currencySymbol)}</TableCell>
+                <TableCell className="text-right font-black">
+                    <div className="flex flex-col items-end">
+                        {product.newPrice ? (
+                            <>
+                                <span className="text-[10px] text-muted-foreground line-through decoration-destructive/50">
+                                    {formatCurrency(product.sellingPrice || 0, currencySymbol)}
+                                </span>
+                                <span className="text-green-600">
+                                    {formatCurrency(product.newPrice, currencySymbol)}
+                                </span>
+                            </>
+                        ) : (
+                            formatCurrency(product.sellingPrice || 0, currencySymbol)
+                        )}
+                    </div>
+                </TableCell>
                 <TableCell className="text-right">
                   {isOutOfStock ? (
                     <Badge variant="destructive" className="font-black uppercase tracking-tighter text-[10px]">Out of Stock</Badge>
