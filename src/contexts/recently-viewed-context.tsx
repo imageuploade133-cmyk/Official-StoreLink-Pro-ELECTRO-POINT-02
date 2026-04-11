@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { safeStorage } from '@/lib/storage-utils';
 
 interface RecentlyViewedContextType {
   viewedProductIds: string[];
@@ -18,19 +19,22 @@ export function RecentlyViewedProvider({ children }: { children: React.ReactNode
 
   // Load from local storage on mount
   useEffect(() => {
-    const saved = localStorage.getItem('recentlyViewed');
+    const saved = safeStorage.getItem('recentlyViewed');
     if (saved) {
       try {
         setViewedProductIds(JSON.parse(saved));
       } catch (e) {
         console.error("Failed to parse recently viewed history", e);
+        safeStorage.removeItem('recentlyViewed');
       }
     }
   }, []);
 
   // Sync to local storage on change
   useEffect(() => {
-    localStorage.setItem('recentlyViewed', JSON.stringify(viewedProductIds));
+    if (viewedProductIds.length > 0 || safeStorage.getItem('recentlyViewed')) {
+      safeStorage.setItem('recentlyViewed', JSON.stringify(viewedProductIds));
+    }
   }, [viewedProductIds]);
 
   const addViewedProduct = useCallback((productId: string) => {
@@ -48,7 +52,7 @@ export function RecentlyViewedProvider({ children }: { children: React.ReactNode
 
   const clearHistory = useCallback(() => {
     setViewedProductIds([]);
-    localStorage.removeItem('recentlyViewed');
+    safeStorage.removeItem('recentlyViewed');
   }, []);
 
   const value = useMemo(() => ({

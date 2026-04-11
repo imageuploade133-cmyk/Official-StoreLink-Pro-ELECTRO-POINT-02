@@ -46,12 +46,16 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
-                const savedZoom = localStorage.getItem('dashboard-zoom');
-                if (savedZoom) {
-                  const zoomLevel = parseInt(savedZoom, 10);
-                  const baseFontSize = 16;
-                  const newFontSize = (baseFontSize * zoomLevel) / 100;
-                  document.documentElement.style.fontSize = newFontSize + 'px';
+                try {
+                  const savedZoom = localStorage.getItem('dashboard-zoom');
+                  if (savedZoom) {
+                    const zoomLevel = parseInt(savedZoom, 10);
+                    const baseFontSize = 16;
+                    const newFontSize = (baseFontSize * zoomLevel) / 100;
+                    document.documentElement.style.fontSize = newFontSize + 'px';
+                  }
+                } catch (e) {
+                  console.error('LocalStorage access denied:', e);
                 }
               })();
             `,
