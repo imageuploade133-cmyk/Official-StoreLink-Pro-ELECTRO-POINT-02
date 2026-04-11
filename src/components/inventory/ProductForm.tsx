@@ -1567,10 +1567,11 @@ export function ProductForm({
                   Public Store Sections
               </CardTitle>
               <CardDescription className="text-destructive/70 text-xs">
-                Control which sections appear on the public product page
+                Control which sections appear on the public product page.
+                <span className="block mt-1 font-bold text-[10px] uppercase tracking-tighter">Note: Global settings can override these.</span>
               </CardDescription>
             </CardHeader>
-            <CardContent className="pt-6 space-y-6">
+
               <FormField
                 control={form.control}
                 name="showTechnicalSpecs"
