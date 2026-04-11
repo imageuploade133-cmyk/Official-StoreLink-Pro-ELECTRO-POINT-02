@@ -46,7 +46,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSettings } from '@/contexts/settings-context';
 import { InventoryStats } from '@/components/inventory/InventoryStats';
-import { ProductSheet } from '@/components/inventory/ProductSheet';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/auth-context';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -341,14 +340,17 @@ export default function InventoryPage() {
                 <RotateCcw className={cn("mr-2 h-4 w-4", isLoading && "animate-spin")} />
                 Sync Registry
             </Button>
-            <ProductSheet
-              trigger={
-                <Button disabled={isLoading || isNavigating} size="lg">
-                  {isNavigating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PlusCircle className="mr-2 h-4 w-4" />}
-                  Add New Product
-                </Button>
-              }
-            />
+            <Button 
+              disabled={isLoading || isNavigating} 
+              size="lg"
+              onClick={() => {
+                setIsNavigating(true);
+                router.push('/dashboard/inventory/add');
+              }}
+            >
+              {isNavigating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PlusCircle className="mr-2 h-4 w-4" />}
+              Add New Product
+            </Button>
         </div>
       </div>
 
