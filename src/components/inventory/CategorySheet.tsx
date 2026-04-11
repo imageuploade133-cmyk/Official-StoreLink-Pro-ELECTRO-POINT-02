@@ -31,7 +31,6 @@ export function CategorySheet({ children, trigger }: CategorySheetProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [snap, setSnap] = useState<number | string | null>('300px');
 
   const handleAddCategory = async (values: CategoryFormValues) => {
     if (!user || !firestore) return;
@@ -82,9 +81,6 @@ export function CategorySheet({ children, trigger }: CategorySheetProps) {
     <Drawer 
       open={isOpen} 
       onOpenChange={setIsOpen}
-      snapPoints={['300px', 1]}
-      activeSnapPoint={snap}
-      setActiveSnapPoint={setSnap}
       dismissible={true}
     >
       <DrawerTrigger asChild>
@@ -94,10 +90,10 @@ export function CategorySheet({ children, trigger }: CategorySheetProps) {
           </Button>
         )}
       </DrawerTrigger>
-      <DrawerContent className="flex flex-col max-h-[95vh] rounded-t-[20px] border-t">
+      <DrawerContent className="flex flex-col h-[90vh] max-h-[90vh] rounded-t-[20px] border-t overflow-hidden">
         {/* Drag Handle Bar - Prominent and Draggable */}
         <div 
-          className="w-full flex flex-col items-center pt-4 pb-2 cursor-grab active:cursor-grabbing touch-none select-none hover:bg-muted/30 transition-colors"
+          className="w-full flex flex-col items-center pt-4 pb-2 cursor-grab active:cursor-grabbing touch-none select-none hover:bg-muted/30 transition-colors shrink-0"
           data-vaul-drag-handle
         >
           <div className="w-12 h-1.5 rounded-full bg-muted-foreground/40 mb-2" />
@@ -131,7 +127,7 @@ export function CategorySheet({ children, trigger }: CategorySheetProps) {
           </DrawerDescription>
         </DrawerHeader>
         
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 min-h-0 overflow-hidden">
           <CategoryForm 
             onSubmit={handleAddCategory}
             isSubmitting={isSubmitting}
