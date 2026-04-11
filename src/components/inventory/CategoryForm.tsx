@@ -169,7 +169,7 @@ export function CategoryForm({
             <CardDescription>Create a new category to organize your inventory. Max image size: {settings?.imageMaxFileSizeMb || 5}MB.</CardDescription>
           </CardHeader>
           
-          <ScrollArea className="flex-1">
+          <ScrollArea className="flex-1 h-0 min-h-0">
             <CardContent className="p-6 space-y-8">
               <div className="grid grid-cols-1 gap-6">
                 <FormField
