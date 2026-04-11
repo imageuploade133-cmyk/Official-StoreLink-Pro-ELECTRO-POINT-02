@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter } from '@/components/ui/drawer';
 import { Camera, Image, Zap, X, Check, RotateCcw, Circle, Wand2, Image as ImageIcon } from 'lucide-react';
 import { uploadImage } from '@/ai/flows/image-upload-flow';
 import { useToast } from '@/hooks/use-toast';
@@ -150,34 +150,35 @@ export function CameraCaptureModal({ isOpen, onClose, onImageCaptured }: CameraC
   }, [isOpen, capturedImage, startCamera, stopCamera]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl p-0 max-h-[90vh] flex flex-col">
-        <DialogHeader className="p-6 pb-4 border-b">
-          <DialogTitle className="flex items-center gap-3 font-black">
-            <Camera className="h-6 w-6" />
+    <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DrawerContent className="h-[100dvh] flex flex-col rounded-none border-none mt-0">
+        <DrawerHeader className="p-6 pb-4 border-b shrink-0">
+          <DrawerTitle className="flex items-center gap-3 font-black text-2xl">
+            <Camera className="h-8 w-8 text-primary" />
             Capture Product Photo
-          </DialogTitle>
-          <DialogDescription className="text-sm">
-            Take a clear photo of your product. Rear camera auto-selected on mobile. Remove background to create professional mockups.
-          </DialogDescription>
-        </DialogHeader>
+          </DrawerTitle>
+          <DrawerDescription className="text-sm">
+            Take a clear photo of your product. Rear camera auto-selected.
+          </DrawerDescription>
+        </DrawerHeader>
 
-        <div className="flex-1 p-6 overflow-hidden flex flex-col">
+        <div className="flex-1 p-4 overflow-hidden flex flex-col justify-center bg-black/5">
+          <canvas ref={canvasRef} className="hidden" />
           {error ? (
-            <div className="flex flex-col items-center justify-center h-full gap-6 text-center p-8">
+            <div className="flex flex-col items-center justify-center h-full gap-6 text-center p-8 bg-background rounded-3xl shadow-inner">
               <Camera className="h-20 w-20 text-muted-foreground opacity-30" />
               <div>
                 <h3 className="font-bold text-lg mb-2 text-destructive">{error}</h3>
                 <p className="text-sm text-muted-foreground mb-6">Camera permission needed for photo capture.</p>
               </div>
-              <Button onClick={startCamera} className="gap-2">
-                <Zap className="h-4 w-4" />
+              <Button onClick={startCamera} className="gap-2 px-8 py-6 rounded-full text-lg font-bold">
+                <Zap className="h-5 w-5" />
                 Try Again
               </Button>
             </div>
           ) : capturedImage ? (
-            <div className="flex flex-col items-center justify-center h-full gap-6 p-8">
-              <div className="relative w-full max-w-sm aspect-square rounded-2xl overflow-hidden shadow-2xl border-4 border-primary/20">
+            <div className="flex flex-col items-center justify-center h-full gap-6 p-4">
+              <div className="relative w-full aspect-square max-w-sm rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white">
                 <img 
                   src={capturedImage} 
                   alt="Captured product" 
@@ -185,63 +186,59 @@ export function CameraCaptureModal({ isOpen, onClose, onImageCaptured }: CameraC
                 />
               </div>
               <div className="text-center space-y-2">
-                <p className="text-sm font-bold text-muted-foreground">Perfect capture!</p>
-                <p className="text-xs text-muted-foreground">Choose how to process your product image.</p>
+                <p className="text-lg font-black text-primary uppercase tracking-widest">Perfect capture!</p>
+                <p className="text-sm text-muted-foreground">Choose how to process your product image.</p>
               </div>
-              <div className="flex flex-col gap-3 w-full">
+              <div className="flex flex-col gap-3 w-full max-w-sm">
                 <Button 
-                  className="w-full gap-2 font-bold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70" 
+                  className="w-full h-16 gap-2 font-black text-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-2xl shadow-xl shadow-purple-500/20" 
                   onClick={removeBackgroundFromImage} 
                   disabled={isUploading}
                 >
-                  {isUploading ? <Circle className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-                  Remove Background (Make Mockup)
+                  {isUploading ? <Circle className="h-5 w-5 animate-spin" /> : <Wand2 className="h-5 w-5" />}
+                  Remove Background
                 </Button>
                 <div className="flex gap-3 w-full">
-                  <Button variant="outline" onClick={retakePhoto} className="flex-1 gap-2">
-                    <RotateCcw className="h-4 w-4" />
+                  <Button variant="outline" onClick={retakePhoto} className="flex-1 h-14 gap-2 rounded-2xl font-bold border-2">
+                    <RotateCcw className="h-5 w-5" />
                     Retake
                   </Button>
                   <Button 
-                    variant="outline" 
-                    className="flex-1 gap-2 font-bold" 
+                    variant="secondary" 
+                    className="flex-1 h-14 gap-2 font-bold rounded-2xl" 
                     onClick={uploadCapturedImage} 
                     disabled={isUploading}
                   >
-                    {isUploading ? <Circle className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-                    Keep Background
+                    {isUploading ? <Circle className="h-5 w-5 animate-spin" /> : <Check className="h-5 w-5" />}
+                    Keep Original
                   </Button>
                 </div>
               </div>
             </div>
           ) : isCapturing ? (
-            <div className="relative h-[400px] md:h-[500px] rounded-xl overflow-hidden shadow-2xl border-4 border-primary/20">
+            <div className="relative w-full aspect-[3/4] max-h-[70vh] md:max-h-none md:flex-1 rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-primary/20 bg-black">
               <video 
                 ref={videoRef} 
                 className="w-full h-full object-cover"
                 playsInline 
                 muted
               />
-              <div className="absolute inset-0 flex items-end justify-center p-8 pointer-events-none">
-                <div className="w-48 h-48 border-4 border-white/30 rounded-2xl bg-white/10 backdrop-blur-sm animate-pulse" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Circle 
-                    className="h-24 w-24 text-white/80 animate-ping" 
-                    strokeWidth={1}
-                  />
-                </div>
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="w-64 h-64 border-2 border-white/20 rounded-3xl animate-pulse" />
               </div>
               <Button
                 onClick={capturePhoto}
-                className="absolute bottom-6 left-1/2 -translate-x-1/2 h-20 w-20 rounded-full bg-white/90 hover:bg-white shadow-2xl border-4 border-white/50 text-primary font-black text-xl shadow-lg active:scale-95 transition-all"
+                className="absolute bottom-8 left-1/2 -translate-x-1/2 h-24 w-24 rounded-full bg-white hover:bg-white/90 shadow-2xl border-[6px] border-primary/20 flex items-center justify-center active:scale-90 transition-all group"
               >
-                <Camera className="h-8 w-8" />
+                <div className="h-16 w-16 rounded-full border-4 border-primary/10 group-hover:border-primary/20 transition-all flex items-center justify-center">
+                    <Camera className="h-10 w-10 text-primary" />
+                </div>
               </Button>
             </div>
           ) : (
-            <div className="flex items-center justify-center h-full text-muted-foreground">
+            <div className="flex items-center justify-center h-full text-muted-foreground bg-background rounded-3xl">
               <div className="text-center">
-                <Camera className="h-16 w-16 mx-auto mb-4 opacity-30" />
+                <Camera className="h-16 w-16 mx-auto mb-4 opacity-30 animate-bounce" />
                 <p className="text-lg font-bold mb-2">Starting Camera...</p>
                 <p className="text-sm">Initializing rear camera.</p>
               </div>
@@ -249,19 +246,19 @@ export function CameraCaptureModal({ isOpen, onClose, onImageCaptured }: CameraC
           )}
         </div>
 
-        <DialogFooter className="p-6 pt-0 border-t">
+        <DrawerFooter className="p-6 pt-4 border-t bg-background shrink-0">
           <Button 
-            variant="outline" 
+            variant="ghost" 
             onClick={onClose} 
-            className="flex-1"
+            className="w-full h-12 rounded-xl text-muted-foreground font-bold"
             disabled={isUploading}
           >
-            <X className="h-4 w-4 mr-2" />
-            Cancel
+            <X className="h-5 w-5 mr-2" />
+            Cancel and Close
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }
 
