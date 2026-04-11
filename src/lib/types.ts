@@ -485,6 +485,9 @@ export interface Product {
   badge2Title?: string;
   badge2Sub?: string;
   showProductInsight?: boolean;
+  showTechnicalSpecs?: boolean;
+  showLogisticsInfo?: boolean;
+  showVerifiedReviews?: boolean;
 }
 
 export interface DisplayProduct extends Product {

@@ -47,7 +47,10 @@ import {
   ChevronDown,
   AlertTriangle,
   Sparkles,
-  Camera
+  Camera,
+  EyeOff,
+  ListChecks,
+  Star
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Timestamp, addDoc, collection, doc, updateDoc } from 'firebase/firestore';
@@ -175,6 +178,9 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
     badge2Icon: z.string().default('ShieldCheck'),
     badge2Title: z.string().default('2-Year Warranty'),
     badge2Sub: z.string().default('Protection'),
+    showTechnicalSpecs: z.boolean().default(true),
+    showLogisticsInfo: z.boolean().default(true),
+    showVerifiedReviews: z.boolean().default(true),
   });
 
   return baseSchema
@@ -302,6 +308,9 @@ export function ProductForm({
       badge2Icon: 'ShieldCheck',
       badge2Title: '2-Year Warranty',
       badge2Sub: 'Protection',
+      showTechnicalSpecs: true,
+      showLogisticsInfo: true,
+      showVerifiedReviews: true,
     },
   });
 
@@ -377,6 +386,9 @@ export function ProductForm({
         badge2Icon: defaultValues.badge2Icon || 'ShieldCheck',
         badge2Title: defaultValues.badge2Title || '2-Year Warranty',
         badge2Sub: defaultValues.badge2Sub || 'Protection',
+        showTechnicalSpecs: defaultValues.showTechnicalSpecs ?? true,
+        showLogisticsInfo: defaultValues.showLogisticsInfo ?? true,
+        showVerifiedReviews: defaultValues.showVerifiedReviews ?? true,
       });
     }
   }, [defaultValues, categories, form]);
@@ -1539,6 +1551,66 @@ export function ProductForm({
                           <Info className="h-3.5 w-3.5 text-primary" /> Product Insight
                       </FormLabel>
                       <p className="text-[10px] text-muted-foreground">Show "Listed Since" metrics</p>
+                    </div>
+                    <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} disabled={isSubmitting} /></FormControl>
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Public Store Section Visibility - Red Color */}
+          <Card className="shadow-xl border-none ring-1 ring-destructive/30">
+            <CardHeader className="bg-destructive/10">
+              <CardTitle className="text-lg flex items-center gap-2 text-destructive">
+                  <EyeOff className="h-5 w-5" />
+                  Public Store Sections
+              </CardTitle>
+              <CardDescription className="text-destructive/70 text-xs">
+                Control which sections appear on the public product page
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-6">
+              <FormField
+                control={form.control}
+                name="showTechnicalSpecs"
+                render={({ field }) => (
+                  <FormItem className="flex items-center justify-between p-4 border border-destructive/20 rounded-2xl bg-destructive/5">
+                    <div className="space-y-0.5">
+                      <FormLabel className="font-black text-xs uppercase tracking-wider flex items-center gap-2 text-destructive">
+                          <ListChecks className="h-3.5 w-3.5" /> Technical Specs
+                      </FormLabel>
+                      <p className="text-[10px] text-muted-foreground">Show specifications, variations, sizing</p>
+                    </div>
+                    <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} disabled={isSubmitting} /></FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="showLogisticsInfo"
+                render={({ field }) => (
+                  <FormItem className="flex items-center justify-between p-4 border border-destructive/20 rounded-2xl bg-destructive/5">
+                    <div className="space-y-0.5">
+                      <FormLabel className="font-black text-xs uppercase tracking-wider flex items-center gap-2 text-destructive">
+                          <Truck className="h-3.5 w-3.5" /> Logistics Info
+                      </FormLabel>
+                      <p className="text-[10px] text-muted-foreground">Show shipping & returns tab</p>
+                    </div>
+                    <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} disabled={isSubmitting} /></FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="showVerifiedReviews"
+                render={({ field }) => (
+                  <FormItem className="flex items-center justify-between p-4 border border-destructive/20 rounded-2xl bg-destructive/5">
+                    <div className="space-y-0.5">
+                      <FormLabel className="font-black text-xs uppercase tracking-wider flex items-center gap-2 text-destructive">
+                          <Star className="h-3.5 w-3.5" /> Verified Reviews
+                      </FormLabel>
+                      <p className="text-[10px] text-muted-foreground">Show customer reviews & ratings</p>
                     </div>
                     <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} disabled={isSubmitting} /></FormControl>
                   </FormItem>
