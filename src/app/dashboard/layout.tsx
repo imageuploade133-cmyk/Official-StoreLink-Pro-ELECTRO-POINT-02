@@ -45,6 +45,7 @@ import {
   Activity,
   Zap,
   Volume2,
+  EyeOff,
   ClipboardList,
   SquarePlus,
   FileText,
