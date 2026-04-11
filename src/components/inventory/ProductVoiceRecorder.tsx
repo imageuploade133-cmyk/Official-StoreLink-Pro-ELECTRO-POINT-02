@@ -14,7 +14,7 @@ import {
   Plus,
   GripVertical,
   Eye,
-  Slash,
+  EyeOff,
   Pause,
   Clock,
   Code,
@@ -294,7 +294,7 @@ const startRecording = async (index: number) => {
                                     name={`voiceSignatures.${index}.isVisible`}
                                     render={({ field: subField }) => (
                                         <div className="flex items-center gap-3 bg-muted/30 px-3 py-1.5 rounded-full border border-slate-200/50">
-                                            {subField.value ? <Eye className="h-3.5 w-3.5 text-green-600" /> : <Eye className="h-3.5 w-3.5 text-muted-foreground opacity-50" />}
+                                            {subField.value ? <Eye className="h-3.5 w-3.5 text-green-600" /> : <EyeOff className="h-3.5 w-3.5 text-muted-foreground opacity-50" />}
                                             <Switch 
                                                 checked={subField.value} 
                                                 onCheckedChange={subField.onChange}
