@@ -32,6 +32,7 @@ import { calculateEffectivePrice } from '@/lib/pos-utils';
 import { useToast } from '@/hooks/use-toast';
 import { cn, convertToDateSafely } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
+import { safeSessionStorage } from '@/lib/storage-utils';
 
 interface CartViewProps {
     onNavigateToHome: () => void;
@@ -51,8 +52,15 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
 
     useEffect(() => {
         setToday(new Date());
-        const saved = sessionStorage.getItem('appliedCoupon');
-        if (saved) setAppliedCoupon(JSON.parse(saved));
+        const saved = safeSessionStorage.getItem('appliedCoupon');
+        if (saved) {
+            try {
+                setAppliedCoupon(JSON.parse(saved));
+            } catch (e) {
+                console.error("Failed to parse coupon from sessionStorage", e);
+                safeSessionStorage.removeItem('appliedCoupon');
+            }
+        }
     }, []);
 
     const currencySymbol = settings?.currency || '$';
@@ -121,7 +129,7 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
                 return;
             }
             setAppliedCoupon(coupon);
-            sessionStorage.setItem('appliedCoupon', JSON.stringify(coupon));
+            safeSessionStorage.setItem('appliedCoupon', JSON.stringify(coupon));
             toast({ title: "Protocol Verified", description: "Promotional discount successfully applied to subtotal." });
             setCouponCode('');
         } catch (e) {

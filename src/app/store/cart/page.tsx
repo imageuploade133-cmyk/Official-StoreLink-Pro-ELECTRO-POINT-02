@@ -23,6 +23,7 @@ import { calculateEffectivePrice } from '@/lib/pos-utils';
 import { Badge } from '@/components/ui/badge';
 import { cn, convertToDateSafely } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { safeSessionStorage } from '@/lib/storage-utils';
 
 export default function CartPage() {
   const { cartItems, updateQuantity, removeFromCart, cartCount } = useCart();
@@ -39,8 +40,15 @@ export default function CartPage() {
   useEffect(() => {
     setToday(new Date());
     // Restore coupon from session if exists
-    const saved = sessionStorage.getItem('appliedCoupon');
-    if (saved) setAppliedCoupon(JSON.parse(saved));
+    const saved = safeSessionStorage.getItem('appliedCoupon');
+    if (saved) {
+      try {
+        setAppliedCoupon(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to parse coupon from sessionStorage", e);
+        safeSessionStorage.removeItem('appliedCoupon');
+      }
+    }
   }, []);
 
   const currencySymbol = settings?.currency || '$';
@@ -124,7 +132,7 @@ export default function CartPage() {
         }
 
         setAppliedCoupon(coupon);
-        sessionStorage.setItem('appliedCoupon', JSON.stringify(coupon));
+        safeSessionStorage.setItem('appliedCoupon', JSON.stringify(coupon));
         toast({ title: "Promo Code Applied!", description: `You saved ${coupon.type === 'percentage' ? coupon.value + '%' : formatCurrency(coupon.value, currencySymbol)}.` });
         setCouponCode('');
     } catch (e: any) {
@@ -136,7 +144,7 @@ export default function CartPage() {
 
   const removeCoupon = () => {
     setAppliedCoupon(null);
-    sessionStorage.removeItem('appliedCoupon');
+    safeSessionStorage.removeItem('appliedCoupon');
     toast({ title: "Promo Code Removed" });
   };
 

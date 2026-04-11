@@ -18,6 +18,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   CreditCard, 
@@ -41,6 +42,7 @@ import type { UserProfile, Order, BankAccount, WhatsappMessageLog, Coupon } from
 import { cn } from '@/lib/utils';
 import { sendWhatsAppReceipt } from '@/lib/whatsapp';
 import { formatPhoneNumberForWhatsapp } from '@/lib/phone-utils';
+import { safeSessionStorage } from '@/lib/storage-utils';
 
 type CheckoutStep = 'details' | 'payment' | 'processing' | 'success';
 
@@ -102,8 +104,15 @@ export default function CheckoutPage() {
   }, [bankAccounts]);
 
   useEffect(() => {
-    const saved = sessionStorage.getItem('appliedCoupon');
-    if (saved) setAppliedCoupon(JSON.parse(saved));
+    const saved = safeSessionStorage.getItem('appliedCoupon');
+    if (saved) {
+      try {
+        setAppliedCoupon(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to parse coupon from sessionStorage", e);
+        safeSessionStorage.removeItem('appliedCoupon');
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -292,7 +301,7 @@ export default function CheckoutPage() {
       toast({ title: 'Order Placed!', description: 'Your order has been received successfully.' });
       setStep('success');
       clearCart();
-      sessionStorage.removeItem('appliedCoupon');
+      safeSessionStorage.removeItem('appliedCoupon');
     } catch (error: any) {
       console.error('Order error:', error);
       toast({ 
@@ -425,7 +434,7 @@ export default function CheckoutPage() {
 
                                 <RadioGroup className="space-y-3">
                                     {bankAccounts.map((acc) => (
-                                        <div key={acc.id} className="flex items-center space-x-3 p-4 rounded-xl border-2 border-muted hover:border-primary/30 cursor-pointer transition-colors" onClick={() => setSelectedBankAccount(acc)}>
+                                        <div key={acc.id} className="flex items-center space-x-3 p-4 rounded-xl border-2 border-muted hover:border-primary/30 cursor-pointer transition-colors" onClick={() => setSelectedBankId(acc.id)}>
                                             <RadioGroupItem value={acc.id} id={acc.id} className="peer sr-only" />
                                             <Label htmlFor={acc.id} className="flex items-center gap-4 cursor-pointer flex-1">
                                                 <div className="w-10 h-10 rounded-md border bg-muted flex items-center justify-center text-muted-foreground flex-shrink-0">

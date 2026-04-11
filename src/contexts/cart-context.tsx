@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useMemo, useCall
 import type { StoreCartItem, Product } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { ensureNumber } from '@/lib/pos-utils';
+import { safeStorage } from '@/lib/storage-utils';
 
 interface CartContextType {
   cartItems: StoreCartItem[];
@@ -21,9 +22,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    try {
-      const storedCart = localStorage.getItem('storeCart');
-      if (storedCart) {
+    const storedCart = safeStorage.getItem('storeCart');
+    if (storedCart) {
+      try {
         const parsedCart: StoreCartItem[] = JSON.parse(storedCart);
         // Data migration/validation to prevent NaN errors from old cart data
         const validatedCart = parsedCart.map(item => ({
@@ -33,18 +34,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             salePrice: ensureNumber(item.salePrice, ensureNumber(item.sellingPrice, 0)),
         }));
         setCartItems(validatedCart);
+      } catch (error) {
+        console.error("Failed to parse cart from localStorage", error);
+        safeStorage.removeItem('storeCart');
       }
-    } catch (error) {
-      console.error("Failed to load cart from localStorage", error);
-      localStorage.removeItem('storeCart');
     }
   }, []);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('storeCart', JSON.stringify(cartItems));
-    } catch (error) {
-      console.error("Failed to save cart to localStorage", error);
+    if (cartItems.length > 0 || safeStorage.getItem('storeCart')) {
+        safeStorage.setItem('storeCart', JSON.stringify(cartItems));
     }
   }, [cartItems]);
 

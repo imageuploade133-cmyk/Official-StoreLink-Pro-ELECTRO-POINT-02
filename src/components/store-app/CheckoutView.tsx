@@ -43,6 +43,7 @@ import type { UserProfile, Order, BankAccount, WhatsappMessageLog, Coupon } from
 import { cn } from '@/lib/utils';
 import { sendWhatsAppReceipt } from '@/lib/whatsapp';
 import { formatPhoneNumberForWhatsapp } from '@/lib/phone-utils';
+import { safeSessionStorage } from '@/lib/storage-utils';
 
 type CheckoutStep = 'details' | 'payment' | 'processing' | 'success';
 
@@ -107,8 +108,15 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
   }, [bankAccounts]);
 
   useEffect(() => {
-    const saved = sessionStorage.getItem('appliedCoupon');
-    if (saved) setAppliedCoupon(JSON.parse(saved));
+    const saved = safeSessionStorage.getItem('appliedCoupon');
+    if (saved) {
+      try {
+        setAppliedCoupon(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to parse coupon from sessionStorage", e);
+        safeSessionStorage.removeItem('appliedCoupon');
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -210,7 +218,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
 
       setStep('success');
       clearCart();
-      sessionStorage.removeItem('appliedCoupon');
+      safeSessionStorage.removeItem('appliedCoupon');
     } catch (error: any) {
       toast({ variant: 'destructive', title: 'Order Failed', description: error.message });
       setStep('payment');

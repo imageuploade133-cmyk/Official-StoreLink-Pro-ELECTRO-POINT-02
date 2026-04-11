@@ -88,6 +88,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { safeStorage } from '@/lib/storage-utils';
 
 
 export default function DashboardLayout({
@@ -99,6 +100,7 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(100);
 
   const firestore = useFirestore();
@@ -111,7 +113,7 @@ export default function DashboardLayout({
 
   // Restore zoom level from localStorage on mount
   useEffect(() => {
-    const savedZoom = localStorage.getItem('dashboard-zoom');
+    const savedZoom = safeStorage.getItem('dashboard-zoom');
     if (savedZoom) {
       const parsedZoom = parseInt(savedZoom, 10);
       if (!isNaN(parsedZoom) && parsedZoom >= 0 && parsedZoom <= 200) {
@@ -127,7 +129,7 @@ export default function DashboardLayout({
     document.documentElement.style.fontSize = newFontSize + 'px';
     
     // Persist to localStorage
-    localStorage.setItem('dashboard-zoom', zoomLevel.toString());
+    safeStorage.setItem('dashboard-zoom', zoomLevel.toString());
   }, [zoomLevel]);
   
   const navItems = [
@@ -359,7 +361,7 @@ export default function DashboardLayout({
         {/* Header */}
         <header className="flex h-14 shrink-0 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6 dark:bg-card dark:border-border/50">
           {showSidebar && (
-            <Sheet>
+            <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <SheetTrigger asChild>
                 <Button
                   variant="outline"
