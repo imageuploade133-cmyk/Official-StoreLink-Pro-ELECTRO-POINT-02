@@ -82,7 +82,7 @@ import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn, convertToDateSafely } from '@/lib/utils';
-// import { ProductImageGallery } from '@/components/inventory/ProductImageGallery';
+import { ProductImageGallery } from '@/components/inventory/ProductImageGallery';
 import { StoreMerchandisingSettings } from '@/components/inventory/StoreMerchandisingSettings';
 import { AdvancedVideoManager } from './AdvancedVideoManager';
 import { ProductVoiceRecorder } from './ProductVoiceRecorder';
