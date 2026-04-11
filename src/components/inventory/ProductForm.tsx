@@ -1571,7 +1571,7 @@ export function ProductForm({
                 <span className="block mt-1 font-bold text-[10px] uppercase tracking-tighter">Note: Global settings can override these.</span>
               </CardDescription>
             </CardHeader>
-
+            <CardContent className="space-y-4">
               <FormField
                 control={form.control}
                 name="showTechnicalSpecs"
