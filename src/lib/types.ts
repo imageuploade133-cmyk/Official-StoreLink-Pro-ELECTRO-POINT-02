@@ -433,6 +433,7 @@ export interface Product {
   id: string;
   name: string;
   sellingPrice: number;
+  newPrice?: number | null;
   purchasePrice: number;
   stock: number;
   categoryId: string | null;

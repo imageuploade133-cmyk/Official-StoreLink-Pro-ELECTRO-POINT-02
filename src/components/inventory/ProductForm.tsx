@@ -111,6 +111,7 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
     stock: z.coerce.number().int().min(0, 'Stock cannot be negative.'),
     purchasePrice: z.coerce.number().min(0, 'Purchase price cannot be negative.'),
     sellingPrice: z.coerce.number().min(0.01, 'Selling price must be greater than 0.'),
+    newPrice: z.coerce.number().min(0.01, 'Discount price must be greater than 0.').optional().nullable(),
     lowStockThreshold: z.coerce.number().int().min(0, 'Low stock threshold cannot be negative.').optional().nullable(),
     supplierName: z.string().optional().or(z.literal('')),    
     imageUrl: z.string().url('Must be a valid URL for the image.').optional().or(z.literal('')),    
@@ -188,6 +189,10 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
     .refine(
       (data) => !(preventReduction && originalStock !== undefined && data.stock < originalStock),
       { message: `Stock cannot be reduced manually here. Current stock is ${originalStock}. Use Restock page for adjustments.`, path: ["stock"] }
+    )
+    .refine(
+      (data) => !data.newPrice || data.newPrice < data.sellingPrice,
+      { message: 'New price must be less than the original selling price.', path: ['newPrice'] }
     );
 };
 
@@ -325,6 +330,7 @@ export function ProductForm({
         stock: defaultValues.stock ?? 0,
         purchasePrice: defaultValues.purchasePrice ?? 0,
         sellingPrice: defaultValues.sellingPrice ?? 0,
+        newPrice: defaultValues.newPrice ?? null,
         lowStockThreshold: defaultValues.lowStockThreshold ?? null,
         supplierName: defaultValues.supplierName ?? '',
         imageUrl: defaultValues.imageUrl ?? '',
@@ -548,7 +554,7 @@ export function ProductForm({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <FormField
                   control={form.control}
                   name="stock"
@@ -578,6 +584,27 @@ export function ProductForm({
                     <FormItem>
                       <FormLabel className="font-bold">Selling Price <span className="text-destructive">*</span></FormLabel>
                       <FormControl><Input type="number" step="0.01" {...field} value={field.value ?? ''} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="newPrice"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold text-green-600">New Price (Discount)</FormLabel>
+                      <FormControl><Input 
+                        type="number" 
+                        step="0.01" 
+                        {...field} 
+                        value={field.value ?? ''} 
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          field.onChange(val === '' ? null : Number(val));
+                        }}
+                        placeholder="Optional"
+                      /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

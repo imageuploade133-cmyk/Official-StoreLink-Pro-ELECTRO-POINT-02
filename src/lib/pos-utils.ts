@@ -12,7 +12,8 @@ export const ensureNumber = (value: any, defaultValue: number = 0): number => {
  * Hierarchy:
  * 1. Individual Product Sale (ACTIVE): If category.allowIndividualProductSales is ON, product promo takes priority.
  * 2. Global Flash Sale (ACTIVE): Applied to all products not handled by Step 1.
- * 3. Base Selling Price: Default if no active promos match.
+ * 3. Manual New Price (Discount): Optional direct discount price set manually.
+ * 4. Base Selling Price: Default if no active promos match.
  */
 export const calculateEffectivePrice = (
   product: DisplayProduct,
@@ -20,6 +21,13 @@ export const calculateEffectivePrice = (
   category?: Category | null
 ): number => {
   const baseSellingPrice = ensureNumber(product.sellingPrice, 0);
+  const manualNewPrice = product.newPrice != null ? ensureNumber(product.newPrice, null) : null;
+
+  // --- Step 0: Check for Manual New Price (Direct Discount) ---
+  // If manual newPrice is set and is less than base price, use it
+  if (manualNewPrice !== null && manualNewPrice < baseSellingPrice && manualNewPrice > 0) {
+    return manualNewPrice;
+  }
 
   // --- Step 1: Check if Individual Sale is allowed and active ---
   const allowIndividual = category ? (category.allowIndividualProductSales ?? true) : true;
