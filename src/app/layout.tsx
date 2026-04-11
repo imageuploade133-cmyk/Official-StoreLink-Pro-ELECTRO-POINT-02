@@ -37,7 +37,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${spaceGrotesk.variable} h-full dark`}
+      className={`${inter.variable} ${spaceGrotesk.variable} h-full`}
       suppressHydrationWarning
       data-scroll-behavior="smooth"
     >
@@ -59,7 +59,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className="bg-background text-foreground antialiased font-display h-full dark:bg-black dark:text-foreground"
+        className="bg-background text-foreground antialiased font-display h-full"
         suppressHydrationWarning={true}
       >
         <ClientProviders>
