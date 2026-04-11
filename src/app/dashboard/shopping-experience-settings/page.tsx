@@ -42,7 +42,6 @@ import {
   Square,
   Circle,
   Ruler,
-  BorderAll,
   Type,
   Magnet
 } from 'lucide-react';
@@ -69,7 +68,7 @@ const buttonShapes = [
   { name: 'rounded-sm', label: 'Small', icon: Square },
   { name: 'rounded-md', label: 'Medium', icon: Square },
   { name: 'rounded-lg', label: 'Large', icon: Ruler },
-  { name: 'rounded-xl', label: 'X-Large', icon: BorderAll },
+  { name: 'rounded-xl', label: 'X-Large', icon: LayoutGrid },
   { name: 'rounded-2xl', label: '2X-Large', icon: Circle },
   { name: 'rounded-full', label: 'Pill', icon: Circle },
 ];

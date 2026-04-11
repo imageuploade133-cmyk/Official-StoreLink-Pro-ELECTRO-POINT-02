@@ -48,10 +48,10 @@ import {
   AlertTriangle,
   Sparkles,
   Camera,
-  EyeOff,
   ListChecks,
   Star
 } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { Timestamp, addDoc, collection, doc, updateDoc } from 'firebase/firestore';
 
@@ -1563,7 +1563,7 @@ export function ProductForm({
           <Card className="shadow-xl border-none ring-1 ring-destructive/30">
             <CardHeader className="bg-destructive/10">
               <CardTitle className="text-lg flex items-center gap-2 text-destructive">
-                  <EyeOff className="h-5 w-5" />
+                  <Eye className="h-5 w-5" />
                   Public Store Sections
               </CardTitle>
               <CardDescription className="text-destructive/70 text-xs">
