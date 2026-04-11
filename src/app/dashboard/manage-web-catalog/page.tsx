@@ -528,10 +528,23 @@ export default function ManageWebCatalogPage() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <div className="font-black text-base tracking-tighter">{formatCurrency(product.sellingPrice, currencySymbol)}</div>
-                          {product.promo?.isActive && (
-                              <Badge className="bg-amber-500 text-white text-[8px] h-4 py-0 font-black border-none px-1.5 mt-1">OFFER ACTIVE</Badge>
-                          )}
+                          <div className="flex flex-col items-end gap-1">
+                            {product.newPrice ? (
+                                <>
+                                    <div className="text-[10px] text-muted-foreground line-through decoration-destructive/50 font-bold">
+                                        {formatCurrency(product.sellingPrice, currencySymbol)}
+                                    </div>
+                                    <div className="font-black text-base tracking-tighter text-green-600">
+                                        {formatCurrency(product.newPrice, currencySymbol)}
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="font-black text-base tracking-tighter">{formatCurrency(product.sellingPrice, currencySymbol)}</div>
+                            )}
+                            {product.promo?.isActive && (
+                                <Badge className="bg-amber-500 text-white text-[8px] h-4 py-0 font-black border-none px-1.5 mt-1">OFFER ACTIVE</Badge>
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-3">
