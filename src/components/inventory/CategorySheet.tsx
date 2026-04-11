@@ -10,14 +10,13 @@ import { CategoryForm, type CategoryFormValues } from '@/components/inventory/Ca
 import { FolderPlus, Loader2, GripHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet';
-import AccessDenied from '@/components/staff-management/AccessDenied';
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer';
 
 interface CategorySheetProps {
   children?: React.ReactNode;
@@ -78,32 +77,29 @@ export function CategorySheet({ children, trigger }: CategorySheetProps) {
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger asChild>
+    <Drawer open={isOpen} onOpenChange={setIsOpen}>
+      <DrawerTrigger asChild>
         {trigger || (
           <Button>
             <FolderPlus className="mr-2 h-4 w-4" /> Add New Category
           </Button>
         )}
-      </SheetTrigger>
-      <SheetContent 
-        className="w-full sm:max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl max-w-[95vw] flex flex-col p-0 overflow-hidden"
-        side="right"
-      >
+      </DrawerTrigger>
+      <DrawerContent className="h-[100dvh] flex flex-col rounded-none border-none mt-0">
         {/* Drag Handle Indicator */}
         <div className="absolute top-2 left-1/2 -translate-x-1/2 p-1 cursor-grab active:cursor-grabbing touch-none select-none z-10">
           <GripHorizontal className="h-5 w-5 text-muted-foreground/50" />
         </div>
         
-        <SheetHeader className="px-6 py-4 border-b bg-muted/30 shrink-0">
-          <SheetTitle className="flex items-center gap-2 pt-2">
+        <DrawerHeader className="px-6 py-4 border-b bg-muted/30 shrink-0">
+          <DrawerTitle className="flex items-center gap-2 pt-2">
             <FolderPlus className="h-5 w-5" />
             New Product Category
-          </SheetTitle>
-          <SheetDescription>
+          </DrawerTitle>
+          <DrawerDescription>
             Create a new classification for your inventory and storefront.
-          </SheetDescription>
-        </SheetHeader>
+          </DrawerDescription>
+        </DrawerHeader>
         
         <div className="flex-1 overflow-hidden">
           <CategoryForm 
@@ -112,8 +108,8 @@ export function CategorySheet({ children, trigger }: CategorySheetProps) {
             onCancel={() => setIsOpen(false)}
           />
         </div>
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }
 
