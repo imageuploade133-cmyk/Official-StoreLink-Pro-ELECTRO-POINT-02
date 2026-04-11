@@ -54,6 +54,7 @@ import {
 
 // --- Custom Components ---
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
+import { CategorySheet } from '@/components/inventory/CategorySheet';
 import { cn, convertToDateSafely } from '@/lib/utils';
 import { PageHeader } from '@/components/PageHeader';
 import AccessDenied from '@/components/staff-management/AccessDenied';
@@ -386,9 +387,13 @@ export default function CategoriesPage() {
                         Sync
                     </Button>
                     {permissions.add_categories && (
-                        <Link href="/dashboard/categories/add" className={buttonVariants()}>
-                            <PlusCircle className="mr-2 h-4 w-4" /> Add New Category
-                        </Link>
+                        <CategorySheet
+                          trigger={
+                            <Button>
+                              <PlusCircle className="mr-2 h-4 w-4" /> Add New Category
+                            </Button>
+                          }
+                        />
                     )}
                 </div>
             </div>
