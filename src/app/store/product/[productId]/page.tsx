@@ -414,9 +414,14 @@ export default function ProductDetailsPage() {
   const isLogisticsEnabled = settings?.showLogisticsOnPublicSite !== false;
   
   // Product-level visibility settings (default to true if not set)
-  const showTechnicalSpecs = product?.showTechnicalSpecs !== false;
-  const showLogisticsTab = product?.showLogisticsInfo !== false && isLogisticsEnabled;
-  const showVerifiedReviews = product?.showVerifiedReviews !== false;
+  // Respect Global Visibility Settings
+  const globalShowTechnicalSpecs = settings?.globalShowTechnicalSpecs !== false;
+  const globalShowLogisticsInfo = settings?.globalShowLogisticsInfo !== false;
+  const globalShowVerifiedReviews = settings?.globalShowVerifiedReviews !== false;
+
+  const showTechnicalSpecs = (product?.showTechnicalSpecs !== false) && globalShowTechnicalSpecs;
+  const showLogisticsTab = (product?.showLogisticsInfo !== false) && isLogisticsEnabled && globalShowLogisticsInfo;
+  const showVerifiedReviews = (product?.showVerifiedReviews !== false) && globalShowVerifiedReviews;
   
   const addToCartText = settings?.storeAddToCartText || 'Secure Purchase';
   const AddToCartIcon = iconMap[settings?.storeAddToCartIcon as keyof typeof iconMap] || ShoppingCart;

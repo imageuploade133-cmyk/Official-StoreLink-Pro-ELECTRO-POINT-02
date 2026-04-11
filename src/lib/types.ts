@@ -316,6 +316,10 @@ export interface Settings {
   productCardTitleAlign?: 'left' | 'center';
   productCardPriceAlign?: 'left' | 'center';
   productCardHoverEffect?: 'none' | 'lift' | 'zoom' | 'glow' | 'border';
+  // Global Visibility Settings
+  globalShowTechnicalSpecs?: boolean;
+  globalShowLogisticsInfo?: boolean;
+  globalShowVerifiedReviews?: boolean;
 }
 
 export type AppSettings = Settings;
