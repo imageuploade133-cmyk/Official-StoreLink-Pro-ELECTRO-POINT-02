@@ -71,10 +71,10 @@ import {
   ChevronUp,
   ChevronDown,
   Volume2,
-  EyeOff,
   ListChecks,
   Star
 } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Image from 'next/image';
 import { generateMarketingContent } from '@/ai/flows/product-marketing-flow';
@@ -1479,7 +1479,7 @@ export function WebStoreProductForm() {
           <Card className="shadow-xl border-none ring-1 ring-destructive/30">
             <CardHeader className="bg-destructive/10">
               <CardTitle className="text-lg flex items-center gap-2 text-destructive">
-                  <EyeOff className="h-5 w-5" />
+                  <Eye className="h-5 w-5" />
                   Public Store Sections
               </CardTitle>
               <CardDescription className="text-destructive/70 text-xs">
