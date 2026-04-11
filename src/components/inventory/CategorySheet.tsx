@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { collection, query, where, getDocs, addDoc, Timestamp } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { CategoryForm, type CategoryFormValues } from '@/components/inventory/CategoryForm';
-import { FolderPlus, Loader2, GripHorizontal } from 'lucide-react';
+import { FolderPlus, Loader2, GripHorizontal, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Drawer,
@@ -16,6 +16,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
+  DrawerClose,
 } from '@/components/ui/drawer';
 
 interface CategorySheetProps {
@@ -30,6 +31,7 @@ export function CategorySheet({ children, trigger }: CategorySheetProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [snap, setSnap] = useState<number | string | null>('300px');
 
   const handleAddCategory = async (values: CategoryFormValues) => {
     if (!user || !firestore) return;
@@ -77,7 +79,14 @@ export function CategorySheet({ children, trigger }: CategorySheetProps) {
   }
 
   return (
-    <Drawer open={isOpen} onOpenChange={setIsOpen}>
+    <Drawer 
+      open={isOpen} 
+      onOpenChange={setIsOpen}
+      snapPoints={['300px', 1]}
+      activeSnapPoint={snap}
+      setActiveSnapPoint={setSnap}
+      dismissible={true}
+    >
       <DrawerTrigger asChild>
         {trigger || (
           <Button>
@@ -85,14 +94,35 @@ export function CategorySheet({ children, trigger }: CategorySheetProps) {
           </Button>
         )}
       </DrawerTrigger>
-      <DrawerContent className="h-[100dvh] flex flex-col rounded-none border-none mt-0">
-        {/* Drag Handle Indicator */}
-        <div className="absolute top-2 left-1/2 -translate-x-1/2 p-1 cursor-grab active:cursor-grabbing touch-none select-none z-10">
-          <GripHorizontal className="h-5 w-5 text-muted-foreground/50" />
+      <DrawerContent className="flex flex-col max-h-[95vh] rounded-t-[20px] border-t">
+        {/* Drag Handle Bar - Prominent and Draggable */}
+        <div 
+          className="w-full flex flex-col items-center pt-4 pb-2 cursor-grab active:cursor-grabbing touch-none select-none hover:bg-muted/30 transition-colors"
+          data-vaul-drag-handle
+        >
+          <div className="w-12 h-1.5 rounded-full bg-muted-foreground/40 mb-2" />
+          <div className="flex items-center gap-1.5">
+            <GripHorizontal className="h-4 w-4 text-muted-foreground/50" />
+            <span className="text-[10px] text-muted-foreground/60 font-medium uppercase tracking-wider">
+              Drag down to close
+            </span>
+          </div>
         </div>
         
-        <DrawerHeader className="px-6 py-4 border-b bg-muted/30 shrink-0">
-          <DrawerTitle className="flex items-center gap-2 pt-2">
+        <DrawerHeader className="px-6 py-3 border-b bg-muted/30 shrink-0 relative">
+          {/* Close Button */}
+          <DrawerClose asChild>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="absolute right-4 top-4 h-8 w-8 rounded-full hover:bg-muted"
+            >
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </Button>
+          </DrawerClose>
+          
+          <DrawerTitle className="flex items-center gap-2 pr-10">
             <FolderPlus className="h-5 w-5" />
             New Product Category
           </DrawerTitle>
