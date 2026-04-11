@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ElysiumLogo } from "@/components/icons";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, type FormEvent } from "react";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { PageSpinner, Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/hooks/use-toast";
@@ -55,7 +55,7 @@ export default function StoreLoginPage() {
         }
     }, [user, isUserLoading, router]);
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = (e: FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         
@@ -86,7 +86,7 @@ export default function StoreLoginPage() {
             });
     }
 
-    const handlePasswordReset = (e: React.FormEvent) => {
+    const handlePasswordReset = (e: FormEvent) => {
         e.preventDefault();
         setResetError('');
         setIsResetLoading(true);
