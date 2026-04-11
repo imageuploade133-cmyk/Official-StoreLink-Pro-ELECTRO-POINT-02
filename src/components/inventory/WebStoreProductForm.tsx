@@ -111,6 +111,7 @@ const storeProductSchema = z.object({
   name: z.string().min(3, 'Product name is required.'),
   categoryId: z.string().min(1, 'Please select a category.'),
   sellingPrice: z.coerce.number().min(0.01, 'Price must be greater than 0.'),
+  newPrice: z.coerce.number().min(0.01, 'Discount price must be greater than 0.').optional().nullable(),
   purchasePrice: z.coerce.number().min(0, 'Cost price cannot be negative.'),
   stock: z.coerce.number().int().min(0, 'Stock cannot be negative.'),
   sku: z.string().optional().or(z.literal('')),
@@ -176,6 +177,9 @@ const storeProductSchema = z.object({
 }).refine(data => !data.isPromo || (!!data.promoType && !!data.promoValue && data.promoValue > 0), {
     message: 'Promo value is required and must be positive when active.',
     path: ['promoValue']
+}).refine(data => !data.newPrice || data.newPrice < data.sellingPrice, {
+    message: 'New price must be less than the original selling price.',
+    path: ['newPrice']
 });
 
 type FormValues = z.infer<typeof storeProductSchema>;
@@ -220,6 +224,7 @@ export function WebStoreProductForm() {
       name: '',
       categoryId: '',
       sellingPrice: 0,
+      newPrice: null,
       purchasePrice: 0,
       stock: 0,
       sku: '',
@@ -515,14 +520,35 @@ export function WebStoreProductForm() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <FormField
                   control={form.control}
                   name="sellingPrice"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="font-bold">Public Price <span className="text-destructive">*</span></FormLabel>
+                      <FormLabel className="font-bold">Original Price <span className="text-destructive">*</span></FormLabel>
                       <FormControl><Input type="number" step="0.01" {...field} value={field.value ?? ''} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="newPrice"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold text-green-600">New Price (Discount)</FormLabel>
+                      <FormControl><Input 
+                        type="number" 
+                        step="0.01" 
+                        {...field} 
+                        value={field.value ?? ''} 
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          field.onChange(val === '' ? null : Number(val));
+                        }}
+                        placeholder="Optional"
+                      /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
