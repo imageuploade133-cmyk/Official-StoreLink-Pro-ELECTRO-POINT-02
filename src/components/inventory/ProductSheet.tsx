@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFirestore, useCollection } from '@/firebase';
 import { collection, addDoc, Timestamp, query, orderBy, doc, writeBatch, serverTimestamp } from 'firebase/firestore';
@@ -20,7 +20,7 @@ import {
 import type { Category } from '@/lib/types';
 
 interface ProductSheetProps {
-  trigger?: React.ReactNode;
+  trigger?: ReactNode;
 }
 
 export function ProductSheet({ trigger }: ProductSheetProps) {
