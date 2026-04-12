@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, useFieldArray, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,7 +9,7 @@ import * as z from 'zod';
 import { useFirestore, useCollection } from '@/firebase';
 import { useSettings } from '@/contexts/settings-context';
 import { useAuth } from '@/contexts/auth-context';
-import { collection, addDoc, Timestamp, query, orderBy, doc, writeBatch, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, Timestamp, query, orderBy, doc, writeBatch, serverTimestamp, limit, startAfter, getDocs, type QueryDocumentSnapshot, type DocumentData } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Card, 
@@ -211,6 +211,16 @@ export function WebStoreProductForm() {
   const [isUploadingPoster, setIsUploadingPoster] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  // Paginated category loading state
+  const CATEGORY_BATCH_SIZE = 20;
+  const [paginatedCategories, setPaginatedCategories] = useState<Category[]>([]);
+  const [isLoadingPaginatedCategories, setIsLoadingPaginatedCategories] = useState(false);
+  const [isLoadingMoreCategories, setIsLoadingMoreCategories] = useState(false);
+  const [hasMoreCategories, setHasMoreCategories] = useState(true);
+  const lastCategoryDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
+  const hasMoreCategoriesRef = useRef(true);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
   const currencySymbol = settings?.currency || '$';
 
   // Fetch Categories
@@ -223,6 +233,78 @@ export function WebStoreProductForm() {
   const filteredCategories = useMemo(() => {
     return (categories || []).filter(c => c.name.toLowerCase().includes(categorySearchTerm.toLowerCase()));
   }, [categories, categorySearchTerm]);
+
+  // Filtered paginated categories based on search term
+  const displayedCategories = useMemo(() => {
+    if (!categorySearchTerm.trim()) return paginatedCategories;
+    return paginatedCategories.filter(c => 
+      c.name.toLowerCase().includes(categorySearchTerm.toLowerCase())
+    );
+  }, [paginatedCategories, categorySearchTerm]);
+
+  // Fetch categories with pagination
+  const fetchPaginatedCategories = useCallback(async (isNextPage = false) => {
+    if (!firestore || (isNextPage && !hasMoreCategoriesRef.current)) return;
+
+    if (isNextPage) {
+      setIsLoadingMoreCategories(true);
+    } else {
+      setIsLoadingPaginatedCategories(true);
+      lastCategoryDocRef.current = null;
+      hasMoreCategoriesRef.current = true;
+    }
+
+    try {
+      let q = query(
+        collection(firestore, 'categories'),
+        orderBy('name', 'asc'),
+        limit(CATEGORY_BATCH_SIZE)
+      );
+
+      if (isNextPage && lastCategoryDocRef.current) {
+        q = query(q, startAfter(lastCategoryDocRef.current));
+      }
+
+      const snapshot = await getDocs(q);
+      const categoryList = snapshot.docs.map(d => ({
+        id: d.id,
+        ...d.data(),
+      } as Category));
+
+      setPaginatedCategories(prev => isNextPage ? [...prev, ...categoryList] : categoryList);
+
+      const newLastDoc = snapshot.docs[snapshot.docs.length - 1] || null;
+      const newHasMore = snapshot.docs.length === CATEGORY_BATCH_SIZE;
+
+      lastCategoryDocRef.current = newLastDoc;
+      hasMoreCategoriesRef.current = newHasMore;
+      setHasMoreCategories(newHasMore);
+    } catch (error) {
+      console.error("Error fetching paginated categories:", error);
+    } finally {
+      setIsLoadingPaginatedCategories(false);
+      setIsLoadingMoreCategories(false);
+    }
+  }, [firestore, CATEGORY_BATCH_SIZE]);
+
+  // Load categories when modal opens
+  useEffect(() => {
+    if (isChangeCategoryModalOpen && paginatedCategories.length === 0) {
+      fetchPaginatedCategories();
+    }
+  }, [isChangeCategoryModalOpen, fetchPaginatedCategories, paginatedCategories.length]);
+
+  // Scroll handler for infinite loading
+  const handleCategoryScroll = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container || isLoadingMoreCategories || !hasMoreCategories) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    // Load more when scrolled to 80% of content
+    if (scrollTop + clientHeight >= scrollHeight * 0.8) {
+      fetchPaginatedCategories(true);
+    }
+  }, [fetchPaginatedCategories, isLoadingMoreCategories, hasMoreCategories]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(storeProductSchema),
@@ -388,6 +470,11 @@ export function WebStoreProductForm() {
         });
         toast({ title: "Category Created", description: `"${values.name}" is now available.` });
         if (refetchCategories) await refetchCategories();
+        // Refresh paginated categories list
+        setPaginatedCategories([]);
+        lastCategoryDocRef.current = null;
+        hasMoreCategoriesRef.current = true;
+        await fetchPaginatedCategories();
         form.setValue('categoryId', docRef.id, { shouldValidate: true });
         setIsCategoryModalOpen(false);
     } catch (e: any) {
@@ -1568,59 +1655,110 @@ export function WebStoreProductForm() {
     </FormProvider>
 
     {/* Change Category Modal */}
-    <Dialog open={isChangeCategoryModalOpen} onOpenChange={setIsChangeCategoryModalOpen}>
-        <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-                <DialogTitle className="flex items-center gap-2"><SlidersHorizontal className="h-5 w-5"/> Select Target Category</DialogTitle>
-                <DialogDescription>
-                    Search and pick a category for this product.
-                </DialogDescription>
-            </DialogHeader>
-            <div className="py-4 space-y-4">
-                <div className="relative">
-                    <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                        placeholder="Filter categories..." 
-                        value={categorySearchTerm}
-                        onChange={(e) => setCategorySearchTerm(e.target.value)}
-                        className="pl-10 h-11"
-                    />
-                </div>
-                <ScrollArea className="h-64 border rounded-xl bg-muted/5 p-2">
-                    <div className="space-y-1">
-                        {filteredCategories.length === 0 ? (
-                            <div className="text-center py-10 text-muted-foreground text-sm">No categories found.</div>
-                        ) : (
-                            filteredCategories.map((cat) => (
-                                <Button
-                                    key={cat.id}
-                                    variant="ghost"
-                                    className={cn(
-                                        "w-full justify-start font-medium text-sm h-11 rounded-lg px-4 transition-all",
-                                        form.watch('categoryId') === cat.id 
-                                            ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-                                            : "hover:bg-muted"
-                                    )}
-                                    onClick={() => {
-                                        form.setValue('categoryId', cat.id, { shouldValidate: true });
-                                        setIsChangeCategoryModalOpen(false);
-                                    }}
-                                >
-                                    {cat.name}
-                                    {form.watch('categoryId') === cat.id && <Check className="ml-auto h-4 w-4" />}
-                                </Button>
-                            ))
-                        )}
-                    </div>
-                </ScrollArea>
-            </div>
-            <DialogFooter className="flex flex-row justify-between items-center border-t pt-4">
-                <Button type="button" variant="secondary" onClick={() => { setIsChangeCategoryModalOpen(false); setIsCategoryModalOpen(true); }} className="gap-2">
-                    <Plus className="h-4 w-4" /> Create New
-                </Button>
-                <DialogClose asChild>
-                    <Button type="button" variant="outline">Cancel</Button>
-                </DialogClose>
+<Dialog open={isChangeCategoryModalOpen} onOpenChange={(open) => {
+  setIsChangeCategoryModalOpen(open);
+  if (!open) setCategorySearchTerm('');
+}}>
+  <DialogContent className="sm:max-w-lg">
+  <DialogHeader>
+  <DialogTitle className="flex items-center gap-2"><SlidersHorizontal className="h-5 w-5"/> Select Target Category</DialogTitle>
+  <DialogDescription>
+  Search and pick a category for this product.
+  </DialogDescription>
+  </DialogHeader>
+  <div className="py-4 space-y-4">
+  <div className="relative">
+  <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+  <Input
+  placeholder="Filter categories..."
+  value={categorySearchTerm}
+  onChange={(e) => setCategorySearchTerm(e.target.value)}
+  className="pl-10 h-11"
+  />
+  </div>
+  <div 
+  ref={scrollContainerRef}
+  onScroll={handleCategoryScroll}
+  className="h-80 overflow-y-auto border rounded-xl bg-muted/5 p-3"
+  >
+  {isLoadingPaginatedCategories ? (
+  <div className="flex flex-col items-center justify-center py-10 gap-3">
+  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+  <span className="text-sm text-muted-foreground">Loading categories...</span>
+  </div>
+  ) : displayedCategories.length === 0 ? (
+  <div className="text-center py-10 text-muted-foreground text-sm">
+  {categorySearchTerm ? 'No categories match your search.' : 'No categories found.'}
+  </div>
+  ) : (
+  <div className="grid grid-cols-2 gap-3">
+  {displayedCategories.map((cat) => (
+  <button
+  key={cat.id}
+  type="button"
+  className={cn(
+  "group relative flex flex-col items-center p-3 rounded-xl border-2 transition-all duration-300 hover:shadow-lg",
+  form.watch('categoryId') === cat.id 
+  ? "border-primary bg-primary/5 ring-2 ring-primary/20" 
+  : "border-transparent bg-background hover:border-primary/30 hover:bg-muted/50"
+  )}
+  onClick={() => {
+  form.setValue('categoryId', cat.id, { shouldValidate: true });
+  setIsChangeCategoryModalOpen(false);
+  setCategorySearchTerm('');
+  }}
+  >
+  <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-muted mb-2">
+  <Image
+  src={cat.imageUrl || `https://picsum.photos/seed/${cat.id}/200/200`}
+  alt={cat.name}
+  fill
+  className="object-cover transition-transform duration-500 group-hover:scale-110"
+  sizes="(max-width: 640px) 40vw, 150px"
+  unoptimized
+  />
+  {form.watch('categoryId') === cat.id && (
+  <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+  <div className="bg-primary text-primary-foreground rounded-full p-1.5">
+  <Check className="h-4 w-4" strokeWidth={3} />
+  </div>
+  </div>
+  )}
+  </div>
+  <span className={cn(
+  "text-xs font-bold text-center line-clamp-2 leading-tight",
+  form.watch('categoryId') === cat.id ? "text-primary" : "text-foreground"
+  )}>
+  {cat.name}
+  </span>
+  </button>
+  ))}
+  </div>
+  )}
+  
+  {/* Load more indicator */}
+  {isLoadingMoreCategories && (
+  <div className="flex items-center justify-center py-4 gap-2">
+  <Loader2 className="h-4 w-4 animate-spin text-primary" />
+  <span className="text-xs text-muted-foreground">Loading more...</span>
+  </div>
+  )}
+  
+  {/* End of list indicator */}
+  {!hasMoreCategories && paginatedCategories.length > 0 && !categorySearchTerm && (
+  <div className="text-center py-3 text-xs text-muted-foreground">
+  All {paginatedCategories.length} categories loaded
+  </div>
+  )}
+  </div>
+  </div>
+  <DialogFooter className="flex flex-row justify-between items-center border-t pt-4">
+  <Button type="button" variant="secondary" onClick={() => { setIsChangeCategoryModalOpen(false); setIsCategoryModalOpen(true); setCategorySearchTerm(''); }} className="gap-2">
+  <Plus className="h-4 w-4" /> Create New
+  </Button>
+  <DialogClose asChild>
+  <Button type="button" variant="outline">Cancel</Button>
+  </DialogClose>
             </DialogFooter>
         </DialogContent>
     </Dialog>
