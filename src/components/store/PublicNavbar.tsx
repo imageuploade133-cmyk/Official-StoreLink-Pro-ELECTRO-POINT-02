@@ -195,6 +195,7 @@ export function PublicNavbar() {
     const navbarSticky = settings?.navbarSticky || 'fixed';
     const navbarShadow = settings?.navbarShadow || 'none';
     const navbarBlurEffect = settings?.navbarBlurEffect ?? true;
+    const navbarMenuStyle = settings?.navbarMenuStyle || 'dropdown';
     
     // Proportional scaling: Logo height is ~33% of width (typical logo aspect ratio)
     // Navbar padding scales with logo height to maintain visual balance
