@@ -178,12 +178,38 @@ export function PublicNavbar() {
     const storeNameFontSize = settings?.storeNameFontSize || 24;
     const showPublicStoreName = settings?.showPublicStoreName ?? true;
     const showMainSiteLogo = settings?.showMainSiteLogo ?? true;
+
+    // New Navigation Settings
+    const navbarStyle = settings?.navbarStyle || 'standard';
+    const navbarHeightSetting = settings?.navbarHeight || 'default';
+    const navbarShowSearch = settings?.navbarShowSearch ?? true;
+    const navbarShowWishlist = settings?.navbarShowWishlist ?? true;
+    const navbarShowCart = settings?.navbarShowCart ?? true;
+    const navbarShowAccount = settings?.navbarShowAccount ?? true;
+    const navbarShowThemeToggle = settings?.navbarShowThemeToggle ?? true;
+    const navbarShowCreditBadge = settings?.navbarShowCreditBadge ?? true;
+    const navbarShowShopLink = settings?.navbarShowShopLink ?? true;
+    const navbarShowFlashSalesLink = settings?.navbarShowFlashSalesLink ?? true;
+    const navbarShowCollectionsLink = settings?.navbarShowCollectionsLink ?? true;
+    const navbarLogoPosition = settings?.navbarLogoPosition || 'left';
+    const navbarSticky = settings?.navbarSticky || 'fixed';
+    const navbarShadow = settings?.navbarShadow || 'none';
+    const navbarBlurEffect = settings?.navbarBlurEffect ?? true;
     
     // Proportional scaling: Logo height is ~33% of width (typical logo aspect ratio)
     // Navbar padding scales with logo height to maintain visual balance
     const logoContainerHeight = Math.max(32, Math.round(storeLogoWidth * 0.33));
     const navbarPadding = Math.max(16, Math.round(logoContainerHeight * 0.5));
-    const navbarHeight = logoContainerHeight + (navbarPadding * 2);
+    
+    // Height Mapping
+    const heightMap = {
+        compact: 48,
+        default: 64,
+        expanded: 80,
+        full: 100,
+    };
+    
+    const navbarHeight = settings?.navbarHeight ? (heightMap[settings.navbarHeight as keyof typeof heightMap] || 64) : (logoContainerHeight + (navbarPadding * 2));
 
     const handleNavbarSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -242,97 +268,157 @@ export function PublicNavbar() {
         router.push('/store');
     };
 
+    const getNavbarClasses = () => {
+        const baseClasses = "z-50 w-full border-b transition-all duration-500 ease-in-out";
+        
+        // Sticky/Fixed/Static
+        const positionClass = navbarSticky === 'fixed' ? 'fixed top-0' : navbarSticky === 'sticky' ? 'sticky top-0' : 'relative';
+        
+        // Shadow
+        const shadowClasses: Record<string, string> = {
+            none: 'shadow-none',
+            sm: 'shadow-sm',
+            md: 'shadow-md',
+            lg: 'shadow-lg',
+            xl: 'shadow-xl',
+        };
+        const shadowClass = shadowClasses[navbarShadow] || 'shadow-none';
+
+        // Blur effect
+        const blurClass = navbarBlurEffect ? "backdrop-blur-2xl" : "";
+
+        // Style handling
+        let styleClasses = "";
+        if (scrolled || navbarStyle === 'glass' || navbarStyle === 'solid') {
+            if (navbarStyle === 'solid') {
+                styleClasses = "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800";
+            } else {
+                styleClasses = `bg-white/90 dark:bg-slate-900/90 ${blurClass} border-slate-200/80 dark:border-slate-800/80 ${shadowClass}`;
+            }
+        } else if (navbarStyle === 'transparent') {
+            styleClasses = "bg-transparent border-transparent shadow-none";
+        } else if (navbarStyle === 'minimal') {
+            styleClasses = scrolled ? "bg-white/90 dark:bg-slate-900/90 border-b shadow-sm" : "bg-transparent border-transparent";
+        } else {
+            // standard
+            styleClasses = scrolled 
+                ? `bg-white/90 dark:bg-slate-900/90 ${blurClass} border-slate-200/80 dark:border-slate-800/80 ${shadowClass}`
+                : "bg-transparent border-transparent shadow-none";
+        }
+
+        return cn(baseClasses, positionClass, styleClasses);
+    };
+
+    const customNavStyles = {
+        backgroundColor: (scrolled || navbarStyle !== 'transparent') ? settings?.navbarBackgroundColor : undefined,
+        color: settings?.navbarTextColor,
+        borderColor: (scrolled || navbarStyle !== 'transparent') ? settings?.navbarBorderColor : undefined,
+    };
+
     return (
-        <nav className={cn(
-            "fixed top-0 z-50 w-full border-b transition-all duration-500 ease-in-out",
-            scrolled 
-                ? "border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl shadow-xl" 
-                : "border-transparent bg-transparent"
-        )}>
+        <nav className={getNavbarClasses()} style={customNavStyles}>
           <div className="max-w-site-container mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-between items-center" style={{ height: `${navbarHeight}px` }}>
-                  <div className="flex-shrink-0 flex items-center pr-4">
+              <div className="flex justify-between items-center relative" style={{ height: `${navbarHeight}px` }}>
+                  <div className={cn(
+                      "flex-shrink-0 flex items-center pr-4 transition-all duration-500",
+                      navbarLogoPosition === 'center' ? "absolute left-1/2 -translate-x-1/2" : 
+                      navbarLogoPosition === 'right' ? "order-3 pl-4 pr-0" : "order-1"
+                  )}>
                     <Logo />
                   </div>
                   
-                  <div className="hidden lg:flex flex-1 max-w-lg mx-12 relative" ref={searchContainerRef}>
-                    <div className="w-full relative group">
-                        <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-slate-400 dark:text-slate-400">
-                            <Search className="h-5 w-5 dark:text-slate-300 dark:p-1 dark:border dark:border-slate-600 dark:rounded-lg" strokeWidth={2.5} />
-                        </div>
-                        <Input 
-                            readOnly
-                            className="w-full pl-14 pr-12 bg-slate-100/40 dark:bg-slate-800/40 border-2 border-primary/10 animate-border-glow hover:border-primary/40 rounded-[2rem] h-12 text-sm font-bold tracking-tight cursor-pointer shadow-inner"
-                            placeholder="Find products, categories or SKUs..."
-                            onClick={() => setIsSearchFocused(true)}
-                        />
-                        <div className="absolute inset-y-0 right-4 flex items-center">
-                            <div className="h-6 w-10 rounded-md border bg-white dark:bg-slate-800 flex items-center justify-center text-[10px] font-black text-slate-400 opacity-50 shadow-sm pointer-events-none uppercase tracking-tighter">
-                                Click
+                  {navbarShowSearch && (
+                      <div className={cn(
+                          "hidden lg:flex flex-1 max-w-lg mx-12 relative",
+                          navbarLogoPosition === 'center' ? "order-1" : "order-2"
+                      )} ref={searchContainerRef}>
+                        <div className="w-full relative group">
+                            <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-slate-400 dark:text-slate-400">
+                                <Search className="h-5 w-5 dark:text-slate-300 dark:p-1 dark:border dark:border-slate-600 dark:rounded-lg" strokeWidth={2.5} />
+                            </div>
+                            <Input 
+                                readOnly
+                                className="w-full pl-14 pr-12 bg-slate-100/40 dark:bg-slate-800/40 border-2 border-primary/10 animate-border-glow hover:border-primary/40 rounded-[2rem] h-12 text-sm font-bold tracking-tight cursor-pointer shadow-inner"
+                                placeholder="Find products, categories or SKUs..."
+                                onClick={() => setIsSearchFocused(true)}
+                            />
+                            <div className="absolute inset-y-0 right-4 flex items-center">
+                                <div className="h-6 w-10 rounded-md border bg-white dark:bg-slate-800 flex items-center justify-center text-[10px] font-black text-slate-400 opacity-50 shadow-sm pointer-events-none uppercase tracking-tighter">
+                                    Click
+                                </div>
                             </div>
                         </div>
-                    </div>
-                  </div>
+                      </div>
+                  )}
 
-                  <div className="flex items-center gap-3">
+                  <div className={cn(
+                      "flex items-center gap-3",
+                      navbarLogoPosition === 'center' ? "order-3 ml-auto" : "order-3"
+                  )}>
                     <div className="hidden lg:flex items-center gap-8 mr-8 font-black text-xs uppercase tracking-[0.2em]">
-                        <Link className="hover:text-primary transition-colors relative group py-2" href="/store/shop" onClick={() => setIsMenuOpen(false)}>
-                        Shop
-                        <span className="absolute bottom-0 left-0 h-0.5 bg-primary w-0 transition-all duration-300 ease-out group-hover:w-full rounded-full"></span>
-                        </Link>
+                        {navbarShowShopLink && (
+                            <Link className="hover:text-primary transition-colors relative group py-2" href="/store/shop" onClick={() => setIsMenuOpen(false)}>
+                            Shop
+                            <span className="absolute bottom-0 left-0 h-0.5 bg-primary w-0 transition-all duration-300 ease-out group-hover:w-full rounded-full"></span>
+                            </Link>
+                        )}
                         
-                        <Link className="hover:text-rose-600 transition-colors relative group py-2 flex items-center gap-2" href="/store/flash-sales" onClick={() => setIsMenuOpen(false)}>
-                        Flash Sales
-                        <span className="absolute bottom-0 left-0 h-0.5 bg-rose-600 w-0 transition-all duration-300 ease-out group-hover:w-full rounded-full"></span>
-                        </Link>
+                        {navbarShowFlashSalesLink && (
+                            <Link className="hover:text-rose-600 transition-colors relative group py-2 flex items-center gap-2" href="/store/flash-sales" onClick={() => setIsMenuOpen(false)}>
+                            Flash Sales
+                            <span className="absolute bottom-0 left-0 h-0.5 bg-rose-600 w-0 transition-all duration-300 ease-out group-hover:w-full rounded-full"></span>
+                            </Link>
+                        )}
 
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="hover:text-primary transition-colors p-0 m-0 h-auto font-black text-xs uppercase tracking-[0.2em] flex items-center gap-2 dark:text-slate-300">
-                                    Collections
-                                    <ChevronDown className="h-3.5 w-3.5 opacity-50 dark:opacity-60" strokeWidth={3} />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-72 p-2 rounded-3xl shadow-2xl border-slate-200 dark:border-slate-800">
-                                <DropdownMenuLabel className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Discover</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <div className="max-h-[400px] overflow-y-auto py-2">
-                                    {isLoadingCategories ? (
-                                        <div className="p-4 flex items-center gap-3 text-muted-foreground">
-                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                            <span className="text-xs font-bold uppercase">Syncing...</span>
-                                        </div>
-                                    ) : (
-                                        categories?.map(category => (
-                                            <DropdownMenuItem key={category.id} asChild className="cursor-pointer p-3 focus:bg-primary/5 rounded-2xl mx-1 my-0.5">
-                                                <Link href={`/store/shop?category=${category.id}`} className="flex items-center gap-4 w-full" onClick={() => setIsMenuOpen(false)}>
-                                                    <div className="relative h-10 w-10 rounded-xl overflow-hidden bg-muted flex-shrink-0 shadow-sm">
-                                                        <Image
-                                                            src={category.imageUrl || `https://picsum.photos/seed/${category.id}/100/100`}
-                                                            alt={category.name}
-                                                            fill
-                                                            className="object-cover"
-                                                            unoptimized
-                                                        />
-                                                    </div>
-                                                    <span className="font-bold text-sm tracking-tight">{category.name}</span>
-                                                </Link>
-                                            </DropdownMenuItem>
-                                        ))
-                                    )}
-                                </div>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem asChild className="cursor-pointer p-4 focus:bg-primary text-primary focus:text-white rounded-2xl m-1 transition-all">
-                                    <Link href="/store/categories" className="flex items-center justify-between font-black uppercase text-[10px] tracking-widest w-full" onClick={() => setIsMenuOpen(false)}>
-                                        View All Collections <ChevronRight className="h-3 w-3" />
-                                    </Link>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        {navbarShowCollectionsLink && (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className="hover:text-primary transition-colors p-0 m-0 h-auto font-black text-xs uppercase tracking-[0.2em] flex items-center gap-2 dark:text-slate-300">
+                                        Collections
+                                        <ChevronDown className="h-3.5 w-3.5 opacity-50 dark:opacity-60" strokeWidth={3} />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-72 p-2 rounded-3xl shadow-2xl border-slate-200 dark:border-slate-800">
+                                    <DropdownMenuLabel className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Discover</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <div className="max-h-[400px] overflow-y-auto py-2">
+                                        {isLoadingCategories ? (
+                                            <div className="p-4 flex items-center gap-3 text-muted-foreground">
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                                <span className="text-xs font-bold uppercase">Syncing...</span>
+                                            </div>
+                                        ) : (
+                                            categories?.map(category => (
+                                                <DropdownMenuItem key={category.id} asChild className="cursor-pointer p-3 focus:bg-primary/5 rounded-2xl mx-1 my-0.5">
+                                                    <Link href={`/store/shop?category=${category.id}`} className="flex items-center gap-4 w-full" onClick={() => setIsMenuOpen(false)}>
+                                                        <div className="relative h-10 w-10 rounded-xl overflow-hidden bg-muted flex-shrink-0 shadow-sm">
+                                                            <Image
+                                                                src={category.imageUrl || `https://picsum.photos/seed/${category.id}/100/100`}
+                                                                alt={category.name}
+                                                                fill
+                                                                className="object-cover"
+                                                                unoptimized
+                                                            />
+                                                        </div>
+                                                        <span className="font-bold text-sm tracking-tight">{category.name}</span>
+                                                    </Link>
+                                                </DropdownMenuItem>
+                                            ))
+                                        )}
+                                    </div>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem asChild className="cursor-pointer p-4 focus:bg-primary text-primary focus:text-white rounded-2xl m-1 transition-all">
+                                        <Link href="/store/categories" className="flex items-center justify-between font-black uppercase text-[10px] tracking-widest w-full" onClick={() => setIsMenuOpen(false)}>
+                                            View All Collections <ChevronRight className="h-3 w-3" />
+                                        </Link>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-1 sm:gap-2">
-                        {user && customer && (
+                        {navbarShowCreditBadge && user && customer && (
                             <Link 
                                 href="/store/account"
                                 className="hidden md:flex items-center gap-2.5 bg-primary/10 text-primary px-4 py-1.5 rounded-full border border-primary/20 shadow-sm hover:bg-primary hover:text-white transition-all duration-500 group/credit active:scale-95 dark:bg-primary/20"
@@ -343,130 +429,148 @@ export function PublicNavbar() {
                                 </span>
                             </Link>
                         )}
-                        <UserButton isLoading={isLoading} user={user} staffMember={staffMember} router={router} handleLogout={handleLogout} getInitials={getInitials} />
-                        <Button asChild variant="ghost" size="icon" className="group hidden sm:inline-flex h-11 w-11 rounded-2xl text-slate-600 dark:text-slate-200 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 relative transition-all dark:border dark:border-slate-700 dark:hover:border-rose-600">
-                            <Link href="/store/wishlist">
-                                <Heart className={cn("h-5.5 w-5.5 transition-transform duration-300 group-hover:scale-110 dark:text-slate-200", wishlistCount > 0 && "fill-current text-rose-500")} />
-                                {wishlistCount > 0 && (
-                                    <span className="absolute top-1.5 right-1.5 h-4 w-4 bg-rose-500 text-white text-[9px] flex items-center justify-center rounded-full font-black border-2 border-white dark:border-slate-900 animate-in zoom-in duration-300">
-                                        {wishlistCount}
+                        {navbarShowAccount && (
+                            <UserButton isLoading={isLoading} user={user} staffMember={staffMember} router={router} handleLogout={handleLogout} getInitials={getInitials} />
+                        )}
+                        {navbarShowWishlist && (
+                            <Button asChild variant="ghost" size="icon" className="group hidden sm:inline-flex h-11 w-11 rounded-2xl text-slate-600 dark:text-slate-200 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 relative transition-all dark:border dark:border-slate-700 dark:hover:border-rose-600">
+                                <Link href="/store/wishlist">
+                                    <Heart className={cn("h-5.5 w-5.5 transition-transform duration-300 group-hover:scale-110 dark:text-slate-200", wishlistCount > 0 && "fill-current text-rose-500")} />
+                                    {wishlistCount > 0 && (
+                                        <span className="absolute top-1.5 right-1.5 h-4 w-4 bg-rose-500 text-white text-[9px] flex items-center justify-center rounded-full font-black border-2 border-white dark:border-slate-900 animate-in zoom-in duration-300">
+                                            {wishlistCount}
+                                        </span>
+                                    )}
+                                </Link>
+                            </Button>
+                        )}
+                        {navbarShowCart && (
+                            <Button asChild variant="ghost" size="icon" className="group h-11 w-11 rounded-2xl text-slate-600 dark:text-slate-200 hover:text-primary hover:bg-primary/5 relative transition-all dark:border dark:border-slate-700 dark:hover:border-slate-600">
+                            <Link href="/store/cart">
+                                <ShoppingBag className={cn("h-5.5 w-5.5 transition-transform duration-300 group-hover:scale-110 dark:text-slate-200", cartCount > 0 && "text-primary dark:text-primary")} />
+                                {cartCount > 0 && (
+                                    <span className="absolute top-1.5 right-1.5 h-4 w-4 bg-primary text-white text-[9px] flex items-center justify-center rounded-full font-black border-2 border-white dark:border-slate-900 animate-in zoom-in duration-300">
+                                        {cartCount}
                                     </span>
                                 )}
                             </Link>
-                        </Button>
-                        <Button asChild variant="ghost" size="icon" className="group h-11 w-11 rounded-2xl text-slate-600 dark:text-slate-200 hover:text-primary hover:bg-primary/5 relative transition-all dark:border dark:border-slate-700 dark:hover:border-slate-600">
-                        <Link href="/store/cart">
-                            <ShoppingBag className={cn("h-5.5 w-5.5 transition-transform duration-300 group-hover:scale-110 dark:text-slate-200", cartCount > 0 && "text-primary dark:text-primary")} />
-                            {cartCount > 0 && (
-                                <span className="absolute top-1.5 right-1.5 h-4 w-4 bg-primary text-white text-[9px] flex items-center justify-center rounded-full font-black border-2 border-white dark:border-slate-900 animate-in zoom-in duration-300">
-                                    {cartCount}
-                                </span>
-                            )}
-                        </Link>
-                        </Button>
-
-                        <ThemeToggle className="h-11 w-11 rounded-2xl text-slate-600 dark:text-slate-300 hover:text-primary hover:bg-primary/5 transition-all dark:border dark:border-slate-700 dark:hover:border-slate-600" />
-                        
-                        <div className="md:hidden">
-                        <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-                            <SheetTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-11 w-11 rounded-2xl hover:bg-primary/5 hover:text-primary dark:text-slate-300 dark:border dark:border-slate-700 dark:hover:border-slate-600">
-                                <Menu className="h-6 w-6 dark:text-slate-300" strokeWidth={2.5} />
-                                <span className="sr-only">Open menu</span>
                             </Button>
-                            </SheetTrigger>
-                            <SheetContent side="left" className="w-full sm:w-[400px] rounded-r-[3rem] border-none shadow-2xl p-0 overflow-hidden">
-                            <div className="h-full flex flex-col">
-                                <SheetHeader className="p-8 border-b bg-muted/20">
-                                    <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-                                    <SheetDescription className="sr-only">Access categories, shop items, and your account settings.</SheetDescription>
-                                    <div className="flex justify-between items-center mb-8">
-                                        <Logo />
-                                    </div>
-                                     <Button 
-                                        variant="outline"
-                                        className="w-full pl-12 pr-4 rounded-2xl bg-white dark:bg-slate-900 border-none h-12 font-bold shadow-sm justify-start relative text-slate-400"
-                                        onClick={() => {
-                                            setIsMenuOpen(false);
-                                            setIsSearchFocused(true);
-                                        }}
-                                    >
-                                        <Search className="absolute left-4 h-5 w-5" strokeWidth={3} />
-                                        Find premium items...
-                                    </Button>
-                                    
-                                    {customer && (
-                                        <div className="mt-6 p-5 bg-primary text-white rounded-[2rem] shadow-xl relative overflow-hidden group">
-                                            <div className="absolute top-0 right-0 p-4 opacity-10">
-                                                <Wallet className="h-16 w-16" />
-                                            </div>
-                                            <div className="relative z-10 space-y-1">
-                                                <p className="text-[8px] font-black uppercase tracking-[0.3em] opacity-70">Account Credit</p>
-                                                <p className="text-2xl font-black tracking-tighter">{formatCurrency(customer.creditBalance || 0, settings?.currency || '$')}</p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </SheetHeader>
-                                
-                                <ScrollArea className="flex-1 px-8 py-10">
-                                    <nav className="flex flex-col space-y-8">
-                                        <Link className="text-3xl font-black tracking-tighter hover:text-primary transition-colors flex items-center justify-between group" href="/store" onClick={() => setIsMenuOpen(false)}>
-                                            Home <ChevronRight className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0" />
-                                        </Link>
-                                        <Link className="text-3xl font-black tracking-tighter hover:text-primary transition-colors flex items-center justify-between group" href="/store/shop" onClick={() => setIsMenuOpen(false)}>
-                                            The Catalog <ChevronRight className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0" />
-                                        </Link>
-                                        <Link className="text-3xl font-black tracking-tighter hover:text-rose-600 transition-colors flex items-center justify-between group" href="/store/flash-sales" onClick={() => setIsMenuOpen(false)}>
-                                            Flash Hub <ChevronRight className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0" />
-                                        </Link>
-                                        <div className="pt-4 border-t border-slate-100">
-                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6">Collections</p>
-                                            <div className="grid grid-cols-1 gap-4">
-                                                {isLoadingCategories ? (
-                                                    <div className="p-4 flex items-center gap-3 text-muted-foreground">
-                                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                                        <span className="text-xs font-bold uppercase">Syncing...</span>
-                                                    </div>
-                                                ) : (
-                                                    categories?.slice(0, 6).map(cat => (
-                                                        <Link key={cat.id} href={`/store/shop?category=${cat.id}`} className="flex items-center gap-4 group" onClick={() => setIsMenuOpen(false)}>
-                                                            <div className="relative h-12 w-12 rounded-2xl bg-muted overflow-hidden border shadow-sm shrink-0">
-                                                                <Image src={cat.imageUrl || `https://picsum.photos/seed/${cat.id}/100/100`} alt={cat.name} fill className="object-cover" unoptimized/>
-                                                            </div>
-                                                            <span className="font-bold text-lg group-hover:text-primary transition-colors">{cat.name}</span>
-                                                        </Link>
-                                                    ))
-                                                )}
-                                                <Link href="/store/categories" className="flex items-center gap-4 text-primary font-black uppercase text-[10px] tracking-widest pt-2" onClick={() => setIsMenuOpen(false)}>
-                                                    Browse All <ArrowRight className="h-3 w-3" strokeWidth={3} />
-                                                </Link>
-                                            </div>
-                                        </div>
-                                    </nav>
-                                </ScrollArea>
+                        )}
 
-                                <div className="p-8 bg-slate-50 dark:bg-slate-900 border-t flex flex-col gap-4">
-                                    {user ? (
-                                        <Button asChild size="lg" className="w-full h-14 rounded-2xl font-black uppercase text-xs tracking-widest gap-3 shadow-xl" onClick={() => setIsMenuOpen(false)}>
-                                            <Link href="/store/account">
-                                                <UserCircle className="h-5 w-5" /> My Account
-                                            </Link>
-                                        </Button>
-                                    ) : (
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <Button asChild variant="outline" size="lg" className="rounded-2xl font-black uppercase text-[10px] tracking-widest h-14" onClick={() => setIsMenuOpen(false)}>
-                                                <Link href="/store/login">Log In</Link>
-                                            </Button>
-                                            <Button asChild size="lg" className="rounded-2xl font-black uppercase text-[10px] tracking-widest h-14 shadow-xl" onClick={() => setIsMenuOpen(false)}>
-                                                <Link href="/store/signup">Join Now</Link>
-                                            </Button>
+                        {navbarShowThemeToggle && (
+                            <ThemeToggle className="h-11 w-11 rounded-2xl text-slate-600 dark:text-slate-300 hover:text-primary hover:bg-primary/5 transition-all dark:border dark:border-slate-700 dark:hover:border-slate-600" />
+                        )}
+                        
+                        {(navbarMenuStyle !== 'none') && (
+                            <div className="md:hidden">
+                            <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+                                <SheetTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-11 w-11 rounded-2xl hover:bg-primary/5 hover:text-primary dark:text-slate-300 dark:border dark:border-slate-700 dark:hover:border-slate-600">
+                                    <Menu className="h-6 w-6 dark:text-slate-300" strokeWidth={2.5} />
+                                    <span className="sr-only">Open menu</span>
+                                </Button>
+                                </SheetTrigger>
+                                <SheetContent side="left" className="w-full sm:w-[400px] rounded-r-[3rem] border-none shadow-2xl p-0 overflow-hidden">
+                                <div className="h-full flex flex-col">
+                                    <SheetHeader className="p-8 border-b bg-muted/20">
+                                        <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                                        <SheetDescription className="sr-only">Access categories, shop items, and your account settings.</SheetDescription>
+                                        <div className="flex justify-between items-center mb-8">
+                                            <Logo />
                                         </div>
-                                    )}
+                                         {navbarShowSearch && (
+                                             <Button 
+                                                variant="outline"
+                                                className="w-full pl-12 pr-4 rounded-2xl bg-white dark:bg-slate-900 border-none h-12 font-bold shadow-sm justify-start relative text-slate-400"
+                                                onClick={() => {
+                                                    setIsMenuOpen(false);
+                                                    setIsSearchFocused(true);
+                                                }}
+                                            >
+                                                <Search className="absolute left-4 h-5 w-5" strokeWidth={3} />
+                                                Find premium items...
+                                            </Button>
+                                         )}
+                                        
+                                        {navbarShowCreditBadge && customer && (
+                                            <div className="mt-6 p-5 bg-primary text-white rounded-[2rem] shadow-xl relative overflow-hidden group">
+                                                <div className="absolute top-0 right-0 p-4 opacity-10">
+                                                    <Wallet className="h-16 w-16" />
+                                                </div>
+                                                <div className="relative z-10 space-y-1">
+                                                    <p className="text-[8px] font-black uppercase tracking-[0.3em] opacity-70">Account Credit</p>
+                                                    <p className="text-2xl font-black tracking-tighter">{formatCurrency(customer.creditBalance || 0, settings?.currency || '$')}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </SheetHeader>
+                                    
+                                    <ScrollArea className="flex-1 px-8 py-10">
+                                        <nav className="flex flex-col space-y-8">
+                                            <Link className="text-3xl font-black tracking-tighter hover:text-primary transition-colors flex items-center justify-between group" href="/store" onClick={() => setIsMenuOpen(false)}>
+                                                Home <ChevronRight className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0" />
+                                            </Link>
+                                            {navbarShowShopLink && (
+                                                <Link className="text-3xl font-black tracking-tighter hover:text-primary transition-colors flex items-center justify-between group" href="/store/shop" onClick={() => setIsMenuOpen(false)}>
+                                                    The Catalog <ChevronRight className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0" />
+                                                </Link>
+                                            )}
+                                            {navbarShowFlashSalesLink && (
+                                                <Link className="text-3xl font-black tracking-tighter hover:text-rose-600 transition-colors flex items-center justify-between group" href="/store/flash-sales" onClick={() => setIsMenuOpen(false)}>
+                                                    Flash Hub <ChevronRight className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0" />
+                                                </Link>
+                                            )}
+                                            {navbarShowCollectionsLink && (
+                                                <div className="pt-4 border-t border-slate-100">
+                                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6">Collections</p>
+                                                    <div className="grid grid-cols-1 gap-4">
+                                                        {isLoadingCategories ? (
+                                                            <div className="p-4 flex items-center gap-3 text-muted-foreground">
+                                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                                                <span className="text-xs font-bold uppercase">Syncing...</span>
+                                                            </div>
+                                                        ) : (
+                                                            categories?.slice(0, 6).map(cat => (
+                                                                <Link key={cat.id} href={`/store/shop?category=${cat.id}`} className="flex items-center gap-4 group" onClick={() => setIsMenuOpen(false)}>
+                                                                    <div className="relative h-12 w-12 rounded-2xl bg-muted overflow-hidden border shadow-sm shrink-0">
+                                                                        <Image src={cat.imageUrl || `https://picsum.photos/seed/${cat.id}/100/100`} alt={cat.name} fill className="object-cover" unoptimized/>
+                                                                    </div>
+                                                                    <span className="font-bold text-lg group-hover:text-primary transition-colors">{cat.name}</span>
+                                                                </Link>
+                                                            ))
+                                                        )}
+                                                        <Link href="/store/categories" className="flex items-center gap-4 text-primary font-black uppercase text-[10px] tracking-widest pt-2" onClick={() => setIsMenuOpen(false)}>
+                                                            Browse All <ArrowRight className="h-3 w-3" strokeWidth={3} />
+                                                        </Link>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </nav>
+                                    </ScrollArea>
+
+                                    <div className="p-8 bg-slate-50 dark:bg-slate-900 border-t flex flex-col gap-4">
+                                        {navbarShowAccount && user ? (
+                                            <Button asChild size="lg" className="w-full h-14 rounded-2xl font-black uppercase text-xs tracking-widest gap-3 shadow-xl" onClick={() => setIsMenuOpen(false)}>
+                                                <Link href="/store/account">
+                                                    <UserCircle className="h-5 w-5" /> My Account
+                                                </Link>
+                                            </Button>
+                                        ) : navbarShowAccount && !user ? (
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <Button asChild variant="outline" size="lg" className="rounded-2xl font-black uppercase text-[10px] tracking-widest h-14" onClick={() => setIsMenuOpen(false)}>
+                                                    <Link href="/store/login">Log In</Link>
+                                                </Button>
+                                                <Button asChild size="lg" className="rounded-2xl font-black uppercase text-[10px] tracking-widest h-14 shadow-xl" onClick={() => setIsMenuOpen(false)}>
+                                                    <Link href="/store/signup">Join Now</Link>
+                                                </Button>
+                                            </div>
+                                        ) : null}
+                                    </div>
                                 </div>
+                                </SheetContent>
+                            </Sheet>
                             </div>
-                            </SheetContent>
-                        </Sheet>
-                        </div>
+                        )}
                     </div>
                   </div>
               </div>
