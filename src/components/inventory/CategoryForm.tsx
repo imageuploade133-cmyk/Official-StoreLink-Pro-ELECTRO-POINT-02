@@ -308,7 +308,7 @@ export function CategoryForm({
                           />
                       </div>
                   </CardHeader>
-                  <CardContent className={cn("pt-8 space-y-8 transition-opacity duration-500", !isFlashSale && "opacity-40 pointer-events-none grayscale-[0.5]")}>
+                  <CardContent className={cn("pt-8 space-y-8 transition-opacity duration-500", !isFlashSale && "opacity-50")}>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                           <FormField
                               control={methods.control}
