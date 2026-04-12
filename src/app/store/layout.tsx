@@ -66,7 +66,17 @@ export default function PublicLayout({
   // Navbar padding scales with logo height to maintain visual balance
   const logoContainerHeight = Math.max(32, Math.round(storeLogoWidth * 0.33));
   const navbarPadding = Math.max(16, Math.round(logoContainerHeight * 0.5));
-  const navbarHeight = logoContainerHeight + (navbarPadding * 2);
+  
+  // Height Mapping (Must match PublicNavbar)
+  const heightMap = {
+      compact: 48,
+      default: 64,
+      expanded: 80,
+      full: 100,
+  };
+  
+  const navbarHeight = settings?.navbarHeight ? (heightMap[settings.navbarHeight as keyof typeof heightMap] || 64) : (logoContainerHeight + (navbarPadding * 2));
+  const navbarSticky = settings?.navbarSticky || 'fixed';
 
   if (!isInitialLoadComplete) {
     return <PublicPageSkeleton />;
@@ -78,7 +88,7 @@ export default function PublicLayout({
       {settings?.backgroundStyle === 'video' && settings.backgroundVideoUrl && <BackgroundVideoPlayer />}
       <PublicNavbar />
       
-      <main className="relative z-10 dark:bg-black" style={{ paddingTop: `${navbarHeight}px` }}>{children}</main>
+      <main className="relative z-10 dark:bg-black" style={{ paddingTop: navbarSticky !== 'static' ? `${navbarHeight}px` : '0px' }}>{children}</main>
 
       <PublicFooter />
     </>
