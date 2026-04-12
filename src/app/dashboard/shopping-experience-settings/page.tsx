@@ -773,10 +773,19 @@ export default function ShoppingExperienceSettingsPage() {
             <Button
               type="submit"
               disabled={isSaving}
-              className="gap-2"
+              className="gap-2 min-w-[160px]"
             >
-              {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
-              {isSaving ? 'Saving...' : 'Save Changes'}
+              {isSaving ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Saving...</span>
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4" />
+                  <span>Save Changes</span>
+                </>
+              )}
             </Button>
           </div>
         </form>
