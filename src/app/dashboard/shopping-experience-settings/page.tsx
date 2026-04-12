@@ -20,6 +20,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
 import { 
   MousePointerClick, 
   Loader2, 
@@ -679,15 +680,10 @@ export default function ShoppingExperienceSettingsPage() {
                       </FormDescription>
                     </div>
                     <FormControl>
-                      <Button
-                        type="button"
-                        variant={field.value ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => field.onChange(!field.value)}
-                        className="w-16"
-                      >
-                        {field.value ? "ON" : "OFF"}
-                      </Button>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
