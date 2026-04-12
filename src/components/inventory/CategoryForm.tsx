@@ -67,6 +67,7 @@ interface CategoryFormProps {
   defaultValues?: Partial<CategoryFormValues>;
   isEditMode?: boolean;
   onCancel?: () => void;
+  isModal?: boolean;
 }
 
 export function CategoryForm({
@@ -75,6 +76,7 @@ export function CategoryForm({
   defaultValues,
   isEditMode = false,
   onCancel,
+  isModal = false,
 }: CategoryFormProps) {
   const { toast } = useToast();
   const { settings } = useSettings();
@@ -163,6 +165,128 @@ export function CategoryForm({
     };
   };
 
+  // Simplified modal version
+  if (isModal) {
+    return (
+      <FormProvider {...methods}>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+          <div className="space-y-4">
+            <FormField
+              control={methods.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-semibold">Category Name <span className="text-destructive">*</span></FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="e.g., Electronics, Home Decor" 
+                      {...field} 
+                      className="h-10" 
+                      autoFocus
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={methods.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-semibold">Description</FormLabel>
+                  <FormControl>
+                    <textarea 
+                      placeholder="Brief description for your customers..." 
+                      {...field}
+                      value={field.value || ''}
+                      className="w-full h-20 px-3 py-2 border rounded-lg text-sm resize-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={methods.control}
+              name="imageUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-semibold">Category Image</FormLabel>
+                  <div className="flex gap-4 items-start">
+                    {imageUrl ? (
+                      <div className="relative w-20 h-20 rounded-lg overflow-hidden border-2 border-primary/20 bg-muted shrink-0 group">
+                        <Image
+                          src={imageUrl}
+                          alt="Category preview"
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
+                        <Button 
+                          type="button" 
+                          variant="destructive" 
+                          size="icon" 
+                          className="absolute -top-2 -right-2 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => setValue('imageUrl', '')}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="w-20 h-20 rounded-lg border-2 border-dashed border-primary/20 bg-primary/5 flex items-center justify-center shrink-0">
+                        <Upload className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                    )}
+                    <div className="flex-1 space-y-2">
+                      <Button 
+                        asChild 
+                        variant="outline" 
+                        size="sm" 
+                        disabled={isSubmitting || isUploading}
+                        className="w-full"
+                      >
+                        <label htmlFor="category-image-upload" className="cursor-pointer">
+                          {isUploading ? <Loader2 className="mr-2 h-3 w-3 animate-spin" /> : <Upload className="mr-2 h-3 w-3" />}
+                          Upload Image
+                        </label>
+                      </Button>
+                      <Input 
+                        id="category-image-upload" 
+                        type="file" 
+                        accept="image/*" 
+                        className="hidden" 
+                        onChange={handleImageUpload} 
+                        disabled={isSubmitting || isUploading} 
+                      />
+                      <p className="text-xs text-muted-foreground">Max {settings?.imageMaxFileSizeMb || 5}MB</p>
+                    </div>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="flex gap-2 justify-end pt-4 border-t">
+            {onCancel && (
+              <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting || isUploading}>
+                Cancel
+              </Button>
+            )}
+            <Button type="submit" disabled={isSubmitting || isUploading}>
+              {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              Create Category
+            </Button>
+          </div>
+        </form>
+      </FormProvider>
+    );
+  }
+
+  // Full page version
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full overflow-hidden bg-transparent">

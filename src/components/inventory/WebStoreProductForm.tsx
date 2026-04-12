@@ -1769,11 +1769,12 @@ export function WebStoreProductForm() {
                 <DialogTitle>Create New Category</DialogTitle>
                 <DialogDescription>Add a new collection to your inventory.</DialogDescription>
             </DialogHeader>
-            <CategoryForm 
-                onSubmit={handleCreateCategory}
-                isSubmitting={isSubmittingCategory}
-                onCancel={() => setIsCategoryModalOpen(false)}
-            />
+<CategoryForm
+  onSubmit={handleCreateCategory}
+  isSubmitting={isSubmittingCategory}
+  onCancel={() => setIsCategoryModalOpen(false)}
+  isModal={true}
+  />
         </DialogContent>
     </Dialog>
     </>
