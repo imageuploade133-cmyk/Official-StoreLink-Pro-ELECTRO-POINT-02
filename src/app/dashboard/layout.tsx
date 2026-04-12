@@ -178,6 +178,7 @@ export default function DashboardLayout({
     { href: '/dashboard/product-card-designer', icon: Palette, label: 'Product Card Designer', perm: 'manage_settings' },
     { href: '/dashboard/public-web-settings', icon: Globe, label: 'General Web Settings', perm: 'manage_settings' },
     { href: '/dashboard/public-visibility-settings', icon: EyeOff, label: 'Global Section Visibility', perm: 'manage_settings' },
+    { href: '/dashboard/store-navigation-settings', icon: List, label: 'Navigation Bar Settings', perm: 'manage_settings' },
     { href: '/dashboard/shopping-experience-settings', icon: MousePointerClick, label: 'Shopping Buttons', perm: 'manage_settings' },
     { href: '/dashboard/website-payment', icon: Landmark, label: 'Website Payment Method', perm: 'manage_settings' },
     { href: '/dashboard/logistics-settings', icon: Truck, label: 'Logistics Settings', perm: 'manage_settings' },
