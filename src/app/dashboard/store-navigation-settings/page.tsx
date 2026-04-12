@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { Navigation } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { useFirestore, useDoc } from '@/firebase';
 import { doc } from 'firebase/firestore';
@@ -32,6 +33,7 @@ export default function StoreNavigationSettingsPage() {
     return (
         <div className="space-y-8">
             <PageHeader
+                icon={Navigation}
                 title="Store Navigation Settings"
                 description="Customize the public store header, navigation, and menu appearance."
             />
