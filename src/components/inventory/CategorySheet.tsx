@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { collection, query, where, getDocs, addDoc, Timestamp } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { CategoryForm, type CategoryFormValues } from '@/components/inventory/CategoryForm';
-import { FolderPlus, Loader2, X } from 'lucide-react';
+import { FolderPlus, Loader2, X as CloseIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Drawer,
@@ -88,24 +88,19 @@ export function CategorySheet({ children, trigger }: CategorySheetProps) {
         )}
       </DrawerTrigger>
       <DrawerContent className="flex flex-col h-screen w-screen overflow-hidden">
-        <div className="flex justify-between items-center px-6 py-4 border-b bg-muted/30 shrink-0">
-          <div className="flex items-center gap-2">
-            <FolderPlus className="h-5 w-5" />
-            <h2 className="text-lg font-semibold">New Product Category</h2>
-          </div>
+        <div className="flex justify-end px-6 py-4 shrink-0">
           <DrawerClose asChild>
             <Button 
               variant="ghost" 
               size="icon" 
               className="h-8 w-8 rounded-full hover:bg-muted"
             >
-              <X className="h-4 w-4" />
+              <CloseIcon className="h-4 w-4" />
               <span className="sr-only">Close</span>
             </Button>
           </DrawerClose>
         </div>
 
-        
         <div className="flex-1 min-h-0 overflow-hidden">
           <CategoryForm 
             onSubmit={handleAddCategory}
