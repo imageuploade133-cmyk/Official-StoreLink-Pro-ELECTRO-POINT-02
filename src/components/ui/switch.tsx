@@ -15,9 +15,9 @@ const Switch = React.forwardRef<
       // Light theme - OFF state (gray), ON state (emerald green)
       "data-[state=unchecked]:bg-gray-300 data-[state=unchecked]:shadow-sm hover:data-[state=unchecked]:bg-gray-400 hover:data-[state=unchecked]:shadow-md",
       "data-[state=checked]:bg-emerald-500 data-[state=checked]:shadow-lg hover:data-[state=checked]:bg-emerald-600 hover:data-[state=checked]:shadow-emerald-500/50",
-      // Dark theme - OFF state (slate-700), ON state (emerald-500)
-      "dark:data-[state=unchecked]:bg-slate-700 dark:data-[state=unchecked]:shadow-sm dark:hover:data-[state=unchecked]:bg-slate-600 dark:hover:data-[state=unchecked]:shadow-md",
-      "dark:data-[state=checked]:bg-emerald-500 dark:data-[state=checked]:shadow-lg dark:hover:data-[state=checked]:bg-emerald-400 dark:hover:data-[state=checked]:shadow-emerald-500/40",
+      // Dark theme - OFF state (red for visibility), ON state (emerald-500)
+      "dark:data-[state=unchecked]:bg-red-500 dark:data-[state=unchecked]:shadow-md dark:hover:data-[state=unchecked]:bg-red-600 dark:hover:data-[state=unchecked]:shadow-red-500/50",
+      "dark:data-[state=checked]:bg-emerald-500 dark:data-[state=checked]:shadow-lg dark:hover:data-[state=checked]:bg-emerald-400 dark:hover:data-[state=checked]:shadow-emerald-500/50",
       className
     )}
     {...props}
@@ -30,7 +30,7 @@ const Switch = React.forwardRef<
         "bg-white data-[state=unchecked]:ring-gray-400/30",
         "data-[state=checked]:ring-emerald-400/40",
         // Dark theme - thumb colors
-        "dark:bg-slate-100 dark:data-[state=unchecked]:ring-slate-500/30",
+        "dark:bg-white dark:data-[state=unchecked]:ring-red-400/40",
         "dark:data-[state=checked]:ring-emerald-300/50"
       )}
     />
