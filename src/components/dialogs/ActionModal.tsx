@@ -1,14 +1,14 @@
 'use client';
 
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog";
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerClose,
+} from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
@@ -31,25 +31,50 @@ export function ActionModal({
   if (!isOpen) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          {description && <DialogDescription>{description}</DialogDescription>}
-        </DialogHeader>
-        <ScrollArea className="max-h-[60vh]">
-            <div className="flex flex-col space-y-2 py-4 pr-4">
-                {children}
-            </div>
+    <Drawer open={isOpen} onOpenChange={onOpenChange} dismissible={true}>
+      <DrawerContent className="flex flex-col h-screen w-screen max-w-full sm:max-w-md mx-auto overflow-hidden">
+        {/* Drag Handle Indicator */}
+        <div 
+          className="w-full flex flex-col items-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none select-none hover:bg-muted/20 transition-colors shrink-0"
+          data-vaul-drag-handle
+        >
+          <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+        </div>
+
+        <DrawerHeader className="px-6 py-4 border-b shrink-0">
+          <DrawerTitle className="flex items-center gap-2">
+            {title}
+          </DrawerTitle>
+          {description && <DrawerDescription>{description}</DrawerDescription>}
+        </DrawerHeader>
+        
+        <div className="flex justify-end px-6 py-2 shrink-0">
+          <DrawerClose asChild>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8 rounded-full hover:bg-muted"
+            >
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </Button>
+          </DrawerClose>
+        </div>
+
+        <ScrollArea className="flex-1 min-h-0 overflow-hidden">
+          <div className="flex flex-col space-y-2 px-6 py-4">
+            {children}
+          </div>
         </ScrollArea>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button type="button" variant="secondary">
+        
+        <DrawerFooter className="shrink-0">
+          <DrawerClose asChild>
+            <Button type="button" variant="secondary" className="w-full">
               <X className="mr-2 h-4 w-4" /> Close
             </Button>
-          </DialogClose>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }
