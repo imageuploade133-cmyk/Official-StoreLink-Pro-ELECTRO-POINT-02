@@ -11,7 +11,13 @@ const Switch = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SwitchPrimitives.Root
     className={cn(
-      "peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-md transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-card/70 hover:data-[state=unchecked]:bg-card/80",
+      "peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-md transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50",
+      // Light theme - OFF state (gray), ON state (emerald green)
+      "data-[state=unchecked]:bg-gray-300 data-[state=unchecked]:shadow-sm hover:data-[state=unchecked]:bg-gray-400 hover:data-[state=unchecked]:shadow-md",
+      "data-[state=checked]:bg-emerald-500 data-[state=checked]:shadow-lg hover:data-[state=checked]:bg-emerald-600 hover:data-[state=checked]:shadow-emerald-500/50",
+      // Dark theme - OFF state (blue), ON state (green)
+      "dark:data-[state=unchecked]:bg-blue-500 dark:data-[state=unchecked]:shadow-md dark:hover:data-[state=unchecked]:bg-blue-600 dark:hover:data-[state=unchecked]:shadow-blue-500/50",
+      "dark:data-[state=checked]:bg-green-500 dark:data-[state=checked]:shadow-lg dark:hover:data-[state=checked]:bg-green-400 dark:hover:data-[state=checked]:shadow-green-500/50",
       className
     )}
     {...props}
@@ -19,7 +25,13 @@ const Switch = React.forwardRef<
   >
     <SwitchPrimitives.Thumb
       className={cn(
-        "pointer-events-none block h-5 w-5 rounded-full bg-background shadow-md ring-0 transition-all duration-200 data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0 data-[state=checked]:ring-primary/40 data-[state=unchecked]:ring-border/50 hover:shadow-lg"
+        "pointer-events-none block h-5 w-5 rounded-full shadow-md ring-0 transition-all duration-300 data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0 hover:shadow-lg",
+        // Light theme - thumb colors
+        "bg-white data-[state=unchecked]:ring-gray-400/30",
+        "data-[state=checked]:ring-emerald-400/40",
+        // Dark theme - thumb colors
+        "dark:bg-white dark:data-[state=unchecked]:ring-blue-400/40",
+        "dark:data-[state=checked]:ring-green-300/50"
       )}
     />
   </SwitchPrimitives.Root>
