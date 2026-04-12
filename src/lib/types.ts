@@ -320,6 +320,26 @@ export interface Settings {
   globalShowTechnicalSpecs?: boolean;
   globalShowLogisticsInfo?: boolean;
   globalShowVerifiedReviews?: boolean;
+  // Navigation Bar Customization Settings
+  navbarStyle?: 'standard' | 'minimal' | 'glass' | 'solid' | 'transparent';
+  navbarBackgroundColor?: string;
+  navbarTextColor?: string;
+  navbarBorderColor?: string;
+  navbarHeight?: 'compact' | 'default' | 'expanded' | 'full';
+  navbarShowSearch?: boolean;
+  navbarShowWishlist?: boolean;
+  navbarShowCart?: boolean;
+  navbarShowAccount?: boolean;
+  navbarShowThemeToggle?: boolean;
+  navbarShowCreditBadge?: boolean;
+  navbarMenuStyle?: 'dropdown' | 'slide' | 'none';
+  navbarShowShopLink?: boolean;
+  navbarShowFlashSalesLink?: boolean;
+  navbarShowCollectionsLink?: boolean;
+  navbarLogoPosition?: 'left' | 'center' | 'right';
+  navbarSticky?: 'fixed' | 'sticky' | 'static';
+  navbarShadow?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
+  navbarBlurEffect?: boolean;
 }
 
 export type AppSettings = Settings;
