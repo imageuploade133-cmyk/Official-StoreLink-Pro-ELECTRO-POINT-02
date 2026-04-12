@@ -46,8 +46,11 @@ import Link from 'next/link';
 
 const categoryFormSchema = z.object({
   name: z.string().min(2, { message: "Category name must be at least 2 characters." }).max(50, { message: "Category name must not exceed 50 characters." }),
-  description: z.string().max(10000, { message: "Description is too long." }).optional().or(z.literal("")),
-  imageUrl: z.string().url("Must be a valid URL.").optional().or(z.literal('')),
+  description: z.string().max(10000, { message: "Description is too long." }).optional().or(z.literal("")).nullable(),
+  imageUrl: z.union([
+    z.literal(''),
+    z.string().url("Must be a valid URL.")
+  ]).optional().nullable(),
   allowIndividualProductSales: z.boolean().default(true),
   isFlashSale: z.boolean().default(false),
   flashSaleDiscountType: z.enum(['percentage', 'fixed']).default('percentage'),
@@ -169,8 +172,8 @@ export function CategoryForm({
             <CardDescription>Create a new category to organize your inventory. Max image size: {settings?.imageMaxFileSizeMb || 5}MB.</CardDescription>
           </CardHeader>
           
-          <ScrollArea className="flex-1 h-0 min-h-0">
-            <CardContent className="p-6 space-y-8">
+          <ScrollArea className="flex-1 h-0 min-h-0 w-full overflow-hidden">
+            <CardContent className="p-6 space-y-8 pr-4">
               <div className="grid grid-cols-1 gap-6">
                 <FormField
                   control={methods.control}
@@ -308,7 +311,7 @@ export function CategoryForm({
                           />
                       </div>
                   </CardHeader>
-                  <CardContent className={cn("pt-8 space-y-8 transition-opacity duration-500", !isFlashSale && "opacity-40 pointer-events-none grayscale-[0.5]")}>
+                  <CardContent className={cn("pt-8 space-y-8 transition-opacity duration-500", !isFlashSale && "opacity-50")}>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                           <FormField
                               control={methods.control}
@@ -465,17 +468,17 @@ export function CategoryForm({
             </CardContent>
           </ScrollArea>
 
-          <CardFooter className="bg-muted/30 border-t p-6 shrink-0 flex justify-between items-center">
-            <Button type="submit" disabled={isSubmitting || isUploading} size="lg" className="px-12 h-14 font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20">
+          <CardFooter className="bg-muted/30 border-t p-6 shrink-0 flex justify-between items-center gap-4 flex-wrap">
+            <Button type="submit" disabled={isSubmitting || isUploading} size="lg" className="px-8 h-12 font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20">
               {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
               {isEditMode ? "Update Collection" : "Publish Category"}
             </Button>
             {onCancel ? (
-              <Button type="button" variant="outline" onClick={onCancel} className="h-14 px-8 font-bold">
+              <Button type="button" variant="outline" onClick={onCancel} className="h-12 px-6 font-bold">
                 Cancel
               </Button>
             ) : (
-              <Button type="button" variant="outline" asChild className="h-14 px-8 font-bold">
+              <Button type="button" variant="outline" asChild className="h-12 px-6 font-bold">
                 <Link href="/dashboard/categories">Cancel</Link>
               </Button>
             )}
