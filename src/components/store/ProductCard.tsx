@@ -4,7 +4,19 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShoppingCart, Heart, CheckCircle2, Zap, Sparkles, TrendingUp } from 'lucide-react';
+import { 
+  ShoppingCart, 
+  Heart, 
+  CheckCircle2, 
+  Zap, 
+  Sparkles, 
+  TrendingUp,
+  ShoppingBag,
+  Plus,
+  Check,
+  ArrowRight,
+  Package
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -79,6 +91,14 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
     setIsLoadingProduct(true);
   };
 
+  const GridCartIcon = useMemo(() => {
+    const iconName = settings?.storeGridCartIcon || 'ShoppingCart';
+    const iconMap: Record<string, any> = {
+      ShoppingCart, ShoppingBag, Plus, Check, CheckCircle2, Zap, ArrowRight, Package
+    };
+    return iconMap[iconName] || ShoppingCart;
+  }, [settings?.storeGridCartIcon]);
+
   // Dynamic Button Style
   const buttonStyle = useMemo(() => {
     const useIndividual = settings?.useIndividualBtnSettings !== false;
@@ -86,37 +106,28 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
       ? (settings?.storeGridCartStyle || 'standard')
       : (settings?.storeBtnStyle || 'standard');
     
-    const getColor = () => {
-      if (useIndividual) {
-        if (style === 'gradient') {
-          return {
-            background: `linear-gradient(135deg, ${settings?.storeGridCartGradientStart || '#10b981'}, ${settings?.storeGridCartGradientEnd || '#059669'})`,
-            color: 'white',
-            border: 'none'
-          };
-        }
-        return {
-          backgroundColor: settings?.storeGridCartColor || '#10b981',
-          color: 'white',
-          border: 'none'
-        };
-      }
-      // Global settings
-      if (style === 'gradient') {
-        return {
-          background: `linear-gradient(135deg, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
-          color: 'white',
-          border: 'none'
-        };
-      }
+    if (style === 'gradient') {
       return {
-        backgroundColor: settings?.storeBtnColor || '#3b82f6',
+        background: `linear-gradient(135deg, ${settings?.storeGridCartGradientStart || '#10b981'}, ${settings?.storeGridCartGradientEnd || '#059669'})`,
         color: 'white',
         border: 'none'
       };
-    };
+    } else if (style === 'image' && settings?.storeGridCartImageUrl) {
+      return {
+        backgroundImage: `url('${settings.storeGridCartImageUrl}')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        color: 'white',
+        textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+        border: 'none'
+      };
+    }
     
-    return getColor();
+    return {
+      backgroundColor: settings?.storeGridCartColor || '#10b981',
+      color: 'white',
+      border: 'none'
+    };
   }, [settings]);
 
   // Button shape and size classes
@@ -302,7 +313,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
             style={buttonStyle}
             className={`w-full font-black text-sm uppercase tracking-wide shadow-xl transition-all active:scale-95 ${styles.cartButton} ${buttonClasses} hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed`}
           >
-            <ShoppingCart className={`h-5 w-5 mr-2 transition-all ${styles.cartIcon}`} />
+            <GridCartIcon className={`h-5 w-5 mr-2 transition-all ${styles.cartIcon}`} />
             {settings?.storeGridCartText || 'Add to Bag'}
           </Button>
         </div>
@@ -397,7 +408,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
               >
-                <ShoppingCart className={`h-5 w-5 transition-all ${styles.mobileCartIcon}`} />
+                <GridCartIcon className={`h-5 w-5 transition-all ${styles.mobileCartIcon}`} />
               </Button>
             </div>
           </div>

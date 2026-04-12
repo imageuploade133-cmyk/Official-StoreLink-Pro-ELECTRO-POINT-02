@@ -19,7 +19,8 @@ import {
     ArrowRight,
     Sparkles,
     CheckCircle2,
-    Zap
+    Zap,
+    Plus
 } from 'lucide-react';
 import { useSettings } from '@/contexts/settings-context';
 import { useCart } from '@/contexts/cart-context';
@@ -45,6 +46,44 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
 
     const currencySymbol = settings?.currency || '$';
     const defaultImageUrl = settings?.defaultProductImageUrl || 'https://placehold.co/400x500.png';
+    
+    const gridCartButtonStyle = useMemo(() => {
+        const useIndividual = settings?.useIndividualBtnSettings !== false;
+        const style = useIndividual 
+            ? (settings?.storeGridCartStyle || 'standard')
+            : (settings?.storeBtnStyle || 'standard');
+        
+        if (style === 'gradient') {
+            return {
+                background: `linear-gradient(135deg, ${settings?.storeGridCartGradientStart || '#10b981'}, ${settings?.storeGridCartGradientEnd || '#059669'})`,
+                color: 'white',
+                border: 'none'
+            };
+        } else if (style === 'image' && settings?.storeGridCartImageUrl) {
+            return {
+                backgroundImage: `url('${settings.storeGridCartImageUrl}')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                color: 'white',
+                textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+                border: 'none'
+            };
+        }
+        
+        return {
+            backgroundColor: settings?.storeGridCartColor || '#10b981',
+            color: 'white',
+            border: 'none'
+        };
+    }, [settings]);
+
+    const GridCartIcon = useMemo(() => {
+        const iconName = settings?.storeGridCartIcon || 'ShoppingCart';
+        const iconMap: Record<string, any> = {
+            ShoppingCart, ShoppingBag, Plus, Zap, Heart, Sparkles, CheckCircle2
+        };
+        return iconMap[iconName] || ShoppingCart;
+    }, [settings?.storeGridCartIcon]);
     
     const productIds = useMemo(() => Array.from(wishlistProductIds), [wishlistProductIds]);
 
@@ -146,9 +185,10 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
                                             <Button 
                                                 onClick={(e) => handleAddToCart(e, product, price)}
                                                 disabled={isOutOfStock}
-                                                className="w-full h-12 rounded-2xl bg-slate-950 text-white font-black text-[10px] uppercase tracking-widest shadow-2xl active:scale-95"
+                                                style={gridCartButtonStyle}
+                                                className="w-full h-12 rounded-2xl text-white font-black text-[10px] uppercase tracking-widest shadow-2xl active:scale-95 border-none"
                                             >
-                                                <ShoppingCart className="h-4 w-4 mr-2" /> Move to Bag
+                                                <GridCartIcon className="h-4 w-4 mr-2" /> Move to Bag
                                             </Button>
                                         </div>
                                     </div>

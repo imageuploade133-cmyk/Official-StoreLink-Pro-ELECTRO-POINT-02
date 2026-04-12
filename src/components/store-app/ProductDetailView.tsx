@@ -251,9 +251,56 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
     const voiceBranding = { preTitle: settings?.voiceExperiencePreTitle || 'Audio Signature', title: settings?.voiceExperienceTitle || 'Product Insights', color: settings?.voiceExperienceColor || '#5048e5', iconUrl: settings?.voiceExperienceIconUrl };
     const visibleVoices = (distributedVoices || []).filter(v => v.isVisible !== false);
     const DescriptionIcon = iconMap[product.descriptionIcon as keyof typeof iconMap] || BookOpen;
-    
+
     const addToCartText = settings?.storeAddToCartText || 'Secure Purchase';
     const AddToCartIcon = iconMap[settings?.storeAddToCartIcon as keyof typeof iconMap] || ShoppingBag;
+
+    // Dynamic Button Style for Add to Cart
+    const addToCartButtonStyle = useMemo(() => {
+        const useIndividual = settings?.useIndividualBtnSettings !== false;
+        const style = useIndividual
+            ? (settings?.storeAddToCartStyle || 'standard')
+            : (settings?.storeBtnStyle || 'standard');
+
+        if (style === 'gradient') {
+            return {
+                background: `linear-gradient(135deg, ${settings?.storeAddToCartGradientStart || '#3b82f6'}, ${settings?.storeAddToCartGradientEnd || '#1d4ed8'})`,
+                color: 'white',
+                border: 'none'
+            };
+        } else if (style === 'image' && settings?.storeAddToCartImageUrl) {
+            return {
+                backgroundImage: `url('${settings.storeAddToCartImageUrl}')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                color: 'white',
+                textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+                border: 'none'
+            };
+        }
+
+        return {
+            backgroundColor: settings?.storeAddToCartColor || '#3b82f6',
+            color: 'white',
+            border: 'none'
+        };
+    }, [settings]);
+
+    const addToCartButtonClasses = useMemo(() => {
+        const useIndividual = settings?.useIndividualBtnSettings !== false;
+        const size = useIndividual
+            ? (settings?.storeAddToCartSize || 'lg')
+            : (settings?.storeBtnSize || 'lg');
+
+        const sizeClasses = {
+            sm: 'h-10 text-xs px-4',
+            md: 'h-12 text-sm px-6',
+            lg: 'h-14 text-sm px-8',
+            xl: 'h-16 text-base px-10'
+        };
+
+        return sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
+    }, [settings]);
 
     const reviewStats = (() => {
         if (!reviews || reviews.length === 0) return { avg: 0, count: 0, distribution: [0, 0, 0, 0, 0] };
@@ -332,13 +379,15 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                 <div className="flex justify-between items-start">
                     <div className="space-y-1">
                         <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight">{product.name}</h1>
-                        <div className="flex items-center gap-2 pt-1">
-                            <div className="flex text-amber-400">
-                                {[...Array(5)].map((_, i) => <Star key={i} className={cn("h-4 w-4 fill-current", i >= Math.floor(reviewStats.avg) && "text-slate-200 dark:text-slate-700")} />)}
+                        {settings?.showProductReviews && (
+                            <div className="flex items-center gap-2 pt-1">
+                                <div className="flex text-amber-400">
+                                    {[...Array(5)].map((_, i) => <Star key={i} className={cn("h-4 w-4 fill-current", i >= Math.floor(reviewStats.avg) && "text-slate-200 dark:text-slate-700")} />)}
+                                </div>
+                                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{reviewStats.avg} ({reviewStats.count})</span>
                             </div>
-                            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{reviewStats.avg} ({reviewStats.count})</span>
+                        )}
                         </div>
-                    </div>
                     <div className="text-right">
                         <p className="text-2xl font-black text-primary tracking-tighter">{formatCurrency(effectivePrice, currencySymbol)}</p>
                         {isDiscounted && <p className="text-[10px] text-slate-400 line-through font-bold">{formatCurrency(product.sellingPrice, currencySymbol)}</p>}
@@ -380,10 +429,15 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
 
                 <div className="pt-4">
                     <Tabs value={activeTabSub} onValueChange={setActiveTabSub} className="w-full">
-                        <TabsList className="grid w-full grid-cols-3 h-11 bg-muted/50 rounded-xl p-1">
+                        <TabsList className={cn(
+                            "grid w-full h-11 bg-muted/50 rounded-xl p-1",
+                            settings?.showProductReviews ? "grid-cols-3" : "grid-cols-2"
+                        )}>
                             <TabsTrigger value="details" className="text-[10px] font-black uppercase tracking-widest">Specs</TabsTrigger>
                             <TabsTrigger value="shipping" className="text-[10px] font-black uppercase tracking-widest">Shipping</TabsTrigger>
-                            <TabsTrigger value="reviews" className="text-[10px] font-black uppercase tracking-widest">Reviews</TabsTrigger>
+                            {settings?.showProductReviews && (
+                                <TabsTrigger value="reviews" className="text-[10px] font-black uppercase tracking-widest">Reviews</TabsTrigger>
+                            )}
                         </TabsList>
                         
                         <TabsContent value="details" className="pt-6 space-y-8">
@@ -576,12 +630,16 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                                 <span className="w-6 text-center font-black text-sm">{detailQty}</span>
                                 <button onClick={() => setDetailQty(Math.min(product.stock, detailQty + 1))} className="w-8 h-8 flex items-center justify-center text-slate-500"><Plus className="h-3.5 w-3.5" /></button>
                             </div>
-                            <Button 
+                            <Button
                                 onClick={() => {
                                     for(let i=0; i<detailQty; i++) addToCart(product, effectivePrice);
                                     onNavigateToCart();
                                 }}
-                                className="flex-1 h-14 rounded-2xl bg-primary text-white font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/25 transition-all active:scale-[0.98] group"
+                                style={addToCartButtonStyle}
+                                className={cn(
+                                    "flex-1 rounded-2xl text-white font-black uppercase tracking-widest shadow-xl transition-all active:scale-[0.98] group",
+                                    addToCartButtonClasses
+                                )}
                             >
                                 <AddToCartIcon className="mr-2 h-5 w-5 group-hover:animate-bounce" strokeWidth={3} /> {addToCartText}
                             </Button>

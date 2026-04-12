@@ -22,7 +22,9 @@ import {
     ChevronRight, 
     ArrowLeft, 
     ArrowRight,
-    ShoppingCart
+    ShoppingCart,
+    ShoppingBag,
+    Plus
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -42,6 +44,90 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
     const { addToCart } = useCart();
     const { toast } = useToast();
     const currencySymbol = settings?.currency || '$';
+
+    const heroButtonStyle = useMemo(() => {
+        const useIndividual = settings?.useIndividualBtnSettings !== false;
+        const style = useIndividual 
+            ? (settings?.storeHeroBtnStyle || 'gradient')
+            : (settings?.storeBtnStyle || 'standard');
+        
+        if (style === 'gradient') {
+            return {
+                background: `linear-gradient(135deg, ${settings?.storeHeroBtnGradientStart || '#8b5cf6'}, ${settings?.storeHeroBtnGradientEnd || '#7c3aed'})`,
+                color: 'white',
+                border: 'none'
+            };
+        } else if (style === 'image' && settings?.storeHeroBtnImageUrl) {
+            return {
+                backgroundImage: `url('${settings.storeHeroBtnImageUrl}')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                color: 'white',
+                textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+                border: 'none'
+            };
+        }
+        
+        return {
+            backgroundColor: settings?.storeHeroBtnColor || '#8b5cf6',
+            color: 'white',
+            border: 'none'
+        };
+    }, [settings]);
+
+    const gridCartButtonStyle = useMemo(() => {
+        const useIndividual = settings?.useIndividualBtnSettings !== false;
+        const style = useIndividual 
+            ? (settings?.storeGridCartStyle || 'standard')
+            : (settings?.storeBtnStyle || 'standard');
+        
+        if (style === 'gradient') {
+            return {
+                background: `linear-gradient(135deg, ${settings?.storeGridCartGradientStart || '#10b981'}, ${settings?.storeGridCartGradientEnd || '#059669'})`,
+                color: 'white',
+                border: 'none'
+            };
+        } else if (style === 'image' && settings?.storeGridCartImageUrl) {
+            return {
+                backgroundImage: `url('${settings.storeGridCartImageUrl}')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                color: 'white',
+                textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+                border: 'none'
+            };
+        }
+        
+        return {
+            backgroundColor: settings?.storeGridCartColor || '#10b981',
+            color: 'white',
+            border: 'none'
+        };
+    }, [settings]);
+
+    const gridCartButtonClasses = useMemo(() => {
+        const useIndividual = settings?.useIndividualBtnSettings !== false;
+        const size = useIndividual
+            ? (settings?.storeGridCartSize || 'md')
+            : (settings?.storeBtnSize || 'md');
+        
+        const sizeClasses = {
+            sm: 'h-8 w-8',
+            md: 'h-10 w-10',
+            lg: 'h-12 w-12',
+            xl: 'h-14 w-14'
+        };
+        
+        return sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.md;
+    }, [settings]);
+
+    const heroButtonText = settings?.storeHeroBtnText || 'Explore Collection';
+    const gridCartIconName = settings?.storeGridCartIcon || 'ShoppingCart';
+    
+    const iconMapForGrid: Record<string, any> = {
+        ShoppingCart, ShoppingBag, Plus, Zap, Heart, TrendingUp
+    };
+    const GridCartIcon = iconMapForGrid[gridCartIconName] || ShoppingCart;
 
     // 1. Fetch Dynamic Slide Show Data from Firestore
     const slidesQuery = useMemo(() => {
@@ -162,8 +248,14 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                                         )}
                                         {slide.showActionButton && (
                                             <div className="pt-2">
-                                                <Button asChild size="sm" variant="secondary" className="rounded-full font-black uppercase text-[8px] tracking-widest px-6 h-8 bg-white text-slate-950 hover:bg-primary hover:text-white transition-all shadow-xl active:scale-90">
-                                                    <Link href="/store/shop">Explore Collection</Link>
+                                                <Button 
+                                                    asChild 
+                                                    size="sm" 
+                                                    variant="secondary" 
+                                                    style={heroButtonStyle}
+                                                    className="rounded-full font-black uppercase text-[8px] tracking-widest px-6 h-8 bg-white text-slate-950 hover:bg-primary hover:text-white transition-all shadow-xl active:scale-90 border-none"
+                                                >
+                                                    <Link href="/store/shop">{heroButtonText}</Link>
                                                 </Button>
                                             </div>
                                         )}
@@ -362,7 +454,11 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                             <div className="absolute bottom-4 right-4 z-10">
                                 <Button 
                                     size="icon" 
-                                    className="h-10 w-10 rounded-2xl bg-primary text-white shadow-2xl hover:scale-110 transition-transform active:scale-90"
+                                    style={gridCartButtonStyle}
+                                    className={cn(
+                                        "rounded-2xl text-white shadow-2xl hover:scale-110 transition-transform active:scale-90 border-none",
+                                        gridCartButtonClasses
+                                    )}
                                     onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
@@ -371,7 +467,7 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                                     }}
                                     disabled={product.stock <= 0}
                                 >
-                                    <ShoppingCart className="h-5 w-5" />
+                                    <GridCartIcon className="h-5 w-5" />
                                 </Button>
                             </div>
                             

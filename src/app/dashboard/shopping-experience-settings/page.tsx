@@ -68,7 +68,7 @@ const buttonSizes = [
 const shoppingExpSchema = z.object({
   storeAddToCartText: z.string().min(1, 'Label required').max(40, 'Label too long.'),
   storeAddToCartIcon: z.string().default('ShoppingCart'),
-  storeAddToCartStyle: z.enum(['solid', 'gradient', 'image']).default('solid'),
+  storeAddToCartStyle: z.enum(['standard', 'gradient', 'image']).default('standard'),
   storeAddToCartColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#3b82f6'),
   storeAddToCartGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#3b82f6'),
   storeAddToCartGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#1d4ed8'),
@@ -77,7 +77,7 @@ const shoppingExpSchema = z.object({
   
   storeGridCartText: z.string().min(1, 'Label required').max(20, 'Label too long.'),
   storeGridCartIcon: z.string().default('ShoppingCart'),
-  storeGridCartStyle: z.enum(['solid', 'gradient', 'image']).default('solid'),
+  storeGridCartStyle: z.enum(['standard', 'gradient', 'image']).default('standard'),
   storeGridCartColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#10b981'),
   storeGridCartGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#10b981'),
   storeGridCartGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#059669'),
@@ -86,7 +86,7 @@ const shoppingExpSchema = z.object({
   
   storeHeroBtnText: z.string().min(1, 'Label required').max(40, 'Label too long.'),
   storeHeroBtnIcon: z.string().default('ArrowRight'),
-  storeHeroBtnStyle: z.enum(['solid', 'gradient', 'image']).default('gradient'),
+  storeHeroBtnStyle: z.enum(['standard', 'gradient', 'image']).default('gradient'),
   storeHeroBtnColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#8b5cf6'),
   storeHeroBtnGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#8b5cf6'),
   storeHeroBtnGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#7c3aed'),
@@ -94,6 +94,8 @@ const shoppingExpSchema = z.object({
   storeHeroBtnSize: z.enum(['sm', 'md', 'lg', 'xl']).default('lg'),
   
   useIndividualBtnSettings: z.boolean().default(true),
+  showProductReviews: z.boolean().default(true),
+  showReviewRatingOnCard: z.boolean().default(true),
 });
 
 type FormValues = z.infer<typeof shoppingExpSchema>;
@@ -120,23 +122,23 @@ function ButtonStyleSelector({
         <Brush className="h-4 w-4" /> Background Style
       </FormLabel>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {/* Solid Style */}
+        {/* Standard Style */}
         <button
           type="button"
-          onClick={() => onChange('solid')}
+          onClick={() => onChange('standard')}
           className={cn(
             "relative flex flex-col items-center gap-3 p-4 rounded-lg border-2 transition-all",
-            value === 'solid'
+            value === 'standard'
               ? 'border-primary bg-primary/5'
               : 'border-muted hover:border-primary/30 hover:bg-muted/30'
           )}
         >
           <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg" />
           <div className="text-center">
-            <p className="text-sm font-semibold">Solid Color</p>
+            <p className="text-sm font-semibold">Standard Color</p>
             <p className="text-xs text-muted-foreground">Single color</p>
           </div>
-          {value === 'solid' && (
+          {value === 'standard' && (
             <Check className="absolute top-2 right-2 h-5 w-5 text-primary" />
           )}
         </button>
@@ -206,7 +208,7 @@ function ButtonPreview({
     : 'storeHeroBtn';
 
   const text = settings[`${prefix}Text`] || 'Button';
-  const style = settings[`${prefix}Style`] || 'solid';
+  const style = settings[`${prefix}Style`] || 'standard';
   const size = settings[`${prefix}Size`] || 'md';
 
   const getSizeClasses = (s: string) => {
@@ -365,8 +367,8 @@ function ButtonSection({
           )}
         />
 
-        {/* Solid Color */}
-        {styleValue === 'solid' && (
+        {/* Standard Color */}
+        {styleValue === 'standard' && (
           <div className="animate-in fade-in slide-in-from-top-2 duration-300">
             <FormField
               control={form.control}
@@ -543,7 +545,7 @@ export default function ShoppingExperienceSettingsPage() {
     defaultValues: {
       storeAddToCartText: 'Secure Purchase',
       storeAddToCartIcon: 'ShoppingCart',
-      storeAddToCartStyle: 'solid',
+      storeAddToCartStyle: 'standard',
       storeAddToCartColor: '#3b82f6',
       storeAddToCartGradientStart: '#3b82f6',
       storeAddToCartGradientEnd: '#1d4ed8',
@@ -552,7 +554,7 @@ export default function ShoppingExperienceSettingsPage() {
 
       storeGridCartText: 'Add to Bag',
       storeGridCartIcon: 'ShoppingCart',
-      storeGridCartStyle: 'solid',
+      storeGridCartStyle: 'standard',
       storeGridCartColor: '#10b981',
       storeGridCartGradientStart: '#10b981',
       storeGridCartGradientEnd: '#059669',
@@ -569,6 +571,8 @@ export default function ShoppingExperienceSettingsPage() {
       storeHeroBtnSize: 'lg',
 
       useIndividualBtnSettings: true,
+      showProductReviews: true,
+      showReviewRatingOnCard: true,
     }
   });
 
@@ -577,7 +581,7 @@ export default function ShoppingExperienceSettingsPage() {
       form.reset({
         storeAddToCartText: settingsData.storeAddToCartText || 'Secure Purchase',
         storeAddToCartIcon: settingsData.storeAddToCartIcon || 'ShoppingCart',
-        storeAddToCartStyle: settingsData.storeAddToCartStyle as any || 'solid',
+        storeAddToCartStyle: settingsData.storeAddToCartStyle as any || 'standard',
         storeAddToCartColor: settingsData.storeAddToCartColor || '#3b82f6',
         storeAddToCartGradientStart: settingsData.storeAddToCartGradientStart || '#3b82f6',
         storeAddToCartGradientEnd: settingsData.storeAddToCartGradientEnd || '#1d4ed8',
@@ -586,7 +590,7 @@ export default function ShoppingExperienceSettingsPage() {
 
         storeGridCartText: settingsData.storeGridCartText || 'Add to Bag',
         storeGridCartIcon: settingsData.storeGridCartIcon || 'ShoppingCart',
-        storeGridCartStyle: settingsData.storeGridCartStyle as any || 'solid',
+        storeGridCartStyle: settingsData.storeGridCartStyle as any || 'standard',
         storeGridCartColor: settingsData.storeGridCartColor || '#10b981',
         storeGridCartGradientStart: settingsData.storeGridCartGradientStart || '#10b981',
         storeGridCartGradientEnd: settingsData.storeGridCartGradientEnd || '#059669',
@@ -603,6 +607,8 @@ export default function ShoppingExperienceSettingsPage() {
         storeHeroBtnSize: settingsData.storeHeroBtnSize || 'lg',
 
         useIndividualBtnSettings: settingsData.useIndividualBtnSettings !== false,
+        showProductReviews: settingsData.showProductReviews ?? true,
+        showReviewRatingOnCard: settingsData.showReviewRatingOnCard ?? true,
       });
     }
   }, [settingsData, form]);
