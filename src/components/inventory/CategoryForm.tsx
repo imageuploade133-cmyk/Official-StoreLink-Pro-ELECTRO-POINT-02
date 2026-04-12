@@ -459,27 +459,27 @@ export function CategoryForm({
                               Strategic Override: If an individual product has a flash sale active and the "Individual Product Sales" toggle above is ON, that product will ignore this global rule.
                           </p>
                       </div>
+
+                      <div className="flex justify-between items-center gap-4 flex-wrap pt-6 border-t">
+                        <Button type="submit" disabled={isSubmitting || isUploading} size="lg" className="px-8 h-12 font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20">
+                          {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                          {isEditMode ? "Update Collection" : "Publish Category"}
+                        </Button>
+                        {onCancel ? (
+                          <Button type="button" variant="outline" onClick={onCancel} className="h-12 px-6 font-bold">
+                            Cancel
+                          </Button>
+                        ) : (
+                          <Button type="button" variant="outline" asChild className="h-12 px-6 font-bold">
+                            <Link href="/dashboard/categories">Cancel</Link>
+                          </Button>
+                        )}
+                      </div>
                   </CardContent>
                 </Card>
               </div>
             </CardContent>
           </ScrollArea>
-
-          <CardFooter className="bg-muted/30 border-t p-6 shrink-0 flex justify-between items-center gap-4 flex-wrap">
-            <Button type="submit" disabled={isSubmitting || isUploading} size="lg" className="px-8 h-12 font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20">
-              {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-              {isEditMode ? "Update Collection" : "Publish Category"}
-            </Button>
-            {onCancel ? (
-              <Button type="button" variant="outline" onClick={onCancel} className="h-12 px-6 font-bold">
-                Cancel
-              </Button>
-            ) : (
-              <Button type="button" variant="outline" asChild className="h-12 px-6 font-bold">
-                <Link href="/dashboard/categories">Cancel</Link>
-              </Button>
-            )}
-          </CardFooter>
         </Card>
       </form>
     </FormProvider>
