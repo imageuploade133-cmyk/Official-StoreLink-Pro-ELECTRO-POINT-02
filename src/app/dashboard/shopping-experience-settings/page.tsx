@@ -683,8 +683,8 @@ export default function ShoppingExperienceSettingsPage() {
         description="Customize the appearance and behavior of shopping buttons throughout your store"
       />
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" noValidate>
           {/* Quick Toggle */}
           <Card>
             <CardHeader>
@@ -704,7 +704,7 @@ export default function ShoppingExperienceSettingsPage() {
                       <FormDescription>Enable to customize each button independently</FormDescription>
                     </div>
                     <FormControl>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      <Switch checked={field.value} onCheckedChange={field.onChange} disabled={isSaving} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -713,8 +713,8 @@ export default function ShoppingExperienceSettingsPage() {
           </Card>
 
           {/* Button Sections */}
-          <Tabs defaultValue="addToCart" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+          <Tabs defaultValue="addToCart" className="w-full" disabled={isSaving}>
+            <TabsList className="grid w-full grid-cols-3" style={{ pointerEvents: isSaving ? 'none' : 'auto', opacity: isSaving ? 0.6 : 1 }}>
               <TabsTrigger value="addToCart">Add to Cart</TabsTrigger>
               <TabsTrigger value="gridCart">Grid Button</TabsTrigger>
               <TabsTrigger value="heroBtn">Hero Button</TabsTrigger>
