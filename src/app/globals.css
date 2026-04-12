@@ -138,6 +138,10 @@
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
   }
+
+  .dark {
+    scrollbar-color: hsl(160 84% 39% / 0.7) transparent;
+  }
   
   /* Smooth transitions for theme-aware elements */
   button, a, input, textarea, select {
@@ -252,13 +256,17 @@
     background-color: hsl(var(--primary) / 0.4);
   }
 
-  /* Dark mode specific scrollbar - refined */
+  /* Dark mode specific scrollbar - vibrant emerald */
   .dark ::-webkit-scrollbar-thumb {
-    background-color: hsl(190 70% 48% / 0.2);
+    background-color: hsl(160 84% 39% / 0.7);
+    border-radius: 20px;
+    border: 3px solid transparent;
+    background-clip: content-box;
   }
 
   .dark ::-webkit-scrollbar-thumb:hover {
-    background-color: hsl(190 70% 48% / 0.4);
+    background-color: hsl(160 84% 39%);
+    box-shadow: 0 0 8px hsl(160 84% 39% / 0.6);
   }
 
   /* Clean Border Focus Animation */
