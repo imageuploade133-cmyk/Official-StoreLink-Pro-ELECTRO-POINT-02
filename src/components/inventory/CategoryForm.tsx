@@ -46,8 +46,11 @@ import Link from 'next/link';
 
 const categoryFormSchema = z.object({
   name: z.string().min(2, { message: "Category name must be at least 2 characters." }).max(50, { message: "Category name must not exceed 50 characters." }),
-  description: z.string().max(10000, { message: "Description is too long." }).optional().or(z.literal("")),
-  imageUrl: z.string().url("Must be a valid URL.").optional().or(z.literal('')),
+  description: z.string().max(10000, { message: "Description is too long." }).optional().or(z.literal("")).nullable(),
+  imageUrl: z.union([
+    z.literal(''),
+    z.string().url("Must be a valid URL.")
+  ]).optional().nullable(),
   allowIndividualProductSales: z.boolean().default(true),
   isFlashSale: z.boolean().default(false),
   flashSaleDiscountType: z.enum(['percentage', 'fixed']).default('percentage'),
