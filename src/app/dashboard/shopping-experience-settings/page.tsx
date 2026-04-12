@@ -445,13 +445,19 @@ export default function ShoppingExperienceSettingsPage() {
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                     className="grid grid-cols-2 md:grid-cols-4 gap-3"
+                    onKeyDown={(e) => {
+                      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) {
+                        e.preventDefault();
+                      }
+                    }}
                   >
                     {['standard', 'gradient', 'outline', 'ghost'].map((style) => (
-                      <div key={style}>
+                      <div key={style} className="scroll-mt-0 focus-within:scroll-mt-0">
                         <RadioGroupItem value={style} id={`${prefix}-${style}`} className="peer sr-only" />
                         <Label
                           htmlFor={`${prefix}-${style}`}
-                          className="flex flex-col items-center justify-between rounded-lg border-2 border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer transition-all text-center"
+                          className="flex flex-col items-center justify-between rounded-lg border-2 border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer transition-all text-center focus:outline-none"
+                          onMouseDown={(e) => e.preventDefault()}
                         >
                           <div className={cn(
                             "h-8 w-full mb-2 flex items-center justify-center",
