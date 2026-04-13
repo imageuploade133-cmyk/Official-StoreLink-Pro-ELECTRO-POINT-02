@@ -62,7 +62,7 @@ export default function CheckoutPage() {
   const { settings, isLoadingSettings } = useSettings();
   const firestore = useFirestore();
   const { toast } = useToast();
-  const { triggerAd } = useAds();
+  const { triggerAd, rewardAdClicked, activeAds, applyRewardDiscount } = useAds();
 
   const [step, setStep] = useState<CheckoutStep>('details');
 
@@ -99,7 +99,17 @@ export default function CheckoutPage() {
     return Math.min(appliedCoupon.value, subtotal);
   }, [appliedCoupon, subtotal]);
 
-  const total = Math.max(0, subtotal - discountAmount + shipping);
+  const activeRewardAd = useMemo(() => {
+    return activeAds.find(ad => ad.adType === 'reward' && ad.placement === 'reward_button');
+  }, [activeAds]);
+
+  const rewardDiscountAmount = useMemo(() => {
+    if (!rewardAdClicked || !activeRewardAd || subtotal === 0) return 0;
+    const discountedPrice = applyRewardDiscount(subtotal, activeRewardAd);
+    return subtotal - discountedPrice;
+  }, [rewardAdClicked, activeRewardAd, subtotal, applyRewardDiscount]);
+
+  const total = Math.max(0, subtotal - discountAmount - rewardDiscountAmount + shipping);
 
   const bankAccounts = settings?.bankAccounts || [];
 
@@ -533,6 +543,12 @@ export default function CheckoutPage() {
                     <div className="flex justify-between text-sm text-green-600">
                         <span className="font-medium flex items-center gap-1"><Tag className="h-3.5 w-3.5" /> Promo Discount</span>
                         <span className="font-bold">-{formatCurrency(discountAmount, currencySymbol)}</span>
+                    </div>
+                  )}
+                  {rewardDiscountAmount > 0 && (
+                    <div className="flex justify-between text-sm text-amber-600">
+                        <span className="font-medium flex items-center gap-1"><Sparkles className="h-3.5 w-3.5" /> Reward Discount</span>
+                        <span className="font-bold">-{formatCurrency(rewardDiscountAmount, currencySymbol)}</span>
                     </div>
                   )}
                   <div className="flex justify-between text-sm"><span className="text-muted-foreground">Shipping</span><span className="font-medium">{formatCurrency(shipping, currencySymbol)}</span></div>

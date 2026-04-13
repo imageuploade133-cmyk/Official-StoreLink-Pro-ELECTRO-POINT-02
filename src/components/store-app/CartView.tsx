@@ -22,7 +22,9 @@ import {
     Loader2, 
     AlertTriangle, 
     ArrowLeft,
-    ShieldCheck
+    ShieldCheck,
+    Sparkles,
+    Gift
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/formatUtils';
 import { useFirestore, useCollection } from '@/firebase';
@@ -33,6 +35,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn, convertToDateSafely } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { safeSessionStorage } from '@/lib/storage-utils';
+import { useAds } from '@/contexts/ad-context';
 
 interface CartViewProps {
     onNavigateToHome: () => void;
@@ -44,6 +47,7 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
     const { settings } = useSettings();
     const firestore = useFirestore();
     const { toast } = useToast();
+    const { activeAds, rewardAdClicked, setRewardAdClicked, applyRewardDiscount } = useAds();
     
     const [couponCode, setCouponCode] = useState('');
     const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
@@ -106,8 +110,28 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
         return Math.min(appliedCoupon.value, subtotal);
     }, [appliedCoupon, subtotal]);
 
+    const activeRewardAd = useMemo(() => {
+        const ad = activeAds.find(ad => ad.adType === 'reward' && ad.placement === 'reward_button');
+        if (!ad) return null;
+
+        // Check device targeting
+        if (typeof window !== 'undefined') {
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            if (ad.deviceTargeting === 'mobile_only' && !isMobile) return null;
+            if (ad.deviceTargeting === 'desktop_only' && isMobile) return null;
+        }
+
+        return ad;
+    }, [activeAds]);
+
+    const rewardDiscountAmount = useMemo(() => {
+        if (!rewardAdClicked || !activeRewardAd || subtotal === 0) return 0;
+        const discountedPrice = applyRewardDiscount(subtotal, activeRewardAd);
+        return subtotal - discountedPrice;
+    }, [rewardAdClicked, activeRewardAd, subtotal, applyRewardDiscount]);
+
     const shipping = subtotal > 0 ? 10 : 0;
-    const total = Math.max(0, subtotal - discountAmount + shipping);
+    const total = Math.max(0, subtotal - discountAmount - rewardDiscountAmount + shipping);
 
     const handleApplyCoupon = async () => {
         const code = couponCode.toUpperCase().trim();
@@ -136,6 +160,17 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
             toast({ variant: "destructive", title: "Registry Error" });
         } finally {
             setIsValidatingCoupon(false);
+        }
+    };
+
+    const handleRewardClick = () => {
+        if (activeRewardAd) {
+            window.open(activeRewardAd.adLink, '_blank');
+            setRewardAdClicked(true);
+            toast({
+                title: "Premium Reward Unlocked",
+                description: "Your exclusive discount has been successfully applied.",
+            });
         }
     };
 
@@ -266,6 +301,12 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
                                 <span>-{formatCurrency(discountAmount, currencySymbol)}</span>
                             </div>
                         )}
+                        {rewardDiscountAmount > 0 && (
+                            <div className="flex justify-between text-xs font-black uppercase tracking-[0.2em] text-amber-600 animate-in slide-in-from-right-2">
+                                <span className="flex items-center gap-2"><Sparkles className="h-3 w-3" /> Reward Applied</span>
+                                <span>-{formatCurrency(rewardDiscountAmount, currencySymbol)}</span>
+                            </div>
+                        )}
                         <div className="flex justify-between text-xs font-black uppercase tracking-[0.2em] text-slate-400">
                             <span>Estimated Shipping</span>
                             <span>{formatCurrency(shipping, currencySymbol)}</span>
@@ -278,6 +319,23 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
                     </div>
                     
                     <div className="space-y-4">
+                        {activeRewardAd && !rewardAdClicked && (
+                            <button 
+                                onClick={handleRewardClick}
+                                className="w-full relative group overflow-hidden h-14 rounded-[1.25rem] transition-all active:scale-[0.98] shadow-xl mb-2"
+                            >
+                                <div className="absolute inset-0 bg-slate-950 dark:bg-slate-900" />
+                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(251,191,36,0.15),transparent_70%)]" />
+                                <div className="absolute inset-0 opacity-20 group-hover:opacity-100 transition-opacity duration-700 bg-[conic-gradient(from_0deg,transparent,rgba(251,191,36,0.3),transparent)] animate-[spin_4s_linear_infinite]" />
+                                <div className="relative flex items-center justify-center gap-3">
+                                    <Sparkles className="h-4 w-4 text-amber-400 group-hover:rotate-12 transition-transform" />
+                                    <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white">
+                                        Unlock {activeRewardAd.rewardDiscountType === 'percentage' ? activeRewardAd.rewardDiscountValue + '%' : currencySymbol + activeRewardAd.rewardDiscountValue} Reward
+                                    </span>
+                                    <Sparkles className="h-4 w-4 text-amber-400 group-hover:-rotate-12 transition-transform" />
+                                </div>
+                            </button>
+                        )}
                         <Button 
                             onClick={onStartCheckout} 
                             className="w-full h-16 rounded-[1.5rem] bg-primary text-white font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-primary/30 group transition-all active:scale-[0.98]"
