@@ -129,7 +129,7 @@ function HubHero({ slides, settings }: { slides: SlideShow[], settings: any }) {
     }
 
     return (
-        <div className="relative w-full bg-slate-950 overflow-hidden" ref={emblaRef}>
+        <div className="relative w-full bg-slate-950 overflow-hidden" ref={emblaRef} data-no-ad-click="true">
             <div className="flex embla__container">
                 {slides.map((slide, index) => {
                     const isLoaded = slidesInView.includes(index) || 

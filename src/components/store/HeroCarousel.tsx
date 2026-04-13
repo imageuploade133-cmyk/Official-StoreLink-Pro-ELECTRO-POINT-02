@@ -89,7 +89,7 @@ export function HeroCarousel() {
   }
 
   return (
-    <div className="relative h-[500px] md:h-[600px] w-full overflow-hidden bg-slate-950">
+    <div className="relative h-[500px] md:h-[600px] w-full overflow-hidden bg-slate-950" data-no-ad-click="true">
       <div className="overflow-hidden h-full w-full" ref={emblaRef}>
         <div className="flex h-full embla__container">
           {slides.map((slide, index) => {

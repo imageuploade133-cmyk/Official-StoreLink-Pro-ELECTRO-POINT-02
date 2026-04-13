@@ -158,6 +158,7 @@ export default function EarnMoneyAdsPage() {
       const newStatus = ad.status === 'active' ? 'inactive' : 'active';
       await updateDoc(doc(firestore, 'adLinks', ad.id), {
         status: newStatus,
+        updatedAt: serverTimestamp(),
       });
       toast({ title: "Status Updated", description: `Ad is now ${newStatus}.` });
       setAds(prev => prev.map(a => a.id === ad.id ? { ...a, status: newStatus } : a));
