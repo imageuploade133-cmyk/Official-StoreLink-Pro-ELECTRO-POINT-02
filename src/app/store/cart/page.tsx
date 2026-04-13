@@ -333,6 +333,7 @@ export default function CartPage() {
                                   <span className="text-muted-foreground font-medium">Shipping</span>
                                   <span className="font-bold">{formatCurrency(shippingCost, currencySymbol)}</span>
                               </div>
+                          </div>
 
 
                            <Separator />
