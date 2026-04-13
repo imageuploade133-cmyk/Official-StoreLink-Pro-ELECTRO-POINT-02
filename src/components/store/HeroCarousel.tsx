@@ -57,14 +57,20 @@ export function HeroCarousel() {
 
   useEffect(() => {
     if (!emblaApi) return;
-    onSelect();
-    setScrollSnaps(emblaApi.scrollSnapList());
+    
+    const onInit = () => {
+      setScrollSnaps(emblaApi.scrollSnapList());
+      onSelect();
+    };
+
+    onInit();
     emblaApi.on('select', onSelect);
-    emblaApi.on('reInit', onSelect);
+    emblaApi.on('reInit', onInit);
     emblaApi.on('slidesInView', updateSlidesInView);
     return () => {
         if (emblaApi) {
           emblaApi.off('select', onSelect);
+          emblaApi.off('reInit', onInit);
           emblaApi.off('slidesInView', updateSlidesInView);
         }
     };
@@ -89,9 +95,9 @@ export function HeroCarousel() {
   }
 
   return (
-    <div className="relative h-[500px] md:h-[600px] w-full overflow-hidden bg-slate-950" data-no-ad-click="true">
-      <div className="overflow-hidden h-full w-full" ref={emblaRef}>
-        <div className="flex h-full embla__container">
+    <div className="relative w-full overflow-hidden bg-slate-950" data-no-ad-click="true">
+      <div className="overflow-hidden w-full" ref={emblaRef}>
+        <div className="flex embla__container">
           {slides.map((slide, index) => {
             const isLoaded = slidesInView.includes(index) || 
                            slidesInView.includes(index - 1) || 
@@ -102,44 +108,42 @@ export function HeroCarousel() {
             return (
               <div 
                 key={slide.id} 
-                className="relative flex-[0_0_100%] min-w-0 h-full"
+                className="relative flex-[0_0_100%] min-w-0"
               >
-                <div className="absolute inset-0 z-0">
+                <div className="relative z-0">
                   {isLoaded ? (
                     <>
                       {slide.mediaType === 'video' && slide.videoUrl ? (
-                        <video
-                          key={slide.id}
-                          autoPlay
-                          muted
-                          loop
-                          playsInline
-                          poster={slide.videoPosterUrl || ''}
-                          className="w-full h-full object-cover"
-                        >
-                          <source src={slide.videoUrl} type="video/mp4" />
-                        </video>
+                        <div className="w-full overflow-hidden">
+                          <video
+                            key={slide.id}
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            poster={slide.videoPosterUrl || ''}
+                            className="w-full h-auto block"
+                          >
+                            <source src={slide.videoUrl} type="video/mp4" />
+                          </video>
+                        </div>
                       ) : (
-                        <Image
+                        <img
                           src={slide.imageUrl || 'https://placehold.co/1920x1080.png'}
                           alt={slide.title || 'Slide background'}
-                          fill
-                          sizes="100vw"
-                          className="w-full h-full object-cover select-none"
+                          className="w-full h-auto select-none block"
                           draggable={false}
-                          priority={index === 0}
-                          unoptimized
                         />
                       )}
                     </>
                   ) : (
-                    <div className="w-full h-full bg-slate-900 flex items-center justify-center">
+                    <div className="aspect-video w-full bg-slate-900 flex items-center justify-center">
                        <Skeleton className="w-full h-full bg-slate-800" />
                     </div>
                   )}
                 </div>
 
-                <div className="relative z-10 h-full flex items-center">
+                <div className="absolute inset-0 z-10 flex items-center">
                   <div className="max-w-7xl mx-auto px-10 w-full">
                     <div className="max-w-2xl">
                       {slide.pretitle && (
