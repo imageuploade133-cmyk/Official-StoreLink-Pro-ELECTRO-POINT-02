@@ -173,7 +173,7 @@ export function HeroCarousel() {
 
   if (isLoading) {
     return (
-      <div className="w-full aspect-[21/7]">
+      <div className="w-full aspect-[16/9] md:aspect-[21/7]">
         <Skeleton className="w-full h-full" />
       </div>
     );
@@ -181,7 +181,7 @@ export function HeroCarousel() {
 
   if (!slides || slides.length === 0) {
     return (
-      <section className="w-full aspect-[21/7] bg-slate-900 flex items-center justify-center">
+      <section className="w-full aspect-[16/9] md:aspect-[21/7] bg-slate-900 flex items-center justify-center">
         <div className="text-center text-white p-6">
           <h2 className="text-4xl font-black">Welcome to Our Store</h2>
           <p className="mt-4 text-slate-300 text-lg">New premium content coming soon!</p>
@@ -204,7 +204,7 @@ export function HeroCarousel() {
             return (
               <div 
                 key={slide.id} 
-                className="relative flex-[0_0_100%] min-w-0 aspect-[21/7]"
+                className="relative flex-[0_0_100%] min-w-0 aspect-[16/9] md:aspect-[21/7]"
               >
                 {/* Proportional Media Container */}
                 <div className="relative z-0 w-full h-full">
@@ -219,7 +219,7 @@ export function HeroCarousel() {
                             loop
                             playsInline
                             poster={slide.videoPosterUrl || ''}
-                            className="w-full h-full object-contain block"
+                            className="w-full h-full object-cover block"
                           >
                             <source src={slide.videoUrl} type="video/mp4" />
                           </video>
@@ -228,7 +228,7 @@ export function HeroCarousel() {
                         <img
                           src={slide.imageUrl || 'https://placehold.co/1920x1080.png'}
                           alt={slide.title || 'Slide background'}
-                          className="w-full h-full object-contain select-none block"
+                          className="w-full h-full object-cover select-none block"
                           draggable={false}
                         />
                       )}
