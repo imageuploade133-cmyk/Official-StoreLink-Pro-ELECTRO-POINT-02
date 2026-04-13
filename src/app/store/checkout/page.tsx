@@ -43,6 +43,7 @@ import { cn } from '@/lib/utils';
 import { sendWhatsAppReceipt } from '@/lib/whatsapp';
 import { formatPhoneNumberForWhatsapp } from '@/lib/phone-utils';
 import { safeSessionStorage } from '@/lib/storage-utils';
+import { useAds } from '@/contexts/ad-context';
 
 type CheckoutStep = 'details' | 'payment' | 'processing' | 'success';
 
@@ -61,8 +62,14 @@ export default function CheckoutPage() {
   const { settings, isLoadingSettings } = useSettings();
   const firestore = useFirestore();
   const { toast } = useToast();
+  const { triggerAd } = useAds();
 
   const [step, setStep] = useState<CheckoutStep>('details');
+
+  useEffect(() => {
+    triggerAd('checkout_start');
+  }, [triggerAd]);
+
   const [paymentMethod, setPaymentMethod] = useState<string>('');
   const [selectedBankId, setSelectedBankId] = useState<string>('');
   const [paymentReference] = useState(generatePaymentReference());

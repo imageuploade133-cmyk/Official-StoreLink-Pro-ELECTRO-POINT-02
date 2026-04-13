@@ -137,6 +137,11 @@ service cloud.firestore {
     match /whatsappMessageLogs/{logId} {
         allow read, write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
     }
+
+    match /adLinks/{adId} {
+        allow read: if true;
+        allow write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+    }
     
     /* =====================================================================
        FALLBACK SECURITY LOCK

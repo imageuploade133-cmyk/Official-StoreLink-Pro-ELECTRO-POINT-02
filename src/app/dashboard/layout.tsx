@@ -165,6 +165,7 @@ export default function DashboardLayout({
     { href: '/dashboard/customers', icon: Users, label: 'Customers', perm: 'canViewCustomers' },
     { href: '/dashboard/staff', icon: Users, label: 'Staff', perm: 'manage_staff' },
     { heading: 'Marketing' },
+    { href: '/dashboard/earn-money-ads', icon: Coins, label: 'Earn Money – Ads', perm: 'manage_ads' },
     { href: '/dashboard/welcome-credit-settings', icon: Coins, label: 'Welcome Bonus', perm: 'manage_settings' },
     { href: '/dashboard/whatsapp', icon: MessageSquare, label: 'WhatsApp', perm: 'canSendMarketingWhatsapp' },
     { heading: 'Website' },

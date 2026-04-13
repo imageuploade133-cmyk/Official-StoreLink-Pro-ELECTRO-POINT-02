@@ -9,6 +9,7 @@ import { CartProvider } from '@/contexts/cart-context';
 import { WishlistProvider } from '@/contexts/wishlist-context';
 import { GlobalLoadingProvider } from '@/contexts/global-loading-context';
 import { RecentlyViewedProvider } from '@/contexts/recently-viewed-context';
+import { AdProvider } from '@/contexts/ad-context';
 
 export function ClientProviders({ children }: { children: React.ReactNode }) {
   return (
@@ -17,6 +18,7 @@ export function ClientProviders({ children }: { children: React.ReactNode }) {
         <SettingsProvider>
           <AuthProvider>
               <GlobalLoadingProvider>
+                <AdProvider>
                 <CartProvider>
                   <WishlistProvider>
                     <RecentlyViewedProvider>
@@ -24,6 +26,7 @@ export function ClientProviders({ children }: { children: React.ReactNode }) {
                     </RecentlyViewedProvider>
                   </WishlistProvider>
                 </CartProvider>
+                </AdProvider>
               </GlobalLoadingProvider>
           </AuthProvider>
         </SettingsProvider>

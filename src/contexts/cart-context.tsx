@@ -5,6 +5,7 @@ import type { StoreCartItem, Product } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { ensureNumber } from '@/lib/pos-utils';
 import { safeStorage } from '@/lib/storage-utils';
+import { useAds } from '@/contexts/ad-context';
 
 interface CartContextType {
   cartItems: StoreCartItem[];
@@ -20,6 +21,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cartItems, setCartItems] = useState<StoreCartItem[]>([]);
   const { toast } = useToast();
+  const { triggerAd } = useAds();
 
   useEffect(() => {
     const storedCart = safeStorage.getItem('storeCart');
@@ -60,6 +62,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
 
     setCartItems(prevItems => {
+        triggerAd('add_to_cart');
         const existingItem = prevItems.find(item => item.id === product.id);
         if (existingItem) {
             if (existingItem.quantity >= productStock) {

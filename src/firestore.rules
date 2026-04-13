@@ -183,6 +183,11 @@ service cloud.firestore {
       allow read: if true;
       allow write: if true;
     }
+
+    match /adLinks/{adId} {
+        allow read: if true;
+        allow write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+    }
     
     match /{document=**} {
       allow read, write: if false;

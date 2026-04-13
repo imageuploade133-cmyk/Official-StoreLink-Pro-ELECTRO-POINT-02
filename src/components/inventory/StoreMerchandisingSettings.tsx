@@ -19,7 +19,8 @@ import {
   Sparkles,
   TrendingUp,
   History,
-  Tag
+  Tag,
+  Gift
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSettings } from '@/contexts/settings-context';
@@ -113,6 +114,26 @@ export function StoreMerchandisingSettings() {
                 Official Brand Item
               </FormLabel>
               <p className="text-[10px] text-muted-foreground">Show "Verified Brand" badge on storefront</p>
+            </div>
+            <FormControl>
+              <Switch checked={field.value} onCheckedChange={field.onChange} />
+            </FormControl>
+          </FormItem>
+        )}
+      />
+
+      {/* Reward Ads Toggle */}
+      <FormField
+        control={control}
+        name="rewardAdsEnabled"
+        render={({ field }) => (
+          <FormItem className="flex items-center justify-between p-4 border rounded-2xl bg-amber-50/30 dark:bg-amber-950/10 transition-colors group hover:border-amber-200">
+            <div className="space-y-0.5">
+              <FormLabel className="font-black text-xs uppercase tracking-wider flex items-center gap-2">
+                <Gift className={cn("h-4 w-4", field.value ? "text-amber-500" : "text-muted-foreground")} />
+                Reward Ads Monetization
+              </FormLabel>
+              <p className="text-[10px] text-muted-foreground">Allow customers to unlock discounts via ads</p>
             </div>
             <FormControl>
               <Switch checked={field.value} onCheckedChange={field.onChange} />

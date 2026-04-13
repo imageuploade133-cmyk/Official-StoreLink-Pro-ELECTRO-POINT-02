@@ -52,7 +52,8 @@ import {
   Square,
   AudioWaveform,
   FastForward,
-  ArrowLeft
+  ArrowLeft,
+  Gift
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -74,6 +75,7 @@ import { RecentlyViewedSection } from '@/components/store/RecentlyViewedSection'
 import { ProductVideoGallery } from '@/components/store/ProductVideoGallery';
 import { StockBar } from '@/components/store/StockBar';
 import { StickyProductBar } from '@/components/store/StickyProductBar';
+import { useAds } from '@/contexts/ad-context';
 
 const iconMap = {
   Truck,
@@ -245,6 +247,7 @@ export default function ProductDetailsPage() {
   const { isProductInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const { addViewedProduct } = useRecentlyViewed();
   const { toast } = useToast();
+  const { activeAds, rewardAdClicked, setRewardAdClicked, applyRewardDiscount } = useAds();
   
   const [quantity, setQuantity] = useState(1);
   const [today, setToday] = useState<Date | null>(null);
@@ -431,24 +434,43 @@ export default function ProductDetailsPage() {
   const recommendationsTitle = settings?.relatedProductsTitle || 'You Might Also Like';
   const recommendationsDescription = settings?.relatedProductsDescription || 'Specially curated items from the same collection.';
 
+  const activeRewardAd = useMemo(() => {
+    const ad = activeAds.find(ad => ad.adType === 'reward' && ad.placement === 'reward_button');
+    if (!ad) return null;
+
+    // Check device targeting
+    if (typeof window !== 'undefined') {
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (ad.deviceTargeting === 'mobile_only' && !isMobile) return null;
+      if (ad.deviceTargeting === 'desktop_only' && isMobile) return null;
+    }
+
+    return ad;
+  }, [activeAds]);
+
   const effectivePrice = useMemo(() => {
     if (!product) return 0;
     const catStart = convertToDateSafely(category?.flashSaleStartDate);
     const catEnd = convertToDateSafely(category?.flashSaleEndDate);
     const isCategoryPromoActive = category?.isFlashSale && (!catStart || today! >= catStart) && (!catEnd || today! <= catEnd);
 
-    if (isCategoryPromoActive) {
-        return calculateEffectivePrice(product as any, today, category);
-    }
+    let price = calculateEffectivePrice(product as any, today, category);
+
     if (activeSectionPromo) {
         const base = Number(product.sellingPrice) || 0;
         if (activeSectionPromo.type === 'percentage') {
-            return base * (1 - activeSectionPromo.value / 100);
+            price = base * (1 - activeSectionPromo.value / 100);
+        } else {
+            price = Math.max(0, base - activeSectionPromo.value);
         }
-        return Math.max(0, base - activeSectionPromo.value);
     }
-    return calculateEffectivePrice(product as any, today, category);
-  }, [product, today, category, activeSectionPromo]);
+
+    if (rewardAdClicked && activeRewardAd && product.rewardAdsEnabled) {
+      price = applyRewardDiscount(price, activeRewardAd);
+    }
+
+    return price;
+  }, [product, today, category, activeSectionPromo, rewardAdClicked, activeRewardAd, applyRewardDiscount]);
 
   const isDiscounted = product ? (effectivePrice < product.sellingPrice) : false;
   const isOutOfStock = product ? product.stock <= 0 : false;
@@ -499,6 +521,17 @@ export default function ProductDetailsPage() {
     } else {
       navigator.clipboard.writeText(window.location.href);
       toast({ title: "Link Copied!" });
+    }
+  };
+
+  const handleRewardClick = () => {
+    if (activeRewardAd) {
+      window.open(activeRewardAd.adLink, '_blank');
+      setRewardAdClicked(true);
+      toast({
+        title: "Reward Unlocked!",
+        description: `Your ${activeRewardAd.rewardDiscountType === 'percentage' ? activeRewardAd.rewardDiscountValue + '%' : currencySymbol + activeRewardAd.rewardDiscountValue} discount has been applied!`,
+      });
     }
   };
 
@@ -714,6 +747,18 @@ export default function ProductDetailsPage() {
                 </div>
               </div>
             </div>
+
+            {/* Reward Ad Button */}
+            {product.rewardAdsEnabled && activeRewardAd && !rewardAdClicked && !isOutOfStock && (
+              <Button 
+                onClick={handleRewardClick}
+                variant="outline"
+                className="w-full h-14 rounded-2xl border-2 border-dashed border-amber-500 bg-amber-50 text-amber-700 hover:bg-amber-100 font-black uppercase tracking-widest gap-2 shadow-sm animate-pulse"
+              >
+                <Gift className="h-5 w-5" />
+                Unlock {activeRewardAd.rewardDiscountType === 'percentage' ? activeRewardAd.rewardDiscountValue + '%' : currencySymbol + activeRewardAd.rewardDiscountValue} Discount
+              </Button>
+            )}
 
             {/* Distributed Voice Signatures - No longer limited by parent document size */}
             {product.voiceEnabled && visibleVoices.length > 0 && (
