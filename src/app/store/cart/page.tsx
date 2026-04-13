@@ -31,7 +31,7 @@ export default function CartPage() {
   const { settings } = useSettings();
   const firestore = useFirestore();
   const { toast } = useToast();
-  const { activeAds, rewardAdClicked, setRewardAdClicked, applyRewardDiscount } = useAds();
+  const { activeAds, rewardAdClicked, setRewardAdClicked, applyRewardDiscount, recordAdClick } = useAds();
   
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
@@ -182,6 +182,7 @@ export default function CartPage() {
 
   const handleRewardClick = () => {
     if (activeRewardAd) {
+      recordAdClick(activeRewardAd.id);
       window.open(activeRewardAd.adLink, '_blank');
       setRewardAdClicked(true);
       toast({

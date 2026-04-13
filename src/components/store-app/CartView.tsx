@@ -47,7 +47,7 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
     const { settings } = useSettings();
     const firestore = useFirestore();
     const { toast } = useToast();
-    const { activeAds, rewardAdClicked, setRewardAdClicked, applyRewardDiscount } = useAds();
+    const { activeAds, rewardAdClicked, setRewardAdClicked, applyRewardDiscount, recordAdClick } = useAds();
     
     const [couponCode, setCouponCode] = useState('');
     const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
@@ -165,6 +165,7 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
 
     const handleRewardClick = () => {
         if (activeRewardAd) {
+            recordAdClick(activeRewardAd.id);
             window.open(activeRewardAd.adLink, '_blank');
             setRewardAdClicked(true);
             toast({
