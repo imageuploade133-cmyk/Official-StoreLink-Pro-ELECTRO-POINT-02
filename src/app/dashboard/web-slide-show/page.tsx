@@ -301,7 +301,9 @@ export default function ManageSlideShowPage() {
                       <TableCell>
                           <div className="w-[80px] h-[45px] rounded-lg bg-muted overflow-hidden relative border shadow-sm">
                           {slide.mediaType === 'image' && slide.imageUrl ? (
-                                    <Image src={slide.imageUrl} alt="" fill className="object-cover" />
+                                    <Image src={slide.imageUrl} alt="" fill className="object-cover" unoptimized />
+                                ) : slide.mediaType === 'video' && slide.videoPosterUrl ? (
+                                    <Image src={slide.videoPosterUrl} alt="" fill className="object-cover" unoptimized />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center bg-black">
                                         <Video className="h-4 w-4 text-white/50" />

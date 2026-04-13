@@ -128,6 +128,7 @@ export function HeroCarousel() {
                           className="w-full h-full object-cover select-none"
                           draggable={false}
                           priority={index === 0}
+                          unoptimized
                         />
                       )}
                     </>

@@ -275,7 +275,7 @@ export default function FlashHubManagerPage() {
                     </div>
                     {iconUrl ? (
                         <div className="relative h-12 w-12 rounded-xl overflow-hidden border-2 border-white shadow-xl bg-white">
-                            <Image src={iconUrl} alt="Hub Icon" fill className="object-cover" />
+                            <Image src={iconUrl} alt="Hub Icon" fill className="object-cover" unoptimized />
                         </div>
                     ) : (
                         <Zap className="h-10 w-10 fill-current opacity-50" style={{ color: iconColor }} />
@@ -430,7 +430,7 @@ export default function FlashHubManagerPage() {
                                 <div className="flex flex-col gap-4">
                                     {iconUrl && (
                                         <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-2 border-primary/10 shadow-lg bg-white group">
-                                            <Image src={iconUrl} alt="Custom Icon" fill className="object-cover" />
+                                            <Image src={iconUrl} alt="Custom Icon" fill className="object-cover" unoptimized />
                                             <Button 
                                                 type="button" 
                                                 variant="destructive" 
@@ -524,7 +524,9 @@ export default function FlashHubManagerPage() {
                                     <TableCell>
                                         <div className="relative w-20 h-12 rounded-lg overflow-hidden border shadow-sm bg-slate-100 flex items-center justify-center">
                                             {slide.mediaType === 'image' && slide.imageUrl ? (
-                                                <Image src={slide.imageUrl} alt="" fill className="object-cover" />
+                                                <Image src={slide.imageUrl} alt="" fill className="object-cover" unoptimized />
+                                            ) : slide.mediaType === 'video' && slide.videoPosterUrl ? (
+                                                <Image src={slide.videoPosterUrl} alt="" fill className="object-cover" unoptimized />
                                             ) : (
                                                 <Zap className="h-5 w-5 text-primary/30" />
                                             )}
