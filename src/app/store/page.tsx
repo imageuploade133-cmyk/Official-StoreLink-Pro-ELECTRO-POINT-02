@@ -14,6 +14,7 @@ import { NewsletterSection } from '@/components/store/NewsletterSection';
 import { ProductSection } from '@/components/store/ProductSection';
 import { CustomUISection } from '@/components/store/CustomUISection';
 import { CategoryGallery } from '@/components/store/CategoryGallery';
+import { BannerAd } from '@/components/ads/BannerAd';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
@@ -110,6 +111,8 @@ export default function StoreHomePage() {
 
       {/* DYNAMIC CATEGORY GALLERY WITH INFINITE SCROLL */}
       {showCategorySection && <CategoryGallery />}
+
+      <BannerAd location="after_first_row" />
 
       {/* RENDER DYNAMIC HOMEPAGE SECTIONS */}
       {sections?.map(section => (

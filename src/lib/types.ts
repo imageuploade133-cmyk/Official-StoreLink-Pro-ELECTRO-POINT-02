@@ -874,10 +874,12 @@ export interface ProductReview {
 
 export interface AdLink {
   id: string;
-  adLink: string;
-  adType: 'background' | 'reward';
+  adLink?: string;
+  adScript?: string;
+  bannerLocation?: string;
+  adType: 'background' | 'reward' | 'banner';
   status: 'active' | 'inactive';
-  placement: 'page_visit' | 'click_anywhere' | 'add_to_cart' | 'checkout_start' | 'reward_button';
+  placement: 'page_visit' | 'click_anywhere' | 'add_to_cart' | 'checkout_start' | 'reward_button' | 'banner';
   frequency: 'once_per_session' | 'every_time';
   frequencyTime?: number; // Added field: frequency time in seconds
   deviceTargeting: 'all' | 'mobile_only' | 'desktop_only';

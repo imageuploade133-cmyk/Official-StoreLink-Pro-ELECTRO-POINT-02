@@ -79,6 +79,7 @@ import { RecentlyViewedSection } from '@/components/store/RecentlyViewedSection'
 import { ProductVideoGallery } from '@/components/store/ProductVideoGallery';
 import { StockBar } from '@/components/store/StockBar';
 import { StickyProductBar } from '@/components/store/StickyProductBar';
+import { BannerAd } from '@/components/ads/BannerAd';
 import { useAds } from '@/contexts/ad-context';
 
 const iconMap = {
@@ -842,10 +843,13 @@ export default function ProductDetailsPage() {
         </div>
 
         {product.description && (
-          <section className="mt-24 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+          <>
+            <BannerAd location="product_details" className="mt-12" />
+            <section className="mt-24 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">
             <div className="flex items-center gap-4"><div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary"><DescriptionIcon className="h-6 w-6" /></div><div><h2 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">{product.descriptionTitle || 'Product Story'}</h2><p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400 mt-1">Detailed narrative and insights</p></div></div>
             <div className="bg-white dark:bg-slate-900/50 rounded-[3rem] p-8 md:p-12 border-2 border-primary/20 hover:border-primary/40 transition-all duration-500 shadow-2xl relative overflow-hidden"><div className="absolute top-0 right-0 p-8 opacity-5"><Info className="h-64 w-64 -mr-20 -mt-20" /></div><div className="prose dark:prose-invert max-w-none text-slate-600 leading-relaxed text-lg font-medium relative z-10 [&_*]:dark:!text-white dark:!text-white"><div className="rich-content"><ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{product.description}</ReactMarkdown></div></div></div>
           </section>
+          </>
         )}
 
         {product.videos && product.videos.length > 0 && (
