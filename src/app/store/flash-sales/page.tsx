@@ -44,7 +44,32 @@ function HubHero({ slides, settings }: { slides: SlideShow[], settings: any }) {
         [slideDuration]
     );
 
-    const [emblaRef] = useEmblaCarousel({ loop: true, align: 'start' }, [autoplayPlugin]);
+    const [emblaRef, emblaApi] = useEmblaCarousel({ 
+        loop: true, 
+        align: 'start',
+        watchSlides: true
+    }, [autoplayPlugin]);
+
+    const [slidesInView, setSlidesInView] = useState<number[]>([]);
+
+    const updateSlidesInView = useCallback(() => {
+        if (!emblaApi) return;
+        setSlidesInView(emblaApi.slidesInView());
+    }, [emblaApi]);
+
+    useEffect(() => {
+        if (!emblaApi) return;
+        updateSlidesInView();
+        emblaApi.on('select', updateSlidesInView);
+        emblaApi.on('reInit', updateSlidesInView);
+        emblaApi.on('slidesInView', updateSlidesInView);
+        return () => {
+            if (emblaApi) {
+                emblaApi.off('select', updateSlidesInView);
+                emblaApi.off('slidesInView', updateSlidesInView);
+            }
+        };
+    }, [emblaApi, updateSlidesInView]);
 
     if (slides.length === 0) {
         const bannerImg = settings?.flashHubBannerImageUrl;
@@ -62,7 +87,7 @@ function HubHero({ slides, settings }: { slides: SlideShow[], settings: any }) {
                             <source src={bannerVid} type="video/mp4" />
                         </video>
                     ) : bannerImg ? (
-                        <Image src={bannerImg} alt="Sales Hub" fill className="object-cover opacity-40" unoptimized />
+                        <Image src={bannerImg} alt="Sales Hub" fill className="object-cover opacity-40" />
                     ) : (
                         <>
                             <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-white/10 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2" />
@@ -85,7 +110,7 @@ function HubHero({ slides, settings }: { slides: SlideShow[], settings: any }) {
                         <div className="bg-white/10 p-3 rounded-2xl shadow-2xl rotate-3 animate-bounce border border-white/20 backdrop-blur-md">
                             {iconUrl ? (
                                 <div className="relative h-12 w-12 rounded-xl overflow-hidden bg-white">
-                                    <Image src={iconUrl} alt="Sale Icon" fill className="object-cover" unoptimized />
+                                    <Image src={iconUrl} alt="Sale Icon" fill className="object-cover" />
                                 </div>
                             ) : (
                                 <Zap className="h-10 w-10 fill-current" style={{ color: iconColor }} />
@@ -106,28 +131,42 @@ function HubHero({ slides, settings }: { slides: SlideShow[], settings: any }) {
     return (
         <div className="relative w-full bg-slate-950 overflow-hidden" ref={emblaRef}>
             <div className="flex embla__container">
-                {slides.map(slide => (
-                    <div key={slide.id} className="relative flex-[0_0_100%] min-w-0">
-                        <div className="aspect-video max-h-[600px] relative w-full">
-                            {slide.mediaType === 'video' && slide.videoUrl ? (
-                                <video autoPlay muted loop playsInline poster={slide.videoPosterUrl || ''} className="w-full h-full object-cover">
-                                    <source src={slide.videoUrl} type="video/mp4" />
-                                </video>
-                            ) : (
-                                <Image src={slide.imageUrl || ''} alt="" fill className="object-cover" unoptimized />
-                            )}
-                            {slide.showOverlay && <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />}
-                            
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="max-w-site-container mx-auto px-10 w-full text-center space-y-6">
-                                    {slide.pretitle && <p className="text-white/80 text-[10px] md:text-sm font-black tracking-[0.4em] uppercase">{slide.pretitle}</p>}
-                                    {slide.title && <h1 className="text-white text-3xl md:text-7xl font-black tracking-tighter leading-none">{slide.title}</h1>}
-                                    {slide.description && <p className="text-slate-200 text-sm md:text-xl font-medium max-w-2xl mx-auto">{slide.description}</p>}
+                {slides.map((slide, index) => {
+                    const isLoaded = slidesInView.includes(index) || 
+                                   slidesInView.includes(index - 1) || 
+                                   slidesInView.includes(index + 1) ||
+                                   (index === 0 && slidesInView.includes(slides.length - 1)) ||
+                                   (index === slides.length - 1 && slidesInView.includes(0));
+
+                    return (
+                        <div key={slide.id} className="relative flex-[0_0_100%] min-w-0">
+                            <div className="aspect-video max-h-[600px] relative w-full">
+                                {isLoaded ? (
+                                    <>
+                                        {slide.mediaType === 'video' && slide.videoUrl ? (
+                                            <video autoPlay muted loop playsInline poster={slide.videoPosterUrl || ''} className="w-full h-full object-cover">
+                                                <source src={slide.videoUrl} type="video/mp4" />
+                                            </video>
+                                        ) : (
+                                            <Image src={slide.imageUrl || ''} alt="" fill className="object-cover" />
+                                        )}
+                                    </>
+                                ) : (
+                                    <div className="w-full h-full bg-slate-900" />
+                                )}
+                                {slide.showOverlay && <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />}
+                                
+                                <div className="absolute inset-0 flex items-center">
+                                    <div className="max-w-site-container mx-auto px-10 w-full text-center space-y-6">
+                                        {slide.pretitle && <p className="text-white/80 text-[10px] md:text-sm font-black tracking-[0.4em] uppercase">{slide.pretitle}</p>}
+                                        {slide.title && <h1 className="text-white text-3xl md:text-7xl font-black tracking-tighter leading-none">{slide.title}</h1>}
+                                        {slide.description && <p className="text-slate-200 text-sm md:text-xl font-medium max-w-2xl mx-auto">{slide.description}</p>}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </div>
     );
