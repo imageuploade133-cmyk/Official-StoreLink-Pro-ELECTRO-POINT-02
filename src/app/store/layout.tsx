@@ -6,6 +6,7 @@ import { useGlobalLoading } from '@/contexts/global-loading-context';
 import { PublicPageSkeleton } from '@/components/store/PublicPageSkeleton';
 import { useSettings } from '@/contexts/settings-context';
 import { BackgroundVideoPlayer } from '@/components/store/BackgroundVideoPlayer';
+import { AdSystem } from '@/components/store/AdSystem';
 import { useEffect } from 'react';
 import { useFirestore } from '@/firebase';
 import { doc, runTransaction, increment } from 'firebase/firestore';
@@ -85,6 +86,7 @@ export default function PublicLayout({
   return (
     <>
       <WebsiteTracker />
+      <AdSystem />
       {settings?.backgroundStyle === 'video' && settings.backgroundVideoUrl && <BackgroundVideoPlayer />}
       <PublicNavbar />
       

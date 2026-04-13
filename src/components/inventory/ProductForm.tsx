@@ -181,6 +181,7 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
     showTechnicalSpecs: z.boolean().default(true),
     showLogisticsInfo: z.boolean().default(true),
     showVerifiedReviews: z.boolean().default(true),
+    rewardAdsEnabled: z.boolean().default(false),
   });
 
   return baseSchema
@@ -311,6 +312,7 @@ export function ProductForm({
       showTechnicalSpecs: true,
       showLogisticsInfo: true,
       showVerifiedReviews: true,
+      rewardAdsEnabled: false,
     },
   });
 
@@ -389,6 +391,7 @@ export function ProductForm({
         showTechnicalSpecs: defaultValues.showTechnicalSpecs ?? true,
         showLogisticsInfo: defaultValues.showLogisticsInfo ?? true,
         showVerifiedReviews: defaultValues.showVerifiedReviews ?? true,
+        rewardAdsEnabled: defaultValues.rewardAdsEnabled ?? false,
       });
     }
   }, [defaultValues, categories, form]);

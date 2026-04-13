@@ -37,7 +37,8 @@ export type PermissionId =
   | 'manage_orders'
   | 'view_online_customers'
   | 'manage_flexible_payments'
-  | 'view_stock_audit';
+  | 'view_stock_audit'
+  | 'manage_ads';
 
 export interface Permission {
   id: PermissionId;
@@ -512,6 +513,7 @@ export interface Product {
   showTechnicalSpecs?: boolean;
   showLogisticsInfo?: boolean;
   showVerifiedReviews?: boolean;
+  rewardAdsEnabled?: boolean;
 }
 
 export interface DisplayProduct extends Product {
@@ -864,6 +866,19 @@ export interface ProductReview {
   userPhotoURL?: string | null;
   rating: number;
   comment: string;
+  createdAt: Timestamp;
+}
+
+export interface AdLink {
+  id: string;
+  adLink: string;
+  adType: 'background' | 'reward';
+  status: 'active' | 'inactive';
+  placement: 'page_visit' | 'click_anywhere' | 'add_to_cart' | 'checkout_start' | 'reward_button';
+  frequency: 'once_per_session' | 'every_time';
+  deviceTargeting: 'all' | 'mobile_only' | 'desktop_only';
+  rewardDiscountType?: 'percentage' | 'fixed';
+  rewardDiscountValue?: number;
   createdAt: Timestamp;
 }
 

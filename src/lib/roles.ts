@@ -38,6 +38,7 @@ export const allPermissions: Permission[] = [
   { id: 'manage_orders', name: 'Manage Online Orders', description: 'Can view and update statuses of public website orders.', module: 'Orders' },
   { id: 'view_online_customers', name: 'View Online Customers', description: 'Can view details of registered e-commerce customers.', module: 'Orders' },
   { id: 'canSendMarketingWhatsapp', name: 'Send Marketing WhatsApp', description: 'Can send bulk WhatsApp messages to customers and staff.', module: 'Marketing' },
+  { id: 'manage_ads', name: 'Manage Ad Links', description: 'Can create and manage background and reward-based advertising links.', module: 'Marketing' },
 ];
 
 export const roles: Role[] = [
@@ -84,7 +85,8 @@ export const roles: Role[] = [
       'manage_orders',
       'view_online_customers',
       'manage_coupons',
-      'manage_website_content'
+      'manage_website_content',
+      'manage_ads'
     ],
   },
   {

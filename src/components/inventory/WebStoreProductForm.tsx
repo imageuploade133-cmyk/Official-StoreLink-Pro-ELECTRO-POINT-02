@@ -180,6 +180,7 @@ const storeProductSchema = z.object({
   showTechnicalSpecs: z.boolean().default(true),
   showLogisticsInfo: z.boolean().default(true),
   showVerifiedReviews: z.boolean().default(true),
+  rewardAdsEnabled: z.boolean().default(false),
 }).refine(data => !data.isPromo || (!!data.promoType && !!data.promoValue && data.promoValue > 0), {
     message: 'Promo value is required and must be positive when active.',
     path: ['promoValue']
@@ -362,6 +363,7 @@ export function WebStoreProductForm() {
       showTechnicalSpecs: true,
       showLogisticsInfo: true,
       showVerifiedReviews: true,
+      rewardAdsEnabled: false,
     }
   });
 
