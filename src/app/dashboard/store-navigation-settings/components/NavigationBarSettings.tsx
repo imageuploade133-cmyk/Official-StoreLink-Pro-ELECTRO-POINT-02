@@ -36,7 +36,8 @@ import {
   Layers,
   Eye,
   EyeOff,
-  Sparkle
+  Sparkle,
+  RotateCcw
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -44,6 +45,17 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const navigationSchema = z.object({
   // Style Settings
@@ -76,6 +88,28 @@ const navigationSchema = z.object({
 
 type FormValues = z.infer<typeof navigationSchema>;
 
+const DEFAULT_NAV_SETTINGS: FormValues = {
+  navbarStyle: 'standard',
+  navbarBackgroundColor: '',
+  navbarTextColor: '',
+  navbarBorderColor: '',
+  navbarHeight: 'default',
+  navbarShowSearch: true,
+  navbarShowWishlist: true,
+  navbarShowCart: true,
+  navbarShowAccount: true,
+  navbarShowThemeToggle: true,
+  navbarShowCreditBadge: true,
+  navbarMenuStyle: 'dropdown',
+  navbarShowShopLink: true,
+  navbarShowFlashSalesLink: true,
+  navbarShowCollectionsLink: true,
+  navbarLogoPosition: 'left',
+  navbarSticky: 'fixed',
+  navbarShadow: 'none',
+  navbarBlurEffect: true,
+};
+
 interface NavigationBarSettingsProps {
   settingsData: AppSettings | null;
   isLoading: boolean;
@@ -88,51 +122,52 @@ export function NavigationBarSettings({ settingsData, isLoading }: NavigationBar
 
   const form = useForm<FormValues>({
     resolver: zodResolver(navigationSchema),
-    defaultValues: {
-      navbarStyle: 'standard',
-      navbarBackgroundColor: '',
-      navbarTextColor: '',
-      navbarBorderColor: '',
-      navbarHeight: 'default',
-      navbarShowSearch: true,
-      navbarShowWishlist: true,
-      navbarShowCart: true,
-      navbarShowAccount: true,
-      navbarShowThemeToggle: true,
-      navbarShowCreditBadge: true,
-      navbarMenuStyle: 'dropdown',
-      navbarShowShopLink: true,
-      navbarShowFlashSalesLink: true,
-      navbarShowCollectionsLink: true,
-      navbarLogoPosition: 'left',
-      navbarSticky: 'fixed',
-      navbarShadow: 'none',
-      navbarBlurEffect: true,
-    }
+    defaultValues: DEFAULT_NAV_SETTINGS
   });
+
+  const handleReset = async () => {
+    if (!firestore) return;
+    setIsSaving(true);
+    try {
+      await saveGlobalSettings(firestore, DEFAULT_NAV_SETTINGS);
+      form.reset(DEFAULT_NAV_SETTINGS);
+      toast({ 
+        title: 'Settings Reset', 
+        description: 'Navigation bar settings have been reset to default values.' 
+      });
+    } catch (e) {
+      toast({ 
+        variant: 'destructive', 
+        title: 'Error', 
+        description: 'Failed to reset settings.' 
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   useEffect(() => {
     if (settingsData) {
       form.reset({
-        navbarStyle: settingsData.navbarStyle || 'standard',
-        navbarBackgroundColor: settingsData.navbarBackgroundColor || '',
-        navbarTextColor: settingsData.navbarTextColor || '',
-        navbarBorderColor: settingsData.navbarBorderColor || '',
-        navbarHeight: settingsData.navbarHeight || 'default',
-        navbarShowSearch: settingsData.navbarShowSearch ?? true,
-        navbarShowWishlist: settingsData.navbarShowWishlist ?? true,
-        navbarShowCart: settingsData.navbarShowCart ?? true,
-        navbarShowAccount: settingsData.navbarShowAccount ?? true,
-        navbarShowThemeToggle: settingsData.navbarShowThemeToggle ?? true,
-        navbarShowCreditBadge: settingsData.navbarShowCreditBadge ?? true,
-        navbarMenuStyle: settingsData.navbarMenuStyle || 'dropdown',
-        navbarShowShopLink: settingsData.navbarShowShopLink ?? true,
-        navbarShowFlashSalesLink: settingsData.navbarShowFlashSalesLink ?? true,
-        navbarShowCollectionsLink: settingsData.navbarShowCollectionsLink ?? true,
-        navbarLogoPosition: settingsData.navbarLogoPosition || 'left',
-        navbarSticky: settingsData.navbarSticky || 'fixed',
-        navbarShadow: settingsData.navbarShadow || 'none',
-        navbarBlurEffect: settingsData.navbarBlurEffect ?? true,
+        navbarStyle: settingsData.navbarStyle || DEFAULT_NAV_SETTINGS.navbarStyle,
+        navbarBackgroundColor: settingsData.navbarBackgroundColor || DEFAULT_NAV_SETTINGS.navbarBackgroundColor,
+        navbarTextColor: settingsData.navbarTextColor || DEFAULT_NAV_SETTINGS.navbarTextColor,
+        navbarBorderColor: settingsData.navbarBorderColor || DEFAULT_NAV_SETTINGS.navbarBorderColor,
+        navbarHeight: settingsData.navbarHeight || DEFAULT_NAV_SETTINGS.navbarHeight,
+        navbarShowSearch: settingsData.navbarShowSearch ?? DEFAULT_NAV_SETTINGS.navbarShowSearch,
+        navbarShowWishlist: settingsData.navbarShowWishlist ?? DEFAULT_NAV_SETTINGS.navbarShowWishlist,
+        navbarShowCart: settingsData.navbarShowCart ?? DEFAULT_NAV_SETTINGS.navbarShowCart,
+        navbarShowAccount: settingsData.navbarShowAccount ?? DEFAULT_NAV_SETTINGS.navbarShowAccount,
+        navbarShowThemeToggle: settingsData.navbarShowThemeToggle ?? DEFAULT_NAV_SETTINGS.navbarShowThemeToggle,
+        navbarShowCreditBadge: settingsData.navbarShowCreditBadge ?? DEFAULT_NAV_SETTINGS.navbarShowCreditBadge,
+        navbarMenuStyle: settingsData.navbarMenuStyle || DEFAULT_NAV_SETTINGS.navbarMenuStyle,
+        navbarShowShopLink: settingsData.navbarShowShopLink ?? DEFAULT_NAV_SETTINGS.navbarShowShopLink,
+        navbarShowFlashSalesLink: settingsData.navbarShowFlashSalesLink ?? DEFAULT_NAV_SETTINGS.navbarShowFlashSalesLink,
+        navbarShowCollectionsLink: settingsData.navbarShowCollectionsLink ?? DEFAULT_NAV_SETTINGS.navbarShowCollectionsLink,
+        navbarLogoPosition: settingsData.navbarLogoPosition || DEFAULT_NAV_SETTINGS.navbarLogoPosition,
+        navbarSticky: settingsData.navbarSticky || DEFAULT_NAV_SETTINGS.navbarSticky,
+        navbarShadow: settingsData.navbarShadow || DEFAULT_NAV_SETTINGS.navbarShadow,
+        navbarBlurEffect: settingsData.navbarBlurEffect ?? DEFAULT_NAV_SETTINGS.navbarBlurEffect,
       });
     }
   }, [settingsData, form]);
@@ -709,12 +744,37 @@ export function NavigationBarSettings({ settingsData, isLoading }: NavigationBar
             </Tabs>
           </CardContent>
           
-          <CardFooter className="flex justify-between">
-            <div className="flex gap-2">
-              <Badge variant="outline" className="font-normal">
-                Navigation Bar Settings
-              </Badge>
-            </div>
+          <CardFooter className="flex justify-between border-t p-6 bg-muted/5">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm" 
+                  disabled={isSaving}
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                >
+                  <RotateCcw className="mr-2 h-4 w-4" />
+                  Reset to Default
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will reset all navigation bar settings to their factory defaults. 
+                    This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleReset} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    Reset Settings
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
             <Button type="submit" disabled={isSaving} className="px-8 font-bold">
               {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Save Changes
