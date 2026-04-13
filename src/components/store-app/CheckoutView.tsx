@@ -37,15 +37,17 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
-  AlertTriangle
-} from 'lucide-react';
-import type { UserProfile, Order, BankAccount, WhatsappMessageLog, Coupon } from '@/lib/types';
-import { cn } from '@/lib/utils';
-import { sendWhatsAppReceipt } from '@/lib/whatsapp';
-import { formatPhoneNumberForWhatsapp } from '@/lib/phone-utils';
-import { safeSessionStorage } from '@/lib/storage-utils';
+  AlertTriangle,
+  Sparkles
+  } from 'lucide-react';
+  import type { UserProfile, Order, BankAccount, WhatsappMessageLog, Coupon } from '@/lib/types';
+  import { cn } from '@/lib/utils';
+  import { sendWhatsAppReceipt } from '@/lib/whatsapp';
+  import { formatPhoneNumberForWhatsapp } from '@/lib/phone-utils';
+  import { safeSessionStorage } from '@/lib/storage-utils';
+  import { useAds } from '@/contexts/ad-context';
 
-type CheckoutStep = 'details' | 'payment' | 'processing' | 'success';
+  type CheckoutStep = 'details' | 'payment' | 'processing' | 'success';
 
 const generatePaymentReference = () => {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -66,6 +68,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
   const { settings, isLoadingSettings } = useSettings();
   const firestore = useFirestore();
   const { toast } = useToast();
+  const { rewardAdClicked, activeAds, applyRewardDiscount } = useAds();
 
   const [step, setStep] = useState<CheckoutStep>('details');
   const [paymentMethod, setPaymentMethod] = useState<string>('');
@@ -97,7 +100,17 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
     return Math.min(appliedCoupon.value, subtotal);
   }, [appliedCoupon, subtotal]);
 
-  const total = Math.max(0, subtotal - discountAmount + shipping);
+  const activeRewardAd = useMemo(() => {
+    return activeAds.find(ad => ad.adType === 'reward' && ad.placement === 'reward_button');
+  }, [activeAds]);
+
+  const rewardDiscountAmount = useMemo(() => {
+    if (!rewardAdClicked || !activeRewardAd || subtotal === 0) return 0;
+    const discountedPrice = applyRewardDiscount(subtotal, activeRewardAd);
+    return subtotal - discountedPrice;
+  }, [rewardAdClicked, activeRewardAd, subtotal, applyRewardDiscount]);
+
+  const total = Math.max(0, subtotal - discountAmount - rewardDiscountAmount + shipping);
   const bankAccounts = settings?.bankAccounts || [];
 
   const availablePaymentMethods = useMemo(() => {
@@ -312,6 +325,12 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                         <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-green-600">
                                             <span>Promo Savings</span>
                                             <span>-{formatCurrency(discountAmount, currencySymbol)}</span>
+                                        </div>
+                                    )}
+                                    {rewardDiscountAmount > 0 && (
+                                        <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-amber-600">
+                                            <span className="flex items-center gap-1"><Sparkles className="h-3 w-3" /> Reward Savings</span>
+                                            <span>-{formatCurrency(rewardDiscountAmount, currencySymbol)}</span>
                                         </div>
                                     )}
                                 </div>

@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Trash2, Plus, Minus, ShoppingCart, ArrowRight, ArrowLeft, Tag, AlertTriangle, Loader2, CheckCircle2, X } from 'lucide-react';
+import { Trash2, Plus, Minus, ShoppingCart, ArrowRight, ArrowLeft, Tag, AlertTriangle, Loader2, CheckCircle2, X, Sparkles } from 'lucide-react';
 import { formatCurrency } from '@/lib/formatUtils';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
@@ -24,12 +24,14 @@ import { Badge } from '@/components/ui/badge';
 import { cn, convertToDateSafely } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { safeSessionStorage } from '@/lib/storage-utils';
+import { useAds } from '@/contexts/ad-context';
 
 export default function CartPage() {
   const { cartItems, updateQuantity, removeFromCart, cartCount } = useCart();
   const { settings } = useSettings();
   const firestore = useFirestore();
   const { toast } = useToast();
+  const { activeAds, rewardAdClicked, setRewardAdClicked, applyRewardDiscount } = useAds();
   
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
@@ -155,8 +157,39 @@ export default function CartPage() {
     }
   };
 
+  const activeRewardAd = useMemo(() => {
+    const ad = activeAds.find(ad => ad.adType === 'reward' && ad.placement === 'reward_button');
+    if (!ad) return null;
+
+    // Check device targeting
+    if (typeof window !== 'undefined') {
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (ad.deviceTargeting === 'mobile_only' && !isMobile) return null;
+      if (ad.deviceTargeting === 'desktop_only' && isMobile) return null;
+    }
+
+    return ad;
+  }, [activeAds]);
+
+  const rewardDiscountAmount = useMemo(() => {
+    if (!rewardAdClicked || !activeRewardAd || subtotal === 0) return 0;
+    const discountedPrice = applyRewardDiscount(subtotal, activeRewardAd);
+    return subtotal - discountedPrice;
+  }, [rewardAdClicked, activeRewardAd, subtotal, applyRewardDiscount]);
+
   const shippingCost = subtotal > 0 ? 10 : 0;
-  const total = Math.max(0, subtotal - discountAmount + shippingCost);
+  const total = Math.max(0, subtotal - discountAmount - rewardDiscountAmount + shippingCost);
+
+  const handleRewardClick = () => {
+    if (activeRewardAd) {
+      window.open(activeRewardAd.adLink, '_blank');
+      setRewardAdClicked(true);
+      toast({
+        title: "Premium Reward Unlocked",
+        description: "Your exclusive discount has been successfully applied to your shopping bag.",
+      });
+    }
+  };
 
   const buttonStyle = useMemo(() => {
     const style = settings?.storeBtnStyle || 'standard';
@@ -290,11 +323,17 @@ export default function CartPage() {
                                     <span className="font-bold">-{formatCurrency(discountAmount, currencySymbol)}</span>
                                 </div>
                               )}
+                              {rewardDiscountAmount > 0 && (
+                                <div className="flex justify-between text-amber-600 animate-in fade-in slide-in-from-right-2">
+                                    <span className="font-medium flex items-center gap-1"><Sparkles className="h-3 w-3" /> Reward</span>
+                                    <span className="font-bold">-{formatCurrency(rewardDiscountAmount, currencySymbol)}</span>
+                                </div>
+                              )}
                               <div className="flex justify-between">
                                   <span className="text-muted-foreground font-medium">Shipping</span>
                                   <span className="font-bold">{formatCurrency(shippingCost, currencySymbol)}</span>
                               </div>
-                          </div>
+
 
                            <Separator />
 
@@ -347,7 +386,25 @@ export default function CartPage() {
                               <span className="text-lg font-bold">Total</span>
                               <span className="text-3xl font-black text-primary tracking-tighter">{formatCurrency(total, currencySymbol)}</span>
                           </div>
-                          
+
+                          {activeRewardAd && !rewardAdClicked && (
+                            <button
+                                onClick={handleRewardClick}
+                                className="w-full relative group overflow-hidden h-14 rounded-[1.25rem] transition-all active:scale-[0.98] shadow-xl mb-4"
+                            >
+                                <div className="absolute inset-0 bg-slate-950 dark:bg-slate-900" />
+                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(251,191,36,0.15),transparent_70%)]" />
+                                <div className="absolute inset-0 opacity-20 group-hover:opacity-100 transition-opacity duration-700 bg-[conic-gradient(from_0deg,transparent,rgba(251,191,36,0.3),transparent)] animate-[spin_4s_linear_infinite]" />
+                                <div className="relative flex items-center justify-center gap-3">
+                                    <Sparkles className="h-4 w-4 text-amber-400 group-hover:rotate-12 transition-transform" />
+                                    <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white">
+                                        Unlock {activeRewardAd.rewardDiscountType === 'percentage' ? activeRewardAd.rewardDiscountValue + '%' : currencySymbol + activeRewardAd.rewardDiscountValue} Reward
+                                    </span>
+                                    <Sparkles className="h-4 w-4 text-amber-400 group-hover:-rotate-12 transition-transform" />
+                                </div>
+                            </button>
+                          )}
+
                           <Button asChild size="lg" style={buttonStyle} className="w-full h-14 text-lg font-bold shadow-lg shadow-primary/20 border-none" disabled={hasIssues || subtotal === 0}>
                              <Link href="/store/checkout">
                                Checkout Now <ArrowRight className="ml-2 h-5 w-5" />
