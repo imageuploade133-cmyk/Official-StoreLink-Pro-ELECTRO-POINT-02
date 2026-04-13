@@ -198,7 +198,7 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
           
           {/* Full Bleed Dynamic Slide Show Hero */}
           <div className="w-full">
-            <div className="overflow-hidden relative bg-slate-950">
+            <div className="overflow-hidden relative bg-slate-950" data-no-ad-click="true">
                 <div className="overflow-hidden w-full" ref={emblaRef}>
                     <div className="flex embla__container">
                         {isLoadingSlides ? (

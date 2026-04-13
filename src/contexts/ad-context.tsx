@@ -5,7 +5,7 @@ import React, { createContext, useContext, useState, useMemo, useCallback } from
 import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, where } from 'firebase/firestore';
 import type { AdLink } from '@/lib/types';
-import { safeStorage } from '@/lib/storage-utils';
+import { safeStorage, safeSessionStorage } from '@/lib/storage-utils';
 
 interface AdContextType {
   activeAds: AdLink[];
@@ -36,9 +36,10 @@ export function AdProvider({ children }: { children: React.ReactNode }) {
     adsToTrigger.forEach(ad => {
       // Check frequency
       if (ad.frequency === 'once_per_session') {
-        const sessionKey = `ad_triggered_${ad.id}`;
-        if (safeStorage.getItem(sessionKey)) return;
-        safeStorage.setItem(sessionKey, 'true');
+        const lastUpdated = ad.updatedAt ? ad.updatedAt.toMillis() : (ad.createdAt?.toMillis() || 0);
+        const sessionKey = `ad_triggered_${ad.id}_${lastUpdated}`;
+        if (safeSessionStorage.getItem(sessionKey)) return;
+        safeSessionStorage.setItem(sessionKey, 'true');
       }
 
       // Check device targeting

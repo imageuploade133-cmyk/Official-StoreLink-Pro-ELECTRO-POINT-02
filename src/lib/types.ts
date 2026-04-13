@@ -880,6 +880,7 @@ export interface AdLink {
   rewardDiscountType?: 'percentage' | 'fixed';
   rewardDiscountValue?: number;
   createdAt: Timestamp;
+  updatedAt?: Timestamp;
 }
 
 export interface SaleTransactionItem {
