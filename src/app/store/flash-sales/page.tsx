@@ -145,20 +145,20 @@ function HubHero({ slides, settings }: { slides: SlideShow[], settings: any }) {
                                    (index === slides.length - 1 && slidesInView.includes(0));
 
                     return (
-                        <div key={slide.id} className="relative flex-[0_0_100%] min-w-0">
-                            <div className="relative w-full">
+                        <div key={slide.id} className="relative flex-[0_0_100%] min-w-0 aspect-[21/7]">
+                            <div className="relative w-full h-full">
                                 {isLoaded ? (
                                     <>
                                         {slide.mediaType === 'video' && slide.videoUrl ? (
-                                            <video autoPlay muted loop playsInline poster={slide.videoPosterUrl || ''} className="w-full h-auto block">
+                                            <video autoPlay muted loop playsInline poster={slide.videoPosterUrl || ''} className="w-full h-full object-contain block">
                                                 <source src={slide.videoUrl} type="video/mp4" />
                                             </video>
                                         ) : (
-                                            <img src={slide.imageUrl || ''} alt="" className="w-full h-auto block" />
+                                            <img src={slide.imageUrl || ''} alt="" className="w-full h-full object-contain block" />
                                         )}
                                     </>
                                 ) : (
-                                    <div className="aspect-video w-full bg-slate-900" />
+                                    <div className="w-full h-full bg-slate-900" />
                                 )}
                                 {slide.showOverlay && <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />}
                                 
