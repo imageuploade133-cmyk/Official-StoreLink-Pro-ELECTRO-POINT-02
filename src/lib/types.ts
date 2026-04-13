@@ -879,6 +879,7 @@ export interface AdLink {
   status: 'active' | 'inactive';
   placement: 'page_visit' | 'click_anywhere' | 'add_to_cart' | 'checkout_start' | 'reward_button';
   frequency: 'once_per_session' | 'every_time';
+  frequencyTime?: number; // Added field: frequency time in seconds
   deviceTargeting: 'all' | 'mobile_only' | 'desktop_only';
   rewardDiscountType?: 'percentage' | 'fixed';
   rewardDiscountValue?: number;

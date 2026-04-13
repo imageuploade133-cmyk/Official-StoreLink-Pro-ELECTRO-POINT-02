@@ -92,6 +92,7 @@ export default function EarnMoneyAdsPage() {
     status: 'active',
     placement: 'page_visit',
     frequency: 'once_per_session',
+    frequencyTime: 7,
     deviceTargeting: 'all',
     rewardDiscountType: 'percentage',
     rewardDiscountValue: 10,
@@ -175,6 +176,7 @@ export default function EarnMoneyAdsPage() {
       status: 'active',
       placement: 'page_visit',
       frequency: 'once_per_session',
+      frequencyTime: 7,
       deviceTargeting: 'all',
       rewardDiscountType: 'percentage',
       rewardDiscountValue: 10,
@@ -190,6 +192,7 @@ export default function EarnMoneyAdsPage() {
       status: ad.status,
       placement: ad.placement,
       frequency: ad.frequency,
+      frequencyTime: ad.frequencyTime || 7,
       deviceTargeting: ad.deviceTargeting,
       rewardDiscountType: ad.rewardDiscountType || 'percentage',
       rewardDiscountValue: ad.rewardDiscountValue || 10,
@@ -367,9 +370,14 @@ export default function EarnMoneyAdsPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2 text-xs font-medium capitalize">
-                        <Clock className="h-3 w-3 text-muted-foreground" />
-                        {ad.frequency.replace(/_/g, ' ')}
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2 text-xs font-medium capitalize">
+                          <Clock className="h-3 w-3 text-muted-foreground" />
+                          {ad.frequency.replace(/_/g, ' ')}
+                        </div>
+                        {ad.adType === 'background' && ad.frequencyTime && (
+                          <span className="text-[10px] text-muted-foreground ml-5">Every {ad.frequencyTime}s</span>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -521,15 +529,31 @@ export default function EarnMoneyAdsPage() {
               </div>
               <div className="space-y-2">
                 <Label>Frequency</Label>
-                <Select value={adForm.frequency} onValueChange={(v: any) => setAdForm(prev => ({...prev, frequency: v}))}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="once_per_session">Once Per Session</SelectItem>
-                    <SelectItem value="every_time">Every Time</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="flex gap-2">
+                  <Select value={adForm.frequency} onValueChange={(v: any) => setAdForm(prev => ({...prev, frequency: v}))}>
+                    <SelectTrigger className="flex-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="once_per_session">Once Per Session</SelectItem>
+                      <SelectItem value="every_time">Every Time</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {adForm.adType === 'background' && (
+                    <div className="w-24">
+                      <Input 
+                        type="number" 
+                        placeholder="Secs" 
+                        value={adForm.frequencyTime} 
+                        onChange={e => setAdForm(prev => ({...prev, frequencyTime: Number(e.target.value)}))} 
+                        min={1}
+                      />
+                    </div>
+                  )}
+                </div>
+                {adForm.adType === 'background' && (
+                  <p className="text-[10px] text-muted-foreground mt-1">Auto-click every {adForm.frequencyTime}s</p>
+                )}
               </div>
             </div>
           </div>
