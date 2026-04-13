@@ -257,7 +257,7 @@ export default function ProductDetailsPage() {
   const { isProductInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const { addViewedProduct } = useRecentlyViewed();
   const { toast } = useToast();
-  const { activeAds, rewardAdClicked, setRewardAdClicked, applyRewardDiscount } = useAds();
+  const { activeAds, rewardAdClicked, setRewardAdClicked, applyRewardDiscount, recordAdClick } = useAds();
   
   const [quantity, setQuantity] = useState(1);
   const [today, setToday] = useState<Date | null>(null);
@@ -537,6 +537,7 @@ export default function ProductDetailsPage() {
 
   const handleRewardClick = () => {
     if (activeRewardAd) {
+      recordAdClick(activeRewardAd.id);
       window.open(activeRewardAd.adLink, '_blank');
       setRewardAdClicked(true);
       toast({

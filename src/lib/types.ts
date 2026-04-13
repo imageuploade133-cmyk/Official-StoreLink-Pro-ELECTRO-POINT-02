@@ -887,6 +887,8 @@ export interface AdLink {
   rewardDiscountValue?: number;
   createdAt: Timestamp;
   updatedAt?: Timestamp;
+  clicks?: number;
+  views?: number;
 }
 
 export interface SaleTransactionItem {

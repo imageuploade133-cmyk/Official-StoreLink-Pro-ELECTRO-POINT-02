@@ -3,13 +3,15 @@
 
 import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
 import { useFirestore, useCollection } from '@/firebase';
-import { collection, query, where } from 'firebase/firestore';
+import { collection, query, where, doc, updateDoc, increment } from 'firebase/firestore';
 import type { AdLink } from '@/lib/types';
 import { safeStorage, safeSessionStorage } from '@/lib/storage-utils';
 
 interface AdContextType {
   activeAds: AdLink[];
   triggerAd: (placement: AdLink['placement']) => void;
+  recordAdClick: (adId: string) => Promise<void>;
+  recordAdView: (adId: string) => Promise<void>;
   rewardAdClicked: boolean;
   setRewardAdClicked: (clicked: boolean) => void;
   applyRewardDiscount: (price: number, ad: AdLink) => number;
@@ -27,6 +29,30 @@ export function AdProvider({ children }: { children: React.ReactNode }) {
   }, [firestore]);
 
   const { data: activeAds } = useCollection<AdLink>(adsQuery);
+
+  const recordAdClick = useCallback(async (adId: string) => {
+    if (!firestore) return;
+    try {
+      const adRef = doc(firestore, 'adLinks', adId);
+      await updateDoc(adRef, {
+        clicks: increment(1)
+      });
+    } catch (error) {
+      console.error("Error recording ad click:", error);
+    }
+  }, [firestore]);
+
+  const recordAdView = useCallback(async (adId: string) => {
+    if (!firestore) return;
+    try {
+      const adRef = doc(firestore, 'adLinks', adId);
+      await updateDoc(adRef, {
+        views: increment(1)
+      });
+    } catch (error) {
+      console.error("Error recording ad view:", error);
+    }
+  }, [firestore]);
 
   const triggerAd = useCallback((placement: AdLink['placement']) => {
     if (!activeAds) return;
@@ -48,9 +74,10 @@ export function AdProvider({ children }: { children: React.ReactNode }) {
       if (ad.deviceTargeting === 'desktop_only' && isMobile) return;
 
       // Trigger
+      recordAdClick(ad.id); // Record the click
       window.open(ad.adLink, '_blank');
     });
-  }, [activeAds]);
+  }, [activeAds, recordAdClick]);
 
   // Handle Background Ads with Frequency Time (Auto-click)
   React.useEffect(() => {
@@ -82,6 +109,7 @@ export function AdProvider({ children }: { children: React.ReactNode }) {
 
         // Auto-click (Open link)
         try {
+          recordAdClick(ad.id); // Record the click
           window.open(ad.adLink, '_blank');
         } catch (e) {
           console.error("Auto-click ad failed (likely blocked by popup blocker):", e);
@@ -117,6 +145,8 @@ export function AdProvider({ children }: { children: React.ReactNode }) {
   const value = {
     activeAds: activeAds || [],
     triggerAd,
+    recordAdClick,
+    recordAdView,
     rewardAdClicked,
     setRewardAdClicked,
     applyRewardDiscount

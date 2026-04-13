@@ -10,7 +10,7 @@ interface BannerAdProps {
 }
 
 export function BannerAd({ location, className }: BannerAdProps) {
-  const { activeAds } = useAds();
+  const { activeAds, recordAdView, recordAdClick } = useAds();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const banner = activeAds.find(
@@ -19,6 +19,9 @@ export function BannerAd({ location, className }: BannerAdProps) {
 
   useEffect(() => {
     if (banner?.adScript && containerRef.current) {
+      // Record view
+      recordAdView(banner.id);
+
       // Clear container
       containerRef.current.innerHTML = '';
       
@@ -47,8 +50,19 @@ export function BannerAd({ location, className }: BannerAdProps) {
       
       // Append the processed HTML to container
       containerRef.current.appendChild(div);
+
+      // Add click listener to container to track clicks on the banner
+      const handleBannerClick = () => {
+        recordAdClick(banner.id);
+      };
+
+      containerRef.current.addEventListener('click', handleBannerClick);
+
+      return () => {
+        containerRef.current?.removeEventListener('click', handleBannerClick);
+      };
     }
-  }, [banner]);
+  }, [banner, recordAdView, recordAdClick]);
 
   if (!banner) return null;
 

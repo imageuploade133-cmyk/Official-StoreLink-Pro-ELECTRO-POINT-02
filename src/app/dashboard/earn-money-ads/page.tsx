@@ -83,6 +83,21 @@ export default function EarnMoneyAdsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLastPage, setIsLastPage] = useState(false);
   const [totalAdsCount, setTotalAdsCount] = useState(0);
+  const [globalStats, setGlobalStats] = useState({
+    clicks: 0,
+    views: 0,
+    active: 0,
+    reward: 0,
+    background: 0,
+    banner: 0
+  });
+
+  const totalClicks = globalStats.clicks;
+  const totalViews = globalStats.views;
+  const activeAdsCount = globalStats.active;
+  const rewardAdsCount = globalStats.reward;
+  const backgroundAdsCount = globalStats.background;
+  const bannerAdsCount = globalStats.banner;
 
   // Refs for stable cursors
   const firstDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
@@ -113,6 +128,18 @@ export default function EarnMoneyAdsPage() {
       if (direction === 'initial') {
         const countSnap = await getCountFromServer(q);
         setTotalAdsCount(countSnap.data().count);
+
+        // Fetch all for global stats
+        const allSnap = await getDocs(collection(firestore, 'adLinks'));
+        const allAds = allSnap.docs.map(d => d.data() as AdLink);
+        setGlobalStats({
+          clicks: allAds.reduce((acc, a) => acc + (a.clicks || 0), 0),
+          views: allAds.reduce((acc, a) => acc + (a.views || 0), 0),
+          active: allAds.filter(a => a.status === 'active').length,
+          reward: allAds.filter(a => a.adType === 'reward').length,
+          background: allAds.filter(a => a.adType === 'background').length,
+          banner: allAds.filter(a => a.adType === 'banner').length,
+        });
       }
 
       if (direction === 'next' && lastDocRef.current) {
@@ -167,6 +194,7 @@ export default function EarnMoneyAdsPage() {
       });
       toast({ title: "Status Updated", description: `Ad is now ${newStatus}.` });
       setAds(prev => prev.map(a => a.id === ad.id ? { ...a, status: newStatus } : a));
+      fetchAds('initial'); // Refresh global stats
     } catch (e: any) {
       toast({ variant: 'destructive', title: "Update Failed", description: e.message });
     }
@@ -280,7 +308,7 @@ export default function EarnMoneyAdsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="bg-primary/5 border-primary/10 shadow-none">
           <CardHeader className="pb-2">
             <CardTitle className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center justify-between">
@@ -299,10 +327,34 @@ export default function EarnMoneyAdsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {isLoadingAds ? <Skeleton className="h-8 w-12" /> : <div className="text-2xl font-black text-green-600">{ads.filter(a => a.status === 'active').length}</div>}
+            {isLoadingAds ? <Skeleton className="h-8 w-12" /> : <div className="text-2xl font-black text-green-600">{activeAdsCount}</div>}
           </CardContent>
         </Card>
 
+        <Card className="bg-rose-50 border-rose-100 shadow-none">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-rose-600 flex items-center justify-between">
+                Total Clicks <MousePointerClick className="h-3.5 w-3.5" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoadingAds ? <Skeleton className="h-8 w-12" /> : <div className="text-2xl font-black text-rose-600">{totalClicks}</div>}
+          </CardContent>
+        </Card>
+
+        <Card className="bg-cyan-50 border-cyan-100 shadow-none">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-cyan-600 flex items-center justify-between">
+                Banner Views <Monitor className="h-3.5 w-3.5" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoadingAds ? <Skeleton className="h-8 w-12" /> : <div className="text-2xl font-black text-cyan-600">{totalViews}</div>}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="bg-amber-50 border-amber-100 shadow-none">
           <CardHeader className="pb-2">
             <CardTitle className="text-[10px] font-black uppercase tracking-widest text-amber-600 flex items-center justify-between">
@@ -310,7 +362,7 @@ export default function EarnMoneyAdsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {isLoadingAds ? <Skeleton className="h-8 w-12" /> : <div className="text-2xl font-black text-amber-600">{ads.filter(a => a.adType === 'reward').length}</div>}
+            {isLoadingAds ? <Skeleton className="h-8 w-12" /> : <div className="text-2xl font-black text-amber-600">{rewardAdsCount}</div>}
           </CardContent>
         </Card>
 
@@ -321,7 +373,7 @@ export default function EarnMoneyAdsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {isLoadingAds ? <Skeleton className="h-8 w-12" /> : <div className="text-2xl font-black text-indigo-600">{ads.filter(a => a.adType === 'background').length}</div>}
+            {isLoadingAds ? <Skeleton className="h-8 w-12" /> : <div className="text-2xl font-black text-indigo-600">{backgroundAdsCount}</div>}
           </CardContent>
         </Card>
 
@@ -332,7 +384,7 @@ export default function EarnMoneyAdsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {isLoadingAds ? <Skeleton className="h-8 w-12" /> : <div className="text-2xl font-black text-blue-600">{ads.filter(a => a.adType === 'banner').length}</div>}
+            {isLoadingAds ? <Skeleton className="h-8 w-12" /> : <div className="text-2xl font-black text-blue-600">{bannerAdsCount}</div>}
           </CardContent>
         </Card>
       </div>
@@ -350,8 +402,9 @@ export default function EarnMoneyAdsPage() {
                 <TableHead>Placement</TableHead>
                 <TableHead>Frequency</TableHead>
                 <TableHead>Targeting</TableHead>
+                <TableHead>Stats</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="text-right pr-6">Action</TableHead>
+
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -412,11 +465,25 @@ export default function EarnMoneyAdsPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Switch 
-                          checked={ad.status === 'active'} 
-                          onCheckedChange={() => handleToggleStatus(ad)}
-                        />
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2 text-xs font-bold">
+                          <MousePointerClick className="h-3 w-3 text-rose-500" />
+                          {ad.clicks || 0} <span className="text-[10px] text-muted-foreground font-normal">clicks</span>
+                        </div>
+                        {ad.adType === 'banner' && (
+                          <div className="flex items-center gap-2 text-xs font-bold">
+                            <Monitor className="h-3 w-3 text-cyan-500" />
+                            {ad.views || 0} <span className="text-[10px] text-muted-foreground font-normal">views</span>
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <Switch 
+                              checked={ad.status === 'active'} 
+                              onCheckedChange={() => handleToggleStatus(ad)}
+                            />
                         <Badge variant={ad.status === 'active' ? 'default' : 'secondary'} className="text-[10px] h-5 uppercase font-black">
                           {ad.status === 'active' ? 'Live' : 'Paused'}
                         </Badge>
