@@ -16,14 +16,22 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, Building, Upload, Maximize, MonitorUp, ArrowUpDown, Ruler } from 'lucide-react';
+import { Loader2, Building, Upload, Maximize, MonitorUp, ArrowUpDown, Ruler, Share2, Share, ExternalLink, Link as LinkIcon, Send } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
+const shareIconOptions = [
+  { name: 'Share2', icon: Share2 },
+  { name: 'Share', icon: Share },
+  { name: 'ExternalLink', icon: ExternalLink },
+  { name: 'LinkIcon', icon: LinkIcon },
+  { name: 'Send', icon: Send },
+];
 
 const siteIdentitySchema = z.object({
   storeName: z.string().min(2, 'Store name is required.').max(50, 'Store name is too long.'),
@@ -35,6 +43,8 @@ const siteIdentitySchema = z.object({
   showFooterDescription: z.boolean().optional(),
   showPublicStoreName: z.boolean().optional(),
   showMainSiteLogo: z.boolean().optional(),
+  enableProductSharing: z.boolean().optional(),
+  productSharingIcon: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof siteIdentitySchema>;
@@ -62,6 +72,8 @@ export function SiteIdentitySettings({ settingsData, isLoading }: SiteIdentitySe
       showFooterDescription: true,
       showPublicStoreName: true,
       showMainSiteLogo: true,
+      enableProductSharing: true,
+      productSharingIcon: 'Share2',
     }
   });
 
@@ -77,6 +89,8 @@ export function SiteIdentitySettings({ settingsData, isLoading }: SiteIdentitySe
         showFooterDescription: settingsData.showFooterDescription ?? true,
         showPublicStoreName: settingsData.showPublicStoreName ?? true,
         showMainSiteLogo: settingsData.showMainSiteLogo ?? true,
+        enableProductSharing: settingsData.enableProductSharing ?? true,
+        productSharingIcon: settingsData.productSharingIcon || 'Share2',
       });
     }
   }, [settingsData, form]);
@@ -404,6 +418,65 @@ export function SiteIdentitySettings({ settingsData, isLoading }: SiteIdentitySe
                 </FormItem>
               )}
             />
+
+            <Separator className="border-dashed" />
+
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                <Share2 className="h-5 w-5 text-primary" /> Product Sharing Settings
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="enableProductSharing"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between p-4 bg-muted/10 rounded-lg border">
+                      <div className="space-y-0.5">
+                        <FormLabel>Enable Product Sharing</FormLabel>
+                        <FormDescription>
+                          Allow users to share product links from the inventory and store.
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={isSaving}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="productSharingIcon"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Sharing Icon</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a share icon" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {shareIconOptions.map((opt) => (
+                            <SelectItem key={opt.name} value={opt.name}>
+                              <div className="flex items-center gap-2">
+                                <opt.icon className="h-4 w-4" />
+                                <span>{opt.name}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
           </CardContent>
           <CardFooter>
             <Button type="submit" disabled={isSaving || !!uploadingField} className="px-8 font-bold">
