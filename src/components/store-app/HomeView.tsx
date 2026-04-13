@@ -207,18 +207,18 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                 <div className="overflow-hidden w-full" ref={emblaRef}>
                     <div className="flex embla__container">
                         {isLoadingSlides ? (
-                            <div className="flex-[0_0_100%] min-w-0 aspect-[16/10]">
+                            <div className="flex-[0_0_100%] min-w-0 aspect-[21/7]">
                                 <Skeleton className="w-full h-full" />
                             </div>
                         ) : slides && slides.length > 0 ? (
                             slides.map((slide) => (
-                                <div key={slide.id} className="relative flex-[0_0_100%] min-w-0 group aspect-[16/10]">
+                                <div key={slide.id} className="relative flex-[0_0_100%] min-w-0 group aspect-[21/7]">
                                     {slide.mediaType === 'video' && slide.videoUrl ? (
                                         <div className="w-full h-full overflow-hidden">
                                             <video 
                                                 autoPlay muted loop playsInline 
                                                 poster={slide.videoPosterUrl || ''} 
-                                                className="w-full h-full object-cover block"
+                                                className="w-full h-full object-contain block"
                                             >
                                                 <source src={slide.videoUrl} type="video/mp4" />
                                             </video>
@@ -226,7 +226,7 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                                     ) : (
                                         <img 
                                             alt={slide.title || 'Slide'} 
-                                            className="w-full h-full object-cover block transition-transform duration-1000 group-hover:scale-105" 
+                                            className="w-full h-full object-contain block transition-transform duration-1000 group-hover:scale-105" 
                                             src={slide.imageUrl || 'https://placehold.co/800x500.png'} 
                                         />
                                     )}
@@ -270,10 +270,10 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                                 </div>
                             ))
                         ) : (
-                            <div className="relative flex-[0_0_100%] min-w-0 aspect-[16/10] flex items-end">
+                            <div className="relative flex-[0_0_100%] min-w-0 aspect-[21/7] flex items-end">
                                 <Image 
                                     alt="Default Banner" 
-                                    className="absolute inset-0 w-full h-full object-cover" 
+                                    className="absolute inset-0 w-full h-full object-contain" 
                                     src="https://images.pexels.com/photos/14146828/pexels-photo-14146828.jpeg" 
                                     fill
                                     unoptimized
