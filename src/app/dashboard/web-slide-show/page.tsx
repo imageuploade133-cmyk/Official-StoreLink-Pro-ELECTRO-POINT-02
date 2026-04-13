@@ -55,7 +55,7 @@ import { useAuth } from '@/contexts/auth-context';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import Image from 'next/image';
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 25;
 
 export default function ManageSlideShowPage() {
   const firestore = useFirestore();
@@ -301,7 +301,7 @@ export default function ManageSlideShowPage() {
                       <TableCell>
                           <div className="w-[80px] h-[45px] rounded-lg bg-muted overflow-hidden relative border shadow-sm">
                           {slide.mediaType === 'image' && slide.imageUrl ? (
-                                    <Image src={slide.imageUrl} alt="" fill className="object-cover" unoptimized />
+                                    <Image src={slide.imageUrl} alt="" fill className="object-cover" />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center bg-black">
                                         <Video className="h-4 w-4 text-white/50" />

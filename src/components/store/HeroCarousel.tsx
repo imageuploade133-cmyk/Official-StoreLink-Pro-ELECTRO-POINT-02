@@ -16,7 +16,7 @@ export function HeroCarousel() {
   const firestore = useFirestore();
   const slidesQuery = React.useMemo(() => {
     if (!firestore) return null;
-    return query(collection(firestore, 'slideShows'), where('published', '==', true), orderBy('order', 'asc'), limit(5));
+    return query(collection(firestore, 'slideShows'), where('published', '==', true), orderBy('order', 'asc'), limit(20));
   }, [firestore]);
   const { data: slides, isLoading } = useCollection<SlideShow>(slidesQuery);
 
@@ -29,13 +29,20 @@ export function HeroCarousel() {
       loop: true, 
       align: 'start',
       skipSnaps: false,
-      duration: 35
+      duration: 35,
+      watchSlides: true,
     }, 
     [autoplay.current]
   );
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
+  const [slidesInView, setSlidesInView] = useState<number[]>([]);
+
+  const updateSlidesInView = useCallback(() => {
+    if (!emblaApi) return;
+    setSlidesInView(emblaApi.slidesInView());
+  }, [emblaApi]);
 
   const scrollTo = useCallback(
     (index: number) => emblaApi && emblaApi.scrollTo(index),
@@ -45,7 +52,8 @@ export function HeroCarousel() {
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
     setSelectedIndex(emblaApi.selectedScrollSnap());
-  }, [emblaApi]);
+    updateSlidesInView();
+  }, [emblaApi, updateSlidesInView]);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -53,12 +61,14 @@ export function HeroCarousel() {
     setScrollSnaps(emblaApi.scrollSnapList());
     emblaApi.on('select', onSelect);
     emblaApi.on('reInit', onSelect);
+    emblaApi.on('slidesInView', updateSlidesInView);
     return () => {
         if (emblaApi) {
           emblaApi.off('select', onSelect);
+          emblaApi.off('slidesInView', updateSlidesInView);
         }
     };
-  }, [emblaApi, onSelect]);
+  }, [emblaApi, onSelect, updateSlidesInView]);
 
   const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
@@ -82,75 +92,91 @@ export function HeroCarousel() {
     <div className="relative h-[500px] md:h-[600px] w-full overflow-hidden bg-slate-950">
       <div className="overflow-hidden h-full w-full" ref={emblaRef}>
         <div className="flex h-full embla__container">
-          {slides.map((slide, index) => (
-            <div 
-              key={slide.id} 
-              className="relative flex-[0_0_100%] min-w-0 h-full"
-            >
-              <div className="absolute inset-0 z-0">
-                {slide.mediaType === 'video' && slide.videoUrl ? (
-                  <video
-                    key={slide.id}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    poster={slide.videoPosterUrl || ''}
-                    className="w-full h-full object-cover"
-                  >
-                    <source src={slide.videoUrl} type="video/mp4" />
-                  </video>
-                ) : (
-                  <Image
-                    src={slide.imageUrl || 'https://placehold.co/1920x1080.png'}
-                    alt={slide.title || 'Slide background'}
-                    fill
-                    sizes="100vw"
-                    className="w-full h-full object-cover select-none"
-                    draggable={false}
-                    priority={index === 0}
-                  />
-                )}
-              </div>
+          {slides.map((slide, index) => {
+            const isLoaded = slidesInView.includes(index) || 
+                           slidesInView.includes(index - 1) || 
+                           slidesInView.includes(index + 1) ||
+                           (index === 0 && slidesInView.includes(slides.length - 1)) ||
+                           (index === slides.length - 1 && slidesInView.includes(0));
 
-              <div className="relative z-10 h-full flex items-center">
-                <div className="max-w-7xl mx-auto px-10 w-full">
-                  <div className="max-w-2xl">
-                    {slide.pretitle && (
-                      <p className="text-white/60 text-xs font-bold tracking-[0.3em] uppercase mb-4 animate-in slide-in-from-left duration-700">
-                        {slide.pretitle}
-                      </p>
-                    )}
-                    {slide.title && (
-                      <h1 className="text-white text-5xl md:text-7xl font-extrabold mb-8 leading-[1.1] tracking-tight">
-                        {slide.title.split(',').map((part, i) => (
-                          <React.Fragment key={i}>
-                            {part.trim()}
-                            {i < slide.title.split(',').length - 1 && <br />}
-                          </React.Fragment>
-                        ))}
-                      </h1>
-                    )}
-                    {slide.description && (
-                      <p className="text-slate-300 text-lg md:text-xl font-light mb-10 max-w-lg leading-relaxed">
-                        {slide.description}
-                      </p>
-                    )}
-                    {slide.showActionButton && (
-                      <Button asChild size="lg" className="group relative overflow-hidden bg-white text-slate-950 px-8 py-4 font-bold text-sm tracking-widest uppercase transition-all duration-300 hover:pr-12 hover:bg-slate-100 active:scale-95 h-auto">
-                        <Link href="/store/shop">
-                          <span className="relative z-10">Shop Collection</span>
-                          <span className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                             <ArrowRight className="h-4 w-4" strokeWidth={2.5}/>
-                          </span>
-                        </Link>
-                      </Button>
-                    )}
+            return (
+              <div 
+                key={slide.id} 
+                className="relative flex-[0_0_100%] min-w-0 h-full"
+              >
+                <div className="absolute inset-0 z-0">
+                  {isLoaded ? (
+                    <>
+                      {slide.mediaType === 'video' && slide.videoUrl ? (
+                        <video
+                          key={slide.id}
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                          poster={slide.videoPosterUrl || ''}
+                          className="w-full h-full object-cover"
+                        >
+                          <source src={slide.videoUrl} type="video/mp4" />
+                        </video>
+                      ) : (
+                        <Image
+                          src={slide.imageUrl || 'https://placehold.co/1920x1080.png'}
+                          alt={slide.title || 'Slide background'}
+                          fill
+                          sizes="100vw"
+                          className="w-full h-full object-cover select-none"
+                          draggable={false}
+                          priority={index === 0}
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <div className="w-full h-full bg-slate-900 flex items-center justify-center">
+                       <Skeleton className="w-full h-full bg-slate-800" />
+                    </div>
+                  )}
+                </div>
+
+                <div className="relative z-10 h-full flex items-center">
+                  <div className="max-w-7xl mx-auto px-10 w-full">
+                    <div className="max-w-2xl">
+                      {slide.pretitle && (
+                        <p className="text-white/60 text-xs font-bold tracking-[0.3em] uppercase mb-4 animate-in slide-in-from-left duration-700">
+                          {slide.pretitle}
+                        </p>
+                      )}
+                      {slide.title && (
+                        <h1 className="text-white text-5xl md:text-7xl font-extrabold mb-8 leading-[1.1] tracking-tight">
+                          {slide.title.split(',').map((part, i) => (
+                            <React.Fragment key={i}>
+                              {part.trim()}
+                              {i < slide.title.split(',').length - 1 && <br />}
+                            </React.Fragment>
+                          ))}
+                        </h1>
+                      )}
+                      {slide.description && (
+                        <p className="text-slate-300 text-lg md:text-xl font-light mb-10 max-w-lg leading-relaxed">
+                          {slide.description}
+                        </p>
+                      )}
+                      {slide.showActionButton && (
+                        <Button asChild size="lg" className="group relative overflow-hidden bg-white text-slate-950 px-8 py-4 font-bold text-sm tracking-widest uppercase transition-all duration-300 hover:pr-12 hover:bg-slate-100 active:scale-95 h-auto">
+                          <Link href="/store/shop">
+                            <span className="relative z-10">Shop Collection</span>
+                            <span className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                               <ArrowRight className="h-4 w-4" strokeWidth={2.5}/>
+                            </span>
+                          </Link>
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

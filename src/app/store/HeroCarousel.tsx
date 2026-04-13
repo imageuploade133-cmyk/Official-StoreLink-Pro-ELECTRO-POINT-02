@@ -42,7 +42,7 @@ export function HeroCarousel() {
   
   const slidesQuery = React.useMemo(() => {
     if (!firestore) return null;
-    return query(collection(firestore, 'slideShows'), where('published', '==', true), orderBy('order', 'asc'), limit(5));
+    return query(collection(firestore, 'slideShows'), where('published', '==', true), orderBy('order', 'asc'), limit(20));
   }, [firestore]);
   const { data: slides, isLoading } = useCollection<SlideShow>(slidesQuery);
 
@@ -58,18 +58,26 @@ export function HeroCarousel() {
       loop: true, 
       align: 'start',
       skipSnaps: false,
-      duration: 40
+      duration: 40,
+      watchSlides: true,
     }, 
     [autoplayPlugin]
   );
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
+  const [slidesInView, setSlidesInView] = useState<number[]>([]);
+
+  const updateSlidesInView = useCallback(() => {
+    if (!emblaApi) return;
+    setSlidesInView(emblaApi.slidesInView());
+  }, [emblaApi]);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
     setSelectedIndex(emblaApi.selectedScrollSnap());
-  }, [emblaApi]);
+    updateSlidesInView();
+  }, [emblaApi, updateSlidesInView]);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -77,12 +85,14 @@ export function HeroCarousel() {
     setScrollSnaps(emblaApi.scrollSnapList());
     emblaApi.on('select', onSelect);
     emblaApi.on('reInit', onSelect);
+    emblaApi.on('slidesInView', updateSlidesInView);
     return () => {
         if (emblaApi) {
           emblaApi.off('select', onSelect);
+          emblaApi.off('slidesInView', updateSlidesInView);
         }
     };
-  }, [emblaApi, onSelect]);
+  }, [emblaApi, onSelect, updateSlidesInView]);
 
   const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
@@ -178,82 +188,97 @@ export function HeroCarousel() {
     <div className="relative w-full overflow-hidden bg-slate-950">
       <div className="overflow-hidden w-full" ref={emblaRef}>
         <div className="flex embla__container">
-          {slides.map((slide, index) => (
-            <div 
-              key={slide.id} 
-              className="relative flex-[0_0_100%] min-w-0"
-            >
-              {/* Proportional Media Container */}
-              <div className="relative z-0 w-full">
-                {slide.mediaType === 'video' && slide.videoUrl ? (
-                  <div className="aspect-video w-full overflow-hidden">
-                    <video
-                      key={slide.id}
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      poster={slide.videoPosterUrl || ''}
-                      className="w-full h-full object-cover"
-                    >
-                      <source src={slide.videoUrl} type="video/mp4" />
-                    </video>
-                  </div>
-                ) : (
-                  <Image
-                    src={slide.imageUrl || 'https://placehold.co/1920x1080.png'}
-                    alt={slide.title || 'Slide background'}
-                    width={1920}
-                    height={800}
-                    sizes="100vw"
-                    className="w-full h-auto select-none block"
-                    draggable={false}
-                    priority={index === 0}
-                    unoptimized
-                  />
-                )}
-                
-                {slide.showOverlay === true && (
-                  <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
-                )}
+          {slides.map((slide, index) => {
+            const isLoaded = slidesInView.includes(index) || 
+                           slidesInView.includes(index - 1) || 
+                           slidesInView.includes(index + 1) ||
+                           (index === 0 && slidesInView.includes(slides.length - 1)) ||
+                           (index === slides.length - 1 && slidesInView.includes(0));
 
-                {/* Content Overlay - Centered within the proportional media */}
-                <div className="absolute inset-0 z-10 flex items-center">
-                  <div className="max-w-site-container mx-auto px-6 sm:px-10 lg:px-12 w-full">
-                    <div className="max-w-4xl text-center mx-auto space-y-2 md:space-y-10">
-                      {slide.pretitle && (
-                        <p className="text-white/80 text-[8px] md:text-sm font-black tracking-[0.2em] md:tracking-[0.4em] uppercase animate-in fade-in slide-in-from-bottom-4 duration-700">
-                          {slide.pretitle}
-                        </p>
-                      )}
-                      {slide.title && (
-                        <h1 className="text-white text-xl sm:text-4xl md:text-6xl lg:text-8xl font-black mb-1 md:mb-4 leading-tight tracking-tighter animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-100">
-                          {slide.title}
-                        </h1>
-                      )}
-                      {slide.description && (
-                        <p className="text-slate-200 text-[10px] sm:text-lg md:text-2xl font-medium max-w-2xl leading-tight md:leading-relaxed mx-auto opacity-90 line-clamp-2 sm:line-clamp-none animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
-                          {slide.description}
-                        </p>
-                      )}
-                      {slide.showActionButton && (
-                        <div className="pt-2 md:pt-10 animate-in fade-in zoom-in-95 duration-1000 delay-300">
-                          <Button asChild style={buttonStyle} className={`group relative overflow-hidden font-black shadow-2xl active:scale-95 border-none transition-all duration-500 ${buttonClasses}`}>
-                            <Link href="/store/shop">
-                              <span className="relative z-10 flex items-center gap-2 md:gap-4">
-                                {heroBtnText}
-                                <HeroBtnIcon className="h-3.5 w-3.5 md:h-5 md:w-5 transition-transform duration-300 group-hover:translate-x-2" strokeWidth={3}/>
-                              </span>
-                            </Link>
-                          </Button>
+            return (
+              <div 
+                key={slide.id} 
+                className="relative flex-[0_0_100%] min-w-0"
+              >
+                {/* Proportional Media Container */}
+                <div className="relative z-0 w-full">
+                  {isLoaded ? (
+                    <>
+                      {slide.mediaType === 'video' && slide.videoUrl ? (
+                        <div className="aspect-video w-full overflow-hidden">
+                          <video
+                            key={slide.id}
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            poster={slide.videoPosterUrl || ''}
+                            className="w-full h-full object-cover"
+                          >
+                            <source src={slide.videoUrl} type="video/mp4" />
+                          </video>
                         </div>
+                      ) : (
+                        <Image
+                          src={slide.imageUrl || 'https://placehold.co/1920x1080.png'}
+                          alt={slide.title || 'Slide background'}
+                          width={1920}
+                          height={800}
+                          sizes="100vw"
+                          className="w-full h-auto select-none block"
+                          draggable={false}
+                          priority={index === 0}
+                        />
                       )}
+                    </>
+                  ) : (
+                    <div className="aspect-video w-full bg-slate-900 flex items-center justify-center">
+                       <Skeleton className="w-full h-full bg-slate-800" />
+                    </div>
+                  )}
+                  
+                  {slide.showOverlay === true && (
+                    <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
+                  )}
+
+                  {/* Content Overlay - Centered within the proportional media */}
+                  <div className="absolute inset-0 z-10 flex items-center">
+                    <div className="max-w-site-container mx-auto px-6 sm:px-10 lg:px-12 w-full">
+                      <div className="max-w-4xl text-center mx-auto space-y-2 md:space-y-10">
+                        {slide.pretitle && (
+                          <p className="text-white/80 text-[8px] md:text-sm font-black tracking-[0.2em] md:tracking-[0.4em] uppercase animate-in fade-in slide-in-from-bottom-4 duration-700">
+                            {slide.pretitle}
+                          </p>
+                        )}
+                        {slide.title && (
+                          <h1 className="text-white text-xl sm:text-4xl md:text-6xl lg:text-8xl font-black mb-1 md:mb-4 leading-tight tracking-tighter animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-100">
+                            {slide.title}
+                          </h1>
+                        )}
+                        {slide.description && (
+                          <p className="text-slate-200 text-[10px] sm:text-lg md:text-2xl font-medium max-w-2xl leading-tight md:leading-relaxed mx-auto opacity-90 line-clamp-2 sm:line-clamp-none animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+                            {slide.description}
+                          </p>
+                        )}
+                        {slide.showActionButton && (
+                          <div className="pt-2 md:pt-10 animate-in fade-in zoom-in-95 duration-1000 delay-300">
+                            <Button asChild style={buttonStyle} className={`group relative overflow-hidden font-black shadow-2xl active:scale-95 border-none transition-all duration-500 ${buttonClasses}`}>
+                              <Link href="/store/shop">
+                                <span className="relative z-10 flex items-center gap-2 md:gap-4">
+                                  {heroBtnText}
+                                  <HeroBtnIcon className="h-3.5 w-3.5 md:h-5 md:w-5 transition-transform duration-300 group-hover:translate-x-2" strokeWidth={3}/>
+                                </span>
+                              </Link>
+                            </Button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
