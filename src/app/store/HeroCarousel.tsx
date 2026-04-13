@@ -228,6 +228,7 @@ export function HeroCarousel() {
                           className="w-full h-auto select-none block"
                           draggable={false}
                           priority={index === 0}
+                          unoptimized
                         />
                       )}
                     </>
