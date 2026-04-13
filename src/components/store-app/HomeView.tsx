@@ -212,13 +212,13 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                             </div>
                         ) : slides && slides.length > 0 ? (
                             slides.map((slide) => (
-                                <div key={slide.id} className="relative flex-[0_0_100%] min-w-0 group">
+                                <div key={slide.id} className="relative flex-[0_0_100%] min-w-0 group aspect-[16/10]">
                                     {slide.mediaType === 'video' && slide.videoUrl ? (
-                                        <div className="w-full overflow-hidden">
+                                        <div className="w-full h-full overflow-hidden">
                                             <video 
                                                 autoPlay muted loop playsInline 
                                                 poster={slide.videoPosterUrl || ''} 
-                                                className="w-full h-auto block"
+                                                className="w-full h-full object-cover block"
                                             >
                                                 <source src={slide.videoUrl} type="video/mp4" />
                                             </video>
@@ -226,7 +226,7 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                                     ) : (
                                         <img 
                                             alt={slide.title || 'Slide'} 
-                                            className="w-full h-auto block transition-transform duration-1000 group-hover:scale-105" 
+                                            className="w-full h-full object-cover block transition-transform duration-1000 group-hover:scale-105" 
                                             src={slide.imageUrl || 'https://placehold.co/800x500.png'} 
                                         />
                                     )}
