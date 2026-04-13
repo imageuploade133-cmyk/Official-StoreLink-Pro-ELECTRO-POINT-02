@@ -81,7 +81,7 @@ export function HeroCarousel() {
 
   if (isLoading) {
     return (
-      <div className="w-full aspect-[16/9] md:aspect-[21/7]">
+      <div className="w-full aspect-[21/7]">
         <Skeleton className="w-full h-full" />
       </div>
     );
@@ -89,7 +89,7 @@ export function HeroCarousel() {
 
   if (!slides || slides.length === 0) {
     return (
-      <section className="w-full aspect-[16/9] md:aspect-[21/7] bg-slate-900 flex items-center justify-center">
+      <section className="w-full aspect-[21/7] bg-slate-900 flex items-center justify-center">
         <div className="text-center text-white">
           <h2 className="text-3xl font-bold">Welcome to Our Store</h2>
           <p className="mt-2 text-slate-300">New content coming soon!</p>
@@ -112,7 +112,7 @@ export function HeroCarousel() {
             return (
               <div 
                 key={slide.id} 
-                className="relative flex-[0_0_100%] min-w-0 aspect-[16/9] md:aspect-[21/7]"
+                className="relative flex-[0_0_100%] min-w-0 aspect-[21/7]"
               >
                 <div className="relative z-0 w-full h-full">
                   {isLoaded ? (

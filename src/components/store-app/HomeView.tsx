@@ -207,12 +207,12 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                 <div className="overflow-hidden w-full" ref={emblaRef}>
                     <div className="flex embla__container">
                         {isLoadingSlides ? (
-                            <div className="flex-[0_0_100%] min-w-0 aspect-[16/9] md:aspect-[21/7]">
+                            <div className="flex-[0_0_100%] min-w-0 aspect-[21/7]">
                                 <Skeleton className="w-full h-full" />
                             </div>
                         ) : slides && slides.length > 0 ? (
                             slides.map((slide) => (
-                                <div key={slide.id} className="relative flex-[0_0_100%] min-w-0 group aspect-[16/9] md:aspect-[21/7]">
+                                <div key={slide.id} className="relative flex-[0_0_100%] min-w-0 group aspect-[21/7]">
                                     {slide.mediaType === 'video' && slide.videoUrl ? (
                                         <div className="w-full h-full overflow-hidden">
                                             <video
@@ -270,7 +270,7 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                                 </div>
                             ))
                         ) : (
-                            <div className="relative flex-[0_0_100%] min-w-0 aspect-[16/9] md:aspect-[21/7] flex items-end">
+                            <div className="relative flex-[0_0_100%] min-w-0 aspect-[21/7] flex items-end">
                                 <Image 
                                     alt="Default Banner" 
                                     className="absolute inset-0 w-full h-full object-cover" 
