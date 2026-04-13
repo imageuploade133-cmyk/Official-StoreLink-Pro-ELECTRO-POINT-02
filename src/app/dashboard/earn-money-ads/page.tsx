@@ -62,6 +62,7 @@ import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmati
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -453,57 +454,32 @@ export default function EarnMoneyAdsPage() {
       </Card>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>{editingAd ? 'Edit Ad Configuration' : 'Add New Ad Link'}</DialogTitle>
+        <DialogContent className="max-w-2xl w-[95vw] p-0 overflow-hidden flex flex-col max-h-[90vh]">
+          <DialogHeader className="p-6 pb-4 border-b">
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              {editingAd ? (
+                <div className="bg-primary/10 p-2 rounded-lg">
+                  <Edit className="h-5 w-5 text-primary" />
+                </div>
+              ) : (
+                <div className="bg-primary/10 p-2 rounded-lg">
+                  <PlusCircle className="h-5 w-5 text-primary" />
+                </div>
+              )}
+              {editingAd ? 'Edit Ad Configuration' : 'Add New Ad Link'}
+            </DialogTitle>
             <DialogDescription>
-              Configure how and where your ad link should be triggered.
+              Set up your monetization strategy by configuring how ads appear to your store visitors.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-6 py-4">
-            {adForm.adType === 'banner' ? (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="adScript">Ad Script Code</Label>
-                  <Textarea 
-                    id="adScript" 
-                    placeholder="Paste your ad script code here..." 
-                    value={adForm.adScript} 
-                    onChange={e => setAdForm(prev => ({...prev, adScript: e.target.value}))} 
-                    className="font-mono text-xs h-32"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="bannerLocation">Banner Location</Label>
-                  <Select value={adForm.bannerLocation} onValueChange={(v: any) => setAdForm(prev => ({...prev, bannerLocation: v}))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select where to show the banner" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="top_of_page">Top of Page</SelectItem>
-                      <SelectItem value="bottom_of_page">Bottom of Page</SelectItem>
-                      <SelectItem value="sidebar">Sidebar</SelectItem>
-                      <SelectItem value="product_details">Product Details Page</SelectItem>
-                      <SelectItem value="after_first_row">After First Row of Products</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </>
-            ) : (
-              <div className="space-y-2">
-                <Label htmlFor="adLink">Ad Link (URL)</Label>
-                <Input 
-                  id="adLink" 
-                  placeholder="https://your-ad-network.com/link" 
-                  value={adForm.adLink} 
-                  onChange={e => setAdForm(prev => ({...prev, adLink: e.target.value}))} 
-                />
-              </div>
-            )}
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-3">
-                <Label>Ad Type</Label>
+          <ScrollArea className="flex-1 px-6">
+            <div className="space-y-8 py-6">
+              {/* Ad Format Section */}
+              <div className="space-y-4">
+                <Label className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                  <Layout className="h-4 w-4" /> Ad Format & Type
+                </Label>
                 <RadioGroup 
                   value={adForm.adType} 
                   onValueChange={(v: any) => {
@@ -515,120 +491,218 @@ export default function EarnMoneyAdsPage() {
                     }
                     setAdForm(prev => ({...prev, ...updates}));
                   }}
-                  className="flex flex-col gap-2"
+                  className="grid grid-cols-1 sm:grid-cols-3 gap-3"
                 >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="background" id="bg" />
-                    <Label htmlFor="bg" className="cursor-pointer">Background (Silent)</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="reward" id="rew" />
-                    <Label htmlFor="rew" className="cursor-pointer">Reward (Discount)</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="banner" id="banner" />
-                    <Label htmlFor="banner" className="cursor-pointer">Banner (Script)</Label>
-                  </div>
+                  <Label
+                    htmlFor="bg"
+                    className={cn(
+                      "flex flex-col items-center justify-between rounded-xl border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer transition-all",
+                      adForm.adType === "background" && "border-primary bg-primary/5"
+                    )}
+                  >
+                    <RadioGroupItem value="background" id="bg" className="sr-only" />
+                    <Settings2 className={cn("mb-2 h-6 w-6", adForm.adType === "background" ? "text-primary" : "text-indigo-600")} />
+                    <span className="text-xs font-bold uppercase">Background</span>
+                    <span className="text-[10px] text-muted-foreground mt-1 text-center">Automated Click</span>
+                  </Label>
+
+                  <Label
+                    htmlFor="rew"
+                    className={cn(
+                      "flex flex-col items-center justify-between rounded-xl border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer transition-all",
+                      adForm.adType === "reward" && "border-primary bg-primary/5"
+                    )}
+                  >
+                    <RadioGroupItem value="reward" id="rew" className="sr-only" />
+                    <Gift className={cn("mb-2 h-6 w-6", adForm.adType === "reward" ? "text-primary" : "text-amber-600")} />
+                    <span className="text-xs font-bold uppercase">Reward</span>
+                    <span className="text-[10px] text-muted-foreground mt-1 text-center">Discount Incentive</span>
+                  </Label>
+
+                  <Label
+                    htmlFor="banner"
+                    className={cn(
+                      "flex flex-col items-center justify-between rounded-xl border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer transition-all",
+                      adForm.adType === "banner" && "border-primary bg-primary/5"
+                    )}
+                  >
+                    <RadioGroupItem value="banner" id="banner" className="sr-only" />
+                    <Monitor className={cn("mb-2 h-6 w-6", adForm.adType === "banner" ? "text-primary" : "text-blue-600")} />
+                    <span className="text-xs font-bold uppercase">Banner</span>
+                    <span className="text-[10px] text-muted-foreground mt-1 text-center">Custom Script</span>
+                  </Label>
                 </RadioGroup>
               </div>
 
-              <div className="space-y-3">
-                <Label>Device Targeting</Label>
-                <Select value={adForm.deviceTargeting} onValueChange={(v: any) => setAdForm(prev => ({...prev, deviceTargeting: v}))}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Devices</SelectItem>
-                    <SelectItem value="mobile_only">Mobile Only</SelectItem>
-                    <SelectItem value="desktop_only">Desktop Only</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {adForm.adType === 'reward' && (
-              <div className="bg-amber-50 p-4 rounded-lg border border-amber-100 space-y-4">
-                <div className="flex items-center gap-2 text-amber-800 font-bold text-sm">
-                  <Gift className="h-4 w-4" /> Reward Settings
-                </div>
-                <div className="grid grid-cols-2 gap-4">
+              {/* Ad Source Section */}
+              <div className="space-y-4">
+                <Label className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                  <ExternalLink className="h-4 w-4" /> Ad Source
+                </Label>
+                {adForm.adType === 'banner' ? (
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="adScript" className="text-xs">Ad Script Code</Label>
+                      <Textarea 
+                        id="adScript" 
+                        placeholder="Paste your ad script code here..." 
+                        value={adForm.adScript} 
+                        onChange={e => setAdForm(prev => ({...prev, adScript: e.target.value}))} 
+                        className="font-mono text-xs h-32 bg-muted/30"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="bannerLocation" className="text-xs">Display Location</Label>
+                      <Select value={adForm.bannerLocation} onValueChange={(v: any) => setAdForm(prev => ({...prev, bannerLocation: v}))}>
+                        <SelectTrigger className="h-11">
+                          <SelectValue placeholder="Select where to show the banner" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="top_of_page">Top of Page</SelectItem>
+                          <SelectItem value="bottom_of_page">Bottom of Page</SelectItem>
+                          <SelectItem value="sidebar">Sidebar</SelectItem>
+                          <SelectItem value="product_details">Product Details Page</SelectItem>
+                          <SelectItem value="after_first_row">After First Row of Products</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                ) : (
                   <div className="space-y-2">
-                    <Label>Discount Type</Label>
-                    <Select value={adForm.rewardDiscountType} onValueChange={(v: any) => setAdForm(prev => ({...prev, rewardDiscountType: v}))}>
-                      <SelectTrigger>
+                    <Label htmlFor="adLink" className="text-xs">Target Destination (URL)</Label>
+                    <div className="relative">
+                      <ExternalLink className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                      <Input 
+                        id="adLink" 
+                        className="pl-10 h-11"
+                        placeholder="https://your-ad-network.com/link" 
+                        value={adForm.adLink} 
+                        onChange={e => setAdForm(prev => ({...prev, adLink: e.target.value}))} 
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Reward Settings (Conditional) */}
+              {adForm.adType === 'reward' && (
+                <div className="bg-amber-50 dark:bg-amber-950/20 p-4 rounded-xl border border-amber-100 dark:border-amber-900/50 space-y-4 animate-in fade-in slide-in-from-top-2">
+                  <div className="flex items-center gap-2 text-amber-800 dark:text-amber-400 font-bold text-sm">
+                    <Gift className="h-4 w-4" /> Reward Configuration
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-xs">Discount Type</Label>
+                      <Select value={adForm.rewardDiscountType} onValueChange={(v: any) => setAdForm(prev => ({...prev, rewardDiscountType: v}))}>
+                        <SelectTrigger className="bg-background">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="percentage">Percentage (%)</SelectItem>
+                          <SelectItem value="fixed">Fixed Amount</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Reward Value</Label>
+                      <Input 
+                        type="number" 
+                        className="bg-background"
+                        value={adForm.rewardDiscountValue} 
+                        onChange={e => setAdForm(prev => ({...prev, rewardDiscountValue: Number(e.target.value)}))} 
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Delivery Rules Section */}
+              <div className="space-y-4">
+                <Label className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                  <Smartphone className="h-4 w-4" /> Delivery & Targeting
+                </Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label className="text-xs">Device Targeting</Label>
+                    <Select value={adForm.deviceTargeting} onValueChange={(v: any) => setAdForm(prev => ({...prev, deviceTargeting: v}))}>
+                      <SelectTrigger className="h-11">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="percentage">Percentage (%)</SelectItem>
-                        <SelectItem value="fixed">Fixed Amount</SelectItem>
+                        <SelectItem value="all">All Devices</SelectItem>
+                        <SelectItem value="mobile_only">Mobile Only</SelectItem>
+                        <SelectItem value="desktop_only">Desktop Only</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Value</Label>
-                    <Input 
-                      type="number" 
-                      value={adForm.rewardDiscountValue} 
-                      onChange={e => setAdForm(prev => ({...prev, rewardDiscountValue: Number(e.target.value)}))} 
-                    />
+                    <Label className="text-xs">Trigger Placement</Label>
+                    <Select value={adForm.placement} onValueChange={(v: any) => setAdForm(prev => ({...prev, placement: v}))}>
+                      <SelectTrigger className="h-11">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="page_visit" disabled={adForm.adType === 'reward' || adForm.adType === 'banner'}>Page Visit</SelectItem>
+                        <SelectItem value="click_anywhere" disabled={adForm.adType === 'reward' || adForm.adType === 'banner'}>Click Anywhere</SelectItem>
+                        <SelectItem value="add_to_cart" disabled={adForm.adType === 'reward' || adForm.adType === 'banner'}>Add to Cart</SelectItem>
+                        <SelectItem value="checkout_start" disabled={adForm.adType === 'reward' || adForm.adType === 'banner'}>Checkout Start</SelectItem>
+                        <SelectItem value="reward_button" disabled={adForm.adType === 'banner'}>Reward Button Only</SelectItem>
+                        <SelectItem value="banner" disabled={adForm.adType !== 'banner'}>Banner Slot</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
-              </div>
-            )}
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Placement</Label>
-                <Select value={adForm.placement} onValueChange={(v: any) => setAdForm(prev => ({...prev, placement: v}))}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="page_visit" disabled={adForm.adType === 'reward' || adForm.adType === 'banner'}>Page Visit</SelectItem>
-                    <SelectItem value="click_anywhere" disabled={adForm.adType === 'reward' || adForm.adType === 'banner'}>Click Anywhere</SelectItem>
-                    <SelectItem value="add_to_cart" disabled={adForm.adType === 'reward' || adForm.adType === 'banner'}>Add to Cart</SelectItem>
-                    <SelectItem value="checkout_start" disabled={adForm.adType === 'reward' || adForm.adType === 'banner'}>Checkout Start</SelectItem>
-                    <SelectItem value="reward_button" disabled={adForm.adType === 'banner'}>Reward Button Only</SelectItem>
-                    <SelectItem value="banner" disabled={adForm.adType !== 'banner'}>Banner Slot</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Frequency</Label>
-                <div className="flex gap-2">
-                  <Select value={adForm.frequency} onValueChange={(v: any) => setAdForm(prev => ({...prev, frequency: v}))}>
-                    <SelectTrigger className="flex-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="once_per_session">Once Per Session</SelectItem>
-                      <SelectItem value="every_time">Every Time</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="space-y-2">
+                  <Label className="text-xs">Frequency Strategy</Label>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Select value={adForm.frequency} onValueChange={(v: any) => setAdForm(prev => ({...prev, frequency: v}))}>
+                      <SelectTrigger className="flex-1 h-11">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="once_per_session">Once Per Session</SelectItem>
+                        <SelectItem value="every_time">Every Time</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    {adForm.adType === 'background' && (
+                      <div className="flex items-center gap-2">
+                        <div className="relative flex-1 sm:w-32">
+                          <Input 
+                            type="number" 
+                            className="h-11 pr-10"
+                            placeholder="7" 
+                            value={adForm.frequencyTime} 
+                            onChange={e => setAdForm(prev => ({...prev, frequencyTime: Number(e.target.value)}))} 
+                            min={1}
+                          />
+                          <span className="absolute right-3 top-3 text-[10px] font-bold text-muted-foreground">SEC</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   {adForm.adType === 'background' && (
-                    <div className="w-24">
-                      <Input 
-                        type="number" 
-                        placeholder="Secs" 
-                        value={adForm.frequencyTime} 
-                        onChange={e => setAdForm(prev => ({...prev, frequencyTime: Number(e.target.value)}))} 
-                        min={1}
-                      />
-                    </div>
+                    <p className="text-[10px] text-primary font-medium flex items-center gap-1 mt-1">
+                      <Clock className="h-3 w-3" /> Auto-click will trigger every {adForm.frequencyTime}s
+                    </p>
                   )}
                 </div>
-                {adForm.adType === 'background' && (
-                  <p className="text-[10px] text-muted-foreground mt-1">Auto-click every {adForm.frequencyTime}s</p>
-                )}
               </div>
             </div>
-          </div>
-          <DialogFooter>
-            <DialogClose asChild><Button variant="outline">Cancel</Button></DialogClose>
-            <Button onClick={handleSaveAd} disabled={isSaving || !adForm.adLink}>
-              {isSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <DollarSign className="h-4 w-4 mr-2" />}
-              {editingAd ? 'Update Ad' : 'Activate Ad'}
+          </ScrollArea>
+
+          <DialogFooter className="p-6 pt-4 border-t bg-muted/10 flex flex-col sm:flex-row gap-2">
+            <DialogClose asChild>
+              <Button variant="ghost" className="font-bold order-2 sm:order-1">Cancel</Button>
+            </DialogClose>
+            <Button 
+              onClick={handleSaveAd} 
+              disabled={isSaving || (adForm.adType === 'banner' ? !adForm.adScript : !adForm.adLink)}
+              className="px-8 font-black shadow-lg shadow-primary/20 gap-2 h-11 order-1 sm:order-2"
+            >
+              {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+              {editingAd ? 'Update Ad Configuration' : 'Activate & Save Ad'}
             </Button>
           </DialogFooter>
         </DialogContent>
