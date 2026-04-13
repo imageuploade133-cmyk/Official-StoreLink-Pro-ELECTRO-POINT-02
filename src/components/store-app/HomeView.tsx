@@ -183,10 +183,15 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
 
     useEffect(() => {
         if (!emblaApi) return;
-        onSelect();
-        setScrollSnaps(emblaApi.scrollSnapList());
+        
+        const onInit = () => {
+            setScrollSnaps(emblaApi.scrollSnapList());
+            onSelect();
+        };
+
+        onInit();
         emblaApi.on('select', onSelect);
-        emblaApi.on('reInit', onSelect);
+        emblaApi.on('reInit', onInit);
     }, [emblaApi, onSelect]);
 
     const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
@@ -207,58 +212,60 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                             </div>
                         ) : slides && slides.length > 0 ? (
                             slides.map((slide) => (
-                                <div key={slide.id} className="relative flex-[0_0_100%] min-w-0 aspect-[16/10] flex items-end group">
+                                <div key={slide.id} className="relative flex-[0_0_100%] min-w-0 group">
                                     {slide.mediaType === 'video' && slide.videoUrl ? (
-                                        <video 
-                                            autoPlay muted loop playsInline 
-                                            poster={slide.videoPosterUrl || ''} 
-                                            className="absolute inset-0 w-full h-full object-cover"
-                                        >
-                                            <source src={slide.videoUrl} type="video/mp4" />
-                                        </video>
+                                        <div className="w-full overflow-hidden">
+                                            <video 
+                                                autoPlay muted loop playsInline 
+                                                poster={slide.videoPosterUrl || ''} 
+                                                className="w-full h-auto block"
+                                            >
+                                                <source src={slide.videoUrl} type="video/mp4" />
+                                            </video>
+                                        </div>
                                     ) : (
-                                        <Image 
+                                        <img 
                                             alt={slide.title || 'Slide'} 
-                                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
+                                            className="w-full h-auto block transition-transform duration-1000 group-hover:scale-105" 
                                             src={slide.imageUrl || 'https://placehold.co/800x500.png'} 
-                                            fill
-                                            unoptimized
                                         />
                                     )}
                                     
-                                    {slide.showOverlay !== false && (
-                                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
-                                    )}
+                                    <div className="absolute inset-0 flex items-end">
+                                        {slide.showOverlay !== false && (
+                                            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
+                                        )}
 
-                                    <div className="relative p-8 w-full space-y-3 z-10">
-                                        {slide.pretitle && (
-                                            <span className="inline-block px-4 py-1.5 text-[8px] font-black uppercase tracking-[0.3em] bg-primary text-white rounded-full shadow-2xl border border-white/20 animate-pulse">
-                                                {slide.pretitle}
-                                            </span>
-                                        )}
-                                        {slide.title && (
-                                            <h2 className="text-3xl font-black text-white leading-none tracking-tighter uppercase whitespace-pre-line">
-                                                {slide.title}
-                                            </h2>
-                                        )}
-                                        {slide.description && (
-                                            <p className="text-slate-200 text-sm font-medium opacity-90 max-w-[240px] leading-relaxed line-clamp-2">
-                                                {slide.description}
-                                            </p>
-                                        )}
-                                        {slide.showActionButton && (
-                                            <div className="pt-2">
-                                                <Button 
-                                                    asChild 
-                                                    size="sm" 
-                                                    variant="secondary" 
-                                                    style={heroButtonStyle}
-                                                    className="rounded-full font-black uppercase text-[8px] tracking-widest px-6 h-8 bg-white text-slate-950 hover:bg-primary hover:text-white transition-all shadow-xl active:scale-90 border-none"
-                                                >
-                                                    <Link href="/store/shop">{heroButtonText}</Link>
-                                                </Button>
-                                            </div>
-                                        )}
+                                        <div className="relative p-8 w-full space-y-3 z-10">
+                                            {slide.pretitle && (
+                                                <span className="inline-block px-4 py-1.5 text-[8px] font-black uppercase tracking-[0.3em] bg-primary text-white rounded-full shadow-2xl border border-white/20 animate-pulse">
+                                                    {slide.pretitle}
+                                                </span>
+                                            )}
+                                            {slide.title && (
+                                                <h2 className="text-3xl font-black text-white leading-none tracking-tighter uppercase whitespace-pre-line">
+                                                    {slide.title}
+                                                </h2>
+                                            )}
+                                            {slide.description && (
+                                                <p className="text-slate-200 text-sm font-medium opacity-90 max-w-[240px] leading-relaxed line-clamp-2">
+                                                    {slide.description}
+                                                </p>
+                                            )}
+                                            {slide.showActionButton && (
+                                                <div className="pt-2">
+                                                    <Button 
+                                                        asChild 
+                                                        size="sm" 
+                                                        variant="secondary" 
+                                                        style={heroButtonStyle}
+                                                        className="rounded-full font-black uppercase text-[8px] tracking-widest px-6 h-8 bg-white text-slate-950 hover:bg-primary hover:text-white transition-all shadow-xl active:scale-90 border-none"
+                                                    >
+                                                        <Link href="/store/shop">{heroButtonText}</Link>
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             ))

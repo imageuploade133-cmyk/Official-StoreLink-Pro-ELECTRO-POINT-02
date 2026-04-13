@@ -59,13 +59,19 @@ function HubHero({ slides, settings }: { slides: SlideShow[], settings: any }) {
 
     useEffect(() => {
         if (!emblaApi) return;
-        updateSlidesInView();
-        emblaApi.on('select', updateSlidesInView);
-        emblaApi.on('reInit', updateSlidesInView);
+        
+        const onInit = () => {
+            updateSlidesInView();
+        };
+
+        onInit();
+        emblaApi.on('select', onInit);
+        emblaApi.on('reInit', onInit);
         emblaApi.on('slidesInView', updateSlidesInView);
         return () => {
             if (emblaApi) {
-                emblaApi.off('select', updateSlidesInView);
+                emblaApi.off('select', onInit);
+                emblaApi.off('reInit', onInit);
                 emblaApi.off('slidesInView', updateSlidesInView);
             }
         };
@@ -140,19 +146,19 @@ function HubHero({ slides, settings }: { slides: SlideShow[], settings: any }) {
 
                     return (
                         <div key={slide.id} className="relative flex-[0_0_100%] min-w-0">
-                            <div className="aspect-video max-h-[600px] relative w-full">
+                            <div className="relative w-full">
                                 {isLoaded ? (
                                     <>
                                         {slide.mediaType === 'video' && slide.videoUrl ? (
-                                            <video autoPlay muted loop playsInline poster={slide.videoPosterUrl || ''} className="w-full h-full object-cover">
+                                            <video autoPlay muted loop playsInline poster={slide.videoPosterUrl || ''} className="w-full h-auto block">
                                                 <source src={slide.videoUrl} type="video/mp4" />
                                             </video>
                                         ) : (
-                                            <Image src={slide.imageUrl || ''} alt="" fill className="object-cover" />
+                                            <img src={slide.imageUrl || ''} alt="" className="w-full h-auto block" />
                                         )}
                                     </>
                                 ) : (
-                                    <div className="w-full h-full bg-slate-900" />
+                                    <div className="aspect-video w-full bg-slate-900" />
                                 )}
                                 {slide.showOverlay && <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />}
                                 

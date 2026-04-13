@@ -81,14 +81,20 @@ export function HeroCarousel() {
 
   useEffect(() => {
     if (!emblaApi) return;
-    onSelect();
-    setScrollSnaps(emblaApi.scrollSnapList());
+
+    const onInit = () => {
+      setScrollSnaps(emblaApi.scrollSnapList());
+      onSelect();
+    };
+
+    onInit();
     emblaApi.on('select', onSelect);
-    emblaApi.on('reInit', onSelect);
+    emblaApi.on('reInit', onInit);
     emblaApi.on('slidesInView', updateSlidesInView);
     return () => {
         if (emblaApi) {
           emblaApi.off('select', onSelect);
+          emblaApi.off('reInit', onInit);
           emblaApi.off('slidesInView', updateSlidesInView);
         }
     };
@@ -205,7 +211,7 @@ export function HeroCarousel() {
                   {isLoaded ? (
                     <>
                       {slide.mediaType === 'video' && slide.videoUrl ? (
-                        <div className="aspect-video w-full overflow-hidden">
+                        <div className="w-full overflow-hidden">
                           <video
                             key={slide.id}
                             autoPlay
@@ -213,22 +219,17 @@ export function HeroCarousel() {
                             loop
                             playsInline
                             poster={slide.videoPosterUrl || ''}
-                            className="w-full h-full object-cover"
+                            className="w-full h-auto block"
                           >
                             <source src={slide.videoUrl} type="video/mp4" />
                           </video>
                         </div>
                       ) : (
-                        <Image
+                        <img
                           src={slide.imageUrl || 'https://placehold.co/1920x1080.png'}
                           alt={slide.title || 'Slide background'}
-                          width={1920}
-                          height={800}
-                          sizes="100vw"
                           className="w-full h-auto select-none block"
                           draggable={false}
-                          priority={index === 0}
-                          unoptimized
                         />
                       )}
                     </>
