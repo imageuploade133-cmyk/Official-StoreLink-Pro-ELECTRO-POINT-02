@@ -145,7 +145,7 @@ function HubHero({ slides, settings }: { slides: SlideShow[], settings: any }) {
                                    (index === slides.length - 1 && slidesInView.includes(0));
 
                     return (
-                        <div key={slide.id} className="relative flex-[0_0_100%] min-w-0 aspect-[16/9] md:aspect-[21/7]">
+                        <div key={slide.id} className="relative flex-[0_0_100%] min-w-0 aspect-[21/7]">
                             <div className="relative w-full h-full">
                                 {isLoaded ? (
                                     <>
