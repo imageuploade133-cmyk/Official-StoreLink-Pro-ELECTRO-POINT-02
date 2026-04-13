@@ -7,6 +7,7 @@ import { PublicPageSkeleton } from '@/components/store/PublicPageSkeleton';
 import { useSettings } from '@/contexts/settings-context';
 import { BackgroundVideoPlayer } from '@/components/store/BackgroundVideoPlayer';
 import { AdSystem } from '@/components/store/AdSystem';
+import { BannerAd } from '@/components/ads/BannerAd';
 import { useEffect } from 'react';
 import { useFirestore } from '@/firebase';
 import { doc, runTransaction, increment } from 'firebase/firestore';
@@ -90,7 +91,11 @@ export default function PublicLayout({
       {settings?.backgroundStyle === 'video' && settings.backgroundVideoUrl && <BackgroundVideoPlayer />}
       <PublicNavbar />
       
-      <main className="relative z-10 dark:bg-black" style={{ paddingTop: navbarSticky !== 'static' ? `${navbarHeight}px` : '0px' }}>{children}</main>
+      <main className="relative z-10 dark:bg-black" style={{ paddingTop: navbarSticky !== 'static' ? `${navbarHeight}px` : '0px' }}>
+        <BannerAd location="top_of_page" />
+        {children}
+        <BannerAd location="bottom_of_page" />
+      </main>
 
       <PublicFooter />
     </>

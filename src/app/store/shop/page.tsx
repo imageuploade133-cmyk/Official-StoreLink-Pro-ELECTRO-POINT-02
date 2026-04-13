@@ -25,6 +25,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, ChevronLeft, ChevronRight, RotateCcw, PackageSearch, Sparkles, Loader2 } from 'lucide-react';
 import { ProductCardSkeleton } from '@/components/store/ProductCardSkeleton';
+import { BannerAd } from '@/components/ads/BannerAd';
 import { cn } from '@/lib/utils';
 
 const ITEMS_PER_PAGE = 12;
@@ -322,7 +323,9 @@ function ShopPageContent() {
                 </div>
             </header>
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-8 sm:mb-12">
+                <div className="flex flex-col lg:flex-row gap-8">
+                    <div className="flex-1">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-8 sm:mb-12">
                     <form onSubmit={handleSearchSubmit} className="relative w-full sm:max-w-xs">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground flex-shrink-0 z-10" />
                         <Input
@@ -474,6 +477,12 @@ function ShopPageContent() {
                         </Button>
                     </div>
                 )}
+                    </div>
+                    {/* Sidebar for Ads */}
+                    <aside className="hidden lg:block w-64 flex-shrink-0">
+                        <BannerAd location="sidebar" className="sticky top-24" />
+                    </aside>
+                </div>
             </main>
         </div>
     );

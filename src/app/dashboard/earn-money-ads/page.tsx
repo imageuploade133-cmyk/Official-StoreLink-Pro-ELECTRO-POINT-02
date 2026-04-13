@@ -61,6 +61,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from '@/components/ui/skeleton';
+import { Textarea } from '@/components/ui/textarea';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -88,6 +89,8 @@ export default function EarnMoneyAdsPage() {
 
   const [adForm, setAdForm] = useState<Partial<AdLink>>({
     adLink: '',
+    adScript: '',
+    bannerLocation: 'none',
     adType: 'background',
     status: 'active',
     placement: 'page_visit',
@@ -172,6 +175,8 @@ export default function EarnMoneyAdsPage() {
     setEditingAd(null);
     setAdForm({
       adLink: '',
+      adScript: '',
+      bannerLocation: 'none',
       adType: 'background',
       status: 'active',
       placement: 'page_visit',
@@ -187,7 +192,9 @@ export default function EarnMoneyAdsPage() {
   const handleOpenEditModal = (ad: AdLink) => {
     setEditingAd(ad);
     setAdForm({
-      adLink: ad.adLink,
+      adLink: ad.adLink || '',
+      adScript: ad.adScript || '',
+      bannerLocation: ad.bannerLocation || 'none',
       adType: ad.adType,
       status: ad.status,
       placement: ad.placement,
@@ -201,7 +208,7 @@ export default function EarnMoneyAdsPage() {
   };
 
   const handleSaveAd = async () => {
-    if (!firestore || !adForm.adLink) return;
+    if (!firestore || (!adForm.adLink && !adForm.adScript)) return;
     setIsSaving(true);
     try {
       const payload = {
@@ -272,7 +279,7 @@ export default function EarnMoneyAdsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <Card className="bg-primary/5 border-primary/10 shadow-none">
           <CardHeader className="pb-2">
             <CardTitle className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center justify-between">
@@ -316,6 +323,17 @@ export default function EarnMoneyAdsPage() {
             {isLoadingAds ? <Skeleton className="h-8 w-12" /> : <div className="text-2xl font-black text-indigo-600">{ads.filter(a => a.adType === 'background').length}</div>}
           </CardContent>
         </Card>
+
+        <Card className="bg-blue-50 border-blue-100 shadow-none">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-blue-600 flex items-center justify-between">
+                Banner Ads <Monitor className="h-3.5 w-3.5" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoadingAds ? <Skeleton className="h-8 w-12" /> : <div className="text-2xl font-black text-blue-600">{ads.filter(a => a.adType === 'banner').length}</div>}
+          </CardContent>
+        </Card>
       </div>
 
       <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
@@ -355,10 +373,16 @@ export default function EarnMoneyAdsPage() {
                     <TableCell className="pl-6">
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">
-                          <code className="text-xs text-muted-foreground truncate max-w-[200px]">{ad.adLink}</code>
-                          <a href={ad.adLink} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline"><ExternalLink className="h-3 w-3" /></a>
+                          {ad.adType === 'banner' ? (
+                            <code className="text-[10px] text-muted-foreground truncate max-w-[200px]">Script Embedded</code>
+                          ) : (
+                            <>
+                              <code className="text-xs text-muted-foreground truncate max-w-[200px]">{ad.adLink}</code>
+                              <a href={ad.adLink} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline"><ExternalLink className="h-3 w-3" /></a>
+                            </>
+                          )}
                         </div>
-                        <Badge variant={ad.adType === 'reward' ? 'outline' : 'secondary'} className="w-fit text-[10px] font-bold uppercase">
+                        <Badge variant={ad.adType === 'reward' ? 'outline' : ad.adType === 'banner' ? 'default' : 'secondary'} className="w-fit text-[10px] font-bold uppercase">
                           {ad.adType}
                         </Badge>
                       </div>
@@ -366,7 +390,7 @@ export default function EarnMoneyAdsPage() {
                     <TableCell>
                       <div className="flex items-center gap-2 text-xs font-medium capitalize">
                         <MousePointerClick className="h-3 w-3 text-muted-foreground" />
-                        {ad.placement.replace('_', ' ')}
+                        {ad.adType === 'banner' ? ad.bannerLocation?.replace(/_/g, ' ') : ad.placement.replace('_', ' ')}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -437,22 +461,60 @@ export default function EarnMoneyAdsPage() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-6 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="adLink">Ad Link (URL)</Label>
-              <Input 
-                id="adLink" 
-                placeholder="https://your-ad-network.com/link" 
-                value={adForm.adLink} 
-                onChange={e => setAdForm(prev => ({...prev, adLink: e.target.value}))} 
-              />
-            </div>
+            {adForm.adType === 'banner' ? (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="adScript">Ad Script Code</Label>
+                  <Textarea 
+                    id="adScript" 
+                    placeholder="Paste your ad script code here..." 
+                    value={adForm.adScript} 
+                    onChange={e => setAdForm(prev => ({...prev, adScript: e.target.value}))} 
+                    className="font-mono text-xs h-32"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="bannerLocation">Banner Location</Label>
+                  <Select value={adForm.bannerLocation} onValueChange={(v: any) => setAdForm(prev => ({...prev, bannerLocation: v}))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select where to show the banner" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="top_of_page">Top of Page</SelectItem>
+                      <SelectItem value="bottom_of_page">Bottom of Page</SelectItem>
+                      <SelectItem value="sidebar">Sidebar</SelectItem>
+                      <SelectItem value="product_details">Product Details Page</SelectItem>
+                      <SelectItem value="after_first_row">After First Row of Products</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
+            ) : (
+              <div className="space-y-2">
+                <Label htmlFor="adLink">Ad Link (URL)</Label>
+                <Input 
+                  id="adLink" 
+                  placeholder="https://your-ad-network.com/link" 
+                  value={adForm.adLink} 
+                  onChange={e => setAdForm(prev => ({...prev, adLink: e.target.value}))} 
+                />
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-3">
                 <Label>Ad Type</Label>
                 <RadioGroup 
                   value={adForm.adType} 
-                  onValueChange={(v: any) => setAdForm(prev => ({...prev, adType: v}))}
+                  onValueChange={(v: any) => {
+                    const updates: Partial<AdLink> = { adType: v };
+                    if (v === 'banner') {
+                      updates.placement = 'banner';
+                    } else if (adForm.placement === 'banner') {
+                      updates.placement = 'page_visit';
+                    }
+                    setAdForm(prev => ({...prev, ...updates}));
+                  }}
                   className="flex flex-col gap-2"
                 >
                   <div className="flex items-center space-x-2">
@@ -462,6 +524,10 @@ export default function EarnMoneyAdsPage() {
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="reward" id="rew" />
                     <Label htmlFor="rew" className="cursor-pointer">Reward (Discount)</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="banner" id="banner" />
+                    <Label htmlFor="banner" className="cursor-pointer">Banner (Script)</Label>
                   </div>
                 </RadioGroup>
               </div>
@@ -519,11 +585,12 @@ export default function EarnMoneyAdsPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="page_visit" disabled={adForm.adType === 'reward'}>Page Visit</SelectItem>
-                    <SelectItem value="click_anywhere" disabled={adForm.adType === 'reward'}>Click Anywhere</SelectItem>
-                    <SelectItem value="add_to_cart" disabled={adForm.adType === 'reward'}>Add to Cart</SelectItem>
-                    <SelectItem value="checkout_start" disabled={adForm.adType === 'reward'}>Checkout Start</SelectItem>
-                    <SelectItem value="reward_button">Reward Button Only</SelectItem>
+                    <SelectItem value="page_visit" disabled={adForm.adType === 'reward' || adForm.adType === 'banner'}>Page Visit</SelectItem>
+                    <SelectItem value="click_anywhere" disabled={adForm.adType === 'reward' || adForm.adType === 'banner'}>Click Anywhere</SelectItem>
+                    <SelectItem value="add_to_cart" disabled={adForm.adType === 'reward' || adForm.adType === 'banner'}>Add to Cart</SelectItem>
+                    <SelectItem value="checkout_start" disabled={adForm.adType === 'reward' || adForm.adType === 'banner'}>Checkout Start</SelectItem>
+                    <SelectItem value="reward_button" disabled={adForm.adType === 'banner'}>Reward Button Only</SelectItem>
+                    <SelectItem value="banner" disabled={adForm.adType !== 'banner'}>Banner Slot</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
