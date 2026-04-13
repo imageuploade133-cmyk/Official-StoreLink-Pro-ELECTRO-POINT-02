@@ -173,15 +173,15 @@ export function HeroCarousel() {
 
   if (isLoading) {
     return (
-      <div className="max-w-site-container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <Skeleton className="aspect-video w-full rounded-3xl" />
+      <div className="w-full aspect-[16/12] sm:aspect-[16/9] md:aspect-[21/9] lg:aspect-[21/7]">
+        <Skeleton className="w-full h-full" />
       </div>
     );
   }
 
   if (!slides || slides.length === 0) {
     return (
-      <section className="aspect-video w-full bg-slate-900 flex items-center justify-center">
+      <section className="w-full aspect-[16/12] sm:aspect-[16/9] md:aspect-[21/9] lg:aspect-[21/7] bg-slate-900 flex items-center justify-center">
         <div className="text-center text-white p-6">
           <h2 className="text-4xl font-black">Welcome to Our Store</h2>
           <p className="mt-4 text-slate-300 text-lg">New premium content coming soon!</p>
@@ -204,14 +204,14 @@ export function HeroCarousel() {
             return (
               <div 
                 key={slide.id} 
-                className="relative flex-[0_0_100%] min-w-0"
+                className="relative flex-[0_0_100%] min-w-0 aspect-[16/12] sm:aspect-[16/9] md:aspect-[21/9] lg:aspect-[21/7]"
               >
                 {/* Proportional Media Container */}
-                <div className="relative z-0 w-full">
+                <div className="relative z-0 w-full h-full">
                   {isLoaded ? (
                     <>
                       {slide.mediaType === 'video' && slide.videoUrl ? (
-                        <div className="w-full overflow-hidden">
+                        <div className="w-full h-full overflow-hidden">
                           <video
                             key={slide.id}
                             autoPlay
@@ -219,7 +219,7 @@ export function HeroCarousel() {
                             loop
                             playsInline
                             poster={slide.videoPosterUrl || ''}
-                            className="w-full h-auto block"
+                            className="w-full h-full object-cover block"
                           >
                             <source src={slide.videoUrl} type="video/mp4" />
                           </video>
@@ -228,13 +228,13 @@ export function HeroCarousel() {
                         <img
                           src={slide.imageUrl || 'https://placehold.co/1920x1080.png'}
                           alt={slide.title || 'Slide background'}
-                          className="w-full h-auto select-none block"
+                          className="w-full h-full object-cover select-none block"
                           draggable={false}
                         />
                       )}
                     </>
                   ) : (
-                    <div className="aspect-video w-full bg-slate-900 flex items-center justify-center">
+                    <div className="w-full h-full bg-slate-900 flex items-center justify-center">
                        <Skeleton className="w-full h-full bg-slate-800" />
                     </div>
                   )}
