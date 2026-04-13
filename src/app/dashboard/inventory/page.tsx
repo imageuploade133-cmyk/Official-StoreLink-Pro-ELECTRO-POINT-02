@@ -11,7 +11,8 @@ import {
   ChevronLeft, 
   ChevronRight, 
   RotateCcw,
-  Copy 
+  Copy,
+  Share2 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/PageHeader';
@@ -51,6 +52,9 @@ import { useAuth } from '@/contexts/auth-context';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
 import { AdvancedPagination } from '@/components/pagination/AdvancedPagination';
+import { Switch } from '@/components/ui/switch';
+import { saveGlobalSettings } from '@/firebase/firestore/settings';
+import { Label } from '@/components/ui/label';
 
 export default function InventoryPage() {
   const router = useRouter();
@@ -60,6 +64,7 @@ export default function InventoryPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
   const [isCloning, setIsCloning] = useState(false);
+  const [isUpdatingSettings, setIsUpdatingSettings] = useState(false);
 
   const firestore = useFirestore();
   const { user } = useAuth();
@@ -298,6 +303,26 @@ export default function InventoryPage() {
     }
   };
 
+  const handleToggleProductSharing = async (enabled: boolean) => {
+    if (!firestore) return;
+    setIsUpdatingSettings(true);
+    try {
+      await saveGlobalSettings(firestore, { enableProductSharing: enabled });
+      toast({
+        title: enabled ? 'Product Sharing Enabled' : 'Product Sharing Disabled',
+        description: `Product sharing is now ${enabled ? 'active' : 'inactive'} across your store.`,
+      });
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Update Failed',
+        description: 'Failed to update sharing settings.',
+      });
+    } finally {
+      setIsUpdatingSettings(false);
+    }
+  };
+
   const isLoading = isLoadingProducts || isLoadingCategories || isLoadingSettings;
   
   const { totalStock, totalStockValue, totalStockProfit } = useMemo(() => {
@@ -335,22 +360,36 @@ export default function InventoryPage() {
           title="Inventory Management"
           description="A complete control center for your product catalog and stock levels."
         />
-        <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => fetchProducts('initial')} disabled={isLoading}>
-                <RotateCcw className={cn("mr-2 h-4 w-4", isLoading && "animate-spin")} />
-                Sync Registry
-            </Button>
-            <Button 
-              disabled={isLoading || isNavigating} 
-              size="lg"
-              onClick={() => {
-                setIsNavigating(true);
-                router.push('/dashboard/inventory/add');
-              }}
-            >
-              {isNavigating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PlusCircle className="mr-2 h-4 w-4" />}
-              Add New Product
-            </Button>
+        <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-3 bg-muted/50 px-4 py-2 rounded-xl border border-dashed">
+                <div className="flex flex-col">
+                    <Label htmlFor="sharing-toggle" className="text-[10px] font-black uppercase tracking-widest cursor-pointer">Product Sharing</Label>
+                    <span className="text-[9px] text-muted-foreground uppercase font-bold">{settings?.enableProductSharing ? 'Active' : 'Disabled'}</span>
+                </div>
+                <Switch 
+                    id="sharing-toggle"
+                    checked={settings?.enableProductSharing ?? true}
+                    onCheckedChange={handleToggleProductSharing}
+                    disabled={isUpdatingSettings}
+                />
+            </div>
+            <div className="flex items-center gap-2">
+                <Button variant="outline" onClick={() => fetchProducts('initial')} disabled={isLoading}>
+                    <RotateCcw className={cn("mr-2 h-4 w-4", isLoading && "animate-spin")} />
+                    Sync Registry
+                </Button>
+                <Button 
+                  disabled={isLoading || isNavigating} 
+                  size="lg"
+                  onClick={() => {
+                    setIsNavigating(true);
+                    router.push('/dashboard/inventory/add');
+                  }}
+                >
+                  {isNavigating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PlusCircle className="mr-2 h-4 w-4" />}
+                  Add New Product
+                </Button>
+            </div>
         </div>
       </div>
 

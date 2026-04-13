@@ -16,7 +16,13 @@ import {
   PackageSearch, 
   AlertTriangle, 
   Truck, 
-  Image as LucideImageIcon 
+  Image as LucideImageIcon,
+  Share2,
+  Share,
+  ExternalLink,
+  Link as LinkIcon,
+  Send,
+  Copy
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import type { Product, Category } from '@/lib/types';
@@ -24,6 +30,15 @@ import { formatCurrency } from '@/lib/formatUtils';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useSettings } from '@/contexts/settings-context';
+import { useToast } from '@/hooks/use-toast';
+
+const shareIcons: Record<string, any> = {
+  Share2,
+  Share,
+  ExternalLink,
+  LinkIcon,
+  Send,
+};
 
 interface ProductTableProps {
   products: Product[];
@@ -36,7 +51,35 @@ interface ProductTableProps {
 export function ProductTable({ products, categories, onOpenActions, currencySymbol, globalLowStockThreshold }: ProductTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const { settings } = useSettings();
+  const { toast } = useToast();
   const defaultProductImageUrl = settings?.defaultProductImageUrl || 'https://placehold.co/400x300.png';
+
+  const ShareIcon = shareIcons[settings?.productSharingIcon || 'Share2'] || Share2;
+
+  const handleShare = (product: Product) => {
+    const origin = window.location.origin;
+    const url = `${origin}/store/product/${product.id}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: product.name,
+        text: `Check out ${product.name} on our store!`,
+        url: url,
+      }).catch(() => {
+        copyToClipboard(url);
+      });
+    } else {
+      copyToClipboard(url);
+    }
+  };
+
+  const copyToClipboard = (url: string) => {
+    navigator.clipboard.writeText(url);
+    toast({
+      title: 'Link Copied',
+      description: 'Product link has been copied to clipboard.',
+    });
+  };
 
   const productsWithCategoryNames = useMemo(() => {
     const categoryMap = new Map(categories.map(c => [c.id, c.name]));
@@ -175,14 +218,31 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
                   )}
                 </TableCell>
                 <TableCell className="text-center">
-                  <Button
-                      variant="ghost"
-                      className="h-8 w-8 p-0"
-                      onClick={() => onOpenActions(product)}
-                  >
-                      <span className="sr-only">Open menu</span>
-                      <MoreHorizontal className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center justify-center gap-1">
+                    {settings?.enableProductSharing && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-primary transition-colors"
+                            onClick={() => handleShare(product)}
+                          >
+                            <ShareIcon className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Share Product</TooltipContent>
+                      </Tooltip>
+                    )}
+                    <Button
+                        variant="ghost"
+                        className="h-8 w-8 p-0"
+                        onClick={() => onOpenActions(product)}
+                    >
+                        <span className="sr-only">Open menu</span>
+                        <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             );

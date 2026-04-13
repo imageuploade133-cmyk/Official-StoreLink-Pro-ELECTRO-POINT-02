@@ -18,9 +18,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Slider } from '@/components/ui/slider';
-import { Loader2, Store, Globe, Smartphone, Copy, CheckCircle2, Info } from 'lucide-react';
+import { Loader2, Store, Globe, Smartphone, Copy, CheckCircle2, Info, Share2, Share, ExternalLink, Link as LinkIcon, Send } from 'lucide-react';
 import regions from '@/lib/regions.json';
 import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
+
+const shareIconOptions = [
+  { name: 'Share2', icon: Share2 },
+  { name: 'Share', icon: Share },
+  { name: 'ExternalLink', icon: ExternalLink },
+  { name: 'LinkIcon', icon: LinkIcon },
+  { name: 'Send', icon: Send },
+];
 
 const generalSettingsSchema = z.object({
   storeAddress: z.string().optional(),
@@ -31,6 +40,8 @@ const generalSettingsSchema = z.object({
   countryCode: z.string().optional(),
   footerLogoUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
   footerLogoWidth: z.coerce.number().min(50).max(300).default(120),
+  enableProductSharing: z.boolean().optional(),
+  productSharingIcon: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof generalSettingsSchema>;
@@ -57,6 +68,8 @@ export function GeneralSettings({ settingsData, isLoading }: GeneralSettingsProp
       countryCode: '+1',
       footerLogoUrl: '',
       footerLogoWidth: 120,
+      enableProductSharing: true,
+      productSharingIcon: 'Share2',
     },
   });
 
@@ -77,6 +90,8 @@ export function GeneralSettings({ settingsData, isLoading }: GeneralSettingsProp
         countryCode: settingsData.countryCode || '+1',
         footerLogoUrl: settingsData.footerLogoUrl || '',
         footerLogoWidth: settingsData.footerLogoWidth || 120,
+        enableProductSharing: settingsData.enableProductSharing ?? true,
+        productSharingIcon: settingsData.productSharingIcon || 'Share2',
       });
     }
   }, [settingsData, form]);
@@ -226,6 +241,62 @@ export function GeneralSettings({ settingsData, isLoading }: GeneralSettingsProp
                         </FormItem>
                       )}
                   />
+              </div>
+
+              <Separator />
+
+              <div className="space-y-4">
+                <h3 className="text-lg font-bold flex items-center gap-2">
+                  <Share2 className="h-5 w-5 text-primary" /> Product Sharing Settings
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="enableProductSharing"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between p-4 bg-muted/30 rounded-xl border border-dashed">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base font-bold">Enable Product Sharing</FormLabel>
+                          <p className="text-xs text-muted-foreground">Allow users to share product links from the inventory and store.</p>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="productSharingIcon"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-bold">Sharing Icon</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a share icon" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {shareIconOptions.map((opt) => (
+                              <SelectItem key={opt.name} value={opt.name}>
+                                <div className="flex items-center gap-2">
+                                  <opt.icon className="h-4 w-4" />
+                                  <span>{opt.name}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
             </CardContent>
             <CardFooter className="bg-muted/30 border-t p-6">

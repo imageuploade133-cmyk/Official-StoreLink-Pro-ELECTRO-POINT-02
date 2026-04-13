@@ -29,6 +29,10 @@ import {
   Clock,
   Package,
   Share2,
+  Share,
+  ExternalLink,
+  Link as LinkIcon,
+  Send,
   CheckCircle2,
   Check,
   ThumbsUp,
@@ -96,6 +100,11 @@ const iconMap = {
   Check,
   CheckCircle2,
   ArrowRight,
+  Share2,
+  Share,
+  ExternalLink,
+  LinkIcon,
+  Send,
 };
 
 function IndividualTrackPlayer({ track, branding }: { track: any, branding: any }) {
@@ -428,6 +437,7 @@ export default function ProductDetailsPage() {
   
   const addToCartText = settings?.storeAddToCartText || 'Secure Purchase';
   const AddToCartIcon = iconMap[settings?.storeAddToCartIcon as keyof typeof iconMap] || ShoppingCart;
+  const ShareIcon = iconMap[settings?.productSharingIcon as keyof typeof iconMap] || Share2;
 
   const showRecommendations = settings?.showRelatedProducts !== false;
   const recommendationsBg = settings?.relatedProductsBackgroundColor || 'transparent';
@@ -807,7 +817,11 @@ export default function ProductDetailsPage() {
               <Button variant="outline" size="lg" className={cn("flex-1 h-11 md:h-13 lg:h-14 rounded-lg md:rounded-2xl font-black uppercase text-[10px] md:text-xs tracking-widest transition-all", isInWishlist && "text-rose-500 border-rose-200 bg-rose-50 dark:bg-rose-950/20")} onClick={handleToggleWishlist}>
                 <Heart className={cn("h-4 md:h-5 w-4 md:w-5 mr-1 md:mr-2", isInWishlist && "fill-current")} /> <span className="hidden sm:inline">{isInWishlist ? "Saved" : "Save"}</span><span className="sm:hidden">{isInWishlist ? "Saved" : "Save"}</span>
               </Button>
-              <Button variant="outline" size="icon" className="h-11 md:h-13 lg:h-14 w-11 md:w-13 lg:w-14 rounded-lg md:rounded-2xl group hover:border-primary transition-all" onClick={handleShare}><Share2 className="h-4 md:h-5 w-4 md:w-5 group-hover:text-primary" /></Button>
+              {settings?.enableProductSharing && (
+                <Button variant="outline" size="icon" className="h-11 md:h-13 lg:h-14 w-11 md:w-13 lg:w-14 rounded-lg md:rounded-2xl group hover:border-primary transition-all" onClick={handleShare}>
+                  <ShareIcon className="h-4 md:h-5 w-4 md:w-5 group-hover:text-primary" />
+                </Button>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-2 md:gap-3 lg:gap-4 pt-4 md:pt-6 border-t border-slate-200 dark:border-slate-800">

@@ -341,6 +341,9 @@ export interface Settings {
   navbarSticky?: 'fixed' | 'sticky' | 'static';
   navbarShadow?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
   navbarBlurEffect?: boolean;
+  // Product Sharing
+  enableProductSharing?: boolean;
+  productSharingIcon?: string;
 }
 
 export type AppSettings = Settings;
