@@ -37,6 +37,7 @@ import {
   Info,
   Tag,
   AlertTriangle,
+  Sparkles,
 } from 'lucide-react';
 import type { UserProfile, Order, BankAccount, WhatsappMessageLog, Coupon } from '@/lib/types';
 import { cn } from '@/lib/utils';
