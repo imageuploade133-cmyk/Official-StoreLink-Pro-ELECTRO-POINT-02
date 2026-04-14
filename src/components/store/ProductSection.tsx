@@ -437,7 +437,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
       ? "bg-white/10 text-white border-white/60 hover:bg-white hover:text-black dark:text-white dark:hover:text-black" 
       : "bg-background border-primary/20 hover:bg-primary hover:text-white dark:text-black dark:hover:text-white";
       
-    return cn(base, styleClasses, colorClasses);
+    return cn(base, colorClasses, styleClasses);
   }, [section.slideStyle, isPromoActive]);
 
   const handleNextPage = () => fetchProducts('next');
