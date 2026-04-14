@@ -296,8 +296,9 @@ export default function CheckoutPage() {
                           paymentMethod: paymentMethod,
                           storeName: settings.storeName,
                           currencySymbol: settings.currency,
+                          fulfillmentType: fulfillmentType,
                           message: extraMsg
-                      });
+                          });
 
                       await addDoc(collection(firestore, 'whatsappMessageLogs'), {
                           timestamp: serverTimestamp(),
@@ -332,7 +333,8 @@ export default function CheckoutPage() {
                           paymentMethod: paymentMethod,
                           storeName: settings.storeName,
                           currencySymbol: settings.currency,
-                      });
+                          fulfillmentType: fulfillmentType,
+                          });
 
                       await addDoc(collection(firestore, 'whatsappMessageLogs'), {
                           timestamp: serverTimestamp(),

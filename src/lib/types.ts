@@ -765,6 +765,7 @@ export interface WhatsappPayload {
     footer?: string;
     storeName?: string;
     customerName: string;
+    fulfillmentType?: 'pickup' | 'delivery';
     message?: string;
 }
 
