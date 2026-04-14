@@ -63,7 +63,7 @@ export default function ManageHomepageSectionsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
-        <PageHeader icon={Columns} title="Manage Homepage Sections" description="Organize and manage the product sections on your public homepage." />
+        <PageHeader icon={Columns} title="Product Section Manage Homepage" description="Organize and manage the product sections on your public homepage." />
         <div className="flex items-center gap-2">
             <Button variant="outline" asChild>
                 <Link href="/dashboard/add-ui-section"><PlusCircle className="mr-2 h-4 w-4"/> Add Custom UI</Link>

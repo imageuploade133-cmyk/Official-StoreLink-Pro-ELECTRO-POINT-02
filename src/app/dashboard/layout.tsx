@@ -188,7 +188,7 @@ export default function DashboardLayout({
     { href: '/dashboard/create-web-page', icon: FilePlus, label: 'Create Web Page', perm: 'manage_website_content' },
     { href: '/dashboard/manage-web-pages', icon: BookCopy, label: 'Manage Web Pages', perm: 'manage_website_content' },
     { href: '/dashboard/web-slide-show', icon: GalleryHorizontal, label: 'Web Slide Show', perm: 'manage_website_content' },
-    { href: '/dashboard/homepage-sections', icon: Columns, label: 'Homepage Sections', perm: 'manage_website_content' },
+    { href: '/dashboard/homepage-sections', icon: Columns, label: 'Product Section Manage Homepage', perm: 'manage_website_content' },
     { href: '/dashboard/add-ui-section', icon: SquarePlus, label: 'Add UI Section', perm: 'manage_website_content' },
     { heading: 'Administration' },
     { href: '/dashboard/settings', icon: Settings, label: 'Settings', perm: 'manage_settings' },

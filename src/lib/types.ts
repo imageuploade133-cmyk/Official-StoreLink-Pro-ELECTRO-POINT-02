@@ -424,6 +424,10 @@ export interface HomepageSection {
   fullWidth?: boolean;
   height?: number;
   textColor?: string;
+  // Carousel Extensions
+  autoScroll?: boolean;
+  slideIcon?: 'chevron' | 'arrow' | 'circle';
+  slideStyle?: 'default' | 'rounded' | 'square' | 'outline' | 'ghost';
 }
 
 
