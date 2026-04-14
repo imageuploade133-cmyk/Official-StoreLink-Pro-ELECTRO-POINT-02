@@ -19,10 +19,12 @@ import {
 import { useFirestore } from '@/firebase';
 import { ProductCard } from '@/components/store/ProductCard';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import Autoplay from "embla-carousel-autoplay";
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { 
   ArrowRight, 
+  ArrowLeft,
   Loader2, 
   Zap, 
   ChevronRight, 
@@ -35,7 +37,9 @@ import {
   Check,
   CheckCircle2,
   Package,
-  CreditCard
+  CreditCard,
+  CircleArrowLeft,
+  CircleArrowRight
 } from 'lucide-react';
 
 const iconMap: Record<string, any> = {
@@ -128,6 +132,10 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasEnteredView, setHasEnteredView] = useState(false);
+  
+  const autoplay = useRef(
+    Autoplay({ delay: 3000, stopOnInteraction: true, stopOnMouseEnter: true })
+  );
   
   // Pagination State for Products
   const [currentPage, setCurrentPage] = useState(1);
@@ -390,6 +398,48 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
     return ArrowRight;
   }, [settings]);
 
+  const NavIcons = useMemo(() => {
+    switch (section.slideIcon) {
+      case 'arrow':
+        return { prev: ArrowLeft, next: ArrowRight };
+      case 'circle':
+        return { prev: CircleArrowLeft, next: CircleArrowRight };
+      case 'chevron':
+      default:
+        return { prev: ChevronLeft, next: ChevronRight };
+    }
+  }, [section.slideIcon]);
+
+  const navButtonClasses = useMemo(() => {
+    const base = "static translate-y-0 h-14 w-14 transition-all duration-300 shadow-xl hover:scale-110 active:scale-95 border-[3px]";
+    let styleClasses = "";
+    
+    switch (section.slideStyle) {
+      case 'rounded':
+        styleClasses = "rounded-2xl";
+        break;
+      case 'square':
+        styleClasses = "rounded-none";
+        break;
+      case 'outline':
+        styleClasses = "rounded-full bg-transparent";
+        break;
+      case 'ghost':
+        styleClasses = "rounded-full bg-transparent border-none shadow-none";
+        break;
+      case 'default':
+      default:
+        styleClasses = "rounded-full";
+        break;
+    }
+    
+    const colorClasses = isPromoActive 
+      ? "bg-white/10 text-white border-white/60 hover:bg-white hover:text-black dark:text-white dark:hover:text-black" 
+      : "bg-background border-primary/20 hover:bg-primary hover:text-white dark:text-black dark:hover:text-white";
+      
+    return cn(base, styleClasses, colorClasses);
+  }, [section.slideStyle, isPromoActive]);
+
   const handleNextPage = () => fetchProducts('next');
   const handlePrevPage = () => fetchProducts('prev');
 
@@ -397,9 +447,10 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
     <section ref={sectionRef} className="py-12 md:py-24 overflow-hidden relative dark:bg-black" style={backgroundColor ? { backgroundColor } : {}}>
       <div className={cn("max-w-site-container mx-auto px-4 sm:px-6 lg:px-8")}>
         <Carousel 
+            plugins={section.autoScroll ? [autoplay.current] : []}
             opts={{ 
                 align: 'start', 
-                loop: displayProducts.length > 2,
+                loop: section.autoScroll || displayProducts.length > 2,
                 dragFree: true
             }} 
             className="w-full"
@@ -491,24 +542,18 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
                     {!isLoading && displayProducts.length > 0 && (
                         <div className="flex justify-center items-center gap-6 mt-16">
                             <CarouselPrevious 
-                                className={cn(
-                                    "static translate-y-0 h-14 w-14 rounded-full border-[3px] transition-all duration-300 shadow-xl hover:scale-110 active:scale-95",
-                                    isPromoActive 
-                                        ? "bg-white/10 text-white border-white/60 hover:bg-white hover:text-black dark:text-white dark:hover:text-black" 
-                                        : "bg-background border-primary/20 hover:bg-primary hover:text-white dark:text-black dark:hover:text-white"
-                                )} 
+                                className={navButtonClasses} 
                                 style={isPromoActive ? { color: 'inherit' } : {}}
-                            />
+                            >
+                                <NavIcons.prev className="h-6 w-6" />
+                            </CarouselPrevious>
                             <div className={cn("h-1 w-16 rounded-full", isPromoActive ? "bg-white/40" : "bg-primary/10")} />
                             <CarouselNext 
-                                className={cn(
-                                    "static translate-y-0 h-14 w-14 rounded-full border-[3px] transition-all duration-300 shadow-xl hover:scale-110 active:scale-95",
-                                    isPromoActive 
-                                        ? "bg-white/10 text-white border-white/60 hover:bg-white hover:text-black dark:text-white dark:hover:text-black" 
-                                        : "bg-background border-primary/20 hover:bg-primary hover:text-white dark:text-black dark:hover:text-white"
-                                )}
+                                className={navButtonClasses}
                                 style={isPromoActive ? { color: 'inherit' } : {}}
-                            />
+                            >
+                                <NavIcons.next className="h-6 w-6" />
+                            </CarouselNext>
                         </div>
                     )}
                 </>

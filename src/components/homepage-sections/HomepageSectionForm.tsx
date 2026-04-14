@@ -62,6 +62,10 @@ const homepageSectionSchema = z.object({
   flashSaleDiscountValue: z.coerce.number().min(0).optional().default(0),
   flashSaleStartDate: z.date().optional().nullable(),
   flashSaleEndDate: z.date().optional().nullable(),
+  // Carousel Extensions
+  autoScroll: z.boolean().default(false),
+  slideIcon: z.enum(['chevron', 'arrow', 'circle']).default('chevron'),
+  slideStyle: z.enum(['default', 'rounded', 'square', 'outline', 'ghost']).default('default'),
 }).superRefine((data, ctx) => {
     if (data.selectionType === 'category' && !data.categoryId) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'A category is required for this selection type.', path: ['categoryId'] });
@@ -115,6 +119,9 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
             flashSaleDiscountValue: 0,
             flashSaleStartDate: null,
             flashSaleEndDate: null,
+            autoScroll: false,
+            slideIcon: 'chevron',
+            slideStyle: 'default',
         },
     });
 
@@ -154,6 +161,9 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                 flashSaleDiscountValue: defaultValues.flashSaleDiscountValue || 0,
                 flashSaleStartDate: convertToDateSafely(defaultValues.flashSaleStartDate),
                 flashSaleEndDate: convertToDateSafely(defaultValues.flashSaleEndDate),
+                autoScroll: defaultValues.autoScroll ?? false,
+                slideIcon: defaultValues.slideIcon || 'chevron',
+                slideStyle: defaultValues.slideStyle || 'default',
             });
         }
     }, [defaultValues, categories, form]);
@@ -365,6 +375,57 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                 </FormItem>
                             )}/>
                         </div>
+
+                        {form.watch('layout') === 'carousel' && (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-dashed">
+                                <FormField control={form.control} name="autoScroll" render={({ field }) => (
+                                    <FormItem className="flex flex-col justify-end">
+                                        <div className="flex flex-row items-center justify-between rounded-lg border p-2 h-10 bg-muted/20">
+                                            <FormLabel className="text-xs font-bold uppercase tracking-widest mr-2">Auto Scroll</FormLabel>
+                                            <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                                        </div>
+                                    </FormItem>
+                                )}/>
+                                <FormField control={form.control} name="slideIcon" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="font-bold">Slide Icon</FormLabel>
+                                        <Select onValueChange={field.onChange} value={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger className="h-10">
+                                                    <SelectValue placeholder="Select icon" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="chevron">Chevron</SelectItem>
+                                                <SelectItem value="arrow">Arrow</SelectItem>
+                                                <SelectItem value="circle">Circle</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}/>
+                                <FormField control={form.control} name="slideStyle" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="font-bold">Slide Button Style</FormLabel>
+                                        <Select onValueChange={field.onChange} value={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger className="h-10">
+                                                    <SelectValue placeholder="Select style" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="default">Default</SelectItem>
+                                                <SelectItem value="rounded">Rounded</SelectItem>
+                                                <SelectItem value="square">Square</SelectItem>
+                                                <SelectItem value="outline">Outline</SelectItem>
+                                                <SelectItem value="ghost">Ghost</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}/>
+                            </div>
+                        )}
                         
                         <FormField
                             control={form.control}
