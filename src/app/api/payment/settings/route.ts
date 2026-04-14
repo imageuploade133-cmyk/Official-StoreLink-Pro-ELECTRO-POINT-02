@@ -60,24 +60,41 @@ export async function POST(request: Request) {
 
     const { firestore } = initializeFirebase();
     
-    // In a real app, we'd verify the user has permission to manage settings for this storeId
-
-    const encryptedConfig = encrypt(JSON.stringify(config));
-    
     const providerId = `${storeId}_${providerName}`;
     const providerRef = doc(firestore, 'payment_providers', providerId);
     
-    const providerData: Partial<PaymentProvider> = {
+    // Fetch existing provider data to merge config if it exists
+    const existingSnap = await getDoc(providerRef);
+    let finalConfig = config || {};
+
+    if (existingSnap.exists() && config) {
+      const existingData = existingSnap.data() as PaymentProvider;
+      if (existingData.config) {
+        try {
+          const decryptedExisting = decrypt(existingData.config);
+          const existingConfig = JSON.parse(decryptedExisting);
+          // Merge: new config values override existing ones
+          // This preserves keys that were masked and not sent back by the frontend
+          finalConfig = { ...existingConfig, ...config };
+        } catch (e) {
+          console.error('Failed to merge with existing config:', e);
+          // If decryption or parsing fails, we stick with what the user sent
+        }
+      }
+    }
+
+    const encryptedConfig = encrypt(JSON.stringify(finalConfig));
+    
+    const providerData: any = {
       storeId,
       providerName,
       config: encryptedConfig,
-      isActive,
-      mode,
       updatedAt: Timestamp.now(),
     };
 
-    // If it's a new provider, add createdAt
-    const existingSnap = await getDoc(providerRef);
+    if (isActive !== undefined) providerData.isActive = isActive;
+    if (mode !== undefined) providerData.mode = mode;
+
     if (!existingSnap.exists()) {
       providerData.createdAt = Timestamp.now();
     }
@@ -87,6 +104,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, id: providerId });
   } catch (error: any) {
     console.error('Error saving payment settings:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Unknown error occurred' }, { status: 500 });
   }
 }
