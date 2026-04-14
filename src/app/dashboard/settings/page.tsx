@@ -19,6 +19,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { PaymentMethodsSettings } from './components/PaymentMethodsSettings';
 import { SocialMediaSettings } from './components/SocialMediaSettings';
+import { ShopSettings } from './components/ShopSettings';
 import { LogoSizeSettings } from '@/components/dashboard/settings/LogoSizeSettings';
 import { PosProductSizeSettings } from '@/components/dashboard/settings/PosProductSizeSettings';
 
@@ -31,6 +32,7 @@ const settingsKeywords = {
   messaging: ['messaging', 'sms', 'whatsapp', 'webhook', 'notifications', 'messages'],
   payment: ['payment methods', 'cash', 'card', 'transfer', 'payment options', 'gateways'],
   social: ['social media', 'links', 'facebook', 'twitter', 'instagram'],
+  shop: ['shop', 'collection', 'banner', 'alignment', 'products'],
 };
 
 export default function SettingsPage() {
@@ -51,10 +53,10 @@ export default function SettingsPage() {
   const visibleSections = useMemo(() => {
     const lowercasedTerm = searchTerm.toLowerCase().trim();
     if (!lowercasedTerm) {
-        return { general: true, api: true, pos: true, inventory: true, messaging: true, payment: true, social: true };
+        return { general: true, api: true, pos: true, inventory: true, messaging: true, payment: true, social: true, shop: true };
     }
     
-    const visible: Record<string, boolean> = { general: false, api: false, pos: false, inventory: false, messaging: false, payment: false, social: false };
+    const visible: Record<string, boolean> = { general: false, api: false, pos: false, inventory: false, messaging: false, payment: false, social: false, shop: false };
     
     // Check card titles and descriptions
     if ('business & regional settings'.includes(lowercasedTerm)) visible.general = true;
@@ -64,6 +66,7 @@ export default function SettingsPage() {
     if ('messaging & webhooks'.includes(lowercasedTerm)) visible.messaging = true;
     if ('payment methods'.includes(lowercasedTerm)) visible.payment = true;
     if ('social media links'.includes(lowercasedTerm)) visible.social = true;
+    if ('shop our collection settings'.includes(lowercasedTerm)) visible.shop = true;
     
     // Check keywords for each section
     for (const section in settingsKeywords) {
@@ -120,6 +123,7 @@ export default function SettingsPage() {
 
       <div className="space-y-6">
         {visibleSections.general && <GeneralSettings settingsData={settingsData} isLoading={isLoading} />}
+        {visibleSections.shop && <ShopSettings settingsData={settingsData} isLoading={isLoading} />}
         {visibleSections.payment && <PaymentMethodsSettings settingsData={settingsData} isLoading={isLoading} />}
         {visibleSections.social && <SocialMediaSettings settingsData={settingsData} isLoading={isLoading} />}
         {visibleSections.api && <ApiKeysSettings settingsData={settingsData} isLoading={isLoading} />}

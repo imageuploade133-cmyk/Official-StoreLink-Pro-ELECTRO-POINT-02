@@ -344,6 +344,9 @@ export interface Settings {
   // Product Sharing
   enableProductSharing?: boolean;
   productSharingIcon?: string;
+  // Shop Our Collection Settings
+  shopBannerImageUrl?: string;
+  shopProductsAlignment?: 'left' | 'center';
 }
 
 export type AppSettings = Settings;
