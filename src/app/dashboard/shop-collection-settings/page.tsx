@@ -24,7 +24,8 @@ import {
   X, 
   Image as ImageIcon,
   AlignLeft,
-  AlignCenter
+  AlignCenter,
+  Link2
 } from 'lucide-react';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -201,28 +202,40 @@ export default function ShopCollectionSettingsPage() {
                           </div>
                         )}
                         
-                        <div className="flex items-center gap-4">
-                          <Button
-                            asChild
-                            variant="outline"
-                            size="sm"
-                            disabled={isUploading}
-                            className="shadow-sm"
-                          >
-                            <label htmlFor="banner-upload" className="cursor-pointer">
-                              {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-                              {field.value ? 'Change Banner' : 'Upload Banner'}
-                            </label>
-                          </Button>
-                          <Input
-                            id="banner-upload"
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={handleImageUpload}
-                            disabled={isUploading}
-                          />
-                          <p className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded">Recommended: 1920x600px. Max 5MB.</p>
+                        <div className="flex flex-col gap-4">
+                          <div className="flex items-center gap-4">
+                            <Button
+                              asChild
+                              variant="outline"
+                              size="sm"
+                              disabled={isUploading}
+                              className="shadow-sm"
+                            >
+                              <label htmlFor="banner-upload" className="cursor-pointer">
+                                {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                                {field.value ? 'Change Banner' : 'Upload Banner'}
+                              </label>
+                            </Button>
+                            <Input
+                              id="banner-upload"
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={handleImageUpload}
+                              disabled={isUploading}
+                            />
+                            <div className="flex-1 relative">
+                              <Link2 className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                placeholder="Or paste image URL here..."
+                                value={field.value}
+                                onChange={(e) => field.onChange(e.target.value)}
+                                className="h-9 pl-9"
+                                disabled={isUploading}
+                              />
+                            </div>
+                          </div>
+                          <p className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded w-fit">Recommended: 1920x600px. Max 5MB.</p>
                         </div>
                       </div>
                       <FormMessage />
