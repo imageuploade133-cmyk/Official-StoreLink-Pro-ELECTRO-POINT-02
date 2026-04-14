@@ -347,6 +347,8 @@ export interface Settings {
   // Shop Our Collection Settings
   shopBannerImageUrl?: string;
   shopProductsAlignment?: 'left' | 'center';
+  shopCollectionTitle?: string;
+  shopCollectionDescription?: string;
 }
 
 export type AppSettings = Settings;

@@ -22,6 +22,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 const shopSettingsSchema = z.object({
   shopBannerImageUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
   shopProductsAlignment: z.enum(['left', 'center']).default('left'),
+  shopCollectionTitle: z.string().min(1, 'Title is required').default('Shop Our Collection'),
+  shopCollectionDescription: z.string().optional().default('Discover products that are crafted with quality and designed for life.'),
 });
 
 type FormValues = z.infer<typeof shopSettingsSchema>;
@@ -41,6 +43,8 @@ export function ShopSettings({ settingsData, isLoading }: ShopSettingsProps) {
     defaultValues: {
       shopBannerImageUrl: '',
       shopProductsAlignment: 'left',
+      shopCollectionTitle: 'Shop Our Collection',
+      shopCollectionDescription: 'Discover products that are crafted with quality and designed for life.',
     },
   });
 
@@ -49,6 +53,8 @@ export function ShopSettings({ settingsData, isLoading }: ShopSettingsProps) {
       form.reset({
         shopBannerImageUrl: settingsData.shopBannerImageUrl || '',
         shopProductsAlignment: settingsData.shopProductsAlignment || 'left',
+        shopCollectionTitle: settingsData.shopCollectionTitle || 'Shop Our Collection',
+        shopCollectionDescription: settingsData.shopCollectionDescription || 'Discover products that are crafted with quality and designed for life.',
       });
     }
   }, [settingsData, form]);
@@ -83,6 +89,40 @@ export function ShopSettings({ settingsData, isLoading }: ShopSettingsProps) {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6 pt-8">
+            <FormField
+              control={form.control}
+              name="shopCollectionTitle"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-bold">Shop Page Title</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Shop Our Collection" {...field} />
+                  </FormControl>
+                  <FormDescription className="text-xs">
+                    The main heading displayed at the top of your shop page.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="shopCollectionDescription"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-bold">Shop Page Description</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Discover products that are crafted..." {...field} />
+                  </FormControl>
+                  <FormDescription className="text-xs">
+                    The subtext displayed below the title.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="shopBannerImageUrl"
