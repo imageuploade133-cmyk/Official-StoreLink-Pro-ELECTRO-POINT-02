@@ -242,6 +242,73 @@ export default function WebsitePaymentSettings() {
     }
   };
 
+  const handleAddAccount = () => {
+    setEditingAccount(null);
+    setIsAccountModalOpen(true);
+  };
+
+  const handleEditAccount = (account: BankAccount) => {
+    setEditingAccount(account);
+    setIsAccountModalOpen(true);
+  };
+
+  const onAccountFormSubmit = async (values: AccountFormValues) => {
+    if (!firestore) return;
+    setIsSaving(true);
+    try {
+      let updatedAccounts: BankAccount[];
+      if (editingAccount) {
+        updatedAccounts = bankAccounts.map((acc) =>
+          acc.id === editingAccount.id ? { ...acc, ...values } : acc
+        );
+      } else {
+        const newAccount: BankAccount = {
+          ...values,
+          id: Math.random().toString(36).substring(2, 9),
+        };
+        updatedAccounts = [...bankAccounts, newAccount];
+      }
+
+      await saveGlobalSettings(firestore, { bankAccounts: updatedAccounts });
+      toast({
+        title: 'Success',
+        description: `Bank account ${editingAccount ? 'updated' : 'added'} successfully.`,
+      });
+      setIsAccountModalOpen(false);
+      setEditingAccount(null);
+    } catch (e) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to save bank account.',
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const confirmDeleteAccount = async () => {
+    if (!firestore || !accountToDelete) return;
+    setIsSaving(true);
+    try {
+      const updatedAccounts = bankAccounts.filter((acc) => acc.id !== accountToDelete.id);
+      await saveGlobalSettings(firestore, { bankAccounts: updatedAccounts });
+      toast({
+        title: 'Success',
+        description: 'Bank account removed.',
+      });
+      setAccountToDelete(null);
+    } catch (e) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to delete bank account.',
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   if (isAuthLoading || isLoadingSettings || isLoadingProviders) {
     return (
       <div className="space-y-6">
