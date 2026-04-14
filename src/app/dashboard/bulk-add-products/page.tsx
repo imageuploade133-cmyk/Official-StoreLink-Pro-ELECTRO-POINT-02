@@ -18,7 +18,7 @@ import { logActivity } from '@/lib/activity-log-utils';
 
 type ParsedProduct = Omit<Product, 'id'> & { id?: string; action: 'create' | 'update' };
 
-const OPTIONAL_HEADERS = ['description', 'supplierName', 'lowStockThreshold', 'isVisibleInPOS', 'imageUrl'];
+const OPTIONAL_HEADERS = ['description', 'supplierName', 'supplierContactName', 'supplierPhone', 'supplierLocation', 'stockDocumentUrl', 'lowStockThreshold', 'isVisibleInPOS', 'imageUrl'];
 
 export default function BulkAddProductsPage() {
   const { user, permissions, isLoading: authLoading } = useAuth();
@@ -67,8 +67,12 @@ export default function BulkAddProductsPage() {
               categoryId: row.categoryId || 'uncategorized',
               description: row.description || '',
               supplierName: row.supplierName || '',
+              supplierContactName: row.supplierContactName || '',
+              supplierPhone: row.supplierPhone || '',
+              supplierLocation: row.supplierLocation || '',
+              stockDocumentUrl: row.stockDocumentUrl || '',
               lowStockThreshold: row.lowStockThreshold ? parseInt(row.lowStockThreshold, 10) : null,
-              isVisibleInPOS: row.isVisibleInPOS ? (String(row.isVisibleInPOS).toLowerCase() === 'true' || String(row.isVisibleInPOS) === '1') : true,
+
               imageUrl: row.imageUrl || '',
               action: 'create' as 'create' | 'update',
             };

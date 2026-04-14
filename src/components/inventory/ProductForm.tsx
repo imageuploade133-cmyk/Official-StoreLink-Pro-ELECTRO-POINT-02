@@ -116,7 +116,11 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
     sellingPrice: z.coerce.number().min(0.01, 'Selling price must be greater than 0.'),
     newPrice: z.coerce.number().min(0.01, 'Discount price must be greater than 0.').optional().nullable(),
     lowStockThreshold: z.coerce.number().int().min(0, 'Low stock threshold cannot be negative.').optional().nullable(),
-    supplierName: z.string().optional().or(z.literal('')),    
+    supplierName: z.string().optional().or(z.literal('')),
+    supplierContactName: z.string().optional().or(z.literal('')),
+    supplierPhone: z.string().optional().or(z.literal('')),
+    supplierLocation: z.string().optional().or(z.literal('')),
+    stockDocumentUrl: z.string().optional().or(z.literal('')),
     imageUrl: z.string().url('Must be a valid URL for the image.').optional().or(z.literal('')),    
     additionalImageUrls: z.array(z.string().url()).optional().default([]),
     dataAiHint: z.string().max(100, 'Hint too long (max 100 chars).').optional().or(z.literal('')),    
@@ -229,6 +233,7 @@ export function ProductForm({
   const [isAiGenerating, setIsAiGenerating] = useState(false);
   const [isUploadingSizeGuide, setIsUploadingSizeGuide] = useState(false);
   const [isUploadingPoster, setIsUploadingPoster] = useState(false);
+  const [isUploadingStockDoc, setIsUploadingStockDoc] = useState(false);
   
   const [isChangeCategoryModalOpen, setIsChangeCategoryModalOpen] = useState(false);
   const [categorySearchTerm, setCategorySearchTerm] = useState('');
@@ -265,6 +270,10 @@ export function ProductForm({
       sellingPrice: 0,
       lowStockThreshold: null,
       supplierName: '',
+      supplierContactName: '',
+      supplierPhone: '',
+      supplierLocation: '',
+      stockDocumentUrl: '',
       imageUrl: '',
       additionalImageUrls: [],
       dataAiHint: '',
@@ -344,6 +353,10 @@ export function ProductForm({
         newPrice: defaultValues.newPrice ?? null,
         lowStockThreshold: defaultValues.lowStockThreshold ?? null,
         supplierName: defaultValues.supplierName ?? '',
+        supplierContactName: defaultValues.supplierContactName ?? '',
+        supplierPhone: defaultValues.supplierPhone ?? '',
+        supplierLocation: defaultValues.supplierLocation ?? '',
+        stockDocumentUrl: defaultValues.stockDocumentUrl ?? '',
         imageUrl: defaultValues.imageUrl ?? '',
         additionalImageUrls: defaultValues.additionalImageUrls || [],
         dataAiHint: defaultValues.dataAiHint ?? '',
@@ -480,6 +493,34 @@ export function ProductForm({
     reader.onerror = () => {
         toast({ variant: "destructive", title: "File Error", description: "Could not read the selected file."});
         setIsUploadingSizeGuide(false);
+    };
+  };
+
+  const handleStockDocUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { 
+      toast({ variant: "destructive", title: "File too large", description: "Document must be smaller than 5MB." });
+      return;
+    }
+    setIsUploadingStockDoc(true);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      try {
+        const imageDataUri = reader.result as string;
+        const result = await uploadImage({ imageDataUri });
+        form.setValue('stockDocumentUrl', result.display_url, { shouldValidate: true });
+        toast({ title: "Document Uploaded", description: "Stock document/receipt has been saved." });
+      } catch (error: any) {
+        toast({ variant: "destructive", title: "Upload Failed", description: error.message || "Could not upload document." });
+      } finally {
+        setIsUploadingStockDoc(false);
+      }
+    };
+    reader.onerror = () => {
+        toast({ variant: "destructive", title: "File Error", description: "Could not read the selected file."});
+        setIsUploadingStockDoc(false);
     };
   };
 
@@ -676,6 +717,115 @@ export function ProductForm({
                   )}
                 />
               </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-xl border-none ring-1 ring-border">
+            <CardHeader className="bg-muted/30">
+              <CardTitle className="flex items-center gap-2">
+                <Truck className="h-5 w-5 text-primary" /> Supplier & Procurement Details (Optional)
+              </CardTitle>
+              <CardDescription>Record where this stock was acquired for better tracking.</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="supplierName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold">Stock Supplier (Company)</FormLabel>
+                      <FormControl><Input placeholder="e.g., Electronics Wholesale Ltd" {...field} value={field.value || ''} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="supplierContactName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold">Supplier Agent Name</FormLabel>
+                      <FormControl><Input placeholder="e.g., John Doe" {...field} value={field.value || ''} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="supplierPhone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold">Supplier Phone</FormLabel>
+                      <FormControl><Input placeholder="+1 234 567 890" {...field} value={field.value || ''} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="supplierLocation"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold">Supplier Location</FormLabel>
+                      <FormControl><Input placeholder="City, Country or Address" {...field} value={field.value || ''} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="stockDocumentUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-bold flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-primary" /> Stock Document / Receipt
+                    </FormLabel>
+                    <div className="flex items-start gap-4">
+                        {field.value && (
+                            <div className="relative w-32 h-32 rounded-xl border overflow-hidden shrink-0 shadow-sm bg-muted flex items-center justify-center">
+                                {field.value.match(/\.(jpeg|jpg|gif|png)$/) != null || field.value.includes('imgbb') ? (
+                                  <Image src={field.value} alt="Receipt" fill className="object-contain" unoptimized />
+                                ) : (
+                                  <FileText className="h-10 w-10 text-muted-foreground" />
+                                )}
+                                <Button type="button" variant="destructive" size="icon" className="absolute top-1 right-1 h-6 w-6 rounded-full" onClick={() => form.setValue('stockDocumentUrl', '')}>
+                                    <X className="h-3 w-3" />
+                                </Button>
+                            </div>
+                        )}
+                        <div className="flex-grow space-y-3">
+                            <FormControl>
+                                <Input placeholder="https://example.com/receipt.pdf" {...field} value={field.value || ''} disabled={isSubmitting || isUploadingStockDoc} />
+                            </FormControl>
+                            <div className="flex items-center gap-2">
+                              <Button asChild variant="outline" size="sm" disabled={isSubmitting || isUploadingStockDoc}>
+                                  <label htmlFor="stock-doc-upload-master" className="cursor-pointer">
+                                      {isUploadingStockDoc ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                                      Upload Receipt
+                                  </label>
+                              </Button>
+                              {field.value && (
+                                <Button type="button" variant="ghost" size="sm" asChild>
+                                  <a href={field.value} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1">
+                                    <Eye className="h-3 w-3" /> View
+                                  </a>
+                                </Button>
+                              )}
+                            </div>
+                            <input id="stock-doc-upload-master" type="file" accept="image/*,.pdf" className="hidden" onChange={handleStockDocUpload} disabled={isSubmitting || isUploadingStockDoc} />
+                            <FormDescription className="text-[10px]">Upload a photo of the receipt or a PDF document for tracking.</FormDescription>
+                        </div>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </CardContent>
           </Card>
 
@@ -1495,6 +1645,115 @@ export function ProductForm({
                             </Button>
                             <input id="size-guide-upload" type="file" accept="image/*" className="hidden" onChange={handleSizeGuideUpload} disabled={isSubmitting || isUploadingSizeGuide} />
                             <FormDescription className="text-[10px]">Recommended: High-resolution PNG or JPG with transparent background.</FormDescription>
+                        </div>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+          
+          <Card className="shadow-xl border-none ring-1 ring-border">
+            <CardHeader className="bg-muted/30">
+              <CardTitle className="flex items-center gap-2">
+                <Truck className="h-5 w-5 text-primary" /> Supplier & Procurement Details (Optional)
+              </CardTitle>
+              <CardDescription>Record where this stock was acquired for better tracking.</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="supplierName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold">Stock Supplier (Company)</FormLabel>
+                      <FormControl><Input placeholder="e.g., Electronics Wholesale Ltd" {...field} value={field.value || ''} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="supplierContactName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold">Supplier Agent Name</FormLabel>
+                      <FormControl><Input placeholder="e.g., John Doe" {...field} value={field.value || ''} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="supplierPhone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold">Supplier Phone</FormLabel>
+                      <FormControl><Input placeholder="+1 234 567 890" {...field} value={field.value || ''} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="supplierLocation"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold">Supplier Location</FormLabel>
+                      <FormControl><Input placeholder="City, Country or Address" {...field} value={field.value || ''} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="stockDocumentUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-bold flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-primary" /> Stock Document / Receipt
+                    </FormLabel>
+                    <div className="flex items-start gap-4">
+                        {field.value && (
+                            <div className="relative w-32 h-32 rounded-xl border overflow-hidden shrink-0 shadow-sm bg-muted flex items-center justify-center">
+                                {field.value.match(/\.(jpeg|jpg|gif|png)$/) != null || field.value.includes('imgbb') ? (
+                                  <Image src={field.value} alt="Receipt" fill className="object-contain" unoptimized />
+                                ) : (
+                                  <FileText className="h-10 w-10 text-muted-foreground" />
+                                )}
+                                <Button type="button" variant="destructive" size="icon" className="absolute top-1 right-1 h-6 w-6 rounded-full" onClick={() => form.setValue('stockDocumentUrl', '')}>
+                                    <X className="h-3 w-3" />
+                                </Button>
+                            </div>
+                        )}
+                        <div className="flex-grow space-y-3">
+                            <FormControl>
+                                <Input placeholder="https://example.com/receipt.pdf" {...field} value={field.value || ''} disabled={isSubmitting || isUploadingStockDoc} />
+                            </FormControl>
+                            <div className="flex items-center gap-2">
+                              <Button asChild variant="outline" size="sm" disabled={isSubmitting || isUploadingStockDoc}>
+                                  <label htmlFor="stock-doc-upload-master" className="cursor-pointer">
+                                      {isUploadingStockDoc ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                                      Upload Receipt
+                                  </label>
+                              </Button>
+                              {field.value && (
+                                <Button type="button" variant="ghost" size="sm" asChild>
+                                  <a href={field.value} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1">
+                                    <Eye className="h-3 w-3" /> View
+                                  </a>
+                                </Button>
+                              )}
+                            </div>
+                            <input id="stock-doc-upload-master" type="file" accept="image/*,.pdf" className="hidden" onChange={handleStockDocUpload} disabled={isSubmitting || isUploadingStockDoc} />
+                            <FormDescription className="text-[10px]">Upload a photo of the receipt or a PDF document for tracking.</FormDescription>
                         </div>
                     </div>
                     <FormMessage />

@@ -30,6 +30,7 @@ import type { RestockEntry } from '@/lib/types';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { PageHeader } from '@/components/PageHeader';
 import { format, startOfDay, endOfDay } from 'date-fns';
+import Image from 'next/image';
 import { 
   Loader2, 
   ListChecks, 
@@ -43,13 +44,28 @@ import {
   ChevronLeft, 
   ChevronRight, 
   DollarSign,
-  Search 
+  Search,
+  Eye,
+  FileText,
+  Truck,
+  Phone,
+  MapPin,
+  ExternalLink
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogFooter, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogClose 
+} from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import type { DateRange } from 'react-day-picker';
@@ -73,6 +89,8 @@ export default function RestockHistoryPage() {
   const [entryPendingDeletion, setEntryPendingDeletion] = useState<RestockEntry | null>(null);
   const [isActionModalOpen, setIsActionModalOpen] = useState(false);
   const [selectedEntryForActions, setSelectedEntryForActions] = useState<RestockEntry | null>(null);
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [selectedEntryForDetails, setSelectedEntryForDetails] = useState<RestockEntry | null>(null);
 
   const [restockEntries, setRestockEntries] = useState<RestockEntry[]>([]);
   const [isLoadingEntries, setIsLoadingEntries] = useState(true);
@@ -371,25 +389,170 @@ export default function RestockHistoryPage() {
             onOpenChange={setIsActionModalOpen}
             title={`Entry Details`}
             description={`${selectedEntryForActions.productName} | ${selectedEntryForActions.quantity > 0 ? '+' : ''}${selectedEntryForActions.quantity} units`}
-        >
-          <Button variant="destructive" className="justify-start h-11" onClick={() => { handleInitiateDelete(selectedEntryForActions); setIsActionModalOpen(false); }} disabled={!canModify || selectedEntryForActions.quantity < 0}>
+            >
+            <Button
+            variant="outline"
+            className="justify-start h-11"
+            onClick={() => { setSelectedEntryForDetails(selectedEntryForActions); setIsDetailsDialogOpen(true); setIsActionModalOpen(false); }}
+            >
+            <Eye className="mr-2 h-4 w-4"/> View Full Details
+            </Button>
+            <Button variant="destructive" className="justify-start h-11" onClick={() => { handleInitiateDelete(selectedEntryForActions); setIsActionModalOpen(false); }} disabled={!canModify || selectedEntryForActions.quantity < 0}>
             <Undo2 className="mr-2 h-4 w-4"/> Reverse Adjustment
-          </Button>
-        </ActionModal>
-    )}
-     <AdminAuthDialog
-        isOpen={isAuthDialogOpen}
-        onOpenChange={handleAuthDialogClose}
-        userEmail={user?.email || ''}
-        onConfirm={confirmDeleteEntry}
-        isProcessing={isProcessingDelete}
-        title="Authorize Reversal"
-        description={`This will reverse the selected stock entry for "${entryPendingDeletion?.productName}". The quantity will be subtracted from the current stock. This action is permanent.`}
-        confirmButtonText="Confirm & Reverse"
-    />
-    </>
-  );
-}
+            </Button>
+            </ActionModal>
+            )}
+
+            <RestockDetailsDialog
+            isOpen={isDetailsDialogOpen}
+            onOpenChange={setIsDetailsDialogOpen}
+            entry={selectedEntryForDetails}
+            currencySymbol={currencySymbol}
+            />
+
+        <AdminAuthDialog
+            isOpen={isAuthDialogOpen}
+            onOpenChange={handleAuthDialogClose}
+            userEmail={user?.email || ''}
+            onConfirm={confirmDeleteEntry}
+            isProcessing={isProcessingDelete}
+            title="Authorize Reversal"
+            description={`This will reverse the selected stock entry for "${entryPendingDeletion?.productName}". The quantity will be subtracted from the current stock. This action is permanent.`}
+            confirmButtonText="Confirm & Reverse"
+        />
+        </>
+      );
+    }
+
+    function RestockDetailsDialog({ isOpen, onOpenChange, entry, currencySymbol }: { isOpen: boolean, onOpenChange: (open: boolean) => void, entry: RestockEntry | null, currencySymbol: string }) {
+        if (!entry) return null;
+        
+        return (
+            <Dialog open={isOpen} onOpenChange={onOpenChange}>
+                <DialogContent className="sm:max-w-xl">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Info className="h-5 w-5 text-primary" /> Procurement & Stock Entry Details
+                        </DialogTitle>
+                        <DialogDescription>
+                            Full record for {entry.productName} updated on {entry.restockDate instanceof Date ? format(entry.restockDate, 'PPP') : 'N/A'}.
+                        </DialogDescription>
+                    </DialogHeader>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
+                        <div className="space-y-4">
+                            <div>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Transaction Info</Label>
+                                <div className="mt-1 p-3 rounded-xl bg-muted/30 border border-dashed space-y-2">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-muted-foreground font-medium">Quantity Adjusted:</span>
+                                        <span className={cn("font-black", entry.quantity > 0 ? "text-green-600" : "text-red-600")}>
+                                            {entry.quantity > 0 ? '+' : ''}{entry.quantity} units
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-muted-foreground font-medium">Cost per Unit:</span>
+                                        <span className="font-bold">{formatCurrency(entry.costPricePerUnit, currencySymbol)}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm pt-2 border-t">
+                                        <span className="text-muted-foreground font-black uppercase text-[10px]">Total Investment:</span>
+                                        <span className="font-black text-primary">{formatCurrency(entry.totalCost, currencySymbol)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Recorder Info</Label>
+                                <div className="mt-1 p-3 rounded-xl bg-muted/30 border border-dashed">
+                                    <div className="text-sm font-bold truncate">{entry.userEmail}</div>
+                                    <div className="text-[10px] text-muted-foreground uppercase font-black mt-1">
+                                        Logged: {entry.createdAt instanceof Date ? format(entry.createdAt, 'PP p') : 'N/A'}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="space-y-4">
+                            <div>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Supplier Information</Label>
+                                <div className="mt-1 p-3 rounded-xl bg-muted/30 border border-dashed space-y-2">
+                                    <div className="flex items-start gap-2">
+                                        <Truck className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                                        <div className="text-sm">
+                                            <div className="font-bold">{entry.supplierName || entry.supplierBusinessName || 'N/A'}</div>
+                                            <div className="text-[10px] text-muted-foreground uppercase">Company / Distributor</div>
+                                        </div>
+                                    </div>
+                                    {entry.supplierContactName && (
+                                        <div className="flex items-start gap-2">
+                                            <Info className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                                            <div className="text-sm">
+                                                <div className="font-bold">{entry.supplierContactName}</div>
+                                                <div className="text-[10px] text-muted-foreground uppercase">Contact Person</div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {entry.supplierPhone && (
+                                        <div className="flex items-start gap-2">
+                                            <Phone className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                                            <div className="text-sm">
+                                                <div className="font-bold">{entry.supplierPhone}</div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {entry.supplierLocation && (
+                                        <div className="flex items-start gap-2">
+                                            <MapPin className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                                            <div className="text-sm font-medium">{entry.supplierLocation}</div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            
+                            {entry.notes && (
+                                <div>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Notes</Label>
+                                    <div className="mt-1 p-3 rounded-xl bg-muted/30 border border-dashed text-sm italic">
+                                        "{entry.notes}"
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    {entry.receiptUrl && (
+                        <div className="mt-4 pt-4 border-t">
+                            <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2 block">Stock Document / Receipt</Label>
+                            <div className="relative w-full h-48 rounded-xl overflow-hidden border-2 border-dashed bg-muted flex items-center justify-center group">
+                                {entry.receiptUrl.match(/\.(jpeg|jpg|gif|png)$/) != null || entry.receiptUrl.includes('imgbb') ? (
+                                    <Image src={entry.receiptUrl} alt="Receipt" fill className="object-contain" unoptimized />
+                                ) : (
+                                    <div className="flex flex-col items-center gap-2">
+                                        <FileText className="h-12 w-12 text-muted-foreground" />
+                                        <span className="text-sm font-bold">Document (PDF/Other)</span>
+                                    </div>
+                                )}
+                                <a 
+                                    href={entry.receiptUrl} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    <Button variant="secondary" className="gap-2">
+                                        <ExternalLink className="h-4 w-4" /> Open Original
+                                    </Button>
+                                </a>
+                            </div>
+                        </div>
+                    )}
+                    
+                    <DialogFooter className="mt-6 border-t pt-4">
+                        <Button onClick={() => onOpenChange(false)} className="w-full">Close Details</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        );
+    }
 
 function getDateRangeTitle(dateRange: DateRange | undefined) {
     if (!dateRange?.from) return "all time";
