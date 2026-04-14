@@ -66,6 +66,18 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                 textShadow: '0 1px 3px rgba(0,0,0,0.5)',
                 border: 'none'
             };
+        } else if (style === 'outline') {
+            return {
+                backgroundColor: 'transparent',
+                color: settings?.storeHeroBtnColor || '#8b5cf6',
+                border: `2px solid ${settings?.storeHeroBtnColor || '#8b5cf6'}`
+            };
+        } else if (style === 'ghost') {
+            return {
+                backgroundColor: 'transparent',
+                color: settings?.storeHeroBtnColor || '#8b5cf6',
+                border: 'none'
+            };
         }
         
         return {
@@ -73,6 +85,36 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
             color: 'white',
             border: 'none'
         };
+    }, [settings]);
+
+    const heroButtonClasses = useMemo(() => {
+        const useIndividual = settings?.useIndividualBtnSettings !== false;
+        const size = useIndividual
+            ? (settings?.storeHeroBtnSize || 'lg')
+            : (settings?.storeBtnSize || 'lg');
+        const shape = useIndividual
+            ? (settings?.storeHeroBtnShape || 'lg')
+            : (settings?.storeBtnShape || 'lg');
+
+        const sizeClasses = {
+            sm: 'h-8 px-4 text-[8px]',
+            md: 'h-10 px-6 text-[10px]',
+            lg: 'h-12 px-8 text-xs',
+            xl: 'h-14 px-10 text-sm'
+        };
+
+        const shapeClasses: Record<string, string> = {
+            none: 'rounded-none',
+            sm: 'rounded-sm',
+            md: 'rounded-md',
+            lg: 'rounded-full',
+            full: 'rounded-full'
+        };
+
+        const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
+        const shapeClass = shapeClasses[shape] || 'rounded-full';
+
+        return `${sizeClass} ${shapeClass}`;
     }, [settings]);
 
     const gridCartButtonStyle = useMemo(() => {
@@ -96,6 +138,18 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                 textShadow: '0 1px 3px rgba(0,0,0,0.5)',
                 border: 'none'
             };
+        } else if (style === 'outline') {
+            return {
+                backgroundColor: 'transparent',
+                color: settings?.storeGridCartColor || '#10b981',
+                border: `2px solid ${settings?.storeGridCartColor || '#10b981'}`
+            };
+        } else if (style === 'ghost') {
+            return {
+                backgroundColor: 'transparent',
+                color: settings?.storeGridCartColor || '#10b981',
+                border: 'none'
+            };
         }
         
         return {
@@ -110,6 +164,9 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
         const size = useIndividual
             ? (settings?.storeGridCartSize || 'md')
             : (settings?.storeBtnSize || 'md');
+        const shape = useIndividual
+            ? (settings?.storeGridCartShape || 'md')
+            : (settings?.storeBtnShape || 'md');
         
         const sizeClasses = {
             sm: 'h-8 w-8',
@@ -117,8 +174,19 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
             lg: 'h-12 w-12',
             xl: 'h-14 w-14'
         };
+
+        const shapeClasses: Record<string, string> = {
+            none: 'rounded-none',
+            sm: 'rounded-sm',
+            md: 'rounded-md',
+            lg: 'rounded-2xl',
+            full: 'rounded-full'
+        };
         
-        return sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.md;
+        const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.md;
+        const shapeClass = shapeClasses[shape] || 'rounded-2xl';
+
+        return `${sizeClass} ${shapeClass}`;
     }, [settings]);
 
     const heroButtonText = settings?.storeHeroBtnText || 'Explore Collection';
@@ -256,10 +324,11 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                                                 <div className="pt-2">
                                                     <Button 
                                                         asChild 
-                                                        size="sm" 
-                                                        variant="secondary" 
                                                         style={heroButtonStyle}
-                                                        className="rounded-full font-black uppercase text-[8px] tracking-widest px-6 h-8 bg-white text-slate-950 hover:bg-primary hover:text-white transition-all shadow-xl active:scale-90 border-none"
+                                                        className={cn(
+                                                            "font-black uppercase tracking-widest bg-white text-slate-950 hover:bg-primary hover:text-white transition-all shadow-xl active:scale-90 border-none",
+                                                            heroButtonClasses
+                                                        )}
                                                     >
                                                         <Link href="/store/shop">{heroButtonText}</Link>
                                                     </Button>

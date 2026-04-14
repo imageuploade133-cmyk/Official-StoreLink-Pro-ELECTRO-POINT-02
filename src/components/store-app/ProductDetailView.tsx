@@ -277,6 +277,18 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                 textShadow: '0 1px 3px rgba(0,0,0,0.5)',
                 border: 'none'
             };
+        } else if (style === 'outline') {
+            return {
+                backgroundColor: 'transparent',
+                color: settings?.storeAddToCartColor || '#3b82f6',
+                border: `2px solid ${settings?.storeAddToCartColor || '#3b82f6'}`
+            };
+        } else if (style === 'ghost') {
+            return {
+                backgroundColor: 'transparent',
+                color: settings?.storeAddToCartColor || '#3b82f6',
+                border: 'none'
+            };
         }
 
         return {
@@ -291,6 +303,10 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
         const size = useIndividual
             ? (settings?.storeAddToCartSize || 'lg')
             : (settings?.storeBtnSize || 'lg');
+        
+        const shape = useIndividual
+            ? (settings?.storeAddToCartShape || 'lg')
+            : (settings?.storeBtnShape || 'lg');
 
         const sizeClasses = {
             sm: 'h-10 text-xs px-4',
@@ -299,7 +315,18 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
             xl: 'h-16 text-base px-10'
         };
 
-        return sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
+        const shapeClasses: Record<string, string> = {
+            none: 'rounded-none',
+            sm: 'rounded-sm',
+            md: 'rounded-md',
+            lg: 'rounded-2xl',
+            full: 'rounded-full'
+        };
+
+        const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
+        const shapeClass = shapeClasses[shape] || 'rounded-2xl';
+
+        return `${sizeClass} ${shapeClass}`;
     }, [settings]);
 
     const reviewStats = (() => {

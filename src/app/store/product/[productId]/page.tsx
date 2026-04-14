@@ -553,57 +553,71 @@ export default function ProductDetailsPage() {
       ? (settings?.storeAddToCartStyle || 'standard')
       : (settings?.storeBtnStyle || 'standard');
     
-    const getColor = () => {
-      if (useIndividual) {
-        if (style === 'gradient') {
-          return {
-            background: `linear-gradient(135deg, ${settings?.storeAddToCartGradientStart || '#3b82f6'}, ${settings?.storeAddToCartGradientEnd || '#1d4ed8'})`,
-            color: 'white',
-            border: 'none'
-          };
-        }
+    if (style === 'gradient') {
         return {
-          backgroundColor: settings?.storeAddToCartColor || '#3b82f6',
+          background: `linear-gradient(135deg, ${settings?.storeAddToCartGradientStart || '#3b82f6'}, ${settings?.storeAddToCartGradientEnd || '#1d4ed8'})`,
           color: 'white',
           border: 'none'
         };
-      }
-      // Global settings
-      if (style === 'gradient') {
+    } else if (style === 'image' && settings?.storeAddToCartImageUrl) {
         return {
-          background: `linear-gradient(135deg, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
+          backgroundImage: `url('${settings.storeAddToCartImageUrl}')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
           color: 'white',
+          textShadow: '0 1px 3px rgba(0,0,0,0.5)',
           border: 'none'
         };
-      }
-      return {
-        backgroundColor: settings?.storeBtnColor || '#3b82f6',
-        color: 'white',
-        border: 'none'
-      };
+    } else if (style === 'outline') {
+        return {
+          backgroundColor: 'transparent',
+          color: settings?.storeAddToCartColor || '#3b82f6',
+          border: `2px solid ${settings?.storeAddToCartColor || '#3b82f6'}`
+        };
+    } else if (style === 'ghost') {
+        return {
+          backgroundColor: 'transparent',
+          color: settings?.storeAddToCartColor || '#3b82f6',
+          border: 'none'
+        };
+    }
+
+    return {
+      backgroundColor: settings?.storeAddToCartColor || '#3b82f6',
+      color: 'white',
+      border: 'none'
     };
-    
-    return getColor();
   }, [settings]);
 
   // Button shape and size classes
   const buttonClasses = useMemo(() => {
     const useIndividual = settings?.useIndividualBtnSettings !== false;
     const shape = useIndividual 
-      ? (settings?.storeAddToCartShape || 'rounded-xl')
-      : (settings?.storeBtnShape || 'rounded-xl');
+      ? (settings?.storeAddToCartShape || 'lg')
+      : (settings?.storeBtnShape || 'lg');
     const size = useIndividual
       ? (settings?.storeAddToCartSize || 'lg')
       : (settings?.storeBtnSize || 'md');
     
-    const sizeClasses = {
-      sm: 'px-3 py-2 text-xs',
-      md: 'px-4 py-2.5 text-sm',
-      lg: 'px-6 py-3 text-sm',
-      xl: 'px-8 py-4 text-base'
+    const sizeClasses: Record<string, string> = {
+      sm: 'px-3 py-2 text-xs h-10',
+      md: 'px-4 py-2.5 text-sm h-12',
+      lg: 'px-6 py-3 text-sm h-14',
+      xl: 'px-8 py-4 text-base h-16'
+    };
+
+    const shapeClasses: Record<string, string> = {
+        none: 'rounded-none',
+        sm: 'rounded-sm',
+        md: 'rounded-md',
+        lg: 'rounded-2xl',
+        full: 'rounded-full'
     };
     
-    return `${shape} ${sizeClasses[size]}`;
+    const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
+    const shapeClass = shapeClasses[shape] || 'rounded-2xl';
+
+    return `${shapeClass} ${sizeClass}`;
   }, [settings]);
 
   if (isLoadingProduct) {
