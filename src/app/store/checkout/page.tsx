@@ -40,6 +40,7 @@ import {
   AlertTriangle,
   Sparkles,
   Store,
+  X,
 } from 'lucide-react';
 import type { UserProfile, Order, BankAccount, WhatsappMessageLog, Coupon } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -47,6 +48,9 @@ import { sendWhatsAppReceipt } from '@/lib/whatsapp';
 import { formatPhoneNumberForWhatsapp } from '@/lib/phone-utils';
 import { safeSessionStorage } from '@/lib/storage-utils';
 import { useAds } from '@/contexts/ad-context';
+
+import { uploadImage } from '@/ai/flows/image-upload-flow';
+import { Upload } from 'lucide-react';
 
 type CheckoutStep = 'details' | 'payment' | 'processing' | 'success';
 
@@ -77,6 +81,8 @@ export default function CheckoutPage() {
   const [selectedBankId, setSelectedBankId] = useState<string>('');
   const [paymentReference] = useState(generatePaymentReference());
   const [hasConfirmedTransfer, setHasConfirmedTransfer] = useState(false);
+  const [receiptUrl, setReceiptUrl] = useState<string>('');
+  const [isUploadingReceipt, setIsUploadingReceipt] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -127,14 +133,25 @@ export default function CheckoutPage() {
 
   const total = Math.max(0, subtotal - discountAmount - rewardDiscountAmount + shipping);
 
-  const bankAccounts = settings?.bankAccounts || [];
+  const [availablePaymentMethods, setAvailablePaymentMethods] = useState<any[]>([]);
+  const [isLoadingMethods, setIsLoadingMethods] = useState(true);
 
-  const availablePaymentMethods = useMemo(() => {
-    if (bankAccounts.length > 0) {
-        return [{ id: 'manual-bank-transfer', name: 'Bank Transfer' }];
-    }
-    return [];
-  }, [bankAccounts]);
+  useEffect(() => {
+    const fetchMethods = async () => {
+      try {
+        const res = await fetch('/api/payment/methods');
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setAvailablePaymentMethods(data);
+        }
+      } catch (e) {
+        console.error('Failed to fetch payment methods', e);
+      } finally {
+        setIsLoadingMethods(false);
+      }
+    };
+    fetchMethods();
+  }, []);
 
   useEffect(() => {
     if (settings) {
@@ -181,6 +198,7 @@ export default function CheckoutPage() {
     }
   }, [availablePaymentMethods, paymentMethod]);
 
+  const bankAccounts = settings?.bankAccounts || [];
   useEffect(() => {
     if (paymentMethod === 'Bank Transfer' && bankAccounts.length > 0 && !selectedBankId) {
         setSelectedBankId(bankAccounts[0].id);
@@ -194,6 +212,32 @@ export default function CheckoutPage() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleReceiptUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ variant: "destructive", title: "File too large", description: "Receipt image should be smaller than 2MB." });
+      return;
+    }
+
+    setIsUploadingReceipt(true);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      try {
+        const imageDataUri = reader.result as string;
+        const result = await uploadImage({ imageDataUri });
+        setReceiptUrl(result.display_url);
+        toast({ title: "Receipt Uploaded", description: "Your payment receipt has been attached." });
+      } catch (error: any) {
+        toast({ variant: "destructive", title: "Upload Failed", description: error.message || "Could not upload receipt." });
+      } finally {
+        setIsUploadingReceipt(false);
+      }
+    };
   };
 
   const handleProceedToPayment = (e: React.FormEvent) => {
@@ -217,10 +261,24 @@ export default function CheckoutPage() {
         return;
     }
 
+    if (!paymentMethod) {
+        toast({ variant: 'destructive', title: 'Action Required', description: 'Please select a payment method.' });
+        return;
+    }
+
     setStep('processing');
 
     try {
       let finalOrderId = '';
+      const orderRef = doc(collection(firestore, 'orders'));
+      finalOrderId = orderRef.id;
+
+      // For online payments, we initialize first, then save the order
+      // But actually, we should probably save the order as 'pending' first.
+      
+      const selectedMethod = availablePaymentMethods.find(m => m.name === paymentMethod);
+      const isOnlinePayment = selectedMethod && selectedMethod.provider !== 'manual';
+
       await runTransaction(firestore, async (transaction) => {
         // --- 1. GATHER ALL READS FIRST ---
         const productRefs = cartItems.map(item => doc(firestore, 'products', item.id));
@@ -249,8 +307,7 @@ export default function CheckoutPage() {
             transaction.update(couponRef, { usageCount: increment(1) });
         }
 
-        const orderRef = doc(collection(firestore, 'orders'));
-        const orderData: Omit<Order, 'id'> = {
+        const orderData: any = {
           userId: user?.uid || 'GUEST',
           items: cartItems.map(item => ({
             productId: item.id,
@@ -260,20 +317,43 @@ export default function CheckoutPage() {
           totalAmount: total,
           totalCost: cartItems.reduce((sum, item) => sum + (item.purchasePrice * item.quantity), 0),
           paymentMethod: paymentMethod,
-          paymentReference: paymentMethod === 'Bank Transfer' ? paymentReference : null as any,
-          couponCode: appliedCoupon?.code || null as any,
+          paymentReference: paymentMethod === 'Bank Transfer' ? paymentReference : null,
+          paymentReceiptUrl: paymentMethod === 'Bank Transfer' ? receiptUrl : null,
+          couponCode: appliedCoupon?.code || null,
           selectedBankAccount: paymentMethod === 'Bank Transfer' ? selectedBankAccount : null,
           fulfillmentType,
           deliveryLocationId: fulfillmentType === 'delivery' ? selectedLocationId : null,
           deliveryPrice: shipping,
           status: 'pending',
-          createdAt: serverTimestamp() as any,
+          isPaid: false,
+          createdAt: serverTimestamp(),
           guestInfo: user ? null : formData,
         };
 
         transaction.set(orderRef, orderData);
-        finalOrderId = orderRef.id;
       });
+
+      if (isOnlinePayment) {
+        // Initialize payment
+        const initRes = await fetch('/api/payment/initialize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderId: finalOrderId,
+            amount: total,
+            currency: settings?.currency || 'NGN',
+            email: formData.email,
+            providerName: selectedMethod.provider,
+          }),
+        });
+        const initData = await initRes.json();
+        if (initData.success && initData.authorization_url) {
+          window.location.href = initData.authorization_url;
+          return;
+        } else {
+          throw new Error(initData.error || 'Failed to initialize payment');
+        }
+      }
 
       // --- WhatsApp Notifications ---
       if (settings?.enableWhatsapp) {
@@ -570,6 +650,35 @@ export default function CheckoutPage() {
                                             <Label className="text-[10px] font-black uppercase text-muted-foreground">Payment Reference</Label>
                                             <div className="flex items-center gap-2"><p className="font-black text-2xl text-primary tracking-widest">{paymentReference}</p><Button variant="ghost" size="icon" className="h-8 w-8 text-primary" onClick={() => copyToClipboard(paymentReference, 'Reference Code')}><Copy className="h-4 w-4"/></Button></div>
                                             <p className="text-[10px] text-orange-600 font-bold">Enter this code in your transfer description.</p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <Label className="text-[10px] font-black uppercase text-muted-foreground">Upload Receipt (Optional)</Label>
+                                            <div className="flex flex-col gap-2">
+                                                {receiptUrl ? (
+                                                    <div className="relative w-full h-32 rounded-xl overflow-hidden border">
+                                                        <Image src={receiptUrl} alt="Receipt" fill className="object-cover" />
+                                                        <Button 
+                                                            variant="destructive" 
+                                                            size="icon" 
+                                                            className="absolute top-2 right-2 h-8 w-8"
+                                                            onClick={() => setReceiptUrl('')}
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-2">
+                                                        <Button asChild variant="outline" className="w-full h-12" disabled={isUploadingReceipt}>
+                                                            <label className="cursor-pointer">
+                                                                {isUploadingReceipt ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                                                                {isUploadingReceipt ? 'Uploading...' : 'Upload Payment Receipt'}
+                                                                <input type="file" accept="image/*" className="hidden" onChange={handleReceiptUpload} disabled={isUploadingReceipt} />
+                                                            </label>
+                                                        </Button>
+                                                    </div>
+                                                )}
+                                                <p className="text-[10px] text-muted-foreground">Attach a screenshot of your successful transfer.</p>
+                                            </div>
                                         </div>
                                         <div className="space-y-1">
                                             <Label className="text-[10px] font-black uppercase text-muted-foreground">Confirm Transfer</Label>

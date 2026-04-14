@@ -188,6 +188,16 @@ service cloud.firestore {
         allow read: if true;
         allow write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
     }
+
+    match /payment_providers/{doc} {
+      allow read: if true;
+      allow write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+    }
+    
+    match /transactions/{doc} {
+      allow read, create: if true;
+      allow update, delete: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+    }
     
     match /{document=**} {
       allow read, write: if false;
