@@ -91,6 +91,31 @@ export interface BankAccount {
   logoUrl?: string;
 }
 
+export interface PaymentProvider {
+  id: string;
+  storeId: string;
+  providerName: 'paystack' | 'flutterwave' | 'manual';
+  config: string; // JSON string, encrypted
+  isActive: boolean;
+  mode: 'test' | 'live';
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface Transaction {
+  id: string;
+  storeId: string;
+  orderId: string;
+  provider: string;
+  reference: string;
+  amount: number;
+  currency: string;
+  status: 'pending' | 'success' | 'failed';
+  customerEmail: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
 export interface Coupon {
   id: string;
   code: string;
@@ -891,6 +916,7 @@ export interface Order {
   totalCost: number;
   paymentMethod: string;
   paymentReference?: string;
+  paymentReceiptUrl?: string;
   couponCode?: string;
   status: OrderStatus;
   createdAt: Timestamp;
