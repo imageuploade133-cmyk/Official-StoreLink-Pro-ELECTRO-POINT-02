@@ -366,6 +366,10 @@ export interface Settings {
   shopProductsAlignment?: 'left' | 'center';
   shopCollectionTitle?: string;
   shopCollectionDescription?: string;
+  // Delivery Settings
+  enablePickUp?: boolean;
+  enableDelivery?: boolean;
+  deliveryLocations?: { id: string, name: string, price: number }[];
 }
 
 export type AppSettings = Settings;
@@ -880,6 +884,9 @@ export interface Order {
   status: OrderStatus;
   createdAt: Timestamp;
   selectedBankAccount?: BankAccount | null;
+  fulfillmentType?: 'pickup' | 'delivery';
+  deliveryLocationId?: string | null;
+  deliveryPrice?: number;
   guestInfo?: {
     name: string;
     email: string;

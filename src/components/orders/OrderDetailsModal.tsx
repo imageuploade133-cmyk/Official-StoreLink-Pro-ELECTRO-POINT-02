@@ -32,7 +32,8 @@ import {
   Info,
   ArchiveX,
   Printer,
-  Loader2
+  Loader2,
+  Store
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { formatCurrency } from '@/lib/formatUtils';
@@ -229,11 +230,26 @@ export function OrderDetailsModal({
                     </div>
                     <Separator className="bg-gray-200" />
                     <div className="space-y-1.5">
-                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Delivery Route</p>
+                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                        {order.fulfillmentType === 'pickup' ? 'Store Pickup' : 'Delivery Route'}
+                      </p>
                       <div className="flex items-start gap-2 text-xs leading-relaxed font-bold">
-                        <MapPin className="h-3.5 w-3.5 text-primary mt-0.5 shrink-0" />
-                        <p>{order.guestInfo?.address || 'Address provided in account profile'}</p>
+                        {order.fulfillmentType === 'pickup' ? (
+                          <Store className="h-3.5 w-3.5 text-primary mt-0.5 shrink-0" />
+                        ) : (
+                          <MapPin className="h-3.5 w-3.5 text-primary mt-0.5 shrink-0" />
+                        )}
+                        <p>
+                          {order.fulfillmentType === 'pickup' 
+                            ? 'Customer will pick up from store.' 
+                            : (order.guestInfo?.address || 'Address provided in account profile')}
+                        </p>
                       </div>
+                      {order.deliveryLocationId && (
+                        <p className="text-[10px] text-muted-foreground">
+                          Location ID: {order.deliveryLocationId}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -318,11 +334,11 @@ export function OrderDetailsModal({
               <div className="w-full md:w-72 space-y-3 bg-muted/10 p-6 rounded-2xl border border-dashed border-gray-300">
                 <div className="flex justify-between items-center text-sm text-muted-foreground">
                   <span className="font-medium">Subtotal</span>
-                  <span className="font-bold text-foreground">{formatCurrency(order.totalAmount - 10, currencySymbol)}</span>
+                  <span className="font-bold text-foreground">{formatCurrency(order.totalAmount - (order.deliveryPrice || 0), currencySymbol)}</span>
                 </div>
                 <div className="flex justify-between items-center text-sm text-muted-foreground">
-                  <span className="font-medium">Estimated Shipping</span>
-                  <span className="font-bold text-foreground">{formatCurrency(10, currencySymbol)}</span>
+                  <span className="font-medium">{order.fulfillmentType === 'pickup' ? 'Pickup Fee' : 'Delivery Price'}</span>
+                  <span className="font-bold text-foreground">{formatCurrency(order.deliveryPrice || 0, currencySymbol)}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between items-end pt-2">
@@ -359,8 +375,12 @@ export function OrderDetailsModal({
                         <p style={{ fontWeight: 'normal', fontSize: '12px' }}>{order.guestInfo?.phone || ''}</p>
                     </div>
                     <div className="meta-item" style={{ textAlign: 'right' }}>
-                        <h3>Delivery Address</h3>
-                        <p style={{ fontWeight: 'normal', whiteSpace: 'pre-wrap', maxWidth: '300px' }}>{order.guestInfo?.address || 'Provided in account profile'}</p>
+                        <h3>{order.fulfillmentType === 'pickup' ? 'Fulfillment Type' : 'Delivery Address'}</h3>
+                        <p style={{ fontWeight: 'normal', whiteSpace: 'pre-wrap', maxWidth: '300px' }}>
+                            {order.fulfillmentType === 'pickup' 
+                                ? 'Store Pickup' 
+                                : (order.guestInfo?.address || 'Provided in account profile')}
+                        </p>
                     </div>
                 </div>
 
@@ -392,11 +412,11 @@ export function OrderDetailsModal({
                     <div className="summary-box">
                         <div className="summary-row">
                             <span>Subtotal:</span>
-                            <span>{formatCurrency(order.totalAmount - 10, currencySymbol)}</span>
+                            <span>{formatCurrency(order.totalAmount - (order.deliveryPrice || 0), currencySymbol)}</span>
                         </div>
                         <div className="summary-row">
-                            <span>Shipping:</span>
-                            <span>{formatCurrency(10, currencySymbol)}</span>
+                            <span>{order.fulfillmentType === 'pickup' ? 'Pickup Fee' : 'Delivery Price'}:</span>
+                            <span>{formatCurrency(order.deliveryPrice || 0, currencySymbol)}</span>
                         </div>
                         <div className="summary-row grand-total">
                             <span>Grand Total:</span>
