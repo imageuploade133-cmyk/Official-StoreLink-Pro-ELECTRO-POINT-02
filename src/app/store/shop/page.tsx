@@ -312,21 +312,46 @@ function ShopPageContent() {
 
             <header className={cn(
                 "sticky top-0 z-30 transition-all duration-300 ease-in-out overflow-hidden",
-                "py-8 sm:py-12 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800",
+                "bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800",
                 showHeader ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
             )}>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tighter text-slate-900 dark:text-white">Shop Our Collection</h1>
-                    <p className="mt-2 sm:mt-4 max-w-2xl mx-auto text-xs sm:text-sm text-slate-500">
-                        Discover products that are crafted with quality and designed for life.
-                    </p>
-                </div>
+                {settings?.shopBannerImageUrl ? (
+                    <div className="w-full h-[200px] sm:h-[300px] lg:h-[400px] relative overflow-hidden">
+                        <img
+                            src={settings.shopBannerImageUrl}
+                            alt="Shop Banner"
+                            className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center px-4">
+                            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tighter text-white drop-shadow-lg">Shop Our Collection</h1>
+                            <p className="mt-2 sm:mt-4 max-w-2xl mx-auto text-sm sm:text-base text-white/90 font-medium drop-shadow-md">
+                                Discover products that are crafted with quality and designed for life.
+                            </p>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-8 sm:py-12">
+                        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tighter text-slate-900 dark:text-white">Shop Our Collection</h1>
+                        <p className="mt-2 sm:mt-4 max-w-2xl mx-auto text-xs sm:text-sm text-slate-500">
+                            Discover products that are crafted with quality and designed for life.
+                        </p>
+                    </div>
+                )}
             </header>
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-                <div className="flex flex-col lg:flex-row gap-8">
-                    <div className="flex-1">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-8 sm:mb-12">
-                    <form onSubmit={handleSearchSubmit} className="relative w-full sm:max-w-xs">
+                <div className={cn(
+                    "flex flex-col gap-8",
+                    settings?.shopProductsAlignment === 'center' ? "items-center" : "lg:flex-row"
+                )}>
+                    <div className={cn(
+                        "flex-1 w-full",
+                        settings?.shopProductsAlignment === 'center' && "max-w-5xl"
+                    )}>
+                        <div className={cn(
+                                "flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-8 sm:mb-12",
+                                settings?.shopProductsAlignment === 'center' && "justify-center"
+                            )}>
+                        <form onSubmit={handleSearchSubmit} className="relative w-full sm:max-w-xs">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground flex-shrink-0 z-10" />
                         <Input
                             ref={searchInputRef}
@@ -479,14 +504,16 @@ function ShopPageContent() {
                 )}
                     </div>
                     {/* Sidebar for Ads */}
-                    <aside className="hidden lg:block w-64 flex-shrink-0">
-                        <BannerAd location="sidebar" className="sticky top-24" />
-                    </aside>
-                </div>
-            </main>
-        </div>
-    );
-}
+                    {settings?.shopProductsAlignment !== 'center' && (
+                        <aside className="hidden lg:block w-64 flex-shrink-0">
+                            <BannerAd location="sidebar" className="sticky top-24" />
+                        </aside>
+                    )}
+                    </div>
+                    </main>
+                    </div>
+                    );
+                    }
 
 export default function ShopPage() {
   return (
