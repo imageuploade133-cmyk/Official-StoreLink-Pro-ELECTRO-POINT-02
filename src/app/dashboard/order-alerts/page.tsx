@@ -230,6 +230,7 @@ export default function OrderAlertsPage() {
               <ul className="list-disc pl-5 space-y-2 font-medium">
                 <li>Order ID Reference</li>
                 <li>Customer Name</li>
+                <li>Fulfillment Type (Delivery/Pickup)</li>
                 <li>Total Order Value</li>
                 <li>Payment Method used</li>
               </ul>

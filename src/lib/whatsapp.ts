@@ -48,6 +48,9 @@ export async function sendWhatsAppReceipt(payload: WhatsappPayload): Promise<voi
         if (payload.paymentMethod) {
             messageBody += `Payment Method: ${payload.paymentMethod}\n`;
         }
+        if (payload.fulfillmentType) {
+            messageBody += `Fulfillment: ${payload.fulfillmentType === 'delivery' ? 'Delivery' : 'Pickup'}\n`;
+        }
         if (payload.message) { // Use for reference codes or extra instructions
             messageBody += `\n${payload.message}\n`;
         }
@@ -57,6 +60,9 @@ export async function sendWhatsAppReceipt(payload: WhatsappPayload): Promise<voi
         messageBody += `Order ID: *#${payload.orderId.substring(0, 12).toUpperCase()}*\n`;
         messageBody += `Customer: ${payload.customerName}\n`;
         messageBody += `Total: *${currency}${payload.total?.toFixed(2)}*\n`;
+        if (payload.fulfillmentType) {
+            messageBody += `Type: ${payload.fulfillmentType === 'delivery' ? '🚚 Delivery' : '🏪 Pickup'}\n`;
+        }
         messageBody += `Payment: ${payload.paymentMethod}\n\n`;
         messageBody += `Please log in to the dashboard to process this order.`;
     } else {

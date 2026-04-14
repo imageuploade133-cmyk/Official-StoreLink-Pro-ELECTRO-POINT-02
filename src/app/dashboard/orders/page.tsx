@@ -416,6 +416,7 @@ export default function WebsiteOrdersPage() {
                         <TableHead>Customer</TableHead>
                         <TableHead className="text-right">Total Amount</TableHead>
                         <TableHead>Payment</TableHead>
+                        <TableHead>Fulfillment</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead className="text-right pr-6">Actions</TableHead>
                       </TableRow>
@@ -452,7 +453,14 @@ export default function WebsiteOrdersPage() {
                               </TableCell>
                               <TableCell>
                                 <div className="font-semibold text-sm truncate max-w-[150px]">{order.guestInfo?.name || 'Registered User'}</div>
-                                <div className="text-[10px] text-muted-foreground truncate max-w-[150px]">{order.guestInfo?.email || 'Authenticated'}</div>
+                                <div className="flex flex-col gap-0.5">
+                                  <div className="text-[10px] text-muted-foreground truncate max-w-[150px]">{order.guestInfo?.email || 'Authenticated'}</div>
+                                  {order.guestInfo?.phone && (
+                                    <div className="text-[10px] font-bold text-primary flex items-center gap-1">
+                                      <Phone className="h-2.5 w-2.5" /> {order.guestInfo.phone}
+                                    </div>
+                                  )}
+                                </div>
                               </TableCell>
                               <TableCell className="text-right font-black">
                                 {formatCurrency(order.totalAmount, currencySymbol)}
@@ -462,6 +470,20 @@ export default function WebsiteOrdersPage() {
                                     <CreditCard className="h-3.5 w-3.5 text-muted-foreground" />
                                     <span className="text-xs font-medium">{order.paymentMethod}</span>
                                 </div>
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="outline" className={cn(
+                                  "font-bold uppercase text-[10px] tracking-tight",
+                                  order.fulfillmentType === 'delivery'
+                                    ? "bg-blue-50 text-blue-700 border-blue-200"
+                                    : "bg-orange-50 text-orange-700 border-orange-200"
+                                )}>
+                                  {order.fulfillmentType === 'delivery' ? (
+                                    <><Truck className="mr-1 h-3 w-3" /> Delivery</>
+                                  ) : (
+                                    <><Store className="mr-1 h-3 w-3" /> Pickup</>
+                                  )}
+                                </Badge>
                               </TableCell>
                               <TableCell>{getStatusBadge(order)}</TableCell>
                               <TableCell className="text-right pr-6">
