@@ -919,7 +919,9 @@ export interface Order {
   paymentReceiptUrl?: string;
   couponCode?: string;
   status: OrderStatus;
+  isPaid: boolean;
   createdAt: Timestamp;
+  updatedAt?: Timestamp;
   selectedBankAccount?: BankAccount | null;
   fulfillmentType?: 'pickup' | 'delivery';
   deliveryLocationId?: string | null;

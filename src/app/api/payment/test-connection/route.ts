@@ -25,11 +25,13 @@ export async function GET(request: Request) {
 
     const data = providerSnap.data() as PaymentProvider;
     const config = JSON.parse(decrypt(data.config));
+    const mode = data.mode || 'test';
+    const secretKey = mode === 'live' ? config.liveSecretKey : config.testSecretKey || config.secretKey;
 
     if (providerName === 'paystack') {
       const res = await fetch('https://api.paystack.co/transaction/verify/test', {
         headers: {
-          Authorization: `Bearer ${config.secretKey}`,
+          Authorization: `Bearer ${secretKey}`,
         },
       });
       // Paystack returns 404 for a non-existent reference, but if we get a response it means the key is valid enough to talk to the API
@@ -42,7 +44,7 @@ export async function GET(request: Request) {
     if (providerName === 'flutterwave') {
       const res = await fetch('https://api.flutterwave.com/v3/transactions', {
         headers: {
-          Authorization: `Bearer ${config.secretKey}`,
+          Authorization: `Bearer ${secretKey}`,
         },
       });
       if (res.status === 401) {

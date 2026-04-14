@@ -23,6 +23,11 @@ export async function POST(request: Request) {
 
     const providerData = providerSnap.data() as PaymentProvider;
     const config = JSON.parse(decrypt(providerData.config));
+    const mode = providerData.mode || 'test';
+    
+    // Pick the correct keys based on mode
+    const secretKey = mode === 'live' ? config.liveSecretKey : config.testSecretKey || config.secretKey;
+    const publicKey = mode === 'live' ? config.livePublicKey : config.testPublicKey || config.publicKey;
 
     let result: any = {};
     let reference = `TRX-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -31,7 +36,7 @@ export async function POST(request: Request) {
       const paystackRes = await fetch('https://api.paystack.co/transaction/initialize', {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${config.secretKey}`,
+          Authorization: `Bearer ${secretKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -39,7 +44,7 @@ export async function POST(request: Request) {
           amount: Math.round(amount * 100), // Paystack uses kobo/cents
           currency,
           reference,
-          callback_url: `${request.headers.get('origin')}/store/checkout/verify?provider=paystack`,
+          callback_url: `${request.headers.get('origin')}/store/checkout/verify?provider=paystack&storeId=${storeId}`,
         }),
       });
       result = await paystackRes.json();
@@ -50,14 +55,14 @@ export async function POST(request: Request) {
         const flutterwaveRes = await fetch('https://api.flutterwave.com/v3/payments', {
             method: 'POST',
             headers: {
-              Authorization: `Bearer ${config.secretKey}`,
+              Authorization: `Bearer ${secretKey}`,
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
               tx_ref: reference,
               amount,
               currency,
-              redirect_url: `${request.headers.get('origin')}/store/checkout/verify?provider=flutterwave`,
+              redirect_url: `${request.headers.get('origin')}/store/checkout/verify?provider=flutterwave&storeId=${storeId}`,
               customer: {
                 email,
               },

@@ -47,16 +47,21 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 
 const paystackSchema = z.object({
-  publicKey: z.string().min(1, 'Public Key is required.'),
-  secretKey: z.string().min(1, 'Secret Key is required.'),
+  testPublicKey: z.string().optional(),
+  testSecretKey: z.string().optional(),
+  livePublicKey: z.string().optional(),
+  liveSecretKey: z.string().optional(),
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
 });
 
 const flutterwaveSchema = z.object({
-  publicKey: z.string().min(1, 'Public Key is required.'),
-  secretKey: z.string().min(1, 'Secret Key is required.'),
-  encryptionKey: z.string().min(1, 'Encryption Key is required.'),
+  testPublicKey: z.string().optional(),
+  testSecretKey: z.string().optional(),
+  testEncryptionKey: z.string().optional(),
+  livePublicKey: z.string().optional(),
+  liveSecretKey: z.string().optional(),
+  liveEncryptionKey: z.string().optional(),
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
 });
@@ -102,8 +107,10 @@ export default function WebsitePaymentSettings() {
   const paystackForm = useForm<PaystackFormValues>({
     resolver: zodResolver(paystackSchema),
     defaultValues: {
-      publicKey: paystackProvider?.config?.publicKey || '',
-      secretKey: paystackProvider?.config?.secretKey || '',
+      testPublicKey: paystackProvider?.config?.testPublicKey || '',
+      testSecretKey: paystackProvider?.config?.testSecretKey || '',
+      livePublicKey: paystackProvider?.config?.livePublicKey || '',
+      liveSecretKey: paystackProvider?.config?.liveSecretKey || '',
       isActive: paystackProvider?.isActive || false,
       mode: paystackProvider?.mode || 'test',
     },
@@ -112,9 +119,12 @@ export default function WebsitePaymentSettings() {
   const flutterwaveForm = useForm<FlutterwaveFormValues>({
     resolver: zodResolver(flutterwaveSchema),
     defaultValues: {
-      publicKey: flutterwaveProvider?.config?.publicKey || '',
-      secretKey: flutterwaveProvider?.config?.secretKey || '',
-      encryptionKey: flutterwaveProvider?.config?.encryptionKey || '',
+      testPublicKey: flutterwaveProvider?.config?.testPublicKey || '',
+      testSecretKey: flutterwaveProvider?.config?.testSecretKey || '',
+      testEncryptionKey: flutterwaveProvider?.config?.testEncryptionKey || '',
+      livePublicKey: flutterwaveProvider?.config?.livePublicKey || '',
+      liveSecretKey: flutterwaveProvider?.config?.liveSecretKey || '',
+      liveEncryptionKey: flutterwaveProvider?.config?.liveEncryptionKey || '',
       isActive: flutterwaveProvider?.isActive || false,
       mode: flutterwaveProvider?.mode || 'test',
     },
@@ -123,17 +133,22 @@ export default function WebsitePaymentSettings() {
   useEffect(() => {
     if (paystackProvider) {
       paystackForm.reset({
-        publicKey: paystackProvider.config?.publicKey || '',
-        secretKey: paystackProvider.config?.secretKey || '',
+        testPublicKey: paystackProvider.config?.testPublicKey || '',
+        testSecretKey: paystackProvider.config?.testSecretKey || '',
+        livePublicKey: paystackProvider.config?.livePublicKey || '',
+        liveSecretKey: paystackProvider.config?.liveSecretKey || '',
         isActive: paystackProvider.isActive || false,
         mode: paystackProvider.mode || 'test',
       });
     }
     if (flutterwaveProvider) {
       flutterwaveForm.reset({
-        publicKey: flutterwaveProvider.config?.publicKey || '',
-        secretKey: flutterwaveProvider.config?.secretKey || '',
-        encryptionKey: flutterwaveProvider.config?.encryptionKey || '',
+        testPublicKey: flutterwaveProvider.config?.testPublicKey || '',
+        testSecretKey: flutterwaveProvider.config?.testSecretKey || '',
+        testEncryptionKey: flutterwaveProvider.config?.testEncryptionKey || '',
+        livePublicKey: flutterwaveProvider.config?.livePublicKey || '',
+        liveSecretKey: flutterwaveProvider.config?.liveSecretKey || '',
+        liveEncryptionKey: flutterwaveProvider.config?.liveEncryptionKey || '',
         isActive: flutterwaveProvider.isActive || false,
         mode: flutterwaveProvider.mode || 'test',
       });
@@ -392,10 +407,10 @@ export default function WebsitePaymentSettings() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                           control={paystackForm.control}
-                          name="publicKey"
+                          name="testPublicKey"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Public Key</FormLabel>
+                              <FormLabel>Test Public Key</FormLabel>
                               <FormControl><Input placeholder="pk_test_..." {...field} /></FormControl>
                               <FormMessage />
                             </FormItem>
@@ -403,11 +418,36 @@ export default function WebsitePaymentSettings() {
                         />
                         <FormField
                           control={paystackForm.control}
-                          name="secretKey"
+                          name="testSecretKey"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Secret Key</FormLabel>
+                              <FormLabel>Test Secret Key</FormLabel>
                               <FormControl><Input type="password" placeholder="sk_test_..." {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={paystackForm.control}
+                          name="livePublicKey"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Live Public Key</FormLabel>
+                              <FormControl><Input placeholder="pk_live_..." {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={paystackForm.control}
+                          name="liveSecretKey"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Live Secret Key</FormLabel>
+                              <FormControl><Input type="password" placeholder="sk_live_..." {...field} /></FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
@@ -417,9 +457,9 @@ export default function WebsitePaymentSettings() {
                       <div className="space-y-2 pt-4">
                         <Label className="text-sm font-medium">Webhook URL</Label>
                         <div className="flex items-center gap-2">
-                          <Input readOnly value={`${window.location.origin}/api/payment/webhook?provider=paystack`} className="bg-muted" />
+                          <Input readOnly value={`${typeof window !== 'undefined' ? window.location.origin : ''}/api/payment/webhook?provider=paystack&storeId=global`} className="bg-muted" />
                           <Button variant="outline" size="sm" onClick={() => {
-                            navigator.clipboard.writeText(`${window.location.origin}/api/payment/webhook?provider=paystack`);
+                            navigator.clipboard.writeText(`${window.location.origin}/api/payment/webhook?provider=paystack&storeId=global`);
                             toast({ title: 'Copied', description: 'Webhook URL copied to clipboard.' });
                           }}>Copy</Button>
                         </div>
@@ -523,10 +563,10 @@ export default function WebsitePaymentSettings() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                           control={flutterwaveForm.control}
-                          name="publicKey"
+                          name="testPublicKey"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Public Key</FormLabel>
+                              <FormLabel>Test Public Key</FormLabel>
                               <FormControl><Input placeholder="FLWPUBK_TEST-..." {...field} /></FormControl>
                               <FormMessage />
                             </FormItem>
@@ -534,10 +574,10 @@ export default function WebsitePaymentSettings() {
                         />
                         <FormField
                           control={flutterwaveForm.control}
-                          name="secretKey"
+                          name="testSecretKey"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Secret Key</FormLabel>
+                              <FormLabel>Test Secret Key</FormLabel>
                               <FormControl><Input type="password" placeholder="FLWSECK_TEST-..." {...field} /></FormControl>
                               <FormMessage />
                             </FormItem>
@@ -546,11 +586,47 @@ export default function WebsitePaymentSettings() {
                       </div>
                       <FormField
                         control={flutterwaveForm.control}
-                        name="encryptionKey"
+                        name="testEncryptionKey"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Encryption Key</FormLabel>
+                            <FormLabel>Test Encryption Key</FormLabel>
                             <FormControl><Input type="password" placeholder="FLWSECK_TEST_ENCRY..." {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={flutterwaveForm.control}
+                          name="livePublicKey"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Live Public Key</FormLabel>
+                              <FormControl><Input placeholder="FLWPUBK-..." {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={flutterwaveForm.control}
+                          name="liveSecretKey"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Live Secret Key</FormLabel>
+                              <FormControl><Input type="password" placeholder="FLWSECK-..." {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <FormField
+                        control={flutterwaveForm.control}
+                        name="liveEncryptionKey"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Live Encryption Key</FormLabel>
+                            <FormControl><Input type="password" placeholder="FLWSECK_ENCRY..." {...field} /></FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
