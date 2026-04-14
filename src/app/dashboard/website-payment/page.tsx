@@ -147,7 +147,7 @@ export default function WebsitePaymentSettings() {
       
       // Filter out masked keys before saving if they haven't been changed
       Object.keys(config).forEach(key => {
-        if (config[key].startsWith('********')) {
+        if (typeof config[key] === 'string' && config[key].startsWith('********')) {
           delete config[key];
         }
       });
