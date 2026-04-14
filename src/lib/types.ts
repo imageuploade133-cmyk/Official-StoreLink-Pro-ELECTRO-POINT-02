@@ -204,6 +204,7 @@ export interface Settings {
   storeAddToCartImageUrl?: string;
   storeAddToCartShape?: 'none' | 'sm' | 'md' | 'lg' | 'full';
   storeAddToCartSize?: 'sm' | 'md' | 'lg' | 'xl';
+  storeAddToCartShadow?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'inner';
   storeGridCartText?: string;
   storeGridCartIcon?: string;
   storeGridCartStyle?: 'standard' | 'gradient' | 'image' | 'outline' | 'ghost';
@@ -213,6 +214,7 @@ export interface Settings {
   storeGridCartImageUrl?: string;
   storeGridCartShape?: 'none' | 'sm' | 'md' | 'lg' | 'full';
   storeGridCartSize?: 'sm' | 'md' | 'lg' | 'xl';
+  storeGridCartShadow?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'inner';
   storeHeroBtnText?: string;
   storeHeroBtnIcon?: string;
   storeHeroBtnStyle?: 'standard' | 'gradient' | 'image' | 'outline' | 'ghost';
@@ -222,6 +224,7 @@ export interface Settings {
   storeHeroBtnImageUrl?: string;
   storeHeroBtnShape?: 'none' | 'sm' | 'md' | 'lg' | 'full';
   storeHeroBtnSize?: 'sm' | 'md' | 'lg' | 'xl';
+  storeHeroBtnShadow?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'inner';
   // Explore Button settings
   storeExploreBtnText?: string;
   storeExploreBtnIcon?: string;
@@ -232,6 +235,7 @@ export interface Settings {
   storeExploreBtnImageUrl?: string;
   storeExploreBtnShape?: 'none' | 'sm' | 'md' | 'lg' | 'full';
   storeExploreBtnSize?: 'sm' | 'md' | 'lg' | 'xl';
+  storeExploreBtnShadow?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'inner';
   // Global Store Button Style
   storeBtnStyle?: 'standard' | 'gradient';
   storeBtnColor?: string;

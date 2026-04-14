@@ -155,20 +155,45 @@ export function HeroCarousel() {
   const buttonClasses = useMemo(() => {
     const useIndividual = settings?.useIndividualBtnSettings !== false;
     const shape = useIndividual 
-      ? (settings?.storeHeroBtnShape || 'rounded-full')
-      : (settings?.storeBtnShape || 'rounded-xl');
+      ? (settings?.storeHeroBtnShape || 'lg')
+      : (settings?.storeBtnShape || 'lg');
     const size = useIndividual
       ? (settings?.storeHeroBtnSize || 'lg')
       : (settings?.storeBtnSize || 'md');
+    const shadow = useIndividual
+      ? (settings?.storeHeroBtnShadow || 'md')
+      : 'md';
     
-    const sizeClasses = {
+    const sizeClasses: Record<string, string> = {
       sm: 'px-4 py-2 text-xs',
       md: 'px-6 py-3 text-sm',
       lg: 'px-8 py-4 text-base',
       xl: 'px-10 py-5 text-lg'
     };
+
+    const shapeClasses: Record<string, string> = {
+      none: 'rounded-none',
+      sm: 'rounded-sm',
+      md: 'rounded-md',
+      lg: 'rounded-[2rem]',
+      full: 'rounded-full'
+    };
+
+    const shadowClasses: Record<string, string> = {
+      none: 'shadow-none',
+      sm: 'shadow-sm',
+      md: 'shadow-md',
+      lg: 'shadow-lg',
+      xl: 'shadow-xl',
+      '2xl': 'shadow-2xl',
+      inner: 'shadow-inner'
+    };
     
-    return `${shape} ${sizeClasses[size]}`;
+    const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
+    const shapeClass = shapeClasses[shape] || 'rounded-[2rem]';
+    const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-md';
+
+    return `${shapeClass} ${sizeClass} ${shadowClass}`;
   }, [settings]);
 
   if (isLoading) {

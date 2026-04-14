@@ -308,6 +308,10 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
             ? (settings?.storeAddToCartShape || 'lg')
             : (settings?.storeBtnShape || 'lg');
 
+        const shadow = useIndividual
+            ? (settings?.storeAddToCartShadow || 'sm')
+            : 'sm';
+
         const sizeClasses = {
             sm: 'h-10 text-xs px-4',
             md: 'h-12 text-sm px-6',
@@ -323,10 +327,21 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
             full: 'rounded-full'
         };
 
+        const shadowClasses: Record<string, string> = {
+            none: 'shadow-none',
+            sm: 'shadow-sm',
+            md: 'shadow-md',
+            lg: 'shadow-lg',
+            xl: 'shadow-xl',
+            '2xl': 'shadow-2xl',
+            inner: 'shadow-inner'
+        };
+
         const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
         const shapeClass = shapeClasses[shape] || 'rounded-2xl';
+        const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
 
-        return `${sizeClass} ${shapeClass}`;
+        return `${sizeClass} ${shapeClass} ${shadowClass}`;
     }, [settings]);
 
     const reviewStats = (() => {

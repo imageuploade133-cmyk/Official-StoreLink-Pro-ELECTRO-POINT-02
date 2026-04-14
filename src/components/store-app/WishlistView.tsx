@@ -76,6 +76,50 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
             border: 'none'
         };
     }, [settings]);
+    
+    const gridCartButtonClasses = useMemo(() => {
+        const useIndividual = settings?.useIndividualBtnSettings !== false;
+        const size = useIndividual
+            ? (settings?.storeGridCartSize || 'md')
+            : (settings?.storeBtnSize || 'md');
+        const shape = useIndividual
+            ? (settings?.storeGridCartShape || 'md')
+            : (settings?.storeBtnShape || 'md');
+        const shadow = useIndividual
+            ? (settings?.storeGridCartShadow || 'sm')
+            : 'sm';
+        
+        const sizeClasses = {
+            sm: 'h-8 text-[8px] px-3',
+            md: 'h-10 text-[9px] px-4',
+            lg: 'h-12 text-[10px] px-6',
+            xl: 'h-14 text-[11px] px-8'
+        };
+
+        const shapeClasses: Record<string, string> = {
+            none: 'rounded-none',
+            sm: 'rounded-sm',
+            md: 'rounded-md',
+            lg: 'rounded-2xl',
+            full: 'rounded-full'
+        };
+
+        const shadowClasses: Record<string, string> = {
+            none: 'shadow-none',
+            sm: 'shadow-sm',
+            md: 'shadow-md',
+            lg: 'shadow-lg',
+            xl: 'shadow-xl',
+            '2xl': 'shadow-2xl',
+            inner: 'shadow-inner'
+        };
+        
+        const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
+        const shapeClass = shapeClasses[shape] || 'rounded-2xl';
+        const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
+
+        return `${sizeClass} ${shapeClass} ${shadowClass}`;
+    }, [settings]);
 
     const GridCartIcon = useMemo(() => {
         const iconName = settings?.storeGridCartIcon || 'ShoppingCart';
@@ -186,7 +230,7 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
                                                 onClick={(e) => handleAddToCart(e, product, price)}
                                                 disabled={isOutOfStock}
                                                 style={gridCartButtonStyle}
-                                                className="w-full h-12 rounded-2xl text-white font-black text-[10px] uppercase tracking-widest shadow-2xl active:scale-95 border-none"
+                                                className={cn("w-full font-black uppercase tracking-widest active:scale-95 border-none", gridCartButtonClasses)}
                                             >
                                                 <GridCartIcon className="h-4 w-4 mr-2" /> Move to Bag
                                             </Button>

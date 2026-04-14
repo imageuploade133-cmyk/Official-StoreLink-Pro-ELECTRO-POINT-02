@@ -151,6 +151,9 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
     const size = useIndividual
       ? (settings?.storeGridCartSize || 'md')
       : (settings?.storeBtnSize || 'md');
+    const shadow = useIndividual
+      ? (settings?.storeGridCartShadow || 'sm')
+      : 'sm';
     
     const sizeClasses: Record<string, string> = {
       sm: 'px-3 py-1.5 text-xs',
@@ -166,11 +169,22 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
       lg: 'rounded-2xl',
       full: 'rounded-full'
     };
+
+    const shadowClasses: Record<string, string> = {
+      none: 'shadow-none',
+      sm: 'shadow-sm',
+      md: 'shadow-md',
+      lg: 'shadow-lg',
+      xl: 'shadow-xl',
+      '2xl': 'shadow-2xl',
+      inner: 'shadow-inner'
+    };
     
     const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.md;
     const shapeClass = shapeClasses[shape] || 'rounded-2xl';
+    const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
 
-    return `${shapeClass} ${sizeClass}`;
+    return `${shapeClass} ${sizeClass} ${shadowClass}`;
   }, [settings]);
 
   // Calculate media area height based on card height setting (60% of total height)

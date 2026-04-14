@@ -339,6 +339,9 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
     const shape = useIndividual
         ? (settings?.storeExploreBtnShape || 'full')
         : (settings?.storeBtnShape || 'full');
+    const shadow = useIndividual
+        ? (settings?.storeExploreBtnShadow || 'sm')
+        : 'sm';
 
     const sizeClasses = {
         sm: 'h-10 px-8 text-[10px]',
@@ -355,10 +358,21 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
         full: 'rounded-full'
     };
 
+    const shadowClasses: Record<string, string> = {
+        none: 'shadow-none',
+        sm: 'shadow-sm',
+        md: 'shadow-md',
+        lg: 'shadow-lg',
+        xl: 'shadow-xl',
+        '2xl': 'shadow-2xl',
+        inner: 'shadow-inner'
+    };
+
     const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
     const shapeClass = shapeClasses[shape] || 'rounded-full';
+    const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
 
-    return `${sizeClass} ${shapeClass}`;
+    return `${sizeClass} ${shapeClass} ${shadowClass}`;
   }, [settings]);
 
   const exploreText = useMemo(() => {

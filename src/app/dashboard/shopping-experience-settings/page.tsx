@@ -73,6 +73,16 @@ const buttonShapes = [
   { name: 'full', label: 'Pill', description: 'Maximum rounding', class: 'rounded-full' },
 ];
 
+const shadowOptions = [
+  { name: 'none', label: 'None', class: 'shadow-none' },
+  { name: 'sm', label: 'Small', class: 'shadow-sm' },
+  { name: 'md', label: 'Medium', class: 'shadow-md' },
+  { name: 'lg', label: 'Large', class: 'shadow-lg' },
+  { name: 'xl', label: 'X-Large', class: 'shadow-xl' },
+  { name: '2xl', label: '2X-Large', class: 'shadow-2xl' },
+  { name: 'inner', label: 'Inner', class: 'shadow-inner' },
+];
+
 const shoppingExpSchema = z.object({
   storeAddToCartText: z.string().min(1, 'Label required').max(40, 'Label too long.'),
   storeAddToCartIcon: z.preprocess((val) => val || 'ShoppingCart', z.string()).default('ShoppingCart'),
@@ -83,6 +93,7 @@ const shoppingExpSchema = z.object({
   storeAddToCartImageUrl: z.string().url().or(z.literal('')).optional(),
   storeAddToCartSize: z.preprocess((val) => val || 'lg', z.enum(['sm', 'md', 'lg', 'xl'])).default('lg'),
   storeAddToCartShape: z.preprocess((val) => val || 'lg', z.enum(['none', 'sm', 'md', 'lg', 'full'])).default('lg'),
+  storeAddToCartShadow: z.preprocess((val) => val || 'sm', z.enum(['none', 'sm', 'md', 'lg', 'xl', '2xl', 'inner'])).default('sm'),
   
   storeGridCartText: z.string().min(1, 'Label required').max(20, 'Label too long.'),
   storeGridCartIcon: z.preprocess((val) => val || 'ShoppingCart', z.string()).default('ShoppingCart'),
@@ -93,6 +104,7 @@ const shoppingExpSchema = z.object({
   storeGridCartImageUrl: z.string().url().or(z.literal('')).optional(),
   storeGridCartSize: z.preprocess((val) => val || 'md', z.enum(['sm', 'md', 'lg', 'xl'])).default('md'),
   storeGridCartShape: z.preprocess((val) => val || 'md', z.enum(['none', 'sm', 'md', 'lg', 'full'])).default('md'),
+  storeGridCartShadow: z.preprocess((val) => val || 'sm', z.enum(['none', 'sm', 'md', 'lg', 'xl', '2xl', 'inner'])).default('sm'),
   
   storeHeroBtnText: z.string().min(1, 'Label required').max(40, 'Label too long.'),
   storeHeroBtnIcon: z.preprocess((val) => val || 'ArrowRight', z.string()).default('ArrowRight'),
@@ -103,6 +115,7 @@ const shoppingExpSchema = z.object({
   storeHeroBtnImageUrl: z.string().url().or(z.literal('')).optional(),
   storeHeroBtnSize: z.preprocess((val) => val || 'lg', z.enum(['sm', 'md', 'lg', 'xl'])).default('lg'),
   storeHeroBtnShape: z.preprocess((val) => val || 'lg', z.enum(['none', 'sm', 'md', 'lg', 'full'])).default('lg'),
+  storeHeroBtnShadow: z.preprocess((val) => val || 'md', z.enum(['none', 'sm', 'md', 'lg', 'xl', '2xl', 'inner'])).default('md'),
 
   storeExploreBtnText: z.string().min(1, 'Label required').max(40, 'Label too long.'),
   storeExploreBtnIcon: z.preprocess((val) => val || 'ArrowRight', z.string()).default('ArrowRight'),
@@ -113,6 +126,7 @@ const shoppingExpSchema = z.object({
   storeExploreBtnImageUrl: z.string().url().or(z.literal('')).optional(),
   storeExploreBtnSize: z.preprocess((val) => val || 'lg', z.enum(['sm', 'md', 'lg', 'xl'])).default('lg'),
   storeExploreBtnShape: z.preprocess((val) => val || 'lg', z.enum(['none', 'sm', 'md', 'lg', 'full'])).default('lg'),
+  storeExploreBtnShadow: z.preprocess((val) => val || 'sm', z.enum(['none', 'sm', 'md', 'lg', 'xl', '2xl', 'inner'])).default('sm'),
   
   useIndividualBtnSettings: z.boolean().default(true),
   showProductReviews: z.boolean().default(true),
@@ -293,6 +307,46 @@ function ButtonShapeSelector({
   );
 }
 
+// Button Shadow Selector Component
+function ButtonShadowSelector({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <FormItem className="space-y-3">
+      <FormLabel className="text-base font-bold flex items-center gap-2">
+        <MousePointerClick className="h-4 w-4" /> Button Shadow
+      </FormLabel>
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+        {shadowOptions.map((shadow) => (
+          <button
+            key={shadow.name}
+            type="button"
+            onClick={() => onChange(shadow.name)}
+            className={cn(
+              "relative flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all",
+              value === shadow.name
+                ? 'border-primary bg-primary/5'
+                : 'border-muted hover:border-primary/30 hover:bg-muted/30'
+            )}
+          >
+            <div className={cn("w-12 h-6 bg-background border border-muted", shadow.class)} />
+            <div className="text-center">
+              <p className="text-[10px] font-semibold">{shadow.label}</p>
+            </div>
+            {value === shadow.name && (
+              <Check className="absolute top-1 right-1 h-3 w-3 text-primary" />
+            )}
+          </button>
+        ))}
+      </div>
+    </FormItem>
+  );
+}
+
 // Button Preview Component
 function ButtonPreview({
   settings,
@@ -310,6 +364,7 @@ function ButtonPreview({
   const style = settings[`${prefix}Style`] || 'standard';
   const size = settings[`${prefix}Size`] || 'md';
   const shape = settings[`${prefix}Shape`] || 'md';
+  const shadow = settings[`${prefix}Shadow`] || 'sm';
 
   const getSizeClasses = (s: string) => {
     switch (s) {
@@ -324,6 +379,11 @@ function ButtonPreview({
   const getShapeClass = (sh: string) => {
     const found = buttonShapes.find(s => s.name === sh);
     return found ? found.class : 'rounded-md';
+  };
+
+  const getShadowClass = (shd: string) => {
+    const found = shadowOptions.find(s => s.name === shd);
+    return found ? found.class : 'shadow-sm';
   };
 
   const getStyleProperties = () => {
@@ -372,7 +432,7 @@ function ButtonPreview({
       <p className="text-xs font-semibold text-muted-foreground mb-3">Preview</p>
       <Button
         type="button"
-        className={cn(getSizeClasses(size), getShapeClass(shape), "font-semibold shadow-sm")}
+        className={cn(getSizeClasses(size), getShapeClass(shape), getShadowClass(shadow), "font-semibold")}
         style={getStyleProperties()}
       >
         {Icon && <Icon className="mr-2 h-4 w-4" />}
@@ -498,6 +558,18 @@ function ButtonSection({
           render={({ field }) => (
             <ButtonShapeSelector
               value={field.value || (prefix === 'storeGridCart' ? 'md' : 'lg')}
+              onChange={field.onChange}
+            />
+          )}
+        />
+
+        {/* Button Shadow Selection */}
+        <FormField
+          control={form.control}
+          name={`${prefix}Shadow` as any}
+          render={({ field }) => (
+            <ButtonShadowSelector
+              value={field.value || (prefix === 'storeHeroBtn' ? 'md' : 'sm')}
               onChange={field.onChange}
             />
           )}
@@ -693,6 +765,7 @@ export default function ShoppingExperienceSettingsPage() {
       storeAddToCartImageUrl: '',
       storeAddToCartSize: 'lg',
       storeAddToCartShape: 'lg',
+      storeAddToCartShadow: 'sm',
 
       storeGridCartText: 'Add to Bag',
       storeGridCartIcon: 'ShoppingCart',
@@ -703,6 +776,7 @@ export default function ShoppingExperienceSettingsPage() {
       storeGridCartImageUrl: '',
       storeGridCartSize: 'md',
       storeGridCartShape: 'md',
+      storeGridCartShadow: 'sm',
 
       storeHeroBtnText: 'Shop Collection',
       storeHeroBtnIcon: 'ArrowRight',
@@ -713,6 +787,7 @@ export default function ShoppingExperienceSettingsPage() {
       storeHeroBtnImageUrl: '',
       storeHeroBtnSize: 'lg',
       storeHeroBtnShape: 'lg',
+      storeHeroBtnShadow: 'md',
 
       storeExploreBtnText: 'Explore Collection',
       storeExploreBtnIcon: 'ArrowRight',
@@ -723,6 +798,7 @@ export default function ShoppingExperienceSettingsPage() {
       storeExploreBtnImageUrl: '',
       storeExploreBtnSize: 'lg',
       storeExploreBtnShape: 'lg',
+      storeExploreBtnShadow: 'sm',
 
       useIndividualBtnSettings: true,
       showProductReviews: true,
@@ -742,6 +818,7 @@ export default function ShoppingExperienceSettingsPage() {
         storeAddToCartImageUrl: settingsData.storeAddToCartImageUrl || '',
         storeAddToCartSize: (settingsData.storeAddToCartSize as any) || 'lg',
         storeAddToCartShape: (settingsData.storeAddToCartShape as any) || 'lg',
+        storeAddToCartShadow: (settingsData.storeAddToCartShadow as any) || 'sm',
 
         storeGridCartText: settingsData.storeGridCartText || 'Add to Bag',
         storeGridCartIcon: settingsData.storeGridCartIcon || 'ShoppingCart',
@@ -752,6 +829,7 @@ export default function ShoppingExperienceSettingsPage() {
         storeGridCartImageUrl: settingsData.storeGridCartImageUrl || '',
         storeGridCartSize: (settingsData.storeGridCartSize as any) || 'md',
         storeGridCartShape: (settingsData.storeGridCartShape as any) || 'md',
+        storeGridCartShadow: (settingsData.storeGridCartShadow as any) || 'sm',
 
         storeHeroBtnText: settingsData.storeHeroBtnText || 'Shop Collection',
         storeHeroBtnIcon: settingsData.storeHeroBtnIcon || 'ArrowRight',
@@ -762,6 +840,7 @@ export default function ShoppingExperienceSettingsPage() {
         storeHeroBtnImageUrl: settingsData.storeHeroBtnImageUrl || '',
         storeHeroBtnSize: (settingsData.storeHeroBtnSize as any) || 'lg',
         storeHeroBtnShape: (settingsData.storeHeroBtnShape as any) || 'lg',
+        storeHeroBtnShadow: (settingsData.storeHeroBtnShadow as any) || 'md',
 
         storeExploreBtnText: settingsData.storeExploreBtnText || 'Explore Collection',
         storeExploreBtnIcon: settingsData.storeExploreBtnIcon || 'ArrowRight',
@@ -772,6 +851,7 @@ export default function ShoppingExperienceSettingsPage() {
         storeExploreBtnImageUrl: settingsData.storeExploreBtnImageUrl || '',
         storeExploreBtnSize: (settingsData.storeExploreBtnSize as any) || 'lg',
         storeExploreBtnShape: (settingsData.storeExploreBtnShape as any) || 'lg',
+        storeExploreBtnShadow: (settingsData.storeExploreBtnShadow as any) || 'sm',
 
         useIndividualBtnSettings: settingsData.useIndividualBtnSettings !== false,
         showProductReviews: settingsData.showProductReviews ?? true,
