@@ -36,7 +36,16 @@ import {
   Zap,
   TrendingDown,
   CalendarIcon,
-  Info
+  Info,
+  ChevronRight,
+  ArrowRight,
+  CircleArrowRight,
+  Circle,
+  Square,
+  Type,
+  MousePointer2,
+  CircleDashed,
+  Box
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
@@ -396,9 +405,24 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                <SelectItem value="chevron">Chevron</SelectItem>
-                                                <SelectItem value="arrow">Arrow</SelectItem>
-                                                <SelectItem value="circle">Circle</SelectItem>
+                                                <SelectItem value="chevron">
+                                                    <div className="flex items-center gap-2">
+                                                        <ChevronRight className="h-4 w-4" />
+                                                        <span>Chevron</span>
+                                                    </div>
+                                                </SelectItem>
+                                                <SelectItem value="arrow">
+                                                    <div className="flex items-center gap-2">
+                                                        <ArrowRight className="h-4 w-4" />
+                                                        <span>Arrow</span>
+                                                    </div>
+                                                </SelectItem>
+                                                <SelectItem value="circle">
+                                                    <div className="flex items-center gap-2">
+                                                        <CircleArrowRight className="h-4 w-4" />
+                                                        <span>Circle</span>
+                                                    </div>
+                                                </SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
@@ -414,11 +438,36 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                <SelectItem value="default">Default</SelectItem>
-                                                <SelectItem value="rounded">Rounded</SelectItem>
-                                                <SelectItem value="square">Square</SelectItem>
-                                                <SelectItem value="outline">Outline</SelectItem>
-                                                <SelectItem value="ghost">Ghost</SelectItem>
+                                                <SelectItem value="default">
+                                                    <div className="flex items-center gap-2">
+                                                        <Circle className="h-4 w-4 fill-current" />
+                                                        <span>Default (Solid)</span>
+                                                    </div>
+                                                </SelectItem>
+                                                <SelectItem value="rounded">
+                                                    <div className="flex items-center gap-2">
+                                                        <Box className="h-4 w-4 fill-current" />
+                                                        <span>Rounded</span>
+                                                    </div>
+                                                </SelectItem>
+                                                <SelectItem value="square">
+                                                    <div className="flex items-center gap-2">
+                                                        <Square className="h-4 w-4 fill-current" />
+                                                        <span>Square</span>
+                                                    </div>
+                                                </SelectItem>
+                                                <SelectItem value="outline">
+                                                    <div className="flex items-center gap-2">
+                                                        <CircleDashed className="h-4 w-4" />
+                                                        <span>Outline</span>
+                                                    </div>
+                                                </SelectItem>
+                                                <SelectItem value="ghost">
+                                                    <div className="flex items-center gap-2">
+                                                        <MousePointer2 className="h-4 w-4" />
+                                                        <span>Ghost</span>
+                                                    </div>
+                                                </SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
