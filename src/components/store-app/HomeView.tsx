@@ -95,6 +95,9 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
         const shape = useIndividual
             ? (settings?.storeHeroBtnShape || 'lg')
             : (settings?.storeBtnShape || 'lg');
+        const shadow = useIndividual
+            ? (settings?.storeHeroBtnShadow || 'md')
+            : 'md';
 
         const sizeClasses = {
             sm: 'h-8 px-4 text-[8px]',
@@ -111,10 +114,21 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
             full: 'rounded-full'
         };
 
+        const shadowClasses: Record<string, string> = {
+            none: 'shadow-none',
+            sm: 'shadow-sm',
+            md: 'shadow-md',
+            lg: 'shadow-lg',
+            xl: 'shadow-xl',
+            '2xl': 'shadow-2xl',
+            inner: 'shadow-inner'
+        };
+
         const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
         const shapeClass = shapeClasses[shape] || 'rounded-full';
+        const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-md';
 
-        return `${sizeClass} ${shapeClass}`;
+        return `${sizeClass} ${shapeClass} ${shadowClass}`;
     }, [settings]);
 
     const gridCartButtonStyle = useMemo(() => {
@@ -167,6 +181,9 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
         const shape = useIndividual
             ? (settings?.storeGridCartShape || 'md')
             : (settings?.storeBtnShape || 'md');
+        const shadow = useIndividual
+            ? (settings?.storeGridCartShadow || 'sm')
+            : 'sm';
         
         const sizeClasses = {
             sm: 'h-8 w-8',
@@ -182,11 +199,22 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
             lg: 'rounded-2xl',
             full: 'rounded-full'
         };
+
+        const shadowClasses: Record<string, string> = {
+            none: 'shadow-none',
+            sm: 'shadow-sm',
+            md: 'shadow-md',
+            lg: 'shadow-lg',
+            xl: 'shadow-xl',
+            '2xl': 'shadow-2xl',
+            inner: 'shadow-inner'
+        };
         
         const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.md;
         const shapeClass = shapeClasses[shape] || 'rounded-2xl';
+        const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
 
-        return `${sizeClass} ${shapeClass}`;
+        return `${sizeClass} ${shapeClass} ${shadowClass}`;
     }, [settings]);
 
     const heroButtonText = settings?.storeHeroBtnText || 'Explore Collection';
