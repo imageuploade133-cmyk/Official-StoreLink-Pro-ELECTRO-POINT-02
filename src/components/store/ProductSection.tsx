@@ -296,6 +296,18 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
           border: 'none',
           textShadow: '0 1px 3px rgba(0,0,0,0.5)',
         };
+      } else if (style === 'outline') {
+        return {
+          backgroundColor: 'transparent',
+          color: settings.storeExploreBtnColor || '#3b82f6',
+          border: `2px solid ${settings.storeExploreBtnColor || '#3b82f6'}`
+        };
+      } else if (style === 'ghost') {
+        return {
+          backgroundColor: 'transparent',
+          color: settings.storeExploreBtnColor || '#3b82f6',
+          border: 'none'
+        };
       }
       return {
         backgroundColor: settings.storeExploreBtnColor || '#3b82f6',
@@ -317,6 +329,36 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
       color: 'white',
       border: 'none'
     };
+  }, [settings]);
+
+  const buttonClasses = useMemo(() => {
+    const useIndividual = settings?.useIndividualBtnSettings !== false;
+    const size = useIndividual
+        ? (settings?.storeExploreBtnSize || 'lg')
+        : (settings?.storeBtnSize || 'lg');
+    const shape = useIndividual
+        ? (settings?.storeExploreBtnShape || 'full')
+        : (settings?.storeBtnShape || 'full');
+
+    const sizeClasses = {
+        sm: 'h-10 px-8 text-[10px]',
+        md: 'h-12 px-10 text-[10px]',
+        lg: 'h-14 px-12 text-[10px] md:text-xs',
+        xl: 'h-16 px-14 text-sm'
+    };
+
+    const shapeClasses: Record<string, string> = {
+        none: 'rounded-none',
+        sm: 'rounded-sm',
+        md: 'rounded-md',
+        lg: 'rounded-2xl',
+        full: 'rounded-full'
+    };
+
+    const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
+    const shapeClass = shapeClasses[shape] || 'rounded-full';
+
+    return `${sizeClass} ${shapeClass}`;
   }, [settings]);
 
   const exploreText = useMemo(() => {
@@ -518,9 +560,9 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
              <div className={cn("mt-12 md:mt-20", alignment === 'left' ? 'text-left' : 'text-center')}>
                 <Button
                     asChild
-                    size="lg"
                     className={cn(
-                        "rounded-full px-12 font-black uppercase text-[10px] md:text-xs tracking-[0.25em] h-14 md:h-16 shadow-2xl transition-all hover:-translate-y-1 active:translate-y-0 border-none"
+                        "font-black uppercase tracking-[0.25em] shadow-2xl transition-all hover:-translate-y-1 active:translate-y-0 border-none",
+                        buttonClasses
                     )}
                     style={isPromoActive ? {
                         backgroundColor: hubColor,

@@ -65,42 +65,54 @@ const buttonSizes = [
   { name: 'xl', label: 'Extra Large', description: 'Maximum' },
 ];
 
+const buttonShapes = [
+  { name: 'none', label: 'Square', description: 'No rounding', class: 'rounded-none' },
+  { name: 'sm', label: 'Small', description: 'Slightly rounded', class: 'rounded-sm' },
+  { name: 'md', label: 'Medium', description: 'Standard rounding', class: 'rounded-md' },
+  { name: 'lg', label: 'Large', description: 'Heavily rounded', class: 'rounded-lg' },
+  { name: 'full', label: 'Pill', description: 'Maximum rounding', class: 'rounded-full' },
+];
+
 const shoppingExpSchema = z.object({
   storeAddToCartText: z.string().min(1, 'Label required').max(40, 'Label too long.'),
   storeAddToCartIcon: z.string().default('ShoppingCart'),
-  storeAddToCartStyle: z.enum(['standard', 'gradient', 'image']).default('standard'),
+  storeAddToCartStyle: z.enum(['standard', 'gradient', 'image', 'outline', 'ghost']).default('standard'),
   storeAddToCartColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#3b82f6'),
   storeAddToCartGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#3b82f6'),
   storeAddToCartGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#1d4ed8'),
   storeAddToCartImageUrl: z.string().url().or(z.literal('')).optional(),
   storeAddToCartSize: z.enum(['sm', 'md', 'lg', 'xl']).default('lg'),
+  storeAddToCartShape: z.enum(['none', 'sm', 'md', 'lg', 'full']).default('lg'),
   
   storeGridCartText: z.string().min(1, 'Label required').max(20, 'Label too long.'),
   storeGridCartIcon: z.string().default('ShoppingCart'),
-  storeGridCartStyle: z.enum(['standard', 'gradient', 'image']).default('standard'),
+  storeGridCartStyle: z.enum(['standard', 'gradient', 'image', 'outline', 'ghost']).default('standard'),
   storeGridCartColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#10b981'),
   storeGridCartGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#10b981'),
   storeGridCartGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#059669'),
   storeGridCartImageUrl: z.string().url().or(z.literal('')).optional(),
   storeGridCartSize: z.enum(['sm', 'md', 'lg', 'xl']).default('md'),
+  storeGridCartShape: z.enum(['none', 'sm', 'md', 'lg', 'full']).default('md'),
   
   storeHeroBtnText: z.string().min(1, 'Label required').max(40, 'Label too long.'),
   storeHeroBtnIcon: z.string().default('ArrowRight'),
-  storeHeroBtnStyle: z.enum(['standard', 'gradient', 'image']).default('gradient'),
+  storeHeroBtnStyle: z.enum(['standard', 'gradient', 'image', 'outline', 'ghost']).default('gradient'),
   storeHeroBtnColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#8b5cf6'),
   storeHeroBtnGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#8b5cf6'),
   storeHeroBtnGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#7c3aed'),
   storeHeroBtnImageUrl: z.string().url().or(z.literal('')).optional(),
   storeHeroBtnSize: z.enum(['sm', 'md', 'lg', 'xl']).default('lg'),
+  storeHeroBtnShape: z.enum(['none', 'sm', 'md', 'lg', 'full']).default('lg'),
 
   storeExploreBtnText: z.string().min(1, 'Label required').max(40, 'Label too long.'),
   storeExploreBtnIcon: z.string().default('ArrowRight'),
-  storeExploreBtnStyle: z.enum(['standard', 'gradient', 'image']).default('standard'),
+  storeExploreBtnStyle: z.enum(['standard', 'gradient', 'image', 'outline', 'ghost']).default('standard'),
   storeExploreBtnColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#3b82f6'),
   storeExploreBtnGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#3b82f6'),
   storeExploreBtnGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#1d4ed8'),
   storeExploreBtnImageUrl: z.string().url().or(z.literal('')).optional(),
   storeExploreBtnSize: z.enum(['sm', 'md', 'lg', 'xl']).default('lg'),
+  storeExploreBtnShape: z.enum(['none', 'sm', 'md', 'lg', 'full']).default('lg'),
   
   useIndividualBtnSettings: z.boolean().default(true),
   showProductReviews: z.boolean().default(true),
@@ -130,7 +142,7 @@ function ButtonStyleSelector({
       <FormLabel className="text-base font-bold flex items-center gap-2">
         <Brush className="h-4 w-4" /> Background Style
       </FormLabel>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         {/* Standard Style */}
         <button
           type="button"
@@ -142,13 +154,12 @@ function ButtonStyleSelector({
               : 'border-muted hover:border-primary/30 hover:bg-muted/30'
           )}
         >
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg" />
+          <div className="w-10 h-10 bg-blue-500 rounded-lg" />
           <div className="text-center">
-            <p className="text-sm font-semibold">Standard Color</p>
-            <p className="text-xs text-muted-foreground">Single color</p>
+            <p className="text-[10px] font-semibold">Solid</p>
           </div>
           {value === 'standard' && (
-            <Check className="absolute top-2 right-2 h-5 w-5 text-primary" />
+            <Check className="absolute top-1 right-1 h-3 w-3 text-primary" />
           )}
         </button>
 
@@ -163,13 +174,52 @@ function ButtonStyleSelector({
               : 'border-muted hover:border-primary/30 hover:bg-muted/30'
           )}
         >
-          <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg" />
+          <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg" />
           <div className="text-center">
-            <p className="text-sm font-semibold">Gradient</p>
-            <p className="text-xs text-muted-foreground">Two colors blend</p>
+            <p className="text-[10px] font-semibold">Gradient</p>
           </div>
           {value === 'gradient' && (
-            <Check className="absolute top-2 right-2 h-5 w-5 text-primary" />
+            <Check className="absolute top-1 right-1 h-3 w-3 text-primary" />
+          )}
+        </button>
+
+        {/* Outline Style */}
+        <button
+          type="button"
+          onClick={() => onChange('outline')}
+          className={cn(
+            "relative flex flex-col items-center gap-3 p-4 rounded-lg border-2 transition-all",
+            value === 'outline'
+              ? 'border-primary bg-primary/5'
+              : 'border-muted hover:border-primary/30 hover:bg-muted/30'
+          )}
+        >
+          <div className="w-10 h-10 border-2 border-primary rounded-lg flex items-center justify-center bg-background" />
+          <div className="text-center">
+            <p className="text-[10px] font-semibold">Outline</p>
+          </div>
+          {value === 'outline' && (
+            <Check className="absolute top-1 right-1 h-3 w-3 text-primary" />
+          )}
+        </button>
+
+        {/* Ghost Style */}
+        <button
+          type="button"
+          onClick={() => onChange('ghost')}
+          className={cn(
+            "relative flex flex-col items-center gap-3 p-4 rounded-lg border-2 transition-all",
+            value === 'ghost'
+              ? 'border-primary bg-primary/5'
+              : 'border-muted hover:border-primary/30 hover:bg-muted/30'
+          )}
+        >
+          <div className="w-10 h-10 border-2 border-dashed border-muted-foreground/30 rounded-lg flex items-center justify-center bg-transparent" />
+          <div className="text-center">
+            <p className="text-[10px] font-semibold">Ghost</p>
+          </div>
+          {value === 'ghost' && (
+            <Check className="absolute top-1 right-1 h-3 w-3 text-primary" />
           )}
         </button>
 
@@ -185,20 +235,59 @@ function ButtonStyleSelector({
           )}
         >
           {imageUrl ? (
-            <img src={imageUrl} alt="Button background" className="w-12 h-12 rounded-lg object-cover" />
+            <img src={imageUrl} alt="Button background" className="w-10 h-10 rounded-lg object-cover" />
           ) : (
-            <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
-              <ImageIcon className="h-6 w-6 text-muted-foreground" />
+            <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
+              <ImageIcon className="h-4 w-4 text-muted-foreground" />
             </div>
           )}
           <div className="text-center">
-            <p className="text-sm font-semibold">Image</p>
-            <p className="text-xs text-muted-foreground">Custom image</p>
+            <p className="text-[10px] font-semibold">Image</p>
           </div>
           {value === 'image' && (
-            <Check className="absolute top-2 right-2 h-5 w-5 text-primary" />
+            <Check className="absolute top-1 right-1 h-3 w-3 text-primary" />
           )}
         </button>
+      </div>
+    </FormItem>
+  );
+}
+
+// Button Shape Selector Component
+function ButtonShapeSelector({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <FormItem className="space-y-3">
+      <FormLabel className="text-base font-bold flex items-center gap-2">
+        <Palette className="h-4 w-4" /> Button Shape
+      </FormLabel>
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        {buttonShapes.map((shape) => (
+          <button
+            key={shape.name}
+            type="button"
+            onClick={() => onChange(shape.name)}
+            className={cn(
+              "relative flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all",
+              value === shape.name
+                ? 'border-primary bg-primary/5'
+                : 'border-muted hover:border-primary/30 hover:bg-muted/30'
+            )}
+          >
+            <div className={cn("w-12 h-6 bg-primary/20 border border-primary/40", shape.class)} />
+            <div className="text-center">
+              <p className="text-[10px] font-semibold">{shape.label}</p>
+            </div>
+            {value === shape.name && (
+              <Check className="absolute top-1 right-1 h-3 w-3 text-primary" />
+            )}
+          </button>
+        ))}
       </div>
     </FormItem>
   );
@@ -220,15 +309,21 @@ function ButtonPreview({
   const text = settings[`${prefix}Text`] || 'Button';
   const style = settings[`${prefix}Style`] || 'standard';
   const size = settings[`${prefix}Size`] || 'md';
+  const shape = settings[`${prefix}Shape`] || 'md';
 
   const getSizeClasses = (s: string) => {
     switch (s) {
-      case 'sm': return 'px-3 py-1.5 text-xs';
-      case 'md': return 'px-4 py-2 text-sm';
-      case 'lg': return 'px-6 py-3 text-base';
-      case 'xl': return 'px-8 py-4 text-lg';
-      default: return 'px-4 py-2 text-sm';
+      case 'sm': return 'px-3 py-1.5 text-xs h-8';
+      case 'md': return 'px-4 py-2 text-sm h-10';
+      case 'lg': return 'px-6 py-3 text-base h-12';
+      case 'xl': return 'px-8 py-4 text-lg h-14';
+      default: return 'px-4 py-2 text-sm h-10';
     }
+  };
+
+  const getShapeClass = (sh: string) => {
+    const found = buttonShapes.find(s => s.name === sh);
+    return found ? found.class : 'rounded-md';
   };
 
   const getStyleProperties = () => {
@@ -236,6 +331,7 @@ function ButtonPreview({
       return {
         background: `linear-gradient(135deg, ${settings[`${prefix}GradientStart`]}, ${settings[`${prefix}GradientEnd`]})`,
         color: 'white',
+        border: 'none',
       };
     } else if (style === 'image' && settings[`${prefix}ImageUrl`]) {
       return {
@@ -244,11 +340,25 @@ function ButtonPreview({
         backgroundPosition: 'center',
         color: 'white',
         textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+        border: 'none',
+      };
+    } else if (style === 'outline') {
+      return {
+        backgroundColor: 'transparent',
+        color: settings[`${prefix}Color`],
+        border: `2px solid ${settings[`${prefix}Color`]}`,
+      };
+    } else if (style === 'ghost') {
+      return {
+        backgroundColor: 'transparent',
+        color: settings[`${prefix}Color`],
+        border: 'none',
       };
     }
     return {
       backgroundColor: settings[`${prefix}Color`],
       color: 'white',
+      border: 'none',
     };
   };
 
@@ -262,7 +372,7 @@ function ButtonPreview({
       <p className="text-xs font-semibold text-muted-foreground mb-3">Preview</p>
       <Button
         type="button"
-        className={cn(getSizeClasses(size), "font-semibold shadow-lg rounded-lg")}
+        className={cn(getSizeClasses(size), getShapeClass(shape), "font-semibold shadow-sm")}
         style={getStyleProperties()}
       >
         {Icon && <Icon className="mr-2 h-4 w-4" />}
@@ -340,7 +450,7 @@ function ButtonSection({
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder="Select icon" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -378,15 +488,27 @@ function ButtonSection({
           )}
         />
 
+        {/* Button Shape Selection */}
+        <FormField
+          control={form.control}
+          name={`${prefix}Shape` as any}
+          render={({ field }) => (
+            <ButtonShapeSelector
+              value={field.value}
+              onChange={field.onChange}
+            />
+          )}
+        />
+
         {/* Standard Color */}
-        {styleValue === 'standard' && (
+        {(styleValue === 'standard' || styleValue === 'outline' || styleValue === 'ghost') && (
           <div className="animate-in fade-in slide-in-from-top-2 duration-300">
             <FormField
               control={form.control}
               name={`${prefix}Color` as any}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-semibold">Color</FormLabel>
+                  <FormLabel className="font-semibold">Button Color</FormLabel>
                   <div className="flex items-center gap-3">
                     <FormControl>
                       <Input type="color" {...field} className="p-1 h-10 w-14 cursor-pointer rounded-md border-2" />
@@ -403,38 +525,40 @@ function ButtonSection({
         {/* Gradient Colors */}
         {styleValue === 'gradient' && (
           <div className="animate-in fade-in slide-in-from-top-2 duration-300 space-y-4">
-            <FormField
-              control={form.control}
-              name={`${prefix}GradientStart` as any}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-semibold">Gradient Start Color</FormLabel>
-                  <div className="flex items-center gap-3">
-                    <FormControl>
-                      <Input type="color" {...field} className="p-1 h-10 w-14 cursor-pointer rounded-md border-2" />
-                    </FormControl>
-                    <span className="text-sm font-mono bg-muted px-3 py-2 rounded-md border">{field.value}</span>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name={`${prefix}GradientEnd` as any}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-semibold">Gradient End Color</FormLabel>
-                  <div className="flex items-center gap-3">
-                    <FormControl>
-                      <Input type="color" {...field} className="p-1 h-10 w-14 cursor-pointer rounded-md border-2" />
-                    </FormControl>
-                    <span className="text-sm font-mono bg-muted px-3 py-2 rounded-md border">{field.value}</span>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name={`${prefix}GradientStart` as any}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-semibold">Gradient Start</FormLabel>
+                    <div className="flex items-center gap-3">
+                      <FormControl>
+                        <Input type="color" {...field} className="p-1 h-10 w-14 cursor-pointer rounded-md border-2" />
+                      </FormControl>
+                      <span className="text-sm font-mono bg-muted px-3 py-2 rounded-md border">{field.value}</span>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`${prefix}GradientEnd` as any}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-semibold">Gradient End</FormLabel>
+                    <div className="flex items-center gap-3">
+                      <FormControl>
+                        <Input type="color" {...field} className="p-1 h-10 w-14 cursor-pointer rounded-md border-2" />
+                      </FormControl>
+                      <span className="text-sm font-mono bg-muted px-3 py-2 rounded-md border">{field.value}</span>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
         )}
 
@@ -511,7 +635,7 @@ function ButtonSection({
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Select size" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -562,6 +686,7 @@ export default function ShoppingExperienceSettingsPage() {
       storeAddToCartGradientEnd: '#1d4ed8',
       storeAddToCartImageUrl: '',
       storeAddToCartSize: 'lg',
+      storeAddToCartShape: 'lg',
 
       storeGridCartText: 'Add to Bag',
       storeGridCartIcon: 'ShoppingCart',
@@ -571,6 +696,7 @@ export default function ShoppingExperienceSettingsPage() {
       storeGridCartGradientEnd: '#059669',
       storeGridCartImageUrl: '',
       storeGridCartSize: 'md',
+      storeGridCartShape: 'md',
 
       storeHeroBtnText: 'Shop Collection',
       storeHeroBtnIcon: 'ArrowRight',
@@ -580,6 +706,7 @@ export default function ShoppingExperienceSettingsPage() {
       storeHeroBtnGradientEnd: '#7c3aed',
       storeHeroBtnImageUrl: '',
       storeHeroBtnSize: 'lg',
+      storeHeroBtnShape: 'lg',
 
       storeExploreBtnText: 'Explore Collection',
       storeExploreBtnIcon: 'ArrowRight',
@@ -589,6 +716,7 @@ export default function ShoppingExperienceSettingsPage() {
       storeExploreBtnGradientEnd: '#1d4ed8',
       storeExploreBtnImageUrl: '',
       storeExploreBtnSize: 'lg',
+      storeExploreBtnShape: 'lg',
 
       useIndividualBtnSettings: true,
       showProductReviews: true,
@@ -601,39 +729,43 @@ export default function ShoppingExperienceSettingsPage() {
       form.reset({
         storeAddToCartText: settingsData.storeAddToCartText || 'Secure Purchase',
         storeAddToCartIcon: settingsData.storeAddToCartIcon || 'ShoppingCart',
-        storeAddToCartStyle: settingsData.storeAddToCartStyle as any || 'standard',
+        storeAddToCartStyle: (settingsData.storeAddToCartStyle as any) || 'standard',
         storeAddToCartColor: settingsData.storeAddToCartColor || '#3b82f6',
         storeAddToCartGradientStart: settingsData.storeAddToCartGradientStart || '#3b82f6',
         storeAddToCartGradientEnd: settingsData.storeAddToCartGradientEnd || '#1d4ed8',
         storeAddToCartImageUrl: settingsData.storeAddToCartImageUrl || '',
-        storeAddToCartSize: settingsData.storeAddToCartSize || 'lg',
+        storeAddToCartSize: (settingsData.storeAddToCartSize as any) || 'lg',
+        storeAddToCartShape: (settingsData.storeAddToCartShape as any) || 'lg',
 
         storeGridCartText: settingsData.storeGridCartText || 'Add to Bag',
         storeGridCartIcon: settingsData.storeGridCartIcon || 'ShoppingCart',
-        storeGridCartStyle: settingsData.storeGridCartStyle as any || 'standard',
+        storeGridCartStyle: (settingsData.storeGridCartStyle as any) || 'standard',
         storeGridCartColor: settingsData.storeGridCartColor || '#10b981',
         storeGridCartGradientStart: settingsData.storeGridCartGradientStart || '#10b981',
         storeGridCartGradientEnd: settingsData.storeGridCartGradientEnd || '#059669',
         storeGridCartImageUrl: settingsData.storeGridCartImageUrl || '',
-        storeGridCartSize: settingsData.storeGridCartSize || 'md',
+        storeGridCartSize: (settingsData.storeGridCartSize as any) || 'md',
+        storeGridCartShape: (settingsData.storeGridCartShape as any) || 'md',
 
         storeHeroBtnText: settingsData.storeHeroBtnText || 'Shop Collection',
         storeHeroBtnIcon: settingsData.storeHeroBtnIcon || 'ArrowRight',
-        storeHeroBtnStyle: settingsData.storeHeroBtnStyle as any || 'gradient',
+        storeHeroBtnStyle: (settingsData.storeHeroBtnStyle as any) || 'gradient',
         storeHeroBtnColor: settingsData.storeHeroBtnColor || '#8b5cf6',
         storeHeroBtnGradientStart: settingsData.storeHeroBtnGradientStart || '#8b5cf6',
         storeHeroBtnGradientEnd: settingsData.storeHeroBtnGradientEnd || '#7c3aed',
         storeHeroBtnImageUrl: settingsData.storeHeroBtnImageUrl || '',
-        storeHeroBtnSize: settingsData.storeHeroBtnSize || 'lg',
+        storeHeroBtnSize: (settingsData.storeHeroBtnSize as any) || 'lg',
+        storeHeroBtnShape: (settingsData.storeHeroBtnShape as any) || 'lg',
 
         storeExploreBtnText: settingsData.storeExploreBtnText || 'Explore Collection',
         storeExploreBtnIcon: settingsData.storeExploreBtnIcon || 'ArrowRight',
-        storeExploreBtnStyle: settingsData.storeExploreBtnStyle as any || 'standard',
+        storeExploreBtnStyle: (settingsData.storeExploreBtnStyle as any) || 'standard',
         storeExploreBtnColor: settingsData.storeExploreBtnColor || '#3b82f6',
         storeExploreBtnGradientStart: settingsData.storeExploreBtnGradientStart || '#3b82f6',
         storeExploreBtnGradientEnd: settingsData.storeExploreBtnGradientEnd || '#1d4ed8',
         storeExploreBtnImageUrl: settingsData.storeExploreBtnImageUrl || '',
-        storeExploreBtnSize: settingsData.storeExploreBtnSize || 'lg',
+        storeExploreBtnSize: (settingsData.storeExploreBtnSize as any) || 'lg',
+        storeExploreBtnShape: (settingsData.storeExploreBtnShape as any) || 'lg',
 
         useIndividualBtnSettings: settingsData.useIndividualBtnSettings !== false,
         showProductReviews: settingsData.showProductReviews ?? true,

@@ -121,6 +121,18 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
         textShadow: '0 1px 3px rgba(0,0,0,0.5)',
         border: 'none'
       };
+    } else if (style === 'outline') {
+      return {
+        backgroundColor: 'transparent',
+        color: settings?.storeGridCartColor || '#10b981',
+        border: `2px solid ${settings?.storeGridCartColor || '#10b981'}`
+      };
+    } else if (style === 'ghost') {
+      return {
+        backgroundColor: 'transparent',
+        color: settings?.storeGridCartColor || '#10b981',
+        border: 'none'
+      };
     }
     
     return {
@@ -134,20 +146,31 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
   const buttonClasses = useMemo(() => {
     const useIndividual = settings?.useIndividualBtnSettings !== false;
     const shape = useIndividual 
-      ? (settings?.storeGridCartShape || 'rounded-lg')
-      : (settings?.storeBtnShape || 'rounded-xl');
+      ? (settings?.storeGridCartShape || 'lg')
+      : (settings?.storeBtnShape || 'lg');
     const size = useIndividual
       ? (settings?.storeGridCartSize || 'md')
       : (settings?.storeBtnSize || 'md');
     
-    const sizeClasses = {
+    const sizeClasses: Record<string, string> = {
       sm: 'px-3 py-1.5 text-xs',
       md: 'px-4 py-2 text-sm',
       lg: 'px-5 py-2.5 text-sm',
       xl: 'px-6 py-3 text-base'
     };
+
+    const shapeClasses: Record<string, string> = {
+      none: 'rounded-none',
+      sm: 'rounded-sm',
+      md: 'rounded-md',
+      lg: 'rounded-2xl',
+      full: 'rounded-full'
+    };
     
-    return `${shape} ${sizeClasses[size]}`;
+    const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.md;
+    const shapeClass = shapeClasses[shape] || 'rounded-2xl';
+
+    return `${shapeClass} ${sizeClass}`;
   }, [settings]);
 
   // Calculate media area height based on card height setting (60% of total height)
