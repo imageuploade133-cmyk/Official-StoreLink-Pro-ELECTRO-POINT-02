@@ -184,6 +184,7 @@ export default function DashboardLayout({
     { href: '/dashboard/shopping-experience-settings', icon: MousePointerClick, label: 'Shopping Buttons', perm: 'manage_settings' },
     { href: '/dashboard/website-payment', icon: Landmark, label: 'Website Payment Method', perm: 'manage_settings' },
     { href: '/dashboard/logistics-settings', icon: Truck, label: 'Logistics Settings', perm: 'manage_settings' },
+    { href: '/dashboard/delivery-settings', icon: Truck, label: 'Delivery Settings', perm: 'manage_settings' },
     { href: '/dashboard/recommendations-settings', icon: Sparkles, label: 'Product Recommendations', perm: 'manage_settings' },
     { href: '/dashboard/create-web-page', icon: FilePlus, label: 'Create Web Page', perm: 'manage_website_content' },
     { href: '/dashboard/manage-web-pages', icon: BookCopy, label: 'Manage Web Pages', perm: 'manage_website_content' },

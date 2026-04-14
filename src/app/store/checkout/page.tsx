@@ -20,6 +20,7 @@ import { Separator } from '@/components/ui/separator';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   CreditCard, 
   Truck, 
@@ -38,6 +39,7 @@ import {
   Tag,
   AlertTriangle,
   Sparkles,
+  Store,
 } from 'lucide-react';
 import type { UserProfile, Order, BankAccount, WhatsappMessageLog, Coupon } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -84,13 +86,26 @@ export default function CheckoutPage() {
 
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
 
+  const [fulfillmentType, setFulfillmentType] = useState<'pickup' | 'delivery'>('delivery');
+  const [selectedLocationId, setSelectedLocationId] = useState<string>('');
+
   // Fetch registered user profile
   const userProfileRef = useMemo(() => user ? doc(firestore, 'users', user.uid) : null, [user, firestore]);
   const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserProfile>(userProfileRef);
 
   const currencySymbol = settings?.currency || '$';
   const subtotal = cartItems.reduce((sum, item) => sum + item.salePrice * item.quantity, 0);
-  const shipping = subtotal > 0 ? 10 : 0; 
+
+  const deliveryLocations = useMemo(() => settings?.deliveryLocations || [], [settings]);
+  const selectedLocation = useMemo(() => 
+    deliveryLocations.find(loc => loc.id === selectedLocationId),
+  [deliveryLocations, selectedLocationId]);
+
+  const shipping = useMemo(() => {
+    if (subtotal === 0) return 0;
+    if (fulfillmentType === 'pickup') return 0;
+    return selectedLocation?.price || 0;
+  }, [subtotal, fulfillmentType, selectedLocation]);
 
   const discountAmount = useMemo(() => {
     if (!appliedCoupon || subtotal === 0) return 0;
@@ -120,6 +135,22 @@ export default function CheckoutPage() {
     }
     return [];
   }, [bankAccounts]);
+
+  useEffect(() => {
+    if (settings) {
+      if (settings.enableDelivery === false && settings.enablePickUp !== false) {
+        setFulfillmentType('pickup');
+      } else if (settings.enablePickUp === false && settings.enableDelivery !== false) {
+        setFulfillmentType('delivery');
+      }
+    }
+  }, [settings]);
+
+  useEffect(() => {
+    if (deliveryLocations.length > 0 && !selectedLocationId) {
+      setSelectedLocationId(deliveryLocations[0].id);
+    }
+  }, [deliveryLocations, selectedLocationId]);
 
   useEffect(() => {
     const saved = safeSessionStorage.getItem('appliedCoupon');
@@ -167,8 +198,12 @@ export default function CheckoutPage() {
 
   const handleProceedToPayment = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.address) {
+    if (!formData.name || !formData.email || (fulfillmentType === 'delivery' && !formData.address)) {
       toast({ variant: 'destructive', title: 'Missing Information', description: 'Please fill in all required delivery details.' });
+      return;
+    }
+    if (fulfillmentType === 'delivery' && deliveryLocations.length > 0 && !selectedLocationId) {
+      toast({ variant: 'destructive', title: 'Missing Information', description: 'Please select a delivery location.' });
       return;
     }
     setStep('payment');
@@ -228,6 +263,9 @@ export default function CheckoutPage() {
           paymentReference: paymentMethod === 'Bank Transfer' ? paymentReference : null as any,
           couponCode: appliedCoupon?.code || null as any,
           selectedBankAccount: paymentMethod === 'Bank Transfer' ? selectedBankAccount : null,
+          fulfillmentType,
+          deliveryLocationId: fulfillmentType === 'delivery' ? selectedLocationId : null,
+          deliveryPrice: shipping,
           status: 'pending',
           createdAt: serverTimestamp() as any,
           guestInfo: user ? null : formData,
@@ -400,7 +438,35 @@ export default function CheckoutPage() {
                 <CardDescription>{user ? "Confirm your account delivery information." : "Provide your details for guest checkout."}</CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleProceedToPayment} className="space-y-4">
+                <form onSubmit={handleProceedToPayment} className="space-y-6">
+                  <div className="space-y-4">
+                    <Label>Fulfillment Method</Label>
+                    <RadioGroup 
+                      value={fulfillmentType} 
+                      onValueChange={(val) => setFulfillmentType(val as 'pickup' | 'delivery')}
+                      className="grid grid-cols-2 gap-4"
+                    >
+                      {settings?.enablePickUp !== false && (
+                        <div>
+                          <RadioGroupItem value="pickup" id="pickup" className="peer sr-only" />
+                          <Label htmlFor="pickup" className="flex flex-col items-center justify-center rounded-xl border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer transition-all">
+                            <Store className="mb-2 h-6 w-6" />
+                            <span className="text-sm font-bold uppercase">Store Pickup</span>
+                          </Label>
+                        </div>
+                      )}
+                      {settings?.enableDelivery !== false && (
+                        <div>
+                          <RadioGroupItem value="delivery" id="delivery" className="peer sr-only" />
+                          <Label htmlFor="delivery" className="flex flex-col items-center justify-center rounded-xl border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer transition-all">
+                            <Truck className="mb-2 h-6 w-6" />
+                            <span className="text-sm font-bold uppercase">Home Delivery</span>
+                          </Label>
+                        </div>
+                      )}
+                    </RadioGroup>
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">Full Name</Label>
@@ -415,11 +481,34 @@ export default function CheckoutPage() {
                     <Label htmlFor="phone">Phone Number (Required for WhatsApp Updates)</Label>
                     <div className="relative"><Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Input id="phone" name="phone" type="tel" placeholder="+1 (555) 000-0000" className="pl-10" value={formData.phone} onChange={handleInputChange} required disabled={step !== 'details'} /></div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="address">Delivery Address</Label>
-                    <div className="relative"><MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Textarea id="address" name="address" placeholder="Enter your full street address..." className="pl-10 min-h-[100px]" value={formData.address} onChange={handleInputChange} required disabled={step !== 'details'} /></div>
-                  </div>
-                  {step === 'details' && <Button type="submit" style={buttonStyle} className="border-none font-bold">Continue to Payment</Button>}
+
+                  {fulfillmentType === 'delivery' && (
+                    <>
+                      {deliveryLocations.length > 0 && (
+                        <div className="space-y-2">
+                          <Label>Select Delivery Location</Label>
+                          <Select value={selectedLocationId} onValueChange={setSelectedLocationId} disabled={step !== 'details'}>
+                            <SelectTrigger className="h-11">
+                              <SelectValue placeholder="Select a location" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {deliveryLocations.map((loc) => (
+                                <SelectItem key={loc.id} value={loc.id}>
+                                  {loc.name} (+{formatCurrency(loc.price, currencySymbol)})
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+                      <div className="space-y-2">
+                        <Label htmlFor="address">Delivery Address</Label>
+                        <div className="relative"><MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Textarea id="address" name="address" placeholder="Enter your full street address..." className="pl-10 min-h-[100px]" value={formData.address} onChange={handleInputChange} required disabled={step !== 'details'} /></div>
+                      </div>
+                    </>
+                  )}
+
+                  {step === 'details' && <Button type="submit" style={buttonStyle} className="border-none font-bold w-full h-12">Continue to Payment</Button>}
                 </form>
               </CardContent>
             </Card>
@@ -552,7 +641,14 @@ export default function CheckoutPage() {
                         <span className="font-bold">-{formatCurrency(rewardDiscountAmount, currencySymbol)}</span>
                     </div>
                   )}
-                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Shipping</span><span className="font-medium">{formatCurrency(shipping, currencySymbol)}</span></div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">
+                      {fulfillmentType === 'pickup' ? 'Store Pickup' : 'Delivery'}
+                    </span>
+                    <span className="font-medium">
+                      {shipping === 0 ? 'Free' : formatCurrency(shipping, currencySymbol)}
+                    </span>
+                  </div>
                   <Separator />
                   <div className="flex justify-between items-baseline pt-2"><span className="text-lg font-bold">Total</span><span className="text-2xl font-black text-primary tracking-tighter">{formatCurrency(total, currencySymbol)}</span></div>
                 </div>
