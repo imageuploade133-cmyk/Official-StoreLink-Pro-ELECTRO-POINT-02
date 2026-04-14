@@ -32,7 +32,7 @@ const settingsKeywords = {
   messaging: ['messaging', 'sms', 'whatsapp', 'webhook', 'notifications', 'messages'],
   payment: ['payment methods', 'cash', 'card', 'transfer', 'payment options', 'gateways'],
   social: ['social media', 'links', 'facebook', 'twitter', 'instagram'],
-  shop: ['shop', 'collection', 'banner', 'alignment', 'products'],
+  shop: ['shop', 'collection', 'banner', 'alignment', 'products', 'title', 'description', 'heading'],
 };
 
 export default function SettingsPage() {

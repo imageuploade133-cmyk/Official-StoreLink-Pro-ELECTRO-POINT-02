@@ -25,7 +25,9 @@ import {
   Image as ImageIcon,
   AlignLeft,
   AlignCenter,
-  Link2
+  Link2,
+  Type,
+  FileText
 } from 'lucide-react';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -36,6 +38,8 @@ import { ProductCardSizeSettings } from '@/components/dashboard/settings/Product
 const shopSettingsSchema = z.object({
   shopBannerImageUrl: z.string().url().or(z.literal('')).optional(),
   shopProductsAlignment: z.enum(['left', 'center']).default('left'),
+  shopCollectionTitle: z.string().min(1, 'Title is required').default('Shop Our Collection'),
+  shopCollectionDescription: z.string().optional().default('Discover products that are crafted with quality and designed for life.'),
 });
 
 type FormValues = z.infer<typeof shopSettingsSchema>;
@@ -59,6 +63,8 @@ export default function ShopCollectionSettingsPage() {
     defaultValues: {
       shopBannerImageUrl: '',
       shopProductsAlignment: 'left',
+      shopCollectionTitle: 'Shop Our Collection',
+      shopCollectionDescription: 'Discover products that are crafted with quality and designed for life.',
     }
   });
 
@@ -67,6 +73,8 @@ export default function ShopCollectionSettingsPage() {
       form.reset({
         shopBannerImageUrl: settingsData.shopBannerImageUrl || '',
         shopProductsAlignment: settingsData.shopProductsAlignment || 'left',
+        shopCollectionTitle: settingsData.shopCollectionTitle || 'Shop Our Collection',
+        shopCollectionDescription: settingsData.shopCollectionDescription || 'Discover products that are crafted with quality and designed for life.',
       });
     }
   }, [settingsData, form]);
@@ -167,6 +175,48 @@ export default function ShopCollectionSettingsPage() {
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="shopCollectionTitle"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-semibold text-base flex items-center gap-2">
+                          <Type className="h-4 w-4 text-primary" />
+                          Shop Page Title
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="Shop Our Collection" {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          The main heading displayed at the top of your shop page
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="shopCollectionDescription"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-semibold text-base flex items-center gap-2">
+                          <FileText className="h-4 w-4 text-primary" />
+                          Shop Page Description
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="Discover products that are crafted..." {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          The subtext displayed below the title
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
                 <FormField
                   control={form.control}
                   name="shopBannerImageUrl"

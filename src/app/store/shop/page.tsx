@@ -323,17 +323,21 @@ function ShopPageContent() {
                             className="w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center px-4">
-                            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tighter text-white drop-shadow-lg">Shop Our Collection</h1>
+                            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tighter text-white drop-shadow-lg">
+                                {settings?.shopCollectionTitle || 'Shop Our Collection'}
+                            </h1>
                             <p className="mt-2 sm:mt-4 max-w-2xl mx-auto text-sm sm:text-base text-white/90 font-medium drop-shadow-md">
-                                Discover products that are crafted with quality and designed for life.
+                                {settings?.shopCollectionDescription || 'Discover products that are crafted with quality and designed for life.'}
                             </p>
                         </div>
                     </div>
                 ) : (
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-8 sm:py-12">
-                        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tighter text-slate-900 dark:text-white">Shop Our Collection</h1>
+                        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tighter text-slate-900 dark:text-white">
+                            {settings?.shopCollectionTitle || 'Shop Our Collection'}
+                        </h1>
                         <p className="mt-2 sm:mt-4 max-w-2xl mx-auto text-xs sm:text-sm text-slate-500">
-                            Discover products that are crafted with quality and designed for life.
+                            {settings?.shopCollectionDescription || 'Discover products that are crafted with quality and designed for life.'}
                         </p>
                     </div>
                 )}
