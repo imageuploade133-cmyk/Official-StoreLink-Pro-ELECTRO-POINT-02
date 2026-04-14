@@ -511,6 +511,11 @@ export interface Product {
   description?: string;
   expiryDate?: Timestamp | null;
   supplierName?: string;
+  supplierBusinessName?: string;
+  supplierContactName?: string;
+  supplierPhone?: string;
+  supplierLocation?: string;
+  stockDocumentUrl?: string;
   imageUrl?: string;
   additionalImageUrls?: string[];
   dataAiHint?: string;
@@ -576,6 +581,11 @@ export interface RestockEntry {
     costPricePerUnit: number;
     totalCost: number;
     supplierName?: string | null;
+    supplierBusinessName?: string | null;
+    supplierContactName?: string | null;
+    supplierPhone?: string | null;
+    supplierLocation?: string | null;
+    receiptUrl?: string | null;
     notes?: string | null;
     restockDate: Timestamp;
     createdAt: Timestamp;

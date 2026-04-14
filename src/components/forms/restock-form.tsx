@@ -22,11 +22,14 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Calendar } from '@/components/ui/calendar';
 import { Textarea } from '@/components/ui/textarea';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Loader2, CalendarIcon, ChevronsUpDown, Check, Pencil, X as CloseIcon } from 'lucide-react';
+import { Loader2, CalendarIcon, ChevronsUpDown, Check, Pencil, X as CloseIcon, X, FileText, Upload, Eye, Truck } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useToast } from '@/hooks/use-toast';
+import { uploadImage } from '@/ai/flows/image-upload-flow';
 import type { Product, ProductForRestockForm } from '@/lib/types';
+import Image from 'next/image';
 
 const createRestockFormSchema = (allowDeduction: boolean) => z.object({
   productId: z.string().min(1, 'Product is required.'),
@@ -36,6 +39,10 @@ const createRestockFormSchema = (allowDeduction: boolean) => z.object({
   newSellingPrice: z.coerce.number().min(0, 'Selling price cannot be negative.').optional().nullable(),
   restockDate: z.date({ required_error: 'Restock date is required.' }),
   supplierName: z.string().optional(),
+  supplierContactName: z.string().optional(),
+  supplierPhone: z.string().optional(),
+  supplierLocation: z.string().optional(),
+  receiptUrl: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -62,7 +69,9 @@ export function RestockForm({
   allowStockDeduction = true,
 }: RestockFormProps) {
   const [isComboboxOpen, setIsComboboxOpen] = useState(false);
+  const [isUploadingStockDoc, setIsUploadingStockDoc] = useState(false);
   const isMobile = useIsMobile();
+  const { toast } = useToast();
   
   const restockFormSchema = createRestockFormSchema(allowStockDeduction);
 
@@ -81,6 +90,10 @@ export function RestockForm({
         newSellingPrice: product?.sellingPrice || 0,
         restockDate: new Date(),
         supplierName: '',
+        supplierContactName: '',
+        supplierPhone: '',
+        supplierLocation: '',
+        receiptUrl: '',
         notes: '',
       });
     }
@@ -95,6 +108,34 @@ export function RestockForm({
       form.setValue('newSellingPrice', product.sellingPrice || 0);
     }
     setIsComboboxOpen(false);
+  };
+
+  const handleStockDocUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { 
+      toast({ variant: "destructive", title: "File too large", description: "Document must be smaller than 5MB." });
+      return;
+    }
+    setIsUploadingStockDoc(true);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      try {
+        const imageDataUri = reader.result as string;
+        const result = await uploadImage({ imageDataUri });
+        form.setValue('receiptUrl', result.display_url, { shouldValidate: true });
+        toast({ title: "Document Uploaded", description: "Stock document/receipt has been saved." });
+      } catch (error: any) {
+        toast({ variant: "destructive", title: "Upload Failed", description: error.message || "Could not upload document." });
+      } finally {
+        setIsUploadingStockDoc(false);
+      }
+    };
+    reader.onerror = () => {
+        toast({ variant: "destructive", title: "File Error", description: "Could not read the selected file."});
+        setIsUploadingStockDoc(false);
+    };
   };
   
   const selectedProduct = products.find(p => p.id === form.watch('productId'));
@@ -174,22 +215,76 @@ export function RestockForm({
                     </div>
                 </AccordionContent>
             </AccordionItem>
+            <AccordionItem value="supplier-info">
+                <AccordionTrigger className="text-sm font-medium flex items-center gap-1"><Truck className="h-4 w-4"/>Supplier Information (Optional)</AccordionTrigger>
+                <AccordionContent className="pt-4 space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField control={form.control} name="supplierName" render={({ field }) => (
+                            <FormItem><FormLabel>Stock Supplier</FormLabel><FormControl><Input placeholder="Company Name" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                        )}/>
+                        <FormField control={form.control} name="supplierContactName" render={({ field }) => (
+                            <FormItem><FormLabel>Supplier Name</FormLabel><FormControl><Input placeholder="Contact Person" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                        )}/>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField control={form.control} name="supplierPhone" render={({ field }) => (
+                            <FormItem><FormLabel>Supplier Phone</FormLabel><FormControl><Input placeholder="Phone Number" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                        )}/>
+                        <FormField control={form.control} name="supplierLocation" render={({ field }) => (
+                            <FormItem><FormLabel>Supplier Location</FormLabel><FormControl><Input placeholder="Location" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                        )}/>
+                    </div>
+                    <FormField
+                      control={form.control}
+                      name="receiptUrl"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                              <FileText className="h-4 w-4 text-primary" /> Stock Document / Receipt
+                          </FormLabel>
+                          <div className="flex items-start gap-4">
+                              {field.value && (
+                                  <div className="relative w-20 h-20 rounded-lg border overflow-hidden shrink-0 shadow-sm bg-muted flex items-center justify-center">
+                                      {field.value.match(/\.(jpeg|jpg|gif|png)$/) != null || field.value.includes('imgbb') ? (
+                                        <Image src={field.value} alt="Receipt" fill className="object-contain" unoptimized />
+                                      ) : (
+                                        <FileText className="h-8 w-8 text-muted-foreground" />
+                                      )}
+                                      <Button type="button" variant="destructive" size="icon" className="absolute top-0.5 right-0.5 h-5 w-5 rounded-full" onClick={() => form.setValue('receiptUrl', '')}>
+                                          <X className="h-3 w-3" />
+                                      </Button>
+                                  </div>
+                              )}
+                              <div className="flex-grow space-y-2">
+                                  <FormControl>
+                                      <Input placeholder="URL or upload below" {...field} value={field.value || ''} disabled={isSubmitting || isUploadingStockDoc} className="h-8 text-xs" />
+                                  </FormControl>
+                                  <div className="flex items-center gap-2">
+                                    <Button asChild variant="outline" size="sm" disabled={isSubmitting || isUploadingStockDoc} className="h-8 text-xs">
+                                        <label htmlFor="restock-doc-upload" className="cursor-pointer flex items-center gap-1">
+                                            {isUploadingStockDoc ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
+                                            Upload
+                                        </label>
+                                    </Button>
+                                    {field.value && (
+                                      <Button type="button" variant="ghost" size="sm" asChild className="h-8 text-xs">
+                                        <a href={field.value} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1">
+                                          <Eye className="h-3 w-3" /> View
+                                        </a>
+                                      </Button>
+                                    )}
+                                  </div>
+                                  <input id="restock-doc-upload" type="file" accept="image/*,.pdf" className="hidden" onChange={handleStockDocUpload} disabled={isSubmitting || isUploadingStockDoc} />
+                              </div>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                </AccordionContent>
+            </AccordionItem>
         </Accordion>
         
-        <FormField control={form.control} name="restockDate" render={({ field }) => (
-          <FormItem className="flex flex-col"><FormLabel>Restock Date</FormLabel>
-            <Popover><PopoverTrigger asChild><FormControl><Button variant={'outline'} className={cn('w-full pl-3 text-left font-normal',!field.value && 'text-muted-foreground')}>
-              {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
-              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-            </Button></FormControl></PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date('1900-01-01')} initialFocus /></PopoverContent></Popover>
-            <FormMessage />
-          </FormItem>)} />
-
-        <FormField control={form.control} name="supplierName" render={({ field }) => (
-          <FormItem><FormLabel>Supplier (Optional)</FormLabel><FormControl><Input {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
-        )}/>
-
         <FormField control={form.control} name="notes" render={({ field }) => (
           <FormItem><FormLabel>Notes (Optional)</FormLabel><FormControl><Textarea {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
         )}/>
