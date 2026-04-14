@@ -22,14 +22,17 @@ export async function GET(request: Request) {
         config = JSON.parse(decrypt(data.config));
       } catch (e) {}
 
+      const mode = data.mode || 'test';
+      const publicKey = mode === 'live' ? config.livePublicKey : config.testPublicKey || config.publicKey;
+
       methods.push({
         id: data.providerName,
         name: data.providerName === 'paystack' ? 'Pay with Card (Paystack)' : 
               data.providerName === 'flutterwave' ? 'Pay with Card (Flutterwave)' :
               data.providerName === 'manual' ? 'Bank Transfer' : data.providerName,
         provider: data.providerName,
-        publicKey: config.publicKey, // Only expose public key
-        mode: data.mode,
+        publicKey: publicKey, // Only expose correct public key
+        mode: mode,
       });
     });
 

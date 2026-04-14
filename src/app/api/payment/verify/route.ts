@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { initializeFirebase } from '@/firebase/init';
-import { doc, getDoc, updateDoc, Timestamp } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, Timestamp, runTransaction } from 'firebase/firestore';
 import { decrypt } from '@/lib/encryption';
 import { PaymentProvider, Transaction } from '@/lib/types';
 
@@ -39,35 +39,45 @@ export async function GET(request: Request) {
     }
 
     const config = JSON.parse(decrypt(providerSnap.data().config));
+    const mode = providerSnap.data().mode || 'test';
+    const secretKey = mode === 'live' ? config.liveSecretKey : config.testSecretKey || config.secretKey;
+    
     let isSuccessful = false;
 
     if (providerName === 'paystack') {
       const res = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
-        headers: { Authorization: `Bearer ${config.secretKey}` },
+        headers: { Authorization: `Bearer ${secretKey}` },
       });
       const result = await res.json();
       isSuccessful = result.status && result.data.status === 'success';
     } else if (providerName === 'flutterwave') {
       // For Flutterwave, reference here might be the transaction ID
       const res = await fetch(`https://api.flutterwave.com/v3/transactions/${reference}/verify`, {
-        headers: { Authorization: `Bearer ${config.secretKey}` },
+        headers: { Authorization: `Bearer ${secretKey}` },
       });
       const result = await res.json();
       isSuccessful = result.status === 'success' && result.data.status === 'successful';
     }
 
     if (isSuccessful) {
-      await updateDoc(transactionRef, {
-        status: 'success',
-        updatedAt: Timestamp.now(),
-      });
+      await runTransaction(firestore, async (dbTransaction) => {
+        const tSnap = await dbTransaction.get(transactionRef);
+        if (!tSnap.exists()) return;
+        const tData = tSnap.data() as Transaction;
+        if (tData.status === 'success') return;
 
-      // Update Order Status
-      const orderRef = doc(firestore, 'orders', transactionData.orderId);
-      await updateDoc(orderRef, {
-        status: 'processing', // Or whatever status you want after payment
-        isPaid: true,
-        updatedAt: Timestamp.now(),
+        dbTransaction.update(transactionRef, {
+          status: 'success',
+          updatedAt: Timestamp.now(),
+        });
+
+        // Update Order Status
+        const orderRef = doc(firestore, 'orders', tData.orderId);
+        dbTransaction.update(orderRef, {
+          status: 'processing',
+          isPaid: true,
+          updatedAt: Timestamp.now(),
+        });
       });
 
       return NextResponse.json({ success: true, status: 'success' });
