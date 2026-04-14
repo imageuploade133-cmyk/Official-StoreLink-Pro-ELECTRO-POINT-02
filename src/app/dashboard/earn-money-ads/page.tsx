@@ -521,8 +521,8 @@ export default function EarnMoneyAdsPage() {
       </Card>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-2xl w-[95vw] p-0 overflow-hidden flex flex-col max-h-[90vh]">
-          <DialogHeader className="p-6 pb-4 border-b">
+        <DialogContent className="max-w-2xl w-[95vw] p-0 overflow-hidden flex flex-col max-h-[90vh] gap-0">
+          <DialogHeader className="p-6 pb-4 border-b shrink-0 text-left">
             <DialogTitle className="flex items-center gap-2 text-xl">
               {editingAd ? (
                 <div className="bg-primary/10 p-2 rounded-lg">
@@ -540,7 +540,7 @@ export default function EarnMoneyAdsPage() {
             </DialogDescription>
           </DialogHeader>
 
-          <ScrollArea className="flex-1 px-6">
+          <ScrollArea className="flex-1 px-6 min-h-0">
             <div className="space-y-8 py-6">
               {/* Ad Format Section */}
               <div className="space-y-4">
@@ -759,7 +759,7 @@ export default function EarnMoneyAdsPage() {
             </div>
           </ScrollArea>
 
-          <DialogFooter className="p-6 pt-4 border-t bg-muted/10 flex flex-col sm:flex-row gap-2">
+          <DialogFooter className="p-6 pt-4 border-t bg-muted/10 flex flex-col sm:flex-row gap-2 shrink-0">
             <DialogClose asChild>
               <Button variant="ghost" className="font-bold order-2 sm:order-1">Cancel</Button>
             </DialogClose>
