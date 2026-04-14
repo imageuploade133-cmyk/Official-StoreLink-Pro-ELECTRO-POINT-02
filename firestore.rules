@@ -33,6 +33,11 @@ service cloud.firestore {
     match /products/{doc} {
       allow read: if true;
       allow write: if isStaffWithOneOfRoles(['admin', 'manager', 'inventory_manager']) || isAdmin();
+
+      match /reviews/{reviewId} {
+        allow read: if true;
+        allow write: if isSignedIn();
+      }
     }
 
     match /categories/{doc} {
@@ -141,6 +146,44 @@ service cloud.firestore {
     match /adLinks/{adId} {
         allow read: if true;
         allow write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+    }
+
+    // Rules for payment providers - currently accessed via unauthenticated API routes
+    match /payment_providers/{doc} {
+      allow read, write: if true; 
+    }
+
+    // Rules for online transactions - currently accessed via unauthenticated API routes
+    match /transactions/{doc} {
+      allow read, write: if true;
+    }
+
+    // Rules for online orders
+    match /orders/{doc} {
+      allow read, write: if true;
+    }
+
+    match /coupons/{doc} {
+      allow read: if true;
+      allow write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+    }
+
+    match /flash_sales/{doc} {
+      allow read: if true;
+      allow write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+    }
+
+    match /invoices/{doc} {
+      allow read, write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+    }
+
+    match /websiteTraffic/{doc} {
+      allow read, write: if true;
+    }
+
+    match /stockAuditEntries/{doc} {
+      allow read: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+      allow write: if true; // Any stock change might record an entry
     }
     
     /* =====================================================================
