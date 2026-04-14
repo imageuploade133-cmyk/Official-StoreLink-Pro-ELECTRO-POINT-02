@@ -42,7 +42,8 @@ import {
   Layout,
   Clock,
   Settings2,
-  Gift
+  Gift,
+  X as CloseIcon
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -55,7 +56,15 @@ import { format } from 'date-fns';
 import { useAuth } from '@/contexts/auth-context';
 import { cn } from '@/lib/utils';
 import AccessDenied from '@/components/staff-management/AccessDenied';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerClose,
+} from '@/components/ui/drawer';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
@@ -520,10 +529,30 @@ export default function EarnMoneyAdsPage() {
         </CardFooter>
       </Card>
 
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-2xl w-[95vw] p-0 overflow-hidden flex flex-col max-h-[90vh] gap-0">
-          <DialogHeader className="p-6 pb-4 border-b shrink-0 text-left">
-            <DialogTitle className="flex items-center gap-2 text-xl">
+      <Drawer open={isModalOpen} onOpenChange={setIsModalOpen} dismissible={true}>
+        <DrawerContent className="flex flex-col h-screen w-screen overflow-hidden">
+          <div 
+            className="w-full flex flex-col items-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none select-none hover:bg-muted/20 transition-colors shrink-0"
+            data-vaul-drag-handle
+          >
+            <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+          </div>
+
+          <div className="flex justify-end px-6 py-2 shrink-0">
+            <DrawerClose asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-8 w-8 rounded-full hover:bg-muted"
+              >
+                <CloseIcon className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+              </Button>
+            </DrawerClose>
+          </div>
+
+          <DrawerHeader className="px-6 pb-4 border-b shrink-0 text-left">
+            <DrawerTitle className="flex items-center gap-2 text-xl">
               {editingAd ? (
                 <div className="bg-primary/10 p-2 rounded-lg">
                   <Edit className="h-5 w-5 text-primary" />
@@ -534,11 +563,11 @@ export default function EarnMoneyAdsPage() {
                 </div>
               )}
               {editingAd ? 'Edit Ad Configuration' : 'Add New Ad Link'}
-            </DialogTitle>
-            <DialogDescription>
+            </DrawerTitle>
+            <DrawerDescription>
               Set up your monetization strategy by configuring how ads appear to your store visitors.
-            </DialogDescription>
-          </DialogHeader>
+            </DrawerDescription>
+          </DrawerHeader>
 
           <ScrollArea className="flex-1 px-6 min-h-0">
             <div className="space-y-8 py-6">
@@ -759,10 +788,10 @@ export default function EarnMoneyAdsPage() {
             </div>
           </ScrollArea>
 
-          <DialogFooter className="p-6 pt-4 border-t bg-muted/10 flex flex-col sm:flex-row gap-2 shrink-0">
-            <DialogClose asChild>
+          <DrawerFooter className="p-6 pt-4 border-t bg-muted/10 flex flex-col sm:flex-row gap-2 shrink-0">
+            <DrawerClose asChild>
               <Button variant="ghost" className="font-bold order-2 sm:order-1">Cancel</Button>
-            </DialogClose>
+            </DrawerClose>
             <Button 
               onClick={handleSaveAd} 
               disabled={isSaving || (adForm.adType === 'banner' ? !adForm.adScript : !adForm.adLink)}
@@ -771,9 +800,9 @@ export default function EarnMoneyAdsPage() {
               {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
               {editingAd ? 'Update Ad Configuration' : 'Activate & Save Ad'}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
 
       <DeleteConfirmationDialog 
         isOpen={!!adToDelete} 
