@@ -75,44 +75,44 @@ const buttonShapes = [
 
 const shoppingExpSchema = z.object({
   storeAddToCartText: z.string().min(1, 'Label required').max(40, 'Label too long.'),
-  storeAddToCartIcon: z.string().default('ShoppingCart'),
-  storeAddToCartStyle: z.enum(['standard', 'gradient', 'image', 'outline', 'ghost']).default('standard'),
-  storeAddToCartColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#3b82f6'),
-  storeAddToCartGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#3b82f6'),
-  storeAddToCartGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#1d4ed8'),
+  storeAddToCartIcon: z.preprocess((val) => val || 'ShoppingCart', z.string()).default('ShoppingCart'),
+  storeAddToCartStyle: z.preprocess((val) => val || 'standard', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost'])).default('standard'),
+  storeAddToCartColor: z.preprocess((val) => val || '#3b82f6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#3b82f6'),
+  storeAddToCartGradientStart: z.preprocess((val) => val || '#3b82f6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#3b82f6'),
+  storeAddToCartGradientEnd: z.preprocess((val) => val || '#1d4ed8', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#1d4ed8'),
   storeAddToCartImageUrl: z.string().url().or(z.literal('')).optional(),
-  storeAddToCartSize: z.enum(['sm', 'md', 'lg', 'xl']).default('lg'),
-  storeAddToCartShape: z.enum(['none', 'sm', 'md', 'lg', 'full']).default('lg'),
+  storeAddToCartSize: z.preprocess((val) => val || 'lg', z.enum(['sm', 'md', 'lg', 'xl'])).default('lg'),
+  storeAddToCartShape: z.preprocess((val) => val || 'lg', z.enum(['none', 'sm', 'md', 'lg', 'full'])).default('lg'),
   
   storeGridCartText: z.string().min(1, 'Label required').max(20, 'Label too long.'),
-  storeGridCartIcon: z.string().default('ShoppingCart'),
-  storeGridCartStyle: z.enum(['standard', 'gradient', 'image', 'outline', 'ghost']).default('standard'),
-  storeGridCartColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#10b981'),
-  storeGridCartGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#10b981'),
-  storeGridCartGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#059669'),
+  storeGridCartIcon: z.preprocess((val) => val || 'ShoppingCart', z.string()).default('ShoppingCart'),
+  storeGridCartStyle: z.preprocess((val) => val || 'standard', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost'])).default('standard'),
+  storeGridCartColor: z.preprocess((val) => val || '#10b981', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#10b981'),
+  storeGridCartGradientStart: z.preprocess((val) => val || '#10b981', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#10b981'),
+  storeGridCartGradientEnd: z.preprocess((val) => val || '#059669', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#059669'),
   storeGridCartImageUrl: z.string().url().or(z.literal('')).optional(),
-  storeGridCartSize: z.enum(['sm', 'md', 'lg', 'xl']).default('md'),
-  storeGridCartShape: z.enum(['none', 'sm', 'md', 'lg', 'full']).default('md'),
+  storeGridCartSize: z.preprocess((val) => val || 'md', z.enum(['sm', 'md', 'lg', 'xl'])).default('md'),
+  storeGridCartShape: z.preprocess((val) => val || 'md', z.enum(['none', 'sm', 'md', 'lg', 'full'])).default('md'),
   
   storeHeroBtnText: z.string().min(1, 'Label required').max(40, 'Label too long.'),
-  storeHeroBtnIcon: z.string().default('ArrowRight'),
-  storeHeroBtnStyle: z.enum(['standard', 'gradient', 'image', 'outline', 'ghost']).default('gradient'),
-  storeHeroBtnColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#8b5cf6'),
-  storeHeroBtnGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#8b5cf6'),
-  storeHeroBtnGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#7c3aed'),
+  storeHeroBtnIcon: z.preprocess((val) => val || 'ArrowRight', z.string()).default('ArrowRight'),
+  storeHeroBtnStyle: z.preprocess((val) => val || 'gradient', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost'])).default('gradient'),
+  storeHeroBtnColor: z.preprocess((val) => val || '#8b5cf6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#8b5cf6'),
+  storeHeroBtnGradientStart: z.preprocess((val) => val || '#8b5cf6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#8b5cf6'),
+  storeHeroBtnGradientEnd: z.preprocess((val) => val || '#7c3aed', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#7c3aed'),
   storeHeroBtnImageUrl: z.string().url().or(z.literal('')).optional(),
-  storeHeroBtnSize: z.enum(['sm', 'md', 'lg', 'xl']).default('lg'),
-  storeHeroBtnShape: z.enum(['none', 'sm', 'md', 'lg', 'full']).default('lg'),
+  storeHeroBtnSize: z.preprocess((val) => val || 'lg', z.enum(['sm', 'md', 'lg', 'xl'])).default('lg'),
+  storeHeroBtnShape: z.preprocess((val) => val || 'lg', z.enum(['none', 'sm', 'md', 'lg', 'full'])).default('lg'),
 
   storeExploreBtnText: z.string().min(1, 'Label required').max(40, 'Label too long.'),
-  storeExploreBtnIcon: z.string().default('ArrowRight'),
-  storeExploreBtnStyle: z.enum(['standard', 'gradient', 'image', 'outline', 'ghost']).default('standard'),
-  storeExploreBtnColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#3b82f6'),
-  storeExploreBtnGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#3b82f6'),
-  storeExploreBtnGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#1d4ed8'),
+  storeExploreBtnIcon: z.preprocess((val) => val || 'ArrowRight', z.string()).default('ArrowRight'),
+  storeExploreBtnStyle: z.preprocess((val) => val || 'standard', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost'])).default('standard'),
+  storeExploreBtnColor: z.preprocess((val) => val || '#3b82f6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#3b82f6'),
+  storeExploreBtnGradientStart: z.preprocess((val) => val || '#3b82f6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#3b82f6'),
+  storeExploreBtnGradientEnd: z.preprocess((val) => val || '#1d4ed8', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#1d4ed8'),
   storeExploreBtnImageUrl: z.string().url().or(z.literal('')).optional(),
-  storeExploreBtnSize: z.enum(['sm', 'md', 'lg', 'xl']).default('lg'),
-  storeExploreBtnShape: z.enum(['none', 'sm', 'md', 'lg', 'full']).default('lg'),
+  storeExploreBtnSize: z.preprocess((val) => val || 'lg', z.enum(['sm', 'md', 'lg', 'xl'])).default('lg'),
+  storeExploreBtnShape: z.preprocess((val) => val || 'lg', z.enum(['none', 'sm', 'md', 'lg', 'full'])).default('lg'),
   
   useIndividualBtnSettings: z.boolean().default(true),
   showProductReviews: z.boolean().default(true),
@@ -447,7 +447,10 @@ function ButtonSection({
                 <FormLabel className="font-semibold flex items-center gap-2">
                   <Magnet className="h-4 w-4" /> Button Icon
                 </FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
+                <Select 
+                  onValueChange={field.onChange} 
+                  value={field.value || (prefix === 'storeHeroBtn' || prefix === 'storeExploreBtn' ? 'ArrowRight' : 'ShoppingCart')}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select icon" />
@@ -478,7 +481,7 @@ function ButtonSection({
           name={`${prefix}Style` as any}
           render={({ field }) => (
             <ButtonStyleSelector
-              value={field.value}
+              value={field.value || (prefix === 'storeHeroBtn' ? 'gradient' : 'standard')}
               onChange={field.onChange}
               prefix={prefix}
               imageUrl={imageUrlValue}
@@ -494,7 +497,7 @@ function ButtonSection({
           name={`${prefix}Shape` as any}
           render={({ field }) => (
             <ButtonShapeSelector
-              value={field.value}
+              value={field.value || (prefix === 'storeGridCart' ? 'md' : 'lg')}
               onChange={field.onChange}
             />
           )}
@@ -632,7 +635,10 @@ function ButtonSection({
           render={({ field }) => (
             <FormItem>
               <FormLabel className="font-semibold">Button Size</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+              <Select 
+                onValueChange={field.onChange} 
+                value={field.value || (prefix === 'storeGridCart' ? 'md' : 'lg')}
+              >
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select size" />
