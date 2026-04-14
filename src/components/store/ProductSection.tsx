@@ -21,7 +21,27 @@ import { ProductCard } from '@/components/store/ProductCard';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowRight, Loader2, Zap, ChevronRight, Timer, ChevronLeft, RotateCcw } from 'lucide-react';
+import { 
+  ArrowRight, 
+  Loader2, 
+  Zap, 
+  ChevronRight, 
+  Timer, 
+  ChevronLeft, 
+  RotateCcw,
+  ShoppingCart,
+  ShoppingBag,
+  Plus,
+  Check,
+  CheckCircle2,
+  Package,
+  CreditCard
+} from 'lucide-react';
+
+const iconMap: Record<string, any> = {
+  ShoppingCart, ShoppingBag, Plus, Check, CheckCircle2, Zap, CreditCard, 
+  ArrowRight, Package
+};
 import type { HomepageSection, Product, Category } from '@/lib/types';
 import { useSettings } from '@/contexts/settings-context';
 import { ProductCardSkeleton } from './ProductCardSkeleton';
@@ -259,6 +279,31 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
   const cornerRadius = settings?.flashHubCornerRadius ?? 24;
 
   const buttonStyle = useMemo(() => {
+    if (settings?.useIndividualBtnSettings && settings?.storeExploreBtnStyle) {
+      const style = settings.storeExploreBtnStyle;
+      if (style === 'gradient') {
+        return {
+          background: `linear-gradient(to right, ${settings.storeExploreBtnGradientStart || '#3b82f6'}, ${settings.storeExploreBtnGradientEnd || '#1d4ed8'})`,
+          color: 'white',
+          border: 'none'
+        };
+      } else if (style === 'image' && settings.storeExploreBtnImageUrl) {
+        return {
+          backgroundImage: `url('${settings.storeExploreBtnImageUrl}')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          color: 'white',
+          border: 'none',
+          textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+        };
+      }
+      return {
+        backgroundColor: settings.storeExploreBtnColor || '#3b82f6',
+        color: 'white',
+        border: 'none'
+      };
+    }
+
     const style = settings?.storeBtnStyle || 'standard';
     if (style === 'gradient') {
       return {
@@ -272,6 +317,21 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
       color: 'white',
       border: 'none'
     };
+  }, [settings]);
+
+  const exploreText = useMemo(() => {
+    if (isPromoActive) return `Enter the ${section.title} Event`;
+    if (settings?.useIndividualBtnSettings && settings?.storeExploreBtnText) {
+      return settings.storeExploreBtnText;
+    }
+    return `Explore ${section.title}`;
+  }, [isPromoActive, section.title, settings]);
+
+  const IconComponent = useMemo(() => {
+    if (settings?.useIndividualBtnSettings && settings?.storeExploreBtnIcon) {
+        return iconMap[settings.storeExploreBtnIcon] || ArrowRight;
+    }
+    return ArrowRight;
   }, [settings]);
 
   const handleNextPage = () => fetchProducts('next');
@@ -468,7 +528,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
                     } : buttonStyle}
                 >
                     <Link href={`/store/shop?category=${section.categoryId}`}>
-                        {isPromoActive ? `Enter the ${section.title} Event` : `Explore ${section.title}`} <ArrowRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={3} />
+                        {exploreText} <IconComponent className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={3} />
                     </Link>
                 </Button>
             </div>

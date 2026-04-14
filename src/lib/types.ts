@@ -219,6 +219,15 @@ export interface Settings {
   storeHeroBtnGradientEnd?: string;
   storeHeroBtnShape?: string;
   storeHeroBtnSize?: 'sm' | 'md' | 'lg' | 'xl';
+  // Explore Button settings
+  storeExploreBtnText?: string;
+  storeExploreBtnIcon?: string;
+  storeExploreBtnStyle?: 'standard' | 'gradient' | 'image';
+  storeExploreBtnColor?: string;
+  storeExploreBtnGradientStart?: string;
+  storeExploreBtnGradientEnd?: string;
+  storeExploreBtnImageUrl?: string;
+  storeExploreBtnSize?: 'sm' | 'md' | 'lg' | 'xl';
   // Global Store Button Style
   storeBtnStyle?: 'standard' | 'gradient';
   storeBtnColor?: string;

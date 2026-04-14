@@ -92,6 +92,15 @@ const shoppingExpSchema = z.object({
   storeHeroBtnGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#7c3aed'),
   storeHeroBtnImageUrl: z.string().url().or(z.literal('')).optional(),
   storeHeroBtnSize: z.enum(['sm', 'md', 'lg', 'xl']).default('lg'),
+
+  storeExploreBtnText: z.string().min(1, 'Label required').max(40, 'Label too long.'),
+  storeExploreBtnIcon: z.string().default('ArrowRight'),
+  storeExploreBtnStyle: z.enum(['standard', 'gradient', 'image']).default('standard'),
+  storeExploreBtnColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#3b82f6'),
+  storeExploreBtnGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#3b82f6'),
+  storeExploreBtnGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#1d4ed8'),
+  storeExploreBtnImageUrl: z.string().url().or(z.literal('')).optional(),
+  storeExploreBtnSize: z.enum(['sm', 'md', 'lg', 'xl']).default('lg'),
   
   useIndividualBtnSettings: z.boolean().default(true),
   showProductReviews: z.boolean().default(true),
@@ -201,11 +210,12 @@ function ButtonPreview({
   type
 }: {
   settings: any;
-  type: 'addToCart' | 'gridCart' | 'heroBtn';
+  type: 'addToCart' | 'gridCart' | 'heroBtn' | 'exploreBtn';
 }) {
   const prefix = type === 'addToCart' ? 'storeAddToCart'
     : type === 'gridCart' ? 'storeGridCart'
-    : 'storeHeroBtn';
+    : type === 'heroBtn' ? 'storeHeroBtn'
+    : 'storeExploreBtn';
 
   const text = settings[`${prefix}Text`] || 'Button';
   const style = settings[`${prefix}Style`] || 'standard';
@@ -272,7 +282,7 @@ function ButtonSection({
   isUploading,
   handleImageUpload
 }: {
-  type: 'addToCart' | 'gridCart' | 'heroBtn';
+  type: 'addToCart' | 'gridCart' | 'heroBtn' | 'exploreBtn';
   title: string;
   description: string;
   icon: any;
@@ -282,7 +292,8 @@ function ButtonSection({
 }) {
   const prefix = type === 'addToCart' ? 'storeAddToCart'
     : type === 'gridCart' ? 'storeGridCart'
-    : 'storeHeroBtn';
+    : type === 'heroBtn' ? 'storeHeroBtn'
+    : 'storeExploreBtn';
 
   const styleValue = form.watch(`${prefix}Style`);
   const imageUrlValue = form.watch(`${prefix}ImageUrl`);
@@ -570,6 +581,15 @@ export default function ShoppingExperienceSettingsPage() {
       storeHeroBtnImageUrl: '',
       storeHeroBtnSize: 'lg',
 
+      storeExploreBtnText: 'Explore Collection',
+      storeExploreBtnIcon: 'ArrowRight',
+      storeExploreBtnStyle: 'standard',
+      storeExploreBtnColor: '#3b82f6',
+      storeExploreBtnGradientStart: '#3b82f6',
+      storeExploreBtnGradientEnd: '#1d4ed8',
+      storeExploreBtnImageUrl: '',
+      storeExploreBtnSize: 'lg',
+
       useIndividualBtnSettings: true,
       showProductReviews: true,
       showReviewRatingOnCard: true,
@@ -605,6 +625,15 @@ export default function ShoppingExperienceSettingsPage() {
         storeHeroBtnGradientEnd: settingsData.storeHeroBtnGradientEnd || '#7c3aed',
         storeHeroBtnImageUrl: settingsData.storeHeroBtnImageUrl || '',
         storeHeroBtnSize: settingsData.storeHeroBtnSize || 'lg',
+
+        storeExploreBtnText: settingsData.storeExploreBtnText || 'Explore Collection',
+        storeExploreBtnIcon: settingsData.storeExploreBtnIcon || 'ArrowRight',
+        storeExploreBtnStyle: settingsData.storeExploreBtnStyle as any || 'standard',
+        storeExploreBtnColor: settingsData.storeExploreBtnColor || '#3b82f6',
+        storeExploreBtnGradientStart: settingsData.storeExploreBtnGradientStart || '#3b82f6',
+        storeExploreBtnGradientEnd: settingsData.storeExploreBtnGradientEnd || '#1d4ed8',
+        storeExploreBtnImageUrl: settingsData.storeExploreBtnImageUrl || '',
+        storeExploreBtnSize: settingsData.storeExploreBtnSize || 'lg',
 
         useIndividualBtnSettings: settingsData.useIndividualBtnSettings !== false,
         showProductReviews: settingsData.showProductReviews ?? true,
@@ -720,10 +749,11 @@ export default function ShoppingExperienceSettingsPage() {
 
           {/* Button Sections */}
           <Tabs defaultValue="addToCart" className="w-full" disabled={isSaving}>
-            <TabsList className="grid w-full grid-cols-3" style={{ pointerEvents: isSaving ? 'none' : 'auto', opacity: isSaving ? 0.6 : 1 }}>
+            <TabsList className="grid w-full grid-cols-4" style={{ pointerEvents: isSaving ? 'none' : 'auto', opacity: isSaving ? 0.6 : 1 }}>
               <TabsTrigger value="addToCart">Add to Cart</TabsTrigger>
               <TabsTrigger value="gridCart">Grid Button</TabsTrigger>
               <TabsTrigger value="heroBtn">Hero Button</TabsTrigger>
+              <TabsTrigger value="exploreBtn">Explore Button</TabsTrigger>
             </TabsList>
 
             <TabsContent value="addToCart" className="space-y-4">
@@ -756,6 +786,18 @@ export default function ShoppingExperienceSettingsPage() {
                 title="Hero Button"
                 description="Banner/hero section button"
                 icon={Zap}
+                form={form}
+                isUploading={isUploading}
+                handleImageUpload={handleImageUpload}
+              />
+            </TabsContent>
+
+            <TabsContent value="exploreBtn" className="space-y-4">
+              <ButtonSection
+                type="exploreBtn"
+                title="Explore Button"
+                description="Product Section / Category 'Explore' button"
+                icon={ArrowRight}
                 form={form}
                 isUploading={isUploading}
                 handleImageUpload={handleImageUpload}
