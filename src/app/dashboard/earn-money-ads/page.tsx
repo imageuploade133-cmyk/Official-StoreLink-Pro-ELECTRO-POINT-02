@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useFirestore } from '@/firebase';
 import { 
   collection, 
@@ -19,6 +19,7 @@ import {
   limitToLast, 
   getDocs, 
   getCountFromServer,
+  where,
   type QueryDocumentSnapshot,
   type DocumentData
 } from 'firebase/firestore';
@@ -77,8 +78,10 @@ const ITEMS_PER_PAGE = 10;
 
 export default function EarnMoneyAdsPage() {
   const firestore = useFirestore();
-  const { permissions, isLoading: isAuthLoading } = useAuth();
+  const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
   const { toast } = useToast();
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAd, setEditingAd] = useState<AdLink | null>(null);
@@ -128,18 +131,18 @@ export default function EarnMoneyAdsPage() {
 
   // Fetch Ads Logic
   const fetchAds = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsLoadingAds(true);
 
     try {
-      let q = query(collection(firestore, 'adLinks'), orderBy('createdAt', 'desc'));
+      let q = query(collection(firestore, 'adLinks'), where('store_id', '==', currentStoreId), orderBy('createdAt', 'desc'));
 
       if (direction === 'initial') {
         const countSnap = await getCountFromServer(q);
         setTotalAdsCount(countSnap.data().count);
 
         // Fetch all for global stats
-        const allSnap = await getDocs(collection(firestore, 'adLinks'));
+        const allSnap = await getDocs(query(collection(firestore, 'adLinks'), where('store_id', '==', currentStoreId)));
         const allAds = allSnap.docs.map(d => d.data() as AdLink);
         setGlobalStats({
           clicks: allAds.reduce((acc, a) => acc + (a.clicks || 0), 0),
@@ -185,13 +188,13 @@ export default function EarnMoneyAdsPage() {
     } finally {
       setIsLoadingAds(false);
     }
-  }, [firestore, toast]);
+  }, [firestore, toast, currentStoreId]);
 
   useEffect(() => {
-    if (firestore && !isAuthLoading && permissions.manage_ads) {
+    if (firestore && !isAuthLoading && permissions.manage_ads && currentStoreId) {
       fetchAds('initial');
     }
-  }, [firestore, isAuthLoading, permissions.manage_ads, fetchAds]);
+  }, [firestore, isAuthLoading, permissions.manage_ads, fetchAds, currentStoreId]);
 
   const handleToggleStatus = async (ad: AdLink) => {
     if (!firestore) return;
@@ -246,11 +249,12 @@ export default function EarnMoneyAdsPage() {
   };
 
   const handleSaveAd = async () => {
-    if (!firestore || (!adForm.adLink && !adForm.adScript)) return;
+    if (!firestore || !currentStoreId || (!adForm.adLink && !adForm.adScript)) return;
     setIsSaving(true);
     try {
       const payload = {
         ...adForm,
+        store_id: currentStoreId,
         updatedAt: serverTimestamp(),
       };
 

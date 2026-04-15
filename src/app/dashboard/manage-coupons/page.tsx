@@ -6,6 +6,7 @@ import { useFirestore, useCollection } from '@/firebase';
 import { 
   collection, 
   query, 
+  where,
   orderBy, 
   addDoc, 
   doc, 
@@ -71,9 +72,11 @@ const ITEMS_PER_PAGE = 10;
 
 export default function ManageCouponsPage() {
   const firestore = useFirestore();
-  const { permissions, isLoading: isAuthLoading } = useAuth();
+  const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
   const { settings } = useSettings();
   const { toast } = useToast();
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const currencySymbol = settings?.currency || '$';
 
@@ -105,11 +108,11 @@ export default function ManageCouponsPage() {
 
   // Fetch Coupons Logic
   const fetchCoupons = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsLoadingCoupons(true);
 
     try {
-      let q = query(collection(firestore, 'coupons'), orderBy('createdAt', 'desc'));
+      let q = query(collection(firestore, 'coupons'), where('store_id', '==', currentStoreId), orderBy('createdAt', 'desc'));
 
       // 1. Initial count (Cost Efficient)
       if (direction === 'initial') {
@@ -152,19 +155,19 @@ export default function ManageCouponsPage() {
     } finally {
       setIsLoadingCoupons(false);
     }
-  }, [firestore, toast]);
+  }, [firestore, toast, currentStoreId]);
 
   useEffect(() => {
-    if (firestore && !isAuthLoading && permissions.manage_coupons) {
+    if (firestore && !isAuthLoading && permissions.manage_coupons && currentStoreId) {
       fetchCoupons('initial');
     }
-  }, [firestore, isAuthLoading, permissions.manage_coupons, fetchCoupons]);
+  }, [firestore, isAuthLoading, permissions.manage_coupons, fetchCoupons, currentStoreId]);
 
   // Order fetch for stats (limited to save reads)
   const ordersQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'orders'), orderBy('createdAt', 'desc'), limit(100));
-  }, [firestore]);
+    if (!firestore || !currentStoreId) return null;
+    return query(collection(firestore, 'orders'), where('store_id', '==', currentStoreId), orderBy('createdAt', 'desc'), limit(100));
+  }, [firestore, currentStoreId]);
 
   const { data: orders, isLoading: isLoadingOrders } = useCollection<Order>(ordersQuery);
 
@@ -262,7 +265,7 @@ export default function ManageCouponsPage() {
   };
 
   const handleSaveCoupon = async () => {
-    if (!firestore || !couponForm.code) return;
+    if (!firestore || !couponForm.code || !currentStoreId) return;
     setIsSaving(true);
     try {
       const codeUpper = couponForm.code.toUpperCase().trim();
@@ -271,6 +274,7 @@ export default function ManageCouponsPage() {
         code: codeUpper,
         startDate: couponForm.startDate ? Timestamp.fromDate(new Date(couponForm.startDate as any)) : null,
         endDate: couponForm.endDate ? Timestamp.fromDate(new Date(couponForm.endDate as any)) : null,
+        store_id: currentStoreId
       };
 
       if (editingCoupon) {

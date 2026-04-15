@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
@@ -29,8 +30,10 @@ const MAX_MESSAGE_LENGTH = 3000;
 const UNIT_COST_PER_MESSAGE = 3.1; 
 
 export default function BulkWhatsAppPage() {
-  const { user, permissions, isLoading: isAuthLoading } = useAuth();
+  const { user, permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
   const firestore = useFirestore();
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const [activeTab, setActiveTab] = useState('customers');
   const [customersWithPhone, setCustomersWithPhone] = useState<Customer[]>([]);
@@ -50,18 +53,18 @@ export default function BulkWhatsAppPage() {
   const [includeFooter, setIncludeFooter] = useState(true);
 
   const fetchContacts = useCallback(async () => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsLoading(true);
     setError(null);
     try {
-      let customersQuery = query(collection(firestore, "customers"));
+      let customersQuery = query(collection(firestore, "customers"), where("store_id", "==", currentStoreId));
       const customersSnapshot = await getDocs(customersQuery);
       const customersList = customersSnapshot.docs
         .map(doc => ({ id: doc.id, ...doc.data() } as Customer))
         .filter(customer => customer.phone && customer.phone.trim() !== '');
       setCustomersWithPhone(customersList);
 
-      const staffQuery = query(collection(firestore, "staff"));
+      let staffQuery = query(collection(firestore, "staff"), where("store_id", "==", currentStoreId));
       const staffSnapshot = await getDocs(staffQuery);
       const staffList = staffSnapshot.docs
         .map(doc => ({ id: doc.id, ...doc.data() } as StaffMember))
@@ -78,13 +81,13 @@ export default function BulkWhatsAppPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [toast, firestore]);
+  }, [toast, firestore, currentStoreId]);
 
   useEffect(() => {
-    if (permissions.canSendMarketingWhatsapp) {
+    if (permissions.canSendMarketingWhatsapp && currentStoreId) {
       fetchContacts();
     }
-  }, [fetchContacts, permissions.canSendMarketingWhatsapp]);
+  }, [fetchContacts, permissions.canSendMarketingWhatsapp, currentStoreId]);
 
   const filteredCustomers = useMemo(() => {
     const lowercasedTerm = searchTerm.toLowerCase();
@@ -248,9 +251,9 @@ export default function BulkWhatsAppPage() {
             status = 'failed';
             errorDetails = error.message || 'Unknown error';
         } finally {
-            const logEntry: WhatsappMessageLog = {
+            const logEntry: WhatsappMessageLog & { store_id?: string } = {
                 timestamp: serverTimestamp() as Timestamp,
-                eventType: payload.eventType, // Added eventType to log
+                eventType: payload.eventType,
                 messageContent: finalMessageForLog,
                 recipientPhone: recipient.phone!,
                 customerName: recipient.name,
@@ -259,6 +262,7 @@ export default function BulkWhatsAppPage() {
                 errorDetails: errorDetails,
                 userId: currentUserId,
                 userName: currentUserName,
+                store_id: currentStoreId
             };
             await addDoc(whatsappMessageLogsRef, logEntry);
         }

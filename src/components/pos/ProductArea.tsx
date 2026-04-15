@@ -36,7 +36,7 @@ export function ProductArea({ onAddToCart, onProductsLoaded }: ProductAreaProps)
     const firestore = useFirestore();
     const { settings } = useSettings();
     const { toast } = useToast();
-    const { user, staffMember } = useAuth();
+    const { user, staffMember, store } = useAuth();
     
     const currencySymbol = settings?.currency || '$';
     const defaultProductImageUrl = settings?.defaultProductImageUrl || 'https://placehold.co/400x300.png';
@@ -63,14 +63,14 @@ export function ProductArea({ onAddToCart, onProductsLoaded }: ProductAreaProps)
     const searchInputContainerRef = useRef<HTMLDivElement>(null);
 
     const fetchInitialData = useCallback(async () => {
-        if (!firestore) return;
+        const currentStoreId = staffMember?.store_id || store?.id;
+        if (!firestore || !currentStoreId) return;
         setLoadingProducts(true);
         setLoadingCategories(true);
         setProductError(null);
         try {
-            const storeId = staffMember?.store_id || null;
-            const productsQuery = firestoreQuery(collection(firestore, 'products'), where('store_id', '==', storeId));
-            const categoriesQuery = firestoreQuery(collection(firestore, 'categories'), where('store_id', '==', storeId));
+            const productsQuery = firestoreQuery(collection(firestore, 'products'), where('store_id', '==', currentStoreId));
+            const categoriesQuery = firestoreQuery(collection(firestore, 'categories'), where('store_id', '==', currentStoreId));
             
             const [productSnapshot, categorySnapshot] = await Promise.all([
                 getDocs(productsQuery),
@@ -107,7 +107,7 @@ export function ProductArea({ onAddToCart, onProductsLoaded }: ProductAreaProps)
         }
         setLoadingProducts(false);
         setLoadingCategories(false);
-    }, [toast, firestore, onProductsLoaded]);
+    }, [toast, firestore, onProductsLoaded, staffMember, store]);
 
     useEffect(() => {
         fetchInitialData();

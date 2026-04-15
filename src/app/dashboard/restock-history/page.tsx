@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
@@ -78,12 +79,14 @@ import { RestockStats } from '@/components/inventory/RestockStats';
 const ITEMS_PER_PAGE = 15;
 
 export default function RestockHistoryPage() {
-  const { user, permissions, isAdmin, isLoading: isAuthLoading } = useAuth();
+  const { user, permissions, isAdmin, isLoading: isAuthLoading, store, staffMember } = useAuth();
   const { settings, isLoading: isSettingsLoading } = useSettings();
   const { toast } = useToast();
   const firestore = useFirestore();
   const firebaseAuth = getAuth();
   
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
+
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [isProcessingDelete, setIsProcessingDelete] = useState(false);
   const [entryPendingDeletion, setEntryPendingDeletion] = useState<RestockEntry | null>(null);
@@ -110,11 +113,11 @@ export default function RestockHistoryPage() {
   const canModify = isAdmin;
 
   const fetchRestockHistory = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsLoadingEntries(true);
 
     try {
-      let q = query(collection(firestore, 'restockEntries'), orderBy('restockDate', 'desc'));
+      let q = query(collection(firestore, 'restockEntries'), where('store_id', '==', currentStoreId), orderBy('restockDate', 'desc'));
 
       if (dateRange?.from) {
         q = query(q, where('restockDate', '>=', startOfDay(dateRange.from)));
@@ -131,12 +134,12 @@ export default function RestockHistoryPage() {
         // Fetch today's stats separately to keep them accurate without full collection scan
         const todayStart = startOfDay(new Date());
         const todayEnd = endOfDay(new Date());
-        const todayQuery = query(collection(firestore, 'restockEntries'), where('restockDate', '>=', todayStart), where('restockDate', '<=', todayEnd));
+        const todayQuery = query(collection(firestore, 'restockEntries'), where('store_id', '==', currentStoreId), where('restockDate', '>=', todayStart), where('restockDate', '<=', todayEnd));
         const todaySnapshot = await getDocs(todayQuery);
         setTodayRestockCount(todaySnapshot.docs.reduce((sum, d) => sum + (d.data().quantity || 0), 0));
         
         // Fetch approximate total value from latest records
-        const statsQuery = query(collection(firestore, 'restockEntries'), limit(500));
+        const statsQuery = query(collection(firestore, 'restockEntries'), where('store_id', '==', currentStoreId), limit(500));
         const statsSnapshot = await getDocs(statsQuery);
         setTotalRestockValue(statsSnapshot.docs.reduce((sum, d) => sum + (d.data().totalCost || 0), 0));
       }
@@ -184,13 +187,13 @@ export default function RestockHistoryPage() {
     } finally {
       setIsLoadingEntries(false);
     }
-  }, [firestore, dateRange, toast]);
+  }, [firestore, dateRange, toast, currentStoreId]);
 
   useEffect(() => {
-    if (firestore && !isAuthLoading && permissions?.transfer_stock) {
+    if (firestore && !isAuthLoading && permissions?.transfer_stock && currentStoreId) {
       fetchRestockHistory('initial');
     }
-  }, [firestore, isAuthLoading, permissions, dateRange, fetchRestockHistory]);
+  }, [firestore, isAuthLoading, permissions, dateRange, fetchRestockHistory, currentStoreId]);
 
   const filteredEntries = useMemo(() => {
     if (!searchTerm) return restockEntries;

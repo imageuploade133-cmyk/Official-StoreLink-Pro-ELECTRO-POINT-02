@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useCollection, useFirestore } from '@/firebase';
-import { collection, query, orderBy, deleteDoc, doc } from 'firebase/firestore';
+import { collection, query, where, orderBy, deleteDoc, doc } from 'firebase/firestore';
 import type { HomepageSection } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
@@ -22,17 +22,19 @@ import { convertToDateSafely } from '@/lib/utils';
 export default function ManageHomepageSectionsPage() {
   const firestore = useFirestore();
   const { toast } = useToast();
-  const { permissions, isLoading: isAuthLoading } = useAuth();
+  const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
   const { settings } = useSettings();
   const currencySymbol = settings?.currency || '$';
   
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
+
   const [sectionToDelete, setSectionToDelete] = useState<HomepageSection | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const sectionsQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'homepageSections'), orderBy('order', 'asc'));
-  }, [firestore]);
+    if (!firestore || !currentStoreId) return null;
+    return query(collection(firestore, 'homepageSections'), where('store_id', '==', currentStoreId), orderBy('order', 'asc'));
+  }, [firestore, currentStoreId]);
 
   const { data: sections, isLoading: isLoadingSections } = useCollection<HomepageSection>(sectionsQuery);
   

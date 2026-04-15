@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -45,13 +46,15 @@ const generateSlug = (title: string) => {
 };
 
 export default function CreateWebPage() {
-  const { permissions, isLoading: authLoading } = useAuth();
+  const { permissions, isLoading: authLoading, store, staffMember } = useAuth();
   const firestore = useFirestore();
   const { settings } = useSettings();
   const router = useRouter();
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const form = useForm<PageFormValues>({
     resolver: zodResolver(pageFormSchema),
@@ -111,11 +114,11 @@ export default function CreateWebPage() {
   };
 
   const onSubmit = async (values: PageFormValues) => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsSaving(true);
     try {
       // Check if slug already exists
-      const q = query(collection(firestore, 'publicPages'), where('slug', '==', values.slug));
+      const q = query(collection(firestore, 'publicPages'), where('store_id', '==', currentStoreId), where('slug', '==', values.slug));
       const querySnapshot = await getDocs(q);
       if (!querySnapshot.empty) {
         form.setError('slug', { type: 'manual', message: 'This slug is already in use. Please choose another.' });
@@ -125,6 +128,7 @@ export default function CreateWebPage() {
 
       await addDoc(collection(firestore, 'publicPages'), {
         ...values,
+        store_id: currentStoreId,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
       });

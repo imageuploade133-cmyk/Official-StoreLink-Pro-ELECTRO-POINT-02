@@ -4,7 +4,7 @@
 import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFirestore, useCollection } from '@/firebase';
-import { collection, addDoc, Timestamp, query, orderBy, doc, writeBatch, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, Timestamp, query, orderBy, doc, writeBatch, serverTimestamp, where } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
 import { PageHeader } from '@/components/PageHeader';
@@ -21,18 +21,20 @@ export default function AddProductPage() {
   const router = useRouter();
   const firestore = useFirestore();
   const { toast } = useToast();
-  const { permissions, user, staffMember, isLoading: isAuthLoading } = useAuth();
+  const { permissions, user, staffMember, store, isLoading: isAuthLoading } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   // Fetch Categories
   const categoriesQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'categories'), orderBy('name'));
-  }, [firestore]);
+    if (!firestore || !currentStoreId) return null;
+    return query(collection(firestore, 'categories'), where('store_id', '==', currentStoreId), orderBy('name'));
+  }, [firestore, currentStoreId]);
   const { data: categories, isLoading: isLoadingCategories, refetch: refetchCategories } = useCollection<Category>(categoriesQuery);
 
   const handleProductSubmit = async (values: ProductFormValues) => {
-    if (!user || !firestore) return;
+    if (!user || !firestore || !currentStoreId) return;
     
     setIsSaving(true);
     try {
@@ -41,7 +43,7 @@ export default function AddProductPage() {
       // 1. Prepare main product data (WITHOUT heavy voices array)
       const productData: any = {
         ...restValues,
-        store_id: staffMember?.store_id || user.uid, // Fallback to user.uid if no store_id (e.g. for old owners)
+        store_id: currentStoreId,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
         promo: null,
@@ -81,7 +83,7 @@ export default function AddProductPage() {
               change: values.stock,
               staffId: user.uid,
               staffName: user.displayName || user.email || 'Staff',
-              store_id: staffMember?.store_id || user.uid,
+              store_id: currentStoreId,
               timestamp: serverTimestamp()
           });
       }

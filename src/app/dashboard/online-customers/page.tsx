@@ -87,11 +87,13 @@ interface CustomerWithOrders extends Customer {
 }
 
 export default function OnlineCustomersPage() {
-  const { permissions, isLoading: isAuthLoading } = useAuth();
+  const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
   const { settings } = useSettings();
   const firestore = useFirestore();
   const { toast } = useToast();
   const currencySymbol = settings?.currency || '$';
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerWithOrders | null>(null);
@@ -127,13 +129,14 @@ export default function OnlineCustomersPage() {
   const lastDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
 
   const fetchCustomers = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsLoading(true);
 
     try {
       // 1. Base Query: Only customers who registered via web (have a UID)
       let q = query(
         collection(firestore, 'customers'), 
+        where('store_id', '==', currentStoreId),
         where('uid', '!=', null),
         orderBy('uid'), 
         orderBy('createdAt', 'desc')
@@ -168,7 +171,7 @@ export default function OnlineCustomersPage() {
         // 4. Fetch orders ONLY for these customers (Batch Query)
         let orderCounts: Record<string, number> = {};
         if (uids.length > 0) {
-            const ordersQuery = query(collection(firestore, 'orders'), where('user_id', 'in', uids));
+            const ordersQuery = query(collection(firestore, 'orders'), where('store_id', '==', currentStoreId), where('user_id', 'in', uids));
             const ordersSnapshot = await getDocs(ordersQuery);
             ordersSnapshot.forEach(orderDoc => {
                 const order = orderDoc.data();
@@ -198,13 +201,13 @@ export default function OnlineCustomersPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [firestore, toast]);
+  }, [firestore, toast, currentStoreId]);
 
   useEffect(() => {
-    if (!isAuthLoading && permissions.view_online_customers) {
+    if (!isAuthLoading && permissions.view_online_customers && currentStoreId) {
       fetchCustomers('initial');
     }
-  }, [isAuthLoading, permissions.view_online_customers, fetchCustomers]);
+  }, [isAuthLoading, permissions.view_online_customers, fetchCustomers, currentStoreId]);
 
   const filteredCustomers = useMemo(() => {
     const term = searchTerm.toLowerCase().trim();
@@ -450,7 +453,7 @@ export default function OnlineCustomersPage() {
         {selectedCustomerForActions && (
           <div className="space-y-4">
             <div className="grid grid-cols-1 gap-2">
-              <Button variant="default" className="justify-start bg-green-600 hover:bg-green-700 h-11" onClick={() => handleBulkPayment(selectedCustomerForActions)} disabled={selectedCustomerForActions.outstandingCredit <= 0.01}>
+              <Button variant="default" className="justify-start bg-green-600 hover:bg-green-700 h-11" onClick={() => handleBulkPayment(selectedCustomerForActions)} disabled={(selectedCustomerForActions.outstandingCredit || 0) <= 0.01}>
                 <DollarSign className="mr-2 h-4 w-4" /> Record Bulk Payment
               </Button>
               <Button variant="outline" className="justify-start h-11" asChild>

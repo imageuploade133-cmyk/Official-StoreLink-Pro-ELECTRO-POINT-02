@@ -60,8 +60,10 @@ export default function ProductSalesPage() {
   const { toast } = useToast();
   const { settings } = useSettings();
   const currencySymbol = settings?.currency || '$';
-  const { permissions, isLoading: authLoading } = useAuth();
+  const { permissions, isLoading: authLoading, store, staffMember } = useAuth();
   const firestore = useFirestore();
+
+  const currentStoreId = React.useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const [loading, setLoading] = React.useState(true);
   const [aggregatedSales, setAggregatedSales] = React.useState<AggregatedProductSale[]>([]);
@@ -96,10 +98,11 @@ export default function ProductSalesPage() {
 
   // 1. Fetch transactions for the period (Cached in ref for aggregation)
   const fetchSummaryData = React.useCallback(async (range: DateRange | undefined) => {
-    if (!range?.from || !firestore) return;
+    if (!range?.from || !firestore || !currentStoreId) return;
     
     try {
       const salesConstraints: any[] = [
+        where("store_id", "==", currentStoreId),
         where("createdAt", ">=", startOfDay(range.from)),
         where("createdAt", "<=", endOfDay(range.to ? range.to : range.from)),
         orderBy("createdAt", "desc"),
@@ -107,7 +110,7 @@ export default function ProductSalesPage() {
       ];
 
       const salesQuery = query(collection(firestore, "saleTransactions"), ...salesConstraints);
-      const staffQuery = query(collection(firestore, "staff"));
+      const staffQuery = query(collection(firestore, "staff"), where("store_id", "==", currentStoreId));
 
       const [salesSnapshot, staffSnapshot] = await Promise.all([
         getDocs(salesQuery),
@@ -140,16 +143,16 @@ export default function ProductSalesPage() {
       console.error("Error fetching summary data:", e);
       toast({ variant: 'destructive', title: "Summary Error", description: "Failed to load period statistics." });
     }
-  }, [firestore, toast]);
+  }, [firestore, toast, currentStoreId]);
 
   // 2. Fetch paginated products and merge with sales data
   const fetchProductBatch = React.useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setLoading(true);
 
     try {
       const productsCol = collection(firestore, "products");
-      let q = query(productsCol, where('isVisibleOnWeb', '==', true), orderBy("name", "asc"));
+      let q = query(productsCol, where('store_id', '==', currentStoreId), where('isVisibleOnWeb', '==', true), orderBy("name", "asc"));
 
       if (searchTerm.trim()) {
         const term = searchTerm.toLowerCase().trim();
@@ -239,14 +242,14 @@ export default function ProductSalesPage() {
     } finally {
       setLoading(false);
     }
-  }, [firestore, searchTerm, toast]);
+  }, [firestore, searchTerm, toast, currentStoreId]);
 
   // Initial Data Load
   React.useEffect(() => {
-    if(!authLoading && permissions.canViewProductSales && dateRange) {
+    if(!authLoading && permissions.canViewProductSales && dateRange && currentStoreId) {
         fetchSummaryData(dateRange).then(() => fetchProductBatch('initial'));
     }
-  }, [authLoading, permissions.canViewProductSales, dateRange, fetchSummaryData, fetchProductBatch]);
+  }, [authLoading, permissions.canViewProductSales, dateRange, fetchSummaryData, fetchProductBatch, currentStoreId]);
 
   const handleRefresh = () => {
     fetchSummaryData(dateRange).then(() => fetchProductBatch('initial'));

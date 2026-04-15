@@ -17,10 +17,11 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Clock, User, FileText, ShoppingCart, Trash2, RotateCcw, Search, X, AlertTriangle, Info } from "lucide-react";
 import { useFirestore } from '@/firebase';
-import { collection, getDocs, query, orderBy, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, Timestamp, where } from 'firebase/firestore';
 import { formatDistanceToNow } from 'date-fns';
 import type { HeldSale } from '@/lib/types';
 import { convertToDateSafely } from '@/lib/utils';
+import { useAuth } from '@/contexts/auth-context';
 
 export interface HeldSaleDisplay extends HeldSale {
   id: string;
@@ -105,14 +106,18 @@ export function HeldSalesModal({ isOpen, onOpenChange, currencySymbol, onRestore
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const firestore = useFirestore();
+  const { store, staffMember } = useAuth();
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const fetchHeldSales = useCallback(async () => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsLoading(true);
     setError(null);
     try {
       const q = query(
         collection(firestore, "heldSales"), 
+        where("store_id", "==", currentStoreId),
         orderBy("heldAt", "desc")
       );
       const querySnapshot = await getDocs(q);
@@ -127,7 +132,7 @@ export function HeldSalesModal({ isOpen, onOpenChange, currencySymbol, onRestore
     } finally {
       setIsLoading(false);
     }
-  }, [firestore]);
+  }, [firestore, currentStoreId]);
 
   useEffect(() => {
     if (isOpen) {

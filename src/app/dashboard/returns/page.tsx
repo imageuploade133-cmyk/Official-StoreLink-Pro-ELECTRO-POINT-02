@@ -35,10 +35,12 @@ import { StatCard } from '@/components/StatCard';
 const ITEMS_PER_PAGE = 15;
 
 export default function ReturnsPage() {
-  const { user, permissions, isLoading: authLoading, isAdmin } = useAuth();
+  const { user, permissions, isLoading: authLoading, isAdmin, store, staffMember } = useAuth();
   const firestore = useFirestore();
   const { settings, isLoading: isLoadingSettings } = useSettings();
   const currencySymbol = settings?.currency || '$';
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
   
   const [returnedSales, setReturnedSales] = useState<SaleTransaction[]>([]);
   const [staffMap, setStaffMap] = useState<Map<string, StaffMember>>(new Map());
@@ -59,9 +61,9 @@ export default function ReturnsPage() {
   const [transactionsCount, setTransactionsCount] = useState(0);
 
   const fetchStaff = useCallback(async () => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     try {
-      const staffQuery = query(collection(firestore, "staff"));
+      const staffQuery = query(collection(firestore, "staff"), where("store_id", "==", currentStoreId));
       const snapshot = await getDocs(staffQuery);
       const map = new Map<string, StaffMember>();
       snapshot.docs.forEach(doc => {
@@ -83,10 +85,10 @@ export default function ReturnsPage() {
     } catch (e) {
       console.error("Error fetching staff map:", e);
     }
-  }, [firestore, isAdmin, user]);
+  }, [firestore, isAdmin, user, currentStoreId]);
 
   const fetchReturns = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore || !user) return;
+    if (!firestore || !user || !currentStoreId) return;
     setIsLoading(true);
     setError(null);
 
@@ -94,6 +96,7 @@ export default function ReturnsPage() {
       const returnsCol = collection(firestore, "saleTransactions");
       let q = query(
         returnsCol, 
+        where("store_id", "==", currentStoreId),
         where("returnStatus", "in", ["partiallyReturned", "fullyReturned"]),
         orderBy("updatedAt", "desc")
       );
@@ -135,6 +138,7 @@ export default function ReturnsPage() {
       if (direction === 'initial') {
         const statsQuery = query(
           returnsCol, 
+          where("store_id", "==", currentStoreId),
           where("returnStatus", "in", ["partiallyReturned", "fullyReturned"])
         );
         const statsSnap = await getDocs(statsQuery);
@@ -149,16 +153,16 @@ export default function ReturnsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [firestore, user]);
+  }, [firestore, user, currentStoreId]);
 
   useEffect(() => {
-    if (!authLoading && permissions.canProcessReturns && firestore) {
+    if (!authLoading && permissions.canProcessReturns && firestore && currentStoreId) {
       fetchStaff();
       fetchReturns('initial');
     }
-  }, [authLoading, permissions.canProcessReturns, firestore, fetchStaff, fetchReturns]);
+  }, [authLoading, permissions.canProcessReturns, firestore, fetchStaff, fetchReturns, currentStoreId]);
 
-  const handleViewDetails = (sale: SaleTransaction) => {
+  const handleViewReceipt = (sale: SaleTransaction) => {
     setSelectedSale(sale);
     setIsReceiptModalOpen(true);
   };
@@ -284,7 +288,7 @@ export default function ReturnsPage() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-center">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-primary/10 hover:text-primary" onClick={() => handleViewReceipt(sale)}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-primary/10 hover:text-primary" onClick={() => handleViewDetails(sale)}>
                           <Eye className="h-4 w-4" />
                         </Button>
                       </TableCell>

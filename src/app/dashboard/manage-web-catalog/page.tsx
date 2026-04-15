@@ -71,12 +71,14 @@ import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/e
 const ITEMS_PER_PAGE = 15;
 
 export default function ManageWebCatalogPage() {
-  const { permissions, isLoading: isAuthLoading, user } = useAuth();
+  const { permissions, isLoading: isAuthLoading, user, store, staffMember } = useAuth();
   const firestore = useFirestore();
   const { settings } = useSettings();
   const { toast } = useToast();
   const currencySymbol = settings?.currency || '$';
   const defaultProductImageUrl = settings?.defaultProductImageUrl || 'https://placehold.co/100x100.png';
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [isToggling, setIsToggling] = useState<string | null>(null);
@@ -106,9 +108,9 @@ export default function ManageWebCatalogPage() {
 
   // Fetch all categories for mapping
   const categoriesQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'categories'), orderBy('name'));
-  }, [firestore]);
+    if (!firestore || !currentStoreId) return null;
+    return query(collection(firestore, 'categories'), where('store_id', '==', currentStoreId), orderBy('name'));
+  }, [firestore, currentStoreId]);
   const { data: categories } = useCollection<Category>(categoriesQuery);
 
   const categoriesMapFull = useMemo(() => {
@@ -122,12 +124,13 @@ export default function ManageWebCatalogPage() {
   }, [categories]);
 
   const fetchWebProducts = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsLoadingProducts(true);
 
     try {
       let q = query(
         collection(firestore, 'products'), 
+        where('store_id', '==', currentStoreId),
         where('isVisibleOnWeb', '==', true),
         orderBy('name', 'asc')
       );
@@ -174,13 +177,13 @@ export default function ManageWebCatalogPage() {
     } finally {
       setIsLoadingProducts(false);
     }
-  }, [firestore, toast]);
+  }, [firestore, toast, currentStoreId]);
 
   useEffect(() => {
-    if (firestore && !isAuthLoading && permissions.manage_website_content) {
+    if (firestore && !isAuthLoading && permissions.manage_website_content && currentStoreId) {
       fetchWebProducts('initial');
     }
-  }, [firestore, isAuthLoading, permissions.manage_website_content, fetchWebProducts]);
+  }, [firestore, isAuthLoading, permissions.manage_website_content, fetchWebProducts, currentStoreId]);
 
   const filteredProducts = useMemo(() => {
     if (!searchTerm.trim()) return products;
@@ -219,7 +222,7 @@ export default function ManageWebCatalogPage() {
   };
 
   const confirmDeleteProduct = async () => {
-    if (!selectedProductForActions || !firestore || !user) return;
+    if (!selectedProductForActions || !firestore || !user || !currentStoreId) return;
     setIsDeleting(true);
 
     const batch = writeBatch(firestore);
@@ -236,7 +239,8 @@ export default function ManageWebCatalogPage() {
       change: -(selectedProductForActions.stock || 0),
       staffId: user.uid,
       staffName: user.displayName || user.email || 'Staff',
-      timestamp: serverTimestamp()
+      timestamp: serverTimestamp(),
+      store_id: currentStoreId
     };
 
     batch.set(auditRef, auditData);
@@ -265,7 +269,7 @@ export default function ManageWebCatalogPage() {
   };
 
   const handleCloneProduct = async () => {
-    if (!selectedProductForActions || !firestore) return;
+    if (!selectedProductForActions || !firestore || !currentStoreId) return;
     setIsCloning(true);
 
     try {
@@ -290,6 +294,7 @@ export default function ManageWebCatalogPage() {
         barcode: undefined, // Remove barcode for clone
         barcodeGenerated: false,
         stock: 0, // Start with 0 stock
+        store_id: currentStoreId,
         // Preserve timestamps (new ones will be set)
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
@@ -325,7 +330,8 @@ export default function ManageWebCatalogPage() {
         staffId: user?.uid || 'SYSTEM',
         staffName: user?.displayName || user?.email || 'Staff',
         timestamp: serverTimestamp(),
-        details: `Cloned from product: ${selectedProductForActions.name}`
+        details: `Cloned from product: ${selectedProductForActions.name}`,
+        store_id: currentStoreId
       });
 
       await batch.commit();

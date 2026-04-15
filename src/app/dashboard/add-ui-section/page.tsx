@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -67,12 +68,14 @@ const uiSectionSchema = z.object({
 type FormValues = z.infer<typeof uiSectionSchema>;
 
 export default function AddUISectionPage() {
-  const { permissions, isLoading: authLoading } = useAuth();
+  const { permissions, isLoading: authLoading, store, staffMember } = useAuth();
   const firestore = useFirestore();
   const router = useRouter();
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(uiSectionSchema),
@@ -117,11 +120,12 @@ export default function AddUISectionPage() {
   };
 
   const onSubmit = async (values: FormValues) => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsSaving(true);
     try {
       await addDoc(collection(firestore, 'homepageSections'), {
         ...values,
+        store_id: currentStoreId,
         selectionType: 'custom-ui',
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
