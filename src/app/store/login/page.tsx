@@ -67,7 +67,7 @@ export default function StoreLoginPage() {
         e.preventDefault();
         setIsLoading(true);
         
-        const email = (document.getElementById('email') as HTMLInputElement).value;
+        const email = (document.getElementById('email') as HTMLInputElement).value.trim();
         const password = (document.getElementById('password') as HTMLInputElement).value;
 
         signInWithEmailAndPassword(auth, email, password)

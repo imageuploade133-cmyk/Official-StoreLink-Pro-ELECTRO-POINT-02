@@ -62,7 +62,7 @@ const iconMap = {
 
 const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
-  email: z.string().email('Invalid email protocol.'),
+  email: z.string().trim().email('Invalid email protocol.'),
   password: z.string().min(6, 'Minimum 6 characters required.'),
   confirmPassword: z.string(),
   phone: z.string().min(1, 'Contact number is required.'),
