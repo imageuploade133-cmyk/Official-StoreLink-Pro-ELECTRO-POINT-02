@@ -3,7 +3,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { useUser, useFirestore } from '@/firebase';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, collection, query, where } from 'firebase/firestore';
 import type { StaffMember, PermissionId, Store } from '@/lib/types';
 import { allPermissions, roles } from '@/lib/roles';
 
@@ -48,10 +48,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     setIsStaffLoading(true);
-    const staffRef = doc(firestore, 'staff', user.uid);
-    const unsubscribe = onSnapshot(staffRef, (doc) => {
-      if (doc.exists()) {
-        setStaffMember({ id: doc.id, ...doc.data() } as StaffMember);
+    const staffQuery = query(
+      collection(firestore, 'staff'),
+      where('uid', '==', user.uid)
+    );
+    
+    const unsubscribe = onSnapshot(staffQuery, (snapshot) => {
+      if (!snapshot.empty) {
+        const staffDoc = snapshot.docs[0];
+        setStaffMember({ id: staffDoc.id, ...staffDoc.data() } as StaffMember);
       } else {
         setStaffMember(null);
       }
@@ -74,11 +79,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     setIsStoreLoading(true);
-    // In our system, storeId is often the same as the owner's UID for the primary store
-    const storeRef = doc(firestore, 'stores', user.uid);
-    const unsubscribe = onSnapshot(storeRef, (docSnap) => {
-      if (docSnap.exists()) {
-        setStore({ id: docSnap.id, ...docSnap.data() } as Store);
+    // Support lookup by owner_id field (Standard)
+    const storeQuery = query(
+      collection(firestore, 'stores'),
+      where('owner_id', '==', user.uid)
+    );
+
+    const unsubscribe = onSnapshot(storeQuery, (snapshot) => {
+      if (!snapshot.empty) {
+        const storeDoc = snapshot.docs[0];
+        setStore({ id: storeDoc.id, ...storeDoc.data() } as Store);
       } else {
         setStore(null);
       }

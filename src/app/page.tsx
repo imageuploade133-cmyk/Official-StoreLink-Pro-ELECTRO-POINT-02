@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@/firebase';
+import { useAuth } from '@/contexts/auth-context';
 import { PageSpinner } from '@/components/ui/spinner';
 
 const loadingStates = [
@@ -12,7 +12,7 @@ const loadingStates = [
 ];
 
 export default function HomePage() {
-  const { user, isLoading } = useUser();
+  const { user, store, staffMember, isCustomer, isLoading } = useAuth();
   const router = useRouter();
   const [stateIndex, setStateIndex] = useState(0);
 
@@ -27,12 +27,20 @@ export default function HomePage() {
   useEffect(() => {
     if (!isLoading) {
       if (user) {
-        router.replace('/dashboard');
+        if (isCustomer) {
+          router.replace('/store');
+        } else if (store || staffMember) {
+          router.replace('/dashboard');
+        } else {
+          // Logged in but no recognized role, could be a new merchant
+          router.replace('/signup-merchant');
+        }
       } else {
-        router.replace('/login');
+        // Default for visitors: Show the store
+        router.replace('/store');
       }
     }
-  }, [user, isLoading, router]);
+  }, [user, store, staffMember, isCustomer, isLoading, router]);
 
   const current = loadingStates[stateIndex];
 
