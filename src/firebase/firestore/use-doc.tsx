@@ -39,11 +39,16 @@ export function useDoc<T>(docRef: DocumentReference | null) {
         setError(null);
       },
       (err: FirestoreError) => {
-        const permissionError = new FirestorePermissionError({
-          path: docRef.path,
-          operation: 'get',
-        });
-        errorEmitter.emit('permission-error', permissionError);
+        if (err.code === 'permission-denied') {
+            const permissionError = new FirestorePermissionError({
+              path: docRef.path,
+              operation: 'get',
+            });
+            errorEmitter.emit('permission-error', permissionError);
+        } else {
+            console.error("Firestore doc fetch failed:", err);
+            errorEmitter.emit('firestore-error', err);
+        }
 
         setError(err);
         setIsLoading(false);

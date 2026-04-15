@@ -222,7 +222,12 @@ export default function MerchantSignupPage() {
                     <FormItem><FormLabel>Store Name</FormLabel><FormControl><Input placeholder="My Awesome Store" {...field} disabled={isSubmitting} /></FormControl><FormMessage /></FormItem>
                 )}/>
                 <FormField control={form.control} name="databaseId" render={({ field }) => (
-                    <FormItem><FormLabel>Database ID (for Separate Database)</FormLabel><FormControl><Input placeholder="(default)" {...field} disabled={isSubmitting} /></FormControl><FormMessage /></FormItem>
+                    <FormItem>
+                        <FormLabel>Database ID (Optional)</FormLabel>
+                        <FormControl><Input placeholder="(default)" {...field} disabled={isSubmitting} /></FormControl>
+                        <p className="text-[10px] text-muted-foreground italic">Leave as <strong>(default)</strong> unless you have specifically created a separate Firestore database for this project.</p>
+                        <FormMessage />
+                    </FormItem>
                 )}/>
                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <FormField control={form.control} name="password" render={({ field }) => (

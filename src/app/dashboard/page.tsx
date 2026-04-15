@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useFirestore, useDoc, useCollection } from '@/firebase';
+import { errorEmitter } from '@/firebase/error-emitter';
 import { collection, getDocs, Timestamp, query as firestoreQuery, orderBy, where, doc } from 'firebase/firestore';
 import {
   format,
@@ -146,6 +147,7 @@ export default function DashboardPage() {
 
     } catch (error: any) {
       console.error("Error fetching dashboard data:", error);
+      errorEmitter.emit('firestore-error', error);
       setGlobalError(`Failed to load dashboard data: ${error.message}`);
       toast({
         variant: "destructive",

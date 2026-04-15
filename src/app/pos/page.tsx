@@ -25,6 +25,7 @@ import {
 } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { useFirestore } from '@/firebase';
+import { errorEmitter } from '@/firebase/error-emitter';
 import { useSettings } from '@/contexts/settings-context';
 import { useAuth } from '@/contexts/auth-context';
 import { logActivity } from '@/lib/activity-log-utils';

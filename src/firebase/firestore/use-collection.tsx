@@ -50,6 +50,7 @@ export function useCollection<T>(query: Query | null) {
         } else {
             // For other errors (like missing indexes), log them for debugging
             console.error("Firestore query failed:", err);
+            errorEmitter.emit('firestore-error', err);
         }
         
         setError(err);
