@@ -119,6 +119,7 @@ export interface Transaction {
 
 export interface Coupon {
   id: string;
+  store_id?: string; // Multi-store support
   code: string;
   type: 'percentage' | 'fixed';
   value: number;
@@ -471,6 +472,7 @@ export interface Promo {
 
 export interface Category {
   id: string;
+  store_id?: string; // Multi-store support
   name: string;
   createdAt?: Timestamp;
   description?: string;
@@ -515,6 +517,7 @@ export interface VoiceSignature {
 
 export interface Product {
   id: string;
+  store_id?: string; // Multi-store support
   name: string;
   sellingPrice: number;
   newPrice?: number | null;
@@ -601,6 +604,7 @@ export interface BarcodeProduct extends Product {
 
 export interface RestockEntry {
     id: string;
+    store_id?: string; // Multi-store support
     productId: string;
     productName: string;
     quantity: number;
@@ -622,9 +626,17 @@ export type ProductForRestockForm = Pick<Product, 'id' | 'name' | 'sku' | 'barco
 export type StockAlertItem = Product;
 
 
+export interface Store {
+  id: string;
+  owner_id: string;
+  name: string;
+  createdAt: Timestamp;
+}
+
 export interface StaffMember {
   id: string;
   uid: string;
+  store_id?: string; // Added for multi-store support
   name: string;
   email: string;
   phone?: string;
@@ -641,6 +653,7 @@ export interface StaffMember {
 
 export interface SaleTransaction {
     id: string;
+    store_id?: string; // Multi-store support
     staffId: string;
     createdAt: Timestamp;
     grandTotal: number;
@@ -688,6 +701,7 @@ export type CustomerStatus = 'active' | 'inactive' | 'banned';
 
 export interface Customer {
   id: string;
+  store_id?: string; // Multi-store support
   uid?: string;
   name: string;
   email?: string;
@@ -875,6 +889,7 @@ export interface AggregatedProductSale {
 
 export interface Expense {
   id: string;
+  store_id?: string; // Multi-store support
   description: string;
   amount: number;
   category: string;
@@ -947,6 +962,7 @@ export interface ProductReview {
 
 export interface AdLink {
   id: string;
+  store_id?: string; // Multi-store support
   adLink?: string;
   adScript?: string;
   bannerLocation?: string;
@@ -984,6 +1000,7 @@ export interface SaleReturn {
 
 export interface StockAuditEntry {
   id: string;
+  store_id?: string; // Multi-store support
   productId: string;
   productName: string;
   type: 'SALE' | 'RESTOCK' | 'ADJUSTMENT' | 'RETURN' | 'MANUAL_EDIT' | 'DELETE';

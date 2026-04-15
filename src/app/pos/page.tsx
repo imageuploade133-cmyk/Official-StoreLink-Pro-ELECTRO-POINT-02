@@ -456,6 +456,7 @@ export default function POSPage() {
         const customerQuery = firestoreQuery(
           collection(firestore, 'customers'),
           where('name', '==', heldSaleData.customerIdentifier),
+          where('store_id', '==', staffMember?.store_id || null),
           limit(1)
         );
         const customerSnapshot = await getDocs(customerQuery);
@@ -546,6 +547,7 @@ export default function POSPage() {
           transaction.set(auditRef, {
             productId: item.productId,
             productName: item.productName,
+            store_id: staffMember?.store_id || currentUser.uid,
             type: 'SALE',
             referenceId: docRef.id,
             beforeStock: currentStock,
@@ -600,6 +602,7 @@ export default function POSPage() {
         
         const saleDataForDb: any = {
             staffId: currentUser.uid,
+            store_id: staffMember?.store_id || currentUser.uid,
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
             grandTotal: saleDataForDialog.grandTotal,

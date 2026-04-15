@@ -23,7 +23,7 @@ interface CategorySheetProps {
 
 export function CategorySheet({ children, trigger }: CategorySheetProps) {
   const firestore = useFirestore();
-  const { user, permissions, isLoading: authLoading } = useAuth();
+  const { user, staffMember, permissions, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,13 +35,13 @@ export function CategorySheet({ children, trigger }: CategorySheetProps) {
     const trimmedName = values.name.trim();
 
     try {
-      const q = query(collection(firestore, "categories"), where("name", "==", trimmedName));
+      const q = query(collection(firestore, "categories"), where("name", "==", trimmedName), where("store_id", "==", staffMember?.store_id || user.uid));
       const existing = await getDocs(q);
       if (!existing.empty) {
         toast({ 
           variant: 'destructive', 
           title: 'Duplicate Category', 
-          description: `A category named "${trimmedName}" already exists.` 
+          description: `A category named "${trimmedName}" already exists in this store.` 
         });
         setIsSubmitting(false);
         return;
@@ -49,6 +49,7 @@ export function CategorySheet({ children, trigger }: CategorySheetProps) {
 
       await addDoc(collection(firestore, 'categories'), {
         ...values,
+        store_id: staffMember?.store_id || user.uid,
         name: trimmedName,
         createdAt: Timestamp.now(),
       });

@@ -35,10 +35,12 @@ export function ProductArea({ onAddToCart, onProductsLoaded }: ProductAreaProps)
     const firestore = useFirestore();
     const { settings } = useSettings();
     const { toast } = useToast();
+    const { user, staffMember } = useAuth();
     
     const currencySymbol = settings?.currency || '$';
     const defaultProductImageUrl = settings?.defaultProductImageUrl || 'https://placehold.co/400x300.png';
     const globalLowStockThreshold = settings?.lowStockThreshold ?? 10;
+
     
     const [products, setProducts] = useState<DisplayProduct[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -65,8 +67,9 @@ export function ProductArea({ onAddToCart, onProductsLoaded }: ProductAreaProps)
         setLoadingCategories(true);
         setProductError(null);
         try {
-            const productsQuery = firestoreQuery(collection(firestore, 'products'));
-            const categoriesQuery = firestoreQuery(collection(firestore, 'categories'));
+            const storeId = staffMember?.store_id || null;
+            const productsQuery = firestoreQuery(collection(firestore, 'products'), where('store_id', '==', storeId));
+            const categoriesQuery = firestoreQuery(collection(firestore, 'categories'), where('store_id', '==', storeId));
             
             const [productSnapshot, categorySnapshot] = await Promise.all([
                 getDocs(productsQuery),
