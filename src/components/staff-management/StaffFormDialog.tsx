@@ -30,7 +30,7 @@ import { cn } from '@/lib/utils';
 const createStaffFormSchema = (isEditing: boolean) => {
     const baseSchema = z.object({
         name: z.string().min(2, 'Name must be at least 2 characters long.'),
-        email: z.string().email('Please enter a valid email address.'),
+        email: z.string().trim().email('Please enter a valid email address.'),
         phone: z.string().optional(),
         role: z.string().min(1, 'Role is required for display purposes.'),
         status: z.enum(['Active', 'Inactive']),

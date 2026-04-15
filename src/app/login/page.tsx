@@ -60,7 +60,7 @@ export default function AdminLoginPage() {
         e.preventDefault();
         setIsLoading(true);
         
-        const email = (document.getElementById('email') as HTMLInputElement).value;
+        const email = (document.getElementById('email') as HTMLInputElement).value.trim();
         const password = (document.getElementById('password') as HTMLInputElement).value;
 
         try {

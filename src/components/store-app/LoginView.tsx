@@ -25,7 +25,7 @@ import { useSettings } from '@/contexts/settings-context';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
 const loginSchema = z.object({
-  email: z.string().email('Enter a valid registry email.'),
+  email: z.string().trim().email('Enter a valid registry email.'),
   password: z.string().min(1, 'Security code required.'),
 });
 

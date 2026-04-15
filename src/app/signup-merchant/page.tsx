@@ -24,7 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 import placeholderImages from '@/lib/placeholder-images.json';
 import { useAuth as useFirebaseAuthInstance, useUser, useFirestore } from "@/firebase";
 import { useRouter } from "next/navigation";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile, signOut } from "firebase/auth";
 import { doc, setDoc, writeBatch, serverTimestamp } from "firebase/firestore";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,7 +34,7 @@ import { useAuth } from "@/contexts/auth-context";
 
 const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
-  email: z.string().email('Invalid email address.'),
+  email: z.string().trim().email('Invalid email address.'),
   storeName: z.string().min(2, 'Store name must be at least 2 characters.'),
   password: z.string().min(6, 'Password must be at least 6 characters long.'),
   confirmPassword: z.string(),
@@ -78,6 +78,11 @@ export default function MerchantSignupPage() {
         try {
             let targetUser = user;
 
+            if (targetUser && targetUser.email?.toLowerCase() !== values.email.toLowerCase()) {
+                await signOut(auth);
+                targetUser = null;
+            }
+
             if (!targetUser) {
                 const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
                 targetUser = userCredential.user;
@@ -89,7 +94,7 @@ export default function MerchantSignupPage() {
             // 1. Create User record
             batch.set(doc(firestore, 'users', targetUser.uid), {
                 uid: targetUser.uid,
-                email: targetUser.email,
+                email: values.email, // Use values.email to ensure consistency
                 displayName: values.name,
                 updatedAt: serverTimestamp(),
             }, { merge: true });
@@ -111,7 +116,7 @@ export default function MerchantSignupPage() {
                 uid: targetUser.uid,
                 store_id: storeId,
                 name: values.name,
-                email: targetUser.email,
+                email: values.email, // Use values.email to ensure consistency
                 role: 'admin',
                 status: 'Active',
                 permissions: {
