@@ -43,8 +43,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [lastLoadedUid, setLastLoadedUid] = useState<string | null>(null);
 
   // Reset loading states when user changes to prevent race conditions
-  if (user?.uid !== lastLoadedUid) {
-    setLastLoadedUid(user?.uid || null);
+  const currentUid = user?.uid || null;
+  if (currentUid !== lastLoadedUid) {
+    setLastLoadedUid(currentUid);
     setIsStaffLoading(!!user);
     setIsStoreLoading(!!user);
     setIsCustomerLoading(!!user);
