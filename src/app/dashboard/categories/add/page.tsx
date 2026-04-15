@@ -15,7 +15,7 @@ import AccessDenied from "@/components/staff-management/AccessDenied";
 
 export default function AddCategoryPage() {
   const firestore = useFirestore();
-  const { user, permissions, isLoading: authLoading } = useAuth();
+  const { user, permissions, isLoading: authLoading, staffMember, store } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,15 +24,20 @@ export default function AddCategoryPage() {
     if (!user || !firestore) return;
     setIsSubmitting(true);
     const trimmedName = values.name.trim();
+    const currentStoreId = staffMember?.store_id || store?.id || user.uid;
 
     try {
-      const q = query(collection(firestore, "categories"), where("name", "==", trimmedName));
+      const q = query(
+        collection(firestore, "categories"), 
+        where("name", "==", trimmedName),
+        where("store_id", "==", currentStoreId)
+      );
       const existing = await getDocs(q);
       if (!existing.empty) {
         toast({ 
           variant: "destructive", 
           title: "Duplicate Category", 
-          description: `A category named "${trimmedName}" already exists.` 
+          description: `A category named "${trimmedName}" already exists in your store.` 
         });
         setIsSubmitting(false);
         return;
@@ -41,6 +46,7 @@ export default function AddCategoryPage() {
       await addDoc(collection(firestore, 'categories'), {
         ...values,
         name: trimmedName,
+        store_id: currentStoreId,
         createdAt: Timestamp.now(),
       });
 
