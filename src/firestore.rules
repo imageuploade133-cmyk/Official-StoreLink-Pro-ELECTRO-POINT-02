@@ -7,277 +7,48 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function isAdmin() {
-      return isSignedIn() && (
-        request.auth.token.role == "admin" || 
-        (exists(/databases/$(database)/documents/staff/$(request.auth.uid)) && 
-         get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role == "admin") ||
-        (request.method in ['create', 'update'] && 
-         existsAfter(/databases/$(database)/documents/staff/$(request.auth.uid)) && 
-         getAfter(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role == "admin")
-      );
-    }
+    /* ===============================
+       PUBLIC READ COLLECTIONS
+    =============================== */
 
-    function isStaffWithOneOfRoles(roles) {
-        return (exists(/databases/$(database)/documents/staff/$(request.auth.uid)) 
-               && get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role in roles) ||
-               (request.method in ['create', 'update'] &&
-                existsAfter(/databases/$(database)/documents/staff/$(request.auth.uid)) &&
-                getAfter(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role in roles);
-    }
-
-    // --- ENFORCE STORE ISOLATION (Point 1 & 2) ---
-    function hasStoreAccess(roles) {
-      let storeId = (resource == null ? request.resource.data.store_id : resource.data.store_id);
-
-      return isSignedIn() && (
-        // NEW SYSTEM (documents WITH store_id)
-        (
-          storeId != null &&
-          (
-            get(/databases/$(database)/documents/stores/$(storeId)).data.owner_id == request.auth.uid
-            ||
-            (request.method in ['create', 'update'] && getAfter(/databases/$(database)/documents/stores/$(storeId)).data.owner_id == request.auth.uid)
-            ||
-            (
-              isStaffWithOneOfRoles(roles) &&
-              (
-                get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.store_id == storeId ||
-                (request.method in ['create', 'update'] && getAfter(/databases/$(database)/documents/staff/$(request.auth.uid)).data.store_id == storeId)
-              )
-            )
-          )
-        )
-        ||
-        // OLD SYSTEM (documents WITHOUT store_id)
-        (storeId == null && request.auth != null)
-      );
-    }
-
-    // STORES COLLECTION (Point 4)
-    match /stores/{storeId} {
+    match /products/{document=**} {
       allow read: if true;
-      allow create: if isSignedIn() && request.resource.data.owner_id == request.auth.uid;
-      allow update: if isSignedIn() && (resource.data.owner_id == request.auth.uid || isAdmin());
+      allow write: if isSignedIn();
     }
 
-    // PRODUCTS (Point 5)
-    match /products/{doc} {
+    match /categories/{document=**} {
       allow read: if true;
-      allow create: if hasStoreAccess(['admin', 'manager', 'inventory_manager']) && request.resource.data.store_id != null;
-      allow update: if hasStoreAccess(['admin', 'manager', 'inventory_manager']) || isAdmin();
-      allow delete: if hasStoreAccess(['admin']) || isAdmin();
-
-      match /reviews/{reviewId} {
-        allow read: if true;
-        allow write: if isSignedIn();
-      }
-      
-      match /voiceSignatures/{voiceId} {
-        allow read: if true;
-        allow write: if hasStoreAccess(['admin', 'manager', 'inventory_manager']) || isAdmin();
-      }
+      allow write: if isSignedIn();
     }
 
-    // CATEGORIES
-    match /categories/{doc} {
+    match /publicPages/{document=**} {
       allow read: if true;
-      allow create: if hasStoreAccess(['admin', 'manager', 'inventory_manager']) && request.resource.data.store_id != null;
-      allow update, delete: if hasStoreAccess(['admin', 'manager', 'inventory_manager']) || isAdmin();
+      allow write: if isSignedIn();
     }
 
-    // CUSTOMERS (Point 2)
-    match /customers/{doc} {
-      allow read: if hasStoreAccess(['admin', 'manager', 'cashier']) || (isSignedIn() && request.auth.uid == doc) || isAdmin();
-      allow create: if (isSignedIn() && request.resource.data.store_id != null) || isAdmin();
-      allow update: if hasStoreAccess(['admin', 'manager', 'cashier']) || (isSignedIn() && request.auth.uid == doc) || isAdmin();
-      allow delete: if hasStoreAccess(['admin']) || isAdmin();
-    }
-
-    // ORDERS (Point 3 & 6)
-    match /orders/{doc} {
-      allow create: if isSignedIn()
-        && (request.auth.uid == request.resource.data.user_id || request.resource.data.user_id == "GUEST")
-        && request.resource.data.amount > 0
-        && request.resource.data.store_id != null;
-
-      allow read: if hasStoreAccess(['admin', 'manager', 'cashier']) || (isSignedIn() && request.auth.uid == resource.data.user_id) || isAdmin();
-
-      allow update: if isAdmin(); // Strictly admin/backend
-      allow delete: if false;
-    }
-
-    // TRANSACTIONS (Point 6)
-    match /transactions/{doc} {
-      allow read: if hasStoreAccess(['admin', 'manager']) || (isSignedIn() && request.auth.uid == resource.data.user_id) || isAdmin();
-      allow write: if false; // Backend only
-    }
-
-    // --- OTHER COLLECTIONS ---
-    
-    match /publicPages/{pageId} {
+    match /slideShows/{document=**} {
       allow read: if true;
-      allow create: if hasStoreAccess(['admin', 'manager']) && request.resource.data.store_id != null;
-      allow update, delete: if hasStoreAccess(['admin', 'manager']) || isAdmin();
+      allow write: if isSignedIn();
     }
 
-    match /slideShows/{slideId} {
+    match /homepageSections/{document=**} {
       allow read: if true;
-      allow create: if hasStoreAccess(['admin', 'manager']) && request.resource.data.store_id != null;
-      allow update, delete: if hasStoreAccess(['admin', 'manager']) || isAdmin();
-    }
-    
-    match /homepageSections/{sectionId} {
-      allow read: if true;
-      allow create: if hasStoreAccess(['admin', 'manager']) && request.resource.data.store_id != null;
-      allow update, delete: if hasStoreAccess(['admin', 'manager']) || isAdmin();
-    }
-    
-    match /settings/{doc} {
-      allow read: if true;
-      allow create: if hasStoreAccess(['admin']) && request.resource.data.store_id != null;
-      allow update, delete: if hasStoreAccess(['admin']) || isAdmin();
-    }
-    
-    match /users/{userId} {
-      allow read, write: if (isSignedIn() && request.auth.uid == userId) || isAdmin();
-      
-      match /{document=**} {
-        allow read, write: if (isSignedIn() && request.auth.uid == userId) || isAdmin();
-      }
-    }
-    
-    match /staff/{userId} {
-      allow get: if (isSignedIn() && request.auth.uid == userId) || hasStoreAccess(['admin', 'manager']) || isAdmin();
-      allow list: if (isSignedIn() && resource.data.uid == request.auth.uid) || hasStoreAccess(['admin', 'manager']) || isAdmin();
-      allow create: if (hasStoreAccess(['admin']) && request.resource.data.store_id != null) || isAdmin();
-      allow update, delete: if hasStoreAccess(['admin']) || isAdmin();
-    }
-    
-    match /branches/{doc} {
-      allow read: if hasStoreAccess(['admin', 'manager', 'cashier', 'inventory_manager']) || isAdmin();
-      allow create: if hasStoreAccess(['admin']) && request.resource.data.store_id != null;
-      allow update, delete: if hasStoreAccess(['admin']) || isAdmin();
-    }
-    
-    match /saleTransactions/{transactionId} {
-      allow get, list: if hasStoreAccess(['admin', 'manager', 'cashier']) || isAdmin();
-      allow create: if hasStoreAccess(['admin', 'manager', 'cashier']) && request.resource.data.store_id != null;
-      allow update: if hasStoreAccess(['admin', 'manager']) || isAdmin();
-      allow delete: if hasStoreAccess(['admin']) || isAdmin();
-    }
-    
-    match /restockEntries/{doc} {
-      allow read: if hasStoreAccess(['admin', 'manager', 'inventory_manager']) || isAdmin();
-      allow create: if hasStoreAccess(['admin', 'manager', 'inventory_manager']) && request.resource.data.store_id != null;
-      allow update, delete: if hasStoreAccess(['admin', 'manager']) || isAdmin();
+      allow write: if isSignedIn();
     }
 
-    match /heldSales/{saleId} {
-      allow read, write: if hasStoreAccess(['admin', 'manager', 'cashier', 'inventory_manager']) || isAdmin();
+    /* ✅ ADD THIS */
+    match /settings/{document=**} {
+      allow read: if true;          // public can read settings/global
+      allow write: if isSignedIn(); // only logged-in users can modify
     }
 
-    match /creditPayments/{paymentId} {
-      allow get, list: if hasStoreAccess(['admin', 'manager', 'cashier']) || isAdmin();
-      allow create: if hasStoreAccess(['admin', 'manager', 'cashier']) && request.resource.data.store_id != null;
-      allow write: if hasStoreAccess(['admin', 'manager']) || isAdmin();
-    }
-
-    match /customerHistory/{doc} {
-      allow read: if hasStoreAccess(['admin', 'manager', 'cashier']) || isAdmin();
-      allow create: if hasStoreAccess(['admin', 'manager', 'cashier']) && request.resource.data.store_id != null;
-      allow update, delete: if false;
-    }
-    
-    match /expenses/{expenseId} {
-      allow read: if hasStoreAccess(['admin', 'manager']) || isAdmin();
-      allow create: if hasStoreAccess(['admin', 'manager']) && request.resource.data.store_id != null;
-      allow update, delete: if hasStoreAccess(['admin']) || isAdmin();
-    }
-
-    match /reversals/{reversalId} {
-      allow read: if hasStoreAccess(['admin']) || isAdmin();
-      allow create: if hasStoreAccess(['admin']) && request.resource.data.store_id != null;
-      allow update, delete: if false;
-    }
-    
-    match /stockTransfers/{transferId} {
-        allow read: if hasStoreAccess(['admin', 'manager', 'inventory_manager']) || isAdmin();
-        allow create: if hasStoreAccess(['admin', 'manager', 'inventory_manager']) && request.resource.data.store_id != null;
-        allow update, delete: if hasStoreAccess(['admin', 'manager']) || isAdmin();
-    }
-
-    match /whatsappMessageLogs/{logId} {
-        allow read: if hasStoreAccess(['admin', 'manager']) || isAdmin();
-        allow create: if hasStoreAccess(['admin', 'manager']) && request.resource.data.store_id != null;
-        allow update, delete: if hasStoreAccess(['admin', 'manager']) || isAdmin();
-    }
-
-    match /adLinks/{adId} {
-        allow read: if true;
-        allow create: if hasStoreAccess(['admin', 'manager']) && request.resource.data.store_id != null;
-        allow update, delete: if hasStoreAccess(['admin', 'manager']) || isAdmin();
-    }
-
-    match /payment_providers/{doc} {
-      allow read: if hasStoreAccess(['admin']) || isAdmin();
-      allow create: if hasStoreAccess(['admin']) && request.resource.data.store_id != null;
-      allow update, delete: if hasStoreAccess(['admin']) || isAdmin();
-    }
-
-    match /coupons/{doc} {
-      allow read: if true;
-      allow create: if hasStoreAccess(['admin', 'manager']) && request.resource.data.store_id != null;
-      allow update, delete: if hasStoreAccess(['admin', 'manager']) || isAdmin();
-    }
-
-    match /flash_sales/{doc} {
-      allow read: if true;
-      allow create: if hasStoreAccess(['admin', 'manager']) && request.resource.data.store_id != null;
-      allow update, delete: if hasStoreAccess(['admin', 'manager']) || isAdmin();
-    }
-
-    match /invoices/{doc} {
-      allow read: if hasStoreAccess(['admin', 'manager']) || isAdmin();
-      allow create: if hasStoreAccess(['admin', 'manager']) && request.resource.data.store_id != null;
-      allow update, delete: if hasStoreAccess(['admin', 'manager']) || isAdmin();
-    }
-
-    match /analytics/{docId} {
-      allow read: if true;
-      allow write: if isAdmin();
-      
-      match /{document=**} {
-         allow read: if true;
-         allow write: if isAdmin();
-      }
-    }
-
-    match /websiteTraffic/{doc} {
-      allow read: if true;
-      allow write: if false;
-    }
-
-    match /stockAuditEntries/{doc} {
-      allow read: if hasStoreAccess(['admin', 'manager']) || isAdmin();
-      allow create: if hasStoreAccess(['admin', 'manager', 'inventory_manager', 'cashier']) && request.resource.data.store_id != null;
-      allow update, delete: if false;
-    }
-
-    match /stockAudit/{auditId} {
-      allow read: if hasStoreAccess(['admin', 'manager']) || isAdmin();
-      allow create: if hasStoreAccess(['admin', 'manager', 'inventory_manager', 'cashier']) && request.resource.data.store_id != null;
-      allow update, delete: if false;
-    }
-    
-    match /orderAudit/{auditId} {
-      allow read: if hasStoreAccess(['admin', 'manager']) || isAdmin();
-      allow create: if hasStoreAccess(['admin', 'manager', 'cashier']) && request.resource.data.store_id != null;
-      allow update, delete: if false;
-    }
+    /* ===============================
+       AUTH REQUIRED COLLECTIONS
+    =============================== */
 
     match /{document=**} {
-      allow read, write: if false;
+      allow read, write: if isSignedIn();
     }
+
   }
 }
