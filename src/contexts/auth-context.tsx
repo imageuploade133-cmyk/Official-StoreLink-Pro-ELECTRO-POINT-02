@@ -156,12 +156,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     return { permissions: defaultPermissions, isAdmin: false, roleId: null };
-  }, [user, staffMember, isCustomer, isLoading, isStaffLoading]);
+  }, [user, staffMember, store, isCustomer, isLoading]);
 
 
   const value = {
     user,
     staffMember,
+    store,
     permissions,
     isLoading,
     isAdmin,
