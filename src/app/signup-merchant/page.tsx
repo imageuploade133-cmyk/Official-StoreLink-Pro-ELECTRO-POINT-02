@@ -80,34 +80,45 @@ export default function MerchantSignupPage() {
     }, [user, isUserLoading, isAuthContextLoading, store, staffMember, router, form.formState.isSubmitSuccessful, isSuccessfullySubmitted]);
 
     const onSubmit = async (values: SignupFormValues) => {
-        if (!firestore) return;
+        console.log("onSubmit started with values:", { ...values, password: '[REDACTED]', confirmPassword: '[REDACTED]' });
+        if (!firestore) {
+            console.error("Firestore instance not found");
+            toast({ variant: "destructive", title: "Configuration Error", description: "Firestore is not initialized. Please refresh the page." });
+            return;
+        }
+
         try {
             let targetUser = user;
+            console.log("Current user:", targetUser?.uid);
 
             if (targetUser && targetUser.email?.toLowerCase() !== values.email.toLowerCase()) {
+                console.log("Signing out current user because email mismatch");
                 await signOut(auth);
                 targetUser = null;
             }
 
             if (!targetUser) {
+                console.log("Creating new user with email:", values.email);
                 const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
                 targetUser = userCredential.user;
+                console.log("New user created:", targetUser.uid);
                 await updateProfile(targetUser, { displayName: values.name });
             }
 
+            console.log("Building batch for store creation...");
             const batch = writeBatch(firestore);
 
             // 1. Create User record
             batch.set(doc(firestore, 'users', targetUser.uid), {
                 uid: targetUser.uid,
-                email: values.email, // Use values.email to ensure consistency
+                email: values.email, 
                 displayName: values.name,
                 updatedAt: serverTimestamp(),
             }, { merge: true });
 
             // 2. Create Store record
-            // Use the user's UID as the store ID for the primary store
             const storeId = `${targetUser.uid}_${Date.now()}`;
+            console.log("New store ID:", storeId);
             batch.set(doc(firestore, 'stores', storeId), {
                 id: storeId,
                 owner_id: targetUser.uid,
@@ -124,7 +135,7 @@ export default function MerchantSignupPage() {
                 uid: targetUser.uid,
                 store_id: storeId,
                 name: values.name,
-                email: values.email, // Use values.email to ensure consistency
+                email: values.email, 
                 role: 'admin',
                 status: 'Active',
                 permissions: {
@@ -143,11 +154,14 @@ export default function MerchantSignupPage() {
                 updatedAt: serverTimestamp(),
             });
 
+            console.log("Committing batch...");
             await batch.commit();
+            console.log("Batch committed successfully");
 
             // 4. Create default settings in the target database if it's different
             if (values.databaseId && values.databaseId !== '(default)') {
                 try {
+                    console.log("Creating settings in separate database:", values.databaseId);
                     const targetFirestore = getFirestoreInstance(values.databaseId);
                     await setDoc(doc(targetFirestore, 'settings', storeId), {
                         store_id: storeId,
@@ -158,32 +172,30 @@ export default function MerchantSignupPage() {
                     });
                 } catch (e) {
                     console.error("Failed to create settings in separate database:", e);
-                    // Non-blocking error
                 }
             }
             
             toast({ 
                 title: "Store Created Successfully", 
-                description: "Redirecting to your dashboard so you can start adding inventory..." 
+                description: "Redirecting to your dashboard..." 
             });
+
             setSelectedStoreId(storeId);
-            
-            // Explicitly set the store ID in localStorage to ensure it's picked up 
-            // even if the context state update hasn't propagated before the redirect.
             if (typeof window !== 'undefined') {
                 localStorage.setItem('selectedStoreId', storeId);
             }
             
             setIsSuccessfullySubmitted(true);
             
-            // Use window.location.href for a clean transition, especially important for separate databases
-            // to ensure the StoreFirestoreProvider re-initializes with the correct database instance.
+            console.log("Redirecting to dashboard in 1000ms...");
             setTimeout(() => {
+                console.log("Navigating to /dashboard");
                 window.location.href = '/dashboard';
-            }, 500);
+            }, 1000);
+
         } catch (error: any) {
-            console.error("Signup error:", error);
-            let description = "An unknown error occurred. Please try again.";
+            console.error("Signup error details:", error);
+            let description = error.message || "An unknown error occurred. Please try again.";
             if (error.code === 'auth/email-already-in-use') {
                 description = "This email is already registered.";
             } else if (error.code === 'auth/weak-password') {
@@ -194,7 +206,24 @@ export default function MerchantSignupPage() {
     }
 
     if (isUserLoading || (user && isAuthContextLoading) || isSuccessfullySubmitted) {
-        return <PageSpinner label="StoreLink Pro" subLabel="Preparing your workspace…" />;
+        return (
+            <div className="relative">
+                <PageSpinner label="StoreLink Pro" subLabel="Preparing your workspace…" />
+                {isSuccessfullySubmitted && (
+                    <div className="fixed bottom-10 left-0 right-0 z-[60] flex flex-col items-center gap-3">
+                        <p className="text-slate-400 text-xs animate-pulse">If you are not redirected automatically, click the button below.</p>
+                        <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                            onClick={() => window.location.href = '/dashboard'}
+                        >
+                            Continue to Dashboard
+                        </Button>
+                    </div>
+                )}
+            </div>
+        );
     }
 
   return (
