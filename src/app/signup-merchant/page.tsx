@@ -58,6 +58,7 @@ export default function MerchantSignupPage() {
     const { user, isLoading: isUserLoading } = useUser();
     const { store, stores, setSelectedStoreId, staffMember, isLoading: isAuthContextLoading } = useAuth();
     const [isSuccessfullySubmitted, setIsSuccessfullySubmitted] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     
     const form = useForm<SignupFormValues>({
       resolver: zodResolver(signupSchema),
@@ -87,6 +88,7 @@ export default function MerchantSignupPage() {
             return;
         }
 
+        setIsLoading(true);
         try {
             let targetUser = user;
             console.log("Current user:", targetUser?.uid);
@@ -103,6 +105,10 @@ export default function MerchantSignupPage() {
                 targetUser = userCredential.user;
                 console.log("New user created:", targetUser.uid);
                 await updateProfile(targetUser, { displayName: values.name });
+                
+                // 4. Check authentication timing: After createUserWithEmailAndPassword, wait for auth state
+                await targetUser.reload();
+                console.log("User reloaded after creation");
             }
 
             console.log("Building batch for store creation...");
@@ -155,8 +161,15 @@ export default function MerchantSignupPage() {
             });
 
             console.log("Committing batch...");
-            await batch.commit();
-            console.log("Batch committed successfully");
+            try {
+                // 2. Ensure batch.commit() is awaited
+                await batch.commit();
+                console.log("Batch committed successfully");
+            } catch (error) {
+                // 1. Wrap batch.commit() in try/catch and log full error
+                console.error("Batch commit failed:", error);
+                throw error;
+            }
 
             // 4. Create default settings in the target database if it's different
             if (values.databaseId && values.databaseId !== '(default)') {
@@ -187,10 +200,11 @@ export default function MerchantSignupPage() {
             
             setIsSuccessfullySubmitted(true);
             
+            // 6. Only redirect AFTER successful commit
             console.log("Redirecting to dashboard in 1000ms...");
             setTimeout(() => {
                 console.log("Navigating to /dashboard");
-                window.location.href = '/dashboard';
+                router.push('/dashboard');
             }, 1000);
 
         } catch (error: any) {
@@ -202,6 +216,9 @@ export default function MerchantSignupPage() {
                 description = "The password must be at least 6 characters.";
             }
             toast({ variant: "destructive", title: "Signup Failed", description: description });
+        } finally {
+            // 5. Prevent infinite loading
+            setIsLoading(false);
         }
     }
 
@@ -216,7 +233,7 @@ export default function MerchantSignupPage() {
                             variant="outline" 
                             size="sm"
                             className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                            onClick={() => window.location.href = '/dashboard'}
+                            onClick={() => router.push('/dashboard')}
                         >
                             Continue to Dashboard
                         </Button>
@@ -242,18 +259,18 @@ export default function MerchantSignupPage() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
                 <FormField control={form.control} name="name" render={({ field }) => (
-                    <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="John Doe" {...field} disabled={isSubmitting} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="John Doe" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
                 )}/>
                 <FormField control={form.control} name="email" render={({ field }) => (
-                    <FormItem><FormLabel>Email Address</FormLabel><FormControl><Input type="email" placeholder="m@example.com" {...field} disabled={isSubmitting} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Email Address</FormLabel><FormControl><Input type="email" placeholder="m@example.com" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
                 )}/>
                 <FormField control={form.control} name="storeName" render={({ field }) => (
-                    <FormItem><FormLabel>Store Name</FormLabel><FormControl><Input placeholder="My Awesome Store" {...field} disabled={isSubmitting} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Store Name</FormLabel><FormControl><Input placeholder="My Awesome Store" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
                 )}/>
                 <FormField control={form.control} name="databaseId" render={({ field }) => (
                     <FormItem>
                         <FormLabel>Database ID (Optional)</FormLabel>
-                        <FormControl><Input placeholder="(default)" {...field} disabled={isSubmitting} /></FormControl>
+                        <FormControl><Input placeholder="(default)" {...field} disabled={isSubmitting || isLoading} /></FormControl>
                         <p className="text-[10px] text-muted-foreground italic">Leave as <strong>(default)</strong> unless you have specifically created a separate Firestore database for this project.</p>
                         <FormMessage />
                     </FormItem>
@@ -262,18 +279,18 @@ export default function MerchantSignupPage() {
                     <FormField control={form.control} name="password" render={({ field }) => (
                         <FormItem><FormLabel>Password</FormLabel>
                           <div className="relative">
-                            <FormControl><Input type={showPassword ? 'text' : 'password'} placeholder="Min. 6 chars" {...field} disabled={isSubmitting} /></FormControl>
+                            <FormControl><Input type={showPassword ? 'text' : 'password'} placeholder="Min. 6 chars" {...field} disabled={isSubmitting || isLoading} /></FormControl>
                              <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7" onClick={() => setShowPassword(!showPassword)}><Eye className="h-4 w-4" /></Button>
                           </div>
                         <FormMessage /></FormItem>
                     )}/>
                     <FormField control={form.control} name="confirmPassword" render={({ field }) => (
-                        <FormItem><FormLabel>Confirm Password</FormLabel><FormControl><Input type={showPassword ? 'text' : 'password'} placeholder="Repeat password" {...field} disabled={isSubmitting} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Confirm Password</FormLabel><FormControl><Input type={showPassword ? 'text' : 'password'} placeholder="Repeat password" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
                     )}/>
                 </div>
 
-                <Button type="submit" className="w-full mt-2 h-12 font-bold" disabled={isSubmitting}>
-                    {isSubmitting ? <><Spinner size="sm" className="mr-2" />Creating Store…</> : 'Create Store Account'}
+                <Button type="submit" className="w-full mt-2 h-12 font-bold" disabled={isSubmitting || isLoading}>
+                    {(isSubmitting || isLoading) ? <><Spinner size="sm" className="mr-2" />Creating Store…</> : 'Create Store Account'}
                 </Button>
                 <div className="text-center text-sm">
                     Already have an account?{" "}
