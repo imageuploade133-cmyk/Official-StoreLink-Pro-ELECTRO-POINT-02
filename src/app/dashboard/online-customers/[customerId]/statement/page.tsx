@@ -173,7 +173,7 @@ export default function OnlineCustomerStatementPage() {
       // 4. Handle Orders only if customer has UID (Web-registered)
       let oDocs: QueryDocumentSnapshot<DocumentData>[] = [];
       if (customer?.uid) {
-        let ordersQ = query(collection(firestore, 'orders'), where('userId', '==', customer.uid), orderBy('createdAt', 'desc'));
+        let ordersQ = query(collection(firestore, 'orders'), where('user_id', '==', customer.uid), orderBy('createdAt', 'desc'));
         if (direction === 'next' && ordersLastDoc.current) ordersQ = query(ordersQ, startAfter(ordersLastDoc.current));
         else if (direction === 'prev' && ordersFirstDoc.current) ordersQ = query(ordersQ, endBefore(ordersFirstDoc.current), limitToLast(ITEMS_PER_PAGE));
         

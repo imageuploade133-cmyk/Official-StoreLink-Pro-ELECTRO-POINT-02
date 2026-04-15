@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { initializeFirebase } from '@/firebase/init';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { adminDb } from '@/lib/firebase-admin';
 import { PaymentProvider } from '@/lib/types';
 import { decrypt } from '@/lib/encryption';
 
@@ -9,10 +8,9 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const storeId = searchParams.get('storeId') || 'global';
 
-    const { firestore } = initializeFirebase();
-    const providersRef = collection(firestore, 'payment_providers');
-    const q = query(providersRef, where('storeId', '==', storeId), where('isActive', '==', true));
-    const querySnapshot = await getDocs(q);
+    const providersRef = adminDb.collection('payment_providers');
+    const q = providersRef.where('storeId', '==', storeId).where('isActive', '==', true);
+    const querySnapshot = await q.get();
 
     const methods: any[] = [];
     querySnapshot.forEach((doc) => {

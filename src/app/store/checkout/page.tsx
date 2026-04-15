@@ -308,7 +308,7 @@ export default function CheckoutPage() {
         }
 
         const orderData: any = {
-          userId: user?.uid || 'GUEST',
+          user_id: user?.uid || 'GUEST',
           items: cartItems.map(item => ({
             productId: item.id,
             quantity: item.quantity,
@@ -344,6 +344,7 @@ export default function CheckoutPage() {
             currency: settings?.currency || 'NGN',
             email: formData.email,
             providerName: selectedMethod.provider,
+            userId: user?.uid || 'GUEST',
           }),
         });
         const initData = await initRes.json();

@@ -4,29 +4,25 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function isAdmin() {
-      // A "Firebase only" user (admin) is one who is authenticated but has no staff document.
-      return request.auth != null && !exists(/databases/$(database)/documents/staff/$(request.auth.uid));
-    }
-
-    function getStaffRole() {
-        // Return the role of the user from the /staff collection.
-        // This function should only be called within a context where the user has read access to their own staff document.
-        return get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role;
-    }
-    
-    // Checks if the user is a staff member with one of the provided roles.
-    function isStaffWithOneOfRoles(roles) {
-        return exists(/databases/$(database)/documents/staff/$(request.auth.uid)) 
-               && getStaffRole() in roles;
-    }
-
     function isSignedIn() {
       return request.auth != null;
     }
-    
+
+    function isAdmin() {
+      return isSignedIn() && (request.auth.token.role == "admin" || exists(/databases/$(database)/documents/staff/$(request.auth.uid)) && get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role == "admin");
+    }
+
     function isOwner(userId) {
-      return request.auth != null && request.auth.uid == userId;
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function getStaffRole() {
+        return get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role;
+    }
+    
+    function isStaffWithOneOfRoles(roles) {
+        return exists(/databases/$(database)/documents/staff/$(request.auth.uid)) 
+               && getStaffRole() in roles;
     }
 
     // Rules for collections that are publicly readable
@@ -60,13 +56,11 @@ service cloud.firestore {
       allow write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
     }
     
-    // Rules for settings - only super admin
     match /settings/{doc} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isAdmin() || isStaffWithOneOfRoles(['admin']);
     }
     
-    // Rules for user-specific data
     match /users/{userId} {
       allow read, write: if isOwner(userId) || isAdmin();
     }
@@ -75,43 +69,35 @@ service cloud.firestore {
       allow read, write: if isOwner(userId) || isAdmin();
     }
     
-    // Rules for staff and branch management - admin heavy
     match /staff/{userId} {
-      // A user can GET their own document (to check their role for UI permissions).
-      // An admin/manager can GET any staff document.
       allow get: if isOwner(userId) || isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
-      
-      // Only admins/managers can LIST the entire staff collection.
       allow list: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
-
-      // Only the super-admin can create, update, or delete staff profiles.
-      allow write: if isAdmin();
+      allow write: if isAdmin() || isStaffWithOneOfRoles(['admin']);
     }
     
     match /branches/{doc} {
       allow read: if isSignedIn();
-      allow write: if isAdmin();
+      allow write: if isAdmin() || isStaffWithOneOfRoles(['admin']);
     }
     
-    // Rules for transactions and financial records
     match /saleTransactions/{transactionId} {
       allow get, list: if isSignedIn();
-      allow create: if isSignedIn(); // Any staff can create a sale via POS
-      allow update: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin(); // Only managers/admins can process returns
-      allow delete: if isAdmin(); // Only super-admin can delete sales records
+      allow create: if isSignedIn();
+      allow update: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+      allow delete: if isAdmin() || isStaffWithOneOfRoles(['admin']);
     }
 
     match /customers/{doc} {
-      allow read, write: if isSignedIn(); // Any staff can create/edit customers
+      allow read, write: if isSignedIn();
     }
     
     match /restockEntries/{doc} {
-      allow read: if isStaffWithOneOfRoles(['admin', 'manager', 'inventory_manager']);
+      allow read: if isStaffWithOneOfRoles(['admin', 'manager', 'inventory_manager']) || isAdmin();
       allow create: if isSignedIn();
     }
 
     match /heldSales/{saleId} {
-      allow read, write: if isSignedIn(); // POS feature for any staff
+      allow read, write: if isSignedIn();
     }
 
     match /creditPayments/{paymentId} {
@@ -122,16 +108,16 @@ service cloud.firestore {
 
     match /customerHistory/{doc} {
       allow read, create: if isSignedIn();
-      allow update, delete: if false; // History is immutable
+      allow update, delete: if false;
     }
     
     match /expenses/{expenseId} {
       allow read, create: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
-      allow update, delete: if isAdmin();
+      allow update, delete: if isAdmin() || isStaffWithOneOfRoles(['admin']);
     }
 
     match /reversals/{reversalId} {
-      allow read, create: if isAdmin();
+      allow read, create: if isAdmin() || isStaffWithOneOfRoles(['admin']);
       allow update, delete: if false;
     }
     
@@ -148,19 +134,29 @@ service cloud.firestore {
         allow write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
     }
 
-    // Rules for payment providers - currently accessed via unauthenticated API routes
+    // 1. Payment Providers (Admin Only)
     match /payment_providers/{doc} {
-      allow read, write: if true; 
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
     }
 
-    // Rules for online transactions - currently accessed via unauthenticated API routes
+    // 2. Transactions (Backend Only)
     match /transactions/{doc} {
-      allow read, write: if true;
+      allow read: if isAdmin() || (isSignedIn() && request.auth.uid == resource.data.user_id);
+      // Only backend (server) should write transactions
+      allow write: if false;
     }
 
-    // Rules for online orders
+    // 3. Orders
     match /orders/{doc} {
-      allow read, write: if true;
+      // User can read their own orders, Admin can read all
+      allow read: if isAdmin() || (isSignedIn() && request.auth.uid == resource.data.user_id);
+      // User can create order
+      allow create: if isSignedIn();
+      // Only backend/admin can update order status (paid, failed)
+      allow update: if isAdmin();
+      // No delete
+      allow delete: if false;
     }
 
     match /coupons/{doc} {
@@ -178,12 +174,13 @@ service cloud.firestore {
     }
 
     match /websiteTraffic/{doc} {
-      allow read, write: if true;
+      allow read: if true;
+      allow write: if false; // Should be handled by backend
     }
 
     match /stockAuditEntries/{doc} {
       allow read: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
-      allow write: if true; // Any stock change might record an entry
+      allow write: if false; // Should be handled by backend
     }
     
     /* =====================================================================

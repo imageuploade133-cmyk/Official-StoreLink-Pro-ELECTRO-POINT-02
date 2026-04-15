@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { initializeFirebase } from '@/firebase/init';
-import { doc, getDoc, updateDoc, Timestamp, runTransaction } from 'firebase/firestore';
+import { adminDb } from '@/lib/firebase-admin';
+import { Timestamp } from 'firebase-admin/firestore';
 import { decrypt } from '@/lib/encryption';
 import { PaymentProvider, Transaction } from '@/lib/types';
 
@@ -15,15 +15,11 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Missing reference or provider' }, { status: 400 });
     }
 
-    const { firestore } = initializeFirebase();
-    
     // Check if transaction already processed
-    const transactionRef = doc(firestore, 'transactions', reference);
-    const transactionSnap = await getDoc(transactionRef);
+    const transactionRef = adminDb.collection('transactions').doc(reference);
+    const transactionSnap = await transactionRef.get();
     
-    if (!transactionSnap.exists()) {
-        // For Flutterwave, the reference might be different in the callback
-        // In a real app, we should search by tx_ref
+    if (!transactionSnap.exists) {
         return NextResponse.json({ error: 'Transaction not found' }, { status: 404 });
     }
     
@@ -33,13 +29,13 @@ export async function GET(request: Request) {
     }
 
     const providerId = `${storeId}_${providerName}`;
-    const providerSnap = await getDoc(doc(firestore, 'payment_providers', providerId));
-    if (!providerSnap.exists()) {
+    const providerSnap = await adminDb.collection('payment_providers').doc(providerId).get();
+    if (!providerSnap.exists) {
       throw new Error('Provider not configured');
     }
 
-    const config = JSON.parse(decrypt(providerSnap.data().config));
-    const mode = providerSnap.data().mode || 'test';
+    const config = JSON.parse(decrypt(providerSnap.data()?.config));
+    const mode = providerSnap.data()?.mode || 'test';
     const secretKey = mode === 'live' ? config.liveSecretKey : config.testSecretKey || config.secretKey;
     
     let isSuccessful = false;
@@ -51,7 +47,6 @@ export async function GET(request: Request) {
       const result = await res.json();
       isSuccessful = result.status && result.data.status === 'success';
     } else if (providerName === 'flutterwave') {
-      // For Flutterwave, reference here might be the transaction ID
       const res = await fetch(`https://api.flutterwave.com/v3/transactions/${reference}/verify`, {
         headers: { Authorization: `Bearer ${secretKey}` },
       });
@@ -60,9 +55,9 @@ export async function GET(request: Request) {
     }
 
     if (isSuccessful) {
-      await runTransaction(firestore, async (dbTransaction) => {
+      await adminDb.runTransaction(async (dbTransaction) => {
         const tSnap = await dbTransaction.get(transactionRef);
-        if (!tSnap.exists()) return;
+        if (!tSnap.exists) return;
         const tData = tSnap.data() as Transaction;
         if (tData.status === 'success') return;
 
@@ -72,7 +67,7 @@ export async function GET(request: Request) {
         });
 
         // Update Order Status
-        const orderRef = doc(firestore, 'orders', tData.orderId);
+        const orderRef = adminDb.collection('orders').doc(tData.orderId);
         dbTransaction.update(orderRef, {
           status: 'processing',
           isPaid: true,
@@ -82,7 +77,7 @@ export async function GET(request: Request) {
 
       return NextResponse.json({ success: true, status: 'success' });
     } else {
-      await updateDoc(transactionRef, {
+      await transactionRef.update({
         status: 'failed',
         updatedAt: Timestamp.now(),
       });

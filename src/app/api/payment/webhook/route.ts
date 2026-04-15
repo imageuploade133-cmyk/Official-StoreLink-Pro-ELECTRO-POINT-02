@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { initializeFirebase } from '@/firebase/init';
-import { doc, getDoc, updateDoc, Timestamp, runTransaction } from 'firebase/firestore';
+import { adminDb } from '@/lib/firebase-admin';
+import { Timestamp } from 'firebase-admin/firestore';
 import { decrypt } from '@/lib/encryption';
 import crypto from 'crypto';
 import { Transaction } from '@/lib/types';
@@ -12,18 +12,17 @@ export async function POST(request: Request) {
     const storeId = searchParams.get('storeId') || 'global';
     
     const body = await request.text();
-    const { firestore } = initializeFirebase();
 
     const providerId = `${storeId}_${providerName}`;
-    const providerSnap = await getDoc(doc(firestore, 'payment_providers', providerId));
+    const providerSnap = await adminDb.collection('payment_providers').doc(providerId).get();
     
-    if (!providerSnap.exists()) {
+    if (!providerSnap.exists) {
       return NextResponse.json({ error: 'Provider not found' }, { status: 404 });
     }
 
     const providerData = providerSnap.data();
-    const config = JSON.parse(decrypt(providerData.config));
-    const mode = providerData.mode || 'test';
+    const config = JSON.parse(decrypt(providerData?.config));
+    const mode = providerData?.mode || 'test';
     const secretKey = mode === 'live' ? config.liveSecretKey : config.testSecretKey || config.secretKey;
 
     if (providerName === 'paystack') {
@@ -35,17 +34,13 @@ export async function POST(request: Request) {
       const event = JSON.parse(body);
       if (event.event === 'charge.success') {
         const reference = event.data.reference;
-        await processSuccessfulTransaction(firestore, reference);
+        await processSuccessfulTransaction(reference);
       }
     } else if (providerName === 'flutterwave') {
-        // Flutterwave uses a secret hash set by the user
-        const signature = request.headers.get('verif-hash');
-        // In a real app, we would check this against a stored secret hash
-        // For now, we'll assume it's valid if we want to support it, but better to check
         const event = JSON.parse(body);
         if (event['event.type'] === 'CARD_TRANSACTION' && event.status === 'successful') {
             const reference = event.tx_ref;
-            await processSuccessfulTransaction(firestore, reference);
+            await processSuccessfulTransaction(reference);
         }
     }
 
@@ -56,13 +51,13 @@ export async function POST(request: Request) {
   }
 }
 
-async function processSuccessfulTransaction(firestore: any, reference: string) {
-  const transactionRef = doc(firestore, 'transactions', reference);
+async function processSuccessfulTransaction(reference: string) {
+  const transactionRef = adminDb.collection('transactions').doc(reference);
 
-  await runTransaction(firestore, async (dbTransaction) => {
+  await adminDb.runTransaction(async (dbTransaction) => {
     const transactionSnap = await dbTransaction.get(transactionRef);
 
-    if (transactionSnap.exists()) {
+    if (transactionSnap.exists) {
       const transactionData = transactionSnap.data() as Transaction;
       if (transactionData.status !== 'success') {
         dbTransaction.update(transactionRef, {
@@ -70,7 +65,7 @@ async function processSuccessfulTransaction(firestore: any, reference: string) {
           updatedAt: Timestamp.now(),
         });
 
-        const orderRef = doc(firestore, 'orders', transactionData.orderId);
+        const orderRef = adminDb.collection('orders').doc(transactionData.orderId);
         dbTransaction.update(orderRef, {
           status: 'processing',
           isPaid: true,

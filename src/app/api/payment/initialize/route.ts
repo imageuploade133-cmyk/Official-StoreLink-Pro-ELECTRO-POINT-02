@@ -1,23 +1,22 @@
 import { NextResponse } from 'next/server';
-import { initializeFirebase } from '@/firebase/init';
-import { doc, getDoc, collection, setDoc, Timestamp } from 'firebase/firestore';
+import { adminDb } from '@/lib/firebase-admin';
+import { Timestamp } from 'firebase-admin/firestore';
 import { decrypt } from '@/lib/encryption';
 import { PaymentProvider, Transaction } from '@/lib/types';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { orderId, amount, currency, email, providerName, storeId = 'global' } = body;
+    const { orderId, amount, currency, email, providerName, storeId = 'global', userId } = body;
 
     if (!orderId || !amount || !email || !providerName) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const { firestore } = initializeFirebase();
     const providerId = `${storeId}_${providerName}`;
-    const providerSnap = await getDoc(doc(firestore, 'payment_providers', providerId));
+    const providerSnap = await adminDb.collection('payment_providers').doc(providerId).get();
 
-    if (!providerSnap.exists() || !providerSnap.data().isActive) {
+    if (!providerSnap.exists || !providerSnap.data()?.isActive) {
       return NextResponse.json({ error: 'Payment provider not active' }, { status: 400 });
     }
 
@@ -27,7 +26,7 @@ export async function POST(request: Request) {
     
     // Pick the correct keys based on mode
     const secretKey = mode === 'live' ? config.liveSecretKey : config.testSecretKey || config.secretKey;
-    const publicKey = mode === 'live' ? config.livePublicKey : config.testPublicKey || config.publicKey;
+    // const publicKey = mode === 'live' ? config.livePublicKey : config.testPublicKey || config.publicKey;
 
     let result: any = {};
     let reference = `TRX-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -85,17 +84,18 @@ export async function POST(request: Request) {
       id: transactionId,
       storeId,
       orderId,
+      user_id: userId || 'GUEST',
       provider: providerName,
       reference,
       amount,
       currency,
       status: 'pending',
       customerEmail: email,
-      createdAt: Timestamp.now(),
-      updatedAt: Timestamp.now(),
+      createdAt: Timestamp.now() as any,
+      updatedAt: Timestamp.now() as any,
     };
 
-    await setDoc(doc(firestore, 'transactions', transactionId), transactionData);
+    await adminDb.collection('transactions').doc(transactionId).set(transactionData);
 
     return NextResponse.json({
         success: true,

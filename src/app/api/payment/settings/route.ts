@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { initializeFirebase } from '@/firebase/init';
-import { doc, getDoc, setDoc, collection, getDocs, query, where, Timestamp } from 'firebase/firestore';
+import { adminDb } from '@/lib/firebase-admin';
+import { Timestamp } from 'firebase-admin/firestore';
 import { encrypt, decrypt } from '@/lib/encryption';
 import { PaymentProvider } from '@/lib/types';
 
@@ -9,10 +9,9 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const storeId = searchParams.get('storeId') || 'global';
 
-    const { firestore } = initializeFirebase();
-    const providersRef = collection(firestore, 'payment_providers');
-    const q = query(providersRef, where('storeId', '==', storeId));
-    const querySnapshot = await getDocs(q);
+    const providersRef = adminDb.collection('payment_providers');
+    const q = providersRef.where('storeId', '==', storeId);
+    const querySnapshot = await q.get();
 
     const providers: any[] = [];
     querySnapshot.forEach((doc) => {
@@ -58,16 +57,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Provider name is required' }, { status: 400 });
     }
 
-    const { firestore } = initializeFirebase();
-    
     const providerId = `${storeId}_${providerName}`;
-    const providerRef = doc(firestore, 'payment_providers', providerId);
+    const providerRef = adminDb.collection('payment_providers').doc(providerId);
     
     // Fetch existing provider data to merge config if it exists
-    const existingSnap = await getDoc(providerRef);
+    const existingSnap = await providerRef.get();
     let finalConfig = config || {};
 
-    if (existingSnap.exists() && config) {
+    if (existingSnap.exists && config) {
       const existingData = existingSnap.data() as PaymentProvider;
       if (existingData.config) {
         try {
@@ -95,11 +92,11 @@ export async function POST(request: Request) {
     if (isActive !== undefined) providerData.isActive = isActive;
     if (mode !== undefined) providerData.mode = mode;
 
-    if (!existingSnap.exists()) {
+    if (!existingSnap.exists) {
       providerData.createdAt = Timestamp.now();
     }
 
-    await setDoc(providerRef, providerData, { merge: true });
+    await providerRef.set(providerData, { merge: true });
 
     return NextResponse.json({ success: true, id: providerId });
   } catch (error: any) {
