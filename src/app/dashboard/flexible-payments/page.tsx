@@ -5,6 +5,7 @@ import { useFirestore } from '@/firebase';
 import { 
   collection, 
   query, 
+  where,
   orderBy, 
   getDocs, 
   limit, 
@@ -54,9 +55,11 @@ const ITEMS_PER_PAGE = 15;
 
 export default function FlexiblePaymentsPage() {
   const firestore = useFirestore();
-  const { user, permissions, isLoading: isAuthLoading } = useAuth();
+  const { user, permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
   const { settings } = useSettings();
   const currencySymbol = settings?.currency || '$';
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('registry');
@@ -84,11 +87,11 @@ export default function FlexiblePaymentsPage() {
   const [isPaymentReceiptOpen, setIsPaymentReceiptOpen] = useState(false);
 
   const fetchCustomers = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsLoadingCustomers(true);
 
     try {
-      let q = query(collection(firestore, 'customers'), orderBy('name', 'asc'));
+      let q = query(collection(firestore, 'customers'), where('store_id', '==', currentStoreId), orderBy('name', 'asc'));
 
       // 1. Initial count (Cost Efficient)
       if (direction === 'initial') {
@@ -137,13 +140,13 @@ export default function FlexiblePaymentsPage() {
     } finally {
       setIsLoadingCustomers(false);
     }
-  }, [firestore]);
+  }, [firestore, currentStoreId]);
 
   useEffect(() => {
-    if (firestore && !isAuthLoading && permissions.manage_flexible_payments) {
+    if (firestore && !isAuthLoading && permissions.manage_flexible_payments && currentStoreId) {
       fetchCustomers('initial');
     }
-  }, [firestore, isAuthLoading, permissions.manage_flexible_payments, fetchCustomers]);
+  }, [firestore, isAuthLoading, permissions.manage_flexible_payments, fetchCustomers, currentStoreId]);
 
   const filteredCustomers = useMemo(() => {
     if (!customers) return [];

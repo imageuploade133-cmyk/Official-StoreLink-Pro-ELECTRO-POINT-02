@@ -239,7 +239,7 @@ export default function WebsiteOrdersPage() {
   }, [orders, searchTerm]);
 
   const handleUpdateStatus = async (orderId: string, newStatus: OrderStatus) => {
-    if (!firestore || !user) return;
+    if (!firestore || !user || !currentStoreId) return;
     try {
       const orderRef = doc(firestore, 'orders', orderId);
       const orderSnap = await getDoc(orderRef);

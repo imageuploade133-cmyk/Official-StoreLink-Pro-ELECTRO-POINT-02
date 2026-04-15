@@ -21,11 +21,13 @@ type ParsedProduct = Omit<Product, 'id'> & { id?: string; action: 'create' | 'up
 const OPTIONAL_HEADERS = ['description', 'supplierName', 'supplierContactName', 'supplierPhone', 'supplierLocation', 'stockDocumentUrl', 'lowStockThreshold', 'isVisibleInPOS', 'imageUrl'];
 
 export default function BulkAddProductsPage() {
-  const { user, permissions, isLoading: authLoading } = useAuth();
+  const { user, permissions, isLoading: authLoading, store, staffMember } = useAuth();
   const firestore = useFirestore();
   const { toast } = useToast();
   const { settings } = useSettings();
   const currencySymbol = settings?.currency || '$';
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
   
   const [parsedData, setParsedData] = useState<ParsedProduct[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -94,7 +96,7 @@ export default function BulkAddProductsPage() {
   };
 
   const handleImport = async () => {
-    if (!user || !firestore || parsedData.length === 0) return;
+    if (!user || !firestore || !currentStoreId || parsedData.length === 0) return;
     setIsProcessing(true);
     
     let createdCount = 0;
@@ -110,6 +112,7 @@ export default function BulkAddProductsPage() {
                 const chunk = skus.slice(i, i + 30);
                 const q = query(
                     collection(firestore, 'products'), 
+                    where('store_id', '==', currentStoreId),
                     where('sku', 'in', chunk)
                 );
                 const querySnapshot = await getDocs(q);
@@ -125,7 +128,7 @@ export default function BulkAddProductsPage() {
             const existingProduct = productData.sku ? existingProductsMap.get(productData.sku) : undefined;
             if (existingProduct) {
                 const productRef = doc(firestore, 'products', existingProduct.id);
-                batch.update(productRef, { ...dataToWrite, updatedAt: serverTimestamp() });
+                batch.update(productRef, { ...dataToWrite, store_id: currentStoreId, updatedAt: serverTimestamp() });
                 
                 // --- ADD AUDIT IF STOCK CHANGED ---
                 if (existingProduct.stock !== dataToWrite.stock) {
@@ -133,6 +136,7 @@ export default function BulkAddProductsPage() {
                     batch.set(auditRef, {
                         productId: existingProduct.id,
                         productName: dataToWrite.name,
+                        store_id: currentStoreId,
                         type: 'ADJUSTMENT',
                         referenceId: 'BULK-' + existingProduct.id.substring(0, 8).toUpperCase(),
                         beforeStock: existingProduct.stock || 0,
@@ -146,13 +150,14 @@ export default function BulkAddProductsPage() {
                 updatedCount++;
             } else {
                 const newProductRef = doc(collection(firestore, 'products'));
-                batch.set(newProductRef, { ...dataToWrite, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+                batch.set(newProductRef, { ...dataToWrite, store_id: currentStoreId, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
                 
                 // --- ADD AUDIT ---
                 const auditRef = doc(collection(firestore, 'stockAudit'));
                 batch.set(auditRef, {
                     productId: newProductRef.id,
                     productName: dataToWrite.name,
+                    store_id: currentStoreId,
                     type: 'ADJUSTMENT',
                     referenceId: 'BULK-' + newProductRef.id.substring(0, 8).toUpperCase(),
                     beforeStock: 0,
@@ -173,7 +178,7 @@ export default function BulkAddProductsPage() {
           actionType: 'BULK_IMPORT', entityType: 'Product', entityId: 'BULK',
           summary: `User imported products via CSV`,
           entityDescription: `Bulk import: ${createdCount} created, ${updatedCount} updated.`,
-          details: { created: createdCount, updated: updatedCount, fileName },
+          details: { created: createdCount, updated: updatedCount, fileName, store_id: currentStoreId },
       });
       
       toast({

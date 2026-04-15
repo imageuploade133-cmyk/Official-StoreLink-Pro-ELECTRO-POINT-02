@@ -26,7 +26,7 @@ import { Receipt, Loader2 } from 'lucide-react';
 
 
 export default function ExpensesPage() {
-  const { user, permissions, isAdmin, isLoading: isAuthLoading } = useAuth();
+  const { user, permissions, isAdmin, isLoading: isAuthLoading, store, staffMember } = useAuth();
   const { settings, isLoading: isSettingsLoading } = useSettings();
   const { toast } = useToast();
   const firestore = useFirestore();
@@ -38,20 +38,22 @@ export default function ExpensesPage() {
   const [isProcessingReturn, setIsProcessingReturn] = useState(false);
   const [expenseToReturn, setExpenseToReturn] = useState<Expense | null>(null);
 
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
+
   const salesQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'saleTransactions'));
-  }, [firestore]);
+    if (!firestore || !currentStoreId) return null;
+    return query(collection(firestore, 'saleTransactions'), where('store_id', '==', currentStoreId));
+  }, [firestore, currentStoreId]);
 
   const expensesQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'expenses'));
-  }, [firestore]);
+    if (!firestore || !currentStoreId) return null;
+    return query(collection(firestore, 'expenses'), where('store_id', '==', currentStoreId));
+  }, [firestore, currentStoreId]);
 
   const reversalsQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'reversals'), orderBy("reversalDate", "desc"));
-  }, [firestore]);
+    if (!firestore || !currentStoreId) return null;
+    return query(collection(firestore, 'reversals'), where('store_id', '==', currentStoreId), orderBy("reversalDate", "desc"));
+  }, [firestore, currentStoreId]);
 
   const { data: rawSales, isLoading: isLoadingSales } = useCollection<SaleTransaction>(salesQuery);
   const { data: rawExpenses, isLoading: isLoadingExpenses, refetch: refetchExpenses } = useCollection<Expense>(expensesQuery);
@@ -132,10 +134,17 @@ export default function ExpensesPage() {
   }, [allSales, allExpenses, allReversals, paymentMethods]);
   
   const handleAddExpense = async (values: ExpenseFormValues) => {
-    if (!user || !firestore) return;
+    if (!user || !firestore || !currentStoreId) return;
     setIsSubmitting(true);
     try {
-        const expenseData = { ...values, recordedBy: user.uid, branchId: null, status: 'Active' as const, expenseDate: Timestamp.fromDate(values.expenseDate) };
+        const expenseData = { 
+            ...values, 
+            recordedBy: user.uid, 
+            branchId: null, 
+            status: 'Active' as const, 
+            expenseDate: Timestamp.fromDate(values.expenseDate),
+            store_id: currentStoreId
+        };
         await addDoc(collection(firestore, 'expenses'), expenseData);
         toast({ title: "Expense Added", description: "Your expense has been successfully recorded." });
         if(refetchExpenses) await refetchExpenses();
@@ -148,7 +157,7 @@ export default function ExpensesPage() {
   };
 
   const handleCashDeposit = async (values: CashDepositFormValues) => {
-    if (!user || !firestore) return;
+    if (!user || !firestore || !currentStoreId) return;
     setIsSubmitting(true);
     try {
         const depositData: Omit<Expense, 'id'> = {
@@ -162,6 +171,7 @@ export default function ExpensesPage() {
             branchId: null,
             recordedBy: user.uid,
             status: 'Active',
+            store_id: currentStoreId,
         };
         await addDoc(collection(firestore, 'expenses'), depositData);
         toast({ title: "Cash Deposit Recorded", description: "The transaction has been successfully logged." });
@@ -200,6 +210,7 @@ export default function ExpensesPage() {
               reversalDate: Timestamp.now(),
               reversedBy: firebaseAuth.currentUser?.uid,
               reversedByEmail: firebaseAuth.currentUser?.email,
+              store_id: currentStoreId,
           };
           
           batch.update(expenseRef, { status: 'Returned' });

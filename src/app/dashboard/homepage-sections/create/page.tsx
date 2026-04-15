@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useFirestore } from '@/firebase';
@@ -15,18 +16,21 @@ import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Button } from '@/components/ui/button';
 
 export default function CreateHomepageSectionPage() {
-    const { permissions, isLoading: isAuthLoading } = useAuth();
+    const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
     const firestore = useFirestore();
     const router = useRouter();
     const { toast } = useToast();
     const [isSaving, setIsSaving] = useState(false);
 
+    const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
+
     const handleCreateSubmit = async (values: any) => {
-        if (!firestore) return;
+        if (!firestore || !currentStoreId) return;
         setIsSaving(true);
         try {
             await addDoc(collection(firestore, 'homepageSections'), {
                 ...values,
+                store_id: currentStoreId,
                 createdAt: Timestamp.now(),
                 updatedAt: Timestamp.now(),
             });

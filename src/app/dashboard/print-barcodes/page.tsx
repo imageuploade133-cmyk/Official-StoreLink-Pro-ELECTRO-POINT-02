@@ -137,11 +137,13 @@ const A4Preview = ({ products, currencySymbol, settings, generatingBarcode, gene
 
 // Main Page Component
 const PrintBarcodePage = () => {
-    const { permissions, isLoading: authLoading } = useAuth();
+    const { permissions, isLoading: authLoading, store, staffMember } = useAuth();
     const firestore = useFirestore();
     const { toast } = useToast();
     const { settings } = useSettings();
     const currencySymbol = settings?.currency || '$';
+
+    const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
     const [products, setProducts] = useState<Product[]>([]);
     const [selectedMap, setSelectedMap] = useState<Record<string, { product: Product, quantity: number }>>({});
@@ -167,12 +169,12 @@ const PrintBarcodePage = () => {
     const [isBold, setIsBold] = useState<boolean>(false);
 
     const fetchProducts = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-        if (!firestore) return;
+        if (!firestore || !currentStoreId) return;
         setIsLoading(true);
         setError(null);
 
         try {
-            let q = query(collection(firestore, 'products'), orderBy('name', 'asc'));
+            let q = query(collection(firestore, 'products'), where('store_id', '==', currentStoreId), orderBy('name', 'asc'));
 
             if (activeFilter === 'withBarcodes') {
                 q = query(q, where('barcode', '!=', null));
@@ -188,10 +190,11 @@ const PrintBarcodePage = () => {
                 const countSnap = await getCountFromServer(q);
                 setTotalFilteredCount(countSnap.data().count);
 
-                const allCountSnap = await getCountFromServer(collection(firestore, 'products'));
+                const allProductsQuery = query(collection(firestore, 'products'), where('store_id', '==', currentStoreId));
+                const allCountSnap = await getCountFromServer(allProductsQuery);
                 setAllProductsCountInDb(allCountSnap.data().count);
 
-                const withBarcodeQuery = query(collection(firestore, 'products'), where('barcode', '!=', null));
+                const withBarcodeQuery = query(collection(firestore, 'products'), where('store_id', '==', currentStoreId), where('barcode', '!=', null));
                 const withBarcodeCountSnap = await getCountFromServer(withBarcodeQuery);
                 setWithBarcodesCountInDb(withBarcodeCountSnap.data().count);
             }
@@ -234,13 +237,13 @@ const PrintBarcodePage = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [firestore, activeFilter, searchTerm, toast]);
+    }, [firestore, activeFilter, searchTerm, toast, currentStoreId]);
 
     useEffect(() => { 
-        if(!authLoading && permissions?.canPrintBarcodes) {
+        if(!authLoading && permissions?.canPrintBarcodes && currentStoreId) {
             fetchProducts('initial'); 
         }
-    }, [fetchProducts, authLoading, permissions]);
+    }, [fetchProducts, authLoading, permissions, currentStoreId]);
 
     const handleLayoutChange = (setting: keyof LayoutSettings, value: string) => {
         const numValue = parseFloat(value);
@@ -305,14 +308,14 @@ const PrintBarcodePage = () => {
     const areAllVisibleSelected = useMemo(() => products.length > 0 && products.every(p => !!selectedMap[p.id]), [products, selectedMap]);
     
     const generateBarcode = async (productId: string) => {
-        if (!firestore) return;
+        if (!firestore || !currentStoreId) return;
         setGeneratingBarcode(productId);
         try {
             let newBarcode = '';
             let isUnique = false;
             while (!isUnique) {
                 newBarcode = Math.random().toString(36).substring(2, 15).toUpperCase();
-                const q = query(collection(firestore, "products"), where("barcode", "==", newBarcode));
+                const q = query(collection(firestore, "products"), where("store_id", "==", currentStoreId), where("barcode", "==", newBarcode));
                 const querySnapshot = await getDocs(q);
                 if (querySnapshot.empty) {
                     isUnique = true;

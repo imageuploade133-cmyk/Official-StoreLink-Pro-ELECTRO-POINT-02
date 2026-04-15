@@ -1,6 +1,7 @@
+
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -74,9 +75,11 @@ export function CustomerManagementModal({ isOpen, onOpenChange, onCustomerSelect
 }) {
   const { toast } = useToast();
   const firestore = useFirestore();
-  const { user: authUser, staffMember } = useAuth();
+  const { user: authUser, staffMember, store } = useAuth();
   const { settings } = useSettings();
   const currencySymbol = settings?.currency || '$';
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [registryFilter, setRegistryFilter] = useState<'all' | 'pos' | 'online'>('all');
@@ -95,11 +98,10 @@ export function CustomerManagementModal({ isOpen, onOpenChange, onCustomerSelect
   const isMobile = useIsMobile();
 
   const fetchCustomers = useCallback(async (direction: 'next' | 'prev' | 'initial' = 'initial') => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsLoading(true);
     try {
-      const storeId = staffMember?.store_id || null;
-      let q = query(collection(firestore, "customers"), where("store_id", "==", storeId), orderBy("name", "asc"));
+      let q = query(collection(firestore, "customers"), where("store_id", "==", currentStoreId), orderBy("name", "asc"));
 
       // Apply registry filters
       if (registryFilter === 'pos') {
@@ -144,25 +146,25 @@ export function CustomerManagementModal({ isOpen, onOpenChange, onCustomerSelect
     } finally {
       setIsLoading(false);
     }
-  }, [firestore, registryFilter, firstDoc, lastDoc, toast]);
+  }, [firestore, registryFilter, firstDoc, lastDoc, toast, currentStoreId]);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && currentStoreId) {
       fetchCustomers('initial');
     }
-  }, [isOpen, registryFilter]);
+  }, [isOpen, registryFilter, currentStoreId]);
 
   const handleNextPage = () => fetchCustomers('next');
   const handlePrevPage = () => fetchCustomers('prev');
 
   const handleRegisterSubmit = async (values: any) => {
-    if (!firestore || !authUser) return;
+    if (!firestore || !authUser || !currentStoreId) return;
     
     setIsSaving(true);
     try {
         const newCustomerData = {
             ...values,
-            store_id: staffMember?.store_id || null,
+            store_id: currentStoreId,
             branchId: null,
             uid: null,
             totalSpent: 0,

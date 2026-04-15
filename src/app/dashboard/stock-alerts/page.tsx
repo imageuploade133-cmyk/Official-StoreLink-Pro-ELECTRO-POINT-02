@@ -46,10 +46,12 @@ import { startOfDay, endOfDay } from 'date-fns';
 const ITEMS_PER_PAGE = 10;
 
 export default function StockAlertsPage() {
-  const { permissions, isLoading: authLoading, user } = useAuth();
+  const { permissions, isLoading: authLoading, user, store, staffMember } = useAuth();
   const firestore = useFirestore();
   const { toast } = useToast();
   const { settings, isLoading: isLoadingSettings } = useSettings();
+
+  const currentStoreId = React.useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const [activeTab, setActiveTab] = useState<'low_stock' | 'out_of_stock'>('low_stock');
   
@@ -72,9 +74,9 @@ export default function StockAlertsPage() {
 
   // Restock Stats Data (Kept simple for summary)
   const restockQuery = React.useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'restockEntries'), limit(500));
-  }, [firestore]);
+    if (!firestore || !currentStoreId) return null;
+    return query(collection(firestore, 'restockEntries'), where('store_id', '==', currentStoreId), limit(500));
+  }, [firestore, currentStoreId]);
   const { data: allRestockEntries, isLoading: isLoadingRestocks } = useCollection<RestockEntry>(restockQuery);
 
   const calculatedRestockStats = React.useMemo(() => {
@@ -94,7 +96,7 @@ export default function StockAlertsPage() {
   }, [allRestockEntries]);
 
   const fetchProducts = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore || !settings) return;
+    if (!firestore || !settings || !currentStoreId) return;
     setIsLoadingProducts(true);
 
     try {
@@ -105,6 +107,7 @@ export default function StockAlertsPage() {
       if (activeTab === 'low_stock') {
         baseQuery = query(
             q, 
+            where('store_id', '==', currentStoreId),
             where('stock', '>', 0), 
             where('stock', '<=', globalThreshold),
             orderBy('stock', 'asc')
@@ -112,6 +115,7 @@ export default function StockAlertsPage() {
       } else {
         baseQuery = query(
             q, 
+            where('store_id', '==', currentStoreId),
             where('stock', '<=', 0),
             orderBy('name', 'asc')
         );
@@ -157,13 +161,13 @@ export default function StockAlertsPage() {
     } finally {
       setIsLoadingProducts(false);
     }
-  }, [firestore, settings, activeTab, toast]);
+  }, [firestore, settings, activeTab, toast, currentStoreId]);
 
   useEffect(() => {
-    if (!authLoading && !isLoadingSettings && firestore) {
+    if (!authLoading && !isLoadingSettings && firestore && currentStoreId) {
       fetchProducts('initial');
     }
-  }, [authLoading, isLoadingSettings, firestore, activeTab, fetchProducts]);
+  }, [authLoading, isLoadingSettings, firestore, activeTab, fetchProducts, currentStoreId]);
 
   const handleRestockClick = (product: Product) => {
     setSelectedProductForRestock(product);
@@ -176,7 +180,7 @@ export default function StockAlertsPage() {
   };
 
   const handleBulkFormSubmit = async (values: BulkUpdateFormValues) => {
-    if (!firestore || !user || productsForBulkUpdate.length === 0) return;
+    if (!firestore || !user || !currentStoreId || productsForBulkUpdate.length === 0) return;
     setIsSubmittingForm(true);
 
     const { quantity, supplierName, notes } = values;
@@ -212,6 +216,7 @@ export default function StockAlertsPage() {
             createdAt: Timestamp.now(),
             userEmail: user.email || 'N/A',
             branchId: null,
+            store_id: currentStoreId
         });
 
         batch.set(auditRef, {
@@ -224,7 +229,8 @@ export default function StockAlertsPage() {
             change: quantity,
             staffId: user.uid,
             staffName: user.displayName || user.email || 'Staff',
-            timestamp: serverTimestamp()
+            timestamp: serverTimestamp(),
+            store_id: currentStoreId
         });
     }
 
@@ -241,7 +247,7 @@ export default function StockAlertsPage() {
   };
 
   const handleFormSubmit = async (values: RestockFormValues) => {
-    if (!firestore || !user) return;
+    if (!firestore || !user || !currentStoreId) return;
     setIsSubmittingForm(true);
     
     const productRef = doc(firestore, 'products', values.productId);
@@ -285,6 +291,7 @@ export default function StockAlertsPage() {
             userEmail: user.email || 'N/A',
             branchId: null,
             notes: values.notes || null,
+            store_id: currentStoreId
           });
 
           transaction.set(auditRef, {
@@ -297,7 +304,8 @@ export default function StockAlertsPage() {
             change: values.quantity,
             staffId: user.uid,
             staffName: user.displayName || user.email || 'Staff',
-            timestamp: serverTimestamp()
+            timestamp: serverTimestamp(),
+            store_id: currentStoreId
           });
       });
       

@@ -1,7 +1,8 @@
+
 'use client';
 import React, { useMemo, useState } from 'react';
 import { useCollection, useFirestore } from '@/firebase';
-import { collection, query, orderBy, doc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { collection, query, orderBy, doc, deleteDoc, updateDoc, where } from 'firebase/firestore';
 import type { PublicPage } from '@/lib/types';
 import { PageHeader } from '@/components/PageHeader';
 import { BookCopy, Edit, PlusCircle, Trash2, Loader2, Globe, EyeOff, Eye } from 'lucide-react';
@@ -21,12 +22,14 @@ import AccessDenied from '@/components/staff-management/AccessDenied';
 export default function ManageWebPages() {
   const firestore = useFirestore();
   const { toast } = useToast();
-  const { permissions, isLoading: isAuthLoading } = useAuth();
+  const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const pagesQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'publicPages'), orderBy('createdAt', 'desc'));
-  }, [firestore]);
+    if (!firestore || !currentStoreId) return null;
+    return query(collection(firestore, 'publicPages'), where('store_id', '==', currentStoreId), orderBy('createdAt', 'desc'));
+  }, [firestore, currentStoreId]);
 
   const { data: pages, isLoading: isLoadingPages, error } = useCollection<PublicPage>(pagesQuery);
 
@@ -160,5 +163,3 @@ export default function ManageWebPages() {
     </div>
   );
 }
-
-    

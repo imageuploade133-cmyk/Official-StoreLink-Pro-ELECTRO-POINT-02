@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
@@ -61,8 +62,10 @@ const ITEMS_PER_PAGE = 20;
 
 export default function StockAuditPage() {
   const firestore = useFirestore();
-  const { permissions, isLoading: isAuthLoading } = useAuth();
+  const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
   const { settings } = useSettings();
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
@@ -80,11 +83,11 @@ export default function StockAuditPage() {
   const lastDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
 
   const fetchAuditLogs = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsLoading(true);
 
     try {
-      let q = query(collection(firestore, 'stockAudit'), orderBy('timestamp', 'desc'));
+      let q = query(collection(firestore, 'stockAudit'), where('store_id', '==', currentStoreId), orderBy('timestamp', 'desc'));
 
       if (typeFilter !== 'all') {
         q = query(q, where('type', '==', typeFilter));
@@ -140,13 +143,13 @@ export default function StockAuditPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [firestore, typeFilter, dateRange]);
+  }, [firestore, typeFilter, dateRange, currentStoreId]);
 
   useEffect(() => {
-    if (!isAuthLoading && permissions.view_stock_audit) {
+    if (!isAuthLoading && permissions.view_stock_audit && currentStoreId) {
       fetchAuditLogs('initial');
     }
-  }, [isAuthLoading, permissions.view_stock_audit, typeFilter, dateRange, fetchAuditLogs]);
+  }, [isAuthLoading, permissions.view_stock_audit, typeFilter, dateRange, fetchAuditLogs, currentStoreId]);
 
   const filteredLogs = useMemo(() => {
     if (!searchTerm.trim()) return auditLogs;
