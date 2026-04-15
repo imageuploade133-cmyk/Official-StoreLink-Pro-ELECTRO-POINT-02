@@ -24,9 +24,17 @@ service cloud.firestore {
     // --- ENFORCE STORE ISOLATION (Point 1) ---
     // General check that can be used across collections
     function hasStoreAccess(roles) {
+      let storeId = (resource == null ? request.resource.data.store_id : resource.data.store_id);
+
       return isSignedIn() && (
-        request.auth.uid == (resource == null ? request.resource.data.store_id : resource.data.store_id) ||
-        (isStaffWithOneOfRoles(roles) && request.auth.uid == (resource == null ? request.resource.data.store_id : resource.data.store_id))
+        // Owner of the store
+        storeId == request.auth.uid ||
+
+        // Staff belongs to store
+        (
+          isStaffWithOneOfRoles(roles) &&
+          get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.store_id == storeId
+        )
       );
     }
 
