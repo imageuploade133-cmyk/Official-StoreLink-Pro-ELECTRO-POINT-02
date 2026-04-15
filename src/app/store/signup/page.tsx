@@ -86,7 +86,7 @@ export default function StoreSignupPage() {
     const auth = useAuth();
     const firestore = useFirestore();
     const router = useRouter();
-    const { user, isLoading: isUserLoading } = useUser();
+    const { user, store, staffMember, isCustomer, isLoading: isAuthLoading } = useAuth();
     const { settings, isLoading: isLoadingSettings } = useSettings();
     
     const form = useForm<SignupFormValues>({
@@ -105,10 +105,14 @@ export default function StoreSignupPage() {
     const loginImage = settings?.loginImageUrl || loginImagePlaceholder.src;
 
     useEffect(() => {
-        if (!isUserLoading && user && !isCongratulationOpen) {
-          router.replace('/store/account');
+        if (!isAuthLoading && user && !isCongratulationOpen) {
+          if (store || staffMember) {
+            router.replace('/dashboard');
+          } else {
+            router.replace('/store/account');
+          }
         }
-    }, [user, isUserLoading, router, isCongratulationOpen]);
+    }, [user, isAuthLoading, store, staffMember, router, isCongratulationOpen]);
 
     const onSubmit = async (values: SignupFormValues) => {
         if (!firestore) return;
@@ -272,7 +276,7 @@ export default function StoreSignupPage() {
         );
     };
 
-    if (isUserLoading || isLoadingSettings) {
+    if (isAuthLoading || isLoadingSettings) {
         return <PageSpinner label="Create Account" subLabel="Setting up registration…" />;
     }
 

@@ -134,11 +134,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { permissions: defaultPermissions, isAdmin: false, roleId: null };
     }
     
-    // If the user is found in the customers collection, they are strictly NOT staff/admin
-    if (isCustomer) {
-        return { permissions: defaultPermissions, isAdmin: false, roleId: 'customer' };
-    }
-
     // NEW LOGIC: Check if user is a Store Owner
     if (store) {
         const allPerms = { ...defaultPermissions };
@@ -163,6 +158,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAdmin: isRoleAdmin,
         roleId: staffMember.role,
       };
+    }
+
+    // If the user is found in the customers collection and not staff/owner
+    if (isCustomer) {
+        return { permissions: defaultPermissions, isAdmin: false, roleId: 'customer' };
     }
 
     return { permissions: defaultPermissions, isAdmin: false, roleId: null };

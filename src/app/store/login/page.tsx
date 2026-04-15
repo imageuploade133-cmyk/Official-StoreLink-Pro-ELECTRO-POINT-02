@@ -21,7 +21,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { useAuth, useUser } from "@/firebase";
+import { useAuth as useFirebaseAuth, useUser } from "@/firebase";
+import { useAuth } from "@/contexts/auth-context";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword, sendPasswordResetEmail, AuthError } from "firebase/auth";
 import { useSettings } from "@/contexts/settings-context";
@@ -37,9 +38,9 @@ export default function StoreLoginPage() {
     const [isForgotPassOpen, setIsForgotPassOpen] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    const auth = useAuth();
+    const auth = useFirebaseAuth();
     const router = useRouter();
-    const { user, isLoading: isUserLoading } = useUser();
+    const { user, store, staffMember, isCustomer, isLoading: isAuthLoading } = useAuth();
     const { settings, isLoading: isLoadingSettings } = useSettings();
 
     const storeName = settings?.storeName || 'Welcome';
@@ -50,10 +51,17 @@ export default function StoreLoginPage() {
 
     useEffect(() => {
         // Handle redirect reactively based on auth state
-        if (!isUserLoading && user) {
-          router.replace('/store/account');
+        if (!isAuthLoading && user) {
+          if (isCustomer) {
+            router.replace('/store/account');
+          } else if (store || staffMember) {
+            router.replace('/dashboard');
+          } else {
+            // Probably a new merchant
+            router.replace('/signup-merchant');
+          }
         }
-    }, [user, isUserLoading, router]);
+    }, [user, isAuthLoading, isCustomer, store, staffMember, router]);
 
     const handleLogin = (e: FormEvent) => {
         e.preventDefault();
@@ -130,7 +138,7 @@ export default function StoreLoginPage() {
         };
     }, [settings]);
 
-    if (isUserLoading || isLoadingSettings) {
+    if (isAuthLoading || isLoadingSettings) {
         return <PageSpinner label="Welcome Back" subLabel="Loading your store experience…" />;
     }
 

@@ -21,7 +21,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { useAuth as useFirebaseAuthInstance, useUser, useFirestore } from "@/firebase";
+import { useAuth as useFirebaseAuthInstance, useFirestore } from "@/firebase";
+import { useAuth } from "@/contexts/auth-context";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword, sendPasswordResetEmail, AuthError, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
@@ -41,30 +42,19 @@ export default function AdminLoginPage() {
     const auth = useFirebaseAuthInstance();
     const firestore = useFirestore();
     const router = useRouter();
-    const { user, isLoading: isUserLoading } = useUser();
+    const { user, store, staffMember, isCustomer, isLoading: isAuthLoading } = useAuth();
 
     useEffect(() => {
-        const checkForRedirect = async () => {
-          if (!isUserLoading && user && firestore) {
-            // Direct lookup by ID is faster and more secure for UID-based records
-            const customerRef = doc(firestore, "customers", user.uid);
-            const customerSnap = await getDoc(customerRef);
-            
-            if(!customerSnap.exists()) {
-                router.replace('/dashboard');
-            } else {
-                // If a customer tries to access the admin portal, sign them out
-                await signOut(auth);
-                toast({
-                    variant: "destructive",
-                    title: "Access Denied",
-                    description: "This portal is for authorized staff only.",
-                });
-            }
+        if (!isAuthLoading && user) {
+          if (store || staffMember) {
+            router.replace('/dashboard');
+          } else if (isCustomer) {
+            router.replace('/store/account');
+          } else {
+            router.replace('/signup-merchant');
           }
-        };
-        checkForRedirect();
-    }, [user, isUserLoading, router, firestore, auth, toast]);
+        }
+    }, [user, isAuthLoading, store, staffMember, isCustomer, router]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -123,7 +113,7 @@ export default function AdminLoginPage() {
             });
     }
 
-    if (isUserLoading) {
+    if (isAuthLoading) {
         return <PageSpinner label="Staff Portal" subLabel="Verifying your credentials…" />;
     }
 

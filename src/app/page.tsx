@@ -27,10 +27,10 @@ export default function HomePage() {
   useEffect(() => {
     if (!isLoading) {
       if (user) {
-        if (isCustomer) {
-          router.replace('/store');
-        } else if (store || staffMember) {
+        if (store || staffMember) {
           router.replace('/dashboard');
+        } else if (isCustomer) {
+          router.replace('/store/account');
         } else {
           // Logged in but no recognized role, could be a new merchant
           router.replace('/signup-merchant');
