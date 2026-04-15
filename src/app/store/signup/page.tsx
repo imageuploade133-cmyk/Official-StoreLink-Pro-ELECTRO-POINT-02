@@ -155,6 +155,7 @@ export default function StoreSignupPage() {
                 allowSms: true,
                 allowWhatsapp: true,
                 branchId: null,
+                store_id: settings?.store_id || 'global',
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp(),
             });
@@ -170,7 +171,8 @@ export default function StoreSignupPage() {
                     notes: 'Welcome Bonus - Automated Registry Credit',
                     staffId: 'SYSTEM',
                     isDeposit: true,
-                    creditAdded: welcomeCreditAmount
+                    creditAdded: welcomeCreditAmount,
+                    store_id: settings?.store_id || 'global'
                 });
             }
 

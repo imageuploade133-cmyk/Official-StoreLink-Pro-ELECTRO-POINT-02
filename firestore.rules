@@ -3,51 +3,143 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // --- Core Authentication Helpers ---
+    
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /* ===============================
-       PUBLIC READ COLLECTIONS
-    =============================== */
+    // Get current user's staff record to find their assigned store identifier
+    function getStaffStoreId(data) {
+      return data.store_id != null ? data.store_id : data.storeId;
+    }
 
-    match /products/{document=**} {
+    // Check if the user is the owner of a specific store
+    function isStoreOwner(storeId) {
+      return isSignedIn() && (
+        (exists(/databases/$(database)/documents/stores/$(storeId)) && get(/databases/$(database)/documents/stores/$(storeId)).data.owner_id == request.auth.uid) ||
+        (existsAfter(/databases/$(database)/documents/stores/$(storeId)) && getAfter(/databases/$(database)/documents/stores/$(storeId)).data.owner_id == request.auth.uid)
+      );
+    }
+
+    // Check if the user is a staff member of a specific store
+    function isStoreStaff(storeId) {
+      return isSignedIn() && (
+        (exists(/databases/$(database)/documents/staff/$(request.auth.uid)) && getStaffStoreId(get(/databases/$(database)/documents/staff/$(request.auth.uid)).data) == storeId) ||
+        (existsAfter(/databases/$(database)/documents/staff/$(request.auth.uid)) && getStaffStoreId(getAfter(/databases/$(database)/documents/staff/$(request.auth.uid)).data) == storeId)
+      );
+    }
+
+    // Determine if the user has administrative/managerial access to the store
+    function canManageStore(storeId) {
+      return isStoreOwner(storeId) || isStoreStaff(storeId);
+    }
+
+    // Helper to check store identity in resource or request.resource
+    function hasStoreAccess() {
+      let data = (request.method == 'create') ? request.resource.data : resource.data;
+      let storeId = data.store_id != null ? data.store_id : data.storeId;
+      return storeId != null && canManageStore(storeId);
+    }
+
+    /* ============================================================
+       1. PUBLIC COLLECTIONS (Public Read, Protected Write)
+       ============================================================ */
+
+    match /products/{docId=**} {
       allow read: if true;
-      allow write: if isSignedIn();
+      allow write: if isSignedIn() && hasStoreAccess();
     }
 
-    match /categories/{document=**} {
+    match /categories/{docId=**} {
       allow read: if true;
-      allow write: if isSignedIn();
+      allow write: if isSignedIn() && hasStoreAccess();
     }
 
-    match /publicPages/{document=**} {
+    match /publicPages/{docId=**} {
       allow read: if true;
-      allow write: if isSignedIn();
+      allow write: if isSignedIn() && hasStoreAccess();
     }
 
-    match /slideShows/{document=**} {
+    match /slideShows/{docId=**} {
       allow read: if true;
-      allow write: if isSignedIn();
+      allow write: if isSignedIn() && hasStoreAccess();
     }
 
-    match /homepageSections/{document=**} {
+    match /homepageSections/{docId=**} {
       allow read: if true;
-      allow write: if isSignedIn();
+      allow write: if isSignedIn() && hasStoreAccess();
     }
 
-    /* ✅ ADD THIS */
-    match /settings/{document=**} {
-      allow read: if true;          // public can read settings/global
-      allow write: if isSignedIn(); // only logged-in users can modify
+    match /settings/{storeId} {
+      allow read: if true; 
+      allow write: if isSignedIn() && (storeId == 'global' || canManageStore(storeId) || storeId == request.auth.uid);
     }
 
-    /* ===============================
-       AUTH REQUIRED COLLECTIONS
-    =============================== */
+    /* ============================================================
+       2. USER & STORE MANAGEMENT
+       ============================================================ */
 
-    match /{document=**} {
-      allow read, write: if isSignedIn();
+    match /users/{userId} {
+      allow read, write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    match /stores/{storeId} {
+      allow read: if true;
+      allow create: if isSignedIn() && request.resource.data.owner_id == request.auth.uid;
+      allow update, delete: if isSignedIn() && isStoreOwner(storeId);
+    }
+
+    match /staff/{staffId} {
+      allow read: if isSignedIn() && (
+        request.auth.uid == staffId || 
+        (resource != null && canManageStore(getStaffStoreId(resource.data)))
+      );
+      allow write: if isSignedIn() && (
+        request.auth.uid == staffId || 
+        (request.method == 'create' && (request.auth.uid == staffId || canManageStore(getStaffStoreId(request.resource.data)))) ||
+        (request.method != 'create' && canManageStore(getStaffStoreId(resource.data)))
+      );
+    }
+
+    /* ============================================================
+       3. PRIVATE BUSINESS DATA (Strictly Isolated by Store)
+       ============================================================ */
+    
+    match /{collectionName}/{docId} {
+      allow read: if isSignedIn() && (
+        (resource != null && (resource.data.store_id != null || resource.data.storeId != null) && canManageStore(getStaffStoreId(resource.data))) ||
+        (resource != null && resource.data.uid == request.auth.uid) ||
+        (resource != null && resource.data.customerId == request.auth.uid) ||
+        (collectionName == 'analytics')
+      );
+      
+      allow write: if isSignedIn() && (
+        (request.method == 'create' && (
+          (request.resource.data.store_id != null || request.resource.data.storeId != null) && canManageStore(getStaffStoreId(request.resource.data)) ||
+          (request.resource.data.uid == request.auth.uid) || 
+          (collectionName == 'customers' && docId == request.auth.uid) ||
+          (collectionName == 'orders') ||
+          (collectionName == 'analytics')
+        )) ||
+        (request.method != 'create' && (
+          (resource != null && (resource.data.store_id != null || resource.data.storeId != null) && canManageStore(getStaffStoreId(resource.data))) ||
+          (resource != null && resource.data.uid == request.auth.uid)
+        ))
+      );
+
+      // Recursive match for subcollections
+      match /{allSubcollections=**} {
+         allow read: if isSignedIn() && (
+           (getStaffStoreId(get(/databases/$(database)/documents/$(collectionName)/$(docId)).data) != null && 
+            canManageStore(getStaffStoreId(get(/databases/$(database)/documents/$(collectionName)/$(docId)).data))) ||
+           (get(/databases/$(database)/documents/$(collectionName)/$(docId)).data.uid == request.auth.uid)
+         );
+         allow write: if isSignedIn() && (
+           (getStaffStoreId(get(/databases/$(database)/documents/$(collectionName)/$(docId)).data) != null && 
+            canManageStore(getStaffStoreId(get(/databases/$(database)/documents/$(collectionName)/$(docId)).data)))
+         );
+      }
     }
 
   }
