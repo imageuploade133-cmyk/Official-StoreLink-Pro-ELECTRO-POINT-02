@@ -243,7 +243,7 @@ export default function DashboardLayout({
         router.replace('/login');
       } else if (isCustomer) {
         // Explicitly block customers from the dashboard
-        router.replace('/store');
+        router.replace('/store/account');
       } else if (!store && !staffMember && pathname !== '/signup-merchant') {
         // No store or staff record yet, redirect to store creation
         router.replace('/signup-merchant');
