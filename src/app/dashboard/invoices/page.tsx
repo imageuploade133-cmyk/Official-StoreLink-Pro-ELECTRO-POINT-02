@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
@@ -55,9 +56,11 @@ const ITEMS_PER_PAGE = 15;
 export default function ManageInvoicesPage() {
   const firestore = useFirestore();
   const { settings } = useSettings();
-  const { permissions, isLoading: isAuthLoading } = useAuth();
+  const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
   const { toast } = useToast();
   const currencySymbol = settings?.currency || '$';
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -77,11 +80,11 @@ export default function ManageInvoicesPage() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchInvoices = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsLoading(true);
 
     try {
-      let q = query(collection(firestore, 'invoices'), orderBy('createdAt', 'desc'));
+      let q = query(collection(firestore, 'invoices'), where('store_id', '==', currentStoreId), orderBy('createdAt', 'desc'));
 
       if (statusFilter !== 'all') {
         q = query(q, where('status', '==', statusFilter));
@@ -132,11 +135,13 @@ export default function ManageInvoicesPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [firestore, statusFilter, toast]);
+  }, [firestore, currentStoreId, statusFilter, toast]);
 
   useEffect(() => {
-    fetchInvoices('initial');
-  }, [fetchInvoices]);
+    if (currentStoreId) {
+      fetchInvoices('initial');
+    }
+  }, [fetchInvoices, currentStoreId]);
 
   const handleDelete = async () => {
     if (!invoiceToDelete || !firestore) return;

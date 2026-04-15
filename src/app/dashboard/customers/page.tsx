@@ -18,6 +18,7 @@ import {
   startAfter,
   endBefore,
   limitToLast,
+  where,
   getCountFromServer,
   type QueryDocumentSnapshot,
   type DocumentData
@@ -92,6 +93,11 @@ import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/e
 const ITEMS_PER_PAGE = 10;
 
 export default function CustomersPage() {
+  const { user: authUser, permissions, isLoading: authLoading, store, staffMember } = useAuth();
+  const firestore = useFirestore();
+  const { settings } = useSettings();
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
+
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -114,12 +120,8 @@ export default function CustomersPage() {
   const [activeTab, setActiveTab] = useState('customers');
 
   const { toast } = useToast();
-  const { settings } = useSettings();
   const currencySymbol = settings?.currency || '$';
   const defaultProfileImageUrl = settings?.defaultProfileImageUrl || 'https://placehold.co/400x400.png';
-
-  const { user: authUser, permissions, isLoading: authLoading } = useAuth();
-  const firestore = useFirestore();
 
   // Pagination State
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -133,11 +135,11 @@ export default function CustomersPage() {
   const lastDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
 
   const fetchCustomers = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsLoadingCustomers(true);
 
     try {
-      let q = query(collection(firestore, 'customers'), orderBy('name', 'asc'));
+      let q = query(collection(firestore, 'customers'), where('store_id', '==', currentStoreId), orderBy('name', 'asc'));
 
       // Initial count (Cost Efficient)
       if (direction === 'initial') {
@@ -174,7 +176,7 @@ export default function CustomersPage() {
         
         if (direction === 'next') setCurrentPage(p => p + 1);
         else if (direction === 'prev') setCurrentPage(p => Math.max(1, p - 1));
-        else setPage(1);
+        else setCurrentPage(1);
       } else {
         if (direction === 'initial') {
           setCustomers([]);
@@ -189,21 +191,16 @@ export default function CustomersPage() {
     } finally {
       setIsLoadingCustomers(false);
     }
-  }, [firestore, toast]);
-
-  const setPage = (p: (prev: number) => number | number) => {
-      if (typeof p === 'function') setCurrentPage(p);
-      else setCurrentPage(p);
-  }
+  }, [firestore, currentStoreId, toast]);
 
   useEffect(() => {
-    if (firestore && !authLoading) {
+    if (firestore && !authLoading && currentStoreId) {
       fetchCustomers('initial');
     }
-  }, [firestore, authLoading, fetchCustomers]);
+  }, [firestore, authLoading, currentStoreId, fetchCustomers]);
 
   const handleSaveCustomer = async (values: Omit<Customer, 'id' | 'createdAt' | 'updatedAt' | 'totalSpent' | 'outstandingCredit' | 'status' | 'branchId'>) => {
-    if (!authUser?.uid || !authUser.email || !firestore) {
+    if (!authUser?.uid || !authUser.email || !firestore || !currentStoreId) {
         toast({ variant: "destructive", title: "Authentication Error", description: "You must be logged in to save customers." });
         return;
     }
@@ -241,6 +238,7 @@ export default function CustomersPage() {
         } else { // CREATE
             const newCustomerData = {
                 ...values,
+                store_id: currentStoreId,
                 branchId: null,
                 totalSpent: 0, outstandingCredit: 0, creditBalance: 0,
                 createdAt: serverTimestamp(), updatedAt: serverTimestamp(),

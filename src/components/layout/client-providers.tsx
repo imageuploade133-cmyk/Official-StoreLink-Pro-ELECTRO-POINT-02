@@ -15,8 +15,8 @@ export function ClientProviders({ children }: { children: React.ReactNode }) {
   return (
     <FirebaseClientProvider>
       <ThemeContextProvider>
-        <SettingsProvider>
-          <AuthProvider>
+        <AuthProvider>
+          <SettingsProvider>
               <GlobalLoadingProvider>
                 <AdProvider>
                 <CartProvider>
@@ -28,8 +28,8 @@ export function ClientProviders({ children }: { children: React.ReactNode }) {
                 </CartProvider>
                 </AdProvider>
               </GlobalLoadingProvider>
-          </AuthProvider>
-        </SettingsProvider>
+          </SettingsProvider>
+        </AuthProvider>
       </ThemeContextProvider>
     </FirebaseClientProvider>
   );

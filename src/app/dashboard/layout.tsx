@@ -96,7 +96,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, permissions, isLoading, isCustomer } = useAuth();
+  const { user, permissions, isLoading, isCustomer, store, staffMember } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [isMinimized, setIsMinimized] = useState(false);
@@ -105,9 +105,12 @@ export default function DashboardLayout({
 
   const firestore = useFirestore();
   const pendingOrdersQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'orders'), where('status', '==', 'pending'));
-  }, [firestore]);
+    if (!firestore || !user) return null;
+    // Only fetch for the user's store
+    const storeId = staffMember?.store_id || store?.id;
+    if (!storeId) return null;
+    return query(collection(firestore, 'orders'), where('store_id', '==', storeId), where('status', '==', 'pending'));
+  }, [firestore, user, staffMember, store]);
   const { data: pendingOrders } = useCollection<Order>(pendingOrdersQuery);
   const pendingCount = pendingOrders?.length || 0;
 
@@ -241,11 +244,14 @@ export default function DashboardLayout({
       } else if (isCustomer) {
         // Explicitly block customers from the dashboard
         router.replace('/store');
+      } else if (!store && !staffMember && pathname !== '/signup-merchant') {
+        // No store or staff record yet, redirect to store creation
+        router.replace('/signup-merchant');
       }
     }
-  }, [user, isLoading, isCustomer, router]);
+  }, [user, isLoading, isCustomer, store, staffMember, router, pathname]);
 
-  if (isLoading || !user || isCustomer) {
+  if (isLoading || !user || isCustomer || (!store && !staffMember)) {
     return <PageSpinner label="StoreLink Pro" subLabel="Authenticating your account…" />;
   }
 

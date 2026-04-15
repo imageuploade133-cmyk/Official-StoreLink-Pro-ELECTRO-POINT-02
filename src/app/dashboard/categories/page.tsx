@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
@@ -15,6 +16,7 @@ import {
   startAfter,
   endBefore,
   limitToLast,
+  where,
   getCountFromServer,
   type QueryDocumentSnapshot,
   type DocumentData
@@ -105,7 +107,9 @@ export default function CategoriesPage() {
     // --- Hooks ---
     const { toast } = useToast();
     const firestore = useFirestore();
-    const { user, permissions, isLoading: authLoading } = useAuth();
+    const { user, permissions, isLoading: authLoading, store, staffMember } = useAuth();
+
+    const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
     // Settings
     const settingsRef = useMemo(() => (firestore ? doc(firestore, 'settings', 'global') : null), [firestore]);
@@ -115,11 +119,11 @@ export default function CategoriesPage() {
 
     // Data Fetching Logic (Cost Optimized)
     const fetchCategories = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-        if (!firestore) return;
+        if (!firestore || !currentStoreId) return;
         setIsLoadingCategories(true);
 
         try {
-            let q = query(collection(firestore, 'categories'), orderBy('name', 'asc'));
+            let q = query(collection(firestore, 'categories'), where('store_id', '==', currentStoreId), orderBy('name', 'asc'));
 
             if (direction === 'initial') {
                 const countSnap = await getCountFromServer(q);
@@ -160,13 +164,13 @@ export default function CategoriesPage() {
         } finally {
             setIsLoadingCategories(false);
         }
-    }, [firestore, toast]);
+    }, [firestore, currentStoreId, toast]);
 
     const fetchProducts = useCallback(async () => {
-        if (!firestore) return;
+        if (!firestore || !currentStoreId) return;
         setIsLoadingProducts(true);
         try {
-            const q = query(collection(firestore, 'products'), limit(2000)); // Limit to a large but reasonable batch
+            const q = query(collection(firestore, 'products'), where('store_id', '==', currentStoreId), limit(2000)); // Limit to a large but reasonable batch
             const snapshot = await getDocs(q);
             setAllProducts(snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Product)));
         } catch (e) {
@@ -174,14 +178,14 @@ export default function CategoriesPage() {
         } finally {
             setIsLoadingProducts(false);
         }
-    }, [firestore]);
+    }, [firestore, currentStoreId]);
 
     useEffect(() => {
-        if (firestore) {
+        if (firestore && currentStoreId) {
             fetchCategories('initial');
             fetchProducts();
         }
-    }, [firestore, fetchCategories, fetchProducts]);
+    }, [firestore, currentStoreId, fetchCategories, fetchProducts]);
 
     const categoriesWithProducts = useMemo((): CategoryWithProducts[] => {
         if (!categories) return [];

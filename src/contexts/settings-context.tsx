@@ -4,6 +4,7 @@ import React, { createContext, useContext, useMemo } from 'react';
 import { useFirestore, useDoc } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { Settings } from '@/lib/types';
+import { useAuth } from './auth-context';
 
 interface SettingsContextType {
   settings: Settings | null;
@@ -14,10 +15,17 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const firestore = useFirestore();
+  const { store, staffMember } = useAuth();
+
+  const storeId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const settingsRef = useMemo(
-    () => (firestore ? doc(firestore, 'settings', 'global') : null),
-    [firestore]
+    () => {
+        if (!firestore) return null;
+        if (storeId) return doc(firestore, 'settings', storeId);
+        return doc(firestore, 'settings', 'global');
+    },
+    [firestore, storeId]
   );
 
   const { data: settingsData, isLoading: isLoadingSettings } = useDoc<Settings>(settingsRef);

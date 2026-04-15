@@ -42,11 +42,13 @@ import { RecentTransfers } from '@/components/dashboard/RecentTransfers';
 import { type DateRange } from 'react-day-picker';
 
 export default function DashboardPage() {
-  const { permissions, isLoading: isAuthLoading } = useAuth();
+  const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
   const firestore = useFirestore();
   const { settings, isLoadingSettings } = useSettings();
   const currencySymbol = settings?.currency || '$';
   const globalLowStockThreshold = settings?.lowStockThreshold ?? 10;
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const [allSales, setAllSales] = useState<SaleTransaction[]>([]);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
@@ -66,7 +68,10 @@ export default function DashboardPage() {
   const { data: trafficData, isLoading: isLoadingTraffic } = useDoc<WebsiteTraffic>(trafficRef);
 
   // Online Orders Count
-  const ordersQuery = useMemo(() => (firestore ? collection(firestore, 'orders') : null), [firestore]);
+  const ordersQuery = useMemo(() => {
+    if (!firestore || !currentStoreId) return null;
+    return firestoreQuery(collection(firestore, 'orders'), where('store_id', '==', currentStoreId));
+  }, [firestore, currentStoreId]);
   const { data: ordersData, isLoading: isLoadingOrders } = useCollection<Order>(ordersQuery);
 
   useEffect(() => {
@@ -83,7 +88,7 @@ export default function DashboardPage() {
   }, []);
 
   const fetchAllDashboardData = useCallback(async () => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsLoading(true);
     setGlobalError(null);
 
@@ -92,9 +97,9 @@ export default function DashboardPage() {
       const productsCollectionRef = collection(firestore, 'products');
       const stockTransfersCollectionRef = collection(firestore, 'stockTransfers');
       
-      const salesQuery = firestoreQuery(salesCollectionRef);
-      const productsQuery = firestoreQuery(productsCollectionRef);
-      const stockTransfersQuery = firestoreQuery(stockTransfersCollectionRef);
+      const salesQuery = firestoreQuery(salesCollectionRef, where('store_id', '==', currentStoreId));
+      const productsQuery = firestoreQuery(productsCollectionRef, where('store_id', '==', currentStoreId));
+      const stockTransfersQuery = firestoreQuery(stockTransfersCollectionRef, where('store_id', '==', currentStoreId));
 
       const [salesSnapshot, productsSnapshot, stockTransfersSnapshot] = await Promise.all([
           getDocs(salesQuery),
@@ -150,7 +155,7 @@ export default function DashboardPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [toast, firestore]);
+  }, [toast, firestore, currentStoreId]);
   
   useEffect(() => {
     if(permissions.view_dashboard && firestore) {

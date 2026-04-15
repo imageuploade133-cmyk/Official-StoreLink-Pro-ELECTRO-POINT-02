@@ -42,10 +42,12 @@ import { AdvancedPagination } from '@/components/pagination/AdvancedPagination';
 import { Separator } from '@/components/ui/separator';
 
 export default function StaffManagementPage() {
-  const { user, permissions, isLoading: isAuthLoading } = useAuth();
+  const { user, permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
   const { toast } = useToast();
   const firestore = useFirestore();
   const firebaseAuth = getAuth();
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   // List State
   const [staffList, setStaffList] = useState<StaffMember[]>([]);
@@ -69,11 +71,11 @@ export default function StaffManagementPage() {
   const [isSendingReset, setIsSendingReset] = useState(false);
 
   const fetchStaffData = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore || !user) return;
+    if (!firestore || !user || !currentStoreId) return;
     setIsLoadingData(true);
 
     try {
-      let q = query(collection(firestore, 'staff'), orderBy('name', 'asc'));
+      let q = query(collection(firestore, 'staff'), where('store_id', '==', currentStoreId), orderBy('name', 'asc'));
 
       // 1. Initial count (Cost Efficient)
       if (direction === 'initial') {
@@ -94,6 +96,7 @@ export default function StaffManagementPage() {
       const docs = snapshot.docs;
 
       if (docs.length > 0) {
+        // Update refs for next call
         firstDocRef.current = docs[0];
         lastDocRef.current = docs[docs.length - 1];
         setIsLastPage(docs.length < itemsPerPage);
@@ -108,6 +111,7 @@ export default function StaffManagementPage() {
             // Split into chunks of 30 if needed (Firestore IN limit), but here we only have 10
             const salesQuery = query(
                 collection(firestore, 'saleTransactions'),
+                where('store_id', '==', currentStoreId),
                 where('staffId', 'in', staffUids)
             );
             const salesSnapshot = await getDocs(salesQuery);
@@ -155,13 +159,13 @@ export default function StaffManagementPage() {
     } finally {
       setIsLoadingData(false);
     }
-  }, [firestore, user, toast, itemsPerPage]);
+  }, [firestore, user, currentStoreId, toast, itemsPerPage]);
 
   useEffect(() => {
-    if (!isAuthLoading && permissions.manage_staff) {
+    if (!isAuthLoading && permissions.manage_staff && currentStoreId) {
       fetchStaffData('initial');
     }
-  }, [isAuthLoading, permissions.manage_staff, fetchStaffData]);
+  }, [isAuthLoading, permissions.manage_staff, currentStoreId, fetchStaffData]);
 
   const handleOpenActions = (staff: StaffMember) => {
     setSelectedStaffForActions(staff);
@@ -179,7 +183,7 @@ export default function StaffManagementPage() {
   };
 
   const handleSaveStaff = async (values: any, existingStaff?: StaffMember | null) => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsSubmitting(true);
     try {
         if (existingStaff) {
@@ -193,14 +197,19 @@ export default function StaffManagementPage() {
                 permissions: {
                     pages: values.pages || [],
                 },
+                updatedAt: serverTimestamp(),
             };
             await setDoc(staffRef, staffDataToUpdate, { merge: true });
             toast({ title: 'Success', description: 'Staff member updated successfully.' });
         } else {
-            const staffQuery = query(collection(firestore, "staff"), where("email", "==", values.email));
+            const staffQuery = query(
+                collection(firestore, "staff"), 
+                where("store_id", "==", currentStoreId),
+                where("email", "==", values.email)
+            );
             const existingStaffSnap = await getDocs(staffQuery);
             if (!existingStaffSnap.empty) {
-                throw new Error("A staff profile with this email already exists.");
+                throw new Error("A staff profile with this email already exists in this store.");
             }
 
             const userCredential = await createUserWithEmailAndPassword(firebaseAuth, values.email, values.password);
@@ -211,6 +220,7 @@ export default function StaffManagementPage() {
             const staffRef = doc(firestore, 'staff', newFirebaseUser.uid);
             const staffDataToCreate: Omit<StaffMember, 'id'> = {
                 uid: newFirebaseUser.uid,
+                store_id: currentStoreId,
                 name: values.name,
                 email: values.email,
                 phone: values.phone,
@@ -219,6 +229,8 @@ export default function StaffManagementPage() {
                 permissions: {
                     pages: values.pages || [],
                 },
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
             };
             batch.set(staffRef, staffDataToCreate);
             
@@ -228,6 +240,7 @@ export default function StaffManagementPage() {
                 email: values.email,
                 displayName: values.name,
                 photoURL: '',
+                createdAt: serverTimestamp(),
             };
             batch.set(userProfileRef, userProfileData);
 
@@ -328,9 +341,9 @@ export default function StaffManagementPage() {
               itemsPerPage={itemsPerPage}
               totalItems={totalStaffCount}
               onPageChange={(page) => {
-                setCurrentPage(page);
                 if (page > currentPage) fetchStaffData('next');
                 else if (page < currentPage) fetchStaffData('prev');
+                setCurrentPage(page);
               }}
               onItemsPerPageChange={handleItemsPerPageChange}
               isLoading={isLoadingData}
@@ -359,7 +372,7 @@ export default function StaffManagementPage() {
             <Button variant="outline" className="justify-start h-11" onClick={() => {handleEditStaff(selectedStaffForActions); setIsActionModalOpen(false)}}>
                 <Edit className="mr-2 h-4 w-4" /> Edit Permissions
             </Button>
-             <Button variant="outline" className="justify-start h-11" onClick={() => {handlePasswordReset(selectedStaffForActions); setIsActionModalOpen(false)}} disabled={isSendingReset}>
+            <Button variant="outline" className="justify-start h-11" onClick={() => {handlePasswordReset(selectedStaffForActions); setIsActionModalOpen(false)}} disabled={isSendingReset}>
                 {isSendingReset ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <KeyRound className="mr-2 h-4 w-4" />}
                 Reset Password
             </Button>
