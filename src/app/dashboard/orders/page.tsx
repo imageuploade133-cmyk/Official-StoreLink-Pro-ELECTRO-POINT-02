@@ -56,7 +56,9 @@ import {
   ChevronDown,
   ChevronUp,
   History,
-  ClipboardList
+  ClipboardList,
+  Phone,
+  Store
 } from 'lucide-react';
 import { format, startOfDay, endOfDay } from 'date-fns';
 import { formatCurrency } from '@/lib/formatUtils';
@@ -73,11 +75,13 @@ import { OrderAuditTab } from '@/components/orders/OrderAuditTab';
 const ITEMS_PER_PAGE = 15;
 
 export default function WebsiteOrdersPage() {
-  const { permissions, isLoading: isAuthLoading, user } = useAuth();
+  const { permissions, isLoading: isAuthLoading, user, store, staffMember } = useAuth();
   const { settings } = useSettings();
   const firestore = useFirestore();
   const { toast } = useToast();
   const currencySymbol = settings?.currency || '$';
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const [activeMainTab, setActiveMainTab] = useState('registry');
   const [orders, setOrders] = useState<Order[]>([]);
@@ -106,21 +110,22 @@ export default function WebsiteOrdersPage() {
   const [isLastPage, setIsLastPage] = useState(false);
 
   const fetchAnalytics = useCallback(async () => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsLoadingAnalytics(true);
     try {
       const ordersCol = collection(firestore, 'orders');
+      const storeOrdersQuery = query(ordersCol, where('store_id', '==', currentStoreId));
       const todayStart = startOfDay(new Date());
       const todayEnd = endOfDay(new Date());
 
       const [totalCountSnap, cancelledCountSnap] = await Promise.all([
-        getCountFromServer(ordersCol),
-        getCountFromServer(query(ordersCol, where('status', '==', 'cancelled')))
+        getCountFromServer(storeOrdersQuery),
+        getCountFromServer(query(storeOrdersQuery, where('status', '==', 'cancelled')))
       ]);
 
       const [todaySnap, allActiveSnap] = await Promise.all([
-        getDocs(query(ordersCol, where('createdAt', '>=', todayStart), where('createdAt', '<=', todayEnd))),
-        getDocs(query(ordersCol, where('status', '!=', 'cancelled'), limit(500)))
+        getDocs(query(storeOrdersQuery, where('createdAt', '>=', todayStart), where('createdAt', '<=', todayEnd))),
+        getDocs(query(storeOrdersQuery, where('status', '!=', 'cancelled'), limit(500)))
       ]);
 
       let todayInc = 0;
@@ -150,14 +155,14 @@ export default function WebsiteOrdersPage() {
     } finally {
       setIsLoadingAnalytics(false);
     }
-  }, [firestore]);
+  }, [firestore, currentStoreId]);
 
   const fetchOrders = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsLoadingOrders(true);
 
     try {
-      let q = query(collection(firestore, 'orders'), orderBy('createdAt', 'desc'));
+      let q = query(collection(firestore, 'orders'), where('store_id', '==', currentStoreId), orderBy('createdAt', 'desc'));
 
       if (statusFilter !== 'all') {
         q = query(q, where('status', '==', statusFilter));
@@ -200,19 +205,19 @@ export default function WebsiteOrdersPage() {
     } finally {
       setIsLoadingOrders(false);
     }
-  }, [firestore, statusFilter, firstDoc, lastDoc, toast]);
+  }, [firestore, currentStoreId, statusFilter, firstDoc, lastDoc, toast]);
 
   useEffect(() => {
-    if (!isAuthLoading && permissions.manage_orders) {
+    if (!isAuthLoading && permissions.manage_orders && currentStoreId) {
       fetchOrders('initial');
       fetchAnalytics();
     }
-  }, [isAuthLoading, permissions.manage_orders, statusFilter]);
+  }, [isAuthLoading, permissions.manage_orders, statusFilter, currentStoreId, fetchOrders, fetchAnalytics]);
 
   const productsQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'products'));
-  }, [firestore]);
+    if (!firestore || !currentStoreId) return null;
+    return query(collection(firestore, 'products'), where('store_id', '==', currentStoreId));
+  }, [firestore, currentStoreId]);
   const { data: products } = useCollection<Product>(productsQuery);
 
   const productMap = useMemo(() => {
@@ -250,7 +255,8 @@ export default function WebsiteOrdersPage() {
         timestamp: serverTimestamp(),
         staffId: user.uid,
         staffName: user.displayName || 'Authorized Agent',
-        staffEmail: user.email || 'N/A'
+        staffEmail: user.email || 'N/A',
+        store_id: currentStoreId
       });
 
       toast({ title: "Status Updated", description: `Order #${orderId.substring(0, 8)} is now ${newStatus}.` });
@@ -428,11 +434,11 @@ export default function WebsiteOrdersPage() {
                     <TableBody>
                       {isLoadingOrders ? (
                         [...Array(5)].map((_, i) => (
-                          <TableRow key={i}><TableCell colSpan={7} className="py-4"><Skeleton className="h-10 w-full" /></TableCell></TableRow>
+                          <TableRow key={i}><TableCell colSpan={8} className="py-4"><Skeleton className="h-10 w-full" /></TableCell></TableRow>
                         ))
                       ) : filteredOrders.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={7} className="h-48 text-center text-muted-foreground">
+                          <TableCell colSpan={8} className="h-48 text-center text-muted-foreground">
                             <div className="flex flex-col items-center gap-2">
                               <ShoppingBasket className="h-12 w-12 opacity-10" />
                               <p className="font-bold">No orders found.</p>

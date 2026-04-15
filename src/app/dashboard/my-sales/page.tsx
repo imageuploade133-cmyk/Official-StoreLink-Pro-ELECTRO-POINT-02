@@ -86,11 +86,13 @@ const ITEMS_PER_PAGE = 15;
 type SalesTypeFilter = 'all' | 'sales' | 'credit' | 'refunds';
 
 export default function MySalesHistoryPage() {
-  const { user, staffMember, isAdmin, permissions, isLoading: isAuthLoading } = useAuth();
+  const { user, staffMember, store, isAdmin, permissions, isLoading: isAuthLoading } = useAuth();
   const { settings } = useSettings();
   const firestore = useFirestore();
   const { toast } = useToast();
   const currencySymbol = settings?.currency || '$';
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const [sales, setSales] = useState<SaleTransaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -149,13 +151,14 @@ export default function MySalesHistoryPage() {
   }, [user, staffMember, isAdmin]);
 
   const fetchMySales = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore || !user || !dateRange?.from) return;
+    if (!firestore || !user || !dateRange?.from || !currentStoreId) return;
     setIsLoading(true);
     setError(null);
 
     try {
       let q = query(
         collection(firestore, "saleTransactions"),
+        where("store_id", "==", currentStoreId),
         where("staffId", "==", user.uid),
         orderBy("createdAt", "desc")
       );
@@ -207,11 +210,11 @@ export default function MySalesHistoryPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [firestore, user, dateRange, activeTab]);
+  }, [firestore, user, currentStoreId, dateRange, activeTab]);
 
   // Fetch Income Stats (Limited query for dashboard accuracy)
   const fetchIncomeStats = useCallback(async () => {
-    if (!firestore || !user) return;
+    if (!firestore || !user || !currentStoreId) return;
     try {
       const todayStart = startOfDay(new Date());
       const yesterdayStart = startOfDay(subDays(new Date(), 1));
@@ -219,12 +222,14 @@ export default function MySalesHistoryPage() {
 
       const todayQuery = query(
         collection(firestore, "saleTransactions"),
+        where("store_id", "==", currentStoreId),
         where("staffId", "==", user.uid),
         where("createdAt", ">=", todayStart)
       );
 
       const yesterdayQuery = query(
         collection(firestore, "saleTransactions"),
+        where("store_id", "==", currentStoreId),
         where("staffId", "==", user.uid),
         where("createdAt", ">=", yesterdayStart),
         where("createdAt", "<=", yesterdayEnd)
@@ -242,14 +247,14 @@ export default function MySalesHistoryPage() {
     } catch (e) {
       console.error("Income stats error:", e);
     }
-  }, [firestore, user]);
+  }, [firestore, user, currentStoreId]);
 
   useEffect(() => {
-    if (user && !isAuthLoading && dateRange?.from) {
+    if (user && !isAuthLoading && dateRange?.from && currentStoreId) {
       fetchMySales('initial');
       fetchIncomeStats();
     }
-  }, [user, isAuthLoading, dateRange, activeTab, fetchMySales, fetchIncomeStats]);
+  }, [user, isAuthLoading, currentStoreId, dateRange, activeTab, fetchMySales, fetchIncomeStats]);
 
   const filteredItemsForSearch = useMemo(() => {
     if (!searchTerm.trim()) return sales;

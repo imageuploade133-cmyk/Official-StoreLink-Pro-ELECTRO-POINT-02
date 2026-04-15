@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo, Suspense, useRef } from 'react';
@@ -89,9 +90,11 @@ const ITEMS_PER_PAGE = 20;
 
 function SalesHistoryContent() {
   const { settings, isLoading: isLoadingSettings } = useSettings();
-  const { user, staffMember, isLoading: isAuthLoading, isAdmin, permissions } = useAuth();
+  const { user, staffMember, store, isLoading: isAuthLoading, isAdmin, permissions } = useAuth();
   const currencySymbol = settings?.currency || '$';
   const firestore = useFirestore();
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const searchParams = useSearchParams();
   const initialSearchTerm = searchParams.get('search') || '';
@@ -154,12 +157,12 @@ function SalesHistoryContent() {
   const canModify = isAdmin || staffMember?.role === 'manager';
 
   const fetchPeriodAnalytics = useCallback(async (currentRange: DateRange | undefined, tab: SalesFilterTab) => {
-    if (!firestore || !currentRange?.from) return;
+    if (!firestore || !currentRange?.from || !currentStoreId) return;
     setPeriodAnalytics(prev => ({ ...prev, isLoading: true }));
 
     try {
         const salesCol = collection(firestore, "saleTransactions");
-        let q = query(salesCol, orderBy("createdAt", "desc"));
+        let q = query(salesCol, where("store_id", "==", currentStoreId), orderBy("createdAt", "desc"));
 
         if (currentRange.from) q = query(q, where("createdAt", ">=", dfnsStartOfDay(currentRange.from)));
         if (currentRange.to) q = query(q, where("createdAt", "<=", dfnsEndOfDay(currentRange.to)));
@@ -192,10 +195,10 @@ function SalesHistoryContent() {
         console.error("Analytics fetch error:", e);
         setPeriodAnalytics(prev => ({ ...prev, isLoading: false }));
     }
-  }, [firestore]);
+  }, [firestore, currentStoreId]);
 
   const fetchSales = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore || !dateRange?.from || !user) return;
+    if (!firestore || !dateRange?.from || !user || !currentStoreId) return;
     
     setIsLoading(true);
     setError(null);
@@ -203,7 +206,7 @@ function SalesHistoryContent() {
     try {
         // Fetch staff first for mapping (only if map is empty)
         if (staffMap.size === 0) {
-            const staffQuery = query(collection(firestore, "staff"));
+            const staffQuery = query(collection(firestore, "staff"), where("store_id", "==", currentStoreId));
             const staffSnapshot = await getDocs(staffQuery);
             const staffDataMap = new Map<string, StaffMember>();
             staffSnapshot.docs.forEach(doc => {
@@ -217,13 +220,14 @@ function SalesHistoryContent() {
                     id: user.uid, uid: user.uid, name: user.displayName || user.email || 'Admin',
                     email: user.email || 'N/A', role: 'admin', status: 'Active',
                     permissions: { pages: [], branches: [] },
+                    store_id: currentStoreId
                 } as any);
             }
             setStaffMap(staffDataMap);
         }
 
         const salesCol = collection(firestore, "saleTransactions");
-        let q = query(salesCol, orderBy("createdAt", "desc"));
+        let q = query(salesCol, where("store_id", "==", currentStoreId), orderBy("createdAt", "desc"));
 
         // Server-side filtering
         if (dateRange?.from) q = query(q, where("createdAt", ">=", dfnsStartOfDay(dateRange.from)));
@@ -294,14 +298,14 @@ function SalesHistoryContent() {
     } finally {
         setIsLoading(false);
     }
-  }, [firestore, dateRange, user, activeTab, firstDoc, lastDoc, staffMap.size]);
+  }, [firestore, dateRange, user, currentStoreId, activeTab, firstDoc, lastDoc, staffMap.size]);
 
   useEffect(() => {
-    if (user && !isAuthLoading && firestore && dateRange?.from) {
+    if (user && !isAuthLoading && firestore && dateRange?.from && currentStoreId) {
       fetchSales('initial');
       fetchPeriodAnalytics(dateRange, activeTab);
     }
-  }, [user, isAuthLoading, firestore, dateRange, activeTab]);
+  }, [user, isAuthLoading, firestore, currentStoreId, dateRange, activeTab]);
 
   const handlePrevPage = () => fetchSales('prev');
   const handleNextPage = () => fetchSales('next');

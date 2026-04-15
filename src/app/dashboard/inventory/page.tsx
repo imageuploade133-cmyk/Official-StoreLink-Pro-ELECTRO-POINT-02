@@ -33,6 +33,7 @@ import {
   serverTimestamp,
   addDoc,
   getDoc,
+  where,
   type QueryDocumentSnapshot, 
   type DocumentData, 
   getCountFromServer 
@@ -67,11 +68,13 @@ export default function InventoryPage() {
   const [isUpdatingSettings, setIsUpdatingSettings] = useState(false);
 
   const firestore = useFirestore();
-  const { user } = useAuth();
+  const { user, store, staffMember } = useAuth();
   const { toast } = useToast();
   const { settings, isLoadingSettings } = useSettings();
   const currencySymbol = settings?.currency || '$';
   const globalLowStockThreshold = settings?.lowStockThreshold ?? 10;
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   // Pagination State
   const [products, setProducts] = useState<Product[]>([]);
@@ -87,19 +90,19 @@ export default function InventoryPage() {
 
   // Still fetch categories once as they are few and static-ish
   const categoriesQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'categories'), orderBy('name'));
-  }, [firestore]);
+    if (!firestore || !currentStoreId) return null;
+    return query(collection(firestore, 'categories'), where('store_id', '==', currentStoreId), orderBy('name'));
+  }, [firestore, currentStoreId]);
 
   const { data: categoriesData, isLoading: isLoadingCategories } = useCollection<Category>(categoriesQuery);
   const categories = categoriesData || [];
 
   const fetchProducts = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsLoadingProducts(true);
 
     try {
-      let q = query(collection(firestore, 'products'), orderBy('name', 'asc'));
+      let q = query(collection(firestore, 'products'), where('store_id', '==', currentStoreId), orderBy('name', 'asc'));
 
       // 1. Initial count (Cost Efficient)
       if (direction === 'initial') {
@@ -146,13 +149,13 @@ export default function InventoryPage() {
     } finally {
       setIsLoadingProducts(false);
     }
-  }, [firestore, toast, itemsPerPage]);
+  }, [firestore, currentStoreId, toast, itemsPerPage]);
 
   useEffect(() => {
-    if (firestore && !isLoadingSettings) {
+    if (firestore && !isLoadingSettings && currentStoreId) {
       fetchProducts('initial');
     }
-  }, [firestore, isLoadingSettings, fetchProducts]);
+  }, [firestore, isLoadingSettings, currentStoreId, fetchProducts]);
 
   const handleEditProduct = (productId: string) => {
     setIsNavigating(true);
@@ -170,7 +173,7 @@ export default function InventoryPage() {
   };
 
   const confirmDeleteProduct = async () => {
-    if (!selectedProductForActions || !firestore) return;
+    if (!selectedProductForActions || !firestore || !currentStoreId) return;
     setIsDeleting(true);
 
     const batch = writeBatch(firestore);
@@ -187,7 +190,8 @@ export default function InventoryPage() {
       change: -(selectedProductForActions.stock || 0),
       staffId: user?.uid || 'SYSTEM',
       staffName: user?.displayName || user?.email || 'Staff',
-      timestamp: serverTimestamp()
+      timestamp: serverTimestamp(),
+      store_id: currentStoreId
     };
 
     batch.set(auditRef, auditData);
@@ -216,7 +220,7 @@ export default function InventoryPage() {
   };
 
   const handleCloneProduct = async () => {
-    if (!selectedProductForActions || !firestore) return;
+    if (!selectedProductForActions || !firestore || !currentStoreId) return;
     setIsCloning(true);
 
     try {
@@ -238,6 +242,7 @@ export default function InventoryPage() {
         // Update fields that should change
         name: `${originalData.name} (Copy)`,
         stock: 0, // Start with 0 stock
+        store_id: currentStoreId,
         // Preserve timestamps (new ones will be set)
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
@@ -278,7 +283,8 @@ export default function InventoryPage() {
         staffId: user?.uid || 'SYSTEM',
         staffName: user?.displayName || user?.email || 'Staff',
         timestamp: serverTimestamp(),
-        details: `Cloned from product: ${selectedProductForActions.name}`
+        details: `Cloned from product: ${selectedProductForActions.name}`,
+        store_id: currentStoreId
       });
 
       await batch.commit();
@@ -427,9 +433,9 @@ export default function InventoryPage() {
               itemsPerPage={itemsPerPage}
               totalItems={totalProductCount}
               onPageChange={(page) => {
-                setCurrentPage(page);
                 if (page > currentPage) fetchProducts('next');
                 else if (page < currentPage) fetchProducts('prev');
+                setCurrentPage(page);
               }}
               onItemsPerPageChange={handleItemsPerPageChange}
               isLoading={isLoadingProducts}
