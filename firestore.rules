@@ -9,26 +9,32 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return isSignedIn() && (request.auth.token.role == "admin" || exists(/databases/$(database)/documents/staff/$(request.auth.uid)) && get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role == "admin");
+      return isSignedIn() && (
+        request.auth.token.role == "admin" || 
+        (exists(/databases/$(database)/documents/staff/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role == "admin")
+      );
     }
 
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
-    }
-
-    function getStaffRole() {
-        return get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role;
-    }
-    
     function isStaffWithOneOfRoles(roles) {
         return exists(/databases/$(database)/documents/staff/$(request.auth.uid)) 
-               && getStaffRole() in roles;
+               && get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role in roles;
     }
 
-    // Rules for collections that are publicly readable
+    // --- ENFORCE STORE ISOLATION (Point 1) ---
+    // General check that can be used across collections
+    function hasStoreAccess(roles) {
+      return isSignedIn() && (
+        request.auth.uid == (resource == null ? request.resource.data.store_id : resource.data.store_id) ||
+        (isStaffWithOneOfRoles(roles) && request.auth.uid == (resource == null ? request.resource.data.store_id : resource.data.store_id))
+      );
+    }
+
+    // Point 5: PRODUCTS SHOULD BE STORE-BASED
     match /products/{doc} {
       allow read: if true;
-      allow write: if isStaffWithOneOfRoles(['admin', 'manager', 'inventory_manager']) || isAdmin();
+      allow write: if isAdmin()
+        && request.auth.uid == (resource == null ? request.resource.data.store_id : resource.data.store_id);
 
       match /reviews/{reviewId} {
         allow read: if true;
@@ -36,156 +42,157 @@ service cloud.firestore {
       }
     }
 
+    // Point 2: FIX CUSTOMERS COLLECTION
+    match /customers/{doc} {
+      allow read, write: if isSignedIn()
+        && request.auth.uid == (resource == null ? request.resource.data.store_id : resource.data.store_id);
+    }
+
+    // Point 3: SECURE ORDERS CREATION
+    match /orders/{doc} {
+      allow create: if isSignedIn()
+        && request.auth.uid == request.resource.data.user_id
+        && request.resource.data.amount > 0
+        && request.resource.data.store_id != null;
+
+      allow read: if isAdmin() || (isSignedIn() && request.auth.uid == resource.data.user_id);
+
+      allow update: if isAdmin();
+
+      allow delete: if false;
+    }
+
+    // Point 4: VALIDATE TRANSACTIONS STRUCTURE
+    match /transactions/{doc} {
+      allow read: if isAdmin() || (isSignedIn() && request.auth.uid == resource.data.user_id);
+      allow write: if false;
+    }
+
+    // --- OTHER COLLECTIONS APPLYING POINT 1 ---
+
     match /categories/{doc} {
       allow read: if true;
-      allow write: if isStaffWithOneOfRoles(['admin', 'manager', 'inventory_manager']) || isAdmin();
+      allow write: if hasStoreAccess(['admin', 'manager', 'inventory_manager']);
     }
     
     match /publicPages/{pageId} {
       allow read: if true;
-      allow write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+      allow write: if hasStoreAccess(['admin', 'manager']);
     }
 
     match /slideShows/{slideId} {
       allow read: if true;
-      allow write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+      allow write: if hasStoreAccess(['admin', 'manager']);
     }
     
     match /homepageSections/{sectionId} {
       allow read: if true;
-      allow write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+      allow write: if hasStoreAccess(['admin', 'manager']);
     }
     
     match /settings/{doc} {
       allow read: if true;
-      allow write: if isAdmin() || isStaffWithOneOfRoles(['admin']);
+      allow write: if hasStoreAccess(['admin']);
     }
     
     match /users/{userId} {
-      allow read, write: if isOwner(userId) || isAdmin();
+      allow read, write: if (isSignedIn() && request.auth.uid == userId) || isAdmin();
     }
 
     match /users/{userId}/{document=**} {
-      allow read, write: if isOwner(userId) || isAdmin();
+      allow read, write: if (isSignedIn() && request.auth.uid == userId) || isAdmin();
     }
     
     match /staff/{userId} {
-      allow get: if isOwner(userId) || isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
-      allow list: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
-      allow write: if isAdmin() || isStaffWithOneOfRoles(['admin']);
+      allow get: if (isSignedIn() && request.auth.uid == userId) || hasStoreAccess(['admin', 'manager']) || isAdmin();
+      allow list: if hasStoreAccess(['admin', 'manager']) || isAdmin();
+      allow write: if isAdmin() || hasStoreAccess(['admin']);
     }
     
     match /branches/{doc} {
-      allow read: if isSignedIn();
-      allow write: if isAdmin() || isStaffWithOneOfRoles(['admin']);
+      allow read: if isSignedIn() && request.auth.uid == resource.data.store_id;
+      allow write: if hasStoreAccess(['admin']);
     }
     
     match /saleTransactions/{transactionId} {
-      allow get, list: if isSignedIn();
-      allow create: if isSignedIn();
-      allow update: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
-      allow delete: if isAdmin() || isStaffWithOneOfRoles(['admin']);
-    }
-
-    match /customers/{doc} {
-      allow read, write: if isSignedIn();
+      allow get, list: if isSignedIn() && request.auth.uid == resource.data.store_id;
+      allow create: if isSignedIn() && request.auth.uid == request.resource.data.store_id;
+      allow update: if hasStoreAccess(['admin', 'manager']);
+      allow delete: if hasStoreAccess(['admin']);
     }
     
     match /restockEntries/{doc} {
-      allow read: if isStaffWithOneOfRoles(['admin', 'manager', 'inventory_manager']) || isAdmin();
-      allow create: if isSignedIn();
+      allow read: if hasStoreAccess(['admin', 'manager', 'inventory_manager']);
+      allow create: if isSignedIn() && request.auth.uid == request.resource.data.store_id;
     }
 
     match /heldSales/{saleId} {
-      allow read, write: if isSignedIn();
+      allow read, write: if isSignedIn() && request.auth.uid == (resource == null ? request.resource.data.store_id : resource.data.store_id);
     }
 
     match /creditPayments/{paymentId} {
-      allow get, list: if isSignedIn();
-      allow create: if isSignedIn();
-      allow write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+      allow get, list: if isSignedIn() && request.auth.uid == resource.data.store_id;
+      allow create: if isSignedIn() && request.auth.uid == request.resource.data.store_id;
+      allow write: if hasStoreAccess(['admin', 'manager']);
     }
 
     match /customerHistory/{doc} {
-      allow read, create: if isSignedIn();
+      allow read, create: if isSignedIn() && request.auth.uid == (resource == null ? request.resource.data.store_id : resource.data.store_id);
       allow update, delete: if false;
     }
     
     match /expenses/{expenseId} {
-      allow read, create: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
-      allow update, delete: if isAdmin() || isStaffWithOneOfRoles(['admin']);
+      allow read, create: if hasStoreAccess(['admin', 'manager']);
+      allow update, delete: if hasStoreAccess(['admin']);
     }
 
     match /reversals/{reversalId} {
-      allow read, create: if isAdmin() || isStaffWithOneOfRoles(['admin']);
+      allow read, create: if hasStoreAccess(['admin']);
       allow update, delete: if false;
     }
     
     match /stockTransfers/{transferId} {
-        allow read, write: if isStaffWithOneOfRoles(['admin', 'manager', 'inventory_manager']) || isAdmin();
+        allow read, write: if hasStoreAccess(['admin', 'manager', 'inventory_manager']);
     }
 
     match /whatsappMessageLogs/{logId} {
-        allow read, write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+        allow read, write: if hasStoreAccess(['admin', 'manager']);
     }
 
     match /adLinks/{adId} {
         allow read: if true;
-        allow write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+        allow write: if hasStoreAccess(['admin', 'manager']);
     }
 
-    // 1. Payment Providers (Admin Only)
     match /payment_providers/{doc} {
-      allow read: if isSignedIn();
-      allow write: if isAdmin();
-    }
-
-    // 2. Transactions (Backend Only)
-    match /transactions/{doc} {
-      allow read: if isAdmin() || (isSignedIn() && request.auth.uid == resource.data.user_id);
-      // Only backend (server) should write transactions
-      allow write: if false;
-    }
-
-    // 3. Orders
-    match /orders/{doc} {
-      // User can read their own orders, Admin can read all
-      allow read: if isAdmin() || (isSignedIn() && request.auth.uid == resource.data.user_id);
-      // User can create order
-      allow create: if isSignedIn();
-      // Only backend/admin can update order status (paid, failed)
-      allow update: if isAdmin();
-      // No delete
-      allow delete: if false;
+      allow read: if isSignedIn() && request.auth.uid == resource.data.store_id;
+      allow write: if isAdmin() && request.auth.uid == (resource == null ? request.resource.data.store_id : resource.data.store_id);
     }
 
     match /coupons/{doc} {
       allow read: if true;
-      allow write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+      allow write: if hasStoreAccess(['admin', 'manager']);
     }
 
     match /flash_sales/{doc} {
       allow read: if true;
-      allow write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+      allow write: if hasStoreAccess(['admin', 'manager']);
     }
 
     match /invoices/{doc} {
-      allow read, write: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
+      allow read, write: if hasStoreAccess(['admin', 'manager']);
     }
 
     match /websiteTraffic/{doc} {
       allow read: if true;
-      allow write: if false; // Should be handled by backend
+      allow write: if false;
     }
 
     match /stockAuditEntries/{doc} {
-      allow read: if isStaffWithOneOfRoles(['admin', 'manager']) || isAdmin();
-      allow write: if false; // Should be handled by backend
+      allow read: if hasStoreAccess(['admin', 'manager']);
+      allow write: if false;
     }
     
-    /* =====================================================================
-       FALLBACK SECURITY LOCK
-    ===================================================================== */
     match /{document=**} {
       allow read, write: if false;
     }
