@@ -918,7 +918,7 @@ export interface WishlistItem {
   addedAt: Timestamp;
 }
 
-export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'paid' | 'failed';
 
 export interface Order {
   id: string;
