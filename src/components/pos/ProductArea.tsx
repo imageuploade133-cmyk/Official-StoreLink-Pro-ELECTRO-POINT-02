@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useFirestore } from '@/firebase';
+import { errorEmitter } from '@/firebase/error-emitter';
 import { collection, getDocs, query as firestoreQuery, where, orderBy } from 'firebase/firestore';
 import type { Product as ProductType, Category, DisplayProduct } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context';
@@ -100,6 +101,7 @@ export function ProductArea({ onAddToCart, onProductsLoaded }: ProductAreaProps)
 
         } catch (e: any) {
             console.error("Error fetching products/categories: ", e);
+            errorEmitter.emit('firestore-error', e);
             setProductError("Failed to load products. Please check your connection.");
             toast({ variant: 'destructive', title: 'Error Loading Data', description: e.message });
         }

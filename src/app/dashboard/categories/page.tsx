@@ -24,6 +24,7 @@ import {
 
 import { useToast } from '@/hooks/use-toast';
 import { useDoc, useFirestore } from '@/firebase';
+import { errorEmitter } from '@/firebase/error-emitter';
 import { useAuth } from '@/contexts/auth-context';
 import type { Settings, Product, Category } from '@/lib/types';
 import { formatCurrency } from '@/lib/formatUtils';
@@ -160,6 +161,7 @@ export default function CategoriesPage() {
             }
         } catch (e: any) {
             console.error("Error fetching categories:", e);
+            errorEmitter.emit('firestore-error', e);
             toast({ variant: 'destructive', title: "Sync Error", description: "Could not load categories." });
         } finally {
             setIsLoadingCategories(false);
