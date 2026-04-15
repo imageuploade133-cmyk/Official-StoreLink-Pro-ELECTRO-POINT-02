@@ -184,7 +184,7 @@ export default function MerchantSignupPage() {
                         <FormMessage /></FormItem>
                     )}/>
                     <FormField control={form.control} name="confirmPassword" render={({ field }) => (
-                        <FormItem><FormLabel>Confirm Password</FormLabel><FormControl><Input type={showPassword ? 'text' : 'password'} placeholder="Repeat password" {...field} disabled={isSubmitting} /></FormControl><FormMessage /></FormMessage /></FormItem>
+                        <FormItem><FormLabel>Confirm Password</FormLabel><FormControl><Input type={showPassword ? 'text' : 'password'} placeholder="Repeat password" {...field} disabled={isSubmitting} /></FormControl><FormMessage /></FormItem>
                     )}/>
                 </div>
 
