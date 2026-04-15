@@ -630,6 +630,7 @@ export interface Store {
   id: string;
   owner_id: string;
   name: string;
+  databaseId?: string;
   createdAt: Timestamp;
 }
 
