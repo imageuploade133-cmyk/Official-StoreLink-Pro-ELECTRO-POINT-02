@@ -97,6 +97,9 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow read, write: if isSignedIn() && request.auth.uid == userId;
+      match /{allSubcollections=**} {
+        allow read, write: if isSignedIn() && request.auth.uid == userId;
+      }
     }
 
     match /stores/{storeId} {
@@ -115,6 +118,24 @@ service cloud.firestore {
         (request.method == 'create' && (request.auth.uid == staffId || canManageStore(getStaffStoreId(request.resource.data)))) ||
         (request.method != 'create' && canManageStore(getStaffStoreId(resource.data)))
       );
+    }
+
+    match /customers/{customerId} {
+      allow read: if isSignedIn() && (
+        request.auth.uid == customerId || 
+        (resource != null && canManageStore(getStaffStoreId(resource.data)))
+      );
+      allow write: if isSignedIn() && (
+        request.auth.uid == customerId || 
+        (request.method == 'create' && (request.auth.uid == customerId || canManageStore(getStaffStoreId(request.resource.data)))) ||
+        (request.method != 'create' && canManageStore(getStaffStoreId(resource.data)))
+      );
+      match /{allSubcollections=**} {
+        allow read, write: if isSignedIn() && (
+          request.auth.uid == customerId ||
+          canManageStore(getStaffStoreId(get(/databases/$(database)/documents/customers/$(customerId)).data))
+        );
+      }
     }
 
     /* ============================================================
