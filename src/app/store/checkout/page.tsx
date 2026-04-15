@@ -302,6 +302,9 @@ export default function CheckoutPage() {
           transaction.update(productRefs[i], { stock: currentStock - item.quantity });
         }
 
+        const firstProduct = productSnapshots[0]?.data();
+        const orderStoreId = firstProduct?.store_id || null;
+
         if (appliedCoupon) {
             const couponRef = doc(firestore, 'coupons', appliedCoupon.id);
             transaction.update(couponRef, { usageCount: increment(1) });
@@ -309,6 +312,7 @@ export default function CheckoutPage() {
 
         const orderData: any = {
           user_id: user?.uid || 'GUEST',
+          store_id: orderStoreId,
           items: cartItems.map(item => ({
             productId: item.id,
             quantity: item.quantity,

@@ -21,7 +21,7 @@ export default function AddProductPage() {
   const router = useRouter();
   const firestore = useFirestore();
   const { toast } = useToast();
-  const { permissions, user, isLoading: isAuthLoading } = useAuth();
+  const { permissions, user, staffMember, isLoading: isAuthLoading } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
 
   // Fetch Categories
@@ -41,6 +41,7 @@ export default function AddProductPage() {
       // 1. Prepare main product data (WITHOUT heavy voices array)
       const productData: any = {
         ...restValues,
+        store_id: staffMember?.store_id || user.uid, // Fallback to user.uid if no store_id (e.g. for old owners)
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
         promo: null,
@@ -80,6 +81,7 @@ export default function AddProductPage() {
               change: values.stock,
               staffId: user.uid,
               staffName: user.displayName || user.email || 'Staff',
+              store_id: staffMember?.store_id || user.uid,
               timestamp: serverTimestamp()
           });
       }

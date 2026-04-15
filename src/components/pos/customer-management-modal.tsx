@@ -74,7 +74,7 @@ export function CustomerManagementModal({ isOpen, onOpenChange, onCustomerSelect
 }) {
   const { toast } = useToast();
   const firestore = useFirestore();
-  const { user: authUser } = useAuth();
+  const { user: authUser, staffMember } = useAuth();
   const { settings } = useSettings();
   const currencySymbol = settings?.currency || '$';
 
@@ -98,7 +98,8 @@ export function CustomerManagementModal({ isOpen, onOpenChange, onCustomerSelect
     if (!firestore) return;
     setIsLoading(true);
     try {
-      let q = query(collection(firestore, "customers"), orderBy("name", "asc"));
+      const storeId = staffMember?.store_id || null;
+      let q = query(collection(firestore, "customers"), where("store_id", "==", storeId), orderBy("name", "asc"));
 
       // Apply registry filters
       if (registryFilter === 'pos') {
@@ -161,6 +162,7 @@ export function CustomerManagementModal({ isOpen, onOpenChange, onCustomerSelect
     try {
         const newCustomerData = {
             ...values,
+            store_id: staffMember?.store_id || null,
             branchId: null,
             uid: null,
             totalSpent: 0,
