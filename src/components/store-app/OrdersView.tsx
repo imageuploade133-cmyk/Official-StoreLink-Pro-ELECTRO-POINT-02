@@ -55,7 +55,7 @@ export function OrdersView({ onClose, onNavigate }: OrdersViewProps) {
         if (!firestore || !user) return null;
         return query(
             collection(firestore, 'orders'),
-            where('userId', '==', user.uid),
+            where('user_id', '==', user.uid),
             orderBy('createdAt', 'desc'),
             limit(50)
         );

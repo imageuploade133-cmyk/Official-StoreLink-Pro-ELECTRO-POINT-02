@@ -25,7 +25,7 @@ export function OrderHistoryTab() {
     if (!firestore || !user) return null;
     return query(
       collection(firestore, 'orders'),
-      where('userId', '==', user.uid),
+      where('user_id', '==', user.uid),
       orderBy('createdAt', 'desc')
     );
   }, [firestore, user]);

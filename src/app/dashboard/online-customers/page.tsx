@@ -168,11 +168,11 @@ export default function OnlineCustomersPage() {
         // 4. Fetch orders ONLY for these customers (Batch Query)
         let orderCounts: Record<string, number> = {};
         if (uids.length > 0) {
-            const ordersQuery = query(collection(firestore, 'orders'), where('userId', 'in', uids));
+            const ordersQuery = query(collection(firestore, 'orders'), where('user_id', 'in', uids));
             const ordersSnapshot = await getDocs(ordersQuery);
             ordersSnapshot.forEach(orderDoc => {
                 const order = orderDoc.data();
-                orderCounts[order.userId] = (orderCounts[order.userId] || 0) + 1;
+                orderCounts[order.user_id] = (orderCounts[order.user_id] || 0) + 1;
             });
         }
 

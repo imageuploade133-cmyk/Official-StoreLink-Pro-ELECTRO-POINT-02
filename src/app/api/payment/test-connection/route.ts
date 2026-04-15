@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { initializeFirebase } from '@/firebase/init';
-import { doc, getDoc } from 'firebase/firestore';
+import { adminDb } from '@/lib/firebase-admin';
 import { decrypt } from '@/lib/encryption';
 import { PaymentProvider } from '@/lib/types';
 
@@ -14,12 +13,10 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Provider name is required' }, { status: 400 });
     }
 
-    const { firestore } = initializeFirebase();
     const providerId = `${storeId}_${providerName}`;
-    const providerRef = doc(firestore, 'payment_providers', providerId);
-    const providerSnap = await getDoc(providerRef);
+    const providerSnap = await adminDb.collection('payment_providers').doc(providerId).get();
 
-    if (!providerSnap.exists()) {
+    if (!providerSnap.exists) {
       return NextResponse.json({ error: 'Provider not configured' }, { status: 404 });
     }
 
@@ -34,7 +31,6 @@ export async function GET(request: Request) {
           Authorization: `Bearer ${secretKey}`,
         },
       });
-      // Paystack returns 404 for a non-existent reference, but if we get a response it means the key is valid enough to talk to the API
       if (res.status === 401) {
         return NextResponse.json({ success: false, error: 'Invalid Secret Key' });
       }

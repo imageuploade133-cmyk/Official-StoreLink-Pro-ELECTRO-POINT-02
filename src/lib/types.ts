@@ -106,6 +106,7 @@ export interface Transaction {
   id: string;
   storeId: string;
   orderId: string;
+  user_id?: string; // Ownership for security rules
   provider: string;
   reference: string;
   amount: number;
@@ -906,7 +907,7 @@ export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | '
 
 export interface Order {
   id: string;
-  userId: string; // "GUEST" for walking customers
+  user_id: string; // "GUEST" for walking customers
   items: {
     productId: string;
     quantity: number;

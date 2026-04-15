@@ -195,7 +195,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
 
         const orderRef = doc(collection(firestore, 'orders'));
         const orderData: Omit<Order, 'id'> = {
-          userId: user?.uid || 'GUEST',
+          user_id: user?.uid || 'GUEST',
           items: cartItems.map(item => ({ productId: item.id, quantity: item.quantity, price: item.salePrice })),
           totalAmount: total,
           totalCost: cartItems.reduce((sum, item) => sum + (item.purchasePrice * item.quantity), 0),

@@ -78,7 +78,7 @@ export function NotificationsView({ onClose, onNavigate }: NotificationsViewProp
         if (!firestore || !user) return null;
         return query(
             collection(firestore, 'orders'),
-            where('userId', '==', user.uid),
+            where('user_id', '==', user.uid),
             orderBy('createdAt', 'desc'),
             limit(20)
         );
