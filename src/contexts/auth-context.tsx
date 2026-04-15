@@ -136,7 +136,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => unsubscribe();
   }, [user, firestore]);
 
-  const isLoading = isAuthLoading || isStaffLoading || isCustomerLoading || isStoreLoading;
+  const isLoading = isAuthLoading || isStaffLoading || isCustomerLoading || isStoreLoading || (currentUid !== lastLoadedUid);
 
   const { permissions, isAdmin, roleId } = useMemo(() => {
     const defaultPermissions: Record<PermissionId, boolean> = {} as Record<PermissionId, boolean>;
