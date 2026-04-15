@@ -55,6 +55,7 @@ export default function MerchantSignupPage() {
     const router = useRouter();
     const { user, isLoading: isUserLoading } = useUser();
     const { store, staffMember, isLoading: isAuthContextLoading } = useAuth();
+    const [isSuccessfullySubmitted, setIsSuccessfullySubmitted] = useState(false);
     
     const form = useForm<SignupFormValues>({
       resolver: zodResolver(signupSchema),
@@ -138,7 +139,8 @@ export default function MerchantSignupPage() {
             await batch.commit();
             
             toast({ title: "Store Created Successfully", description: "Welcome to StoreLink Pro!" });
-            router.replace('/dashboard');
+            setIsSuccessfullySubmitted(true);
+            // Redirect will be handled by the useEffect once the store is detected in the auth context
         } catch (error: any) {
             console.error("Signup error:", error);
             let description = "An unknown error occurred. Please try again.";
@@ -151,7 +153,7 @@ export default function MerchantSignupPage() {
         }
     }
 
-    if (isUserLoading || (user && isAuthContextLoading)) {
+    if (isUserLoading || (user && isAuthContextLoading) || isSuccessfullySubmitted) {
         return <PageSpinner label="StoreLink Pro" subLabel="Preparing your workspace…" />;
     }
 

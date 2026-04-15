@@ -39,6 +39,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isCustomer, setIsCustomer] = useState(false);
   const [isCustomerLoading, setIsCustomerLoading] = useState(true);
 
+  // Keep track of the last user ID we loaded for
+  const [lastLoadedUid, setLastLoadedUid] = useState<string | null>(null);
+
+  // Reset loading states when user changes to prevent race conditions
+  if (user?.uid !== lastLoadedUid) {
+    setLastLoadedUid(user?.uid || null);
+    setIsStaffLoading(!!user);
+    setIsStoreLoading(!!user);
+    setIsCustomerLoading(!!user);
+  }
+
   // Monitor Staff Record
   useEffect(() => {
     if (!user || !firestore) {
