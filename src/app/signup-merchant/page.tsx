@@ -1,4 +1,3 @@
-
 'use client';
 
 import Image from "next/image"
@@ -73,9 +72,6 @@ export default function MerchantSignupPage() {
         if (!isUserLoading && user && !isAuthContextLoading) {
           if ((store || staffMember) && !form.formState.isSubmitSuccessful && !isSuccessfullySubmitted) {
             // Only redirect if they have a store and didn't just arrive from the "Create New Store" link with intent to create another
-            // For now, let's allow them to stay if they want to create another store.
-            // But if they have exactly one store and just logged in, they should probably go to dashboard.
-            // This is tricky. Let's just allow them to stay on this page if they are already here.
           }
         }
     }, [user, isUserLoading, isAuthContextLoading, store, staffMember, router, form.formState.isSubmitSuccessful, isSuccessfullySubmitted]);
@@ -106,7 +102,6 @@ export default function MerchantSignupPage() {
                 console.log("New user created:", targetUser.uid);
                 await updateProfile(targetUser, { displayName: values.name });
                 
-                // 4. Check authentication timing: After createUserWithEmailAndPassword, wait for auth state
                 await targetUser.reload();
                 console.log("User reloaded after creation");
             }
@@ -152,39 +147,47 @@ export default function MerchantSignupPage() {
             });
 
             // 4. Create default settings for the store
-            batch.set(doc(firestore, 'settings', storeId), {
+            const settingsData = {
                 store_id: storeId,
                 storeName: values.storeName,
                 currency: '₦',
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp(),
-            });
+            };
+
+            batch.set(doc(firestore, 'settings', storeId), settingsData);
+
+            // 4b. Also store settings under /stores/{storeId}/settings/config (Recommended Refactor)
+            const storeSettingsRef = doc(firestore, 'stores', storeId, 'settings', 'config');
+            batch.set(storeSettingsRef, settingsData);
 
             console.log("Committing batch...");
             try {
-                // 2. Ensure batch.commit() is awaited
                 await batch.commit();
                 console.log("Batch committed successfully");
             } catch (error) {
-                // 1. Wrap batch.commit() in try/catch and log full error
                 console.error("Batch commit failed:", error);
                 throw error;
             }
 
-            // 4. Create default settings in the target database if it's different
+            // 5. Create settings in the separate database if specified
             if (values.databaseId && values.databaseId !== '(default)') {
                 try {
-                    console.log("Creating settings in separate database:", values.databaseId);
+                    console.log("Attempting to create settings in separate database:", values.databaseId);
                     const targetFirestore = getFirestoreInstance(values.databaseId);
-                    await setDoc(doc(targetFirestore, 'settings', storeId), {
-                        store_id: storeId,
-                        storeName: values.storeName,
-                        currency: '₦',
-                        createdAt: serverTimestamp(),
-                        updatedAt: serverTimestamp(),
-                    });
+                    
+                    const timeoutPromise = new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('Timeout: Separate database write took too long')), 5000)
+                    );
+
+                    await Promise.race([
+                        setDoc(doc(targetFirestore, 'settings', storeId), settingsData),
+                        timeoutPromise
+                    ]);
+                    console.log("Settings created in separate database successfully");
                 } catch (e) {
-                    console.error("Failed to create settings in separate database:", e);
+                    console.error("Separate database settings creation failed or timed out:", e);
+                    // Non-blocking error
                 }
             }
             
@@ -200,12 +203,8 @@ export default function MerchantSignupPage() {
             
             setIsSuccessfullySubmitted(true);
             
-            // 6. Only redirect AFTER successful commit
-            console.log("Redirecting to dashboard in 1000ms...");
-            setTimeout(() => {
-                console.log("Navigating to /dashboard");
-                router.push('/dashboard');
-            }, 1000);
+            console.log("Redirecting to dashboard...");
+            router.push('/dashboard');
 
         } catch (error: any) {
             console.error("Signup error details:", error);
@@ -217,7 +216,6 @@ export default function MerchantSignupPage() {
             }
             toast({ variant: "destructive", title: "Signup Failed", description: description });
         } finally {
-            // 5. Prevent infinite loading
             setIsLoading(false);
         }
     }

@@ -16,8 +16,31 @@ export function saveGlobalSettings(
       requestResourceData: settings,
     });
     errorEmitter.emit('permission-error', permissionError);
-    // It's important to re-throw the error or handle it here
-    // so the UI can be notified of the failure.
+    throw serverError;
+  });
+}
+
+export function saveStoreSettings(
+  firestore: Firestore,
+  storeId: string,
+  settings: Partial<Omit<Settings, 'id'>>
+) {
+  // We save to both locations during transition: 
+  // 1. The old top-level collection
+  // 2. The new subcollection (Recommended Refactor)
+  const oldSettingsRef = doc(firestore, 'settings', storeId);
+  const newSettingsRef = doc(firestore, 'stores', storeId, 'settings', 'config');
+  
+  return Promise.all([
+    setDoc(oldSettingsRef, settings, { merge: true }),
+    setDoc(newSettingsRef, settings, { merge: true })
+  ]).catch((serverError) => {
+    const permissionError = new FirestorePermissionError({
+      path: newSettingsRef.path,
+      operation: 'update',
+      requestResourceData: settings,
+    });
+    errorEmitter.emit('permission-error', permissionError);
     throw serverError;
   });
 }
