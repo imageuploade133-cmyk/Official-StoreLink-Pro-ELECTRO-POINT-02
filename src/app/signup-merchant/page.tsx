@@ -86,7 +86,7 @@ export default function MerchantSignupPage() {
 
         setIsLoading(true);
         try {
-            let targetUser = user;
+            let targetUser = auth.currentUser || user;
             console.log("Current user:", targetUser?.uid);
 
             if (targetUser && targetUser.email?.toLowerCase() !== values.email.toLowerCase()) {
@@ -103,10 +103,23 @@ export default function MerchantSignupPage() {
                 await updateProfile(targetUser, { displayName: values.name });
                 
                 await targetUser.reload();
+                targetUser = auth.currentUser || userCredential.user;
                 console.log("User reloaded after creation");
             }
 
+            if (!targetUser) {
+                throw new Error("Failed to create user account. Please try again.");
+            }
+
             console.log("Building batch for store creation...");
+            // Force token refresh to ensure Firestore has the latest auth state
+            try {
+                await targetUser.getIdToken(true);
+                console.log("Auth token refreshed");
+            } catch (e) {
+                console.warn("Failed to refresh token, proceeding anyway:", e);
+            }
+
             const batch = writeBatch(firestore);
 
             // 1. Create User record
