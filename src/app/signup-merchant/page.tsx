@@ -162,10 +162,25 @@ export default function MerchantSignupPage() {
                 }
             }
             
-            toast({ title: "Store Created Successfully", description: "Welcome to StoreLink Pro!" });
+            toast({ 
+                title: "Store Created Successfully", 
+                description: "Redirecting to your dashboard so you can start adding inventory..." 
+            });
             setSelectedStoreId(storeId);
+            
+            // Explicitly set the store ID in localStorage to ensure it's picked up 
+            // even if the context state update hasn't propagated before the redirect.
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('selectedStoreId', storeId);
+            }
+            
             setIsSuccessfullySubmitted(true);
-            router.push('/dashboard');
+            
+            // Use window.location.href for a clean transition, especially important for separate databases
+            // to ensure the StoreFirestoreProvider re-initializes with the correct database instance.
+            setTimeout(() => {
+                window.location.href = '/dashboard';
+            }, 500);
         } catch (error: any) {
             console.error("Signup error:", error);
             let description = "An unknown error occurred. Please try again.";

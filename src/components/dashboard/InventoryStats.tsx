@@ -27,7 +27,7 @@ export function InventoryStats({ isLoading, stats }: InventoryStatsProps) {
           {isLoading ? <Skeleton className="h-8 w-1/4 my-1" /> : <div className="text-2xl font-bold">{stats.lowStockCount}</div>}
           <p className="text-xs text-muted-foreground">Items nearing depletion</p>
           <Button variant="ghost" size="sm" className="text-xs p-0 h-auto mt-2 text-primary hover:underline" asChild>
-            <Link href="/stock-alerts">Manage <ArrowRight className="ml-1 h-3 w-3" /></Link>
+            <Link href="/dashboard/stock-alerts">Manage <ArrowRight className="ml-1 h-3 w-3" /></Link>
           </Button>
         </CardContent>
       </Card>
@@ -40,7 +40,7 @@ export function InventoryStats({ isLoading, stats }: InventoryStatsProps) {
           {isLoading ? <Skeleton className="h-8 w-1/4 my-1" /> : <div className="text-2xl font-bold">{stats.outOfStockCount}</div>}
           <p className="text-xs text-muted-foreground">Items with 0 stock</p>
           <Button variant="ghost" size="sm" className="text-xs p-0 h-auto mt-2 text-primary hover:underline" asChild>
-            <Link href="/inventory">Manage <ArrowRight className="ml-1 h-3 w-3" /></Link>
+            <Link href="/dashboard/inventory">Manage <ArrowRight className="ml-1 h-3 w-3" /></Link>
           </Button>
         </CardContent>
       </Card>
@@ -53,7 +53,7 @@ export function InventoryStats({ isLoading, stats }: InventoryStatsProps) {
           {isLoading ? <Skeleton className="h-8 w-1/4 my-1" /> : <div className="text-2xl font-bold">{stats.expiredProductCount}</div>}
           <p className="text-xs text-muted-foreground">Past expiry date</p>
           <Button variant="ghost" size="sm" className="text-xs p-0 h-auto mt-2 text-primary hover:underline" asChild>
-            <Link href="/inventory">Review <ArrowRight className="ml-1 h-3 w-3" /></Link>
+            <Link href="/dashboard/inventory">Review <ArrowRight className="ml-1 h-3 w-3" /></Link>
           </Button>
         </CardContent>
       </Card>
