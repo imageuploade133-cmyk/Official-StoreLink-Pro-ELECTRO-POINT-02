@@ -11,13 +11,19 @@ service cloud.firestore {
       return isSignedIn() && (
         request.auth.token.role == "admin" || 
         (exists(/databases/$(database)/documents/staff/$(request.auth.uid)) && 
-         get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role == "admin")
+         get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role == "admin") ||
+        (request.method in ['create', 'update'] && 
+         existsAfter(/databases/$(database)/documents/staff/$(request.auth.uid)) && 
+         getAfter(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role == "admin")
       );
     }
 
     function isStaffWithOneOfRoles(roles) {
-        return exists(/databases/$(database)/documents/staff/$(request.auth.uid)) 
-               && get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role in roles;
+        return (exists(/databases/$(database)/documents/staff/$(request.auth.uid)) 
+               && get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role in roles) ||
+               (request.method in ['create', 'update'] &&
+                existsAfter(/databases/$(database)/documents/staff/$(request.auth.uid)) &&
+                getAfter(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role in roles);
     }
 
     // --- ENFORCE STORE ISOLATION (Point 1 & 2) ---
@@ -31,9 +37,14 @@ service cloud.firestore {
           (
             get(/databases/$(database)/documents/stores/$(storeId)).data.owner_id == request.auth.uid
             ||
+            (request.method in ['create', 'update'] && getAfter(/databases/$(database)/documents/stores/$(storeId)).data.owner_id == request.auth.uid)
+            ||
             (
               isStaffWithOneOfRoles(roles) &&
-              get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.store_id == storeId
+              (
+                get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.store_id == storeId ||
+                (request.method in ['create', 'update'] && getAfter(/databases/$(database)/documents/staff/$(request.auth.uid)).data.store_id == storeId)
+              )
             )
           )
         )
@@ -138,7 +149,7 @@ service cloud.firestore {
     
     match /staff/{userId} {
       allow get: if (isSignedIn() && request.auth.uid == userId) || hasStoreAccess(['admin', 'manager']) || isAdmin();
-      allow list: if hasStoreAccess(['admin', 'manager']) || isAdmin();
+      allow list: if (isSignedIn() && resource.data.uid == request.auth.uid) || hasStoreAccess(['admin', 'manager']) || isAdmin();
       allow create: if (hasStoreAccess(['admin']) && request.resource.data.store_id != null) || isAdmin();
       allow update, delete: if hasStoreAccess(['admin']) || isAdmin();
     }
