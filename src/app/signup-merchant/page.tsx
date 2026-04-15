@@ -192,19 +192,17 @@ export default function MerchantSignupPage() {
             }
             
             toast({ 
-                title: "Store Created Successfully", 
-                description: "Redirecting to your dashboard..." 
+                title: "Account Created Successfully", 
+                description: "Your store account has been created. Please log in with your credentials." 
             });
 
-            setSelectedStoreId(storeId);
-            if (typeof window !== 'undefined') {
-                localStorage.setItem('selectedStoreId', storeId);
-            }
+            // Sign out the user so they can log in again
+            await signOut(auth);
             
             setIsSuccessfullySubmitted(true);
             
-            console.log("Redirecting to dashboard...");
-            router.push('/dashboard');
+            console.log("Redirecting to login...");
+            router.push('/login');
 
         } catch (error: any) {
             console.error("Signup error details:", error);
@@ -223,7 +221,7 @@ export default function MerchantSignupPage() {
     if (isUserLoading || (user && isAuthContextLoading) || isSuccessfullySubmitted) {
         return (
             <div className="relative">
-                <PageSpinner label="StoreLink Pro" subLabel="Preparing your workspace…" />
+                <PageSpinner label="StoreLink Pro" subLabel={isSuccessfullySubmitted ? "Account created! Redirecting to login..." : "Preparing your workspace…"} />
                 {isSuccessfullySubmitted && (
                     <div className="fixed bottom-10 left-0 right-0 z-[60] flex flex-col items-center gap-3">
                         <p className="text-slate-400 text-xs animate-pulse">If you are not redirected automatically, click the button below.</p>
@@ -231,9 +229,9 @@ export default function MerchantSignupPage() {
                             variant="outline" 
                             size="sm"
                             className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                            onClick={() => router.push('/dashboard')}
+                            onClick={() => router.push('/login')}
                         >
-                            Continue to Dashboard
+                            Continue to Login
                         </Button>
                     </div>
                 )}
