@@ -269,6 +269,8 @@ export default function WebsiteOrdersPage() {
       case 'processing': return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200"><Package className="mr-1 h-3 w-3" /> Processing</Badge>;
       case 'shipped': return <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200"><Truck className="mr-1 h-3 w-3" /> Shipped</Badge>;
       case 'delivered': return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200"><CheckCircle2 className="mr-1 h-3 w-3" /> Delivered</Badge>;
+      case 'paid': return <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200"><DollarSign className="mr-1 h-3 w-3" /> Paid</Badge>;
+      case 'failed': return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200"><XCircle className="mr-1 h-3 w-3" /> Failed</Badge>;
       case 'cancelled': return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200"><XCircle className="mr-1 h-3 w-3" /> Cancelled</Badge>;
       default: return <Badge variant="secondary">{order.status}</Badge>;
     }
@@ -396,9 +398,11 @@ export default function WebsiteOrdersPage() {
                     <SelectContent>
                       <SelectItem value="all">All Statuses</SelectItem>
                       <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="paid">Paid</SelectItem>
                       <SelectItem value="processing">Processing</SelectItem>
                       <SelectItem value="shipped">Shipped</SelectItem>
                       <SelectItem value="delivered">Delivered</SelectItem>
+                      <SelectItem value="failed">Failed</SelectItem>
                       <SelectItem value="cancelled">Cancelled</SelectItem>
                     </SelectContent>
                   </Select>
