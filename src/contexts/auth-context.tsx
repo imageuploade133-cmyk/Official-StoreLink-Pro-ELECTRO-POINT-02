@@ -11,6 +11,8 @@ interface AuthContextType {
   user: ReturnType<typeof useUser>['user'];
   staffMember: StaffMember | null;
   store: Store | null;
+  stores: Store[];
+  setSelectedStoreId: (id: string | null) => void;
   permissions: Record<PermissionId, boolean>;
   isLoading: boolean;
   isAdmin: boolean;
@@ -22,6 +24,8 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   staffMember: null,
   store: null,
+  stores: [],
+  setSelectedStoreId: () => {},
   permissions: {} as Record<PermissionId, boolean>,
   isLoading: true,
   isAdmin: false,
@@ -34,13 +38,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const firestore = useFirestore();
   const [staffMember, setStaffMember] = useState<StaffMember | null>(null);
   const [isStaffLoading, setIsStaffLoading] = useState(true);
-  const [store, setStore] = useState<Store | null>(null);
+  const [stores, setStores] = useState<Store[]>([]);
+  const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
   const [isStoreLoading, setIsStoreLoading] = useState(true);
   const [isCustomer, setIsCustomer] = useState(false);
   const [isCustomerLoading, setIsCustomerLoading] = useState(true);
 
+  // Derived selected store
+  const store = useMemo(() => {
+    if (selectedStoreId) {
+      return stores.find(s => s.id === selectedStoreId) || stores[0] || null;
+    }
+    return stores[0] || null;
+  }, [stores, selectedStoreId]);
+
   // Keep track of the last user ID we loaded for
   const [lastLoadedUid, setLastLoadedUid] = useState<string | null>(null);
+
+  // Load selectedStoreId from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('selectedStoreId');
+    if (saved) setSelectedStoreId(saved);
+  }, []);
+
+  // Save selectedStoreId to localStorage
+  useEffect(() => {
+    if (selectedStoreId) {
+      localStorage.setItem('selectedStoreId', selectedStoreId);
+    } else {
+      localStorage.removeItem('selectedStoreId');
+    }
+  }, [selectedStoreId]);
 
   // Reset loading states when user changes to prevent race conditions
   const currentUid = user?.uid || null;
@@ -60,9 +88,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     setIsStaffLoading(true);
+    const constraints = [where('uid', '==', user.uid)];
+    if (store?.id) {
+        constraints.push(where('store_id', '==', store.id));
+    }
+    
     const staffQuery = query(
       collection(firestore, 'staff'),
-      where('uid', '==', user.uid)
+      ...constraints
     );
     
     const unsubscribe = onSnapshot(staffQuery, (snapshot) => {
@@ -80,12 +113,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => unsubscribe();
-  }, [user, firestore]);
+  }, [user, firestore, store?.id]);
 
   // Monitor Store Ownership
   useEffect(() => {
     if (!user || !firestore) {
-      setStore(null);
+      setStores([]);
       setIsStoreLoading(false);
       return;
     }
@@ -99,15 +132,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const unsubscribe = onSnapshot(storeQuery, (snapshot) => {
       if (!snapshot.empty) {
-        const storeDoc = snapshot.docs[0];
-        setStore({ id: storeDoc.id, ...storeDoc.data() } as Store);
+        const storesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Store));
+        setStores(storesData);
       } else {
-        setStore(null);
+        setStores([]);
       }
       setIsStoreLoading(false);
     }, (error) => {
-      console.error("Error fetching store:", error);
-      setStore(null);
+      console.error("Error fetching stores:", error);
+      setStores([]);
       setIsStoreLoading(false);
     });
 
@@ -185,6 +218,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     staffMember,
     store,
+    stores,
+    setSelectedStoreId,
     permissions,
     isLoading,
     isAdmin,

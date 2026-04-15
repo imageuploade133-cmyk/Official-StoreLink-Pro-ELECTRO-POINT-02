@@ -22,7 +22,7 @@ import {
 import { PageSpinner, Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/hooks/use-toast";
 import placeholderImages from '@/lib/placeholder-images.json';
-import { useAuth as useFirebaseAuthInstance, useUser, useFirestore } from "@/firebase";
+import { useAuth as useFirebaseAuthInstance, useUser, useFirestore, useFirebase } from "@/firebase";
 import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword, updateProfile, signOut } from "firebase/auth";
 import { doc, setDoc, writeBatch, serverTimestamp } from "firebase/firestore";
@@ -36,6 +36,7 @@ const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
   email: z.string().trim().email('Invalid email address.'),
   storeName: z.string().min(2, 'Store name must be at least 2 characters.'),
+  databaseId: z.string().min(1, 'Database ID is required.').regex(/^[a-z0-9-]+$/, 'Only lowercase letters, numbers, and hyphens allowed.').default('(default)'),
   password: z.string().min(6, 'Password must be at least 6 characters long.'),
   confirmPassword: z.string(),
 }).refine(data => data.password === data.confirmPassword, {
@@ -52,15 +53,16 @@ export default function MerchantSignupPage() {
 
     const auth = useFirebaseAuthInstance();
     const firestore = useFirestore();
+    const { getFirestoreInstance } = useFirebase();
     const router = useRouter();
     const { user, isLoading: isUserLoading } = useUser();
-    const { store, staffMember, isLoading: isAuthContextLoading } = useAuth();
+    const { store, stores, setSelectedStoreId, staffMember, isLoading: isAuthContextLoading } = useAuth();
     const [isSuccessfullySubmitted, setIsSuccessfullySubmitted] = useState(false);
     
     const form = useForm<SignupFormValues>({
       resolver: zodResolver(signupSchema),
       defaultValues: {
-        name: '', email: '', storeName: '', password: '', confirmPassword: '',
+        name: '', email: '', storeName: '', databaseId: '(default)', password: '', confirmPassword: '',
       },
     });
 
@@ -68,11 +70,14 @@ export default function MerchantSignupPage() {
 
     useEffect(() => {
         if (!isUserLoading && user && !isAuthContextLoading) {
-          if (store || staffMember) {
-            router.replace('/dashboard');
+          if ((store || staffMember) && !form.formState.isSubmitSuccessful && !isSuccessfullySubmitted) {
+            // Only redirect if they have a store and didn't just arrive from the "Create New Store" link with intent to create another
+            // For now, let's allow them to stay if they want to create another store.
+            // But if they have exactly one store and just logged in, they should probably go to dashboard.
+            // This is tricky. Let's just allow them to stay on this page if they are already here.
           }
         }
-    }, [user, isUserLoading, isAuthContextLoading, store, staffMember, router]);
+    }, [user, isUserLoading, isAuthContextLoading, store, staffMember, router, form.formState.isSubmitSuccessful, isSuccessfullySubmitted]);
 
     const onSubmit = async (values: SignupFormValues) => {
         if (!firestore) return;
@@ -102,18 +107,20 @@ export default function MerchantSignupPage() {
 
             // 2. Create Store record
             // Use the user's UID as the store ID for the primary store
-            const storeId = targetUser.uid;
+            const storeId = `${targetUser.uid}_${Date.now()}`;
             batch.set(doc(firestore, 'stores', storeId), {
                 id: storeId,
                 owner_id: targetUser.uid,
                 name: values.storeName,
+                databaseId: values.databaseId,
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp(),
             });
 
             // 3. Create Staff record (Admin)
-            batch.set(doc(firestore, 'staff', targetUser.uid), {
-                id: targetUser.uid,
+            const staffId = `${targetUser.uid}_${storeId}`;
+            batch.set(doc(firestore, 'staff', staffId), {
+                id: staffId,
                 uid: targetUser.uid,
                 store_id: storeId,
                 name: values.name,
@@ -137,10 +144,28 @@ export default function MerchantSignupPage() {
             });
 
             await batch.commit();
+
+            // 4. Create default settings in the target database if it's different
+            if (values.databaseId && values.databaseId !== '(default)') {
+                try {
+                    const targetFirestore = getFirestoreInstance(values.databaseId);
+                    await setDoc(doc(targetFirestore, 'settings', storeId), {
+                        store_id: storeId,
+                        storeName: values.storeName,
+                        currency: '₦',
+                        createdAt: serverTimestamp(),
+                        updatedAt: serverTimestamp(),
+                    });
+                } catch (e) {
+                    console.error("Failed to create settings in separate database:", e);
+                    // Non-blocking error
+                }
+            }
             
             toast({ title: "Store Created Successfully", description: "Welcome to StoreLink Pro!" });
+            setSelectedStoreId(storeId);
             setIsSuccessfullySubmitted(true);
-            // Redirect will be handled by the useEffect once the store is detected in the auth context
+            router.push('/dashboard');
         } catch (error: any) {
             console.error("Signup error:", error);
             let description = "An unknown error occurred. Please try again.";
@@ -180,6 +205,9 @@ export default function MerchantSignupPage() {
                 )}/>
                 <FormField control={form.control} name="storeName" render={({ field }) => (
                     <FormItem><FormLabel>Store Name</FormLabel><FormControl><Input placeholder="My Awesome Store" {...field} disabled={isSubmitting} /></FormControl><FormMessage /></FormItem>
+                )}/>
+                <FormField control={form.control} name="databaseId" render={({ field }) => (
+                    <FormItem><FormLabel>Database ID (for Separate Database)</FormLabel><FormControl><Input placeholder="(default)" {...field} disabled={isSubmitting} /></FormControl><FormMessage /></FormItem>
                 )}/>
                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <FormField control={form.control} name="password" render={({ field }) => (
