@@ -237,6 +237,23 @@ export default function DashboardLayout({
   }, [permissions, user, showSidebar, permissibleLinks]);
 
 
+  const [isGracePeriodActive, setIsGracePeriodActive] = useState(true);
+
+  useEffect(() => {
+    // If we're loading or have a store, we don't need a grace period
+    if (isLoading || store || staffMember) {
+      if (store || staffMember) setIsGracePeriodActive(false);
+      return;
+    }
+
+    // If we are not loading but have no store, start a grace period
+    const timer = setTimeout(() => {
+      setIsGracePeriodActive(false);
+    }, 4000); // 4 second grace period for Firestore propagation/loading
+
+    return () => clearTimeout(timer);
+  }, [isLoading, store, staffMember]);
+
   useEffect(() => {
     if (!isLoading) {
       if (!user) {
@@ -244,15 +261,17 @@ export default function DashboardLayout({
       } else if (isCustomer) {
         // Explicitly block customers from the dashboard
         router.replace('/store/account');
-      } else if (!store && !staffMember && pathname !== '/signup-merchant') {
-        // No store or staff record yet, redirect to store creation
+      } else if (!store && !staffMember && !isGracePeriodActive && pathname !== '/signup-merchant') {
+        // No store or staff record yet, and grace period has expired
+        console.log("No store found after grace period, redirecting to signup-merchant");
         router.replace('/signup-merchant');
       }
     }
-  }, [user, isLoading, isCustomer, store, staffMember, router, pathname]);
+  }, [user, isLoading, isCustomer, store, staffMember, router, pathname, isGracePeriodActive]);
 
   if (isLoading || !user || isCustomer || (!store && !staffMember)) {
-    return <PageSpinner label="StoreLink Pro" subLabel="Authenticating your account…" />;
+    const subLabel = (!store && !staffMember) ? "Locating your store..." : "Authenticating your account…";
+    return <PageSpinner label="StoreLink Pro" subLabel={subLabel} />;
   }
 
   return (
