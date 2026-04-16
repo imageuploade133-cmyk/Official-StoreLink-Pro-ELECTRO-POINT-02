@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect, Suspense, useCallback, useRef } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter, useParams } from 'next/navigation';
 import { useFirestore, useCollection } from '@/firebase';
 import { 
   collection, 
@@ -27,6 +27,7 @@ import { Search, ChevronLeft, ChevronRight, RotateCcw, PackageSearch, Sparkles, 
 import { ProductCardSkeleton } from '@/components/store/ProductCardSkeleton';
 import { BannerAd } from '@/components/ads/BannerAd';
 import { cn } from '@/lib/utils';
+import { useStoreUrl } from '@/hooks/use-store-url';
 
 const ITEMS_PER_PAGE = 12;
 
@@ -34,6 +35,9 @@ function ShopPageContent() {
     const firestore = useFirestore();
     const router = useRouter();
     const searchParams = useSearchParams();
+    const params = useParams();
+    const storeId = params?.storeId as string;
+    const { getStoreUrl } = useStoreUrl();
     
     // URL-driven state
     const categoryFromUrl = searchParams.get('category') || 'all';
@@ -108,7 +112,7 @@ function ShopPageContent() {
     const lastDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
 
     // Fetch categories for the filter dropdown
-    const categoriesQuery = useMemo(() => firestore ? query(collection(firestore, 'categories'), orderBy('name')) : null, [firestore]);
+    const categoriesQuery = useMemo(() => firestore && storeId ? query(collection(firestore, 'categories'), where('store_id', '==', storeId), orderBy('name')) : null, [firestore, storeId]);
     const { data: categories, isLoading: isLoadingCategories } = useCollection<Category>(categoriesQuery);
 
     const categoryMap = useMemo(() => {
@@ -118,7 +122,7 @@ function ShopPageContent() {
 
     // Fetch search suggestions
     const fetchSuggestions = useCallback(async (term: string) => {
-        if (!firestore || !term.trim() || term.length < 1) {
+        if (!firestore || !storeId || !term.trim() || term.length < 1) {
             setSearchSuggestions([]);
             setShowSuggestions(false);
             return;
@@ -128,9 +132,10 @@ function ShopPageContent() {
         try {
             const searchTerm = term.toLowerCase().trim();
             
-            // Fetch all visible products without orderBy to avoid index issues
+            // Fetch all visible products for this store without orderBy to avoid index issues
             const q = query(
                 collection(firestore, 'products'),
+                where('store_id', '==', storeId),
                 where('isVisibleOnWeb', '==', true),
                 limit(500) // Fetch larger batch for local filtering
             );
@@ -145,19 +150,16 @@ function ShopPageContent() {
                 (p.description && p.description.toLowerCase().includes(searchTerm))
             ).slice(0, 8); // Show up to 8 suggestions
 
-            console.log("[v0] Suggestions - Search term:", searchTerm, "Total products:", allProducts.length, "Filtered:", filtered.length);
-            
             setSearchSuggestions(filtered);
             setShowSuggestions(filtered.length > 0);
         } catch (error) {
             console.error('Error fetching suggestions:', error);
-            console.log("[v0] Error details:", error);
             setSearchSuggestions([]);
             setShowSuggestions(false);
         } finally {
             setIsLoadingSuggestions(false);
         }
-    }, [firestore]);
+    }, [firestore, storeId]);
 
     // Debounce search suggestions
     useEffect(() => {
@@ -171,19 +173,21 @@ function ShopPageContent() {
     }, [searchTerm, fetchSuggestions]);
 
     const fetchProducts = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-        if (!firestore) return;
+        if (!firestore || !storeId) return;
         setIsLoadingProducts(true);
 
         try {
             // Build base query with only required filters
             let q = query(
                 collection(firestore, 'products'), 
+                where('store_id', '==', storeId),
                 where('isVisibleOnWeb', '==', true)
             );
 
             if (categoryFromUrl !== 'all') {
                 q = query(
                     collection(firestore, 'products'),
+                    where('store_id', '==', storeId),
                     where('isVisibleOnWeb', '==', true),
                     where('categoryId', '==', categoryFromUrl)
                 );
@@ -209,8 +213,10 @@ function ShopPageContent() {
             // Sort by creation date descending
             allProducts.sort((a, b) => {
                 const aDate = a.createdAt instanceof Date ? a.createdAt.getTime() : 
+                             (a.createdAt as any)?.toDate?.()?.getTime() || 
                              typeof a.createdAt === 'string' ? new Date(a.createdAt).getTime() : 0;
                 const bDate = b.createdAt instanceof Date ? b.createdAt.getTime() : 
+                             (b.createdAt as any)?.toDate?.()?.getTime() ||
                              typeof b.createdAt === 'string' ? new Date(b.createdAt).getTime() : 0;
                 return bDate - aDate;
             });
@@ -244,7 +250,7 @@ function ShopPageContent() {
         } finally {
             setIsLoadingProducts(false);
         }
-    }, [firestore, categoryFromUrl, searchTerm, categoryMap, currentPage]);
+    }, [firestore, storeId, categoryFromUrl, searchTerm, categoryMap, currentPage]);
 
     useEffect(() => {
         fetchProducts('initial');
@@ -292,7 +298,7 @@ function ShopPageContent() {
             params.delete('q');
         }
         params.delete('page');
-        router.push(`/store/shop?${params.toString()}`);
+        router.push(getStoreUrl(`/store/shop?${params.toString()}`));
     };
 
     const totalPages = Math.ceil(totalProductsCount / ITEMS_PER_PAGE);

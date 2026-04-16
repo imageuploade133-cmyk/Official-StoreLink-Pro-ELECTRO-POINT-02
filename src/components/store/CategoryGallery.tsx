@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   collection, 
   query, 
+  where,
   limit, 
   getDocs, 
   startAfter, 
@@ -27,12 +28,14 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { useStoreUrl } from '@/hooks/use-store-url';
 
 const BATCH_SIZE = 15;
 
 export function CategoryGallery() {
   const firestore = useFirestore();
   const { settings } = useSettings();
+  const { storeId, getStoreUrl } = useStoreUrl();
   
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -44,7 +47,7 @@ export function CategoryGallery() {
   const hasMoreRef = useRef(true);
 
   const fetchCategories = useCallback(async (isNextPage = false) => {
-    if (!firestore || (isNextPage && !hasMoreRef.current)) return;
+    if (!firestore || !storeId || (isNextPage && !hasMoreRef.current)) return;
 
     if (isNextPage) setIsLoadingMore(true);
     else {
@@ -56,6 +59,7 @@ export function CategoryGallery() {
     try {
       let q = query(
         collection(firestore, 'categories'),
+        where('store_id', '==', storeId),
         orderBy('name', 'asc'),
         limit(BATCH_SIZE)
       );
@@ -84,7 +88,7 @@ export function CategoryGallery() {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [firestore]);
+  }, [firestore, storeId]);
 
   useEffect(() => {
     fetchCategories();
@@ -146,7 +150,7 @@ export function CategoryGallery() {
             </p>
         </div>
         <Button asChild variant="ghost" className="font-black text-[10px] uppercase tracking-[0.2em] gap-3 hover:bg-primary/5 p-0 h-auto group/btn self-start md:self-auto animate-in fade-in zoom-in-95 duration-1000 delay-200 dark:text-black" style={{ color: sectionTextColor }}>
-            <Link href="/store/categories">
+            <Link href={getStoreUrl('/store/categories')}>
                 View All Collections <ChevronRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1 dark:text-black" strokeWidth={3} />
             </Link>
         </Button>
@@ -165,7 +169,7 @@ export function CategoryGallery() {
             {categories.map((category) => (
               <CarouselItem key={category.id} className="pl-4 md:pl-6 basis-1/3 sm:basis-1/4 md:basis-1/5 lg:basis-1/6 xl:basis-[12.5%]">
                 <Link 
-                  href={`/store/shop?category=${category.id}`}
+                  href={getStoreUrl(`/store/shop?category=${category.id}`)}
                   className="flex flex-col items-center group/item"
                 >
                   <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-500 group-hover/item:shadow-2xl group-hover/item:border-primary/30 group-hover/item:-translate-y-2 group-hover/item:ring-4 group-hover/item:ring-primary/5">

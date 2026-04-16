@@ -43,7 +43,7 @@ export async function POST(request: Request) {
           amount: Math.round(amount * 100), // Paystack uses kobo/cents
           currency,
           reference,
-          callback_url: `${request.headers.get('origin')}/store/checkout/verify?provider=paystack&storeId=${storeId}`,
+          callback_url: `${request.headers.get('origin')}/store/${storeId}/checkout/verify?provider=paystack`,
         }),
       });
       result = await paystackRes.json();
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
               tx_ref: reference,
               amount,
               currency,
-              redirect_url: `${request.headers.get('origin')}/store/checkout/verify?provider=flutterwave&storeId=${storeId}`,
+              redirect_url: `${request.headers.get('origin')}/store/${storeId}/checkout/verify?provider=flutterwave`,
               customer: {
                 email,
               },

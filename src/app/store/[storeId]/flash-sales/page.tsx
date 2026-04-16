@@ -27,13 +27,15 @@ import { useSettings } from '@/contexts/settings-context';
 import { cn, convertToDateSafely } from '@/lib/utils';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
+import { useParams } from 'next/navigation';
+import { useStoreUrl } from '@/hooks/use-store-url';
 
 const SECTIONS_PER_PAGE = 5;
 
 /**
  * HubHero - Specific slideshow/banner for the Flash Hub
  */
-function HubHero({ slides, settings }: { slides: SlideShow[], settings: any }) {
+function HubHero({ slides, settings, getStoreUrl }: { slides: SlideShow[], settings: any, getStoreUrl: (path: string) => string }) {
     const slideDuration = settings?.slideShowDuration || 7000;
     const hubColor = settings?.flashHubColor || '#e11d48';
     const iconColor = settings?.flashHubIconColor || '#fbbf24';
@@ -109,7 +111,7 @@ function HubHero({ slides, settings }: { slides: SlideShow[], settings: any }) {
                 </div>
                 
                 <div className="max-w-site-container mx-auto px-6 relative z-10 text-center space-y-8">
-                    <Link href="/store/shop" className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors font-black text-[10px] uppercase tracking-[0.2em] mb-4">
+                    <Link href={getStoreUrl('/store/shop')} className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors font-black text-[10px] uppercase tracking-[0.2em] mb-4">
                         <ArrowLeft className="h-3 w-3" /> Back to Catalog
                     </Link>
                     <div className="flex justify-center">
@@ -181,6 +183,9 @@ function HubHero({ slides, settings }: { slides: SlideShow[], settings: any }) {
 export default function AllFlashSalesPage() {
   const firestore = useFirestore();
   const { settings } = useSettings();
+  const params = useParams();
+  const storeId = params?.storeId as string;
+  const { getStoreUrl } = useStoreUrl();
   const [today, setToday] = useState<Date | null>(null);
 
   // Pagination State for Sections
@@ -197,16 +202,17 @@ export default function AllFlashSalesPage() {
     setToday(new Date());
   }, []);
 
-  const categoriesQuery = useMemo(() => firestore ? query(collection(firestore, 'categories'), orderBy('name')) : null, [firestore]);
+  const categoriesQuery = useMemo(() => firestore && storeId ? query(collection(firestore, 'categories'), where('store_id', '==', storeId), orderBy('name')) : null, [firestore, storeId]);
   const { data: categories } = useCollection<Category>(categoriesQuery);
 
   const fetchSections = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore) return;
+    if (!firestore || !storeId) return;
     setIsLoading(true);
 
     try {
       let q = query(
         collection(firestore, 'homepageSections'), 
+        where('store_id', '==', storeId),
         where('isFlashSale', '==', true),
         where('published', '==', true), 
         orderBy('order', 'asc')
@@ -250,21 +256,22 @@ export default function AllFlashSalesPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [firestore]);
+  }, [firestore, storeId]);
 
   useEffect(() => {
     fetchSections('initial');
   }, [fetchSections]);
 
   const slidesQuery = useMemo(() => {
-    if (!firestore) return null;
+    if (!firestore || !storeId) return null;
     return query(
         collection(firestore, 'slideShows'),
+        where('store_id', '==', storeId),
         where('placement', '==', 'flash-hub'),
         where('published', '==', true),
         orderBy('order', 'asc')
     );
-  }, [firestore]);
+  }, [firestore, storeId]);
   const { data: hubSlides } = useCollection<SlideShow>(slidesQuery);
 
   const activeSections = useMemo(() => {
@@ -291,7 +298,7 @@ export default function AllFlashSalesPage() {
 
   return (
     <div className="bg-background min-h-screen">
-      <HubHero slides={hubSlides || []} settings={settings} />
+      <HubHero slides={hubSlides || []} settings={settings} getStoreUrl={getStoreUrl} />
 
       <main className="pb-20">
         {isLoading && sections.length === 0 ? (
@@ -353,7 +360,7 @@ export default function AllFlashSalesPage() {
               Our automated merchandising engine is currently preparing the next round of exclusive events. Check back shortly.
             </p>
             <Button asChild size="lg" className="mt-10 rounded-2xl h-14 px-10 font-black uppercase text-xs tracking-widest shadow-xl">
-                <Link href="/store/shop">Explore Catalog</Link>
+                <Link href={getStoreUrl('/store/shop')}>Explore Catalog</Link>
             </Button>
           </div>
         )}

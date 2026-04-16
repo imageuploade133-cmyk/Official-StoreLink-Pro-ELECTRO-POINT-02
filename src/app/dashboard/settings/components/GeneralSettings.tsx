@@ -6,9 +6,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useFirestore } from '@/firebase';
-import { saveGlobalSettings } from '@/firebase/firestore/settings';
+import { saveGlobalSettings, saveStoreSettings } from '@/firebase/firestore/settings';
 import type { AppSettings } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/auth-context';
 
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -54,6 +55,8 @@ interface GeneralSettingsProps {
 export function GeneralSettings({ settingsData, isLoading }: GeneralSettingsProps) {
   const { toast } = useToast();
   const firestore = useFirestore();
+  const { store, staffMember } = useAuth();
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
   const [isSaving, setIsSaving] = useState(false);
   const [origin, setOrigin] = useState('');
 
@@ -116,7 +119,13 @@ export function GeneralSettings({ settingsData, isLoading }: GeneralSettingsProp
           ? data.countryCode 
           : selectedRegion?.dialCode || '',
       };
-      await saveGlobalSettings(firestore, settingsToUpdate);
+      
+      if (currentStoreId) {
+          await saveStoreSettings(firestore, currentStoreId, settingsToUpdate);
+      } else {
+          await saveGlobalSettings(firestore, settingsToUpdate);
+      }
+      
       toast({ title: 'Success', description: 'General settings have been updated.' });
     } catch (e) {
       toast({ variant: 'destructive', title: 'Error', description: 'Failed to update settings.' });
@@ -333,12 +342,12 @@ export function GeneralSettings({ settingsData, isLoading }: GeneralSettingsProp
                     </div>
                     <div className="space-y-3">
                         <div className="bg-muted/30 p-3 rounded-xl border font-mono text-[10px] truncate opacity-60">
-                            {origin}/store
+                            {origin}/store/{currentStoreId || 'global'}
                         </div>
                         <Button 
                             variant="secondary" 
                             className="w-full h-12 rounded-xl font-black uppercase text-[10px] tracking-widest gap-2 shadow-lg active:scale-95 transition-all"
-                            onClick={() => copyToClipboard('/store', 'Storefront URL')}
+                            onClick={() => copyToClipboard(`/store/${currentStoreId || 'global'}`, 'Storefront URL')}
                         >
                             <Copy className="h-3.5 w-3.5" />
                             Copy Store Link
@@ -359,12 +368,12 @@ export function GeneralSettings({ settingsData, isLoading }: GeneralSettingsProp
                     </div>
                     <div className="space-y-3">
                         <div className="bg-muted/30 p-3 rounded-xl border font-mono text-[10px] truncate opacity-60">
-                            {origin}/store-app
+                            {origin}/store-app/{currentStoreId || 'global'}
                         </div>
                         <Button 
                             variant="secondary" 
                             className="w-full h-12 rounded-xl font-black uppercase text-[10px] tracking-widest gap-2 shadow-lg active:scale-95 transition-all"
-                            onClick={() => copyToClipboard('/store-app', 'Store-App URL')}
+                            onClick={() => copyToClipboard(`/store-app/${currentStoreId || 'global'}`, 'Store-App URL')}
                         >
                             <Copy className="h-3.5 w-3.5" />
                             Copy App Link
