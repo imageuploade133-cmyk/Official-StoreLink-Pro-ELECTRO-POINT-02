@@ -11,6 +11,7 @@ import { useSettings } from '@/contexts/settings-context';
 import { useAuth } from '@/contexts/auth-context';
 import { collection, addDoc, Timestamp, query, where, orderBy, doc, writeBatch, serverTimestamp, limit, startAfter, getDocs, type QueryDocumentSnapshot, type DocumentData } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { 
   Card, 
   CardContent, 
@@ -83,6 +84,15 @@ import type { Category, Product, ProductVideo } from '@/lib/types';
 import { CategoryForm, type CategoryFormValues } from '@/components/inventory/CategoryForm';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerClose,
+} from '@/components/ui/drawer';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn, convertToDateSafely } from '@/lib/utils';
 import { ProductImageGallery } from '@/components/inventory/ProductImageGallery';
@@ -196,6 +206,7 @@ export function WebStoreProductForm() {
   const firestore = useFirestore();
   const { user, store, staffMember } = useAuth();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const { settings } = useSettings();
   
   const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
@@ -570,6 +581,141 @@ export function WebStoreProductForm() {
   const currentCategoryName = useMemo(() => {
     return categories?.find(c => c.id === watchCategory)?.name || 'Select Category...';
   }, [categories, watchCategory]);
+
+  const categorySelectionBody = (
+    <div className="space-y-6">
+      <div className="relative group">
+        <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
+        <Input
+          placeholder="Search categories (e.g. Shoes, Luxury...)"
+          value={categorySearchTerm}
+          onChange={(e) => setCategorySearchTerm(e.target.value)}
+          className="pl-12 h-14 bg-muted/40 border-primary/10 focus:border-primary/30 rounded-2xl shadow-sm text-base transition-all"
+        />
+      </div>
+      <div
+        ref={scrollContainerRef}
+        onScroll={handleCategoryScroll}
+        className={cn(
+          "h-80 overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-muted-foreground/20",
+          isMobile && "h-[calc(100vh-400px)] min-h-[300px]"
+        )}
+      >
+        {isLoadingPaginatedCategories ? (
+          <div className="flex flex-col items-center justify-center py-20 gap-4">
+            <div className="relative">
+              <Loader2 className="h-10 w-10 animate-spin text-primary opacity-20" />
+              <Loader2 className="h-10 w-10 animate-spin text-primary absolute inset-0 [animation-delay:-0.3s]" />
+            </div>
+            <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Scanning Catalog...</span>
+          </div>
+        ) : displayedCategories.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 bg-muted/5 rounded-3xl border-2 border-dashed">
+            <SearchIcon className="h-12 w-12 text-muted-foreground/20" />
+            <div className="space-y-1">
+              <p className="font-bold text-muted-foreground">No matches found</p>
+              <p className="text-xs text-muted-foreground/60 max-w-[200px]">Try a different search term or create a new category.</p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4 pb-4">
+            {displayedCategories.map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                className={cn(
+                  "group relative flex flex-col items-center p-4 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl",
+                  form.watch('categoryId') === cat.id
+                    ? "border-primary bg-primary/5 ring-4 ring-primary/10"
+                    : "border-muted-foreground/10 bg-background hover:border-primary/30 hover:bg-primary/5"
+                )}
+                onClick={() => {
+                  form.setValue('categoryId', cat.id, { shouldValidate: true });
+                  setIsChangeCategoryModalOpen(false);
+                  setCategorySearchTerm('');
+                }}
+              >
+                <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-muted mb-3 shadow-inner">
+                  <Image
+                    src={cat.imageUrl || `https://picsum.photos/seed/${cat.id}/200/200`}
+                    alt={cat.name}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    sizes="(max-width: 640px) 40vw, 150px"
+                    unoptimized
+                  />
+                  {form.watch('categoryId') === cat.id && (
+                    <div className="absolute inset-0 bg-primary/40 backdrop-blur-[2px] flex items-center justify-center animate-in fade-in duration-300">
+                      <div className="bg-white text-primary rounded-full p-2 shadow-2xl scale-110">
+                        <Check className="h-5 w-5" strokeWidth={4} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <span className={cn(
+                  "text-xs font-black text-center line-clamp-2 leading-tight uppercase tracking-wider",
+                  form.watch('categoryId') === cat.id ? "text-primary" : "text-foreground"
+                )}>
+                  {cat.name}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Load more indicator */}
+        {isLoadingMoreCategories && (
+          <div className="flex items-center justify-center py-6 gap-3">
+            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+            <span className="text-xs font-black text-muted-foreground uppercase tracking-tighter">Loading more collections...</span>
+          </div>
+        )}
+
+        {/* End of list indicator */}
+        {!hasMoreCategories && paginatedCategories.length > 0 && !categorySearchTerm && (
+          <div className="flex items-center justify-center gap-2 py-6">
+            <div className="h-px w-8 bg-muted" />
+            <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest whitespace-nowrap">
+              End of Catalog ({paginatedCategories.length})
+            </div>
+            <div className="h-px w-8 bg-muted" />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const categorySelectionFooter = (
+    <div className="flex flex-row justify-between items-center w-full">
+      <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium italic">
+        <Info className="h-4 w-4 text-primary opacity-50" />
+        <span className="hidden sm:inline">Missing a category?</span>
+      </div>
+      <div className="flex gap-3">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => {
+            setIsChangeCategoryModalOpen(false);
+            setIsCategoryModalOpen(true);
+            setCategorySearchTerm('');
+          }}
+          className="gap-2 border-primary/20 text-primary hover:bg-primary/5 font-bold rounded-xl h-11"
+        >
+          <PlusCircle className="h-4 w-4" /> Create New
+        </Button>
+        {isMobile ? (
+          <DrawerClose asChild>
+            <Button type="button" variant="ghost" className="font-bold h-11 rounded-xl">Cancel</Button>
+          </DrawerClose>
+        ) : (
+          <DialogClose asChild>
+            <Button type="button" variant="ghost" className="font-bold h-11 rounded-xl">Cancel</Button>
+          </DialogClose>
+        )}
+      </div>
+    </div>
+  );
 
   return (
     <>
@@ -1663,150 +1809,126 @@ export function WebStoreProductForm() {
     </FormProvider>
 
     {/* Change Category Modal */}
-    <Dialog open={isChangeCategoryModalOpen} onOpenChange={(open) => {
-    setIsChangeCategoryModalOpen(open);
-    if (!open) setCategorySearchTerm('');
-    }}>
-    <DialogContent className="sm:max-w-lg p-0 overflow-hidden rounded-[2rem]">
-    <DialogHeader className="p-8 pb-4">
-    <DialogTitle className="flex items-center gap-3 text-2xl font-bold tracking-tight">
-    <div className="p-2.5 bg-primary/10 rounded-2xl">
-      <Layers className="h-6 w-6 text-primary"/>
-    </div>
-    Select Target Category
-    </DialogTitle>
-    <DialogDescription className="text-base">
-    Organize your product by assigning it to a specific collection.
-    </DialogDescription>
-    </DialogHeader>
-    <div className="px-8 py-2 space-y-6">
-    <div className="relative group">
-    <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
-    <Input
-    placeholder="Search categories (e.g. Shoes, Luxury...)"
-    value={categorySearchTerm}
-    onChange={(e) => setCategorySearchTerm(e.target.value)}
-    className="pl-12 h-14 bg-muted/40 border-primary/10 focus:border-primary/30 rounded-2xl shadow-sm text-base transition-all"
-    />
-    </div>
-    <div
-    ref={scrollContainerRef}
-    onScroll={handleCategoryScroll}
-    className="h-80 overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-muted-foreground/20"
-    >
-    {isLoadingPaginatedCategories ? (
-    <div className="flex flex-col items-center justify-center py-20 gap-4">
-    <div className="relative">
-    <Loader2 className="h-10 w-10 animate-spin text-primary opacity-20" />
-    <Loader2 className="h-10 w-10 animate-spin text-primary absolute inset-0 [animation-delay:-0.3s]" />
-    </div>
-    <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Scanning Catalog...</span>
-    </div>
-    ) : displayedCategories.length === 0 ? (
-    <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 bg-muted/5 rounded-3xl border-2 border-dashed">
-    <SearchIcon className="h-12 w-12 text-muted-foreground/20" />
-    <div className="space-y-1">
-    <p className="font-bold text-muted-foreground">No matches found</p>
-    <p className="text-xs text-muted-foreground/60 max-w-[200px]">Try a different search term or create a new category.</p>
-    </div>
-    </div>
+    {isMobile ? (
+      <Drawer open={isChangeCategoryModalOpen} onOpenChange={(open) => {
+        setIsChangeCategoryModalOpen(open);
+        if (!open) setCategorySearchTerm('');
+      }} dismissible={true}>
+        <DrawerContent className="flex flex-col h-screen w-screen overflow-hidden border-none rounded-none">
+          <div
+            className="w-full flex flex-col items-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none select-none hover:bg-muted/20 transition-colors shrink-0"
+            data-vaul-drag-handle
+          >
+            <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+          </div>
+
+          <div className="flex justify-end px-6 py-2 shrink-0">
+            <DrawerClose asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-muted">
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+              </Button>
+            </DrawerClose>
+          </div>
+
+          <div className="flex-1 flex flex-col min-h-0">
+            <DrawerHeader className="px-8 pb-4 text-left shrink-0">
+              <DrawerTitle className="flex items-center gap-3 text-2xl font-bold tracking-tight">
+                <div className="p-2.5 bg-primary/10 rounded-2xl">
+                  <Layers className="h-6 w-6 text-primary"/>
+                </div>
+                Select Target Category
+              </DrawerTitle>
+              <DrawerDescription className="text-base text-left">
+                Organize your product by assigning it to a specific collection.
+              </DrawerDescription>
+            </DrawerHeader>
+
+            <div className="flex-1 overflow-y-auto px-8 py-2">
+               {categorySelectionBody}
+            </div>
+
+            <DrawerFooter className="flex flex-row justify-between items-center border-t p-8 bg-muted/10 shrink-0 mt-auto">
+              {categorySelectionFooter}
+            </DrawerFooter>
+          </div>
+        </DrawerContent>
+      </Drawer>
     ) : (
-    <div className="grid grid-cols-2 gap-4 pb-4">
-    {displayedCategories.map((cat) => (
-    <button
-    key={cat.id}
-    type="button"
-    className={cn(
-    "group relative flex flex-col items-center p-4 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl",
-    form.watch('categoryId') === cat.id
-    ? "border-primary bg-primary/5 ring-4 ring-primary/10"
-    : "border-muted-foreground/10 bg-background hover:border-primary/30 hover:bg-primary/5"
-    )}
-    onClick={() => {
-    form.setValue('categoryId', cat.id, { shouldValidate: true });
-    setIsChangeCategoryModalOpen(false);
-    setCategorySearchTerm('');
-    }}
-    >
-    <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-muted mb-3 shadow-inner">
-    <Image
-    src={cat.imageUrl || `https://picsum.photos/seed/${cat.id}/200/200`}
-    alt={cat.name}
-    fill
-    className="object-cover transition-transform duration-700 group-hover:scale-110"
-    sizes="(max-width: 640px) 40vw, 150px"
-    unoptimized
-    />
-    {form.watch('categoryId') === cat.id && (
-    <div className="absolute inset-0 bg-primary/40 backdrop-blur-[2px] flex items-center justify-center animate-in fade-in duration-300">
-    <div className="bg-white text-primary rounded-full p-2 shadow-2xl scale-110">
-    <Check className="h-5 w-5" strokeWidth={4} />
-    </div>
-    </div>
-    )}
-    </div>
-    <span className={cn(
-    "text-xs font-black text-center line-clamp-2 leading-tight uppercase tracking-wider",
-    form.watch('categoryId') === cat.id ? "text-primary" : "text-foreground"
-    )}>
-    {cat.name}
-    </span>
-    </button>
-    ))}
-    </div>
-    )}
+      <Dialog open={isChangeCategoryModalOpen} onOpenChange={(open) => {
+        setIsChangeCategoryModalOpen(open);
+        if (!open) setCategorySearchTerm('');
+      }}>
+        <DialogContent className="sm:max-w-lg p-0 overflow-hidden rounded-[2rem]">
+          <DialogHeader className="p-8 pb-4">
+            <DialogTitle className="flex items-center gap-3 text-2xl font-bold tracking-tight">
+              <div className="p-2.5 bg-primary/10 rounded-2xl">
+                <Layers className="h-6 w-6 text-primary"/>
+              </div>
+              Select Target Category
+            </DialogTitle>
+            <DialogDescription className="text-base text-left">
+              Organize your product by assigning it to a specific collection.
+            </DialogDescription>
+          </DialogHeader>
 
-    {/* Load more indicator */}
-    {isLoadingMoreCategories && (
-    <div className="flex items-center justify-center py-6 gap-3">
-    <Loader2 className="h-5 w-5 animate-spin text-primary" />
-    <span className="text-xs font-black text-muted-foreground uppercase tracking-tighter">Loading more collections...</span>
-    </div>
-    )}
+          <div className="px-8 py-2">
+             {categorySelectionBody}
+          </div>
 
-    {/* End of list indicator */}
-    {!hasMoreCategories && paginatedCategories.length > 0 && !categorySearchTerm && (
-    <div className="flex items-center justify-center gap-2 py-6">
-    <div className="h-px w-8 bg-muted" />
-    <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest whitespace-nowrap">
-      End of Catalog ({paginatedCategories.length})
-    </div>
-    <div className="h-px w-8 bg-muted" />
-    </div>
-    )}
-    </div>
-    </div>
-    <DialogFooter className="flex flex-row justify-between items-center border-t mt-6 p-8 bg-muted/10">
-    <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium italic">
-    <Info className="h-4 w-4 text-primary opacity-50" />
-    <span className="hidden sm:inline">Missing a category?</span>
-    </div>
-    <div className="flex gap-3">
-    <Button type="button" variant="outline" onClick={() => { setIsChangeCategoryModalOpen(false); setIsCategoryModalOpen(true); setCategorySearchTerm(''); }} className="gap-2 border-primary/20 text-primary hover:bg-primary/5 font-bold rounded-xl h-11">
-    <PlusCircle className="h-4 w-4" /> Create New
-    </Button>
-    <DialogClose asChild>
-    <Button type="button" variant="ghost" className="font-bold h-11 rounded-xl">Cancel</Button>
-    </DialogClose>
-    </div>
-            </DialogFooter>
+          <DialogFooter className="flex flex-row justify-between items-center border-t mt-6 p-8 bg-muted/10">
+            {categorySelectionFooter}
+          </DialogFooter>
         </DialogContent>
-    </Dialog>
+      </Dialog>
+    )}
 
-    <Dialog open={isCategoryModalOpen} onOpenChange={setIsCategoryModalOpen}>
+    {/* Create New Category Modal */}
+    {isMobile ? (
+      <Drawer open={isCategoryModalOpen} onOpenChange={setIsCategoryModalOpen} dismissible={true}>
+        <DrawerContent className="flex flex-col h-screen w-screen overflow-hidden border-none rounded-none">
+          <div 
+            className="w-full flex flex-col items-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none select-none hover:bg-muted/20 transition-colors shrink-0"
+            data-vaul-drag-handle
+          >
+            <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+          </div>
+
+          <div className="flex justify-end px-6 py-2 shrink-0">
+            <DrawerClose asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-muted">
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+              </Button>
+            </DrawerClose>
+          </div>
+
+          <div className="flex-1 overflow-hidden">
+            <CategoryForm
+              onSubmit={handleCreateCategory}
+              isSubmitting={isSubmittingCategory}
+              onCancel={() => { setIsCategoryModalOpen(false); setIsChangeCategoryModalOpen(true); }}
+              isModal={true}
+            />
+          </div>
+        </DrawerContent>
+      </Drawer>
+    ) : (
+      <Dialog open={isCategoryModalOpen} onOpenChange={setIsCategoryModalOpen}>
         <DialogContent className="max-w-2xl p-0 overflow-hidden border-none shadow-2xl rounded-[2.5rem]">
-            <DialogHeader className="sr-only">
-                <DialogTitle>Create New Category</DialogTitle>
-                <DialogDescription>Add a new collection to your inventory.</DialogDescription>
-            </DialogHeader>
-    <CategoryForm
-    onSubmit={handleCreateCategory}
-    isSubmitting={isSubmittingCategory}
-    onCancel={() => { setIsCategoryModalOpen(false); setIsChangeCategoryModalOpen(true); }}
-    isModal={true}
-    />
+          <DialogHeader className="sr-only">
+            <DialogTitle>Create New Category</DialogTitle>
+            <DialogDescription>Add a new collection to your inventory.</DialogDescription>
+          </DialogHeader>
+          <CategoryForm
+            onSubmit={handleCreateCategory}
+            isSubmitting={isSubmittingCategory}
+            onCancel={() => { setIsCategoryModalOpen(false); setIsChangeCategoryModalOpen(true); }}
+            isModal={true}
+          />
         </DialogContent>
-    </Dialog>
+      </Dialog>
+    )}
 
     </>
   );
