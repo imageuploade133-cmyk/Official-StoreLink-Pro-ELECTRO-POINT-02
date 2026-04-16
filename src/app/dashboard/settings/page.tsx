@@ -140,19 +140,19 @@ export default function SettingsPage() {
 
       <div className="space-y-6">
         {visibleSections.general && <GeneralSettings settingsData={settingsData} isLoading={isLoading} />}
-        {visibleSections.shop && <ShopSettings settingsData={settingsData} isLoading={isLoading} />}
-        {visibleSections.payment && <PaymentMethodsSettings settingsData={settingsData} isLoading={isLoading} />}
-        {visibleSections.social && <SocialMediaSettings settingsData={settingsData} isLoading={isLoading} />}
-        {visibleSections.api && <ApiKeysSettings settingsData={settingsData} isLoading={isLoading} />}
+        {visibleSections.shop && <ShopSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />}
+        {visibleSections.payment && <PaymentMethodsSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />}
+        {visibleSections.social && <SocialMediaSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />}
+        {visibleSections.api && <ApiKeysSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />}
         {visibleSections.pos && (
             <>
                 <PosProductSizeSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
                 <LogoSizeSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
-                <PosReceiptSettings settingsData={settingsData} isLoading={isLoading} />
+                <PosReceiptSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
             </>
         )}
-        {visibleSections.inventory && <InventoryStockSettings settingsData={settingsData} isLoading={isLoading} />}
-        {visibleSections.messaging && <MessagingSettings settingsData={settingsData} isLoading={isLoading} />}
+        {visibleSections.inventory && <InventoryStockSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />}
+        {visibleSections.messaging && <MessagingSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />}
         
         {noResultsFound && (
           <Card>

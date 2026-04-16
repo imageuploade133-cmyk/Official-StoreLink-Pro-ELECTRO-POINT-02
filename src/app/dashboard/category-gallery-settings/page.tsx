@@ -61,17 +61,34 @@ const ColorInput = ({ field, label }: { field: any; label: string }) => (
 
 export default function CategoryGallerySettingsPage() {
   const firestore = useFirestore();
-  const { permissions, isLoading: isAuthLoading } = useAuth();
+  const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
   const { toast } = useToast();
   
   const [isSaving, setIsSaving] = useState(false);
 
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
+
   const settingsRef = useMemo(
-    () => (firestore ? doc(firestore, 'settings', 'global') : null),
-    [firestore]
+    () => {
+        if (!firestore) return null;
+        if (currentStoreId) {
+            return doc(firestore, 'stores', currentStoreId, 'settings', 'config');
+        }
+        return doc(firestore, 'settings', 'global');
+    },
+    [firestore, currentStoreId]
   );
 
-  const { data: settingsData, isLoading: isLoadingSettings } = useDoc<AppSettings>(settingsRef);
+  // Fallback for old stores
+  const oldSettingsRef = useMemo(
+    () => (firestore && currentStoreId) ? doc(firestore, 'settings', currentStoreId) : null,
+    [firestore, currentStoreId]
+  );
+
+  const { data: mainSettingsData, isLoading: isLoadingMainSettings } = useDoc<AppSettings>(settingsRef);
+  const { data: oldSettingsData, isLoading: isLoadingOldSettings } = useDoc<AppSettings>(oldSettingsRef);
+
+  const settingsData = mainSettingsData || oldSettingsData;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(categorySettingsSchema),
@@ -104,7 +121,11 @@ export default function CategoryGallerySettingsPage() {
     if (!firestore) return;
     setIsSaving(true);
     try {
-      await saveGlobalSettings(firestore, data);
+      if (currentStoreId) {
+        await saveStoreSettings(firestore, currentStoreId, data);
+      } else {
+        await saveGlobalSettings(firestore, data);
+      }
       toast({ title: 'Settings Saved', description: 'Category Section configuration has been updated.' });
     } catch (e) {
       toast({ variant: 'destructive', title: 'Error', description: 'Failed to update configuration.' });
@@ -113,7 +134,7 @@ export default function CategoryGallerySettingsPage() {
     }
   };
 
-  const isLoading = isAuthLoading || isLoadingSettings;
+  const isLoading = isAuthLoading || isLoadingMainSettings || (currentStoreId ? isLoadingOldSettings : false);
   const isEnabled = form.watch('showCategorySection');
   const isPreTitleEnabled = form.watch('showCategorySectionPreTitle');
 

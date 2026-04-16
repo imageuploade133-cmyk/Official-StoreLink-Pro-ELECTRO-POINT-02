@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import Image from 'next/image';
 import { useFirestore } from '@/firebase';
-import { saveGlobalSettings } from '@/firebase/firestore/settings';
+import { saveGlobalSettings, saveStoreSettings } from '@/firebase/firestore/settings';
 import type { AppSettings, SocialMediaLink } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { uploadImage } from '@/ai/flows/image-upload-flow';
@@ -31,9 +31,10 @@ type FormValues = z.infer<typeof socialMediaLinkSchema>;
 interface SocialMediaSettingsProps {
   settingsData: AppSettings | null;
   isLoading: boolean;
+  storeId?: string | null;
 }
 
-export function SocialMediaSettings({ settingsData, isLoading }: SocialMediaSettingsProps) {
+export function SocialMediaSettings({ settingsData, isLoading, storeId }: SocialMediaSettingsProps) {
   const { toast } = useToast();
   const firestore = useFirestore();
   const [isSaving, setIsSaving] = useState(false);
@@ -62,7 +63,11 @@ export function SocialMediaSettings({ settingsData, isLoading }: SocialMediaSett
     setIsSaving(true);
     const updatedLinks = socialMediaLinks.filter(pm => pm.id !== linkToDelete.id);
     try {
-      await saveGlobalSettings(firestore, { socialMediaLinks: updatedLinks });
+      if (storeId) {
+        await saveStoreSettings(firestore, storeId, { socialMediaLinks: updatedLinks });
+      } else {
+        await saveGlobalSettings(firestore, { socialMediaLinks: updatedLinks });
+      }
       toast({ title: 'Success', description: `Social link "${linkToDelete.name}" has been deleted.` });
       setLinkToDelete(null);
     } catch (e) {
@@ -93,7 +98,11 @@ export function SocialMediaSettings({ settingsData, isLoading }: SocialMediaSett
     }
     
     try {
-      await saveGlobalSettings(firestore, { socialMediaLinks: updatedLinks });
+      if (storeId) {
+        await saveStoreSettings(firestore, storeId, { socialMediaLinks: updatedLinks });
+      } else {
+        await saveGlobalSettings(firestore, { socialMediaLinks: updatedLinks });
+      }
       toast({ title: 'Success', description: 'Social media links have been updated.' });
       setIsFormModalOpen(false);
     } catch (e) {

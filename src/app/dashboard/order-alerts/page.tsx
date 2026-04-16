@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useFirestore, useDoc } from '@/firebase';
 import { doc } from 'firebase/firestore';
-import { saveGlobalSettings } from '@/firebase/firestore/settings';
+import { saveGlobalSettings, saveStoreSettings } from '@/firebase/firestore/settings';
 import type { AppSettings } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
@@ -31,18 +31,36 @@ type FormValues = z.infer<typeof orderAlertsSchema>;
 
 export default function OrderAlertsPage() {
   const firestore = useFirestore();
-  const { permissions, isLoading: isAuthLoading } = useAuth();
+  const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
   const { toast } = useToast();
   
   const [isSaving, setIsSaving] = useState(false);
   const [newNumber, setNewNumber] = useState('');
 
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
+
   const settingsRef = useMemo(
-    () => (firestore ? doc(firestore, 'settings', 'global') : null),
-    [firestore]
+    () => {
+        if (!firestore) return null;
+        if (currentStoreId) {
+            return doc(firestore, 'stores', currentStoreId, 'settings', 'config');
+        }
+        return doc(firestore, 'settings', 'global');
+    },
+    [firestore, currentStoreId]
   );
 
-  const { data: settingsData, isLoading: isLoadingSettings } = useDoc<AppSettings>(settingsRef);
+  // Fallback for old stores
+  const oldSettingsRef = useMemo(
+    () => (firestore && currentStoreId) ? doc(firestore, 'settings', currentStoreId) : null,
+    [firestore, currentStoreId]
+  );
+
+  const { data: mainSettingsData, isLoading: isLoadingMainSettings } = useDoc<AppSettings>(settingsRef);
+  const { data: oldSettingsData, isLoading: isLoadingOldSettings } = useDoc<AppSettings>(oldSettingsRef);
+
+  const settingsData = mainSettingsData || oldSettingsData;
+  const isLoadingSettings = isLoadingMainSettings && (currentStoreId ? isLoadingOldSettings : true);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(orderAlertsSchema),

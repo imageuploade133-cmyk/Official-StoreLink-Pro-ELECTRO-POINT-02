@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useFirestore } from '@/firebase';
-import { saveGlobalSettings } from '@/firebase/firestore/settings';
+import { saveGlobalSettings, saveStoreSettings } from '@/firebase/firestore/settings';
 import type { AppSettings, SaleTransaction } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
@@ -35,9 +35,10 @@ type FormValues = z.infer<typeof posSettingsSchema>;
 interface PosReceiptSettingsProps {
   settingsData: AppSettings | null;
   isLoading: boolean;
+  storeId?: string | null;
 }
 
-export function PosReceiptSettings({ settingsData, isLoading }: PosReceiptSettingsProps) {
+export function PosReceiptSettings({ settingsData, isLoading, storeId }: PosReceiptSettingsProps) {
   const { toast } = useToast();
   const firestore = useFirestore();
   const [isSaving, setIsSaving] = useState(false);
@@ -68,7 +69,11 @@ export function PosReceiptSettings({ settingsData, isLoading }: PosReceiptSettin
     if (!firestore) return;
     setIsSaving(true);
     try {
-      await saveGlobalSettings(firestore, data);
+      if (storeId) {
+        await saveStoreSettings(firestore, storeId, data);
+      } else {
+        await saveGlobalSettings(firestore, data);
+      }
       toast({ title: 'Success', description: 'POS & Receipt settings updated.' });
     } catch (e) {
       toast({ variant: 'destructive', title: 'Error', description: 'Failed to update settings.' });

@@ -4,7 +4,8 @@ import { useMemo, useState, useEffect, useCallback } from 'react';
 import { PageHeader } from '@/components/PageHeader';
 import { Palette, Loader2, Code, Eye, Layout, Sparkles, Save, RotateCcw, Check, AlertCircle, Monitor, Smartphone, Tablet } from 'lucide-react';
 import { useFirestore, useDoc } from '@/firebase';
-import { doc, updateDoc, setDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
+import { saveGlobalSettings, saveStoreSettings } from '@/firebase/firestore/settings';
 import type { AppSettings, Product, Category } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context';
 import AccessDenied from '@/components/staff-management/AccessDenied';
@@ -95,12 +96,37 @@ const imageRatioOptions = [
 
 export default function ProductCardDesignerPage() {
   const firestore = useFirestore();
-  const { permissions, isLoading: isAuthLoading } = useAuth();
+  const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [previewDevice, setPreviewDevice] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
   const [activeTab, setActiveTab] = useState('presets');
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
+
+  const settingsRef = useMemo(
+    () => {
+        if (!firestore) return null;
+        if (currentStoreId) {
+            return doc(firestore, 'stores', currentStoreId, 'settings', 'config');
+        }
+        return doc(firestore, 'settings', 'global');
+    },
+    [firestore, currentStoreId]
+  );
+
+  // Fallback for old stores
+  const oldSettingsRef = useMemo(
+    () => (firestore && currentStoreId) ? doc(firestore, 'settings', currentStoreId) : null,
+    [firestore, currentStoreId]
+  );
+
+  const { data: mainSettingsData, isLoading: isLoadingMainSettings } = useDoc<AppSettings>(settingsRef);
+  const { data: oldSettingsData, isLoading: isLoadingOldSettings } = useDoc<AppSettings>(oldSettingsRef);
+
+  const settingsData = mainSettingsData || oldSettingsData;
+  const isLoading = isLoadingMainSettings && (currentStoreId ? isLoadingOldSettings : true) || isAuthLoading;
 
   // Settings state
   const [settings, setSettings] = useState<Partial<AppSettings>>({
@@ -124,14 +150,6 @@ export default function ProductCardDesignerPage() {
     productCardHoverEffect: 'lift',
     productCardHeight: 380,
   });
-
-  const settingsRef = useMemo(
-    () => (firestore ? doc(firestore, 'settings', 'global') : null),
-    [firestore]
-  );
-  
-  const { data: settingsData, isLoading: isLoadingSettings } = useDoc<AppSettings>(settingsRef);
-  const isLoading = isLoadingSettings || isAuthLoading;
 
   // Load settings from Firestore
   useEffect(() => {
@@ -180,19 +198,10 @@ export default function ProductCardDesignerPage() {
     setErrorMessage('');
     
     try {
-      const settingsRef = doc(firestore, 'settings', 'global');
-      const updateData = {
-        ...settings,
-      };
-
-      try {
-        await updateDoc(settingsRef, updateData);
-      } catch (updateError: any) {
-        if (updateError.code === 'not-found') {
-          await setDoc(settingsRef, updateData, { merge: true });
-        } else {
-          throw updateError;
-        }
+      if (currentStoreId) {
+        await saveStoreSettings(firestore, currentStoreId, settings);
+      } else {
+        await saveGlobalSettings(firestore, settings);
       }
 
       setSaveStatus('success');
