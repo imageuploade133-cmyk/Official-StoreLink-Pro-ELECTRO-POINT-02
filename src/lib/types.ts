@@ -182,6 +182,8 @@ export interface Settings {
   footerBgImageUrl?: string;
   footerBgSize?: number;
   footerBgRotation?: number;
+  footerCustomHtml?: string;
+  showFooterCustomHtml?: boolean;
   enableExternalPrinter?: boolean;
   receiptFooterMessage?: string;
   storeLogoUrl?: string;

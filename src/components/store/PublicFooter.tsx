@@ -14,6 +14,7 @@ import { Skeleton } from '../ui/skeleton';
 import { cn } from '@/lib/utils';
 
 import { useStoreUrl } from '@/hooks/use-store-url';
+import { SafeHtml } from '../SafeHtml';
 
 export function PublicFooter() {
   const { settings } = useSettings();
@@ -292,6 +293,12 @@ export function PublicFooter() {
               )} 
               loading="lazy"
             />
+          </div>
+        )}
+
+        {settings?.showFooterCustomHtml && settings?.footerCustomHtml && (
+          <div className="mb-10 w-full overflow-hidden">
+            <SafeHtml html={settings.footerCustomHtml} />
           </div>
         )}
 

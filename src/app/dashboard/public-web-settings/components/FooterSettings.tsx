@@ -22,6 +22,9 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import { Code2 } from 'lucide-react';
 
 const footerSettingsSchema = z.object({
   footerBackgroundStyle: z.enum(['solid', 'gradient']).optional(),
@@ -37,6 +40,8 @@ const footerSettingsSchema = z.object({
   footerBgImageUrl: z.string().url('Must be a valid URL.').or(z.literal('')).optional(),
   footerBgSize: z.coerce.number().optional(),
   footerBgRotation: z.coerce.number().optional(),
+  footerCustomHtml: z.string().optional(),
+  showFooterCustomHtml: z.boolean().optional(),
 });
 
 type FormValues = z.infer<typeof footerSettingsSchema>;
@@ -55,6 +60,8 @@ const defaultValues: FormValues = {
   footerBgImageUrl: '',
   footerBgSize: 100,
   footerBgRotation: 0,
+  footerCustomHtml: '',
+  showFooterCustomHtml: false,
 };
 
 interface FooterSettingsProps {
@@ -106,6 +113,8 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
         footerBgImageUrl: settingsData.footerBgImageUrl || '',
         footerBgSize: settingsData.footerBgSize || 100,
         footerBgRotation: settingsData.footerBgRotation || 0,
+        footerCustomHtml: settingsData.footerCustomHtml || '',
+        showFooterCustomHtml: settingsData.showFooterCustomHtml || false,
       });
     }
   }, [settingsData, form]);
@@ -515,6 +524,54 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
                     )}
                     <FormField control={form.control} name="footerTextColor" render={({ field }) => <ColorInput field={field} label="Text & Description Color" />} />
                 </div>
+            </div>
+
+            <Separator className="border-dashed" />
+
+            <div className="space-y-8">
+                <div className="flex items-center justify-between">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                        <Code2 className="h-3.5 w-3.5" /> Footer HTML Customization
+                    </h4>
+                    <FormField
+                      control={form.control}
+                      name="showFooterCustomHtml"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center gap-2 space-y-0">
+                          <FormLabel className="text-xs font-bold">Enable Custom HTML</FormLabel>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="footerCustomHtml"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-bold text-primary flex items-center gap-2">
+                        Custom Footer HTML
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          {...field} 
+                          placeholder="<div style='text-align: center;'>Your custom footer content here</div>"
+                          className="font-mono min-h-[200px] bg-muted/20 border-2 transition-all focus:border-primary"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Inject custom HTML into the footer. This content is isolated and will not affect the rest of the page UI.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
             </div>
           </CardContent>
           <CardFooter className="bg-muted/30 border-t p-6 flex justify-between items-center">
