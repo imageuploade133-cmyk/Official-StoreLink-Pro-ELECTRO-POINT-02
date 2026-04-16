@@ -1928,126 +1928,80 @@ export function ProductForm({
     </FormProvider>
 
     {/* Change Category Modal */}
-    {isMobile ? (
-      <Drawer open={isChangeCategoryModalOpen} onOpenChange={(open) => {
-        setIsChangeCategoryModalOpen(open);
-        if (!open) setCategorySearchTerm('');
-      }} dismissible={true}>
-        <DrawerContent className="flex flex-col h-screen w-screen overflow-hidden border-none rounded-none">
-          <div 
-            className="w-full flex flex-col items-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none select-none hover:bg-muted/20 transition-colors shrink-0"
-            data-vaul-drag-handle
-          >
-            <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
-          </div>
+    <Drawer open={isChangeCategoryModalOpen} onOpenChange={(open) => {
+      setIsChangeCategoryModalOpen(open);
+      if (!open) setCategorySearchTerm('');
+    }} dismissible={true}>
+      <DrawerContent className="flex flex-col h-screen w-screen overflow-hidden border-none rounded-none">
+        <div 
+          className="w-full flex flex-col items-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none select-none hover:bg-muted/20 transition-colors shrink-0"
+          data-vaul-drag-handle
+        >
+          <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+        </div>
 
-          <div className="flex justify-end px-6 py-2 shrink-0">
-            <DrawerClose asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-muted">
-                <X className="h-4 w-4" />
-                <span className="sr-only">Close</span>
-              </Button>
-            </DrawerClose>
-          </div>
+        <div className="flex justify-end px-6 py-2 shrink-0">
+          <DrawerClose asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-muted">
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </Button>
+          </DrawerClose>
+        </div>
 
-          <div className="flex-1 flex flex-col min-h-0">
-            <DrawerHeader className="px-8 pb-4 text-left shrink-0">
-              <DrawerTitle className="flex items-center gap-3 text-2xl font-bold tracking-tight">
-                <div className="p-2.5 bg-primary/10 rounded-2xl">
-                  <Layers className="h-6 w-6 text-primary"/>
-                </div>
-                Select Target Category
-              </DrawerTitle>
-              <DrawerDescription className="text-base text-left">
-                Organize your product by assigning it to a specific collection.
-              </DrawerDescription>
-            </DrawerHeader>
-            
-            <div className="flex-1 overflow-y-auto px-8 py-2">
-               {categorySelectionBody}
-            </div>
-
-            <DrawerFooter className="flex flex-row justify-between items-center border-t p-8 bg-muted/10 shrink-0 mt-auto">
-              {categorySelectionFooter}
-            </DrawerFooter>
-          </div>
-        </DrawerContent>
-      </Drawer>
-    ) : (
-      <Dialog open={isChangeCategoryModalOpen} onOpenChange={(open) => {
-        setIsChangeCategoryModalOpen(open);
-        if (!open) setCategorySearchTerm('');
-      }}>
-        <DialogContent className="sm:max-w-lg p-0 overflow-hidden rounded-[2rem]">
-          <DialogHeader className="p-8 pb-4">
-            <DialogTitle className="flex items-center gap-3 text-2xl font-bold tracking-tight">
+        <div className="flex-1 flex flex-col min-h-0">
+          <DrawerHeader className="px-8 pb-4 text-left shrink-0">
+            <DrawerTitle className="flex items-center gap-3 text-2xl font-bold tracking-tight">
               <div className="p-2.5 bg-primary/10 rounded-2xl">
                 <Layers className="h-6 w-6 text-primary"/>
               </div>
               Select Target Category
-            </DialogTitle>
-            <DialogDescription className="text-base text-left">
+            </DrawerTitle>
+            <DrawerDescription className="text-base text-left">
               Organize your product by assigning it to a specific collection.
-            </DialogDescription>
-          </DialogHeader>
+            </DrawerDescription>
+          </DrawerHeader>
           
-          <div className="px-8 py-2">
+          <div className="flex-1 overflow-y-auto px-8 py-2">
              {categorySelectionBody}
           </div>
 
-          <DialogFooter className="flex flex-row justify-between items-center border-t mt-6 p-8 bg-muted/10">
+          <DrawerFooter className="flex flex-row justify-between items-center border-t p-8 bg-muted/10 shrink-0 mt-auto">
             {categorySelectionFooter}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    )}
+          </DrawerFooter>
+        </div>
+      </DrawerContent>
+    </Drawer>
 
     {/* Create New Category Modal */}
-    {isMobile ? (
-      <Drawer open={isCategoryModalOpen} onOpenChange={setIsCategoryModalOpen} dismissible={true}>
-        <DrawerContent className="flex flex-col h-screen w-screen overflow-hidden border-none rounded-none">
-          <div 
-            className="w-full flex flex-col items-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none select-none hover:bg-muted/20 transition-colors shrink-0"
-            data-vaul-drag-handle
-          >
-            <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
-          </div>
+    <Drawer open={isCategoryModalOpen} onOpenChange={setIsCategoryModalOpen} dismissible={true}>
+      <DrawerContent className="flex flex-col h-screen w-screen overflow-hidden border-none rounded-none">
+        <div 
+          className="w-full flex flex-col items-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none select-none hover:bg-muted/20 transition-colors shrink-0"
+          data-vaul-drag-handle
+        >
+          <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+        </div>
 
-          <div className="flex justify-end px-6 py-2 shrink-0">
-            <DrawerClose asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-muted">
-                <X className="h-4 w-4" />
-                <span className="sr-only">Close</span>
-              </Button>
-            </DrawerClose>
-          </div>
+        <div className="flex justify-end px-6 py-2 shrink-0">
+          <DrawerClose asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-muted">
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </Button>
+          </DrawerClose>
+        </div>
 
-          <div className="flex-1 overflow-hidden">
-            <CategoryForm 
-              onSubmit={handleNewCategorySubmit}
-              isSubmitting={isSubmittingCategory}
-              onCancel={() => { setIsCategoryModalOpen(false); setIsChangeCategoryModalOpen(true); }}
-              isModal={true}
-            />
-          </div>
-        </DrawerContent>
-      </Drawer>
-    ) : (
-      <Dialog open={isCategoryModalOpen} onOpenChange={setIsCategoryModalOpen}>
-        <DialogContent className="max-w-2xl p-0 overflow-hidden border-none shadow-2xl rounded-[2.5rem]">
-          <DialogHeader className="sr-only">
-            <DialogTitle>Create New Category</DialogTitle>
-            <DialogDescription>Add a new collection to your inventory.</DialogDescription>
-          </DialogHeader>
+        <div className="flex-1 overflow-hidden">
           <CategoryForm 
             onSubmit={handleNewCategorySubmit}
             isSubmitting={isSubmittingCategory}
             onCancel={() => { setIsCategoryModalOpen(false); setIsChangeCategoryModalOpen(true); }}
             isModal={true}
           />
-        </DialogContent>
-      </Dialog>
-    )}
+        </div>
+      </DrawerContent>
+    </Drawer>
     </>
   );
 };
