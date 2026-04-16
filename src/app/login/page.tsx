@@ -56,7 +56,9 @@ export default function AdminLoginPage() {
              setSelectedStoreId(stores[0].id);
              router.replace('/dashboard');
           } else {
-            router.replace('/signup-merchant');
+            // Break the redirect loop from signup page
+            // If user is logged in but has no stores/staff record, let them stay on this page 
+            // to either sign out or click the 'Create a New Store' button.
           }
         }
     }, [user, isAuthLoading, store, stores, staffMember, isCustomer, router, setSelectedStoreId]);
@@ -122,7 +124,7 @@ export default function AdminLoginPage() {
         return <PageSpinner label="Staff Portal" subLabel="Verifying your credentials…" />;
     }
 
-    if (user && stores.length > 1 && !store) {
+    if (user && (stores.length === 0 || (stores.length > 1 && !store)) && !staffMember && !isCustomer) {
         return (
             <div className="w-full min-h-screen grid lg:grid-cols-2 relative">
                 <div className="absolute top-4 right-4 z-50">
@@ -139,7 +141,7 @@ export default function AdminLoginPage() {
                     <div className="absolute bottom-10 left-10 text-white">
                         <h2 className="text-4xl font-bold font-headline">StoreLink-Pro</h2>
                         <p className="text-white/80 mt-2 max-w-lg">
-                            Select the store you want to manage.
+                            {stores.length > 0 ? "Select the store you want to manage." : "Manage your business with ease."}
                         </p>
                     </div>
                 </div>
@@ -149,9 +151,13 @@ export default function AdminLoginPage() {
                             <div className="flex justify-center mb-4">
                                 <ElysiumLogo className="h-10 w-10 text-primary" />
                             </div>
-                            <h1 className="text-4xl font-bold font-headline">Select a Store</h1>
+                            <h1 className="text-4xl font-bold font-headline">
+                                {stores.length > 0 ? "Select a Store" : "No Store Found"}
+                            </h1>
                             <p className="text-balance text-muted-foreground text-sm">
-                                You have multiple stores under this account.
+                                {stores.length > 0 
+                                    ? "You have multiple stores under this account." 
+                                    : "You are logged in as " + (user.email || "your account") + " but don't have a store yet."}
                             </p>
                         </div>
                         <div className="grid gap-3">
@@ -169,14 +175,16 @@ export default function AdminLoginPage() {
                                     </div>
                                 </Button>
                             ))}
-                            <div className="relative my-4">
-                                <div className="absolute inset-0 flex items-center">
-                                    <span className="w-full border-t" />
+                            {stores.length > 0 && (
+                                <div className="relative my-4">
+                                    <div className="absolute inset-0 flex items-center">
+                                        <span className="w-full border-t" />
+                                    </div>
+                                    <div className="relative flex justify-center text-xs uppercase">
+                                        <span className="bg-background px-2 text-muted-foreground">Or</span>
+                                    </div>
                                 </div>
-                                <div className="relative flex justify-center text-xs uppercase">
-                                    <span className="bg-background px-2 text-muted-foreground">Or</span>
-                                </div>
-                            </div>
+                            )}
                             <Button asChild variant="secondary" className="h-12 border-2">
                                 <Link href="/signup-merchant">
                                     <Plus className="mr-2 h-4 w-4" />
@@ -184,7 +192,7 @@ export default function AdminLoginPage() {
                                 </Link>
                             </Button>
                             <Button variant="ghost" size="sm" onClick={() => signOut(auth)} className="mt-4 text-muted-foreground">
-                                Sign out of {user.email}
+                                Sign out of {user.email || "account"}
                             </Button>
                         </div>
                     </div>
