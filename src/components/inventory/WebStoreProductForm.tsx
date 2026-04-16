@@ -9,7 +9,7 @@ import * as z from 'zod';
 import { useFirestore, useCollection } from '@/firebase';
 import { useSettings } from '@/contexts/settings-context';
 import { useAuth } from '@/contexts/auth-context';
-import { collection, addDoc, Timestamp, query, orderBy, doc, writeBatch, serverTimestamp, limit, startAfter, getDocs, type QueryDocumentSnapshot, type DocumentData } from 'firebase/firestore';
+import { collection, addDoc, Timestamp, query, where, orderBy, doc, writeBatch, serverTimestamp, limit, startAfter, getDocs, type QueryDocumentSnapshot, type DocumentData } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Card, 
@@ -145,7 +145,7 @@ const storeProductSchema = z.object({
   isVisibleOnWeb: z.boolean().default(true),
   isVisibleInPOS: z.boolean().default(true),
   isNewArrival: z.boolean().default(false),
-  isPopular: z.boolean().default(false),
+  isPopular: false,
   isOldStock: z.boolean().default(false),
   showProductInsight: z.boolean().default(false),
   isOfficialBrand: z.boolean().default(false),
@@ -228,9 +228,9 @@ export function WebStoreProductForm() {
 
   // Fetch Categories
   const categoriesQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'categories'), orderBy('name'));
-  }, [firestore]);
+    if (!firestore || !currentStoreId) return null;
+    return query(collection(firestore, 'categories'), where('store_id', '==', currentStoreId), orderBy('name'));
+  }, [firestore, currentStoreId]);
   const { data: categories, refetch: refetchCategories } = useCollection<Category>(categoriesQuery);
 
   const filteredCategories = useMemo(() => {
@@ -247,7 +247,7 @@ export function WebStoreProductForm() {
 
   // Fetch categories with pagination
   const fetchPaginatedCategories = useCallback(async (isNextPage = false) => {
-    if (!firestore || (isNextPage && !hasMoreCategoriesRef.current)) return;
+    if (!firestore || !currentStoreId || (isNextPage && !hasMoreCategoriesRef.current)) return;
 
     if (isNextPage) {
       setIsLoadingMoreCategories(true);
@@ -260,6 +260,7 @@ export function WebStoreProductForm() {
     try {
       let q = query(
         collection(firestore, 'categories'),
+        where('store_id', '==', currentStoreId),
         orderBy('name', 'asc'),
         limit(CATEGORY_BATCH_SIZE)
       );
@@ -288,7 +289,7 @@ export function WebStoreProductForm() {
       setIsLoadingPaginatedCategories(false);
       setIsLoadingMoreCategories(false);
     }
-  }, [firestore, CATEGORY_BATCH_SIZE]);
+  }, [firestore, CATEGORY_BATCH_SIZE, currentStoreId]);
 
   // Load categories when modal opens
   useEffect(() => {

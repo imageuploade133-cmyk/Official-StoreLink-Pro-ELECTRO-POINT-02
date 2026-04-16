@@ -24,9 +24,12 @@ interface CategorySheetProps {
 
 export function CategorySheet({ children, trigger }: CategorySheetProps) {
   const firestore = useFirestore();
-  const { user, staffMember, permissions, isLoading: authLoading } = useAuth();
+  const { user, staffMember, store, permissions, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
+  
+  const currentStoreId = staffMember?.store_id || store?.id || user?.uid;
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -36,7 +39,7 @@ export function CategorySheet({ children, trigger }: CategorySheetProps) {
     const trimmedName = values.name.trim();
 
     try {
-      const q = query(collection(firestore, "categories"), where("name", "==", trimmedName), where("store_id", "==", staffMember?.store_id || user.uid));
+      const q = query(collection(firestore, "categories"), where("name", "==", trimmedName), where("store_id", "==", currentStoreId));
       const existing = await getDocs(q);
       if (!existing.empty) {
         toast({ 
@@ -50,7 +53,7 @@ export function CategorySheet({ children, trigger }: CategorySheetProps) {
 
       await addDoc(collection(firestore, 'categories'), {
         ...values,
-        store_id: staffMember?.store_id || user.uid,
+        store_id: currentStoreId,
         name: trimmedName,
         createdAt: Timestamp.now(),
       });

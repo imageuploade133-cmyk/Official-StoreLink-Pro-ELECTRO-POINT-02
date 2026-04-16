@@ -4,7 +4,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useFirestore, useCollection, useDoc } from '@/firebase';
-import { collection, doc, updateDoc, Timestamp, query, orderBy, writeBatch, getDocs, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, updateDoc, Timestamp, query, where, orderBy, writeBatch, getDocs, serverTimestamp } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
 import { PageHeader } from '@/components/PageHeader';
@@ -24,7 +24,10 @@ export default function EditProductPage() {
   const productId = params.productId as string;
   const firestore = useFirestore();
   const { toast } = useToast();
-  const { permissions, user, isLoading: isAuthLoading } = useAuth();
+  const { permissions, user, isLoading: isAuthLoading, staffMember, store } = useAuth();
+  
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
+
   const [isSaving, setIsSaving] = useState(false);
   const [voiceParts, setVoiceParts] = useState<VoiceSignature[]>([]);
   const [isLoadingParts, setIsLoadingParts] = useState(true);
@@ -53,9 +56,9 @@ export default function EditProductPage() {
 
   // Fetch Categories
   const categoriesQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'categories'), orderBy('name'));
-  }, [firestore]);
+    if (!firestore || !currentStoreId) return null;
+    return query(collection(firestore, 'categories'), where('store_id', '==', currentStoreId), orderBy('name'));
+  }, [firestore, currentStoreId]);
   const { data: categories, isLoading: isLoadingCategories, refetch: refetchCategories } = useCollection<Category>(categoriesQuery);
 
   const handleProductUpdate = async (values: ProductFormValues) => {
