@@ -198,18 +198,40 @@ export default function MerchantSignupPage() {
                     console.log("Attempting to create settings in separate database:", values.databaseId);
                     const targetFirestore = getFirestoreInstance(values.databaseId);
                     
+                    // Create a promise that writes to both settings locations in the separate database
+                    // This ensures the new store is fully initialized in the target database
+                    const separateDatabaseWrite = Promise.all([
+                        setDoc(doc(targetFirestore, 'settings', storeId), settingsData),
+                        setDoc(doc(targetFirestore, 'stores', storeId, 'settings', 'config'), settingsData)
+                    ]);
+
                     const timeoutPromise = new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error('Timeout: Separate database write took too long')), 5000)
+                        setTimeout(() => reject(new Error('Timeout: Separate database write took too long. Check if the database ID is correct and provisioned in Firebase.')), 10000)
                     );
 
                     await Promise.race([
-                        setDoc(doc(targetFirestore, 'settings', storeId), settingsData),
+                        separateDatabaseWrite,
                         timeoutPromise
                     ]);
                     console.log("Settings created in separate database successfully");
                 } catch (e) {
                     console.error("Separate database settings creation failed or timed out:", e);
-                    // Non-blocking error
+                    
+                    // Fallback: update the store record in the main database to use '(default)'
+                    // This ensures the user can still use their store even if the separate database was invalid
+                    try {
+                        await setDoc(doc(firestore, 'stores', storeId), { databaseId: '(default)' }, { merge: true });
+                        console.log("Successfully fell back to default databaseId");
+                    } catch (fallbackError) {
+                        console.warn("Failed to reset databaseId to (default):", fallbackError);
+                    }
+
+                    // Non-blocking error, but we should inform the user so they are not confused
+                    toast({ 
+                        variant: "destructive", 
+                        title: "Separate Database Warning", 
+                        description: "Your store was created, but we couldn't initialize the separate database. Your store will use the default database for now." 
+                    });
                 }
             }
             
