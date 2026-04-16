@@ -1706,7 +1706,7 @@ export function ProductForm({
                     <div className="space-y-0.5">
                       <FormLabel className="font-black text-xs uppercase tracking-wider flex items-center gap-2">
                           <Info className="h-3.5 w-3.5 text-primary" /> Product Insight
-                      </p>
+                      </FormLabel>
                       <p className="text-[10px] text-muted-foreground">Show "Listed Since" metrics</p>
                     </div>
                     <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} disabled={isSubmitting} /></FormControl>
