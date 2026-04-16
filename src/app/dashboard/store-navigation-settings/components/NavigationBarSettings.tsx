@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useFirestore } from '@/firebase';
-import { saveGlobalSettings } from '@/firebase/firestore/settings';
+import { saveGlobalSettings, saveStoreSettings } from '@/firebase/firestore/settings';
 import type { AppSettings } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
@@ -56,6 +56,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useAuth } from '@/contexts/auth-context';
+import { useMemo } from 'react';
 
 const navigationSchema = z.object({
   // Style Settings
@@ -118,7 +120,10 @@ interface NavigationBarSettingsProps {
 export function NavigationBarSettings({ settingsData, isLoading }: NavigationBarSettingsProps) {
   const { toast } = useToast();
   const firestore = useFirestore();
+  const { store, staffMember } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(navigationSchema),
@@ -129,7 +134,11 @@ export function NavigationBarSettings({ settingsData, isLoading }: NavigationBar
     if (!firestore) return;
     setIsSaving(true);
     try {
-      await saveGlobalSettings(firestore, DEFAULT_NAV_SETTINGS);
+      if (currentStoreId) {
+        await saveStoreSettings(firestore, currentStoreId, DEFAULT_NAV_SETTINGS);
+      } else {
+        await saveGlobalSettings(firestore, DEFAULT_NAV_SETTINGS);
+      }
       form.reset(DEFAULT_NAV_SETTINGS);
       toast({ 
         title: 'Settings Reset', 
@@ -176,7 +185,11 @@ export function NavigationBarSettings({ settingsData, isLoading }: NavigationBar
     if (!firestore) return;
     setIsSaving(true);
     try {
-      await saveGlobalSettings(firestore, data);
+      if (currentStoreId) {
+        await saveStoreSettings(firestore, currentStoreId, data);
+      } else {
+        await saveGlobalSettings(firestore, data);
+      }
       toast({ title: 'Success', description: 'Navigation bar settings have been updated.' });
     } catch (e) {
       toast({ variant: 'destructive', title: 'Error', description: 'Failed to update settings.' });

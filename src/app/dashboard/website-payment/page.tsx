@@ -71,7 +71,7 @@ type FlutterwaveFormValues = z.infer<typeof flutterwaveSchema>;
 
 export default function WebsitePaymentSettings() {
   const firestore = useFirestore();
-  const { permissions, isLoading: isAuthLoading } = useAuth();
+  const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
   const { toast } = useToast();
   
   const [isSaving, setIsSaving] = useState(false);
@@ -82,9 +82,11 @@ export default function WebsitePaymentSettings() {
   const [providers, setProviders] = useState<any[]>([]);
   const [isLoadingProviders, setIsLoadingProviders] = useState(true);
 
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
+
   const fetchProviders = async () => {
     try {
-      const res = await fetch('/api/payment/settings');
+      const res = await fetch(`/api/payment/settings?storeId=${currentStoreId || 'global'}`);
       const data = await res.json();
       if (Array.isArray(data)) {
         setProviders(data);
@@ -97,8 +99,10 @@ export default function WebsitePaymentSettings() {
   };
 
   useEffect(() => {
-    fetchProviders();
-  }, []);
+    if (currentStoreId) {
+      fetchProviders();
+    }
+  }, [currentStoreId]);
 
   const paystackProvider = providers.find(p => p.providerName === 'paystack');
   const flutterwaveProvider = providers.find(p => p.providerName === 'flutterwave');
@@ -175,6 +179,7 @@ export default function WebsitePaymentSettings() {
           isActive,
           mode,
           config,
+          storeId: currentStoreId || 'global',
         }),
       });
 
@@ -192,7 +197,7 @@ export default function WebsitePaymentSettings() {
   const testConnection = async (providerName: string) => {
     setIsSaving(true);
     try {
-      const res = await fetch(`/api/payment/test-connection?provider=${providerName}`);
+      const res = await fetch(`/api/payment/test-connection?provider=${providerName}&storeId=${currentStoreId || 'global'}`);
       const data = await res.json();
       if (data.success) {
         toast({ title: 'Success', description: `${providerName} connection is valid.` });
@@ -207,11 +212,27 @@ export default function WebsitePaymentSettings() {
   };
 
   const settingsRef = useMemo(
-    () => (firestore ? doc(firestore, 'settings', 'global') : null),
-    [firestore]
+    () => {
+        if (!firestore) return null;
+        if (currentStoreId) {
+            return doc(firestore, 'stores', currentStoreId, 'settings', 'config');
+        }
+        return doc(firestore, 'settings', 'global');
+    },
+    [firestore, currentStoreId]
   );
 
-  const { data: settingsData, isLoading: isLoadingSettings } = useDoc<AppSettings>(settingsRef);
+  // Fallback for old stores
+  const oldSettingsRef = useMemo(
+    () => (firestore && currentStoreId) ? doc(firestore, 'settings', currentStoreId) : null,
+    [firestore, currentStoreId]
+  );
+
+  const { data: mainSettingsData, isLoading: isLoadingMainSettings } = useDoc<AppSettings>(settingsRef);
+  const { data: oldSettingsData, isLoading: isLoadingOldSettings } = useDoc<AppSettings>(oldSettingsRef);
+
+  const settingsData = mainSettingsData || oldSettingsData;
+  const isLoadingSettings = isLoadingMainSettings && (currentStoreId ? isLoadingOldSettings : true);
 
   const bankAccounts = settingsData?.bankAccounts || [];
 
@@ -248,7 +269,11 @@ export default function WebsitePaymentSettings() {
     if (!firestore) return;
     setIsSaving(true);
     try {
-      await saveGlobalSettings(firestore, data);
+      if (currentStoreId) {
+          await saveStoreSettings(firestore, currentStoreId, data);
+      } else {
+          await saveGlobalSettings(firestore, data);
+      }
       toast({ title: 'Success', description: 'Transfer instructions updated.' });
     } catch (e) {
       toast({ variant: 'destructive', title: 'Error', description: 'Failed to update instructions.' });
@@ -284,7 +309,11 @@ export default function WebsitePaymentSettings() {
         updatedAccounts = [...bankAccounts, newAccount];
       }
 
-      await saveGlobalSettings(firestore, { bankAccounts: updatedAccounts });
+      if (currentStoreId) {
+          await saveStoreSettings(firestore, currentStoreId, { bankAccounts: updatedAccounts });
+      } else {
+          await saveGlobalSettings(firestore, { bankAccounts: updatedAccounts });
+      }
       toast({
         title: 'Success',
         description: `Bank account ${editingAccount ? 'updated' : 'added'} successfully.`,
@@ -307,7 +336,11 @@ export default function WebsitePaymentSettings() {
     setIsSaving(true);
     try {
       const updatedAccounts = bankAccounts.filter((acc) => acc.id !== accountToDelete.id);
-      await saveGlobalSettings(firestore, { bankAccounts: updatedAccounts });
+      if (currentStoreId) {
+          await saveStoreSettings(firestore, currentStoreId, { bankAccounts: updatedAccounts });
+      } else {
+          await saveGlobalSettings(firestore, { bankAccounts: updatedAccounts });
+      }
       toast({
         title: 'Success',
         description: 'Bank account removed.',

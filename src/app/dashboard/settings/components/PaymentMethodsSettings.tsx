@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import Image from 'next/image';
 import { useFirestore } from '@/firebase';
-import { saveGlobalSettings } from '@/firebase/firestore/settings';
+import { saveGlobalSettings, saveStoreSettings } from '@/firebase/firestore/settings';
 import type { AppSettings, PaymentMethod } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { uploadImage } from '@/ai/flows/image-upload-flow';
@@ -30,9 +30,10 @@ type FormValues = z.infer<typeof paymentMethodSchema>;
 interface PaymentMethodsSettingsProps {
   settingsData: AppSettings | null;
   isLoading: boolean;
+  storeId?: string | null;
 }
 
-export function PaymentMethodsSettings({ settingsData, isLoading }: PaymentMethodsSettingsProps) {
+export function PaymentMethodsSettings({ settingsData, isLoading, storeId }: PaymentMethodsSettingsProps) {
   const { toast } = useToast();
   const firestore = useFirestore();
   const [isSaving, setIsSaving] = useState(false);
@@ -61,7 +62,11 @@ export function PaymentMethodsSettings({ settingsData, isLoading }: PaymentMetho
     setIsSaving(true);
     const updatedMethods = paymentMethods.filter(pm => pm.id !== methodToDelete.id);
     try {
-      await saveGlobalSettings(firestore, { paymentMethods: updatedMethods });
+      if (storeId) {
+        await saveStoreSettings(firestore, storeId, { paymentMethods: updatedMethods });
+      } else {
+        await saveGlobalSettings(firestore, { paymentMethods: updatedMethods });
+      }
       toast({ title: 'Success', description: `Payment method "${methodToDelete.name}" has been deleted.` });
       setMethodToDelete(null);
     } catch (e) {
@@ -91,7 +96,11 @@ export function PaymentMethodsSettings({ settingsData, isLoading }: PaymentMetho
     }
     
     try {
-      await saveGlobalSettings(firestore, { paymentMethods: updatedMethods });
+      if (storeId) {
+        await saveStoreSettings(firestore, storeId, { paymentMethods: updatedMethods });
+      } else {
+        await saveGlobalSettings(firestore, { paymentMethods: updatedMethods });
+      }
       toast({ title: 'Success', description: 'Payment methods have been updated.' });
       setIsFormModalOpen(false);
     } catch (e) {

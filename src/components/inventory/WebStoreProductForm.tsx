@@ -194,10 +194,12 @@ type FormValues = z.infer<typeof storeProductSchema>;
 export function WebStoreProductForm() {
   const router = useRouter();
   const firestore = useFirestore();
-  const { user } = useAuth();
+  const { user, store, staffMember } = useAuth();
   const { toast } = useToast();
   const { settings } = useSettings();
   
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
+
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [isSubmittingCategory, setIsSubmittingCategory] = useState(false);
   const [isAiGenerating, setIsAiGenerating] = useState(false);
@@ -462,11 +464,12 @@ export function WebStoreProductForm() {
   };
 
   const handleCreateCategory = async (values: CategoryFormValues) => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsSubmittingCategory(true);
     try {
         const docRef = await addDoc(collection(firestore, 'categories'), {
             ...values,
+            store_id: currentStoreId,
             createdAt: Timestamp.now(),
             updatedAt: Timestamp.now(),
         });
@@ -487,13 +490,14 @@ export function WebStoreProductForm() {
   };
 
   const onSubmit = async (values: FormValues) => {
-    if (!firestore || !user) return;
+    if (!firestore || !user || !currentStoreId) return;
     setIsSaving(true);
     try {
       const { isPromo, promoType, promoValue, promoStartDate, promoEndDate, voiceSignatures, ...rest } = values;
       
       const productData: any = {
         ...rest,
+        store_id: currentStoreId,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
         promo: null,
@@ -529,7 +533,8 @@ export function WebStoreProductForm() {
               change: values.stock,
               staffId: user.uid,
               staffName: user.displayName || user.email || 'Staff',
-              timestamp: serverTimestamp()
+              timestamp: serverTimestamp(),
+              store_id: currentStoreId
           });
       }
 

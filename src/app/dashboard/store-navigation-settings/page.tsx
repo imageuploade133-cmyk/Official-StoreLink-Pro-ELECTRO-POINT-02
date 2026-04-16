@@ -13,14 +13,32 @@ import { NavigationBarSettings } from './components/NavigationBarSettings';
 
 export default function StoreNavigationSettingsPage() {
     const firestore = useFirestore();
-    const { permissions, isLoading: isAuthLoading } = useAuth();
+    const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
+
+    const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
     const settingsRef = useMemo(
-        () => (firestore ? doc(firestore, 'settings', 'global') : null),
-        [firestore]
+        () => {
+            if (!firestore) return null;
+            if (currentStoreId) {
+                return doc(firestore, 'stores', currentStoreId, 'settings', 'config');
+            }
+            return doc(firestore, 'settings', 'global');
+        },
+        [firestore, currentStoreId]
     );
-    const { data: settingsData, isLoading: isLoadingSettings } = useDoc<AppSettings>(settingsRef);
-    const isLoading = isLoadingSettings || isAuthLoading;
+
+    // Fallback for old stores
+    const oldSettingsRef = useMemo(
+        () => (firestore && currentStoreId) ? doc(firestore, 'settings', currentStoreId) : null,
+        [firestore, currentStoreId]
+    );
+
+    const { data: mainSettingsData, isLoading: isLoadingMainSettings } = useDoc<AppSettings>(settingsRef);
+    const { data: oldSettingsData, isLoading: isLoadingOldSettings } = useDoc<AppSettings>(oldSettingsRef);
+
+    const settingsData = mainSettingsData || oldSettingsData;
+    const isLoading = (isLoadingMainSettings && (currentStoreId ? isLoadingOldSettings : true)) || isAuthLoading;
     
     if (isLoading) {
         return <div className="flex h-screen w-full items-center justify-center"><Skeleton className="h-96 w-full" /></div>;
