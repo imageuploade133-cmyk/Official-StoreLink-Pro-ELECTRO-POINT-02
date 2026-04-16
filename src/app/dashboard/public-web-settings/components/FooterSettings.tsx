@@ -8,16 +8,19 @@ import { useFirestore } from '@/firebase';
 import { saveGlobalSettings, saveStoreSettings } from '@/firebase/firestore/settings';
 import type { AppSettings } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
+import { uploadImage } from '@/ai/flows/image-upload-flow';
+import Image from 'next/image';
 
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, Palette, RotateCcw, LayoutPanelTop, Save } from 'lucide-react';
+import { Loader2, Palette, RotateCcw, LayoutPanelTop, Save, Upload, Image as ImageIcon, Layout, Maximize2, Minimize2 } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const footerSettingsSchema = z.object({
   footerBackgroundStyle: z.enum(['solid', 'gradient']).optional(),
@@ -25,6 +28,9 @@ const footerSettingsSchema = z.object({
   footerBackgroundGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').optional(),
   footerBackgroundGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').optional(),
   footerTextColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').optional(),
+  footerDesign: z.enum(['standard', 'modern', 'minimal']).optional(),
+  footerBannerUrl: z.string().url('Must be a valid URL.').or(z.literal('')).optional(),
+  footerBannerSize: z.enum(['small', 'big']).optional(),
 });
 
 type FormValues = z.infer<typeof footerSettingsSchema>;
@@ -35,6 +41,9 @@ const defaultValues: FormValues = {
   footerBackgroundGradientStart: '#101622',
   footerBackgroundGradientEnd: '#1e293b',
   footerTextColor: '#94a3b8',
+  footerDesign: 'standard',
+  footerBannerUrl: '',
+  footerBannerSize: 'small',
 };
 
 interface FooterSettingsProps {
@@ -60,6 +69,7 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
   const { toast } = useToast();
   const firestore = useFirestore();
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(footerSettingsSchema),
@@ -76,9 +86,42 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
         footerBackgroundGradientStart: settingsData.footerBackgroundGradientStart || '#101622',
         footerBackgroundGradientEnd: settingsData.footerBackgroundGradientEnd || '#1e293b',
         footerTextColor: settingsData.footerTextColor || '#94a3b8',
+        footerDesign: settingsData.footerDesign || 'standard',
+        footerBannerUrl: settingsData.footerBannerUrl || '',
+        footerBannerSize: settingsData.footerBannerSize || 'small',
       });
     }
   }, [settingsData, form]);
+
+  const handleBannerUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ variant: "destructive", title: "File too large", description: "Banner image must be smaller than 5MB." });
+      return;
+    }
+
+    setIsUploadingBanner(true);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      try {
+        const imageDataUri = reader.result as string;
+        const result = await uploadImage({ imageDataUri });
+        form.setValue('footerBannerUrl', result.display_url, { shouldValidate: true });
+        toast({ title: "Banner Uploaded", description: "Footer banner image has been updated." });
+      } catch (error: any) {
+        toast({ variant: "destructive", title: "Upload Failed", description: error.message || "Could not upload banner." });
+      } finally {
+        setIsUploadingBanner(false);
+      }
+    };
+    reader.onerror = () => {
+      toast({ variant: "destructive", title: "File Read Error" });
+      setIsUploadingBanner(false);
+    };
+  };
 
   const onSubmit = async (data: FormValues) => {
     if (!firestore) return;
@@ -118,31 +161,58 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
             <CardDescription>Design an immersive experience for the bottom of your public storefront.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-10 pt-8">
-            <FormField
-              control={form.control}
-              name="footerBackgroundStyle"
-              render={({ field }) => (
-                <FormItem className="space-y-4">
-                  <FormLabel className="text-xs font-black uppercase tracking-[0.2em] text-primary">Background Mode</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      className="grid grid-cols-2 gap-4"
-                    >
-                      <FormItem className="flex items-center space-x-3 space-y-0 rounded-2xl border p-4 bg-muted/10 transition-colors hover:bg-muted/20">
-                        <FormControl><RadioGroupItem value="solid" /></FormControl>
-                        <Label className="font-bold cursor-pointer">Solid Color Fill</Label>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-3 space-y-0 rounded-2xl border p-4 bg-muted/10 transition-colors hover:bg-muted/20">
-                        <FormControl><RadioGroupItem value="gradient" /></FormControl>
-                        <Label className="font-bold cursor-pointer">Linear Gradient Flow</Label>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <FormField
+                  control={form.control}
+                  name="footerDesign"
+                  render={({ field }) => (
+                    <FormItem className="space-y-4">
+                      <FormLabel className="text-xs font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                        <Layout className="h-4 w-4" /> Footer UI Design
+                      </FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="h-12 rounded-2xl border-2 transition-all hover:border-primary">
+                            <SelectValue placeholder="Select a design" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="standard">Standard (Classic)</SelectItem>
+                          <SelectItem value="modern">Modern (Spacious)</SelectItem>
+                          <SelectItem value="minimal">Minimal (Clean)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>Choose the structural layout of your footer links and info.</FormDescription>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="footerBackgroundStyle"
+                  render={({ field }) => (
+                    <FormItem className="space-y-4">
+                      <FormLabel className="text-xs font-black uppercase tracking-[0.2em] text-primary">Background Mode</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          className="grid grid-cols-2 gap-4"
+                        >
+                          <FormItem className="flex items-center space-x-3 space-y-0 rounded-2xl border p-4 bg-muted/10 transition-colors hover:bg-muted/20">
+                            <FormControl><RadioGroupItem value="solid" /></FormControl>
+                            <Label className="font-bold cursor-pointer">Solid Fill</Label>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-3 space-y-0 rounded-2xl border p-4 bg-muted/10 transition-colors hover:bg-muted/20">
+                            <FormControl><RadioGroupItem value="gradient" /></FormControl>
+                            <Label className="font-bold cursor-pointer">Gradient</Label>
+                          </FormItem>
+                        </RadioGroup>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+            </div>
             
             <Separator className="border-dashed" />
 
@@ -162,20 +232,75 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
                     <FormField control={form.control} name="footerTextColor" render={({ field }) => <ColorInput field={field} label="Text & Description Color" />} />
                 </div>
 
-                <div className="space-y-4">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Real-time Insight</h4>
-                    <div className="p-6 rounded-[2rem] border-2 border-dashed bg-muted/5 flex flex-col items-center justify-center text-center gap-4">
-                        <div 
-                            className="w-full h-24 rounded-2xl border shadow-inner flex items-center justify-center overflow-hidden"
-                            style={footerBackgroundStyle === 'solid' 
-                                ? { backgroundColor: form.watch('footerColorBackground') } 
-                                : { backgroundImage: `linear-gradient(to bottom right, ${form.watch('footerBackgroundGradientStart')}, ${form.watch('footerBackgroundGradientEnd')})` }
-                            }
-                        >
-                            <span className="font-black text-xs uppercase tracking-widest" style={{ color: form.watch('footerTextColor') }}>PREVIEW CONTENT</span>
-                        </div>
-                        <p className="text-[10px] text-muted-foreground font-medium max-w-[200px]">The preview above approximates how the footer background will interact with your text color.</p>
-                    </div>
+                <div className="space-y-8">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                        <ImageIcon className="h-3.5 w-3.5" /> Footer Banner Asset
+                    </h4>
+                    
+                    <FormField
+                      control={form.control}
+                      name="footerBannerUrl"
+                      render={({ field }) => (
+                        <FormItem className="space-y-4">
+                          <FormLabel className="text-sm font-bold">Banner Image</FormLabel>
+                          <div className="flex flex-col gap-4">
+                            {field.value && (
+                              <div className="relative w-full aspect-[4/1] rounded-xl overflow-hidden border shadow-inner bg-muted/20">
+                                <Image src={field.value} alt="Footer Banner" fill className="object-cover" unoptimized />
+                                <Button 
+                                  type="button" 
+                                  variant="destructive" 
+                                  size="icon" 
+                                  className="absolute top-2 right-2 h-8 w-8 rounded-full"
+                                  onClick={() => form.setValue('footerBannerUrl', '')}
+                                >
+                                  <RotateCcw className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            )}
+                            <div className="flex items-center gap-2">
+                              <FormControl>
+                                <Input {...field} placeholder="https://example.com/banner.png" disabled={isSaving || isUploadingBanner} />
+                              </FormControl>
+                              <Button asChild variant="outline" size="icon" className="shrink-0 h-10 w-10 rounded-xl" disabled={isSaving || isUploadingBanner}>
+                                <label htmlFor="footer-banner-upload" className="cursor-pointer">
+                                  {isUploadingBanner ? <Loader2 className="h-4 w-4 animate-spin"/> : <Upload className="h-4 w-4" />}
+                                  <span className="sr-only">Upload Banner</span>
+                                </label>
+                              </Button>
+                              <Input id="footer-banner-upload" type="file" accept="image/*" className="hidden" onChange={handleBannerUpload} disabled={isSaving || isUploadingBanner} />
+                            </div>
+                          </div>
+                          <FormDescription className="text-[10px]">A promotional banner displayed at the very bottom of your footer.</FormDescription>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="footerBannerSize"
+                      render={({ field }) => (
+                        <FormItem className="space-y-4">
+                          <FormLabel className="text-sm font-bold">Banner Scale</FormLabel>
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              value={field.value}
+                              className="flex gap-4"
+                            >
+                              <FormItem className="flex items-center space-x-2 space-y-0">
+                                <FormControl><RadioGroupItem value="small" /></FormControl>
+                                <Label className="font-medium cursor-pointer flex items-center gap-1.5"><Minimize2 className="h-3.5 w-3.5"/> Small</Label>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-2 space-y-0">
+                                <FormControl><RadioGroupItem value="big" /></FormControl>
+                                <Label className="font-medium cursor-pointer flex items-center gap-1.5"><Maximize2 className="h-3.5 w-3.5"/> Big</Label>
+                              </FormItem>
+                            </RadioGroup>
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
                 </div>
             </div>
           </CardContent>

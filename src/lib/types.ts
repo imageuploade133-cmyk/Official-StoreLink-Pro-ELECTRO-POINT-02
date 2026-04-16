@@ -169,6 +169,14 @@ export interface Settings {
   showFooterDescription?: boolean;
   footerLogoUrl?: string;
   footerLogoWidth?: number;
+  footerBackgroundStyle?: 'solid' | 'gradient';
+  footerColorBackground?: string;
+  footerBackgroundGradientStart?: string;
+  footerBackgroundGradientEnd?: string;
+  footerTextColor?: string;
+  footerDesign?: 'standard' | 'modern' | 'minimal';
+  footerBannerUrl?: string;
+  footerBannerSize?: 'small' | 'big';
   enableExternalPrinter?: boolean;
   receiptFooterMessage?: string;
   storeLogoUrl?: string;
