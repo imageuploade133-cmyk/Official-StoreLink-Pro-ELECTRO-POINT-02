@@ -527,7 +527,7 @@ export default function WebsiteOrdersPage() {
         </TabsContent>
 
         <TabsContent value="audit" className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-          <OrderAuditTab />
+          <OrderAuditTab storeId={currentStoreId} />
         </TabsContent>
       </Tabs>
 
