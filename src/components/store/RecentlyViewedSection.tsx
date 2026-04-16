@@ -18,6 +18,7 @@ import {
   CarouselNext, 
   CarouselPrevious 
 } from '@/components/ui/carousel';
+import { useStoreUrl } from '@/hooks/use-store-url';
 
 interface RecentlyViewedSectionProps {
   excludeId?: string;
@@ -28,6 +29,7 @@ export function RecentlyViewedSection({ excludeId, onViewAll }: RecentlyViewedSe
   const { viewedProductIds } = useRecentlyViewed();
   const firestore = useFirestore();
   const { settings } = useSettings();
+  const { storeId, getStoreUrl } = useStoreUrl();
   const currencySymbol = settings?.currency || '$';
 
   // Filter out current product and limit to 10 for the slider
@@ -43,9 +45,13 @@ export function RecentlyViewedSection({ excludeId, onViewAll }: RecentlyViewedSe
   }, [firestore, targetIds]);
 
   const categoriesQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'categories'), orderBy('name'));
-  }, [firestore]);
+    if (!firestore || !storeId) return null;
+    return query(
+      collection(firestore, 'categories'), 
+      where('store_id', '==', storeId),
+      orderBy('name')
+    );
+  }, [firestore, storeId]);
 
   const { data: products, isLoading } = useCollection<Product>(productsQuery);
   const { data: categories } = useCollection<Category>(categoriesQuery);
@@ -93,7 +99,7 @@ export function RecentlyViewedSection({ excludeId, onViewAll }: RecentlyViewedSe
           </Button>
         ) : (
           <Button asChild variant="ghost" className="font-black text-[10px] uppercase tracking-widest text-primary p-0 h-auto hover:bg-transparent">
-            <Link href="/store/recently-viewed" className="flex items-center gap-2">
+            <Link href={getStoreUrl('/store/recently-viewed')} className="flex items-center gap-2">
               View Full History <ChevronRight className="h-4 w-4" />
             </Link>
           </Button>

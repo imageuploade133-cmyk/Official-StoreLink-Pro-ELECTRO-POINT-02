@@ -26,12 +26,15 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
+import { useStoreUrl } from '@/hooks/use-store-url';
+
 const ITEMS_PER_PAGE = 12;
 
 function CategoryCard({ category }: { category: Category }) {
+    const { getStoreUrl } = useStoreUrl();
     return (
         <Link 
-            href={`/store/shop?category=${category.id}`}
+            href={getStoreUrl(`/store/shop?category=${category.id}`)}
             className="group relative rounded-xl overflow-hidden border dark:border-slate-800 hover:shadow-xl transition-shadow duration-300 h-full block"
         >
             <div className="aspect-w-1 aspect-h-1 h-96 relative">

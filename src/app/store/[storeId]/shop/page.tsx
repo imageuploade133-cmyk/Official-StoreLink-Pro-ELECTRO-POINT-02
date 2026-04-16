@@ -304,6 +304,11 @@ function ShopPageContent() {
     const totalPages = Math.ceil(totalProductsCount / ITEMS_PER_PAGE);
     const isLoading = isLoadingProducts || isLoadingCategories;
 
+    const currentCategory = useMemo(() => {
+        if (categoryFromUrl === 'all' || !categories) return null;
+        return categories.find(c => c.id === categoryFromUrl);
+    }, [categoryFromUrl, categories]);
+
     return (
         <div className="bg-background min-h-screen">
             {/* Category Auto-Switch Notification */}
@@ -330,25 +335,41 @@ function ShopPageContent() {
                         />
                         <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center px-4">
                             <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tighter text-white drop-shadow-lg">
-                                {settings?.shopCollectionTitle || 'Shop Our Collection'}
+                                {currentCategory ? currentCategory.name : (settings?.shopCollectionTitle || 'Shop Our Collection')}
                             </h1>
                             <p className="mt-2 sm:mt-4 max-w-2xl mx-auto text-sm sm:text-base text-white/90 font-medium drop-shadow-md">
-                                {settings?.shopCollectionDescription || 'Discover products that are crafted with quality and designed for life.'}
+                                {currentCategory?.description ? (
+                                    <span dangerouslySetInnerHTML={{ __html: currentCategory.description }} />
+                                ) : (settings?.shopCollectionDescription || 'Discover products that are crafted with quality and designed for life.')}
                             </p>
                         </div>
                     </div>
                 ) : (
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-8 sm:py-12">
+                    <div className="max-w-site-container mx-auto px-4 sm:px-6 lg:px-8 text-center py-8 sm:py-12">
                         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tighter text-slate-900 dark:text-white">
-                            {settings?.shopCollectionTitle || 'Shop Our Collection'}
+                            {currentCategory ? currentCategory.name : (settings?.shopCollectionTitle || 'Shop Our Collection')}
                         </h1>
                         <p className="mt-2 sm:mt-4 max-w-2xl mx-auto text-xs sm:text-sm text-slate-500">
-                            {settings?.shopCollectionDescription || 'Discover products that are crafted with quality and designed for life.'}
+                            {currentCategory?.description ? (
+                                <span dangerouslySetInnerHTML={{ __html: currentCategory.description }} />
+                            ) : (settings?.shopCollectionDescription || 'Discover products that are crafted with quality and designed for life.')}
                         </p>
                     </div>
                 )}
             </header>
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+                {/* Breadcrumbs */}
+                <nav className="flex items-center gap-2 text-xs text-slate-400 mb-8 overflow-x-auto no-scrollbar whitespace-nowrap pb-2">
+                    <Link href={getStoreUrl('/store')} className="hover:text-primary transition-colors">Home</Link>
+                    <ChevronRight className="h-3 w-3" />
+                    <Link href={getStoreUrl('/store/shop')} className={cn("hover:text-primary transition-colors", categoryFromUrl === 'all' && "text-slate-900 dark:text-white font-bold")}>Shop</Link>
+                    {currentCategory && (
+                        <>
+                            <ChevronRight className="h-3 w-3" />
+                            <span className="text-slate-900 dark:text-white font-bold">{currentCategory.name}</span>
+                        </>
+                    )}
+                </nav>
                 <div className={cn(
                     "flex flex-col gap-8",
                     settings?.shopProductsAlignment === 'center' ? "items-center" : "lg:flex-row"

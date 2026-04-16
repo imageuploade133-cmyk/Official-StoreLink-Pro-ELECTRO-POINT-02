@@ -26,6 +26,8 @@ import { cn } from '@/lib/utils';
 import { useSettings } from '@/contexts/settings-context';
 import { useParams } from 'next/navigation';
 
+import { useStoreUrl } from '@/hooks/use-store-url';
+
 const iconMap = {
   ShoppingCart,
   ShoppingBag,
@@ -42,6 +44,7 @@ export function HeroCarousel() {
   const { settings } = useSettings();
   const params = useParams();
   const storeId = params?.storeId as string;
+  const { getStoreUrl } = useStoreUrl();
   
   const slidesQuery = React.useMemo(() => {
     if (!firestore || !storeId) return null;
@@ -299,7 +302,7 @@ export function HeroCarousel() {
                         {slide.showActionButton && (
                           <div className="pt-2 md:pt-10 animate-in fade-in zoom-in-95 duration-1000 delay-300">
                             <Button asChild style={buttonStyle} className={`group relative overflow-hidden font-black shadow-2xl active:scale-95 border-none transition-all duration-500 ${buttonClasses}`}>
-                              <Link href="/store/shop">
+                              <Link href={getStoreUrl('/store/shop')}>
                                 <span className="relative z-10 flex items-center gap-2 md:gap-4">
                                   {heroBtnText}
                                   <HeroBtnIcon className="h-3.5 w-3.5 md:h-5 md:w-5 transition-transform duration-300 group-hover:translate-x-2" strokeWidth={3}/>
