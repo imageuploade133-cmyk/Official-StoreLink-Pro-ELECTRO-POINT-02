@@ -176,7 +176,7 @@ export interface Settings {
   footerTextColor?: string;
   footerDesign?: 'standard' | 'modern' | 'minimal';
   footerBannerUrl?: string;
-  footerBannerSize?: 'small' | 'big';
+  footerBannerSize?: 'small' | 'big' | number;
   footerBgType?: 'text' | 'image' | 'none';
   footerBgText?: string;
   footerBgImageUrl?: string;

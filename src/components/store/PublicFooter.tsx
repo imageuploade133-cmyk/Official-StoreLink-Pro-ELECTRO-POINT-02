@@ -276,14 +276,20 @@ export function PublicFooter() {
           </div>
         </div>
         {footerBannerUrl && (
-          <div className={cn(
-            "mb-10 w-full overflow-hidden rounded-2xl border border-white/10 shadow-2xl transition-all duration-500 hover:scale-[1.01]",
-            footerBannerSize === 'small' ? "max-w-4xl mx-auto h-32 md:h-40" : "h-48 md:h-72"
-          )}>
+          <div 
+            className={cn(
+              "mb-10 w-full overflow-hidden rounded-2xl border border-white/10 shadow-2xl transition-all duration-500 hover:scale-[1.01]",
+              (footerBannerSize === 'small' || (typeof footerBannerSize === 'number' && footerBannerSize <= 200)) && "max-w-4xl mx-auto"
+            )}
+            style={typeof footerBannerSize === 'number' ? { height: `${footerBannerSize}px` } : {}}
+          >
             <img 
               src={footerBannerUrl} 
               alt="Footer Banner" 
-              className="w-full h-full object-cover" 
+              className={cn(
+                "w-full object-cover",
+                typeof footerBannerSize === 'number' ? "h-full" : (footerBannerSize === 'small' ? "h-32 md:h-40" : "h-48 md:h-72")
+              )} 
               loading="lazy"
             />
           </div>
