@@ -231,6 +231,9 @@ function SocialMediaFormDialog({ isOpen, onOpenChange, onSubmit, isSaving, defau
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{defaultValues ? 'Edit' : 'Add'} Social Media Link</DialogTitle>
+          <DialogDescription>
+            {defaultValues ? 'Update the details for this social media profile.' : 'Add a new social media link to your website.'}
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">

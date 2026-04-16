@@ -225,6 +225,9 @@ function PaymentMethodFormDialog({ isOpen, onOpenChange, onSubmit, isSaving, def
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{defaultValues ? 'Edit' : 'Add'} Payment Method</DialogTitle>
+          <DialogDescription>
+            {defaultValues ? 'Update the details for this payment option.' : 'Configure a new payment method for your store.'}
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
