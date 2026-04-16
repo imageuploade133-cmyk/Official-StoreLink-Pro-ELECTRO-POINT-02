@@ -42,6 +42,11 @@ service cloud.firestore {
       allow write: if isSignedIn(); // only logged-in users can modify
     }
 
+    match /stores/{storeId}/settings/{document=**} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
     /* ===============================
        AUTH REQUIRED COLLECTIONS
     =============================== */
