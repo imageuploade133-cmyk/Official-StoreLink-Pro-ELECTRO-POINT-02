@@ -863,7 +863,7 @@ function UserButton({ isLoading, user, staffMember, router, handleLogout, getIni
                 <DropdownMenuContent align="end" className="w-56 rounded-2xl shadow-2xl border-slate-200 dark:border-slate-800">
                     <DropdownMenuLabel className="p-4">
                         <div className="flex flex-col space-y-1">
-                            <p className="text-sm font-black leading-none">{user.displayName || 'Valued Customer'}</p>
+                            <p className="text-sm font-black leading-none">{user.displayName || 'You'}</p>
                             <p className="text-[10px] font-medium leading-none text-muted-foreground uppercase tracking-widest mt-1">
                             {user.email}
                             </p>

@@ -101,7 +101,7 @@ export default function AccountPage() {
                         <AvatarImage src={user.photoURL || ''} alt={user.displayName || 'User'} />
                         <AvatarFallback className="text-3xl font-black">{getInitials(user?.email)}</AvatarFallback>
                     </Avatar>
-                    <h2 className="text-xl font-black tracking-tight">{user.displayName || 'Valued Customer'}</h2>
+                    <h2 className="text-xl font-black tracking-tight">{user.displayName || 'You'}</h2>
                     <p className="text-xs text-muted-foreground uppercase font-bold tracking-widest mt-1">{user.email}</p>
                      <Button variant="destructive" onClick={handleLogout} className="w-full mt-8 rounded-2xl h-12 font-bold uppercase text-[10px] tracking-widest">
                         <LogOut className="mr-2 h-4 w-4" /> Logout
