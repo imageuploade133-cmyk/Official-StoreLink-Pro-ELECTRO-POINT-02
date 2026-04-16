@@ -1,0 +1,1 @@
+      { message: `Stock cannot be reduced manually here. Current stock is ${originalStock}. Use Restock page for adjustments.`, path: ["stock"] }

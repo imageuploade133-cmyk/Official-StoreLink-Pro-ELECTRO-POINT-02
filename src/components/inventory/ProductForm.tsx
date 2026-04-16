@@ -210,7 +210,7 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
     )
     .refine(
       (data) => !(preventReduction && originalStock !== undefined && data.stock < originalStock),
-      { message: \`Stock cannot be reduced manually here. Current stock is ${originalStock}. Use Restock page for adjustments.`, path: ["stock"] }
+      { message: "Stock cannot be reduced manually here. Current stock is " + originalStock + ". Use Restock page for adjustments.", path: ["stock"] }
     )
     .refine(
       (data) => !data.newPrice || data.newPrice < data.sellingPrice,
@@ -549,7 +549,7 @@ export function ProductForm({
         updatedAt: Timestamp.now(),
       });
       
-      toast({ title: "Category Created", description: \`"\${categoryValues.name}" is now available.\` });
+      toast({ title: "Category Created", description: `"${categoryValues.name}" is now available.` });
       if (onCategoriesNeedRefresh) await onCategoriesNeedRefresh();
       form.setValue('categoryId', docRef.id, { shouldValidate: true });
       setIsCategoryModalOpen(false);
@@ -1449,7 +1449,7 @@ export function ProductForm({
                         <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <FormField
                             control={form.control}
-                            name={`specifications.\${index}.label`}
+                            name={`specifications.${index}.label`}
                             render={({ field: subField }) => (
                               <FormItem className="space-y-1">
                                 <FormControl><Input placeholder="Label (e.g. Battery Life)" {...subField} className="h-10 text-sm" /></FormControl>
@@ -1459,7 +1459,7 @@ export function ProductForm({
                           />
                           <FormField
                             control={form.control}
-                            name={`specifications.\${index}.value`}
+                            name={`specifications.${index}.value`}
                             render={({ field: subField }) => (
                               <FormItem className="space-y-1">
                                 <FormControl><Input placeholder="Value (e.g. 24 Hours)" {...subField} className="h-10 text-sm" /></FormControl>
@@ -1586,7 +1586,7 @@ export function ProductForm({
                         <div className="flex-1">
                           <FormField
                             control={form.control}
-                            name={\`whatsInTheBox.\${index}.name\`}
+                            name={`whatsInTheBox.${index}.name`}
                             render={({ field: subField }) => (
                               <FormItem className="space-y-1">
                                 <FormControl><Input placeholder="Item name (e.g. Charging Cable)" {...subField} className="h-10 text-sm" /></FormControl>
@@ -1713,7 +1713,7 @@ export function ProductForm({
                         <div className="flex-1">
                           <FormField
                             control={form.control}
-                            name={\`variations.\${index}.name\`}
+                            name={`variations.${index}.name`}
                             render={({ field: subField }) => (
                               <FormItem className="space-y-1">
                                 <FormControl><Input placeholder="Variation (e.g. Space Gray Finish)" {...subField} className="h-10 text-sm" /></FormControl>
