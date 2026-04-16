@@ -60,7 +60,7 @@ export function StoreFirestoreProvider({ children }: { children: React.ReactNode
     const databaseId = store?.databaseId || urlStore?.databaseId;
     
     // Specifically block known invalid databases for this project to prevent immediate errors
-    const isKnownInvalid = databaseId === 'gano7777';
+    const isKnownInvalid = databaseId === 'gano7777' || databaseId === 'yyyyy';
 
     if (!fallbackToDefault && !isKnownInvalid && databaseId && databaseId !== '(default)') {
       try {
