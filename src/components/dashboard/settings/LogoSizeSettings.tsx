@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useFirestore } from '@/firebase';
-import { saveGlobalSettings } from '@/firebase/firestore/settings';
+import { saveGlobalSettings, saveStoreSettings } from '@/firebase/firestore/settings';
 import type { AppSettings } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
@@ -26,9 +26,10 @@ type FormValues = z.infer<typeof logoSizeSchema>;
 interface LogoSizeSettingsProps {
   settingsData: AppSettings | null;
   isLoading: boolean;
+  storeId?: string | null;
 }
 
-export function LogoSizeSettings({ settingsData, isLoading }: LogoSizeSettingsProps) {
+export function LogoSizeSettings({ settingsData, isLoading, storeId }: LogoSizeSettingsProps) {
   const { toast } = useToast();
   const firestore = useFirestore();
   const [isSaving, setIsSaving] = useState(false);
@@ -54,7 +55,11 @@ export function LogoSizeSettings({ settingsData, isLoading }: LogoSizeSettingsPr
     if (!firestore) return;
     setIsSaving(true);
     try {
-      await saveGlobalSettings(firestore, data);
+      if (storeId) {
+        await saveStoreSettings(firestore, storeId, data);
+      } else {
+        await saveGlobalSettings(firestore, data);
+      }
       toast({ title: 'Success', description: 'Logo size settings have been updated.' });
     } catch (e) {
       toast({ variant: 'destructive', title: 'Error', description: 'Failed to update settings.' });

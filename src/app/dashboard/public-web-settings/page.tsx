@@ -23,13 +23,33 @@ import { ProductCardSizeSettings } from '@/components/dashboard/settings/Product
 
 export default function PublicWebSettingsPage() {
     const firestore = useFirestore();
-    const { permissions, isLoading: isAuthLoading } = useAuth();
+    const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
+
+    const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
     const settingsRef = useMemo(
-        () => (firestore ? doc(firestore, 'settings', 'global') : null),
-        [firestore]
+        () => {
+            if (!firestore) return null;
+            if (currentStoreId) {
+                return doc(firestore, 'stores', currentStoreId, 'settings', 'config');
+            }
+            return doc(firestore, 'settings', 'global');
+        },
+        [firestore, currentStoreId]
     );
-    const { data: settingsData, isLoading: isLoadingSettings } = useDoc<AppSettings>(settingsRef);
+
+    // Fallback for old stores
+    const oldSettingsRef = useMemo(
+        () => (firestore && currentStoreId) ? doc(firestore, 'settings', currentStoreId) : null,
+        [firestore, currentStoreId]
+    );
+
+    const { data: mainSettingsData, isLoading: isLoadingMainSettings } = useDoc<AppSettings>(settingsRef);
+    const { data: oldSettingsData, isLoading: isLoadingOldSettings } = useDoc<AppSettings>(oldSettingsRef);
+
+    const settingsData = mainSettingsData || oldSettingsData;
+    const isLoadingSettings = isLoadingMainSettings && (currentStoreId ? isLoadingOldSettings : true);
+    
     const isLoading = isLoadingSettings || isAuthLoading;
     
     if (isLoading) {
@@ -49,17 +69,17 @@ export default function PublicWebSettingsPage() {
             />
             
             <div className="space-y-6">
-                <SiteIdentitySettings settingsData={settingsData} isLoading={isLoading} />
-                <AuthPageSettings settingsData={settingsData} isLoading={isLoading} />
-                <HeroCarouselSettings settingsData={settingsData} isLoading={isLoading} />
-                <ImageUploadSettings settingsData={settingsData} isLoading={isLoading} />
-                <WatermarkSettings settingsData={settingsData} isLoading={isLoading} />
-                <ColorSettings settingsData={settingsData} isLoading={isLoading} />
-                <WebStoreGridSettings settingsData={settingsData} isLoading={isLoading} />
-                <ProductCardSizeSettings settingsData={settingsData} isLoading={isLoading} />
-                <BrandValuesSettings settingsData={settingsData} isLoading={isLoading} />
-                <FooterSettings settingsData={settingsData} isLoading={isLoading} />
-                <NewsletterSettings settingsData={settingsData} isLoading={isLoading} />
+                <SiteIdentitySettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
+                <AuthPageSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
+                <HeroCarouselSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
+                <ImageUploadSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
+                <WatermarkSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
+                <ColorSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
+                <WebStoreGridSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
+                <ProductCardSizeSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
+                <BrandValuesSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
+                <FooterSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
+                <NewsletterSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
             </div>
         </div>
     );

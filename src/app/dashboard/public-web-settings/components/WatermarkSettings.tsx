@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import Image from 'next/image';
 import { useFirestore } from '@/firebase';
-import { saveGlobalSettings } from '@/firebase/firestore/settings';
+import { saveGlobalSettings, saveStoreSettings } from '@/firebase/firestore/settings';
 import type { AppSettings } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { uploadImage } from '@/ai/flows/image-upload-flow';
@@ -40,9 +40,10 @@ type FormValues = z.infer<typeof watermarkSchema>;
 interface WatermarkSettingsProps {
   settingsData: AppSettings | null;
   isLoading: boolean;
+  storeId?: string | null;
 }
 
-export function WatermarkSettings({ settingsData, isLoading }: WatermarkSettingsProps) {
+export function WatermarkSettings({ settingsData, isLoading, storeId }: WatermarkSettingsProps) {
   const { toast } = useToast();
   const firestore = useFirestore();
   const [isSaving, setIsSaving] = useState(false);
@@ -81,7 +82,11 @@ export function WatermarkSettings({ settingsData, isLoading }: WatermarkSettings
     if (!firestore) return;
     setIsSaving(true);
     try {
-      await saveGlobalSettings(firestore, data);
+      if (storeId) {
+        await saveStoreSettings(firestore, storeId, data);
+      } else {
+        await saveGlobalSettings(firestore, data);
+      }
       toast({ title: 'Success', description: 'Brand watermark settings updated.' });
     } catch (e) {
       toast({ variant: 'destructive', title: 'Error', description: 'Failed to update settings.' });

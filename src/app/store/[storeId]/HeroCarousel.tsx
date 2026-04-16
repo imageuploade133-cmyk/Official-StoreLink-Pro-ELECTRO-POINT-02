@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSettings } from '@/contexts/settings-context';
+import { useParams } from 'next/navigation';
 
 const iconMap = {
   ShoppingCart,
@@ -39,11 +40,19 @@ const iconMap = {
 export function HeroCarousel() {
   const firestore = useFirestore();
   const { settings } = useSettings();
+  const params = useParams();
+  const storeId = params?.storeId as string;
   
   const slidesQuery = React.useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'slideShows'), where('published', '==', true), orderBy('order', 'asc'), limit(20));
-  }, [firestore]);
+    if (!firestore || !storeId) return null;
+    return query(
+      collection(firestore, 'slideShows'), 
+      where('store_id', '==', storeId),
+      where('published', '==', true), 
+      orderBy('order', 'asc'), 
+      limit(20)
+    );
+  }, [firestore, storeId]);
   const { data: slides, isLoading } = useCollection<SlideShow>(slidesQuery);
 
   const slideDuration = settings?.slideShowDuration || 7000;

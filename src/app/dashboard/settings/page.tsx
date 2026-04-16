@@ -146,8 +146,8 @@ export default function SettingsPage() {
         {visibleSections.api && <ApiKeysSettings settingsData={settingsData} isLoading={isLoading} />}
         {visibleSections.pos && (
             <>
-                <PosProductSizeSettings settingsData={settingsData} isLoading={isLoading} />
-                <LogoSizeSettings settingsData={settingsData} isLoading={isLoading} />
+                <PosProductSizeSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
+                <LogoSizeSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
                 <PosReceiptSettings settingsData={settingsData} isLoading={isLoading} />
             </>
         )}

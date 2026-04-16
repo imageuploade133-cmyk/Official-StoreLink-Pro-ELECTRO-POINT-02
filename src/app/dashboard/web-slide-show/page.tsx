@@ -60,8 +60,10 @@ const ITEMS_PER_PAGE = 25;
 export default function ManageSlideShowPage() {
   const firestore = useFirestore();
   const { toast } = useToast();
-  const { permissions, isLoading: isAuthLoading } = useAuth();
+  const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
   
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
+
   // Pagination State
   const [slides, setSlides] = useState<SlideShow[]>([]);
   const [isLoadingSlides, setIsLoadingSlides] = useState(true);
@@ -82,13 +84,14 @@ export default function ManageSlideShowPage() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchSlides = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsLoadingSlides(true);
 
     try {
       // Fetch only Homepage slides here (Flash Hub has its own manager)
       let q = query(
         collection(firestore, 'slideShows'), 
+        where('store_id', '==', currentStoreId),
         where('placement', '==', 'homepage'),
         orderBy('order', 'asc')
       );
@@ -132,13 +135,13 @@ export default function ManageSlideShowPage() {
     } finally {
       setIsLoadingSlides(false);
     }
-  }, [firestore, toast]);
+  }, [firestore, toast, currentStoreId]);
 
   useEffect(() => {
-    if (!isAuthLoading && permissions.manage_website_content) {
+    if (!isAuthLoading && permissions.manage_website_content && currentStoreId) {
       fetchSlides('initial');
     }
-  }, [isAuthLoading, permissions.manage_website_content, fetchSlides]);
+  }, [isAuthLoading, permissions.manage_website_content, fetchSlides, currentStoreId]);
 
   const handleTogglePublished = async (slide: SlideShow) => {
     if (!firestore) return;

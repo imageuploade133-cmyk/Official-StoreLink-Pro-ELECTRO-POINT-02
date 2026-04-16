@@ -15,9 +15,10 @@ import { cn } from '@/lib/utils';
 interface ProductCardSizeSettingsProps {
   settingsData: AppSettings | null;
   isLoading: boolean;
+  storeId?: string | null;
 }
 
-export function ProductCardSizeSettings({ settingsData, isLoading }: ProductCardSizeSettingsProps) {
+export function ProductCardSizeSettings({ settingsData, isLoading, storeId }: ProductCardSizeSettingsProps) {
   const firestore = useFirestore();
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -52,24 +53,24 @@ export function ProductCardSizeSettings({ settingsData, isLoading }: ProductCard
     setErrorMessage('');
     
     try {
-      const settingsRef = doc(firestore, 'settings', 'global');
+      const settingsRef = storeId 
+        ? doc(firestore, 'stores', storeId, 'settings', 'config')
+        : doc(firestore, 'settings', 'global');
+      
       const updateData = {
         productCardHeight: cardHeight
       };
 
       console.log("[v0] Saving card size settings:", updateData);
 
-      try {
-        await updateDoc(settingsRef, updateData);
-        console.log("[v0] Settings updated successfully");
-      } catch (updateError: any) {
-        if (updateError.code === 'not-found') {
-          console.log("[v0] Document doesn't exist, creating new one");
-          await setDoc(settingsRef, updateData, { merge: true });
-        } else {
-          throw updateError;
-        }
+      // Also save to old location for compatibility
+      if (storeId) {
+        const oldSettingsRef = doc(firestore, 'settings', storeId);
+        await setDoc(oldSettingsRef, updateData, { merge: true });
       }
+
+      await setDoc(settingsRef, updateData, { merge: true });
+      console.log("[v0] Settings updated successfully");
 
       setSaveStatus('success');
       console.log("[v0] Card size settings saved successfully");
