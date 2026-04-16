@@ -16,11 +16,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, Palette, RotateCcw, LayoutPanelTop, Save, Upload, Image as ImageIcon, Layout, Maximize2, Minimize2 } from 'lucide-react';
+import { Loader2, Palette, RotateCcw, LayoutPanelTop, Save, Upload, Image as ImageIcon, Layout, Maximize2, Minimize2, Type, RotateCw, Scaling } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
 
 const footerSettingsSchema = z.object({
   footerBackgroundStyle: z.enum(['solid', 'gradient']).optional(),
@@ -31,6 +32,11 @@ const footerSettingsSchema = z.object({
   footerDesign: z.enum(['standard', 'modern', 'minimal']).optional(),
   footerBannerUrl: z.string().url('Must be a valid URL.').or(z.literal('')).optional(),
   footerBannerSize: z.enum(['small', 'big']).optional(),
+  footerBgType: z.enum(['text', 'image', 'none']).optional(),
+  footerBgText: z.string().optional(),
+  footerBgImageUrl: z.string().url('Must be a valid URL.').or(z.literal('')).optional(),
+  footerBgSize: z.coerce.number().optional(),
+  footerBgRotation: z.coerce.number().optional(),
 });
 
 type FormValues = z.infer<typeof footerSettingsSchema>;
@@ -44,6 +50,11 @@ const defaultValues: FormValues = {
   footerDesign: 'standard',
   footerBannerUrl: '',
   footerBannerSize: 'small',
+  footerBgType: 'none',
+  footerBgText: 'FOOTER',
+  footerBgImageUrl: '',
+  footerBgSize: 100,
+  footerBgRotation: 0,
 };
 
 interface FooterSettingsProps {
@@ -70,6 +81,7 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
   const firestore = useFirestore();
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingBanner, setIsUploadingBanner] = useState(false);
+  const [isUploadingBgImage, setIsUploadingBgImage] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(footerSettingsSchema),
@@ -89,6 +101,11 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
         footerDesign: settingsData.footerDesign || 'standard',
         footerBannerUrl: settingsData.footerBannerUrl || '',
         footerBannerSize: settingsData.footerBannerSize || 'small',
+        footerBgType: settingsData.footerBgType || 'none',
+        footerBgText: settingsData.footerBgText || 'FOOTER',
+        footerBgImageUrl: settingsData.footerBgImageUrl || '',
+        footerBgSize: settingsData.footerBgSize || 100,
+        footerBgRotation: settingsData.footerBgRotation || 0,
       });
     }
   }, [settingsData, form]);
@@ -120,6 +137,36 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
     reader.onerror = () => {
       toast({ variant: "destructive", title: "File Read Error" });
       setIsUploadingBanner(false);
+    };
+  };
+
+  const handleBgImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ variant: "destructive", title: "File too large", description: "Background image must be smaller than 5MB." });
+      return;
+    }
+
+    setIsUploadingBgImage(true);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      try {
+        const imageDataUri = reader.result as string;
+        const result = await uploadImage({ imageDataUri });
+        form.setValue('footerBgImageUrl', result.display_url, { shouldValidate: true });
+        toast({ title: "Background Image Uploaded", description: "Footer background image has been updated." });
+      } catch (error: any) {
+        toast({ variant: "destructive", title: "Upload Failed", description: error.message || "Could not upload background image." });
+      } finally {
+        setIsUploadingBgImage(false);
+      }
+    };
+    reader.onerror = () => {
+      toast({ variant: "destructive", title: "File Read Error" });
+      setIsUploadingBgImage(false);
     };
   };
 
@@ -284,6 +331,158 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
                         </FormItem>
                       )}
                     />
+                </div>
+            </div>
+            
+            <Separator className="border-dashed" />
+
+            <div className="space-y-8">
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                    <ImageIcon className="h-3.5 w-3.5" /> Footer Background Branding (Text/Image)
+                </h4>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div className="space-y-6">
+                        <FormField
+                          control={form.control}
+                          name="footerBgType"
+                          render={({ field }) => (
+                            <FormItem className="space-y-4">
+                              <FormLabel className="text-sm font-bold">Background Type</FormLabel>
+                              <FormControl>
+                                <RadioGroup
+                                  onValueChange={field.onChange}
+                                  value={field.value}
+                                  className="flex gap-4"
+                                >
+                                  <FormItem className="flex items-center space-x-2 space-y-0">
+                                    <FormControl><RadioGroupItem value="none" /></FormControl>
+                                    <Label className="font-medium cursor-pointer">None</Label>
+                                  </FormItem>
+                                  <FormItem className="flex items-center space-x-2 space-y-0">
+                                    <FormControl><RadioGroupItem value="text" /></FormControl>
+                                    <Label className="font-medium cursor-pointer flex items-center gap-1.5"><Type className="h-3.5 w-3.5"/> Text</Label>
+                                  </FormItem>
+                                  <FormItem className="flex items-center space-x-2 space-y-0">
+                                    <FormControl><RadioGroupItem value="image" /></FormControl>
+                                    <Label className="font-medium cursor-pointer flex items-center gap-1.5"><ImageIcon className="h-3.5 w-3.5"/> Image</Label>
+                                  </FormItem>
+                                </RadioGroup>
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+
+                        {form.watch('footerBgType') === 'text' && (
+                          <FormField
+                            control={form.control}
+                            name="footerBgText"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-sm font-bold">Background Text</FormLabel>
+                                <FormControl>
+                                  <Input {...field} placeholder="Enter background text" />
+                                </FormControl>
+                                <FormDescription>Large background text for the footer.</FormDescription>
+                              </FormItem>
+                            )}
+                          />
+                        )}
+
+                        {form.watch('footerBgType') === 'image' && (
+                          <FormField
+                            control={form.control}
+                            name="footerBgImageUrl"
+                            render={({ field }) => (
+                              <FormItem className="space-y-4">
+                                <FormLabel className="text-sm font-bold">Background Image</FormLabel>
+                                <div className="flex flex-col gap-4">
+                                  {field.value && (
+                                    <div className="relative w-full aspect-video rounded-xl overflow-hidden border shadow-inner bg-muted/20">
+                                      <Image src={field.value} alt="Footer BG" fill className="object-contain" unoptimized />
+                                      <Button 
+                                        type="button" 
+                                        variant="destructive" 
+                                        size="icon" 
+                                        className="absolute top-2 right-2 h-8 w-8 rounded-full"
+                                        onClick={() => form.setValue('footerBgImageUrl', '')}
+                                      >
+                                        <RotateCcw className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  )}
+                                  <div className="flex items-center gap-2">
+                                    <FormControl>
+                                      <Input {...field} placeholder="https://example.com/bg.png" disabled={isSaving || isUploadingBgImage} />
+                                    </FormControl>
+                                    <Button asChild variant="outline" size="icon" className="shrink-0 h-10 w-10 rounded-xl" disabled={isSaving || isUploadingBgImage}>
+                                      <label htmlFor="footer-bg-upload" className="cursor-pointer">
+                                        {isUploadingBgImage ? <Loader2 className="h-4 w-4 animate-spin"/> : <Upload className="h-4 w-4" />}
+                                        <span className="sr-only">Upload Background Image</span>
+                                      </label>
+                                    </Button>
+                                    <Input id="footer-bg-upload" type="file" accept="image/*" className="hidden" onChange={handleBgImageUpload} disabled={isSaving || isUploadingBgImage} />
+                                  </div>
+                                </div>
+                              </FormItem>
+                            )}
+                          />
+                        )}
+                    </div>
+
+                    {(form.watch('footerBgType') === 'text' || form.watch('footerBgType') === 'image') && (
+                      <div className="space-y-8">
+                        <FormField
+                          control={form.control}
+                          name="footerBgSize"
+                          render={({ field }) => (
+                            <FormItem className="space-y-4">
+                              <div className="flex justify-between">
+                                <FormLabel className="text-sm font-bold flex items-center gap-2">
+                                  <Scaling className="h-4 w-4" /> Size Scale
+                                </FormLabel>
+                                <span className="text-xs font-mono bg-muted px-2 py-0.5 rounded">{field.value}px</span>
+                              </div>
+                              <FormControl>
+                                <Slider 
+                                  min={10} 
+                                  max={1000} 
+                                  step={10} 
+                                  value={[field.value || 100]} 
+                                  onValueChange={(val) => field.onChange(val[0])} 
+                                />
+                              </FormControl>
+                              <FormDescription>Adjust the size of the background element.</FormDescription>
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="footerBgRotation"
+                          render={({ field }) => (
+                            <FormItem className="space-y-4">
+                              <div className="flex justify-between">
+                                <FormLabel className="text-sm font-bold flex items-center gap-2">
+                                  <RotateCw className="h-4 w-4" /> Rotation
+                                </FormLabel>
+                                <span className="text-xs font-mono bg-muted px-2 py-0.5 rounded">{field.value}°</span>
+                              </div>
+                              <FormControl>
+                                <Slider 
+                                  min={-180} 
+                                  max={180} 
+                                  step={1} 
+                                  value={[field.value || 0]} 
+                                  onValueChange={(val) => field.onChange(val[0])} 
+                                />
+                              </FormControl>
+                              <FormDescription>Rotate the background element.</FormDescription>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    )}
                 </div>
             </div>
             
