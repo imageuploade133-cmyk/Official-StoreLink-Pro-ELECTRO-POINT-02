@@ -225,6 +225,8 @@ export interface Settings {
   eBulkApiKey?: string;
   brandValues?: BrandValue[];
   brandValuesBackgroundColor?: string;
+  brandValuesVerticalPadding?: number;
+  brandValuesMaxWidth?: number;
   showBrandValues?: boolean;
   showNewsletterSection?: boolean;
   newsletterSectionTitle?: string;

@@ -27,6 +27,8 @@ const brandValueSchema = z.object({
 const formSchema = z.object({
   brandValues: z.array(brandValueSchema).length(4, "There must be exactly 4 brand values."),
   brandValuesBackgroundColor: z.string().optional(),
+  brandValuesVerticalPadding: z.number().min(0).optional(),
+  brandValuesMaxWidth: z.number().min(0).optional(),
   showBrandValues: z.boolean().optional(),
 });
 
@@ -63,6 +65,8 @@ export function BrandValuesSettings({ settingsData, isLoading, storeId }: BrandV
     defaultValues: {
         brandValues: defaultValuesArray,
         brandValuesBackgroundColor: '#FFFFFF',
+        brandValuesVerticalPadding: 80,
+        brandValuesMaxWidth: 1400,
         showBrandValues: true,
     }
   });
@@ -77,6 +81,8 @@ export function BrandValuesSettings({ settingsData, isLoading, storeId }: BrandV
       form.reset({
         brandValues: settingsData.brandValues?.length === 4 ? settingsData.brandValues : defaultValuesArray,
         brandValuesBackgroundColor: settingsData.brandValuesBackgroundColor || '#FFFFFF',
+        brandValuesVerticalPadding: settingsData.brandValuesVerticalPadding ?? 80,
+        brandValuesMaxWidth: settingsData.brandValuesMaxWidth ?? 1400,
         showBrandValues: settingsData.showBrandValues ?? true,
       });
     }
@@ -190,22 +196,52 @@ export function BrandValuesSettings({ settingsData, isLoading, storeId }: BrandV
                 </Card>
               ))}
             </div>
-             <FormField
-                control={form.control}
-                name="brandValuesBackgroundColor"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Section Background Color</FormLabel>
-                        <div className="relative flex items-center">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <FormField
+                    control={form.control}
+                    name="brandValuesBackgroundColor"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Background Color</FormLabel>
+                            <div className="relative flex items-center">
+                                <FormControl>
+                                    <Input type="color" {...field} value={field.value || '#FFFFFF'} className="p-1 h-10 w-12 cursor-pointer" />
+                                </FormControl>
+                                <span className="absolute left-14 text-sm text-muted-foreground font-mono">{field.value}</span>
+                            </div>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="brandValuesVerticalPadding"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Vertical Padding (px)</FormLabel>
                             <FormControl>
-                                <Input type="color" {...field} value={field.value || '#FFFFFF'} className="p-1 h-10 w-12 cursor-pointer" />
+                                <Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value))} />
                             </FormControl>
-                            <span className="absolute left-14 text-sm text-muted-foreground font-mono">{field.value}</span>
-                        </div>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
+                            <FormDescription>Height: Space above and below cards.</FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="brandValuesMaxWidth"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Max Width (px)</FormLabel>
+                            <FormControl>
+                                <Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value))} />
+                            </FormControl>
+                            <FormDescription>Width: Maximum width of the section content.</FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            </div>
           </CardContent>
           <CardFooter>
             <Button type="submit" disabled={isSaving}>

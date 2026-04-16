@@ -67,8 +67,20 @@ export default function StoreHomePage() {
       <HeroCarousel />
       
       {settings?.showBrandValues !== false && (
-        <section className="py-16 md:py-24 relative group/values" style={{ backgroundColor: brandValuesBg }}>
-          <div className="max-w-site-container mx-auto px-4 sm:px-6 lg:px-8">
+        <section 
+          className="relative group/values" 
+          style={{ 
+            backgroundColor: brandValuesBg,
+            paddingTop: `${settings?.brandValuesVerticalPadding ?? 80}px`,
+            paddingBottom: `${settings?.brandValuesVerticalPadding ?? 80}px`
+          }}
+        >
+          <div 
+            className="mx-auto px-4 sm:px-6 lg:px-8"
+            style={{ 
+              maxWidth: settings?.brandValuesMaxWidth ? `${settings.brandValuesMaxWidth}px` : 'var(--container-width)' 
+            }}
+          >
             <Carousel
               plugins={[valuesAutoplay.current]}
               opts={{
