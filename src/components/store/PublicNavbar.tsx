@@ -474,60 +474,69 @@ export function PublicNavbar() {
                                     <span className="sr-only">Open menu</span>
                                 </Button>
                                 </SheetTrigger>
-                                <SheetContent side="left" className="w-full sm:w-[400px] rounded-r-[3rem] border-none shadow-2xl p-0 overflow-hidden">
+                                <SheetContent side="left" className="w-[300px] sm:w-[350px] border-none shadow-2xl p-0 overflow-hidden bg-white dark:bg-slate-950">
                                 <div className="h-full flex flex-col">
-                                    <SheetHeader className="p-8 border-b bg-muted/20">
+                                    <SheetHeader className="p-6 border-b bg-slate-50/50 dark:bg-slate-900/50">
                                         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                                         <SheetDescription className="sr-only">Access categories, shop items, and your account settings.</SheetDescription>
-                                        <div className="flex justify-between items-center mb-8">
+                                        <div className="flex justify-between items-center mb-6">
                                             <Logo />
                                         </div>
                                          {navbarShowSearch && (
                                              <Button 
                                                 variant="outline"
-                                                className="w-full pl-12 pr-4 rounded-2xl bg-white dark:bg-slate-900 border-none h-12 font-bold shadow-sm justify-start relative text-slate-400"
+                                                className="w-full pl-10 pr-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 h-10 text-sm font-medium shadow-sm justify-start relative text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                                                 onClick={() => {
                                                     setIsMenuOpen(false);
                                                     setIsSearchFocused(true);
                                                 }}
                                             >
-                                                <Search className="absolute left-4 h-5 w-5" strokeWidth={3} />
-                                                Find premium items...
+                                                <Search className="absolute left-3.5 h-4 w-4" strokeWidth={2} />
+                                                Search products...
                                             </Button>
                                          )}
                                         
                                         {navbarShowCreditBadge && customer && (
-                                            <div className="mt-6 p-5 bg-primary text-white rounded-[2rem] shadow-xl relative overflow-hidden group">
-                                                <div className="absolute top-0 right-0 p-4 opacity-10">
-                                                    <Wallet className="h-16 w-16" />
+                                            <div className="mt-4 p-4 bg-primary text-white rounded-xl shadow-md relative overflow-hidden group">
+                                                <div className="absolute top-0 right-0 p-3 opacity-10">
+                                                    <Wallet className="h-12 w-12" />
                                                 </div>
-                                                <div className="relative z-10 space-y-1">
-                                                    <p className="text-[8px] font-black uppercase tracking-[0.3em] opacity-70">Account Credit</p>
-                                                    <p className="text-2xl font-black tracking-tighter">{formatCurrency(customer.creditBalance || 0, settings?.currency || '$')}</p>
+                                                <div className="relative z-10 space-y-0.5">
+                                                    <p className="text-[10px] font-bold uppercase tracking-wider opacity-80">Account Credit</p>
+                                                    <p className="text-xl font-bold tracking-tight">{formatCurrency(customer.creditBalance || 0, settings?.currency || "$")}</p>
                                                 </div>
                                             </div>
                                         )}
                                     </SheetHeader>
                                     
-                                    <ScrollArea className="flex-1 px-8 py-10">
-                                        <nav className="flex flex-col space-y-8">
-                                            <Link className="text-3xl font-black tracking-tighter hover:text-primary transition-colors flex items-center justify-between group" href={getStoreUrl('/store')} onClick={() => setIsMenuOpen(false)}>
-                                                Home <ChevronRight className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0" />
+                                    <ScrollArea className="flex-1 px-6 py-8">
+                                        <nav className="flex flex-col space-y-6">
+                                            <Link className="text-lg font-bold tracking-tight hover:text-primary transition-colors flex items-center gap-3 group" href={getStoreUrl("/store")} onClick={() => setIsMenuOpen(false)}>
+                                                <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-900 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                                                    <Sparkles className="h-5 w-5 text-slate-600 dark:text-slate-400 group-hover:text-primary" />
+                                                </div>
+                                                Home
                                             </Link>
                                             {navbarShowShopLink && (
-                                                <Link className="text-3xl font-black tracking-tighter hover:text-primary transition-colors flex items-center justify-between group" href={getStoreUrl('/store/shop')} onClick={() => setIsMenuOpen(false)}>
-                                                    The Catalog <ChevronRight className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0" />
+                                                <Link className="text-lg font-bold tracking-tight hover:text-primary transition-colors flex items-center gap-3 group" href={getStoreUrl("/store/shop")} onClick={() => setIsMenuOpen(false)}>
+                                                    <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-900 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                                                        <ShoppingBag className="h-5 w-5 text-slate-600 dark:text-slate-400 group-hover:text-primary" />
+                                                    </div>
+                                                    The Catalog
                                                 </Link>
                                             )}
                                             {navbarShowFlashSalesLink && (
-                                                <Link className="text-3xl font-black tracking-tighter hover:text-rose-600 transition-colors flex items-center justify-between group" href={getStoreUrl('/store/flash-sales')} onClick={() => setIsMenuOpen(false)}>
-                                                    Flash Hub <ChevronRight className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0" />
+                                                <Link className="text-lg font-bold tracking-tight hover:text-rose-600 transition-colors flex items-center gap-3 group" href={getStoreUrl("/store/flash-sales")} onClick={() => setIsMenuOpen(false)}>
+                                                    <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-900 flex items-center justify-center group-hover:bg-rose-50 dark:group-hover:bg-rose-900/20 transition-colors">
+                                                        <Zap className="h-5 w-5 text-slate-600 dark:text-slate-400 group-hover:text-rose-600" />
+                                                    </div>
+                                                    Flash Hub
                                                 </Link>
                                             )}
                                             {navbarShowCollectionsLink && (
-                                                <div className="pt-4 border-t border-slate-100">
-                                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6">Collections</p>
-                                                    <div className="grid grid-cols-1 gap-4">
+                                                <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
+                                                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-4">Collections</p>
+                                                    <div className="grid grid-cols-1 gap-3">
                                                         {isLoadingCategories ? (
                                                             <div className="p-4 flex items-center gap-3 text-muted-foreground">
                                                                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -535,15 +544,15 @@ export function PublicNavbar() {
                                                             </div>
                                                         ) : (
                                                             categories?.slice(0, 6).map(cat => (
-                                                                <Link key={cat.id} href={getStoreUrl(`/store/shop?category=${cat.id}`)} className="flex items-center gap-4 group" onClick={() => setIsMenuOpen(false)}>
-                                                                    <div className="relative h-12 w-12 rounded-2xl bg-muted overflow-hidden border shadow-sm shrink-0">
+                                                                <Link key={cat.id} href={getStoreUrl(`/store/shop?category=${cat.id}`)} className="flex items-center gap-3 group p-2 -mx-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors" onClick={() => setIsMenuOpen(false)}>
+                                                                    <div className="relative h-10 w-10 rounded-lg bg-muted overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm shrink-0">
                                                                         <Image src={cat.imageUrl || `https://picsum.photos/seed/${cat.id}/100/100`} alt={cat.name} fill className="object-cover" unoptimized/>
                                                                     </div>
-                                                                    <span className="font-bold text-lg group-hover:text-primary transition-colors">{cat.name}</span>
+                                                                    <span className="font-semibold text-sm group-hover:text-primary transition-colors">{cat.name}</span>
                                                                 </Link>
                                                             ))
                                                         )}
-                                                        <Link href={getStoreUrl('/store/categories')} className="flex items-center gap-4 text-primary font-black uppercase text-[10px] tracking-widest pt-2" onClick={() => setIsMenuOpen(false)}>
+                                                        <Link href={getStoreUrl("/store/categories")} className="flex items-center gap-2 text-primary font-bold uppercase text-[10px] tracking-widest pt-2 px-2" onClick={() => setIsMenuOpen(false)}>
                                                             Browse All <ArrowRight className="h-3 w-3" strokeWidth={3} />
                                                         </Link>
                                                     </div>
@@ -552,20 +561,20 @@ export function PublicNavbar() {
                                         </nav>
                                     </ScrollArea>
 
-                                    <div className="p-8 bg-slate-50 dark:bg-slate-900 border-t flex flex-col gap-4">
+                                    <div className="p-6 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 mt-auto">
                                         {navbarShowAccount && user ? (
-                                            <Button asChild size="lg" className="w-full h-14 rounded-2xl font-black uppercase text-xs tracking-widest gap-3 shadow-xl" onClick={() => setIsMenuOpen(false)}>
-                                                <Link href={getStoreUrl('/store/account')}>
-                                                    <UserCircle className="h-5 w-5" /> My Account
+                                            <Button asChild size="lg" className="w-full h-12 rounded-xl font-bold uppercase text-xs tracking-wider gap-2 shadow-sm" onClick={() => setIsMenuOpen(false)}>
+                                                <Link href={getStoreUrl("/store/account")}>
+                                                    <UserCircle className="h-4 w-4" /> My Account
                                                 </Link>
                                             </Button>
                                         ) : navbarShowAccount && !user ? (
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <Button asChild variant="outline" size="lg" className="rounded-2xl font-black uppercase text-[10px] tracking-widest h-14" onClick={() => setIsMenuOpen(false)}>
-                                                    <Link href={getStoreUrl('/store/login')}>Log In</Link>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <Button asChild variant="outline" size="lg" className="rounded-xl font-bold uppercase text-[10px] tracking-wider h-12 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm" onClick={() => setIsMenuOpen(false)}>
+                                                    <Link href={getStoreUrl("/store/login")}>Log In</Link>
                                                 </Button>
-                                                <Button asChild size="lg" className="rounded-2xl font-black uppercase text-[10px] tracking-widest h-14 shadow-xl" onClick={() => setIsMenuOpen(false)}>
-                                                    <Link href={getStoreUrl('/store/signup')}>Join Now</Link>
+                                                <Button asChild size="lg" className="rounded-xl font-bold uppercase text-[10px] tracking-wider h-12 shadow-sm" onClick={() => setIsMenuOpen(false)}>
+                                                    <Link href={getStoreUrl("/store/signup")}>Join Now</Link>
                                                 </Button>
                                             </div>
                                         ) : null}
