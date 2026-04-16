@@ -69,6 +69,7 @@ import { ProductCard } from '@/components/store/ProductCard';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
+import { OutOfDataDrawer } from '@/components/ui/out-of-data-drawer';
 import { ProductReviewForm } from '@/components/store/ProductReviewForm';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import ReactMarkdown from 'react-markdown';
@@ -267,6 +268,7 @@ export default function ProductDetailsPage() {
   const [activeImage, setActiveImage] = useState<string | null>(null);
   const [showVideo, setShowVideo] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isOutOfDataDrawerOpen, setIsOutOfDataDrawerOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -667,9 +669,9 @@ export default function ProductDetailsPage() {
         productPrice={formatCurrency(effectivePrice, currencySymbol)}
         isInWishlist={isInWishlist}
         isOutOfStock={isOutOfStock}
-        onAddToCart={handleAddToCart}
+        onAddToCart={isOutOfStock ? () => setIsOutOfDataDrawerOpen(true) : handleAddToCart}
         onToggleWishlist={handleToggleWishlist}
-        addToCartText={addToCartText}
+        addToCartText={isOutOfStock ? "Out of Stock" : addToCartText}
       />
       
       <main className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 md:py-8">
@@ -813,11 +815,15 @@ export default function ProductDetailsPage() {
                     <Button variant="ghost" size="icon" className="h-10 md:h-12 w-10 md:w-12 rounded-md md:rounded-xl" onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}><Plus className="h-4 md:h-5 w-4 md:w-5" /></Button>
                   </div>
                   <Button 
-                    onClick={handleAddToCart} 
-                    style={buttonStyle}
-                    className={`flex-1 text-white font-black uppercase tracking-widest shadow-xl transition-all group ${buttonClasses}`}
+                    onClick={isOutOfStock ? () => setIsOutOfDataDrawerOpen(true) : handleAddToCart} 
+                    style={isOutOfStock ? { backgroundColor: '#e2e8f0', color: '#94a3b8' } : buttonStyle}
+                    className={cn(
+                        "flex-1 font-black uppercase tracking-widest shadow-xl transition-all group", 
+                        buttonClasses,
+                        isOutOfStock && "cursor-pointer"
+                    )}
                   >
-                    <AddToCartIcon className="mr-2 md:mr-3 h-4 md:h-5 w-4 md:w-5 group-hover:animate-bounce" /> {addToCartText}
+                    <AddToCartIcon className="mr-2 md:mr-3 h-4 md:h-5 w-4 md:w-5 group-hover:animate-bounce" /> {isOutOfStock ? "Out of Stock" : addToCartText}
                   </Button>
                 </div>
               </div>
@@ -989,6 +995,13 @@ export default function ProductDetailsPage() {
         )}
 
         <RecentlyViewedSection excludeId={productId} />
+        <OutOfDataDrawer 
+            isOpen={isOutOfDataDrawerOpen} 
+            onOpenChange={setIsOutOfDataDrawerOpen}
+            title="Out of Stock"
+            description={`${product.name} is currently out of stock. We'll restock soon!`}
+            type="stock"
+        />
       </main>
     </div>
   );

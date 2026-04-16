@@ -74,6 +74,7 @@ import { SendReceiptDialog } from '@/components/pos/SendReceiptDialog';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { UserNav } from '@/components/UserNav';
+import { OutOfDataDrawer } from '@/components/ui/out-of-data-drawer';
 import { useRouter } from 'next/navigation';
 
 const SCAN_TIMEOUT_MS = 100;
@@ -135,6 +136,8 @@ export default function POSPage() {
   const [isCreditSaleDialogOpen, setIsCreditSaleDialogOpen] = useState(false);
   const [isConfirmHoldSaleDialogOpen, setIsConfirmHoldSaleDialogOpen] = useState(false);
   const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
+  const [isOutOfDataDrawerOpen, setIsOutOfDataDrawerOpen] = useState(false);
+  const [outOfDataDrawerInfo, setOutOfDataDrawerInfo] = useState({ title: '', description: '', type: 'data' as 'data' | 'stock' | 'error' });
   const [currentSaleForReceipt, setCurrentSaleForReceipt] = useState<SaleTransaction | null>(null);
   const [isSendReceiptDialogOpen, setIsSendReceiptDialogOpen] = useState(false);
   const [saleForReceipt, setSaleForReceipt] = useState<{ transaction: SaleTransaction; customerInfo: { name: string; phone: string; }; } | null>(null);
@@ -204,12 +207,22 @@ export default function POSPage() {
         const existingItem = cartItems.find((item) => item.id === product.id);
 
         if (product.stock <= 0) {
-            toast({ variant: 'destructive', title: 'Out of Stock', description: `${product.name} is currently out of stock.` });
+            setOutOfDataDrawerInfo({
+                title: 'Out of Stock',
+                description: `${product.name} is currently out of stock and cannot be added to the cart.`,
+                type: 'stock'
+            });
+            setIsOutOfDataDrawerOpen(true);
             return;
         }
         
         if (existingItem && existingItem.quantity >= product.stock) {
-            toast({ variant: 'default', title: 'Stock Limit Reached', description: `Cannot add more ${product.name}. Max stock available: ${product.stock}.` });
+            setOutOfDataDrawerInfo({
+                title: 'Stock Limit Reached',
+                description: `You have reached the maximum available stock for ${product.name}. Max available: ${product.stock}.`,
+                type: 'stock'
+            });
+            setIsOutOfDataDrawerOpen(true);
             return;
         }
         
@@ -868,6 +881,13 @@ export default function POSPage() {
             customerInfo={saleForReceipt?.customerInfo || null}
             settings={settings}
             onSendComplete={() => handlePostSendActions(saleForReceipt!.transaction)}
+        />
+        <OutOfDataDrawer 
+            isOpen={isOutOfDataDrawerOpen} 
+            onOpenChange={setIsOutOfDataDrawerOpen}
+            title={outOfDataDrawerInfo.title}
+            description={outOfDataDrawerInfo.description}
+            type={outOfDataDrawerInfo.type}
         />
       </div>
     </TooltipProvider>
