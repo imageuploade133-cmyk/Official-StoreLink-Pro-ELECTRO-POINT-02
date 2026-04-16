@@ -371,8 +371,8 @@ export default function StoreSignupPage() {
           unoptimized
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-        <div className="absolute bottom-10 left-10 text-white max-w-lg">
-            <h2 className="text-4xl font-black tracking-tighter uppercase">{storeName}</h2>
+        <div className="absolute bottom-10 left-10 text-white max-w-lg p-6">
+            <h2 className="text-4xl font-black tracking-tighter uppercase break-words leading-tight">{storeName}</h2>
             <p className="text-white/80 mt-2 font-medium">{storeDescription}</p>
         </div>
       </div>
