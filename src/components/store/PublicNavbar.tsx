@@ -242,7 +242,7 @@ export function PublicNavbar() {
         ) : null}
         {showPublicStoreName && (
           <span 
-              className={'font-black tracking-tighter text-primary group-hover:opacity-80 transition-opacity'}
+              className={'font-black tracking-tighter text-primary group-hover:opacity-80 transition-opacity whitespace-pre-wrap break-words leading-tight max-w-[150px] sm:max-w-[200px] md:max-w-[250px]'}
               style={{ fontSize: `${storeNameFontSize}px` }}
           >
             {storeName}

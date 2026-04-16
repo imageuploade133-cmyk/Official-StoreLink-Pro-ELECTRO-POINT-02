@@ -120,7 +120,7 @@ export function PublicFooter() {
                 <ElysiumLogo className="h-6 w-6" style={{ color: textColor }} />
               ) : null}
               {showPublicStoreName && (
-                <span className={'font-extrabold tracking-tighter text-2xl'} style={{ color: 'inherit' }}>{storeName}</span>
+                <span className={'font-extrabold tracking-tighter text-2xl whitespace-pre-wrap break-words leading-tight max-w-[200px] sm:max-w-[250px]'} style={{ color: 'inherit' }}>{storeName}</span>
               )}
             </Link>
             {showFooterDescription && footerDescription && <p className="text-sm mb-6" style={{ color: textColor }}>{footerDescription}</p>}

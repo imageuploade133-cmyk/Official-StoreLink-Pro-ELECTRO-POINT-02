@@ -158,7 +158,7 @@ export default function StoreAppPage() {
                                     <ShoppingBag className="text-white h-4 w-4" strokeWidth={3} />
                                 </div>
                             )}
-                            <h1 className="text-[10px] font-black tracking-[0.25em] uppercase leading-none text-slate-900 dark:text-white truncate w-full text-center">
+                            <h1 className="text-[10px] font-black tracking-[0.25em] uppercase leading-tight text-slate-900 dark:text-white break-words line-clamp-2 w-full text-center">
                                 {settings?.storeName || 'LUXE'}
                             </h1>
                         </div>

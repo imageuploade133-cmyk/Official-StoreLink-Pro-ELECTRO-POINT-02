@@ -34,7 +34,7 @@ const shareIconOptions = [
 ];
 
 const siteIdentitySchema = z.object({
-  storeName: z.string().min(2, 'Store name is required.').max(50, 'Store name is too long.'),
+  storeName: z.string().min(2, 'Store name is required.').max(200, 'Store name is too long.'),
   invoiceLogoUrl: z.string().url('Must be a valid URL.').or(z.literal('')).optional(),
   storeLogoUrl: z.string().url('Must be a valid URL.').or(z.literal('')).optional(),
   storeLogoWidth: z.coerce.number().min(20).max(200).optional(),
@@ -166,6 +166,11 @@ export function SiteIdentitySettings({ settingsData, isLoading, storeId }: SiteI
                   <FormControl>
                     <Input {...field} disabled={isSaving}/>
                   </FormControl>
+                  {field.value && field.value.length > 20 && (
+                    <FormDescription className="text-amber-600 dark:text-amber-400 font-medium italic">
+                      Note: This name is quite long. It will be automatically wrapped on your public store for better readability, but you can still save it.
+                    </FormDescription>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}

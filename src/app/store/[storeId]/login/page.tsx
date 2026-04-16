@@ -157,8 +157,8 @@ export default function StoreLoginPage() {
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-        <div className="absolute bottom-10 left-10 text-white">
-            <h2 className="text-4xl font-bold font-headline">{storeName}</h2>
+        <div className="absolute bottom-10 left-10 text-white p-6">
+            <h2 className="text-4xl font-bold font-headline break-words max-w-md leading-tight">{storeName}</h2>
             <p className="text-white/80 mt-2 max-w-lg">
                 {storeDescription}
             </p>
