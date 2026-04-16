@@ -1976,6 +1976,10 @@ export function ProductForm({
     {/* Create New Category Modal */}
     <Drawer open={isCategoryModalOpen} onOpenChange={setIsCategoryModalOpen} dismissible={true}>
       <DrawerContent className="flex flex-col h-screen w-screen overflow-hidden border-none rounded-none">
+        <DrawerHeader className="sr-only">
+          <DrawerTitle>Create New Category</DrawerTitle>
+          <DrawerDescription>Add a new collection to organize your products.</DrawerDescription>
+        </DrawerHeader>
         <div 
           className="w-full flex flex-col items-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none select-none hover:bg-muted/20 transition-colors shrink-0"
           data-vaul-drag-handle
