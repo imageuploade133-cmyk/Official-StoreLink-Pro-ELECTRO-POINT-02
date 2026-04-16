@@ -8,6 +8,7 @@ import {
   DialogTitle,
   DialogFooter,
   DialogClose,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -136,6 +137,9 @@ export function CalculatorDialog({ isOpen, onOpenChange }: CalculatorDialogProps
           <DialogTitle className="flex items-center gap-2 text-lg">
             <CalculatorIcon className="h-5 w-5 text-primary" /> Calculator
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Perform basic arithmetic calculations.
+          </DialogDescription>
         </DialogHeader>
         
         <div className="p-4 space-y-3 flex-grow flex flex-col">

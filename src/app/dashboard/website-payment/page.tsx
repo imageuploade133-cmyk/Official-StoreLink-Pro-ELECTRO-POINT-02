@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Save, Landmark, Info, PlusCircle, Trash2, Edit, X, Upload } from 'lucide-react';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { uploadImage } from '@/ai/flows/image-upload-flow';
 
@@ -789,6 +789,9 @@ export default function WebsitePaymentSettings() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{editingAccount ? 'Edit Account' : 'Add New Account'}</DialogTitle>
+            <DialogDescription>
+              {editingAccount ? 'Update your bank account details.' : 'Provide details for a new bank account to accept manual transfers.'}
+            </DialogDescription>
           </DialogHeader>
           <AccountForm onSubmit={onAccountFormSubmit} isSaving={isSaving} defaultValues={editingAccount || undefined} />
         </DialogContent>
