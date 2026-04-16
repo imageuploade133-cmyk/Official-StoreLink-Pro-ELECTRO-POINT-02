@@ -631,6 +631,8 @@ export interface Store {
   slug?: string;
   owner_id: string;
   name: string;
+  address?: string;
+  phone?: string;
   databaseId?: string;
   createdAt: Timestamp;
 }

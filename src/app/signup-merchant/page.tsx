@@ -36,6 +36,8 @@ const signupSchema = z.object({
   email: z.string().trim().email('Invalid email address.'),
   storeName: z.string().min(2, 'Store name must be at least 2 characters.'),
   storeSlug: z.string().min(2, 'Store slug must be at least 2 characters.').regex(/^[a-z0-9-]+$/, 'Only lowercase letters, numbers, and hyphens allowed.'),
+  storeAddress: z.string().min(5, 'Store address must be at least 5 characters.'),
+  storePhone: z.string().min(5, 'Store phone number is required.'),
   databaseId: z.string().min(1, 'Database ID is required.').regex(/^[a-z0-9-]+$/, 'Only lowercase letters, numbers, and hyphens allowed.').default('(default)'),
   password: z.string().min(6, 'Password must be at least 6 characters long.'),
   confirmPassword: z.string(),
@@ -63,7 +65,7 @@ export default function MerchantSignupPage() {
     const form = useForm<SignupFormValues>({
       resolver: zodResolver(signupSchema),
       defaultValues: {
-        name: '', email: '', storeName: '', storeSlug: '', databaseId: '(default)', password: '', confirmPassword: '',
+        name: '', email: '', storeName: '', storeSlug: '', storeAddress: '', storePhone: '', databaseId: '(default)', password: '', confirmPassword: '',
       },
     });
 
@@ -139,6 +141,8 @@ export default function MerchantSignupPage() {
                 slug: values.storeSlug,
                 owner_id: targetUser.uid,
                 name: values.storeName,
+                address: values.storeAddress,
+                phone: values.storePhone,
                 databaseId: values.databaseId,
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp(),
@@ -165,6 +169,9 @@ export default function MerchantSignupPage() {
             const settingsData = {
                 store_id: storeId,
                 storeName: values.storeName,
+                storeAddress: values.storeAddress,
+                storePhone: values.storePhone,
+                storeEmail: values.email,
                 currency: '₦',
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp(),
@@ -290,6 +297,14 @@ export default function MerchantSignupPage() {
                         <FormMessage />
                     </FormItem>
                 )}/>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormField control={form.control} name="storePhone" render={({ field }) => (
+                        <FormItem><FormLabel>Store Phone Number</FormLabel><FormControl><Input placeholder="+234..." {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
+                    )}/>
+                    <FormField control={form.control} name="storeAddress" render={({ field }) => (
+                        <FormItem><FormLabel>Store Address</FormLabel><FormControl><Input placeholder="123 Business St, Lagos" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
+                    )}/>
+                </div>
                 <FormField control={form.control} name="databaseId" render={({ field }) => (
                     <FormItem>
                         <FormLabel>Database ID (Optional)</FormLabel>
