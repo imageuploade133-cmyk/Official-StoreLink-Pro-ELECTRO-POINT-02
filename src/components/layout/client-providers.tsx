@@ -1,4 +1,5 @@
-'use client';
+"use client";
+import React from "react";
 
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { AuthProvider } from '@/contexts/auth-context';

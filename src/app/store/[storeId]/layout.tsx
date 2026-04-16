@@ -1,4 +1,5 @@
-'use client';
+"use client";
+import React from "react";
 
 import { PublicNavbar } from '@/components/store/PublicNavbar';
 import { PublicFooter } from '@/components/store/PublicFooter';
