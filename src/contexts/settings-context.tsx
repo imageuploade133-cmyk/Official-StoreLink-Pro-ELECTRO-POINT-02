@@ -5,6 +5,7 @@ import { useFirestore, useDoc } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { Settings } from '@/lib/types';
 import { useAuth } from './auth-context';
+import { usePathname } from 'next/navigation';
 
 interface SettingsContextType {
   settings: Settings | null;
@@ -16,8 +17,18 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const firestore = useFirestore();
   const { store, staffMember } = useAuth();
+  const pathname = usePathname();
 
-  const storeId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
+  const storeIdFromPath = useMemo(() => {
+      const parts = pathname.split('/');
+      // Check if we are in /store/[storeId] or /store-app/[storeId]
+      if ((parts[1] === 'store' || parts[1] === 'store-app') && parts[2]) {
+          return parts[2];
+      }
+      return null;
+  }, [pathname]);
+
+  const storeId = useMemo(() => staffMember?.store_id || store?.id || storeIdFromPath, [staffMember, store, storeIdFromPath]);
 
   const settingsRef = useMemo(
     () => {

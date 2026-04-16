@@ -1,7 +1,6 @@
-
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { useFirestore, useCollection } from '@/firebase';
 import { 
@@ -37,6 +36,7 @@ import { calculateEffectivePrice } from '@/lib/pos-utils';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { useParams } from 'next/navigation';
 
 const BATCH_SIZE = 12;
 
@@ -50,6 +50,8 @@ interface SearchViewProps {
 export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClearCategory }: SearchViewProps) {
     const firestore = useFirestore();
     const { settings } = useSettings();
+    const params = useParams();
+    const storeId = params?.storeId as string;
     const [searchQuery, setSearchTerm] = useState('');
     const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(initialCategoryId || null);
     const currencySymbol = settings?.currency || '$';
@@ -64,11 +66,11 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
     const lastDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
     const hasMoreRef = useRef(true);
 
-    const categoriesQuery = useMemo(() => firestore ? query(collection(firestore, 'categories'), orderBy('name')) : null, [firestore]);
+    const categoriesQuery = useMemo(() => firestore && storeId ? query(collection(firestore, 'categories'), where('store_id', '==', storeId), orderBy('name')) : null, [firestore, storeId]);
     const { data: categories } = useCollection<Category>(categoriesQuery);
 
     const fetchResults = useCallback(async (isNextPage = false) => {
-        if (!firestore) return;
+        if (!firestore || !storeId) return;
 
         if (isNextPage) setIsLoadingMore(true);
         else {
@@ -82,6 +84,7 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
             // Since Firestore doesn't support 'contains', we fetch a larger metadata set and filter locally
             let q = query(
                 collection(firestore, 'products'),
+                where('store_id', '==', storeId),
                 where('isVisibleOnWeb', '==', true),
                 orderBy('createdAt', 'desc'),
                 limit(500) // Increased limit for broader reach
@@ -120,14 +123,14 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
             setIsLoading(false);
             setIsLoadingMore(false);
         }
-    }, [firestore, searchQuery, selectedCategoryId, results.length]);
+    }, [firestore, storeId, searchQuery, selectedCategoryId, results.length]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
             fetchResults();
         }, 300);
         return () => clearTimeout(timer);
-    }, [searchQuery, selectedCategoryId]); // Removed fetchResults from deps to avoid loop
+    }, [searchQuery, selectedCategoryId, fetchResults]);
 
     useEffect(() => {
         if (initialCategoryId) setSelectedCategoryId(initialCategoryId);

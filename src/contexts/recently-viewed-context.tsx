@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { safeStorage } from '@/lib/storage-utils';
+import { useStoreUrl } from '@/hooks/use-store-url';
 
 interface RecentlyViewedContextType {
   viewedProductIds: string[];
@@ -16,26 +17,30 @@ const MAX_HISTORY = 20;
 
 export function RecentlyViewedProvider({ children }: { children: React.ReactNode }) {
   const [viewedProductIds, setViewedProductIds] = useState<string[]>([]);
+  const { storeId } = useStoreUrl();
+  const storageKey = useMemo(() => `recentlyViewed_${storeId || 'global'}`, [storeId]);
 
   // Load from local storage on mount
   useEffect(() => {
-    const saved = safeStorage.getItem('recentlyViewed');
+    const saved = safeStorage.getItem(storageKey);
     if (saved) {
       try {
         setViewedProductIds(JSON.parse(saved));
       } catch (e) {
         console.error("Failed to parse recently viewed history", e);
-        safeStorage.removeItem('recentlyViewed');
+        safeStorage.removeItem(storageKey);
       }
+    } else {
+        setViewedProductIds([]);
     }
-  }, []);
+  }, [storageKey]);
 
   // Sync to local storage on change
   useEffect(() => {
-    if (viewedProductIds.length > 0 || safeStorage.getItem('recentlyViewed')) {
-      safeStorage.setItem('recentlyViewed', JSON.stringify(viewedProductIds));
+    if (viewedProductIds.length > 0 || safeStorage.getItem(storageKey)) {
+      safeStorage.setItem(storageKey, JSON.stringify(viewedProductIds));
     }
-  }, [viewedProductIds]);
+  }, [viewedProductIds, storageKey]);
 
   const addViewedProduct = useCallback((productId: string) => {
     setViewedProductIds(prev => {
@@ -52,8 +57,8 @@ export function RecentlyViewedProvider({ children }: { children: React.ReactNode
 
   const clearHistory = useCallback(() => {
     setViewedProductIds([]);
-    safeStorage.removeItem('recentlyViewed');
-  }, []);
+    safeStorage.removeItem(storageKey);
+  }, [storageKey]);
 
   const value = useMemo(() => ({
     viewedProductIds,

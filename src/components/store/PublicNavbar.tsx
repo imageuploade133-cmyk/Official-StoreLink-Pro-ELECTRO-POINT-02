@@ -46,13 +46,14 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useCart } from '@/contexts/cart-context';
 import { useWishlist } from '@/contexts/wishlist-context';
 import { Input } from '@/components/ui/input';
 import { formatCurrency } from '@/lib/formatUtils';
 import { calculateEffectivePrice } from '@/lib/pos-utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useStoreUrl } from '@/hooks/use-store-url';
 
 export function PublicNavbar() {
     const { settings } = useSettings();
@@ -65,6 +66,7 @@ export function PublicNavbar() {
     const { cartCount } = useCart();
     const { wishlistCount } = useWishlist();
     const firestore = useFirestore();
+    const { storeId, getStoreUrl } = useStoreUrl();
 
     const [navbarSearch, setNavbarSearch] = useState('');
     const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -76,21 +78,22 @@ export function PublicNavbar() {
 
     // Fetch categories for the dropdown and search enrichment
     const categoriesQuery = useMemo(() => {
-        if (!firestore) return null;
-        return query(collection(firestore, 'categories'), orderBy('name'));
-    }, [firestore]);
+        if (!firestore || !storeId) return null;
+        return query(collection(firestore, 'categories'), where('store_id', '==', storeId), orderBy('name'));
+    }, [firestore, storeId]);
 
     const { data: categories, isLoading: isLoadingCategories } = useCollection<Category>(categoriesQuery);
 
     // Fetch products for live search - Substring Discovery Active
     const productsQuery = useMemo(() => {
-        if (!firestore) return null;
+        if (!firestore || !storeId) return null;
         return query(
             collection(firestore, 'products'), 
+            where('store_id', '==', storeId),
             where('isVisibleOnWeb', '==', true),
             limit(1000) 
         );
-    }, [firestore]);
+    }, [firestore, storeId]);
 
     const { data: products, isLoading: isLoadingProducts } = useCollection<Product>(productsQuery);
 
@@ -215,14 +218,14 @@ export function PublicNavbar() {
     const handleNavbarSearch = (e: React.FormEvent) => {
         e.preventDefault();
         if (navbarSearch.trim()) {
-            router.push(`/store/search?q=${encodeURIComponent(navbarSearch.trim())}`);
+            router.push(getStoreUrl(`/store/search?q=${encodeURIComponent(navbarSearch.trim())}`));
             setIsSearchFocused(false);
             setNavbarSearch('');
         }
     };
 
     const Logo = () => (
-      <Link href="/store" className="flex items-center gap-3 text-lg font-semibold group" onClick={() => setIsMenuOpen(false)}>
+      <Link href={getStoreUrl('/store')} className="flex items-center gap-3 text-lg font-semibold group" onClick={() => setIsMenuOpen(false)}>
         {showMainSiteLogo && logoUrl ? (
           <div style={{ width: `${storeLogoWidth}px`, height: `${logoContainerHeight}px` }} className="relative flex items-center">
             <Image 
@@ -266,7 +269,7 @@ export function PublicNavbar() {
             title: "Logged Out",
             description: "You have been successfully logged out.",
         });
-        router.push('/store');
+        router.push(getStoreUrl('/store'));
     };
 
     const getNavbarClasses = () => {
@@ -358,14 +361,14 @@ export function PublicNavbar() {
                   )}>
                     <div className="hidden lg:flex items-center gap-8 mr-8 font-black text-xs uppercase tracking-[0.2em]">
                         {navbarShowShopLink && (
-                            <Link className="hover:text-primary transition-colors relative group py-2" href="/store/shop" onClick={() => setIsMenuOpen(false)}>
+                            <Link className="hover:text-primary transition-colors relative group py-2" href={getStoreUrl('/store/shop')} onClick={() => setIsMenuOpen(false)}>
                             Shop
                             <span className="absolute bottom-0 left-0 h-0.5 bg-primary w-0 transition-all duration-300 ease-out group-hover:w-full rounded-full"></span>
                             </Link>
                         )}
                         
                         {navbarShowFlashSalesLink && (
-                            <Link className="hover:text-rose-600 transition-colors relative group py-2 flex items-center gap-2" href="/store/flash-sales" onClick={() => setIsMenuOpen(false)}>
+                            <Link className="hover:text-rose-600 transition-colors relative group py-2 flex items-center gap-2" href={getStoreUrl('/store/flash-sales')} onClick={() => setIsMenuOpen(false)}>
                             Flash Sales
                             <span className="absolute bottom-0 left-0 h-0.5 bg-rose-600 w-0 transition-all duration-300 ease-out group-hover:w-full rounded-full"></span>
                             </Link>
@@ -391,7 +394,7 @@ export function PublicNavbar() {
                                         ) : (
                                             categories?.map(category => (
                                                 <DropdownMenuItem key={category.id} asChild className="cursor-pointer p-3 focus:bg-primary/5 rounded-2xl mx-1 my-0.5">
-                                                    <Link href={`/store/shop?category=${category.id}`} className="flex items-center gap-4 w-full" onClick={() => setIsMenuOpen(false)}>
+                                                    <Link href={getStoreUrl(`/store/shop?category=${category.id}`)} className="flex items-center gap-4 w-full" onClick={() => setIsMenuOpen(false)}>
                                                         <div className="relative h-10 w-10 rounded-xl overflow-hidden bg-muted flex-shrink-0 shadow-sm">
                                                             <Image
                                                                 src={category.imageUrl || `https://picsum.photos/seed/${category.id}/100/100`}
@@ -409,7 +412,7 @@ export function PublicNavbar() {
                                     </div>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem asChild className="cursor-pointer p-4 focus:bg-primary text-primary focus:text-white rounded-2xl m-1 transition-all">
-                                        <Link href="/store/categories" className="flex items-center justify-between font-black uppercase text-[10px] tracking-widest w-full" onClick={() => setIsMenuOpen(false)}>
+                                        <Link href={getStoreUrl('/store/categories')} className="flex items-center justify-between font-black uppercase text-[10px] tracking-widest w-full" onClick={() => setIsMenuOpen(false)}>
                                             View All Collections <ChevronRight className="h-3 w-3" />
                                         </Link>
                                     </DropdownMenuItem>
@@ -421,7 +424,7 @@ export function PublicNavbar() {
                     <div className="flex items-center gap-1 sm:gap-2">
                         {navbarShowCreditBadge && user && customer && (
                             <Link 
-                                href="/store/account"
+                                href={getStoreUrl('/store/account')}
                                 className="hidden md:flex items-center gap-2.5 bg-primary/10 text-primary px-4 py-1.5 rounded-full border border-primary/20 shadow-sm hover:bg-primary hover:text-white transition-all duration-500 group/credit active:scale-95 dark:bg-primary/20"
                             >
                                 <Coins className="h-3.5 w-3.5 group-hover/credit:rotate-12 transition-transform dark:text-primary" strokeWidth={3} />
@@ -431,11 +434,11 @@ export function PublicNavbar() {
                             </Link>
                         )}
                         {navbarShowAccount && (
-                            <UserButton isLoading={isLoading} user={user} staffMember={staffMember} router={router} handleLogout={handleLogout} getInitials={getInitials} />
+                            <UserButton isLoading={isLoading} user={user} staffMember={staffMember} router={router} handleLogout={handleLogout} getInitials={getInitials} getStoreUrl={getStoreUrl} />
                         )}
                         {navbarShowWishlist && (
                             <Button asChild variant="ghost" size="icon" className="group hidden sm:inline-flex h-11 w-11 rounded-2xl text-slate-600 dark:text-slate-200 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 relative transition-all dark:border dark:border-slate-700 dark:hover:border-rose-600">
-                                <Link href="/store/wishlist">
+                                <Link href={getStoreUrl('/store/wishlist')}>
                                     <Heart className={cn("h-5.5 w-5.5 transition-transform duration-300 group-hover:scale-110 dark:text-slate-200", wishlistCount > 0 && "fill-current text-rose-500")} />
                                     {wishlistCount > 0 && (
                                         <span className="absolute top-1.5 right-1.5 h-4 w-4 bg-rose-500 text-white text-[9px] flex items-center justify-center rounded-full font-black border-2 border-white dark:border-slate-900 animate-in zoom-in duration-300">
@@ -447,7 +450,7 @@ export function PublicNavbar() {
                         )}
                         {navbarShowCart && (
                             <Button asChild variant="ghost" size="icon" className="group h-11 w-11 rounded-2xl text-slate-600 dark:text-slate-200 hover:text-primary hover:bg-primary/5 relative transition-all dark:border dark:border-slate-700 dark:hover:border-slate-600">
-                            <Link href="/store/cart">
+                            <Link href={getStoreUrl('/store/cart')}>
                                 <ShoppingBag className={cn("h-5.5 w-5.5 transition-transform duration-300 group-hover:scale-110 dark:text-slate-200", cartCount > 0 && "text-primary dark:text-primary")} />
                                 {cartCount > 0 && (
                                     <span className="absolute top-1.5 right-1.5 h-4 w-4 bg-primary text-white text-[9px] flex items-center justify-center rounded-full font-black border-2 border-white dark:border-slate-900 animate-in zoom-in duration-300">
@@ -508,16 +511,16 @@ export function PublicNavbar() {
                                     
                                     <ScrollArea className="flex-1 px-8 py-10">
                                         <nav className="flex flex-col space-y-8">
-                                            <Link className="text-3xl font-black tracking-tighter hover:text-primary transition-colors flex items-center justify-between group" href="/store" onClick={() => setIsMenuOpen(false)}>
+                                            <Link className="text-3xl font-black tracking-tighter hover:text-primary transition-colors flex items-center justify-between group" href={getStoreUrl('/store')} onClick={() => setIsMenuOpen(false)}>
                                                 Home <ChevronRight className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0" />
                                             </Link>
                                             {navbarShowShopLink && (
-                                                <Link className="text-3xl font-black tracking-tighter hover:text-primary transition-colors flex items-center justify-between group" href="/store/shop" onClick={() => setIsMenuOpen(false)}>
+                                                <Link className="text-3xl font-black tracking-tighter hover:text-primary transition-colors flex items-center justify-between group" href={getStoreUrl('/store/shop')} onClick={() => setIsMenuOpen(false)}>
                                                     The Catalog <ChevronRight className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0" />
                                                 </Link>
                                             )}
                                             {navbarShowFlashSalesLink && (
-                                                <Link className="text-3xl font-black tracking-tighter hover:text-rose-600 transition-colors flex items-center justify-between group" href="/store/flash-sales" onClick={() => setIsMenuOpen(false)}>
+                                                <Link className="text-3xl font-black tracking-tighter hover:text-rose-600 transition-colors flex items-center justify-between group" href={getStoreUrl('/store/flash-sales')} onClick={() => setIsMenuOpen(false)}>
                                                     Flash Hub <ChevronRight className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0" />
                                                 </Link>
                                             )}
@@ -532,7 +535,7 @@ export function PublicNavbar() {
                                                             </div>
                                                         ) : (
                                                             categories?.slice(0, 6).map(cat => (
-                                                                <Link key={cat.id} href={`/store/shop?category=${cat.id}`} className="flex items-center gap-4 group" onClick={() => setIsMenuOpen(false)}>
+                                                                <Link key={cat.id} href={getStoreUrl(`/store/shop?category=${cat.id}`)} className="flex items-center gap-4 group" onClick={() => setIsMenuOpen(false)}>
                                                                     <div className="relative h-12 w-12 rounded-2xl bg-muted overflow-hidden border shadow-sm shrink-0">
                                                                         <Image src={cat.imageUrl || `https://picsum.photos/seed/${cat.id}/100/100`} alt={cat.name} fill className="object-cover" unoptimized/>
                                                                     </div>
@@ -540,7 +543,7 @@ export function PublicNavbar() {
                                                                 </Link>
                                                             ))
                                                         )}
-                                                        <Link href="/store/categories" className="flex items-center gap-4 text-primary font-black uppercase text-[10px] tracking-widest pt-2" onClick={() => setIsMenuOpen(false)}>
+                                                        <Link href={getStoreUrl('/store/categories')} className="flex items-center gap-4 text-primary font-black uppercase text-[10px] tracking-widest pt-2" onClick={() => setIsMenuOpen(false)}>
                                                             Browse All <ArrowRight className="h-3 w-3" strokeWidth={3} />
                                                         </Link>
                                                     </div>
@@ -552,17 +555,17 @@ export function PublicNavbar() {
                                     <div className="p-8 bg-slate-50 dark:bg-slate-900 border-t flex flex-col gap-4">
                                         {navbarShowAccount && user ? (
                                             <Button asChild size="lg" className="w-full h-14 rounded-2xl font-black uppercase text-xs tracking-widest gap-3 shadow-xl" onClick={() => setIsMenuOpen(false)}>
-                                                <Link href="/store/account">
+                                                <Link href={getStoreUrl('/store/account')}>
                                                     <UserCircle className="h-5 w-5" /> My Account
                                                 </Link>
                                             </Button>
                                         ) : navbarShowAccount && !user ? (
                                             <div className="grid grid-cols-2 gap-4">
                                                 <Button asChild variant="outline" size="lg" className="rounded-2xl font-black uppercase text-[10px] tracking-widest h-14" onClick={() => setIsMenuOpen(false)}>
-                                                    <Link href="/store/login">Log In</Link>
+                                                    <Link href={getStoreUrl('/store/login')}>Log In</Link>
                                                 </Button>
                                                 <Button asChild size="lg" className="rounded-2xl font-black uppercase text-[10px] tracking-widest h-14 shadow-xl" onClick={() => setIsMenuOpen(false)}>
-                                                    <Link href="/store/signup">Join Now</Link>
+                                                    <Link href={getStoreUrl('/store/signup')}>Join Now</Link>
                                                 </Button>
                                             </div>
                                         ) : null}
@@ -645,7 +648,7 @@ export function PublicNavbar() {
                                                         {categoryMatches.map(cat => (
                                                             <Link 
                                                                 key={cat.id}
-                                                                href={`/store/shop?category=${cat.id}`}
+                                                                href={getStoreUrl(`/store/shop?category=${cat.id}`)}
                                                                 className="flex items-center gap-4 p-4 bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-100 dark:border-slate-800 hover:border-primary/30 transition-all"
                                                                 onClick={() => setIsSearchFocused(false)}
                                                             >
@@ -665,7 +668,7 @@ export function PublicNavbar() {
                                                     {searchResults.map(product => (
                                                         <Link 
                                                             key={product.id}
-                                                            href={`/store/product/${product.id}`}
+                                                            href={getStoreUrl(`/store/product/${product.id}`)}
                                                             className="flex items-center gap-6 p-6 bg-white dark:bg-slate-900 rounded-[2rem] transition-all border border-slate-100 dark:border-slate-800 hover:border-primary/30 group shadow-lg hover:shadow-2xl active:scale-[0.98]"
                                                             onClick={() => setIsSearchFocused(false)}
                                                         >
@@ -711,7 +714,7 @@ export function PublicNavbar() {
                                                         {similarSuggestions.map(p => (
                                                             <Link 
                                                                 key={p.id}
-                                                                href={`/store/product/${p.id}`}
+                                                                href={getStoreUrl(`/store/product/${p.id}`)}
                                                                 className="group block space-y-3"
                                                                 onClick={() => setIsSearchFocused(false)}
                                                             >
@@ -747,7 +750,7 @@ export function PublicNavbar() {
                                                     {products?.slice(0, 5).map((p, idx) => (
                                                         <Link 
                                                             key={p.id} 
-                                                            href={`/store/product/${p.id}`}
+                                                            href={getStoreUrl(`/store/product/${p.id}`)}
                                                             className="group flex items-center gap-4 text-xl font-bold hover:text-primary transition-colors tracking-tight"
                                                             onClick={() => setIsSearchFocused(false)}
                                                         >
@@ -787,7 +790,7 @@ export function PublicNavbar() {
                                         className="w-full h-16 rounded-[1.5rem] bg-primary text-white font-black uppercase text-xs tracking-[0.25em] shadow-2xl shadow-primary/20 hover:scale-[1.01] transition-transform"
                                         asChild
                                     >
-                                        <Link href={`/store/search?q=${encodeURIComponent(navbarSearch)}`} onClick={() => setIsSearchFocused(false)}>
+                                        <Link href={getStoreUrl(`/store/search?q=${encodeURIComponent(navbarSearch)}`)} onClick={() => setIsSearchFocused(false)}>
                                             Enter Full Registry Search <ArrowRight className="ml-4 h-5 w-5" strokeWidth={3}/>
                                         </Link>
                                     </Button>
@@ -802,7 +805,7 @@ export function PublicNavbar() {
                                     {categories?.slice(0, 10).map(cat => (
                                         <Link 
                                             key={cat.id} 
-                                            href={`/store/shop?category=${cat.id}`}
+                                            href={getStoreUrl(`/store/shop?category=${cat.id}`)}
                                             className="block group"
                                             onClick={() => setIsSearchFocused(false)}
                                         >
@@ -825,13 +828,14 @@ export function PublicNavbar() {
     );
 }
 
-function UserButton({ isLoading, user, staffMember, router, handleLogout, getInitials }: { 
+function UserButton({ isLoading, user, staffMember, router, handleLogout, getInitials, getStoreUrl }: { 
     isLoading: boolean, 
     user: any, 
     staffMember: any, 
     router: any, 
     handleLogout: () => void, 
-    getInitials: (email?: string | null) => string 
+    getInitials: (email?: string | null) => string,
+    getStoreUrl: (path: string) => string
 }) {
     if (isLoading) {
         return <Button variant="ghost" size="icon" className="hidden sm:inline-flex text-slate-600 dark:text-slate-300"><Loader2 className="h-5 w-5 animate-spin" /></Button>
@@ -857,7 +861,7 @@ function UserButton({ isLoading, user, staffMember, router, handleLogout, getIni
                         </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => router.push('/store/account')} className="cursor-pointer p-3 focus:bg-primary/5 rounded-xl mx-1 my-1">
+                    <DropdownMenuItem onClick={() => router.push(getStoreUrl('/store/account'))} className="cursor-pointer p-3 focus:bg-primary/5 rounded-xl mx-1 my-1">
                         <UserCircle className="mr-3 h-4 w-4 text-primary" />
                         <span className="font-bold">My Account</span>
                     </DropdownMenuItem>
@@ -879,13 +883,13 @@ function UserButton({ isLoading, user, staffMember, router, handleLogout, getIni
     return (
         <div className="hidden sm:flex items-center gap-3 ml-2">
             <Button variant="ghost" asChild className="group relative overflow-hidden text-xs font-black uppercase tracking-[0.2em] h-10">
-                <Link href="/store/login">
+                <Link href={getStoreUrl('/store/login')}>
                     Log In
                     <span className="absolute bottom-0 left-0 h-0.5 bg-primary w-0 transition-all duration-300 ease-out group-hover:w-full"></span>
                 </Link>
             </Button>
             <Button asChild className="rounded-full px-8 font-black uppercase text-[10px] tracking-[0.25em] h-10 shadow-lg shadow-primary/20">
-                <Link href="/store/signup">Sign Up</Link>
+                <Link href={getStoreUrl('/store/signup')}>Sign Up</Link>
             </Button>
         </div>
     )

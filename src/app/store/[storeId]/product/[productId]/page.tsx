@@ -81,6 +81,7 @@ import { StockBar } from '@/components/store/StockBar';
 import { StickyProductBar } from '@/components/store/StickyProductBar';
 import { BannerAd } from '@/components/ads/BannerAd';
 import { useAds } from '@/contexts/ad-context';
+import { useStoreUrl } from '@/hooks/use-store-url';
 
 const iconMap = {
   Truck,
@@ -251,6 +252,8 @@ export default function ProductDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const productId = params.productId as string;
+  const storeId = params.storeId as string;
+  const { getStoreUrl } = useStoreUrl();
   const firestore = useFirestore();
   const { settings } = useSettings();
   const { addToCart } = useCart();
@@ -288,11 +291,14 @@ export default function ProductDetailsPage() {
     }
   }, [product]);
 
+  // Verify product belongs to store
+  const isProductInCorrectStore = product && product.store_id === storeId;
+
   // Fetch Category info
   const categoryRef = useMemo(() => (firestore && product?.categoryId) ? doc(firestore, 'categories', product.categoryId) : null, [firestore, product?.categoryId]);
   const { data: category } = useDoc<Category>(categoryRef);
 
-  // Fetch distributed voice signatures from sub-collection (The "Unlimited Parts" logic)
+  // Fetch distributed voice signatures from sub-collection
   const voicesQuery = useMemo(() => {
       if (!firestore || !productId) return null;
       return query(collection(firestore, 'products', productId, 'voiceSignatures'));
@@ -301,13 +307,14 @@ export default function ProductDetailsPage() {
 
   // Fetch active flash sale sections
   const sectionsQuery = useMemo(() => {
-    if (!firestore) return null;
+    if (!firestore || !storeId) return null;
     return query(
       collection(firestore, 'homepageSections'), 
+      where('store_id', '==', storeId),
       where('isFlashSale', '==', true),
       where('published', '==', true)
     );
-  }, [firestore]);
+  }, [firestore, storeId]);
   const { data: flashSections } = useCollection<HomepageSection>(sectionsQuery);
 
   const activeSectionPromo = useMemo(() => {
@@ -370,9 +377,9 @@ export default function ProductDetailsPage() {
   };
 
   const allCategoriesQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'categories'), orderBy('name'));
-  }, [firestore]);
+    if (!firestore || !storeId) return null;
+    return query(collection(firestore, 'categories'), where('store_id', '==', storeId), orderBy('name'));
+  }, [firestore, storeId]);
   const { data: allCategories } = useCollection<Category>(allCategoriesQuery);
 
   const categoryMap = useMemo(() => {
@@ -391,10 +398,11 @@ export default function ProductDetailsPage() {
   const { data: reviews, isLoading: isLoadingReviews } = useCollection<ProductReview>(reviewsQuery);
 
   const relatedQuery = useMemo(() => {
-    if (!firestore) return null;
+    if (!firestore || !storeId) return null;
     if (product?.categoryId) {
         return query(
             collection(firestore, 'products'),
+            where('store_id', '==', storeId),
             where('categoryId', '==', product.categoryId),
             where('isVisibleOnWeb', '==', true),
             limit(12)
@@ -402,11 +410,12 @@ export default function ProductDetailsPage() {
     }
     return query(
         collection(firestore, 'products'),
+        where('store_id', '==', storeId),
         where('isVisibleOnWeb', '==', true),
         orderBy('createdAt', 'desc'),
         limit(12)
     );
-  }, [firestore, product?.categoryId, productId]);
+  }, [firestore, product?.categoryId, productId, storeId]);
 
   const { data: rawRelatedProducts } = useCollection<Product>(relatedQuery);
 
@@ -426,8 +435,6 @@ export default function ProductDetailsPage() {
   const defaultImageUrl = settings?.defaultProductImageUrl || 'https://placehold.co/600x600.png';
   const isLogisticsEnabled = settings?.showLogisticsOnPublicSite !== false;
   
-  // Product-level visibility settings (default to true if not set)
-  // Respect Global Visibility Settings
   const globalShowTechnicalSpecs = settings?.globalShowTechnicalSpecs !== false;
   const globalShowLogisticsInfo = settings?.globalShowLogisticsInfo !== false;
   const globalShowVerifiedReviews = settings?.globalShowVerifiedReviews !== false;
@@ -449,7 +456,6 @@ export default function ProductDetailsPage() {
     const ad = activeAds.find(ad => ad.adType === 'reward' && ad.placement === 'reward_button');
     if (!ad) return null;
 
-    // Check device targeting
     if (typeof window !== 'undefined') {
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       if (ad.deviceTargeting === 'mobile_only' && !isMobile) return null;
@@ -461,10 +467,6 @@ export default function ProductDetailsPage() {
 
   const effectivePrice = useMemo(() => {
     if (!product) return 0;
-    const catStart = convertToDateSafely(category?.flashSaleStartDate);
-    const catEnd = convertToDateSafely(category?.flashSaleEndDate);
-    const isCategoryPromoActive = category?.isFlashSale && (!catStart || today! >= catStart) && (!catEnd || today! <= catEnd);
-
     let price = calculateEffectivePrice(product as any, today, category);
 
     if (activeSectionPromo) {
@@ -589,7 +591,6 @@ export default function ProductDetailsPage() {
     };
   }, [settings]);
 
-  // Button shape and size classes
   const buttonClasses = useMemo(() => {
     const useIndividual = settings?.useIndividualBtnSettings !== false;
     const shape = useIndividual 
@@ -635,11 +636,11 @@ export default function ProductDetailsPage() {
     );
   }
 
-  if (!product) {
+  if (!product || !isProductInCorrectStore) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-24 text-center">
-        <h1 className="text-2xl font-bold">Product not found</h1>
-        <Button asChild className="mt-4"><Link href="/store/shop">Return to Shop</Link></Button>
+        <h1 className="text-2xl font-bold">Product not found in this store</h1>
+        <Button asChild className="mt-4"><Link href={getStoreUrl('/store/shop')}>Return to Shop</Link></Button>
       </div>
     );
   }
@@ -650,7 +651,6 @@ export default function ProductDetailsPage() {
   const DescriptionIcon = iconMap[product.descriptionIcon as keyof typeof iconMap] || BookOpen;
   const lowStockThreshold = product.lowStockThreshold || settings?.lowStockThreshold || 10;
 
-  // Voice Signature Branding
   const voiceBranding = {
       preTitle: settings?.voiceExperiencePreTitle || 'Listen to Audio Signature',
       title: settings?.voiceExperienceTitle || 'Expert Insights & Detailed Pitch',
@@ -658,12 +658,10 @@ export default function ProductDetailsPage() {
       iconUrl: settings?.voiceExperienceIconUrl
   };
 
-  // Filter visible voice signatures from distributed parts
   const visibleVoices = (distributedVoices || []).filter(v => v.isVisible !== false);
 
   return (
     <div className="bg-background-light dark:bg-background-dark min-h-screen">
-      {/* Sticky Product Action Bar */}
       <StickyProductBar
         productName={product.name}
         productPrice={formatCurrency(effectivePrice, currencySymbol)}
@@ -675,7 +673,6 @@ export default function ProductDetailsPage() {
       />
       
       <main className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 md:py-8">
-        {/* Mobile Back Button - Sticky on Mobile */}
         <div className="md:hidden mb-4 sticky top-0 z-40 bg-background-light dark:bg-background-dark pb-2">
           <Button 
             onClick={() => router.back()}
@@ -688,15 +685,14 @@ export default function ProductDetailsPage() {
           </Button>
         </div>
 
-        {/* Breadcrumb Navigation - Hidden on small mobile, visible on sm+ */}
         <nav className="hidden sm:flex items-center gap-2 text-xs sm:text-sm text-slate-500 mb-6 md:mb-8 overflow-x-auto pb-2">
-          <Link href="/store" className="hover:text-primary transition-colors flex-shrink-0">Home</Link>
+          <Link href={getStoreUrl('/store')} className="hover:text-primary transition-colors flex-shrink-0">Home</Link>
           <ChevronRight className="h-4 w-4 flex-shrink-0" />
-          <Link href="/store/shop" className="hover:text-primary transition-colors flex-shrink-0">Shop</Link>
+          <Link href={getStoreUrl('/store/shop')} className="hover:text-primary transition-colors flex-shrink-0">Shop</Link>
           {category && (
             <>
               <ChevronRight className="h-4 w-4 flex-shrink-0" />
-              <Link href={`/store/shop?category=${category.id}`} className="hover:text-primary transition-colors flex-shrink-0 truncate max-w-[150px]">{category.name}</Link>
+              <Link href={getStoreUrl(`/store/shop?category=${category.id}`)} className="hover:text-primary transition-colors flex-shrink-0 truncate max-w-[150px]">{category.name}</Link>
             </>
           )}
           <ChevronRight className="h-4 w-4 flex-shrink-0" />
@@ -720,7 +716,7 @@ export default function ProductDetailsPage() {
                         </Button>
                     </div>
                 ) : (
-                    <Image src={activeImage || product.imageUrl || defaultImageUrl} alt={product.name} fill priority className={cn("object-cover transition-all duration-700 ease-in-out", isOutOfStock && "opacity-50 grayscale" [0.5])} unoptimized />
+                    <Image src={activeImage || product.imageUrl || defaultImageUrl} alt={product.name} fill priority className={cn("object-cover transition-all duration-700 ease-in-out", isOutOfStock && "opacity-50 grayscale")} unoptimized />
                 )}
                 <div className="absolute top-8 left-8 flex flex-col gap-3">
                     {product.isOfficialBrand && (
@@ -774,7 +770,6 @@ export default function ProductDetailsPage() {
               </div>
             </div>
 
-            {/* Reward Ad Button */}
             {product.rewardAdsEnabled && activeRewardAd && !rewardAdClicked && !isOutOfStock && (
               <Button 
                 onClick={handleRewardClick}
@@ -786,7 +781,6 @@ export default function ProductDetailsPage() {
               </Button>
             )}
 
-            {/* Distributed Voice Signatures - No longer limited by parent document size */}
             {product.voiceEnabled && visibleVoices.length > 0 && (
                 <div className="space-y-4">
                     <div className="flex items-center gap-2 mb-2">
@@ -991,7 +985,7 @@ export default function ProductDetailsPage() {
         )}
 
         {showRecommendations && finalRelatedProducts.length > 0 && (
-          <section className="mt-40 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-20" style={{ backgroundColor: recommendationsBg }}><div className="max-w-7xl mx-auto"><div className="flex items-end justify-between mb-16 px-4"><div className="space-y-2"><h2 className="text-4xl font-black tracking-tighter">{recommendationsTitle}</h2><p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">{recommendationsDescription}</p></div><div className="flex gap-4"><Button asChild variant="ghost" className="font-black text-[10px] uppercase tracking-[0.2em] text-primary gap-3 p-0 h-auto"><Link href="/store/shop">Explore Full Shop <ChevronRight className="h-4 w-4" /></Link></Button></div></div><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">{finalRelatedProducts.map((related) => (<ProductCard key={related.id} product={related} currencySymbol={currencySymbol} />))}</div></div></section>
+          <section className="mt-40 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-20" style={{ backgroundColor: recommendationsBg }}><div className="max-w-7xl mx-auto"><div className="flex items-end justify-between mb-16 px-4"><div className="space-y-2"><h2 className="text-4xl font-black tracking-tighter">{recommendationsTitle}</h2><p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">{recommendationsDescription}</p></div><div className="flex gap-4"><Button asChild variant="ghost" className="font-black text-[10px] uppercase tracking-[0.2em] text-primary gap-3 p-0 h-auto"><Link href={getStoreUrl('/store/shop')}>Explore Full Shop <ChevronRight className="h-4 w-4" /></Link></Button></div></div><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">{finalRelatedProducts.map((related) => (<ProductCard key={related.id} product={related} currencySymbol={currencySymbol} />))}</div></div></section>
         )}
 
         <RecentlyViewedSection excludeId={productId} />

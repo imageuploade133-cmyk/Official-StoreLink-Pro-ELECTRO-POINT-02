@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ensureNumber } from '@/lib/pos-utils';
 import { safeStorage } from '@/lib/storage-utils';
 import { useAds } from '@/contexts/ad-context';
+import { useStoreUrl } from '@/hooks/use-store-url';
 
 interface CartContextType {
   cartItems: StoreCartItem[];
@@ -22,9 +23,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cartItems, setCartItems] = useState<StoreCartItem[]>([]);
   const { toast } = useToast();
   const { triggerAd } = useAds();
+  const { storeId } = useStoreUrl();
+  const storageKey = useMemo(() => `storeCart_${storeId || 'global'}`, [storeId]);
 
   useEffect(() => {
-    const storedCart = safeStorage.getItem('storeCart');
+    const storedCart = safeStorage.getItem(storageKey);
     if (storedCart) {
       try {
         const parsedCart: StoreCartItem[] = JSON.parse(storedCart);
@@ -38,16 +41,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         setCartItems(validatedCart);
       } catch (error) {
         console.error("Failed to parse cart from localStorage", error);
-        safeStorage.removeItem('storeCart');
+        safeStorage.removeItem(storageKey);
       }
+    } else {
+        setCartItems([]);
     }
-  }, []);
+  }, [storageKey]);
 
   useEffect(() => {
-    if (cartItems.length > 0 || safeStorage.getItem('storeCart')) {
-        safeStorage.setItem('storeCart', JSON.stringify(cartItems));
+    if (cartItems.length > 0 || safeStorage.getItem(storageKey)) {
+        safeStorage.setItem(storageKey, JSON.stringify(cartItems));
     }
-  }, [cartItems]);
+  }, [cartItems, storageKey]);
 
   const addToCart = useCallback((product: Product, salePrice: number) => {
     const productStock = ensureNumber(product.stock, 0);
@@ -88,7 +93,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             return [...prevItems, { ...product, quantity: 1, salePrice }];
         }
     });
-  }, [toast]);
+  }, [toast, triggerAd]);
 
   const removeFromCart = useCallback((productId: string) => {
     const itemBeingRemoved = cartItems.find(item => item.id === productId);

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect, Suspense, useCallback } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useFirestore, useCollection } from '@/firebase';
 import { 
@@ -24,7 +24,7 @@ import {
   Search, 
   ChevronRight, 
   Zap, 
-  ShoppingBag as BagIcon, 
+  BagIcon, 
   Loader2, 
   RotateCcw, 
   ChevronLeft, 
@@ -34,12 +34,16 @@ import {
 import { ProductCard } from '@/components/store/ProductCard';
 import { ProductCardSkeleton } from '@/components/store/ProductCardSkeleton';
 import { cn, convertToDateSafely } from '@/lib/utils';
+import { useStoreUrl } from '@/hooks/use-store-url';
 
 const ITEMS_PER_PAGE = 12;
 
 function SearchPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const params = useParams();
+  const storeId = params?.storeId as string;
+  const { getStoreUrl } = useStoreUrl();
   const firestore = useFirestore();
   const { settings } = useSettings();
   const currencySymbol = settings?.currency || '$';
@@ -112,7 +116,7 @@ function SearchPageContent() {
   }, [queryParam]);
 
   // Data Fetching
-  const categoriesQuery = useMemo(() => firestore ? query(collection(firestore, 'categories'), orderBy('name')) : null, [firestore]);
+  const categoriesQuery = useMemo(() => firestore && storeId ? query(collection(firestore, 'categories'), where('store_id', '==', storeId), orderBy('name')) : null, [firestore, storeId]);
   const { data: categories } = useCollection<Category>(categoriesQuery);
 
   const categoryMap = useMemo(() => {
@@ -121,12 +125,13 @@ function SearchPageContent() {
   }, [categories]);
 
   const fetchFilteredProducts = useCallback(async () => {
-    if (!firestore) return;
+    if (!firestore || !storeId) return;
     setIsLoading(true);
 
     try {
       let q = query(
         collection(firestore, 'products'), 
+        where('store_id', '==', storeId),
         where('isVisibleOnWeb', '==', true),
         limit(1000) 
       );
@@ -174,7 +179,11 @@ function SearchPageContent() {
       // Sorting
       if (sortBy === 'price-low') list.sort((a, b) => a.sellingPrice - b.sellingPrice);
       else if (sortBy === 'price-high') list.sort((a, b) => b.sellingPrice - a.sellingPrice);
-      else list.sort((a, b) => (convertToDateSafely(b.createdAt)?.getTime() || 0) - (convertToDateSafely(a.createdAt)?.getTime() || 0));
+      else list.sort((a, b) => {
+          const bDate = convertToDateSafely(b.createdAt)?.getTime() || 0;
+          const aDate = convertToDateSafely(a.createdAt)?.getTime() || 0;
+          return bDate - aDate;
+      });
 
       setTotalFilteredCount(list.length);
       
@@ -192,7 +201,7 @@ function SearchPageContent() {
     } finally {
       setIsLoading(false);
     }
-  }, [firestore, searchTerm, selectedCategories, priceRange, sortBy, onlyOnSale, currentPage, categoryMap]);
+  }, [firestore, storeId, searchTerm, selectedCategories, priceRange, sortBy, onlyOnSale, currentPage, categoryMap]);
 
   useEffect(() => {
     fetchFilteredProducts();
@@ -249,7 +258,7 @@ function SearchPageContent() {
         <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-xs font-black uppercase text-slate-400 tracking-widest mb-4 sm:mb-6">
-            <Link href="/store" className="hover:text-primary transition-colors">Home</Link>
+            <Link href={getStoreUrl('/store')} className="hover:text-primary transition-colors">Home</Link>
             <ChevronRight className="h-3 w-3" />
             <span className="text-primary">Registry Search</span>
           </nav>
@@ -439,7 +448,7 @@ function SearchPageContent() {
                   setOnlyOnSale(false);
                   setSearchTerm('');
                   setCurrentPage(1);
-                  router.push('/store/search');
+                  router.push(getStoreUrl('/store/search'));
                 }}
               >
                 Reset Filters
@@ -520,7 +529,7 @@ function SearchPageContent() {
             ) : (
               <div className="flex flex-col items-center justify-center py-16 sm:py-24 text-center bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800 px-4 sm:px-8">
                 <div className="h-16 w-16 sm:h-24 sm:w-24 bg-muted rounded-full flex items-center justify-center mb-4 sm:mb-6 flex-shrink-0">
-                  <BagIcon className="h-8 w-8 sm:h-10 sm:w-10 text-slate-300" />
+                  <X className="h-8 w-8 sm:h-10 sm:w-10 text-slate-300" />
                 </div>
                 <h3 className="text-xl sm:text-2xl font-black tracking-tight">No matches found</h3>
                 <p className="text-slate-500 mt-2 text-sm sm:text-base max-w-sm mx-auto">Try using broader keywords or adjust your filters</p>

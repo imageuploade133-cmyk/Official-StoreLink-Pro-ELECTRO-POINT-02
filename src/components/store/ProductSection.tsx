@@ -50,6 +50,7 @@ import type { HomepageSection, Product, Category } from '@/lib/types';
 import { useSettings } from '@/contexts/settings-context';
 import { ProductCardSkeleton } from './ProductCardSkeleton';
 import { cn, convertToDateSafely } from '@/lib/utils';
+import { useStoreUrl } from '@/hooks/use-store-url';
 
 interface ProductSectionProps {
   section: HomepageSection;
@@ -124,6 +125,7 @@ function FlashSaleMarquee() {
 export function ProductSection({ section, categories }: ProductSectionProps) {
   const firestore = useFirestore();
   const { settings } = useSettings();
+  const { storeId, getStoreUrl } = useStoreUrl();
   const currencySymbol = settings?.currency || '$';
 
   // Guard: Custom UI Sections are handled by a different component
@@ -165,7 +167,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
   }, [categories]);
 
   const fetchProducts = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore || !hasEnteredView) return;
+    if (!firestore || !hasEnteredView || !storeId) return;
     setIsLoading(true);
 
     const page = currentPageRef.current;
@@ -177,6 +179,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
       if (section.selectionType === 'category' && section.categoryId) {
         let q = query(
           collection(firestore, 'products'),
+          where('store_id', '==', storeId),
           where('categoryId', '==', section.categoryId),
           where('isVisibleOnWeb', '==', true),
           orderBy('createdAt', 'desc')
@@ -213,6 +216,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
         if (nextIds.length > 0) {
             const q = query(
                 collection(firestore, 'products'),
+                where('store_id', '==', storeId),
                 where(documentId(), 'in', nextIds)
             );
             const snapshot = await getDocs(q);
@@ -246,7 +250,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [firestore, section, hasEnteredView, categoryMap]);
+  }, [firestore, section, hasEnteredView, categoryMap, storeId]);
 
   useEffect(() => {
     if (hasEnteredView) {
@@ -486,7 +490,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
 
                         <div className="flex items-center">
                             <Link 
-                                href="/store/flash-sales"
+                                href={getStoreUrl('/store/flash-sales')}
                                 className="flex items-center gap-2 text-white font-black text-xs uppercase tracking-widest hover:translate-x-1 transition-transform bg-white/10 px-4 py-2 rounded-full backdrop-blur-md border border-white/20"
                             >
                                 See All <ChevronRight className="h-4 w-4" strokeWidth={3} />
@@ -628,7 +632,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
                         boxShadow: `0 20px 40px -5px ${hubColor}44`
                     } : buttonStyle}
                 >
-                    <Link href={`/store/shop?category=${section.categoryId}`}>
+                    <Link href={getStoreUrl(`/store/shop?category=${section.categoryId}`)}>
                         {exploreText} <IconComponent className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={3} />
                     </Link>
                 </Button>

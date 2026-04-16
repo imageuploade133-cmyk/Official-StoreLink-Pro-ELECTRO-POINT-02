@@ -37,7 +37,7 @@ export default function HomePage() {
         }
       } else {
         // Default for visitors: Show the store
-        router.replace('/store');
+        router.replace('/store/global');
       }
     }
   }, [user, store, staffMember, isCustomer, isLoading, router]);

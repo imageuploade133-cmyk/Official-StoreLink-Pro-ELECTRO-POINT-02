@@ -33,6 +33,7 @@ import { cn } from '@/lib/utils';
 import { calculateRatingStats } from '@/lib/rating-utils';
 import { useProductReviews } from '@/hooks/use-product-reviews';
 import styles from './ProductCard.module.css';
+import { useStoreUrl } from '@/hooks/use-store-url';
 
 interface ProductCardProps {
   product: Product;
@@ -44,6 +45,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
   const { addToCart } = useCart();
   const { isProductInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const { settings } = useSettings();
+  const { getStoreUrl } = useStoreUrl();
   const [today, setToday] = useState<Date | null>(null);
   const [isLoadingProduct, setIsLoadingProduct] = useState(false);
   const { reviews } = useProductReviews(product.id);
@@ -263,6 +265,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
           onProductClick={handleProductClick}
           ratingStats={ratingStats}
           settings={settings}
+          getStoreUrl={getStoreUrl}
         />
       </>
     );
@@ -288,7 +291,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
       >
         {/* Media Area with Enhanced Hover */}
         {showImage && (
-        <Link href={`/store/product/${product.id}`} onClick={handleProductClick} className={`block relative overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 ${styles.mediaArea}`} style={{ height: `${mediaHeight}px` }}>
+        <Link href={getStoreUrl(`/store/product/${product.id}`)} onClick={handleProductClick} className={`block relative overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 ${styles.mediaArea}`} style={{ height: `${mediaHeight}px` }}>
         <Image
           src={product.imageUrl || settings?.defaultProductImageUrl || 'https://placehold.co/600x600.png'}
           alt={product.name}
@@ -472,6 +475,7 @@ interface CustomHtmlCardProps {
   onProductClick: () => void;
   ratingStats: { averageRating: number; totalReviews: number };
   settings: any;
+  getStoreUrl: (path: string) => string;
 }
 
 function CustomHtmlCard({
@@ -489,6 +493,7 @@ function CustomHtmlCard({
   onProductClick,
   ratingStats,
   settings,
+  getStoreUrl,
 }: CustomHtmlCardProps) {
   // Simple placeholder replacement
   const processedHtml = html
@@ -508,7 +513,8 @@ function CustomHtmlCard({
     .replace(/\{\{product\.reviewCount\}\}/g, ratingStats.totalReviews.toString())
     .replace(/\{\{currency\}\}/g, currencySymbol)
     .replace(/\{\{cardHeight\}\}/g, (settings?.productCardHeight || 380).toString())
-    .replace(/\{\{isInWishlist\}\}/g, isInWishlist ? 'true' : 'false');
+    .replace(/\{\{isInWishlist\}\}/g, isInWishlist ? 'true' : 'false')
+    .replace(/\{\{product\.url\}\}/g, getStoreUrl(`/store/product/${product.id}`));
 
   return (
     <div 

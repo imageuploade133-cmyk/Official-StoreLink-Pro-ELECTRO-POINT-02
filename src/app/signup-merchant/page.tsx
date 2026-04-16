@@ -35,6 +35,7 @@ const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
   email: z.string().trim().email('Invalid email address.'),
   storeName: z.string().min(2, 'Store name must be at least 2 characters.'),
+  storeSlug: z.string().min(2, 'Store slug must be at least 2 characters.').regex(/^[a-z0-9-]+$/, 'Only lowercase letters, numbers, and hyphens allowed.'),
   databaseId: z.string().min(1, 'Database ID is required.').regex(/^[a-z0-9-]+$/, 'Only lowercase letters, numbers, and hyphens allowed.').default('(default)'),
   password: z.string().min(6, 'Password must be at least 6 characters long.'),
   confirmPassword: z.string(),
@@ -62,7 +63,7 @@ export default function MerchantSignupPage() {
     const form = useForm<SignupFormValues>({
       resolver: zodResolver(signupSchema),
       defaultValues: {
-        name: '', email: '', storeName: '', databaseId: '(default)', password: '', confirmPassword: '',
+        name: '', email: '', storeName: '', storeSlug: '', databaseId: '(default)', password: '', confirmPassword: '',
       },
     });
 
@@ -131,10 +132,11 @@ export default function MerchantSignupPage() {
             }, { merge: true });
 
             // 2. Create Store record
-            const storeId = `${targetUser.uid}_${Date.now()}`;
+            const storeId = values.storeSlug; // Use slug as ID for easier routing
             console.log("New store ID:", storeId);
             batch.set(doc(firestore, 'stores', storeId), {
                 id: storeId,
+                slug: values.storeSlug,
                 owner_id: targetUser.uid,
                 name: values.storeName,
                 databaseId: values.databaseId,
@@ -275,6 +277,18 @@ export default function MerchantSignupPage() {
                 )}/>
                 <FormField control={form.control} name="storeName" render={({ field }) => (
                     <FormItem><FormLabel>Store Name</FormLabel><FormControl><Input placeholder="My Awesome Store" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
+                )}/>
+                <FormField control={form.control} name="storeSlug" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Store URL Slug</FormLabel>
+                        <FormControl>
+                            <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">/store/</span>
+                                <Input placeholder="my-awesome-store" className="pl-16" {...field} disabled={isSubmitting || isLoading} />
+                            </div>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
                 )}/>
                 <FormField control={form.control} name="databaseId" render={({ field }) => (
                     <FormItem>

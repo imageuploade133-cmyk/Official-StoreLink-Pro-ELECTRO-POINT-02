@@ -628,6 +628,7 @@ export type StockAlertItem = Product;
 
 export interface Store {
   id: string;
+  slug?: string;
   owner_id: string;
   name: string;
   databaseId?: string;
