@@ -243,15 +243,9 @@ export function PublicFooter() {
             </ul>
           </div>
         </div>
-        <div className="pt-8 flex flex-col md:flex-row justify-between items-center border-t" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
-          <p className="text-xs mb-4 md:mb-0" style={{ color: textColor, opacity: 0.6 }}>© {new Date().getFullYear()} {showPublicStoreName ? `${storeName}. All rights reserved.` : 'All rights reserved.'}</p>
-          <div className="flex items-center gap-4">
-          </div>
-        </div>
-
         {footerBannerUrl && (
           <div className={cn(
-            "mt-10 w-full overflow-hidden rounded-2xl border border-white/10 shadow-2xl transition-all duration-500 hover:scale-[1.01]",
+            "mb-10 w-full overflow-hidden rounded-2xl border border-white/10 shadow-2xl transition-all duration-500 hover:scale-[1.01]",
             footerBannerSize === 'small' ? "max-w-4xl mx-auto h-32 md:h-40" : "h-48 md:h-72"
           )}>
             <img 
@@ -262,6 +256,12 @@ export function PublicFooter() {
             />
           </div>
         )}
+
+        <div className="pt-8 flex flex-col md:flex-row justify-between items-center border-t" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
+          <p className="text-xs mb-4 md:mb-0" style={{ color: textColor, opacity: 0.6 }}>© {new Date().getFullYear()} {showPublicStoreName ? `${storeName}. All rights reserved.` : 'All rights reserved.'}</p>
+          <div className="flex items-center gap-4">
+          </div>
+        </div>
       </div>
     </footer>
   );

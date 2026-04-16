@@ -162,76 +162,6 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
           </CardHeader>
           <CardContent className="space-y-10 pt-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <FormField
-                  control={form.control}
-                  name="footerDesign"
-                  render={({ field }) => (
-                    <FormItem className="space-y-4">
-                      <FormLabel className="text-xs font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
-                        <Layout className="h-4 w-4" /> Footer UI Design
-                      </FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="h-12 rounded-2xl border-2 transition-all hover:border-primary">
-                            <SelectValue placeholder="Select a design" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="standard">Standard (Classic)</SelectItem>
-                          <SelectItem value="modern">Modern (Spacious)</SelectItem>
-                          <SelectItem value="minimal">Minimal (Clean)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormDescription>Choose the structural layout of your footer links and info.</FormDescription>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="footerBackgroundStyle"
-                  render={({ field }) => (
-                    <FormItem className="space-y-4">
-                      <FormLabel className="text-xs font-black uppercase tracking-[0.2em] text-primary">Background Mode</FormLabel>
-                      <FormControl>
-                        <RadioGroup
-                          onValueChange={field.onChange}
-                          value={field.value}
-                          className="grid grid-cols-2 gap-4"
-                        >
-                          <FormItem className="flex items-center space-x-3 space-y-0 rounded-2xl border p-4 bg-muted/10 transition-colors hover:bg-muted/20">
-                            <FormControl><RadioGroupItem value="solid" /></FormControl>
-                            <Label className="font-bold cursor-pointer">Solid Fill</Label>
-                          </FormItem>
-                          <FormItem className="flex items-center space-x-3 space-y-0 rounded-2xl border p-4 bg-muted/10 transition-colors hover:bg-muted/20">
-                            <FormControl><RadioGroupItem value="gradient" /></FormControl>
-                            <Label className="font-bold cursor-pointer">Gradient</Label>
-                          </FormItem>
-                        </RadioGroup>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-            </div>
-            
-            <Separator className="border-dashed" />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <div className="space-y-6">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                        <Palette className="h-3.5 w-3.5" /> Color Merchandising
-                    </h4>
-                    {footerBackgroundStyle === 'solid' ? (
-                        <FormField control={form.control} name="footerColorBackground" render={({ field }) => <ColorInput field={field} label="Main Background" />} />
-                    ) : (
-                        <div className="space-y-6">
-                            <FormField control={form.control} name="footerBackgroundGradientStart" render={({ field }) => <ColorInput field={field} label="Gradient Start" />} />
-                            <FormField control={form.control} name="footerBackgroundGradientEnd" render={({ field }) => <ColorInput field={field} label="Gradient End" />} />
-                        </div>
-                    )}
-                    <FormField control={form.control} name="footerTextColor" render={({ field }) => <ColorInput field={field} label="Text & Description Color" />} />
-                </div>
-
                 <div className="space-y-8">
                     <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                         <ImageIcon className="h-3.5 w-3.5" /> Footer Banner Asset
@@ -301,6 +231,78 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
                         </FormItem>
                       )}
                     />
+                </div>
+
+                <div className="space-y-8">
+                    <FormField
+                      control={form.control}
+                      name="footerDesign"
+                      render={({ field }) => (
+                        <FormItem className="space-y-4">
+                          <FormLabel className="text-xs font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                            <Layout className="h-4 w-4" /> Footer UI Design
+                          </FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="h-12 rounded-2xl border-2 transition-all hover:border-primary">
+                                <SelectValue placeholder="Select a design" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="standard">Standard (Classic)</SelectItem>
+                              <SelectItem value="modern">Modern (Spacious)</SelectItem>
+                              <SelectItem value="minimal">Minimal (Clean)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormDescription>Choose the structural layout of your footer links and info.</FormDescription>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="footerBackgroundStyle"
+                      render={({ field }) => (
+                        <FormItem className="space-y-4">
+                          <FormLabel className="text-xs font-black uppercase tracking-[0.2em] text-primary">Background Mode</FormLabel>
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              value={field.value}
+                              className="grid grid-cols-2 gap-4"
+                            >
+                              <FormItem className="flex items-center space-x-3 space-y-0 rounded-2xl border p-4 bg-muted/10 transition-colors hover:bg-muted/20">
+                                <FormControl><RadioGroupItem value="solid" /></FormControl>
+                                <Label className="font-bold cursor-pointer">Solid Fill</Label>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0 rounded-2xl border p-4 bg-muted/10 transition-colors hover:bg-muted/20">
+                                <FormControl><RadioGroupItem value="gradient" /></FormControl>
+                                <Label className="font-bold cursor-pointer">Gradient</Label>
+                              </FormItem>
+                            </RadioGroup>
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                </div>
+            </div>
+            
+            <Separator className="border-dashed" />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div className="space-y-6">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                        <Palette className="h-3.5 w-3.5" /> Color Merchandising
+                    </h4>
+                    {footerBackgroundStyle === 'solid' ? (
+                        <FormField control={form.control} name="footerColorBackground" render={({ field }) => <ColorInput field={field} label="Main Background" />} />
+                    ) : (
+                        <div className="space-y-6">
+                            <FormField control={form.control} name="footerBackgroundGradientStart" render={({ field }) => <ColorInput field={field} label="Gradient Start" />} />
+                            <FormField control={form.control} name="footerBackgroundGradientEnd" render={({ field }) => <ColorInput field={field} label="Gradient End" />} />
+                        </div>
+                    )}
+                    <FormField control={form.control} name="footerTextColor" render={({ field }) => <ColorInput field={field} label="Text & Description Color" />} />
                 </div>
             </div>
           </CardContent>
