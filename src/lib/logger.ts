@@ -3,6 +3,7 @@ import type { Customer, CustomerHistory } from './types';
 
 interface LogData {
     action: CustomerHistory['action'];
+    store_id: string;
     entityId: string;
     entityDescription: string;
     userId: string;
@@ -17,7 +18,7 @@ export async function logCustomerActivity(firestore: Firestore, logData: LogData
         return;
     }
 
-    const { action, entityId, entityDescription, userId, userName, beforeData, afterData } = logData;
+    const { action, store_id, entityId, entityDescription, userId, userName, beforeData, afterData } = logData;
 
     let details = '';
     if (action === 'CREATE') {
@@ -34,7 +35,7 @@ export async function logCustomerActivity(firestore: Firestore, logData: LogData
             
             const beforeValue = (beforeData as any)?.[key];
             const afterValue = (afterData as any)?.[key];
-
+            
             if (JSON.stringify(beforeValue) !== JSON.stringify(afterValue)) {
                 const formatValue = (val: any) => val === undefined || val === null || val === '' ? 'not set' : `'${val}'`;
                 changes.push(`${key} from ${formatValue(beforeValue)} to ${formatValue(afterValue)}`);
@@ -51,6 +52,7 @@ export async function logCustomerActivity(firestore: Firestore, logData: LogData
     const historyEntry: Omit<CustomerHistory, 'id'> = {
         customerId: entityId,
         customerName: entityDescription,
+        store_id,
         action,
         timestamp: serverTimestamp() as any, // Cast because serverTimestamp returns a sentinel value
         userId,

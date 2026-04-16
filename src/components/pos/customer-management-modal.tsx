@@ -185,6 +185,7 @@ export function CustomerManagementModal({ isOpen, onOpenChange, onCustomerSelect
 
         await logCustomerActivity(firestore, {
             action: "CREATE",
+            store_id: currentStoreId!,
             entityId: docRef.id,
             entityDescription: values.name,
             userId: authUser.uid,

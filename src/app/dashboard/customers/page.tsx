@@ -217,7 +217,7 @@ export default function CustomersPage() {
             updateDoc(customerRef, updatedCustomerData)
               .then(async () => {
                 await logCustomerActivity(firestore, {
-                    action: "UPDATE", entityId: editingCustomer.id, entityDescription: values.name,
+                    action: "UPDATE", store_id: currentStoreId!, entityId: editingCustomer.id, entityDescription: values.name,
                     userId: authUser.uid, userName: authUser.email!, beforeData: oldCustomerData, afterData: { ...oldCustomerData, ...values } as any,
                 });
                 toast({ title: 'Customer Updated', description: `"${values.name}" has been successfully updated.` });
@@ -249,7 +249,7 @@ export default function CustomersPage() {
             addDoc(customersCol, newCustomerData)
               .then(async (docRef) => {
                 await logCustomerActivity(firestore, {
-                    action: "CREATE", entityId: docRef.id, entityDescription: values.name,
+                    action: "CREATE", store_id: currentStoreId!, entityId: docRef.id, entityDescription: values.name,
                     userId: authUser.uid, userName: authUser.email!, afterData: { id: docRef.id, ...newCustomerData } as any,
                 });
                 toast({ title: 'Customer Added', description: `"${values.name}" has been successfully added.` });
@@ -286,7 +286,7 @@ export default function CustomersPage() {
     deleteDoc(customerRef)
       .then(async () => {
         await logCustomerActivity(firestore, {
-            action: "DELETE", entityId: customerId, entityDescription: customerName,
+            action: "DELETE", store_id: currentStoreId!, entityId: customerId, entityDescription: customerName,
             userId: authUser.uid, userName: authUser.email!, beforeData: customerToDeleteData,
         });
         toast({ title: 'Customer Deleted', description: `"${customerName}" has been successfully deleted.` });
@@ -319,7 +319,7 @@ export default function CustomersPage() {
     updateDoc(customerRef, updateData)
       .then(async () => {
         await logCustomerActivity(firestore, {
-            action: "STATUS_UPDATE", entityId: customerId, entityDescription: customerName,
+            action: "STATUS_UPDATE", store_id: currentStoreId!, entityId: customerId, entityDescription: customerName,
             userId: authUser.uid, userName: authUser.email!, beforeData: customerToUpdate, afterData: { ...customerToUpdate, status: newStatus } as any,
         });
         toast({ title: 'Status Updated', description: `"${customerName}" status has been updated to "${newStatus}".` });

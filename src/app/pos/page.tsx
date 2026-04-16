@@ -101,11 +101,14 @@ export default function POSPage() {
     permissions,
     isLoading: authLoading,
     staffMember,
+    store,
     isAdmin,
   } = useAuth();
   const { toast } = useToast();
   const firestore = useFirestore();
   const router = useRouter();
+  
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
   
   const [products, setProducts] = useState<DisplayProduct[]>([]);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -399,6 +402,7 @@ export default function POSPage() {
 
       await logActivity(firestore, {
         user: currentUser,
+        store_id: currentStoreId!,
         actionType: 'HELD_SALE_DELETED',
         entityType: 'Held Sale',
         entityId: heldSaleToDelete.id,
@@ -548,7 +552,7 @@ export default function POSPage() {
           transaction.set(auditRef, {
             productId: item.productId,
             productName: item.productName,
-            store_id: staffMember?.store_id || currentUser.uid,
+            store_id: currentStoreId!,
             type: 'SALE',
             referenceId: docRef.id,
             beforeStock: currentStock,
@@ -603,7 +607,7 @@ export default function POSPage() {
         
         const saleDataForDb: any = {
             staffId: currentUser.uid,
-            store_id: staffMember?.store_id || currentUser.uid,
+            store_id: currentStoreId!,
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
             grandTotal: saleDataForDialog.grandTotal,
@@ -748,6 +752,7 @@ export default function POSPage() {
             barcode: item.barcode || null,
             categoryId: item.categoryId,
         })),
+        store_id: currentStoreId!,
         totalAmount: grandTotal,
         notes: notes || null,
         customerIdentifier: customerIdentifier || null,

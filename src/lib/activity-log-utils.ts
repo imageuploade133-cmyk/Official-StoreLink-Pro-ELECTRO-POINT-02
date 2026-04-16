@@ -3,6 +3,7 @@ import type { ActivityLog } from './types';
 
 interface LogActivityParams {
     user: { uid: string; displayName: string | null; email?: string | null };
+    store_id: string;
     actionType: ActivityLog['actionType'];
     entityType: ActivityLog['entityType'];
     entityId: string;
@@ -11,14 +12,15 @@ interface LogActivityParams {
     details?: Record<string, any>;
 }
 
-export async function logActivity(firestore: Firestore, { user, ...logData }: LogActivityParams): Promise<void> {
-    if (!firestore || !user) {
-        console.error("Firestore or user not provided for logging activity.");
+export async function logActivity(firestore: Firestore, { user, store_id, ...logData }: LogActivityParams): Promise<void> {
+    if (!firestore || !user || !store_id) {
+        console.error("Firestore, user, or store_id not provided for logging activity.");
         return;
     }
     
     const activityLog: Omit<ActivityLog, 'id'> = {
         ...logData,
+        store_id,
         timestamp: serverTimestamp() as any,
         userId: user.uid,
         userName: user.displayName || user.email || 'Unknown User'

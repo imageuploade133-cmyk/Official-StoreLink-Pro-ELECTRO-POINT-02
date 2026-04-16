@@ -727,6 +727,7 @@ export interface Customer {
 
 export interface CustomerHistory {
     id: string;
+    store_id: string;
     customerId: string;
     customerName: string;
     action: "CREATE" | "UPDATE" | "DELETE" | "STATUS_UPDATE" | "PAYMENT" | "SALE";
@@ -752,6 +753,7 @@ export interface HeldSaleItem {
 
 export interface HeldSale {
     id: string;
+    store_id: string;
     items: HeldSaleItem[];
     totalAmount: number;
     notes: string | null;
@@ -774,6 +776,7 @@ export interface PaymentDetails {
 
 export interface ActivityLog {
     id: string;
+    store_id: string;
     timestamp: Timestamp;
     userId: string;
     userName: string;

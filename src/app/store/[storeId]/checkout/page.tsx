@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useCart } from '@/contexts/cart-context';
 import { useUser, useFirestore, useDoc } from '@/firebase';
 import { useSettings } from '@/contexts/settings-context';
@@ -64,6 +64,8 @@ const generatePaymentReference = () => {
 };
 
 export default function CheckoutPage() {
+  const params = useParams();
+  const storeId = params?.storeId as string;
   const { cartItems, clearCart } = useCart();
   const { user, isLoading: isAuthLoading } = useUser();
   const { settings, isLoadingSettings } = useSettings();
@@ -387,6 +389,7 @@ export default function CheckoutPage() {
 
                       await addDoc(collection(firestore, 'whatsappMessageLogs'), {
                           timestamp: serverTimestamp(),
+                          store_id: storeId,
                           eventType: 'order_placed',
                           messageContent: `Order Confirmation sent to Customer for #${finalOrderId}`,
                           recipientPhone: formData.phone,
@@ -423,6 +426,7 @@ export default function CheckoutPage() {
 
                       await addDoc(collection(firestore, 'whatsappMessageLogs'), {
                           timestamp: serverTimestamp(),
+                          store_id: storeId,
                           eventType: 'staff_order_alert',
                           messageContent: `Staff Order Alert sent for #${finalOrderId}`,
                           recipientPhone: alertNum,

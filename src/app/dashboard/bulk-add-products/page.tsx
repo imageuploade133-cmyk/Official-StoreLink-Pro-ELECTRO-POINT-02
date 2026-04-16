@@ -175,10 +175,11 @@ export default function BulkAddProductsPage() {
 
       await logActivity(firestore, {
           user: { uid: user.uid, displayName: user.displayName || user.email || 'System' },
+          store_id: currentStoreId,
           actionType: 'BULK_IMPORT', entityType: 'Product', entityId: 'BULK',
           summary: `User imported products via CSV`,
           entityDescription: `Bulk import: ${createdCount} created, ${updatedCount} updated.`,
-          details: { created: createdCount, updated: updatedCount, fileName, store_id: currentStoreId },
+          details: { created: createdCount, updated: updatedCount, fileName },
       });
       
       toast({

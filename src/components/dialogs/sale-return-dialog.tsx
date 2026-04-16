@@ -60,7 +60,8 @@ interface SaleReturnDialogProps {
 export function SaleReturnDialog({ isOpen, onOpenChange, saleTransaction, currencySymbol, onReturnSuccess }: SaleReturnDialogProps) {
   const { toast } = useToast();
   const firestore = useFirestore();
-  const { user } = useAuth();
+  const { user, store, staffMember } = useAuth();
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
   const [searchTerm, setSearchTerm] = useState('');
   
   const form = useForm<ReturnFormValues>({
@@ -218,6 +219,7 @@ export function SaleReturnDialog({ isOpen, onOpenChange, saleTransaction, curren
       
       await logActivity(firestore, {
         user,
+        store_id: currentStoreId!,
         actionType: 'SALE_ITEMS_RETURNED',
         entityType: 'SaleTransaction',
         entityId: saleTransaction.id,
