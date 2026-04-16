@@ -16,7 +16,7 @@ import {
   orderBy, 
   deleteDoc, 
 } from 'firebase/firestore';
-import { saveGlobalSettings } from '@/firebase/firestore/settings';
+import { saveGlobalSettings, saveStoreSettings } from '@/firebase/firestore/settings';
 import type { AppSettings, SlideShow, HomepageSection } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
@@ -76,9 +76,11 @@ type FormValues = z.infer<typeof flashHubSettingsSchema>;
 
 export default function FlashHubManagerPage() {
   const firestore = useFirestore();
-  const { permissions, isLoading: isAuthLoading } = useAuth();
+  const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
   const { toast } = useToast();
   
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
+
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isUploadingIcon, setIsUploadingIcon] = useState(false);
@@ -86,31 +88,50 @@ export default function FlashHubManagerPage() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const settingsRef = useMemo(
-    () => (firestore ? doc(firestore, 'settings', 'global') : null),
-    [firestore]
+    () => {
+        if (!firestore) return null;
+        if (currentStoreId) {
+            return doc(firestore, 'stores', currentStoreId, 'settings', 'config');
+        }
+        return doc(firestore, 'settings', 'global');
+    },
+    [firestore, currentStoreId]
   );
-  const { data: settingsData, isLoading: isLoadingSettings } = useDoc<AppSettings>(settingsRef);
+  
+  // Fallback for old stores
+  const oldSettingsRef = useMemo(
+    () => (firestore && currentStoreId) ? doc(firestore, 'settings', currentStoreId) : null,
+    [firestore, currentStoreId]
+  );
+
+  const { data: mainSettingsData, isLoading: isLoadingMainSettings } = useDoc<AppSettings>(settingsRef);
+  const { data: oldSettingsData, isLoading: isLoadingOldSettings } = useDoc<AppSettings>(oldSettingsRef);
+
+  const settingsData = mainSettingsData || oldSettingsData;
+  const isLoadingSettings = isLoadingMainSettings && (currentStoreId ? isLoadingOldSettings : true);
 
   // Fetch only Flash Hub slides
   const slidesQuery = useMemo(() => {
-    if (!firestore) return null;
+    if (!firestore || !currentStoreId) return null;
     return query(
         collection(firestore, 'slideShows'), 
+        where('store_id', '==', currentStoreId),
         where('placement', '==', 'flash-hub'),
         orderBy('order', 'asc')
     );
-  }, [firestore]);
+  }, [firestore, currentStoreId]);
   const { data: slides, isLoading: isLoadingSlides } = useCollection<SlideShow>(slidesQuery);
 
   // Fetch active flash sale sections for an overview
   const sectionsQuery = useMemo(() => {
-    if (!firestore) return null;
+    if (!firestore || !currentStoreId) return null;
     return query(
         collection(firestore, 'homepageSections'), 
+        where('store_id', '==', currentStoreId),
         where('isFlashSale', '==', true),
         orderBy('order', 'asc')
     );
-  }, [firestore]);
+  }, [firestore, currentStoreId]);
   const { data: flashSections, isLoading: isLoadingSections } = useCollection<HomepageSection>(sectionsQuery);
 
   const form = useForm<FormValues>({
@@ -188,7 +209,11 @@ export default function FlashHubManagerPage() {
     if (!firestore) return;
     setIsSaving(true);
     try {
-      await saveGlobalSettings(firestore, data);
+      if (currentStoreId) {
+          await saveStoreSettings(firestore, currentStoreId, data);
+      } else {
+          await saveGlobalSettings(firestore, data);
+      }
       toast({ title: 'Sync Successful', description: 'Flash Hub configuration has been updated.' });
     } catch (e) {
       toast({ variant: 'destructive', title: 'Error', description: 'Failed to update Flash Hub settings.' });

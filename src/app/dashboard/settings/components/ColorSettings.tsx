@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useFirestore } from '@/firebase';
-import { saveGlobalSettings } from '@/firebase/firestore/settings';
+import { saveGlobalSettings, saveStoreSettings } from '@/firebase/firestore/settings';
 import type { AppSettings } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { hslStringToHex } from '@/lib/color-utils';
@@ -50,6 +50,7 @@ const defaultThemeValues: FormValues = {
 interface ColorSettingsProps {
   settingsData: AppSettings | null;
   isLoading: boolean;
+  storeId?: string | null;
 }
 
 const ColorInput = ({ field, label }: { field: any; label: string }) => (
@@ -72,7 +73,7 @@ const toHex = (colorString: string | undefined, fallback: string): string => {
   return fallback;
 };
 
-export function ColorSettings({ settingsData, isLoading }: ColorSettingsProps) {
+export function ColorSettings({ settingsData, isLoading, storeId }: ColorSettingsProps) {
   const { toast } = useToast();
   const firestore = useFirestore();
   const [isSaving, setIsSaving] = useState(false);
@@ -105,7 +106,11 @@ export function ColorSettings({ settingsData, isLoading }: ColorSettingsProps) {
     if (!firestore) return;
     setIsSaving(true);
     try {
-      await saveGlobalSettings(firestore, data);
+      if (storeId) {
+        await saveStoreSettings(firestore, storeId, data);
+      } else {
+        await saveGlobalSettings(firestore, data);
+      }
       toast({ title: 'Success', description: 'Color & Theme settings have been updated.' });
     } catch (e) {
       toast({ variant: 'destructive', title: 'Error', description: 'Failed to update settings.' });

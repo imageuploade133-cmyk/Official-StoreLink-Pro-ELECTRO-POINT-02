@@ -53,13 +53,15 @@ const slideFormSchema = z.object({
 type SlideFormValues = z.infer<typeof slideFormSchema>;
 
 export default function CreateSlidePage() {
-  const { permissions, isLoading: authLoading } = useAuth();
+  const { permissions, isLoading: authLoading, store, staffMember } = useAuth();
   const firestore = useFirestore();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const initialPlacement = (searchParams.get('placement') as any) || 'homepage';
 
@@ -123,11 +125,12 @@ export default function CreateSlidePage() {
   };
 
   const onSubmit = async (values: SlideFormValues) => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsSaving(true);
     try {
       await addDoc(collection(firestore, 'slideShows'), {
         ...values,
+        store_id: currentStoreId,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
       });

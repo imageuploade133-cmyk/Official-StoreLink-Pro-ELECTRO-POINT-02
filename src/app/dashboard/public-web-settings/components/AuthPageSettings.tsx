@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import Image from 'next/image';
 import { useFirestore } from '@/firebase';
-import { saveGlobalSettings } from '@/firebase/firestore/settings';
+import { saveGlobalSettings, saveStoreSettings } from '@/firebase/firestore/settings';
 import type { AppSettings } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { uploadImage } from '@/ai/flows/image-upload-flow';
@@ -28,9 +28,10 @@ type FormValues = z.infer<typeof authPageSchema>;
 interface AuthPageSettingsProps {
   settingsData: AppSettings | null;
   isLoading: boolean;
+  storeId?: string | null;
 }
 
-export function AuthPageSettings({ settingsData, isLoading }: AuthPageSettingsProps) {
+export function AuthPageSettings({ settingsData, isLoading, storeId }: AuthPageSettingsProps) {
   const { toast } = useToast();
   const firestore = useFirestore();
   const [isSaving, setIsSaving] = useState(false);
@@ -56,7 +57,11 @@ export function AuthPageSettings({ settingsData, isLoading }: AuthPageSettingsPr
     if (!firestore) return;
     setIsSaving(true);
     try {
-      await saveGlobalSettings(firestore, data);
+      if (storeId) {
+        await saveStoreSettings(firestore, storeId, data);
+      } else {
+        await saveGlobalSettings(firestore, data);
+      }
       toast({ title: 'Success', description: 'Authentication page settings have been updated.' });
     } catch (e) {
       toast({ variant: 'destructive', title: 'Error', description: 'Failed to update settings.' });

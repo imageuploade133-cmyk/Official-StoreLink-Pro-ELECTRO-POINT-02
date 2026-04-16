@@ -5,7 +5,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useFirestore } from '@/firebase';
-import { saveGlobalSettings } from '@/firebase/firestore/settings';
+import { saveGlobalSettings, saveStoreSettings } from '@/firebase/firestore/settings';
 import type { AppSettings, BrandValue } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
@@ -50,9 +50,10 @@ const defaultValuesArray: BrandValue[] = [
 interface BrandValuesSettingsProps {
   settingsData: AppSettings | null;
   isLoading: boolean;
+  storeId?: string | null;
 }
 
-export function BrandValuesSettings({ settingsData, isLoading }: BrandValuesSettingsProps) {
+export function BrandValuesSettings({ settingsData, isLoading, storeId }: BrandValuesSettingsProps) {
   const { toast } = useToast();
   const firestore = useFirestore();
   const [isSaving, setIsSaving] = useState(false);
@@ -85,7 +86,11 @@ export function BrandValuesSettings({ settingsData, isLoading }: BrandValuesSett
     if (!firestore) return;
     setIsSaving(true);
     try {
-      await saveGlobalSettings(firestore, data);
+      if (storeId) {
+        await saveStoreSettings(firestore, storeId, data);
+      } else {
+        await saveGlobalSettings(firestore, data);
+      }
       toast({ title: 'Success', description: 'Brand values have been updated.' });
     } catch (e) {
       toast({ variant: 'destructive', title: 'Error', description: 'Failed to update settings.' });

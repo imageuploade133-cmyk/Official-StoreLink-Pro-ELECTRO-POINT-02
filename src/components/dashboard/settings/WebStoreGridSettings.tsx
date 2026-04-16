@@ -14,9 +14,10 @@ import { cn } from '@/lib/utils';
 interface WebStoreGridSettingsProps {
   settingsData: AppSettings | null;
   isLoading: boolean;
+  storeId?: string | null;
 }
 
-export function WebStoreGridSettings({ settingsData, isLoading }: WebStoreGridSettingsProps) {
+export function WebStoreGridSettings({ settingsData, isLoading, storeId }: WebStoreGridSettingsProps) {
   const firestore = useFirestore();
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -69,7 +70,10 @@ export function WebStoreGridSettings({ settingsData, isLoading }: WebStoreGridSe
     setErrorMessage('');
     
     try {
-      const settingsRef = doc(firestore, 'settings', 'global');
+      const settingsRef = storeId 
+        ? doc(firestore, 'stores', storeId, 'settings', 'config')
+        : doc(firestore, 'settings', 'global');
+      
       const updateData = {
         storeGridColumnsDefault: defaultColumns,
         storeGridColumnsSm: smColumns,
@@ -80,18 +84,14 @@ export function WebStoreGridSettings({ settingsData, isLoading }: WebStoreGridSe
 
       console.log("[v0] Saving grid settings:", updateData);
 
-      // Try updateDoc first, if it fails (document doesn't exist), use setDoc
-      try {
-        await updateDoc(settingsRef, updateData);
-        console.log("[v0] Settings updated successfully");
-      } catch (updateError: any) {
-        if (updateError.code === 'not-found') {
-          console.log("[v0] Document doesn't exist, creating new one");
-          await setDoc(settingsRef, updateData, { merge: true });
-        } else {
-          throw updateError;
-        }
+      // Also save to old location for compatibility
+      if (storeId) {
+        const oldSettingsRef = doc(firestore, 'settings', storeId);
+        await setDoc(oldSettingsRef, updateData, { merge: true });
       }
+
+      await setDoc(settingsRef, updateData, { merge: true });
+      console.log("[v0] Settings updated successfully");
 
       setSaveStatus('success');
       console.log("[v0] Grid settings saved successfully");
