@@ -13,8 +13,11 @@ import type { Category, PublicPage } from '@/lib/types';
 import { Skeleton } from '../ui/skeleton';
 import { cn } from '@/lib/utils';
 
+import { useStoreUrl } from '@/hooks/use-store-url';
+
 export function PublicFooter() {
   const { settings } = useSettings();
+  const { storeId, getStoreUrl } = useStoreUrl();
   const firestore = useFirestore();
   const storeName = settings?.storeName || 'StoreLink-Pro';
   const logoUrl = settings?.invoiceLogoUrl;
@@ -29,14 +32,23 @@ export function PublicFooter() {
   const showMainSiteLogo = settings?.showMainSiteLogo ?? true;
 
   const categoriesQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'categories'), orderBy('name'));
-  }, [firestore]);
+    if (!firestore || !storeId) return null;
+    return query(
+      collection(firestore, 'categories'), 
+      where('store_id', '==', storeId),
+      orderBy('name')
+    );
+  }, [firestore, storeId]);
 
   const publicPagesQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'publicPages'), where('published', '==', true), orderBy('createdAt', 'asc'));
-  }, [firestore]);
+    if (!firestore || !storeId) return null;
+    return query(
+      collection(firestore, 'publicPages'), 
+      where('store_id', '==', storeId),
+      where('published', '==', true), 
+      orderBy('createdAt', 'asc')
+    );
+  }, [firestore, storeId]);
 
   const { data: categories, isLoading: isLoadingCategories } = useCollection<Category>(categoriesQuery);
   const { data: publicPages, isLoading: isLoadingPages } = useCollection<PublicPage>(publicPagesQuery);
@@ -104,7 +116,7 @@ export function PublicFooter() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           {/* Company Info */}
           <div className="col-span-1">
-            <Link href="/store" className="flex items-center gap-3 text-lg font-semibold mb-6">
+            <Link href={getStoreUrl('/store')} className="flex items-center gap-3 text-lg font-semibold mb-6">
               {showMainSiteLogo && logoUrl ? (
                  <div style={{ width: `${footerLogoWidth}px`, height: `${logoContainerHeight}px` }} className="relative">
                     <Image 
@@ -169,8 +181,8 @@ export function PublicFooter() {
           <div>
             <h4 className="font-bold text-sm uppercase tracking-widest mb-6" style={{ color: 'inherit', opacity: 0.9 }}>Shop</h4>
             <ul className="space-y-4 text-sm">
-              <li><Link className="hover:opacity-80 transition-colors" href="/store/shop" style={{ color: textColor }}>All Products</Link></li>
-              <li><Link className="hover:opacity-80 transition-colors" href="/store/categories" style={{ color: textColor }}>All Categories</Link></li>
+              <li><Link className="hover:opacity-80 transition-colors" href={getStoreUrl('/store/shop')} style={{ color: textColor }}>All Products</Link></li>
+              <li><Link className="hover:opacity-80 transition-colors" href={getStoreUrl('/store/categories')} style={{ color: textColor }}>All Categories</Link></li>
               {isLoadingCategories ? (
                 <>
                   <li className="mt-4"><Skeleton className="h-4 w-2/3 opacity-20" /></li>
@@ -179,7 +191,7 @@ export function PublicFooter() {
               ) : (
                 categories?.slice(0, 4).map((category) => (
                   <li key={category.id}>
-                    <Link className="hover:opacity-80 transition-colors" href={`/store/shop?category=${category.id}`} style={{ color: textColor }}>
+                    <Link className="hover:opacity-80 transition-colors" href={getStoreUrl(`/store/shop?category=${category.id}`)} style={{ color: textColor }}>
                       {category.name}
                     </Link>
                   </li>
@@ -191,15 +203,15 @@ export function PublicFooter() {
           <div>
             <h4 className="font-bold text-sm uppercase tracking-widest mb-6" style={{ color: 'inherit', opacity: 0.9 }}>Support</h4>
             <ul className="space-y-4 text-sm">
-              <li><Link className="hover:opacity-80 transition-colors" href="/store/logistics" style={{ color: textColor }}>Logistics & Shipping</Link></li>
-              <li><Link className="hover:opacity-80 transition-colors" href="/store/logistics" style={{ color: textColor }}>Returns Policy</Link></li>
+              <li><Link className="hover:opacity-80 transition-colors" href={getStoreUrl('/store/logistics')} style={{ color: textColor }}>Logistics & Shipping</Link></li>
+              <li><Link className="hover:opacity-80 transition-colors" href={getStoreUrl('/store/logistics')} style={{ color: textColor }}>Returns Policy</Link></li>
               {isLoadingPages ? (
                 <>
                    <li className="mt-4"><Skeleton className="h-4 w-2/3 opacity-20" /></li>
                 </>
               ) : (
                 supportPages.map(page => (
-                  <li key={page.id}><Link className="hover:opacity-80 transition-colors" href={`/store/pages/${page.slug}`} style={{ color: textColor }}>{page.title}</Link></li>
+                  <li key={page.id}><Link className="hover:opacity-80 transition-colors" href={getStoreUrl(`/store/pages/${page.slug}`)} style={{ color: textColor }}>{page.title}</Link></li>
                 ))
               )}
             </ul>
@@ -214,7 +226,7 @@ export function PublicFooter() {
                 </>
               ) : (
                 companyPages.map(page => (
-                  <li key={page.id}><Link className="hover:opacity-80 transition-colors" href={`/store/pages/${page.slug}`} style={{ color: textColor }}>{page.title}</Link></li>
+                  <li key={page.id}><Link className="hover:opacity-80 transition-colors" href={getStoreUrl(`/store/pages/${page.slug}`)} style={{ color: textColor }}>{page.title}</Link></li>
                 ))
               )}
             </ul>

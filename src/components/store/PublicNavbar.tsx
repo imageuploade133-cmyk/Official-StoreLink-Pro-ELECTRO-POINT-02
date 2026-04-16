@@ -522,7 +522,7 @@ export function PublicNavbar() {
                                                     <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-900 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
                                                         <ShoppingBag className="h-5 w-5 text-slate-600 dark:text-slate-400 group-hover:text-primary" />
                                                     </div>
-                                                    The Catalog
+                                                    Shop
                                                 </Link>
                                             )}
                                             {navbarShowFlashSalesLink && (

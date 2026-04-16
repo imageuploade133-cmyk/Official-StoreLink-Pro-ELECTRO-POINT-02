@@ -13,6 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { useStoreUrl } from '@/hooks/use-store-url';
 
 const reviewSchema = z.object({
   rating: z.number().min(1, 'Please select a rating.').max(5),
@@ -31,6 +32,7 @@ export function ProductReviewForm({ productId }: ProductReviewFormProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hoveredRating, setHoveredRating] = useState(0);
+  const { getStoreUrl } = useStoreUrl();
 
   const form = useForm<ReviewFormValues>({
     resolver: zodResolver(reviewSchema),
@@ -68,7 +70,7 @@ export function ProductReviewForm({ productId }: ProductReviewFormProps) {
         <h4 className="text-xl font-black tracking-tight mb-2">Share Your Thoughts</h4>
         <p className="text-sm text-muted-foreground mb-6">You must be logged in to write a review for this product.</p>
         <Button asChild variant="outline" className="rounded-xl font-black uppercase text-[10px] tracking-widest px-8">
-          <Link href="/store/login">Login to Review</Link>
+          <Link href={getStoreUrl('/store/login')}>Login to Review</Link>
         </Button>
       </div>
     );

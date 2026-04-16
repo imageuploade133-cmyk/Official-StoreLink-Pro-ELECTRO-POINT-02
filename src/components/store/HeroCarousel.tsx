@@ -12,12 +12,21 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
+import { useStoreUrl } from '@/hooks/use-store-url';
+
 export function HeroCarousel() {
   const firestore = useFirestore();
+  const { storeId, getStoreUrl } = useStoreUrl();
   const slidesQuery = React.useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'slideShows'), where('published', '==', true), orderBy('order', 'asc'), limit(20));
-  }, [firestore]);
+    if (!firestore || !storeId) return null;
+    return query(
+      collection(firestore, 'slideShows'), 
+      where('store_id', '==', storeId),
+      where('published', '==', true), 
+      orderBy('order', 'asc'), 
+      limit(20)
+    );
+  }, [firestore, storeId]);
   const { data: slides, isLoading } = useCollection<SlideShow>(slidesQuery);
 
   const autoplay = useRef(
@@ -172,7 +181,7 @@ export function HeroCarousel() {
                       )}
                       {slide.showActionButton && (
                         <Button asChild size="lg" className="group relative overflow-hidden bg-white text-slate-950 px-8 py-4 font-bold text-sm tracking-widest uppercase transition-all duration-300 hover:pr-12 hover:bg-slate-100 active:scale-95 h-auto">
-                          <Link href="/store/shop">
+                          <Link href={getStoreUrl('/store/shop')}>
                             <span className="relative z-10">Shop Collection</span>
                             <span className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300">
                                <ArrowRight className="h-4 w-4" strokeWidth={2.5}/>

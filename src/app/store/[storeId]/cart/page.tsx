@@ -26,11 +26,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { safeSessionStorage } from '@/lib/storage-utils';
 import { useAds } from '@/contexts/ad-context';
 
+import { useStoreUrl } from '@/hooks/use-store-url';
+
 export default function CartPage() {
   const { cartItems, updateQuantity, removeFromCart, cartCount } = useCart();
   const { settings } = useSettings();
   const firestore = useFirestore();
   const { toast } = useToast();
+  const { getStoreUrl } = useStoreUrl();
   const { activeAds, rewardAdClicked, setRewardAdClicked, applyRewardDiscount, recordAdClick } = useAds();
   
   const [couponCode, setCouponCode] = useState('');
@@ -215,7 +218,7 @@ export default function CartPage() {
         <h1 className="mt-8 text-3xl font-bold">Your cart is empty</h1>
         <p className="mt-2 text-lg text-muted-foreground">Looks like you haven't added anything to your cart yet.</p>
         <Button asChild className="mt-8">
-          <Link href="/store/shop">Start Shopping</Link>
+          <Link href={getStoreUrl('/store/shop')}>Start Shopping</Link>
         </Button>
       </div>
     );
@@ -226,7 +229,7 @@ export default function CartPage() {
       <div className="bg-muted/30">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
               <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white mb-4">Shopping Bag</h1>
-               <Link href="/store/shop" className="text-sm text-primary hover:underline flex items-center mb-8">
+               <Link href={getStoreUrl('/store/shop')} className="text-sm text-primary hover:underline flex items-center mb-8">
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Continue Shopping
               </Link>
@@ -408,7 +411,7 @@ export default function CartPage() {
                           )}
 
                           <Button asChild size="lg" style={buttonStyle} className="w-full h-14 text-lg font-bold shadow-lg shadow-primary/20 border-none" disabled={hasIssues || subtotal === 0}>
-                             <Link href="/store/checkout">
+                             <Link href={getStoreUrl('/store/checkout')}>
                                Checkout Now <ArrowRight className="ml-2 h-5 w-5" />
                              </Link>
                           </Button>
