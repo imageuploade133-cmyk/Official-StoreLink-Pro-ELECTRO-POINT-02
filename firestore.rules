@@ -11,7 +11,7 @@ service cloud.firestore {
 
     // Get current user's staff record to find their assigned store identifier
     function getStaffStoreId(data) {
-      return data.store_id != null ? data.store_id : data.storeId;
+      return data != null ? (data.get('store_id', data.get('storeId', null))) : null;
     }
 
     // Check if the user is the owner of a specific store
@@ -26,13 +26,12 @@ service cloud.firestore {
 
     // Check if the user is a staff member of a specific store
     function isStoreStaff(storeId) {
-      let combinedStaffId = request.auth.uid + "_" + storeId;
       return isSignedIn() && (
         // Check for combined ID format (new system: uid_storeId)
-        (exists(/databases/$(database)/documents/staff/$(combinedStaffId)) && 
-         getStaffStoreId(get(/databases/$(database)/documents/staff/$(combinedStaffId)).data) == storeId) ||
-        (existsAfter(/databases/$(database)/documents/staff/$(combinedStaffId)) && 
-         getStaffStoreId(getAfter(/databases/$(database)/documents/staff/$(combinedStaffId)).data) == storeId) ||
+        (exists(/databases/$(database)/documents/staff/$(request.auth.uid + "_" + storeId)) && 
+         getStaffStoreId(get(/databases/$(database)/documents/staff/$(request.auth.uid + "_" + storeId)).data) == storeId) ||
+        (existsAfter(/databases/$(database)/documents/staff/$(request.auth.uid + "_" + storeId)) && 
+         getStaffStoreId(getAfter(/databases/$(database)/documents/staff/$(request.auth.uid + "_" + storeId)).data) == storeId) ||
         // Check for UID-only ID format (old system: uid)
         (exists(/databases/$(database)/documents/staff/$(request.auth.uid)) && 
          getStaffStoreId(get(/databases/$(database)/documents/staff/$(request.auth.uid)).data) == storeId) ||
@@ -43,38 +42,33 @@ service cloud.firestore {
 
     // Determine if the user has administrative/managerial access to the store
     function canManageStore(storeId) {
-      return isStoreOwner(storeId) || isStoreStaff(storeId);
+      return storeId != null && (isStoreOwner(storeId) || isStoreStaff(storeId));
     }
 
     // Helper to check store identity in resource or request.resource
     function hasStoreAccess() {
-      let data = (request.method == 'create') ? request.resource.data : resource.data;
-      let storeId = getStaffStoreId(data);
-      return storeId != null && canManageStore(storeId);
+      return canManageStore(getStaffStoreId(request.method == 'create' ? request.resource.data : resource.data));
     }
 
     // Helper for subcollection access
     function canAccessSubcollection(collectionName, docId) {
-      if (!isSignedIn()) return false;
-      
-      // If the parent is a store, the storeId is the docId itself
-      if (collectionName == 'stores') {
-        return canManageStore(docId);
-      }
-      
-      // Otherwise, get the storeId from the parent document
-      let parentPath = /databases/$(database)/documents/$(collectionName)/$(docId);
-      let parentData = existsAfter(parentPath) ? getAfter(parentPath).data : (exists(parentPath) ? get(parentPath).data : null);
-      
-      return parentData != null && (
-        canManageStore(getStaffStoreId(parentData)) ||
-        parentData.uid == request.auth.uid ||
-        parentData.owner_id == request.auth.uid
+      return isSignedIn() && (
+        (collectionName == 'stores' && canManageStore(docId)) ||
+        (collectionName != 'stores' && (
+          existsAfter(/databases/$(database)/documents/$(collectionName)/$(docId)) ? (
+            canManageStore(getStaffStoreId(getAfter(/databases/$(database)/documents/$(collectionName)/$(docId)).data)) ||
+            getAfter(/databases/$(database)/documents/$(collectionName)/$(docId)).data.get('uid', null) == request.auth.uid ||
+            getAfter(/databases/$(database)/documents/$(collectionName)/$(docId)).data.get('owner_id', null) == request.auth.uid
+          ) : (
+            exists(/databases/$(database)/documents/$(collectionName)/$(docId)) && (
+              canManageStore(getStaffStoreId(get(/databases/$(database)/documents/$(collectionName)/$(docId)).data)) ||
+              get(/databases/$(database)/documents/$(collectionName)/$(docId)).data.get('uid', null) == request.auth.uid ||
+              get(/databases/$(database)/documents/$(collectionName)/$(docId)).data.get('owner_id', null) == request.auth.uid
+            )
+          )
+        ))
       );
     }
-
-    // --- Global Write Rule for Debugging (Optional, kept for now but made more explicit) ---
-    // allow write: if isSignedIn(); 
 
     /* ============================================================
        1. PUBLIC COLLECTIONS (Public Read, Protected Write)
@@ -157,12 +151,12 @@ service cloud.firestore {
       allow write: if isSignedIn() && (
         // Allow creating own staff record during signup
         (request.method == 'create' && (
-          request.resource.data.uid == request.auth.uid || 
+          request.resource.data.get('uid', null) == request.auth.uid || 
           canManageStore(getStaffStoreId(request.resource.data))
         )) ||
         // Allow update/delete if self or manager
         (request.method != 'create' && (
-          (resource != null && resource.data.uid == request.auth.uid) || 
+          (resource != null && resource.data.get('uid', null) == request.auth.uid) || 
           canManageStore(getStaffStoreId(resource.data))
         ))
       );
@@ -176,12 +170,12 @@ service cloud.firestore {
       allow write: if isSignedIn() && (
         request.auth.uid == customerId || 
         (request.method == 'create' && (request.auth.uid == customerId || canManageStore(getStaffStoreId(request.resource.data)))) ||
-        (request.method != 'create' && canManageStore(getStaffStoreId(resource.data)))
+        (request.method != 'create' && (resource != null && canManageStore(getStaffStoreId(resource.data))))
       );
       match /{allSubcollections=**} {
         allow read, write: if isSignedIn() && (
           request.auth.uid == customerId ||
-          canManageStore(getStaffStoreId(get(/databases/$(database)/documents/customers/$(customerId)).data))
+          (exists(/databases/$(database)/documents/customers/$(customerId)) && canManageStore(getStaffStoreId(get(/databases/$(database)/documents/customers/$(customerId)).data)))
         );
       }
     }
@@ -192,23 +186,23 @@ service cloud.firestore {
     
     match /{collectionName}/{docId} {
       allow read: if isSignedIn() && (
-        (resource != null && (resource.data.store_id != null || resource.data.storeId != null) && canManageStore(getStaffStoreId(resource.data))) ||
-        (resource != null && resource.data.uid == request.auth.uid) ||
-        (resource != null && resource.data.customerId == request.auth.uid) ||
+        (resource != null && (resource.data.get('store_id', null) != null || resource.data.get('storeId', null) != null) && canManageStore(getStaffStoreId(resource.data))) ||
+        (resource != null && resource.data.get('uid', null) == request.auth.uid) ||
+        (resource != null && resource.data.get('customerId', null) == request.auth.uid) ||
         (collectionName == 'analytics')
       );
       
       allow write: if isSignedIn() && (
         (request.method == 'create' && (
-          (request.resource.data.store_id != null || request.resource.data.storeId != null) && canManageStore(getStaffStoreId(request.resource.data)) ||
-          (request.resource.data.uid == request.auth.uid) || 
+          (request.resource.data.get('store_id', null) != null || request.resource.data.get('storeId', null) != null) && canManageStore(getStaffStoreId(request.resource.data)) ||
+          (request.resource.data.get('uid', null) == request.auth.uid) || 
           (collectionName == 'customers' && docId == request.auth.uid) ||
           (collectionName == 'orders') ||
           (collectionName == 'analytics')
         )) ||
         (request.method != 'create' && (
-          (resource != null && (resource.data.store_id != null || resource.data.storeId != null) && canManageStore(getStaffStoreId(resource.data))) ||
-          (resource != null && resource.data.uid == request.auth.uid)
+          (resource != null && (resource.data.get('store_id', null) != null || resource.data.get('storeId', null) != null) && canManageStore(getStaffStoreId(resource.data))) ||
+          (resource != null && resource.data.get('uid', null) == request.auth.uid)
         ))
       );
 
