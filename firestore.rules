@@ -141,7 +141,8 @@ service cloud.firestore {
 
       // Allow access to settings subcollection
       match /settings/{docId} {
-        allow read, write: if isSignedIn() && canManageStore(storeId);
+        allow read: if true;
+        allow write: if isSignedIn() && canManageStore(storeId);
       }
     }
 
