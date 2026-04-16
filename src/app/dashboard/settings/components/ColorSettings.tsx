@@ -343,12 +343,12 @@ export function ColorSettings({ settingsData, isLoading, storeId }: ColorSetting
             </div>
             
           </CardContent>
-          <CardFooter className="flex justify-between items-center">
+          <CardFooter className="flex flex-col sm:flex-row gap-4 justify-between items-center">
             <Button type="submit" disabled={isSaving || isUploading}>
               {(isSaving || isUploading) && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
               {isSaving ? 'Saving...' : isUploading ? 'Uploading...' : 'Save Theme Settings'}
             </Button>
-            <Button type="button" variant="ghost" onClick={handleReset} disabled={isSaving || isUploading}>
+            <Button type="button" variant="outline" onClick={handleReset} disabled={isSaving || isUploading}>
               <RotateCcw className="mr-2 h-4 w-4"/>
               Reset to Default
             </Button>

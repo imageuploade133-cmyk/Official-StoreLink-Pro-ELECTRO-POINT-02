@@ -574,13 +574,13 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
                 />
             </div>
           </CardContent>
-          <CardFooter className="bg-muted/30 border-t p-6 flex justify-between items-center">
+          <CardFooter className="bg-muted/30 border-t p-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
             <Button type="submit" disabled={isSaving} size="lg" className="px-10 h-12 font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20">
               {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Save className="mr-2 h-4 w-4" />}
               Apply Footer Styles
             </Button>
-            <Button type="button" variant="ghost" onClick={resetToDefault} className="text-xs font-bold text-muted-foreground hover:text-primary gap-2">
-                <RotateCcw className="h-3.5 w-3.5" /> Reset Defaults
+            <Button type="button" variant="outline" onClick={resetToDefault} className="font-bold uppercase tracking-widest text-[10px]">
+                <RotateCcw className="mr-2 h-4 w-4" /> Reset to Default
             </Button>
           </CardFooter>
         </form>

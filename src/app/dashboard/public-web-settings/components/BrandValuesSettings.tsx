@@ -15,7 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, Palette, Truck, ShieldCheck, Headset, Leaf, Sparkles, Gift } from 'lucide-react';
+import { Loader2, Palette, Truck, ShieldCheck, Headset, Leaf, Sparkles, Gift, RotateCcw } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 
 const brandValueSchema = z.object({
@@ -57,6 +57,21 @@ interface BrandValuesSettingsProps {
   storeId?: string | null;
 }
 
+const defaultBrandValues: FormValues = {
+  brandValues: [
+    { icon: 'Truck', title: 'Free Shipping', description: 'On all orders over $150' },
+    { icon: 'ShieldCheck', title: 'Secure Payment', description: '100% secure payment' },
+    { icon: 'Headset', title: '24/7 Support', description: 'Dedicated assistance' },
+    { icon: 'Leaf', title: 'Eco-friendly', description: 'Sustainable packaging' },
+  ],
+  brandValuesBackgroundColor: '#FFFFFF',
+  brandValuesVerticalPadding: 80,
+  brandValuesMaxWidth: 1400,
+  showBrandValues: true,
+  brandValuesEnableZoom: true,
+  brandValuesEnableShadow: true,
+};
+
 export function BrandValuesSettings({ settingsData, isLoading, storeId }: BrandValuesSettingsProps) {
   const { toast } = useToast();
   const firestore = useFirestore();
@@ -64,15 +79,7 @@ export function BrandValuesSettings({ settingsData, isLoading, storeId }: BrandV
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-        brandValues: defaultValuesArray,
-        brandValuesBackgroundColor: '#FFFFFF',
-        brandValuesVerticalPadding: 80,
-        brandValuesMaxWidth: 1400,
-        showBrandValues: true,
-        brandValuesEnableZoom: true,
-        brandValuesEnableShadow: true,
-    }
+    defaultValues: defaultBrandValues
   });
 
   const { fields } = useFieldArray({
@@ -83,7 +90,7 @@ export function BrandValuesSettings({ settingsData, isLoading, storeId }: BrandV
   useEffect(() => {
     if (settingsData) {
       form.reset({
-        brandValues: settingsData.brandValues?.length === 4 ? settingsData.brandValues : defaultValuesArray,
+        brandValues: settingsData.brandValues?.length === 4 ? settingsData.brandValues : defaultBrandValues.brandValues,
         brandValuesBackgroundColor: settingsData.brandValuesBackgroundColor || '#FFFFFF',
         brandValuesVerticalPadding: settingsData.brandValuesVerticalPadding ?? 80,
         brandValuesMaxWidth: settingsData.brandValuesMaxWidth ?? 1400,
@@ -109,6 +116,11 @@ export function BrandValuesSettings({ settingsData, isLoading, storeId }: BrandV
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleReset = () => {
+    form.reset(defaultBrandValues);
+    toast({ title: 'Settings Reset', description: 'Brand values have been reset to default. Click "Save Brand Values" to save.' });
   };
   
   if (isLoading) {
@@ -282,10 +294,13 @@ export function BrandValuesSettings({ settingsData, isLoading, storeId }: BrandV
                 />
             </div>
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex flex-col sm:flex-row gap-4 justify-between">
             <Button type="submit" disabled={isSaving}>
               {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
               Save Brand Values
+            </Button>
+            <Button type="button" variant="outline" onClick={handleReset} disabled={isSaving}>
+              <RotateCcw className="mr-2 h-4 w-4" /> Reset to Default
             </Button>
           </CardFooter>
         </form>

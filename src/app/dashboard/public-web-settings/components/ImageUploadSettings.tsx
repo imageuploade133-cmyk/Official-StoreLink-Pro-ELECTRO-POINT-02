@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, ImagePlus, Save, Info, Check, ShieldCheck } from 'lucide-react';
+import { Loader2, ImagePlus, Save, Info, Check, ShieldCheck, RotateCcw } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 
@@ -32,6 +32,12 @@ interface ImageUploadSettingsProps {
   storeId?: string | null;
 }
 
+const defaultImageValues: FormValues = {
+  imageUploadQuality: 80,
+  imageMaxWidth: 1920,
+  imageMaxFileSizeMb: 5,
+};
+
 export function ImageUploadSettings({ settingsData, isLoading, storeId }: ImageUploadSettingsProps) {
   const { toast } = useToast();
   const firestore = useFirestore();
@@ -39,11 +45,7 @@ export function ImageUploadSettings({ settingsData, isLoading, storeId }: ImageU
 
   const form = useForm<FormValues>({
     resolver: zodResolver(imageSettingsSchema),
-    defaultValues: {
-      imageUploadQuality: 80,
-      imageMaxWidth: 1920,
-      imageMaxFileSizeMb: 5,
-    }
+    defaultValues: defaultImageValues
   });
 
   useEffect(() => {
@@ -71,6 +73,11 @@ export function ImageUploadSettings({ settingsData, isLoading, storeId }: ImageU
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleReset = () => {
+    form.reset(defaultImageValues);
+    toast({ title: 'Settings Reset', description: 'Image optimization settings have been reset to default. Click "Save Optimization Profile" to save.' });
   };
 
   if (isLoading) {
@@ -189,10 +196,13 @@ export function ImageUploadSettings({ settingsData, isLoading, storeId }: ImageU
                 </div>
             </div>
           </CardContent>
-          <CardFooter className="bg-muted/30 border-t p-6">
+          <CardFooter className="bg-muted/30 border-t p-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
             <Button type="submit" disabled={isSaving} className="font-black uppercase tracking-widest text-xs h-12 px-8 shadow-xl shadow-primary/20">
               {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Save className="mr-2 h-4 w-4" />}
               Save Optimization Profile
+            </Button>
+            <Button type="button" variant="outline" onClick={handleReset} disabled={isSaving} className="font-bold uppercase tracking-widest text-[10px]">
+              <RotateCcw className="mr-2 h-4 w-4" /> Reset to Default
             </Button>
           </CardFooter>
         </form>
