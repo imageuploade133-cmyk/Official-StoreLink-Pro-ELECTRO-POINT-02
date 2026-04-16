@@ -30,6 +30,8 @@ const formSchema = z.object({
   brandValuesVerticalPadding: z.number().min(0).optional(),
   brandValuesMaxWidth: z.number().min(0).optional(),
   showBrandValues: z.boolean().optional(),
+  brandValuesEnableZoom: z.boolean().optional(),
+  brandValuesEnableShadow: z.boolean().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -68,6 +70,8 @@ export function BrandValuesSettings({ settingsData, isLoading, storeId }: BrandV
         brandValuesVerticalPadding: 80,
         brandValuesMaxWidth: 1400,
         showBrandValues: true,
+        brandValuesEnableZoom: true,
+        brandValuesEnableShadow: true,
     }
   });
 
@@ -84,6 +88,8 @@ export function BrandValuesSettings({ settingsData, isLoading, storeId }: BrandV
         brandValuesVerticalPadding: settingsData.brandValuesVerticalPadding ?? 80,
         brandValuesMaxWidth: settingsData.brandValuesMaxWidth ?? 1400,
         showBrandValues: settingsData.showBrandValues ?? true,
+        brandValuesEnableZoom: settingsData.brandValuesEnableZoom ?? true,
+        brandValuesEnableShadow: settingsData.brandValuesEnableShadow ?? true,
       });
     }
   }, [settingsData, form]);
@@ -118,26 +124,59 @@ export function BrandValuesSettings({ settingsData, isLoading, storeId }: BrandV
             <CardDescription>Customize the content and appearance of the brand values section on your public website.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <FormField
-              control={form.control}
-              name="showBrandValues"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel>Show Brand Values Section</FormLabel>
-                    <FormDescription>
-                      Toggle the visibility of this entire section on your homepage.
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <FormField
+                control={form.control}
+                name="showBrandValues"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel>Show Section</FormLabel>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="brandValuesEnableZoom"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel>Enable Zoom Hover</FormLabel>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="brandValuesEnableShadow"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel>Enable BG Shadow</FormLabel>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {fields.map((field, index) => (
                 <Card key={field.id} className="p-4 bg-muted/30">

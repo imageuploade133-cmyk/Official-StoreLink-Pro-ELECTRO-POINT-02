@@ -176,7 +176,7 @@ export interface Settings {
   footerTextColor?: string;
   footerDesign?: 'standard' | 'modern' | 'minimal';
   footerBannerUrl?: string;
-  footerBannerSize?: 'small' | 'big';
+  footerBannerSize?: 'small' | 'big' | number;
   footerBgType?: 'text' | 'image' | 'none';
   footerBgText?: string;
   footerBgImageUrl?: string;
@@ -233,6 +233,8 @@ export interface Settings {
   brandValuesVerticalPadding?: number;
   brandValuesMaxWidth?: number;
   showBrandValues?: boolean;
+  brandValuesEnableZoom?: boolean;
+  brandValuesEnableShadow?: boolean;
   showNewsletterSection?: boolean;
   newsletterSectionTitle?: string;
   newsletterSectionDescription?: string;

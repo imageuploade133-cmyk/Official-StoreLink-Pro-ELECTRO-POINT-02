@@ -31,7 +31,7 @@ const footerSettingsSchema = z.object({
   footerTextColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').optional(),
   footerDesign: z.enum(['standard', 'modern', 'minimal']).optional(),
   footerBannerUrl: z.string().url('Must be a valid URL.').or(z.literal('')).optional(),
-  footerBannerSize: z.enum(['small', 'big']).optional(),
+  footerBannerSize: z.union([z.enum(['small', 'big']), z.coerce.number()]).optional(),
   footerBgType: z.enum(['text', 'image', 'none']).optional(),
   footerBgText: z.string().optional(),
   footerBgImageUrl: z.string().url('Must be a valid URL.').or(z.literal('')).optional(),
@@ -222,12 +222,19 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
                           <FormLabel className="text-sm font-bold">Banner Image</FormLabel>
                           <div className="flex flex-col gap-4">
                             {field.value && (
-                              <div className="relative w-full aspect-[4/1] rounded-xl overflow-hidden border shadow-inner bg-muted/20">
+                              <div
+                                className="relative w-full rounded-xl overflow-hidden border shadow-inner bg-muted/20 transition-all duration-500"
+                                style={{
+                                  height: typeof form.watch('footerBannerSize') === 'number'
+                                    ? `${Math.min(form.watch('footerBannerSize') as number / 2, 200)}px`
+                                    : form.watch('footerBannerSize') === 'big' ? '120px' : '80px'
+                                }}
+                              >
                                 <Image src={field.value} alt="Footer Banner" fill className="object-cover" unoptimized />
-                                <Button 
-                                  type="button" 
-                                  variant="destructive" 
-                                  size="icon" 
+                                <Button
+                                  type="button"
+                                  variant="destructive"
+                                  size="icon"
                                   className="absolute top-2 right-2 h-8 w-8 rounded-full"
                                   onClick={() => form.setValue('footerBannerUrl', '')}
                                 >
@@ -256,27 +263,32 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
                     <FormField
                       control={form.control}
                       name="footerBannerSize"
-                      render={({ field }) => (
-                        <FormItem className="space-y-4">
-                          <FormLabel className="text-sm font-bold">Banner Scale</FormLabel>
-                          <FormControl>
-                            <RadioGroup
-                              onValueChange={field.onChange}
-                              value={field.value}
-                              className="flex gap-4"
-                            >
-                              <FormItem className="flex items-center space-x-2 space-y-0">
-                                <FormControl><RadioGroupItem value="small" /></FormControl>
-                                <Label className="font-medium cursor-pointer flex items-center gap-1.5"><Minimize2 className="h-3.5 w-3.5"/> Small</Label>
-                              </FormItem>
-                              <FormItem className="flex items-center space-x-2 space-y-0">
-                                <FormControl><RadioGroupItem value="big" /></FormControl>
-                                <Label className="font-medium cursor-pointer flex items-center gap-1.5"><Maximize2 className="h-3.5 w-3.5"/> Big</Label>
-                              </FormItem>
-                            </RadioGroup>
-                          </FormControl>
-                        </FormItem>
-                      )}
+                      render={({ field }) => {
+                        const val = typeof field.value === 'number' 
+                          ? field.value 
+                          : field.value === 'big' ? 288 : 160;
+
+                        return (
+                          <FormItem className="space-y-4">
+                            <div className="flex justify-between">
+                              <FormLabel className="text-sm font-bold flex items-center gap-2">
+                                <Scaling className="h-4 w-4" /> Banner Height
+                              </FormLabel>
+                              <span className="text-xs font-mono bg-muted px-2 py-0.5 rounded">{val}px</span>
+                            </div>
+                            <FormControl>
+                              <Slider 
+                                min={50} 
+                                max={800} 
+                                step={10} 
+                                value={[val]} 
+                                onValueChange={(vals) => field.onChange(vals[0])} 
+                              />
+                            </FormControl>
+                            <FormDescription>Adjust the vertical height of your footer promotional banner.</FormDescription>
+                          </FormItem>
+                        );
+                      }}
                     />
                 </div>
 

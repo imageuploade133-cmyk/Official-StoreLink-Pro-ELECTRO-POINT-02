@@ -18,6 +18,7 @@ import { BannerAd } from '@/components/ads/BannerAd';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useParams } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 const iconComponents = { Truck, ShieldCheck, Headset, Leaf, Sparkles, Gift };
 const DynamicIcon = ({ name }: { name: string }) => {
@@ -93,9 +94,16 @@ export default function StoreHomePage() {
                 {brandValues.map((value, index) => (
                   <CarouselItem key={index} className="pl-4 md:pl-8 basis-full sm:basis-1/2 lg:basis-1/4">
                     <div 
-                      className="flex flex-col items-center text-center p-8 rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500 group h-full"
+                      className={cn(
+                        "flex flex-col items-center text-center p-8 rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 transition-all duration-500 group h-full",
+                        settings?.brandValuesEnableShadow !== false && "shadow-sm hover:shadow-2xl",
+                        settings?.brandValuesEnableZoom !== false && "hover:-translate-y-1.5"
+                      )}
                     >
-                      <div className="h-16 w-16 mb-6 rounded-2xl bg-primary/5 flex items-center justify-center text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-inner">
+                      <div className={cn(
+                        "h-16 w-16 mb-6 rounded-2xl bg-primary/5 flex items-center justify-center text-primary transition-all duration-500 shadow-inner",
+                        settings?.brandValuesEnableZoom !== false && "group-hover:scale-110 group-hover:bg-primary group-hover:text-white"
+                      )}>
                         <DynamicIcon name={value.icon} />
                       </div>
                       <h4 className="font-black text-xs md:text-sm uppercase tracking-[0.2em] mb-2 text-slate-900 dark:text-white">
