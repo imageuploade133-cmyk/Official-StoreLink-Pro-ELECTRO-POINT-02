@@ -452,6 +452,37 @@
     color: hsl(var(--foreground));
   }
 
+  /* Custom Global Button Styles */
+  .btn-back {
+    @apply border-2 border-slate-200 bg-white text-slate-900 shadow-sm transition-all duration-200 !important;
+    border-radius: 0.75rem;
+    padding-left: 1rem !important;
+    padding-right: 1.25rem !important;
+  }
+
+  .btn-back:hover {
+    @apply border-slate-300 bg-slate-50 shadow-md !important;
+    transform: translateY(-1px);
+  }
+
+  .btn-back svg {
+    @apply transition-transform duration-200 !important;
+  }
+
+  .btn-back:hover svg {
+    @apply -translate-x-1 !important;
+  }
+
+  .btn-save {
+    @apply border-2 border-emerald-600/20 bg-emerald-600 text-white shadow-sm transition-all duration-200 !important;
+    border-radius: 0.75rem;
+  }
+
+  .btn-save:hover {
+    @apply bg-emerald-700 shadow-emerald-200/50 shadow-lg !important;
+    transform: translateY(-1px);
+  }
+
   /* Select dropdown styling with nice borders */
   .dark [class*="SelectTrigger"] {
     border: 1px solid hsl(var(--border)) !important;
@@ -719,25 +750,33 @@
 
   /* Specific styling for Back and Save buttons in Dark Mode */
   .dark .btn-back {
-    background-color: #334155 !important;
-    border: 1px solid #64748b !important;
-    color: #ffffff !important;
+    background-color: #0f172a !important;
+    border: 2px solid rgba(148, 163, 184, 0.3) !important;
+    color: #f8fafc !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
   }
 
   .dark .btn-back:hover {
-    background-color: #475569 !important;
-    border-color: #94a3b8 !important;
+    background-color: #1e293b !important;
+    border-color: rgba(148, 163, 184, 0.5) !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4) !important;
+    transform: translateY(-1px);
+  }
+
+  .dark .btn-back:hover svg {
+    transform: translateX(-4px) !important;
   }
 
   .dark .btn-save {
     background-color: #059669 !important;
-    border: 1px solid #10b981 !important;
+    border: 2px solid rgba(16, 185, 129, 0.4) !important;
     color: #ffffff !important;
   }
 
   .dark .btn-save:hover {
     background-color: #10b981 !important;
-    border-color: #34d399 !important;
+    border-color: rgba(52, 211, 153, 0.6) !important;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3) !important;
   }
 
   .dark .btn-back svg, 
@@ -1264,7 +1303,7 @@
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4) !important;
 }
 
-/* ═══════════════════════════════════════════════
+/* ═════════════���═════════════════════════════════
    HEADER — Frosted glass panel
    ═══════════════════════════════════════════════ */
 .dark header {
