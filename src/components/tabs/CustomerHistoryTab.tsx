@@ -7,11 +7,12 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { History, Info } from 'lucide-react';
 import { useFirestore, useCollection } from '@/firebase';
-import { collection, query, orderBy } from 'firebase/firestore';
+import { collection, query, orderBy, where } from 'firebase/firestore';
 import type { CustomerHistory } from '@/lib/types';
 import { format } from 'date-fns';
 import { convertToDateSafely } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/contexts/auth-context';
 
 const getActionBadgeVariant = (action: CustomerHistory['action']) => {
     switch (action) {
@@ -27,12 +28,18 @@ const getActionBadgeVariant = (action: CustomerHistory['action']) => {
 
 export default function CustomerHistoryTab() {
     const firestore = useFirestore();
+    const { store, staffMember } = useAuth();
+    const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
     const historyQuery = useMemo(() => {
-        if (!firestore) return null;
+        if (!firestore || !currentStoreId) return null;
         
-        return query(collection(firestore, 'customerHistory'), orderBy('timestamp', 'desc'));
-    }, [firestore]);
+        return query(
+            collection(firestore, 'customerHistory'), 
+            where('store_id', '==', currentStoreId),
+            orderBy('timestamp', 'desc')
+        );
+    }, [firestore, currentStoreId]);
 
     const { data: rawHistory, isLoading } = useCollection<CustomerHistory>(historyQuery);
 

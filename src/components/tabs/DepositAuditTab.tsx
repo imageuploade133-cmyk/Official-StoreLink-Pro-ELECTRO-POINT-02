@@ -50,6 +50,7 @@ import type { CreditPayment, StaffMember } from '@/lib/types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import type { DateRange } from 'react-day-picker';
+import { useAuth } from '@/contexts/auth-context';
 
 const ITEMS_PER_PAGE = 15;
 
@@ -59,6 +60,9 @@ interface DepositAuditTabProps {
 
 export function DepositAuditTab({ currencySymbol }: DepositAuditTabProps) {
   const firestore = useFirestore();
+  const { store, staffMember } = useAuth();
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
@@ -73,9 +77,9 @@ export function DepositAuditTab({ currencySymbol }: DepositAuditTabProps) {
   const lastDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
 
   const fetchStaff = useCallback(async () => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     try {
-      const q = query(collection(firestore, 'staff'));
+      const q = query(collection(firestore, 'staff'), where('store_id', '==', currentStoreId));
       const snapshot = await getDocs(q);
       const map = new Map<string, StaffMember>();
       snapshot.docs.forEach(d => map.set(d.id, { id: d.id, ...d.data() } as StaffMember));
@@ -83,14 +87,14 @@ export function DepositAuditTab({ currencySymbol }: DepositAuditTabProps) {
     } catch (e) {
       console.error("Staff fetch failed", e);
     }
-  }, [firestore]);
+  }, [firestore, currentStoreId]);
 
   const fetchPayments = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore) return;
+    if (!firestore || !currentStoreId) return;
     setIsLoading(true);
 
     try {
-      let q = query(collection(firestore, 'creditPayments'), orderBy('paymentDate', 'desc'));
+      let q = query(collection(firestore, 'creditPayments'), where('store_id', '==', currentStoreId), orderBy('paymentDate', 'desc'));
 
       if (dateRange?.from) {
         q = query(q, where('paymentDate', '>=', startOfDay(dateRange.from)));

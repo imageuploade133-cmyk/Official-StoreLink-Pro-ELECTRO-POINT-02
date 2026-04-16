@@ -356,6 +356,7 @@ export function RecordPaymentDialog({
             notes: state.notes.trim() || null,
             staffId: currentStaffAuth.uid,
             saleId: sale.id,
+            store_id: sale.store_id || null,
         });
 
         const originalSaleDate = convertToDateSafely(sale.createdAt);
