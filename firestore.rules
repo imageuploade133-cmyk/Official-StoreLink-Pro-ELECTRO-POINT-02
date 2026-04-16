@@ -135,6 +135,10 @@ service cloud.firestore {
       allow create: if isSignedIn() && request.resource.data.owner_id == request.auth.uid;
       allow update, delete: if isSignedIn() && isStoreOwner(storeId);
       
+      match /analytics/{docId} {
+        allow read, write: if true;
+      }
+
       // Allow access to settings subcollection
       match /settings/{docId} {
         allow read, write: if isSignedIn() && canManageStore(storeId);
@@ -189,6 +193,7 @@ service cloud.firestore {
         (resource != null && (resource.data.get('store_id', null) != null || resource.data.get('storeId', null) != null) && canManageStore(getStaffStoreId(resource.data))) ||
         (resource != null && resource.data.get('uid', null) == request.auth.uid) ||
         (resource != null && resource.data.get('customerId', null) == request.auth.uid) ||
+        (resource != null && resource.data.get('user_id', null) == request.auth.uid) ||
         (collectionName == 'analytics')
       );
       
