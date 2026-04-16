@@ -177,6 +177,11 @@ export interface Settings {
   footerDesign?: 'standard' | 'modern' | 'minimal';
   footerBannerUrl?: string;
   footerBannerSize?: 'small' | 'big';
+  footerBgType?: 'text' | 'image' | 'none';
+  footerBgText?: string;
+  footerBgImageUrl?: string;
+  footerBgSize?: number;
+  footerBgRotation?: number;
   enableExternalPrinter?: boolean;
   receiptFooterMessage?: string;
   storeLogoUrl?: string;

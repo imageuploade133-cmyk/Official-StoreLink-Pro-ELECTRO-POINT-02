@@ -83,6 +83,38 @@ export function PublicFooter() {
         className={cn("pt-20 pb-10 transition-all duration-700 relative overflow-hidden", !hasCustomBg && "bg-background-dark text-slate-400")} 
         style={footerStyle}
     >
+      {/* Custom Footer Background Branding */}
+      {settings?.footerBgType && settings.footerBgType !== 'none' && (
+        <div className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden select-none">
+          <div 
+            style={{ 
+              opacity: 0.05, 
+              transform: `rotate(${settings.footerBgRotation ?? 0}deg)`,
+              width: settings.footerBgType === 'text' ? 'auto' : `${settings.footerBgSize ?? 400}px`,
+            }}
+            className="transition-all duration-700 ease-in-out"
+          >
+            {settings.footerBgType === 'text' ? (
+              <span 
+                className="font-black whitespace-nowrap leading-none tracking-tighter"
+                style={{ fontSize: `${settings.footerBgSize ?? 200}px` }}
+              >
+                {settings.footerBgText || 'FOOTER'}
+              </span>
+            ) : (
+              settings.footerBgImageUrl && (
+                <img 
+                  src={settings.footerBgImageUrl} 
+                  alt="" 
+                  className="w-full h-auto object-contain"
+                  draggable={false}
+                />
+              )
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Brand Watermark Overlay */}
       {settings?.webWatermarkEnabled && (
         <div className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden select-none">
