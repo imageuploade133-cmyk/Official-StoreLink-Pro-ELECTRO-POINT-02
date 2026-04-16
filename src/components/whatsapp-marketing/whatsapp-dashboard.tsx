@@ -3,10 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, MessageSquare, XCircle, Loader2, Receipt } from 'lucide-react';
-import { collection, query, getDocs, orderBy, limit, Timestamp } from 'firebase/firestore';
+import { collection, query, getDocs, orderBy, limit, Timestamp, where } from 'firebase/firestore';
 import type { WhatsappMessageLog } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { useFirestore } from '@/firebase';
+import { useAuth } from '@/contexts/auth-context';
 
 const UNIT_COST_PER_MESSAGE = 3.1;
 
@@ -18,13 +19,15 @@ export default function WhatsappDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const firestore = useFirestore();
+  const { store, staffMember } = useAuth();
+  const currentStoreId = React.useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   useEffect(() => {
     const fetchMessageLogs = async () => {
-      if (!firestore) return;
+      if (!firestore || !currentStoreId) return;
       setIsLoading(true);
       try {
-        const q = query(collection(firestore, "whatsappMessageLogs"));
+        const q = query(collection(firestore, "whatsappMessageLogs"), where("store_id", "==", currentStoreId));
         const querySnapshot = await getDocs(q);
         
         let marketingCount = 0;

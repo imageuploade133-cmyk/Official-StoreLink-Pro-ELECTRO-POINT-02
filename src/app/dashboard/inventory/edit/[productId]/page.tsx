@@ -102,6 +102,7 @@ export default function EditProductPage() {
               change: afterStock - beforeStock,
               staffId: user?.uid || 'SYSTEM',
               staffName: user?.displayName || user?.email || 'Staff',
+              store_id: (product as any).store_id || null,
               timestamp: serverTimestamp()
           });
       }

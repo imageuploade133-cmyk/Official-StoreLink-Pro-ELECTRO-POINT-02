@@ -27,19 +27,21 @@ export function ProductSheet({ trigger }: ProductSheetProps) {
   const router = useRouter();
   const firestore = useFirestore();
   const { toast } = useToast();
-  const { permissions, user, isLoading: isAuthLoading } = useAuth();
+  const { permissions, user, staffMember, store, isLoading: isAuthLoading } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
+
   // Fetch Categories
   const categoriesQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'categories'), orderBy('name'));
-  }, [firestore]);
+    if (!firestore || !currentStoreId) return null;
+    return query(collection(firestore, 'categories'), where('store_id', '==', currentStoreId), orderBy('name'));
+  }, [firestore, currentStoreId]);
   const { data: categories, isLoading: isLoadingCategories, refetch: refetchCategories } = useCollection<Category>(categoriesQuery);
 
   const handleProductSubmit = async (values: ProductFormValues) => {
-    if (!user || !firestore) return;
+    if (!user || !firestore || !currentStoreId) return;
     
     setIsSubmitting(true);
     try {
@@ -47,6 +49,7 @@ export function ProductSheet({ trigger }: ProductSheetProps) {
 
       const productData: any = {
         ...restValues,
+        store_id: currentStoreId,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
         promo: null,
@@ -85,6 +88,7 @@ export function ProductSheet({ trigger }: ProductSheetProps) {
               change: values.stock,
               staffId: user.uid,
               staffName: user.displayName || user.email || 'Staff',
+              store_id: currentStoreId,
               timestamp: serverTimestamp()
           });
       }

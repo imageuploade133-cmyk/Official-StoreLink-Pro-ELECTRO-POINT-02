@@ -30,9 +30,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { useFirestore, useCollection } from '@/firebase';
-import { collection, addDoc, serverTimestamp, query, orderBy, Timestamp, limit, doc, getDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, orderBy, Timestamp, limit, doc, getDoc, where } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { useSettings } from '@/contexts/settings-context';
+import { useAuth } from '@/contexts/auth-context';
 import type { Customer, Product, WhatsappMessageLog } from '@/lib/types';
 import { format } from 'date-fns';
 import { formatCurrency } from '@/lib/formatUtils';
@@ -57,10 +58,12 @@ const DEFAULT_STORE_NAME = 'StoreLink Pro';
 export default function GenerateInvoicePage() {
   const firestore = useFirestore();
   const { settings } = useSettings();
+  const { staffMember, store } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
   const printableRef = useRef<HTMLDivElement>(null);
   
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
   const currencySymbol = settings?.currency || '$';
   const storeName = settings?.storeName || DEFAULT_STORE_NAME;
 
@@ -88,10 +91,26 @@ export default function GenerateInvoicePage() {
   const [isSaving, setIsSaving] = useState(false);
 
   // Data Fetching
-  const customersQuery = useMemo(() => firestore ? query(collection(firestore, 'customers'), orderBy('name')) : null, [firestore]);
+  const customersQuery = useMemo(() => {
+    if (!firestore || !currentStoreId) return null;
+    return query(
+      collection(firestore, 'customers'), 
+      where('store_id', '==', currentStoreId),
+      orderBy('name')
+    );
+  }, [firestore, currentStoreId]);
+
   const { data: customers } = useCollection<Customer>(customersQuery);
 
-  const productsQuery = useMemo(() => firestore ? query(collection(firestore, 'products'), orderBy('name')) : null, [firestore]);
+  const productsQuery = useMemo(() => {
+    if (!firestore || !currentStoreId) return null;
+    return query(
+      collection(firestore, 'products'), 
+      where('store_id', '==', currentStoreId),
+      orderBy('name')
+    );
+  }, [firestore, currentStoreId]);
+
   const { data: products } = useCollection<Product>(productsQuery);
 
   const filteredCustomers = useMemo(() => {
@@ -166,6 +185,7 @@ export default function GenerateInvoicePage() {
       const invoiceData = {
         invoiceNumber,
         status,
+        store_id: currentStoreId,
         date: Timestamp.fromDate(new Date(date)),
         dueDate: status === 'credit' ? Timestamp.fromDate(new Date(dueDate)) : null,
         paymentMethod: status === 'paid' ? paymentMethod : null,
