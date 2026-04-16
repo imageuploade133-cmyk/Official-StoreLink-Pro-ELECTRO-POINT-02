@@ -7,7 +7,8 @@ import * as z from 'zod';
 import { useFirestore, useCollection } from '@/firebase';
 import Image from 'next/image';
 import { useSettings } from '@/contexts/settings-context';
-import { collection, query, orderBy, addDoc, Timestamp, limit, startAfter, getDocs, type QueryDocumentSnapshot, type DocumentData } from 'firebase/firestore';
+import { useAuth } from '@/contexts/auth-context';
+import { collection, query, where, orderBy, addDoc, Timestamp, limit, startAfter, getDocs, type QueryDocumentSnapshot, type DocumentData } from 'firebase/firestore';
 import type { HomepageSection, Category, Product } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -102,10 +103,19 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
     const firestore = useFirestore();
     const { toast } = useToast();
     const { settings } = useSettings();
+    const { store, staffMember } = useAuth();
+    const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
     const currencySymbol = settings?.currency || '$';
 
-    const categoriesQuery = useMemo(() => firestore ? query(collection(firestore, 'categories'), orderBy('name')) : null, [firestore]);
-    const productsQuery = useMemo(() => firestore ? query(collection(firestore, 'products'), orderBy('name')) : null, [firestore]);
+    const categoriesQuery = useMemo(() => {
+        if (!firestore || !currentStoreId) return null;
+        return query(collection(firestore, 'categories'), where('store_id', '==', currentStoreId), orderBy('name'));
+    }, [firestore, currentStoreId]);
+
+    const productsQuery = useMemo(() => {
+        if (!firestore || !currentStoreId) return null;
+        return query(collection(firestore, 'products'), where('store_id', '==', currentStoreId), orderBy('name'));
+    }, [firestore, currentStoreId]);
 
     const { data: categories, isLoading: isLoadingCategories, refetch: refetchCategories } = useCollection<Category>(categoriesQuery);
     const { data: allProducts, isLoading: isLoadingProducts } = useCollection<Product>(productsQuery);
@@ -207,7 +217,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
 
     // Fetch categories with pagination
     const fetchPaginatedCategories = useCallback(async (isNextPage = false) => {
-        if (!firestore || (isNextPage && !hasMoreCategoriesRef.current)) return;
+        if (!firestore || !currentStoreId || (isNextPage && !hasMoreCategoriesRef.current)) return;
 
         if (isNextPage) {
             setIsLoadingMoreCategories(true);
@@ -220,6 +230,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
         try {
             let q = query(
                 collection(firestore, 'categories'),
+                where('store_id', '==', currentStoreId),
                 orderBy('name', 'asc'),
                 limit(CATEGORY_BATCH_SIZE)
             );
@@ -248,7 +259,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
             setIsLoadingPaginatedCategories(false);
             setIsLoadingMoreCategories(false);
         }
-    }, [firestore, CATEGORY_BATCH_SIZE]);
+    }, [firestore, currentStoreId, CATEGORY_BATCH_SIZE]);
 
     // Load categories when modal opens
     useEffect(() => {
@@ -280,11 +291,12 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
     };
 
     const handleNewCategorySubmit = async (categoryValues: CategoryFormValues) => {
-        if (!firestore) return;
+        if (!firestore || !currentStoreId) return;
         setIsSubmittingNewCategory(true);
         try {
             const docRef = await addDoc(collection(firestore, 'categories'), {
                 ...categoryValues,
+                store_id: currentStoreId,
                 createdAt: Timestamp.now(),
                 updatedAt: Timestamp.now(),
             });
@@ -578,7 +590,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                         {selectedProductIds.length === 0 ? (
                                             <p className="text-sm text-center text-muted-foreground pt-8">No products curated yet. Search above to begin.</p>
                                         ) : (
-                                            <div className="flex flex-wrap gap-2">
+                                            <div className="flex wrap gap-2">
                                                 {selectedProductIds.map(id => {
                                                     const product = productMap.get(id);
                                                     return (

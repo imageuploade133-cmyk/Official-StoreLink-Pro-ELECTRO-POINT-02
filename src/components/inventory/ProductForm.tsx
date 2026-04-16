@@ -53,10 +53,11 @@ import {
 } from 'lucide-react';
 import { Eye } from 'lucide-react';
 import { format } from 'date-fns';
-import { Timestamp, addDoc, collection, doc, updateDoc } from 'firebase/firestore';
+import { Timestamp, addDoc, collection, doc, updateDoc, where, query, getDocs } from 'firebase/firestore';
 
 import { useFirestore } from '@/firebase';
 import { useSettings } from '@/contexts/settings-context';
+import { useAuth } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
 import { cn, convertToDateSafely } from '@/lib/utils';
 import type { Product, Category, ProductVideo } from '@/lib/types';
@@ -227,6 +228,8 @@ export function ProductForm({
   const firestore = useFirestore();
   const { toast } = useToast();
   const { settings } = useSettings();
+  const { store, staffMember } = useAuth();
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
   
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [isSubmittingCategory, setIsSubmittingCategory] = useState(false);
@@ -530,6 +533,7 @@ export function ProductForm({
     try {
       const docRef = await addDoc(collection(firestore, 'categories'), {
         ...categoryValues,
+        store_id: currentStoreId,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
       });

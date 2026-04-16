@@ -3,7 +3,7 @@
 import { useState, useMemo, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFirestore, useCollection } from '@/firebase';
-import { collection, addDoc, Timestamp, query, orderBy, doc, writeBatch, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, Timestamp, query, where, orderBy, doc, writeBatch, serverTimestamp } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
 import { ProductForm, type ProductFormValues, type ProductFormProps } from '@/components/inventory/ProductForm';
