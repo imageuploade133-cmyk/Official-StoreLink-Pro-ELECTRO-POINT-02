@@ -57,6 +57,10 @@ import type { DateRange } from 'react-day-picker';
 
 const ITEMS_PER_PAGE = 20;
 
+interface OrderAuditTabProps {
+  storeId?: string;
+}
+
 const getStatusIcon = (status: string) => {
     switch (status) {
         case 'pending': return <Clock className="h-3 w-3" />;
@@ -79,7 +83,7 @@ const getStatusColor = (status: string) => {
     }
 };
 
-export function OrderAuditTab() {
+export function OrderAuditTab({ storeId }: OrderAuditTabProps) {
   const firestore = useFirestore();
   const [searchTerm, setSearchTerm] = useState('');
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
@@ -94,11 +98,15 @@ export function OrderAuditTab() {
   const lastDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
 
   const fetchAuditLogs = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore) return;
+    if (!firestore || !storeId) return;
     setIsLoading(true);
 
     try {
-      let q = query(collection(firestore, 'orderAudit'), orderBy('timestamp', 'desc'));
+      let q = query(
+        collection(firestore, 'orderAudit'), 
+        where('store_id', '==', storeId),
+        orderBy('timestamp', 'desc')
+      );
 
       if (dateRange?.from) {
         q = query(q, where('timestamp', '>=', startOfDay(dateRange.from)));
@@ -150,11 +158,11 @@ export function OrderAuditTab() {
     } finally {
       setIsLoading(false);
     }
-  }, [firestore, dateRange]);
+  }, [firestore, dateRange, storeId]);
 
   useEffect(() => {
     fetchAuditLogs('initial');
-  }, [fetchAuditLogs, dateRange]);
+  }, [fetchAuditLogs, dateRange, storeId]);
 
   const filteredLogs = useMemo(() => {
     if (!searchTerm.trim()) return auditLogs;
