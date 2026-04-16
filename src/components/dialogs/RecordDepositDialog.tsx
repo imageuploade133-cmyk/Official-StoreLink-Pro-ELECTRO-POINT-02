@@ -43,7 +43,8 @@ export function RecordDepositDialog({
   onSuccess
 }: RecordDepositDialogProps) {
   const firestore = useFirestore();
-  const { user } = useAuth();
+  const { user, store, staffMember } = useAuth();
+  const currentStoreId = React.useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
   const { settings } = useSettings();
   const { toast } = useToast();
 
@@ -156,6 +157,7 @@ export function RecordDepositDialog({
         const paymentLogData = {
             customerId: customer.id,
             customerName: currentCustomer.name,
+            store_id: currentStoreId!,
             amount: depositAmount,
             paymentDate: serverTimestamp(),
             paymentMethod: paymentMethod,
@@ -191,6 +193,7 @@ export function RecordDepositDialog({
 
       await logCustomerActivity(firestore, {
         action: 'PAYMENT',
+        store_id: currentStoreId!,
         entityId: customer.id,
         entityDescription: customer.name,
         userId: user.uid,

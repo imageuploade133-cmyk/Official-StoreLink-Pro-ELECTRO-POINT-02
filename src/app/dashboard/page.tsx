@@ -65,7 +65,10 @@ export default function DashboardPage() {
   const [_, setMidnightTicker] = useState(0);
 
   // Traffic Stats
-  const trafficRef = useMemo(() => (firestore ? doc(firestore, 'analytics', 'websiteTraffic') : null), [firestore]);
+  const trafficRef = useMemo(() => {
+    if (!firestore || !currentStoreId) return null;
+    return doc(firestore, 'stores', currentStoreId, 'analytics', 'websiteTraffic');
+  }, [firestore, currentStoreId]);
   const { data: trafficData, isLoading: isLoadingTraffic } = useDoc<WebsiteTraffic>(trafficRef);
 
   // Online Orders Count

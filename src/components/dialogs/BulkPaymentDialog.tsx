@@ -58,7 +58,8 @@ export function BulkPaymentDialog({
   const { settings } = useSettings();
   const { toast } = useToast();
   const firestore = useFirestore();
-  const { user } = useAuth();
+  const { user, store, staffMember } = useAuth();
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -155,6 +156,7 @@ export function BulkPaymentDialog({
         batch.set(paymentLogRef, {
             customerId: customer.id,
             customerName: customer.name,
+            store_id: currentStoreId!,
             amount: paymentAmount,
             paymentDate: serverTimestamp(),
             paymentMethod: values.paymentMethod,
@@ -199,6 +201,7 @@ export function BulkPaymentDialog({
         // 6. Log activity
         await logCustomerActivity(firestore, {
           action: 'PAYMENT',
+          store_id: currentStoreId!,
           entityId: customer.id,
           entityDescription: customer.name,
           userId: user.uid,
