@@ -30,6 +30,9 @@ export function PublicFooter() {
   const logoContainerHeight = Math.max(24, (footerLogoWidth || 100) / 3.5);
   const showPublicStoreName = settings?.showPublicStoreName ?? true;
   const showMainSiteLogo = settings?.showMainSiteLogo ?? true;
+  const footerDesign = settings?.footerDesign || 'standard';
+  const footerBannerUrl = settings?.footerBannerUrl;
+  const footerBannerSize = settings?.footerBannerSize || 'small';
 
   const categoriesQuery = useMemo(() => {
     if (!firestore || !storeId) return null;
@@ -113,9 +116,17 @@ export function PublicFooter() {
       )}
 
       <div className="max-w-site-container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+        <div className={cn(
+            "grid grid-cols-1 gap-12 mb-16",
+            footerDesign === 'standard' && "md:grid-cols-4",
+            footerDesign === 'modern' && "md:grid-cols-5",
+            footerDesign === 'minimal' && "md:grid-cols-2"
+        )}>
           {/* Company Info */}
-          <div className="col-span-1">
+          <div className={cn(
+            "col-span-1",
+            footerDesign === 'modern' && "md:col-span-2"
+          )}>
             <Link href={getStoreUrl('/store')} className="flex items-center gap-3 text-lg font-semibold mb-6">
               {showMainSiteLogo && logoUrl ? (
                  <div style={{ width: `${footerLogoWidth}px`, height: `${logoContainerHeight}px` }} className="relative">
@@ -237,6 +248,20 @@ export function PublicFooter() {
           <div className="flex items-center gap-4">
           </div>
         </div>
+
+        {footerBannerUrl && (
+          <div className={cn(
+            "mt-10 w-full overflow-hidden rounded-2xl border border-white/10 shadow-2xl transition-all duration-500 hover:scale-[1.01]",
+            footerBannerSize === 'small' ? "max-w-4xl mx-auto h-32 md:h-40" : "h-48 md:h-72"
+          )}>
+            <img 
+              src={footerBannerUrl} 
+              alt="Footer Banner" 
+              className="w-full h-full object-cover" 
+              loading="lazy"
+            />
+          </div>
+        )}
       </div>
     </footer>
   );
