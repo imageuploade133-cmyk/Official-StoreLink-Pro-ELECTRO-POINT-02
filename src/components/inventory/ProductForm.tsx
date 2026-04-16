@@ -1657,115 +1657,6 @@ export function ProductForm({
               />
             </CardContent>
           </Card>
-          
-          <Card className="shadow-xl border-none ring-1 ring-border">
-            <CardHeader className="bg-muted/30">
-              <CardTitle className="flex items-center gap-2">
-                <Truck className="h-5 w-5 text-primary" /> Supplier & Procurement Details (Optional)
-              </CardTitle>
-              <CardDescription>Record where this stock was acquired for better tracking.</CardDescription>
-            </CardHeader>
-            <CardContent className="pt-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="supplierName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="font-bold">Stock Supplier (Company)</FormLabel>
-                      <FormControl><Input placeholder="e.g., Electronics Wholesale Ltd" {...field} value={field.value || ''} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="supplierContactName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="font-bold">Supplier Agent Name</FormLabel>
-                      <FormControl><Input placeholder="e.g., John Doe" {...field} value={field.value || ''} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="supplierPhone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="font-bold">Supplier Phone</FormLabel>
-                      <FormControl><Input placeholder="+1 234 567 890" {...field} value={field.value || ''} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="supplierLocation"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="font-bold">Supplier Location</FormLabel>
-                      <FormControl><Input placeholder="City, Country or Address" {...field} value={field.value || ''} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="stockDocumentUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-bold flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-primary" /> Stock Document / Receipt
-                    </FormLabel>
-                    <div className="flex items-start gap-4">
-                        {field.value && (
-                            <div className="relative w-32 h-32 rounded-xl border overflow-hidden shrink-0 shadow-sm bg-muted flex items-center justify-center">
-                                {field.value.match(/\.(jpeg|jpg|gif|png)$/) != null || field.value.includes('imgbb') ? (
-                                  <Image src={field.value} alt="Receipt" fill className="object-contain" unoptimized />
-                                ) : (
-                                  <FileText className="h-10 w-10 text-muted-foreground" />
-                                )}
-                                <Button type="button" variant="destructive" size="icon" className="absolute top-1 right-1 h-6 w-6 rounded-full" onClick={() => form.setValue('stockDocumentUrl', '')}>
-                                    <X className="h-3 w-3" />
-                                </Button>
-                            </div>
-                        )}
-                        <div className="flex-grow space-y-3">
-                            <FormControl>
-                                <Input placeholder="https://example.com/receipt.pdf" {...field} value={field.value || ''} disabled={isSubmitting || isUploadingStockDoc} />
-                            </FormControl>
-                            <div className="flex items-center gap-2">
-                              <Button asChild variant="outline" size="sm" disabled={isSubmitting || isUploadingStockDoc}>
-                                  <label htmlFor="stock-doc-upload-master" className="cursor-pointer">
-                                      {isUploadingStockDoc ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-                                      Upload Receipt
-                                  </label>
-                              </Button>
-                              {field.value && (
-                                <Button type="button" variant="ghost" size="sm" asChild>
-                                  <a href={field.value} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1">
-                                    <Eye className="h-3 w-3" /> View
-                                  </a>
-                                </Button>
-                              )}
-                            </div>
-                            <input id="stock-doc-upload-master" type="file" accept="image/*,.pdf" className="hidden" onChange={handleStockDocUpload} disabled={isSubmitting || isUploadingStockDoc} />
-                            <FormDescription className="text-[10px]">Upload a photo of the receipt or a PDF document for tracking.</FormDescription>
-                        </div>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
         </div>
 
         <div className="lg:col-span-1 space-y-6">
@@ -1815,7 +1706,7 @@ export function ProductForm({
                     <div className="space-y-0.5">
                       <FormLabel className="font-black text-xs uppercase tracking-wider flex items-center gap-2">
                           <Info className="h-3.5 w-3.5 text-primary" /> Product Insight
-                      </FormLabel>
+                      </p>
                       <p className="text-[10px] text-muted-foreground">Show "Listed Since" metrics</p>
                     </div>
                     <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} disabled={isSubmitting} /></FormControl>
@@ -1918,76 +1809,121 @@ export function ProductForm({
     </FormProvider>
 
     {/* Change Category Modal */}
-    <Dialog open={isChangeCategoryModalOpen} onOpenChange={setIsChangeCategoryModalOpen}>
-        <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-                <DialogTitle className="flex items-center gap-2"><SlidersHorizontal className="h-5 w-5"/> Select Target Category</DialogTitle>
-                <DialogDescription>
-                    Search and pick a category for this product.
-                </DialogDescription>
-            </DialogHeader>
-            <div className="py-4 space-y-4">
-                <div className="relative">
-                    <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                        placeholder="Filter categories..." 
-                        value={categorySearchTerm}
-                        onChange={(e) => setCategorySearchTerm(e.target.value)}
-                        className="pl-10 h-11"
-                    />
-                </div>
-                <ScrollArea className="h-64 border rounded-xl bg-muted/5 p-2">
-                    <div className="space-y-1">
-                        {filteredCategories.length === 0 ? (
-                            <div className="text-center py-10 text-muted-foreground text-sm">No categories found.</div>
-                        ) : (
-                            filteredCategories.map((cat) => (
-                                <Button
-                                    key={cat.id}
-                                    variant="ghost"
-                                    className={cn(
-                                        "w-full justify-start font-medium text-sm h-11 rounded-lg px-4 transition-all",
-                                        form.watch('categoryId') === cat.id 
-                                            ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-                                            : "hover:bg-muted"
-                                    )}
-                                    onClick={() => {
-                                        form.setValue('categoryId', cat.id, { shouldValidate: true });
-                                        setIsChangeCategoryModalOpen(false);
-                                    }}
-                                >
-                                    {cat.name}
-                                    {form.watch('categoryId') === cat.id && <Check className="ml-auto h-4 w-4" />}
-                                </Button>
-                            ))
-                        )}
-                    </div>
-                </ScrollArea>
-            </div>
-            <DialogFooter className="flex flex-row justify-between items-center border-t pt-4">
-                <Button type="button" variant="secondary" onClick={() => { setIsChangeCategoryModalOpen(false); setIsCategoryModalOpen(true); }} className="gap-2">
-                    <Plus className="h-4 w-4" /> Create New
-                </Button>
-                <DialogClose asChild>
-                    <Button type="button" variant="outline">Cancel</Button>
-                </DialogClose>
-            </DialogFooter>
-        </DialogContent>
-    </Dialog>
+    <Dialog open={isChangeCategoryModalOpen} onOpenChange={(open) => {
+      setIsChangeCategoryModalOpen(open);
+      if (!open) setCategorySearchTerm('');
+    }}>
+      <DialogContent className="sm:max-w-lg p-0 overflow-hidden rounded-[2rem]">
+      <DialogHeader className="p-8 pb-4">
+      <DialogTitle className="flex items-center gap-3 text-2xl font-bold tracking-tight">
+        <div className="p-2.5 bg-primary/10 rounded-2xl">
+          <Layers className="h-6 w-6 text-primary"/>
+        </div>
+        Select Target Category
+      </DialogTitle>
+      <DialogDescription className="text-base">
+        Organize your product by assigning it to a specific collection.
+      </DialogDescription>
+      </DialogHeader>
+      <div className="px-8 py-2 space-y-6">
+      <div className="relative group">
+      <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
+      <Input
+      placeholder="Search categories (e.g. Shoes, Luxury...)"
+      value={categorySearchTerm}
+      onChange={(e) => setCategorySearchTerm(e.target.value)}
+      className="pl-12 h-14 bg-muted/40 border-primary/10 focus:border-primary/30 rounded-2xl shadow-sm text-base transition-all"
+      />
+      </div>
+      <div className="h-80 overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-muted-foreground/20">
+      {filteredCategories.length === 0 ? (
+      <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 bg-muted/5 rounded-3xl border-2 border-dashed">
+      <SearchIcon className="h-12 w-12 text-muted-foreground/20" />
+      <div className="space-y-1">
+        <p className="font-bold text-muted-foreground">No matches found</p>
+        <p className="text-xs text-muted-foreground/60 max-w-[200px]">Try a different search term or create a new category.</p>
+      </div>
+      </div>
+      ) : (
+      <div className="grid grid-cols-2 gap-4 pb-4">
+      {filteredCategories.map((cat) => (
+      <button
+      key={cat.id}
+      type="button"
+      className={cn(
+      "group relative flex flex-col items-center p-4 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl",
+      form.watch('categoryId') === cat.id 
+      ? "border-primary bg-primary/5 ring-4 ring-primary/10" 
+      : "border-muted-foreground/10 bg-background hover:border-primary/30 hover:bg-primary/5"
+      )}
+      onClick={() => {
+      form.setValue('categoryId', cat.id, { shouldValidate: true });
+      setIsChangeCategoryModalOpen(false);
+      setCategorySearchTerm('');
+      }}
+      >
+      <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-muted mb-3 shadow-inner">
+      <Image
+      src={cat.imageUrl || `https://picsum.photos/seed/${cat.id}/200/200`}
+      alt={cat.name}
+      fill
+      className="object-cover transition-transform duration-700 group-hover:scale-110"
+      sizes="(max-width: 640px) 40vw, 150px"
+      unoptimized
+      />
+      {form.watch('categoryId') === cat.id && (
+      <div className="absolute inset-0 bg-primary/40 backdrop-blur-[2px] flex items-center justify-center animate-in fade-in duration-300">
+      <div className="bg-white text-primary rounded-full p-2 shadow-2xl scale-110">
+      <Check className="h-5 w-5" strokeWidth={4} />
+      </div>
+      </div>
+      )}
+      </div>
+      <span className={cn(
+      "text-xs font-black text-center line-clamp-2 leading-tight uppercase tracking-wider",
+      form.watch('categoryId') === cat.id ? "text-primary" : "text-foreground"
+      )}>
+      {cat.name}
+      </span>
+      </button>
+      ))}
+      </div>
+      )}
+      </div>
+      </div>
+      <DialogFooter className="flex flex-row justify-between items-center border-t mt-6 p-8 bg-muted/10">
+      <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium italic">
+        <div className="p-1 bg-primary/10 rounded-full">
+          <Info className="h-3 w-3 text-primary" />
+        </div>
+        <span className="hidden sm:inline">Missing a category?</span>
+      </div>
+      <div className="flex gap-3">
+        <Button type="button" variant="outline" onClick={() => { setIsChangeCategoryModalOpen(false); setIsCategoryModalOpen(true); setCategorySearchTerm(''); }} className="gap-2 border-primary/20 text-primary hover:bg-primary/5 font-bold rounded-xl h-11">
+        <PlusCircle className="h-4 w-4" /> Create New
+        </Button>
+        <DialogClose asChild>
+        <Button type="button" variant="ghost" className="font-bold h-11 rounded-xl">Cancel</Button>
+        </DialogClose>
+      </div>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
 
-    <Dialog open={isCategoryModalOpen} onOpenChange={setIsCategoryModalOpen}>
-        <DialogContent className="max-w-2xl p-0 overflow-hidden border-none shadow-2xl">
-            <DialogHeader className="sr-only">
-                <DialogTitle>Create New Category</DialogTitle>
-                <DialogDescription>Add a new collection to your inventory.</DialogDescription>
-            </DialogHeader>
-            <CategoryForm 
-                onSubmit={handleNewCategorySubmit}
-                isSubmitting={isSubmittingCategory}
-                onCancel={() => setIsCategoryModalOpen(false)}
-            />
-        </DialogContent>
-    </Dialog>
+        <Dialog open={isCategoryModalOpen} onOpenChange={setIsCategoryModalOpen}>
+            <DialogContent className="max-w-2xl p-0 overflow-hidden border-none shadow-2xl rounded-[2.5rem]">
+                <DialogHeader className="sr-only">
+                    <DialogTitle>Create New Category</DialogTitle>
+                    <DialogDescription>Add a new collection to your inventory.</DialogDescription>
+                </DialogHeader>
+                <CategoryForm 
+                    onSubmit={handleNewCategorySubmit}
+                    isSubmitting={isSubmittingCategory}
+                    onCancel={() => { setIsCategoryModalOpen(false); setIsChangeCategoryModalOpen(true); }}
+                    isModal={true}
+                />
+            </DialogContent>
+        </Dialog>
     </>
   );
 };

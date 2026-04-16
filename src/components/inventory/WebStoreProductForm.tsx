@@ -1663,128 +1663,151 @@ export function WebStoreProductForm() {
     </FormProvider>
 
     {/* Change Category Modal */}
-<Dialog open={isChangeCategoryModalOpen} onOpenChange={(open) => {
-  setIsChangeCategoryModalOpen(open);
-  if (!open) setCategorySearchTerm('');
-}}>
-  <DialogContent className="sm:max-w-lg">
-  <DialogHeader>
-  <DialogTitle className="flex items-center gap-2"><SlidersHorizontal className="h-5 w-5"/> Select Target Category</DialogTitle>
-  <DialogDescription>
-  Search and pick a category for this product.
-  </DialogDescription>
-  </DialogHeader>
-  <div className="py-4 space-y-4">
-  <div className="relative">
-  <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-  <Input
-  placeholder="Filter categories..."
-  value={categorySearchTerm}
-  onChange={(e) => setCategorySearchTerm(e.target.value)}
-  className="pl-10 h-11"
-  />
-  </div>
-  <div 
-  ref={scrollContainerRef}
-  onScroll={handleCategoryScroll}
-  className="h-80 overflow-y-auto border rounded-xl bg-muted/5 p-3"
-  >
-  {isLoadingPaginatedCategories ? (
-  <div className="flex flex-col items-center justify-center py-10 gap-3">
-  <Loader2 className="h-6 w-6 animate-spin text-primary" />
-  <span className="text-sm text-muted-foreground">Loading categories...</span>
-  </div>
-  ) : displayedCategories.length === 0 ? (
-  <div className="text-center py-10 text-muted-foreground text-sm">
-  {categorySearchTerm ? 'No categories match your search.' : 'No categories found.'}
-  </div>
-  ) : (
-  <div className="grid grid-cols-2 gap-3">
-  {displayedCategories.map((cat) => (
-  <button
-  key={cat.id}
-  type="button"
-  className={cn(
-  "group relative flex flex-col items-center p-3 rounded-xl border-2 transition-all duration-300 hover:shadow-lg",
-  form.watch('categoryId') === cat.id 
-  ? "border-primary bg-primary/5 ring-2 ring-primary/20" 
-  : "border-transparent bg-background hover:border-primary/30 hover:bg-muted/50"
-  )}
-  onClick={() => {
-  form.setValue('categoryId', cat.id, { shouldValidate: true });
-  setIsChangeCategoryModalOpen(false);
-  setCategorySearchTerm('');
-  }}
-  >
-  <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-muted mb-2">
-  <Image
-  src={cat.imageUrl || `https://picsum.photos/seed/${cat.id}/200/200`}
-  alt={cat.name}
-  fill
-  className="object-cover transition-transform duration-500 group-hover:scale-110"
-  sizes="(max-width: 640px) 40vw, 150px"
-  unoptimized
-  />
-  {form.watch('categoryId') === cat.id && (
-  <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-  <div className="bg-primary text-primary-foreground rounded-full p-1.5">
-  <Check className="h-4 w-4" strokeWidth={3} />
-  </div>
-  </div>
-  )}
-  </div>
-  <span className={cn(
-  "text-xs font-bold text-center line-clamp-2 leading-tight",
-  form.watch('categoryId') === cat.id ? "text-primary" : "text-foreground"
-  )}>
-  {cat.name}
-  </span>
-  </button>
-  ))}
-  </div>
-  )}
-  
-  {/* Load more indicator */}
-  {isLoadingMoreCategories && (
-  <div className="flex items-center justify-center py-4 gap-2">
-  <Loader2 className="h-4 w-4 animate-spin text-primary" />
-  <span className="text-xs text-muted-foreground">Loading more...</span>
-  </div>
-  )}
-  
-  {/* End of list indicator */}
-  {!hasMoreCategories && paginatedCategories.length > 0 && !categorySearchTerm && (
-  <div className="text-center py-3 text-xs text-muted-foreground">
-  All {paginatedCategories.length} categories loaded
-  </div>
-  )}
-  </div>
-  </div>
-  <DialogFooter className="flex flex-row justify-between items-center border-t pt-4">
-  <Button type="button" variant="secondary" onClick={() => { setIsChangeCategoryModalOpen(false); setIsCategoryModalOpen(true); setCategorySearchTerm(''); }} className="gap-2">
-  <Plus className="h-4 w-4" /> Create New
-  </Button>
-  <DialogClose asChild>
-  <Button type="button" variant="outline">Cancel</Button>
-  </DialogClose>
+    <Dialog open={isChangeCategoryModalOpen} onOpenChange={(open) => {
+    setIsChangeCategoryModalOpen(open);
+    if (!open) setCategorySearchTerm('');
+    }}>
+    <DialogContent className="sm:max-w-lg p-0 overflow-hidden rounded-[2rem]">
+    <DialogHeader className="p-8 pb-4">
+    <DialogTitle className="flex items-center gap-3 text-2xl font-bold tracking-tight">
+    <div className="p-2.5 bg-primary/10 rounded-2xl">
+      <Layers className="h-6 w-6 text-primary"/>
+    </div>
+    Select Target Category
+    </DialogTitle>
+    <DialogDescription className="text-base">
+    Organize your product by assigning it to a specific collection.
+    </DialogDescription>
+    </DialogHeader>
+    <div className="px-8 py-2 space-y-6">
+    <div className="relative group">
+    <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
+    <Input
+    placeholder="Search categories (e.g. Shoes, Luxury...)"
+    value={categorySearchTerm}
+    onChange={(e) => setCategorySearchTerm(e.target.value)}
+    className="pl-12 h-14 bg-muted/40 border-primary/10 focus:border-primary/30 rounded-2xl shadow-sm text-base transition-all"
+    />
+    </div>
+    <div
+    ref={scrollContainerRef}
+    onScroll={handleCategoryScroll}
+    className="h-80 overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-muted-foreground/20"
+    >
+    {isLoadingPaginatedCategories ? (
+    <div className="flex flex-col items-center justify-center py-20 gap-4">
+    <div className="relative">
+    <Loader2 className="h-10 w-10 animate-spin text-primary opacity-20" />
+    <Loader2 className="h-10 w-10 animate-spin text-primary absolute inset-0 [animation-delay:-0.3s]" />
+    </div>
+    <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Scanning Catalog...</span>
+    </div>
+    ) : displayedCategories.length === 0 ? (
+    <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 bg-muted/5 rounded-3xl border-2 border-dashed">
+    <SearchIcon className="h-12 w-12 text-muted-foreground/20" />
+    <div className="space-y-1">
+    <p className="font-bold text-muted-foreground">No matches found</p>
+    <p className="text-xs text-muted-foreground/60 max-w-[200px]">Try a different search term or create a new category.</p>
+    </div>
+    </div>
+    ) : (
+    <div className="grid grid-cols-2 gap-4 pb-4">
+    {displayedCategories.map((cat) => (
+    <button
+    key={cat.id}
+    type="button"
+    className={cn(
+    "group relative flex flex-col items-center p-4 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl",
+    form.watch('categoryId') === cat.id
+    ? "border-primary bg-primary/5 ring-4 ring-primary/10"
+    : "border-muted-foreground/10 bg-background hover:border-primary/30 hover:bg-primary/5"
+    )}
+    onClick={() => {
+    form.setValue('categoryId', cat.id, { shouldValidate: true });
+    setIsChangeCategoryModalOpen(false);
+    setCategorySearchTerm('');
+    }}
+    >
+    <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-muted mb-3 shadow-inner">
+    <Image
+    src={cat.imageUrl || `https://picsum.photos/seed/${cat.id}/200/200`}
+    alt={cat.name}
+    fill
+    className="object-cover transition-transform duration-700 group-hover:scale-110"
+    sizes="(max-width: 640px) 40vw, 150px"
+    unoptimized
+    />
+    {form.watch('categoryId') === cat.id && (
+    <div className="absolute inset-0 bg-primary/40 backdrop-blur-[2px] flex items-center justify-center animate-in fade-in duration-300">
+    <div className="bg-white text-primary rounded-full p-2 shadow-2xl scale-110">
+    <Check className="h-5 w-5" strokeWidth={4} />
+    </div>
+    </div>
+    )}
+    </div>
+    <span className={cn(
+    "text-xs font-black text-center line-clamp-2 leading-tight uppercase tracking-wider",
+    form.watch('categoryId') === cat.id ? "text-primary" : "text-foreground"
+    )}>
+    {cat.name}
+    </span>
+    </button>
+    ))}
+    </div>
+    )}
+
+    {/* Load more indicator */}
+    {isLoadingMoreCategories && (
+    <div className="flex items-center justify-center py-6 gap-3">
+    <Loader2 className="h-5 w-5 animate-spin text-primary" />
+    <span className="text-xs font-black text-muted-foreground uppercase tracking-tighter">Loading more collections...</span>
+    </div>
+    )}
+
+    {/* End of list indicator */}
+    {!hasMoreCategories && paginatedCategories.length > 0 && !categorySearchTerm && (
+    <div className="flex items-center justify-center gap-2 py-6">
+    <div className="h-px w-8 bg-muted" />
+    <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest whitespace-nowrap">
+      End of Catalog ({paginatedCategories.length})
+    </div>
+    <div className="h-px w-8 bg-muted" />
+    </div>
+    )}
+    </div>
+    </div>
+    <DialogFooter className="flex flex-row justify-between items-center border-t mt-6 p-8 bg-muted/10">
+    <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium italic">
+    <Info className="h-4 w-4 text-primary opacity-50" />
+    <span className="hidden sm:inline">Missing a category?</span>
+    </div>
+    <div className="flex gap-3">
+    <Button type="button" variant="outline" onClick={() => { setIsChangeCategoryModalOpen(false); setIsCategoryModalOpen(true); setCategorySearchTerm(''); }} className="gap-2 border-primary/20 text-primary hover:bg-primary/5 font-bold rounded-xl h-11">
+    <PlusCircle className="h-4 w-4" /> Create New
+    </Button>
+    <DialogClose asChild>
+    <Button type="button" variant="ghost" className="font-bold h-11 rounded-xl">Cancel</Button>
+    </DialogClose>
+    </div>
             </DialogFooter>
         </DialogContent>
     </Dialog>
 
     <Dialog open={isCategoryModalOpen} onOpenChange={setIsCategoryModalOpen}>
-        <DialogContent className="max-w-2xl p-0 overflow-hidden border-none shadow-2xl">
+        <DialogContent className="max-w-2xl p-0 overflow-hidden border-none shadow-2xl rounded-[2.5rem]">
             <DialogHeader className="sr-only">
                 <DialogTitle>Create New Category</DialogTitle>
                 <DialogDescription>Add a new collection to your inventory.</DialogDescription>
             </DialogHeader>
-<CategoryForm
-  onSubmit={handleCreateCategory}
-  isSubmitting={isSubmittingCategory}
-  onCancel={() => setIsCategoryModalOpen(false)}
-  isModal={true}
-  />
+    <CategoryForm
+    onSubmit={handleCreateCategory}
+    isSubmitting={isSubmittingCategory}
+    onCancel={() => { setIsCategoryModalOpen(false); setIsChangeCategoryModalOpen(true); }}
+    isModal={true}
+    />
         </DialogContent>
     </Dialog>
+
     </>
   );
 }
