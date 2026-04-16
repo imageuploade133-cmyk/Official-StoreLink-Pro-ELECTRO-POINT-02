@@ -222,12 +222,19 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
                           <FormLabel className="text-sm font-bold">Banner Image</FormLabel>
                           <div className="flex flex-col gap-4">
                             {field.value && (
-                              <div className="relative w-full aspect-[4/1] rounded-xl overflow-hidden border shadow-inner bg-muted/20">
+                              <div
+                                className="relative w-full rounded-xl overflow-hidden border shadow-inner bg-muted/20 transition-all duration-500"
+                                style={{
+                                  height: typeof form.watch('footerBannerSize') === 'number'
+                                    ? `${Math.min(form.watch('footerBannerSize') as number / 2, 200)}px`
+                                    : form.watch('footerBannerSize') === 'big' ? '120px' : '80px'
+                                }}
+                              >
                                 <Image src={field.value} alt="Footer Banner" fill className="object-cover" unoptimized />
-                                <Button 
-                                  type="button" 
-                                  variant="destructive" 
-                                  size="icon" 
+                                <Button
+                                  type="button"
+                                  variant="destructive"
+                                  size="icon"
                                   className="absolute top-2 right-2 h-8 w-8 rounded-full"
                                   onClick={() => form.setValue('footerBannerUrl', '')}
                                 >

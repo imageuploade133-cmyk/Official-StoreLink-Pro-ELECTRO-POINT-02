@@ -233,6 +233,8 @@ export interface Settings {
   brandValuesVerticalPadding?: number;
   brandValuesMaxWidth?: number;
   showBrandValues?: boolean;
+  brandValuesEnableZoom?: boolean;
+  brandValuesEnableShadow?: boolean;
   showNewsletterSection?: boolean;
   newsletterSectionTitle?: string;
   newsletterSectionDescription?: string;
