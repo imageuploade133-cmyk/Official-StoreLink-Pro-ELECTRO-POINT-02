@@ -196,7 +196,10 @@ export function CollectionsView({ onSelectCategory }: CollectionsViewProps) {
                                         src={category.imageUrl || `https://picsum.photos/seed/${category.id}/600/400`}
                                         alt={category.name}
                                         fill
-                                        className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                                        className={cn(
+                                            "object-cover transition-transform duration-1000",
+                                            settings?.enableHoverZoom !== false && "group-hover:scale-110"
+                                        )}
                                         unoptimized
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />

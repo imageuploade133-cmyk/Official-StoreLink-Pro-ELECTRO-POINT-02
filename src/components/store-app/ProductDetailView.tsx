@@ -641,7 +641,16 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                             {relatedProducts.filter(p => p.id !== id).slice(0, 4).map(p => (
                                 <div key={p.id} className="bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-lg p-3 group active:scale-95 transition-all">
                                     <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted mb-3">
-                                        <Image src={p.imageUrl || 'https://placehold.co/200x200.png'} alt={p.name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" unoptimized />
+                                        <Image 
+                                            src={p.imageUrl || 'https://placehold.co/200x200.png'} 
+                                            alt={p.name} 
+                                            fill 
+                                            className={cn(
+                                                "object-cover transition-transform duration-700",
+                                                settings?.enableHoverZoom !== false && "group-hover:scale-110"
+                                            )} 
+                                            unoptimized 
+                                        />
                                     </div>
                                     <div className="space-y-1 px-1">
                                         <p className="text-[8px] font-black uppercase text-primary/60 tracking-widest">

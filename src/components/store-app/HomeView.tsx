@@ -328,7 +328,10 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                                     ) : (
                                         <img
                                             alt={slide.title || 'Slide'}
-                                            className="w-full h-full object-cover block transition-transform duration-1000 group-hover:scale-105"
+                                            className={cn(
+                                                "w-full h-full object-cover block transition-transform duration-1000",
+                                                settings?.enableHoverZoom !== false && "group-hover:scale-105"
+                                            )}
                                             src={slide.imageUrl || 'https://placehold.co/800x500.png'}
                                         />
                                     )}
@@ -539,7 +542,10 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                         <div className="relative aspect-[3/4] rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-800 mb-5 border-2 border-slate-200 dark:border-slate-700 shadow-2xl transition-all active:scale-[0.98] hover:border-primary/20">
                             <Image 
                                 alt={product.name}  
-                                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+                                className={cn(
+                                    "w-full h-full object-cover transition-transform duration-1000",
+                                    settings?.enableHoverZoom !== false && "group-hover:scale-110"
+                                )}
                                 src={product.imageUrl || 'https://placehold.co/400x600.png'}
                                 fill
                                 unoptimized

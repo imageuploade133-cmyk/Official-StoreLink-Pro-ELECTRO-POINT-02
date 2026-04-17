@@ -19,7 +19,7 @@
   transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.cardContainer:hover .productImage {
+.cardContainer.enableZoom:hover .productImage {
   transform: scale(1.08);
 }
 

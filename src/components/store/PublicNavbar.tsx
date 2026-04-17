@@ -233,7 +233,10 @@ export function PublicNavbar() {
                 alt={storeName}
                 fill
                 sizes={`${storeLogoWidth}px`}
-                className="object-contain transition-transform duration-500 group-hover:scale-105"
+                className={cn(
+                    "object-contain transition-transform duration-500",
+                    settings?.enableHoverZoom !== false && "group-hover:scale-105"
+                )}
                 unoptimized
             />
         </div>
@@ -686,7 +689,10 @@ export function PublicNavbar() {
                                                                     src={product.imageUrl || 'https://placehold.co/200x200.png'} 
                                                                     alt={product.name} 
                                                                     fill 
-                                                                    className="object-cover group-hover:scale-110 transition-transform duration-700"
+                                                                    className={cn(
+                                                                        "object-cover transition-transform duration-700",
+                                                                        settings?.enableHoverZoom !== false && "group-hover:scale-110"
+                                                                    )}
                                                                     unoptimized
                                                                 />
                                                             </div>
@@ -728,7 +734,16 @@ export function PublicNavbar() {
                                                                 onClick={() => setIsSearchFocused(false)}
                                                             >
                                                                 <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border bg-slate-50">
-                                                                    <Image src={p.imageUrl || ''} alt="" fill className="object-cover transition-transform group-hover:scale-110" unoptimized />
+                                                                    <Image 
+                                                                        src={p.imageUrl || ''} 
+                                                                        alt="" 
+                                                                        fill 
+                                                                        className={cn(
+                                                                            "object-cover transition-transform",
+                                                                            settings?.enableHoverZoom !== false && "group-hover:scale-110"
+                                                                        )}
+                                                                        unoptimized 
+                                                                    />
                                                                 </div>
                                                                 <p className="text-xs font-bold truncate px-1">{p.name}</p>
                                                             </Link>

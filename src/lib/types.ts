@@ -350,6 +350,8 @@ export interface Settings {
   // Logo and Store Name visibility toggles
   showPublicStoreName?: boolean;
   showMainSiteLogo?: boolean;
+  // Hover Zoom UI
+  enableHoverZoom?: boolean;
   // Product Review Settings
   showProductReviews?: boolean;
   showReviewRatingOnCard?: boolean;
@@ -469,6 +471,8 @@ export interface HomepageSection {
   uiType?: 'image' | 'html';
   htmlContent?: string;
   imageUrl?: string;
+  overlayTitle?: string;
+  overlaySubtitle?: string;
   linkUrl?: string;
   buttonText?: string;
   fullWidth?: boolean;

@@ -8,12 +8,14 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { HomepageSection } from '@/lib/types';
+import { useSettings } from '@/contexts/settings-context';
 
 interface CustomUISectionProps {
   section: HomepageSection;
 }
 
 export function CustomUISection({ section }: CustomUISectionProps) {
+  const { settings } = useSettings();
   if (!section.published) return null;
 
   const isHTML = section.uiType === 'html';
@@ -40,7 +42,10 @@ export function CustomUISection({ section }: CustomUISectionProps) {
                         src={section.imageUrl} 
                         alt={section.title} 
                         fill 
-                        className="object-cover transition-transform duration-700 group-hover:scale-110" 
+                        className={cn(
+                            "object-cover transition-transform duration-700",
+                            settings?.enableHoverZoom !== false && "group-hover:scale-110"
+                        )} 
                         unoptimized
                     />
                     <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] transition-opacity group-hover:opacity-40" />
