@@ -23,11 +23,28 @@ export async function POST(request: Request) {
     const providerData = providerSnap.data() as PaymentProvider;
     const config = JSON.parse(decrypt(providerData.config));
     const mode = providerData.mode || 'test';
+
+    // Normalize currency to ISO 3-letter code
+    const normalizeCurrency = (curr: string) => {
+      const map: Record<string, string> = {
+        '₦': 'NGN',
+        '$': 'USD',
+        '€': 'EUR',
+        '£': 'GBP',
+        '₵': 'GHS',
+        'GH₵': 'GHS',
+        'KSH': 'KES',
+        'KSHS': 'KES',
+      };
+      const upper = curr?.toUpperCase().trim() || 'NGN';
+      return map[upper] || map[curr] || upper;
+    };
+
+    const normalizedCurrency = normalizeCurrency(currency);
     
     // Pick the correct keys based on mode
     const secretKey = mode === 'live' ? config.liveSecretKey : config.testSecretKey || config.secretKey;
-    // const publicKey = mode === 'live' ? config.livePublicKey : config.testPublicKey || config.publicKey;
-
+    
     let result: any = {};
     let reference = `TRX-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
@@ -41,13 +58,14 @@ export async function POST(request: Request) {
         body: JSON.stringify({
           email,
           amount: Math.round(amount * 100), // Paystack uses kobo/cents
-          currency,
+          currency: normalizedCurrency,
           reference,
           callback_url: `${request.headers.get('origin')}/store/${storeId}/checkout/verify?provider=paystack`,
         }),
       });
       result = await paystackRes.json();
       if (!result.status) {
+        console.error('Paystack Error:', result);
         throw new Error(result.message || 'Paystack initialization failed');
       }
     } else if (providerName === 'flutterwave') {
@@ -60,7 +78,7 @@ export async function POST(request: Request) {
             body: JSON.stringify({
               tx_ref: reference,
               amount,
-              currency,
+              currency: normalizedCurrency,
               redirect_url: `${request.headers.get('origin')}/store/${storeId}/checkout/verify?provider=flutterwave`,
               customer: {
                 email,
@@ -72,6 +90,7 @@ export async function POST(request: Request) {
           });
           result = await flutterwaveRes.json();
           if (result.status !== 'success') {
+            console.error('Flutterwave Error:', result);
             throw new Error(result.message || 'Flutterwave initialization failed');
           }
     } else {
@@ -88,7 +107,7 @@ export async function POST(request: Request) {
       provider: providerName,
       reference,
       amount,
-      currency,
+      currency: normalizedCurrency,
       status: 'pending',
       customerEmail: email,
       createdAt: Timestamp.now() as any,
