@@ -94,7 +94,7 @@ export interface BankAccount {
 export interface PaymentProvider {
   id: string;
   storeId: string;
-  providerName: 'paystack' | 'flutterwave' | 'manual';
+  providerName: 'paystack' | 'flutterwave' | 'stripe' | 'manual';
   config: string; // JSON string, encrypted
   isActive: boolean;
   mode: 'test' | 'live';

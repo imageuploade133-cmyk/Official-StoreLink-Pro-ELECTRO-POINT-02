@@ -3,11 +3,21 @@ import { adminDb } from '@/lib/firebase-admin';
 import { Timestamp } from 'firebase-admin/firestore';
 import { encrypt, decrypt } from '@/lib/encryption';
 import { PaymentProvider } from '@/lib/types';
+import { verifyAuth, isStoreAuthorized } from '@/lib/auth-admin-utils';
 
 export async function GET(request: Request) {
   try {
+    const decodedToken = await verifyAuth(request);
+    if (!decodedToken) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const storeId = searchParams.get('storeId') || 'global';
+
+    if (!(await isStoreAuthorized(decodedToken.uid, storeId))) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
     const providersRef = adminDb.collection('payment_providers');
     const q = providersRef.where('storeId', '==', storeId);
@@ -50,11 +60,20 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const decodedToken = await verifyAuth(request);
+    if (!decodedToken) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { providerName, config, isActive, mode, storeId = 'global' } = body;
 
     if (!providerName) {
       return NextResponse.json({ error: 'Provider name is required' }, { status: 400 });
+    }
+
+    if (!(await isStoreAuthorized(decodedToken.uid, storeId))) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const providerId = `${storeId}_${providerName}`;
