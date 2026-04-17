@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, Stamp, Save, Upload, Type, Image as ImageIcon, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Stamp, Save, Upload, Type, Image as ImageIcon, Eye, EyeOff, RotateCcw } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -43,6 +43,17 @@ interface WatermarkSettingsProps {
   storeId?: string | null;
 }
 
+const defaultWatermarkValues: FormValues = {
+  webWatermarkEnabled: false,
+  webWatermarkType: 'text',
+  webWatermarkText: 'STORELINK PRO',
+  webWatermarkImageUrl: '',
+  webWatermarkOpacity: 0.1,
+  webWatermarkFontSize: 120,
+  webWatermarkImageWidth: 400,
+  webWatermarkRotation: -30,
+};
+
 export function WatermarkSettings({ settingsData, isLoading, storeId }: WatermarkSettingsProps) {
   const { toast } = useToast();
   const firestore = useFirestore();
@@ -51,16 +62,7 @@ export function WatermarkSettings({ settingsData, isLoading, storeId }: Watermar
 
   const form = useForm<FormValues>({
     resolver: zodResolver(watermarkSchema),
-    defaultValues: {
-      webWatermarkEnabled: false,
-      webWatermarkType: 'text',
-      webWatermarkText: 'STORELINK PRO',
-      webWatermarkImageUrl: '',
-      webWatermarkOpacity: 0.1,
-      webWatermarkFontSize: 120,
-      webWatermarkImageWidth: 400,
-      webWatermarkRotation: -30,
-    }
+    defaultValues: defaultWatermarkValues
   });
 
   useEffect(() => {
@@ -93,6 +95,11 @@ export function WatermarkSettings({ settingsData, isLoading, storeId }: Watermar
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleReset = () => {
+    form.reset(defaultWatermarkValues);
+    toast({ title: 'Settings Reset', description: 'Watermark settings have been reset to default. Click "Synchronize Watermark" to save.' });
   };
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -325,10 +332,13 @@ export function WatermarkSettings({ settingsData, isLoading, storeId }: Watermar
                 </div>
             </div>
           </CardContent>
-          <CardFooter className="bg-muted/30 border-t p-6">
+          <CardFooter className="bg-muted/30 border-t p-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
             <Button type="submit" disabled={isSaving || isUploading} size="lg" className="px-10 h-12 font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20 transition-all active:scale-95">
               {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Save className="mr-2 h-4 w-4" />}
               Synchronize Watermark
+            </Button>
+            <Button type="button" variant="outline" onClick={handleReset} disabled={isSaving || isUploading} className="font-bold uppercase tracking-widest text-[10px]">
+              <RotateCcw className="mr-2 h-4 w-4" /> Reset to Default
             </Button>
           </CardFooter>
         </form>

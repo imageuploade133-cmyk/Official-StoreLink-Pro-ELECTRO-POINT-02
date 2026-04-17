@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, GalleryHorizontal, Save, Clock } from 'lucide-react';
+import { Loader2, GalleryHorizontal, Save, Clock, RotateCcw } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 
 const heroSettingsSchema = z.object({
@@ -28,6 +28,10 @@ interface HeroCarouselSettingsProps {
   storeId?: string | null;
 }
 
+const defaultHeroValues: FormValues = {
+  slideShowDuration: 7000,
+};
+
 export function HeroCarouselSettings({ settingsData, isLoading, storeId }: HeroCarouselSettingsProps) {
   const { toast } = useToast();
   const firestore = useFirestore();
@@ -35,9 +39,7 @@ export function HeroCarouselSettings({ settingsData, isLoading, storeId }: HeroC
 
   const form = useForm<FormValues>({
     resolver: zodResolver(heroSettingsSchema),
-    defaultValues: {
-      slideShowDuration: 7000,
-    }
+    defaultValues: defaultHeroValues
   });
 
   useEffect(() => {
@@ -63,6 +65,11 @@ export function HeroCarouselSettings({ settingsData, isLoading, storeId }: HeroC
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleReset = () => {
+    form.reset(defaultHeroValues);
+    toast({ title: 'Settings Reset', description: 'Hero carousel settings have been reset to default. Click "Save Carousel Timing" to save.' });
   };
 
   if (isLoading) {
@@ -110,10 +117,13 @@ export function HeroCarouselSettings({ settingsData, isLoading, storeId }: HeroC
                 )}
             />
           </CardContent>
-          <CardFooter className="bg-muted/30 border-t p-6">
+          <CardFooter className="bg-muted/30 border-t p-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
             <Button type="submit" disabled={isSaving} className="font-black uppercase tracking-widest text-xs h-12 px-8 shadow-xl shadow-primary/20">
               {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Save className="mr-2 h-4 w-4" />}
               Save Carousel Timing
+            </Button>
+            <Button type="button" variant="outline" onClick={handleReset} disabled={isSaving} className="font-bold uppercase tracking-widest text-[10px]">
+              <RotateCcw className="mr-2 h-4 w-4" /> Reset to Default
             </Button>
           </CardFooter>
         </form>

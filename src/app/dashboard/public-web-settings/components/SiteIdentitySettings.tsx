@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, Building, Upload, Maximize, MonitorUp, ArrowUpDown, Ruler, Share2, Share, ExternalLink, Link as LinkIcon, Send } from 'lucide-react';
+import { Loader2, Building, Upload, Maximize, MonitorUp, ArrowUpDown, Ruler, Share2, Share, ExternalLink, Link as LinkIcon, Send, RotateCcw } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
@@ -55,6 +55,20 @@ interface SiteIdentitySettingsProps {
   storeId?: string | null;
 }
 
+const defaultIdentityValues: FormValues = {
+  storeName: 'StoreLink-Pro',
+  invoiceLogoUrl: '',
+  storeLogoUrl: '',
+  storeLogoWidth: 120,
+  webMaxContainerWidth: 1520,
+  footerDescription: '',
+  showFooterDescription: true,
+  showPublicStoreName: true,
+  showMainSiteLogo: true,
+  enableProductSharing: true,
+  productSharingIcon: 'Share2',
+};
+
 export function SiteIdentitySettings({ settingsData, isLoading, storeId }: SiteIdentitySettingsProps) {
   const { toast } = useToast();
   const firestore = useFirestore();
@@ -63,19 +77,7 @@ export function SiteIdentitySettings({ settingsData, isLoading, storeId }: SiteI
 
   const form = useForm<FormValues>({
     resolver: zodResolver(siteIdentitySchema),
-    defaultValues: {
-      storeName: 'StoreLink-Pro',
-      invoiceLogoUrl: '',
-      storeLogoUrl: '',
-      storeLogoWidth: 120,
-      webMaxContainerWidth: 1520,
-      footerDescription: '',
-      showFooterDescription: true,
-      showPublicStoreName: true,
-      showMainSiteLogo: true,
-      enableProductSharing: true,
-      productSharingIcon: 'Share2',
-    }
+    defaultValues: defaultIdentityValues
   });
 
   useEffect(() => {
@@ -111,6 +113,11 @@ export function SiteIdentitySettings({ settingsData, isLoading, storeId }: SiteI
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleReset = () => {
+    form.reset(defaultIdentityValues);
+    toast({ title: 'Settings Reset', description: 'Site identity settings have been reset to default. Click "Sync Site Configuration" to save.' });
   };
   
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, fieldName: 'invoiceLogoUrl' | 'storeLogoUrl') => {
@@ -488,10 +495,13 @@ export function SiteIdentitySettings({ settingsData, isLoading, storeId }: SiteI
               </div>
             </div>
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex flex-col sm:flex-row gap-4 justify-between">
             <Button type="submit" disabled={isSaving || !!uploadingField} className="px-8 font-bold">
               {(isSaving || !!uploadingField) && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
               Sync Site Configuration
+            </Button>
+            <Button type="button" variant="outline" onClick={handleReset} disabled={isSaving || !!uploadingField}>
+              <RotateCcw className="mr-2 h-4 w-4" /> Reset to Default
             </Button>
           </CardFooter>
         </form>

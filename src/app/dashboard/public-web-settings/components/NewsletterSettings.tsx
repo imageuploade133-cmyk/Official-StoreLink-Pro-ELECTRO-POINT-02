@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, Mail } from 'lucide-react';
+import { Loader2, Mail, RotateCcw } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -33,30 +33,30 @@ interface NewsletterSettingsProps {
   storeId?: string | null;
 }
 
+const defaultNewsletterValues: FormValues = {
+  showNewsletterSection: true,
+  newsletterSectionTitle: 'Join Our Newsletter',
+  newsletterSectionDescription: 'Subscribe to receive updates, access to exclusive deals, and more.',
+  newsletterSectionBackgroundColor: '#f1f5f9',
+};
+
 export function NewsletterSettings({ settingsData, isLoading, storeId }: NewsletterSettingsProps) {
   const { toast } = useToast();
   const firestore = useFirestore();
   const [isSaving, setIsSaving] = useState(false);
 
-  const defaults = {
-      showNewsletterSection: true,
-      newsletterSectionTitle: 'Join Our Newsletter',
-      newsletterSectionDescription: 'Subscribe to receive updates, access to exclusive deals, and more.',
-      newsletterSectionBackgroundColor: '#f1f5f9', // Corresponds to primary/5 or a light gray
-  };
-
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: defaults,
+    defaultValues: defaultNewsletterValues,
   });
 
   useEffect(() => {
     if (settingsData) {
         form.reset({
-          showNewsletterSection: settingsData?.showNewsletterSection ?? defaults.showNewsletterSection,
-          newsletterSectionTitle: settingsData?.newsletterSectionTitle || defaults.newsletterSectionTitle,
-          newsletterSectionDescription: settingsData?.newsletterSectionDescription || defaults.newsletterSectionDescription,
-          newsletterSectionBackgroundColor: settingsData?.newsletterSectionBackgroundColor || defaults.newsletterSectionBackgroundColor,
+          showNewsletterSection: settingsData?.showNewsletterSection ?? defaultNewsletterValues.showNewsletterSection,
+          newsletterSectionTitle: settingsData?.newsletterSectionTitle || defaultNewsletterValues.newsletterSectionTitle,
+          newsletterSectionDescription: settingsData?.newsletterSectionDescription || defaultNewsletterValues.newsletterSectionDescription,
+          newsletterSectionBackgroundColor: settingsData?.newsletterSectionBackgroundColor || defaultNewsletterValues.newsletterSectionBackgroundColor,
         });
     }
   }, [settingsData, form]);
@@ -76,6 +76,11 @@ export function NewsletterSettings({ settingsData, isLoading, storeId }: Newslet
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleReset = () => {
+    form.reset(defaultNewsletterValues);
+    toast({ title: 'Settings Reset', description: 'Newsletter settings have been reset to default. Click "Save Newsletter Settings" to save.' });
   };
   
   if (isLoading) {
@@ -154,10 +159,13 @@ export function NewsletterSettings({ settingsData, isLoading, storeId }: Newslet
                 )}
             />
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex flex-col sm:flex-row gap-4 justify-between">
             <Button type="submit" disabled={isSaving}>
               {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
               Save Newsletter Settings
+            </Button>
+            <Button type="button" variant="outline" onClick={handleReset} disabled={isSaving}>
+              <RotateCcw className="mr-2 h-4 w-4" /> Reset to Default
             </Button>
           </CardFooter>
         </form>

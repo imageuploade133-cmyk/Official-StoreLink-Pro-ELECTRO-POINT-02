@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, Image as ImageIcon, Upload } from 'lucide-react';
+import { Loader2, Image as ImageIcon, Upload, RotateCcw } from 'lucide-react';
 import placeholderImages from '@/lib/placeholder-images.json';
 
 const authPageSchema = z.object({
@@ -31,6 +31,10 @@ interface AuthPageSettingsProps {
   storeId?: string | null;
 }
 
+const defaultAuthPageValues: FormValues = {
+  loginImageUrl: '',
+};
+
 export function AuthPageSettings({ settingsData, isLoading, storeId }: AuthPageSettingsProps) {
   const { toast } = useToast();
   const firestore = useFirestore();
@@ -40,9 +44,7 @@ export function AuthPageSettings({ settingsData, isLoading, storeId }: AuthPageS
 
   const form = useForm<FormValues>({
     resolver: zodResolver(authPageSchema),
-    defaultValues: {
-      loginImageUrl: '',
-    }
+    defaultValues: defaultAuthPageValues
   });
 
   useEffect(() => {
@@ -68,6 +70,11 @@ export function AuthPageSettings({ settingsData, isLoading, storeId }: AuthPageS
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleReset = () => {
+    form.reset(defaultAuthPageValues);
+    toast({ title: 'Settings Reset', description: 'Authentication page settings have been reset to default. Click "Save Changes" to save.' });
   };
   
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -152,10 +159,13 @@ export function AuthPageSettings({ settingsData, isLoading, storeId }: AuthPageS
               )}
             />
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex flex-col sm:flex-row gap-4 justify-between">
             <Button type="submit" disabled={isSaving || isUploading}>
               {(isSaving || isUploading) && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
               Save Changes
+            </Button>
+            <Button type="button" variant="outline" onClick={handleReset} disabled={isSaving || isUploading}>
+              <RotateCcw className="mr-2 h-4 w-4" /> Reset to Default
             </Button>
           </CardFooter>
         </form>

@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
-import { Box, Check, AlertCircle, Loader2 } from 'lucide-react';
+import { Box, Check, AlertCircle, Loader2, RotateCcw } from 'lucide-react';
 import type { AppSettings } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
@@ -18,19 +18,25 @@ interface ProductCardSizeSettingsProps {
   storeId?: string | null;
 }
 
+const DEFAULT_CARD_HEIGHT = 380;
+
 export function ProductCardSizeSettings({ settingsData, isLoading, storeId }: ProductCardSizeSettingsProps) {
   const firestore = useFirestore();
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState<string>('');
   
-  const [cardHeight, setCardHeight] = useState(380);
+  const [cardHeight, setCardHeight] = useState(DEFAULT_CARD_HEIGHT);
 
   useEffect(() => {
     if (settingsData?.productCardHeight) {
       setCardHeight(settingsData.productCardHeight);
     }
   }, [settingsData]);
+
+  const handleReset = () => {
+    setCardHeight(DEFAULT_CARD_HEIGHT);
+  };
 
   // Reset status message after 4 seconds
   useEffect(() => {
@@ -177,29 +183,39 @@ export function ProductCardSizeSettings({ settingsData, isLoading, storeId }: Pr
           </div>
         )}
 
-        <Button 
-          onClick={handleSave} 
-          disabled={isSaving || isLoading}
-          className={cn(
-            "w-full transition-all",
-            saveStatus === 'success' && 'bg-green-600 hover:bg-green-700',
-            saveStatus === 'error' && 'bg-red-600 hover:bg-red-700'
-          )}
-        >
-          {isSaving ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Saving Card Size...
-            </>
-          ) : saveStatus === 'success' ? (
-            <>
-              <Check className="h-4 w-4 mr-2" />
-              Saved
-            </>
-          ) : (
-            'Save Card Size'
-          )}
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-4 pt-4">
+          <Button 
+            onClick={handleSave} 
+            disabled={isSaving || isLoading}
+            className={cn(
+              "flex-1 transition-all",
+              saveStatus === 'success' && 'bg-green-600 hover:bg-green-700',
+              saveStatus === 'error' && 'bg-red-600 hover:bg-red-700'
+            )}
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Saving Card Size...
+              </>
+            ) : saveStatus === 'success' ? (
+              <>
+                <Check className="h-4 w-4 mr-2" />
+                Saved
+              </>
+            ) : (
+              'Save Card Size'
+            )}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleReset}
+            disabled={isSaving || isLoading}
+          >
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Reset to Default
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

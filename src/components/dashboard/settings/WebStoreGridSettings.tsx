@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { LayoutGrid, Check, AlertCircle, Loader2 } from 'lucide-react';
+import { LayoutGrid, Check, AlertCircle, Loader2, RotateCcw } from 'lucide-react';
 import type { AppSettings } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
@@ -17,6 +17,14 @@ interface WebStoreGridSettingsProps {
   storeId?: string | null;
 }
 
+const DEFAULT_GRID_VALUES = {
+  storeGridColumnsDefault: 2 as const,
+  storeGridColumnsSm: 2 as const,
+  storeGridColumnsMd: 3 as const,
+  storeGridColumnsLg: 4 as const,
+  storeGridColumnsCustom: 5,
+};
+
 export function WebStoreGridSettings({ settingsData, isLoading, storeId }: WebStoreGridSettingsProps) {
   const firestore = useFirestore();
   const [isSaving, setIsSaving] = useState(false);
@@ -24,28 +32,28 @@ export function WebStoreGridSettings({ settingsData, isLoading, storeId }: WebSt
   const [errorMessage, setErrorMessage] = useState<string>('');
   
   const [defaultColumns, setDefaultColumns] = useState<2 | 3>(
-    settingsData?.storeGridColumnsDefault || 2
+    settingsData?.storeGridColumnsDefault || DEFAULT_GRID_VALUES.storeGridColumnsDefault
   );
   const [smColumns, setSmColumns] = useState<2 | 3>(
-    settingsData?.storeGridColumnsSm || 2
+    settingsData?.storeGridColumnsSm || DEFAULT_GRID_VALUES.storeGridColumnsSm
   );
   const [mdColumns, setMdColumns] = useState<2 | 3 | 4>(
-    settingsData?.storeGridColumnsMd || 3
+    settingsData?.storeGridColumnsMd || DEFAULT_GRID_VALUES.storeGridColumnsMd
   );
   const [lgColumns, setLgColumns] = useState<2 | 3 | 4 | 'custom'>(
-    settingsData?.storeGridColumnsLg || 4
+    settingsData?.storeGridColumnsLg || DEFAULT_GRID_VALUES.storeGridColumnsLg
   );
   const [customColumns, setCustomColumns] = useState(
-    settingsData?.storeGridColumnsCustom || 5
+    settingsData?.storeGridColumnsCustom || DEFAULT_GRID_VALUES.storeGridColumnsCustom
   );
 
   useEffect(() => {
     if (settingsData) {
-      setDefaultColumns(settingsData.storeGridColumnsDefault || 2);
-      setSmColumns(settingsData.storeGridColumnsSm || 2);
-      setMdColumns(settingsData.storeGridColumnsMd || 3);
-      setLgColumns(settingsData.storeGridColumnsLg || 4);
-      setCustomColumns(settingsData.storeGridColumnsCustom || 5);
+      setDefaultColumns(settingsData.storeGridColumnsDefault || DEFAULT_GRID_VALUES.storeGridColumnsDefault);
+      setSmColumns(settingsData.storeGridColumnsSm || DEFAULT_GRID_VALUES.storeGridColumnsSm);
+      setMdColumns(settingsData.storeGridColumnsMd || DEFAULT_GRID_VALUES.storeGridColumnsMd);
+      setLgColumns(settingsData.storeGridColumnsLg || DEFAULT_GRID_VALUES.storeGridColumnsLg);
+      setCustomColumns(settingsData.storeGridColumnsCustom || DEFAULT_GRID_VALUES.storeGridColumnsCustom);
     }
   }, [settingsData]);
 
@@ -56,6 +64,14 @@ export function WebStoreGridSettings({ settingsData, isLoading, storeId }: WebSt
       return () => clearTimeout(timer);
     }
   }, [saveStatus]);
+
+  const handleReset = () => {
+    setDefaultColumns(DEFAULT_GRID_VALUES.storeGridColumnsDefault);
+    setSmColumns(DEFAULT_GRID_VALUES.storeGridColumnsSm);
+    setMdColumns(DEFAULT_GRID_VALUES.storeGridColumnsMd);
+    setLgColumns(DEFAULT_GRID_VALUES.storeGridColumnsLg);
+    setCustomColumns(DEFAULT_GRID_VALUES.storeGridColumnsCustom);
+  };
 
   const handleSave = async () => {
     if (!firestore) {
@@ -317,29 +333,39 @@ export function WebStoreGridSettings({ settingsData, isLoading, storeId }: WebSt
           </div>
         )}
 
-        <Button 
-          onClick={handleSave} 
-          disabled={isSaving || isLoading}
-          className={cn(
-            "w-full transition-all",
-            saveStatus === 'success' && 'bg-green-600 hover:bg-green-700',
-            saveStatus === 'error' && 'bg-red-600 hover:bg-red-700'
-          )}
-        >
-          {isSaving ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Saving Grid Layout...
-            </>
-          ) : saveStatus === 'success' ? (
-            <>
-              <Check className="h-4 w-4 mr-2" />
-              Saved
-            </>
-          ) : (
-            'Save Grid Layout'
-          )}
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-4 pt-4">
+          <Button 
+            onClick={handleSave} 
+            disabled={isSaving || isLoading}
+            className={cn(
+              "flex-1 transition-all",
+              saveStatus === 'success' && 'bg-green-600 hover:bg-green-700',
+              saveStatus === 'error' && 'bg-red-600 hover:bg-red-700'
+            )}
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Saving Grid Layout...
+              </>
+            ) : saveStatus === 'success' ? (
+              <>
+                <Check className="h-4 w-4 mr-2" />
+                Saved
+              </>
+            ) : (
+              'Save Grid Layout'
+            )}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleReset}
+            disabled={isSaving || isLoading}
+          >
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Reset to Default
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
