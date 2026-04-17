@@ -261,7 +261,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
 
   if (isAuthLoading || isLoadingSettings || isProfileLoading) {
     return (
-      <div className="flex h-[60vh] items-center justify-center">
+      <div className="flex h items-center justify-center">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
       </div>
     );
@@ -270,7 +270,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
   if (step === 'success') {
     return (
       <div className="h-full flex flex-col items-center justify-center p-8 text-center space-y-8 animate-in zoom-in-95 duration-500 bg-white dark:bg-slate-900">
-        <div className="w-24 h-24 rounded-[3rem] bg-primary/10 flex items-center justify-center text-primary shadow-2xl">
+        <div className="w-24 h-24 rounded bg-primary/10 flex items-center justify-center text-primary ">
           <CheckCircle2 className="h-12 w-12" strokeWidth={3} />
         </div>
         <div className="space-y-2">
@@ -278,14 +278,14 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
           <p className="text-slate-500 font-medium">Your premium essentials are being prepared.</p>
         </div>
         {paymentMethod === 'Bank Transfer' && (
-            <Card className="w-full bg-slate-50 dark:bg-slate-800/50 border-none rounded-[2rem] p-6 shadow-inner">
+            <Card className="w-full bg-slate-50 dark:bg-slate-800/50 border-none rounded p-6 ">
                 <div className="space-y-4">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-primary">Verification Pending</p>
+                    <p className="text font-black uppercase tracking-widest text-primary">Verification Pending</p>
                     <p className="text-sm font-bold leading-relaxed">Please ensure you used reference <span className="text-primary font-black">{paymentReference}</span> in your transfer to expedite verification.</p>
                 </div>
             </Card>
         )}
-        <Button onClick={onClose} size="lg" className="w-full h-16 rounded-[1.5rem] font-black uppercase text-xs tracking-widest shadow-xl">Back to Store</Button>
+        <Button onClick={onClose} size="lg" className="w-full h-16 rounded font-black uppercase text-xs tracking-widest ">Back to Store</Button>
       </div>
     );
   }
@@ -294,9 +294,9 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
     <div className="flex flex-col h-full bg-background-light dark:bg-black animate-in slide-in-from-right-4 fade-in duration-500">
         <header className="sticky top-0 z-50 flex flex-col bg-background-light/80 dark:bg-black/80 backdrop-blur-md px-4 py-6 justify-between border-b border-slate-200 dark:border-slate-800">
             <div className="flex items-center justify-between px-6 py-6">
-                <button onClick={step === 'details' ? onClose : () => setStep('details')} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-800 active:scale-90 transition-transform"><ArrowLeft className="h-6 w-6" /></button>
+                <button onClick={step === 'details' ? onClose : () => setStep('details')} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white dark:bg-slate-800  border border-slate-100 dark:border-slate-800 active:scale-90 transition-transform"><ArrowLeft className="h-6 w-6" /></button>
                 <h1 className="text-xl font-black tracking-tighter uppercase">Checkout</h1>
-                <Badge variant="secondary" className="font-black h-8 px-4 rounded-full shadow-sm">{cartCount} items</Badge>
+                <Badge variant="secondary" className="font-black h-8 px-4 rounded-full ">{cartCount} items</Badge>
             </div>
         </header>
 
@@ -307,14 +307,14 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                     <div className="animate-in fade-in slide-in-from-top-2 duration-500">
                         <button 
                             onClick={() => setIsSummaryExpanded(!isSummaryExpanded)}
-                            className="w-full flex items-center justify-between p-5 bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm"
+                            className="w-full flex items-center justify-between p-5 bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-800 "
                         >
                             <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 rounded-2xl bg-primary/5 flex items-center justify-center text-primary">
                                     <ShoppingBag className="h-5 w-5" />
                                 </div>
                                 <div className="text-left">
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Review Summary</p>
+                                    <p className="text font-black uppercase tracking-widest text-slate-400">Review Summary</p>
                                     <p className="text-lg font-black tracking-tighter">{formatCurrency(total, currencySymbol)}</p>
                                 </div>
                             </div>
@@ -322,11 +322,11 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                         </button>
                         
                         {isSummaryExpanded && (
-                            <div className="mt-2 p-6 bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-xl space-y-4 animate-in zoom-in-95 duration-300">
+                            <div className="mt-2 p-6 bg-white dark:bg-slate-800 rounded border border-slate-100 dark:border-slate-800  space-y-4 animate-in zoom-in-95 duration-300">
                                 <div className="space-y-3">
                                     {cartItems.map(item => (
                                         <div key={item.id} className="flex justify-between items-center text-sm">
-                                            <span className="text-slate-500 font-medium truncate pr-4">{item.name} <span className="text-[10px] font-black text-primary/60 ml-1">x{item.quantity}</span></span>
+                                            <span className="text-slate-500 font-medium truncate pr-4">{item.name} <span className="text font-black text-primary/60 ml-1">x{item.quantity}</span></span>
                                             <span className="font-bold shrink-0">{formatCurrency(item.salePrice * item.quantity, currencySymbol)}</span>
                                         </div>
                                     ))}
@@ -363,33 +363,33 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                         </div>
                         <div className="space-y-6">
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-primary ml-1">Full Identity</Label>
+                                <Label className="text font-black uppercase tracking-widest text-primary ml-1">Full Identity</Label>
                                 <div className="relative">
                                     <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                                    <Input name="name" value={formData.name} onChange={handleInputChange} placeholder="Recipient Name" className="h-14 pl-12 rounded-2xl border-none shadow-xl font-bold bg-white dark:bg-slate-800 focus-visible:ring-primary/20" />
+                                    <Input name="name" value={formData.name} onChange={handleInputChange} placeholder="Recipient Name" className="h-14 pl-12 rounded-2xl border-none  font-bold bg-white dark:bg-slate-800 focus-visible:ring-primary/20" />
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 gap-6">
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-primary ml-1">Communication</Label>
+                                    <Label className="text font-black uppercase tracking-widest text-primary ml-1">Communication</Label>
                                     <div className="relative">
                                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                                        <Input name="email" value={formData.email} onChange={handleInputChange} type="email" placeholder="email@example.com" className="h-14 pl-12 rounded-2xl border-none shadow-xl font-bold bg-white dark:bg-slate-800 focus-visible:ring-primary/20" />
+                                        <Input name="email" value={formData.email} onChange={handleInputChange} type="email" placeholder="email@example.com" className="h-14 pl-12 rounded-2xl border-none  font-bold bg-white dark:bg-slate-800 focus-visible:ring-primary/20" />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-primary ml-1">Phone Protocol</Label>
+                                    <Label className="text font-black uppercase tracking-widest text-primary ml-1">Phone Protocol</Label>
                                     <div className="relative">
                                         <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                                        <Input name="phone" value={formData.phone} onChange={handleInputChange} type="tel" placeholder="+1..." className="h-14 pl-12 rounded-2xl border-none shadow-xl font-bold bg-white dark:bg-slate-800 focus-visible:ring-primary/20" />
+                                        <Input name="phone" value={formData.phone} onChange={handleInputChange} type="tel" placeholder="+1..." className="h-14 pl-12 rounded-2xl border-none  font-bold bg-white dark:bg-slate-800 focus-visible:ring-primary/20" />
                                     </div>
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-primary ml-1">Fulfillment Address</Label>
+                                <Label className="text font-black uppercase tracking-widest text-primary ml-1">Fulfillment Address</Label>
                                 <div className="relative">
                                     <MapPin className="absolute left-4 top-4 h-5 w-5 text-slate-400" />
-                                    <Textarea name="address" value={formData.address} onChange={handleInputChange} placeholder="Full street address, city and postal code..." className="min-h-[120px] pl-12 pt-4 rounded-[2rem] border-none shadow-xl font-bold bg-white dark:bg-slate-800 resize-none focus-visible:ring-primary/20" />
+                                    <Textarea name="address" value={formData.address} onChange={handleInputChange} placeholder="Full street address, city and postal code..." className="min-h pl-12 pt-4 rounded border-none  font-bold bg-white dark:bg-slate-800 resize-none focus-visible:ring-primary/20" />
                                 </div>
                             </div>
                         </div>
@@ -409,7 +409,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                     {availablePaymentMethods.map((method) => (
                                         <div key={method.id} className="relative">
                                             <RadioGroupItem value={method.name} id={method.id} className="peer sr-only" />
-                                            <Label htmlFor={method.id} className="flex items-center gap-4 p-6 bg-white dark:bg-slate-800 rounded-[2rem] border-2 border-transparent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 shadow-lg cursor-pointer transition-all active:scale-[0.98]">
+                                            <Label htmlFor={method.id} className="flex items-center gap-4 p-6 bg-white dark:bg-slate-800 rounded border-2 border-transparent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5  cursor-pointer transition-all active:scale">
                                                 <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                                                     {method.name.toLowerCase().includes('transfer') ? <Landmark className="h-7 w-7" /> : 
                                                      method.name.toLowerCase().includes('card') ? <CreditCard className="h-7 w-7" /> :
@@ -418,7 +418,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                                 </div>
                                                 <div className="flex-1">
                                                     <p className="font-black text-sm uppercase tracking-widest">{method.name}</p>
-                                                    <p className="text-[10px] font-bold text-slate-400 uppercase mt-0.5">
+                                                    <p className="text font-bold text-slate-400 uppercase mt-0.5">
                                                         {method.name === 'Bank Transfer' ? 'Direct manual verification' : 
                                                          method.name.toLowerCase().includes('delivery') ? 'Pay upon receipt' : 'Secure payment method'}
                                                     </p>
@@ -432,14 +432,14 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                 {paymentMethod === 'Bank Transfer' && (
                                     <div className="space-y-8 animate-in zoom-in-95 duration-500">
                                         <div className="space-y-4">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-primary ml-1">Authorized Receiving Banks</Label>
+                                            <Label className="text font-black uppercase tracking-widest text-primary ml-1">Authorized Receiving Banks</Label>
                                             <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 -mx-2 px-2">
                                                 {bankAccounts.map(acc => (
                                                     <button 
                                                         key={acc.id}
                                                         onClick={() => setSelectedBankId(acc.id)}
                                                         className={cn(
-                                                            "shrink-0 w-44 p-5 rounded-[2rem] border-2 transition-all text-left space-y-4 shadow-xl",
+                                                            "shrink-0 w-44 p-5 rounded border-2 transition-all text-left space-y-4 ",
                                                             selectedBankId === acc.id 
                                                                 ? "bg-slate-900 text-white border-primary ring-4 ring-primary/10" 
                                                                 : "bg-white dark:bg-slate-800 border-transparent text-slate-900 dark:text-white"
@@ -454,7 +454,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                                         </div>
                                                         <div className="min-w-0">
                                                             <p className="text-xs font-black truncate">{acc.bankName}</p>
-                                                            <p className={cn("text-[9px] font-bold uppercase tracking-widest truncate mt-1", selectedBankId === acc.id ? "text-primary" : "text-slate-400")}>{acc.accountName}</p>
+                                                            <p className={cn("text font-bold uppercase tracking-widest truncate mt-1", selectedBankId === acc.id ? "text-primary" : "text-slate-400")}>{acc.accountName}</p>
                                                         </div>
                                                     </button>
                                                 ))}
@@ -462,29 +462,29 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                         </div>
 
                                         {selectedBankAccount && (
-                                            <div className="p-8 bg-slate-900 text-white rounded-[2.5rem] shadow-2xl space-y-8 relative overflow-hidden">
+                                            <div className="p-8 bg-slate-900 text-white rounded  space-y-8 relative overflow-hidden">
                                                 <div className="absolute top-0 right-0 p-8 opacity-5">
                                                     <Landmark className="h-48 w-48 -mr-16 -mt-16" />
                                                 </div>
                                                 <div className="grid grid-cols-1 gap-8 relative z-10">
                                                     <div className="space-y-2">
-                                                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Transfer Destination</p>
+                                                        <p className="text font-black uppercase tracking text-primary">Transfer Destination</p>
                                                         <div className="flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5">
                                                             <p className="text-2xl font-black tracking-tighter">{selectedBankAccount.accountNumber}</p>
                                                             <Button variant="ghost" size="icon" className="h-10 w-10 text-white/40 hover:text-white bg-white/5" onClick={() => copyToClipboard(selectedBankAccount.accountNumber)}><Copy className="h-4 w-4"/></Button>
                                                         </div>
                                                     </div>
                                                     <div className="space-y-2">
-                                                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Narration Reference</p>
+                                                        <p className="text font-black uppercase tracking text-primary">Narration Reference</p>
                                                         <div className="flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5">
                                                             <p className="text-3xl font-black tracking-widest text-white">{paymentReference}</p>
                                                             <Button variant="ghost" size="icon" className="h-10 w-10 text-white/40 hover:text-white bg-white/5" onClick={() => copyToClipboard(paymentReference)}><Copy className="h-4 w-4"/></Button>
                                                         </div>
                                                         <div className="mt-3 space-y-2">
-                                                            <p className="text-[10px] font-black text-rose-400 uppercase tracking-widest flex items-center gap-2">
+                                                            <p className="text font-black text-rose-400 uppercase tracking-widest flex items-center gap-2">
                                                                 <AlertTriangle className="h-3.5 w-3.5" /> CRITICAL PROTOCOL
                                                             </p>
-                                                            <p className="text-[11px] text-white/70 leading-relaxed font-medium">
+                                                            <p className="text text-white/70 leading-relaxed font-medium">
                                                                 You <span className="text-white font-bold underline">MUST</span> enter this code in your bank app&apos;s <strong>Remark</strong> or <strong>Narration</strong> field. This unique digital signature allows our automated verification engine to instantly clear your payment and initiate fulfillment.
                                                             </p>
                                                         </div>
@@ -495,7 +495,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                                         onClick={() => setHasConfirmedTransfer(!hasConfirmedTransfer)}
                                                         className={cn(
                                                             "h-14 w-14 rounded-2xl flex items-center justify-center transition-all flex-shrink-0 group relative overflow-hidden",
-                                                            hasConfirmedTransfer ? "bg-primary text-white shadow-2xl shadow-primary/40 border-primary" : "bg-white/5 border-2 border-white/20 text-white/40 hover:border-white/40 hover:bg-white/10"
+                                                            hasConfirmedTransfer ? "bg-primary text-white   border-primary" : "bg-white/5 border-2 border-white/20 text-white/40 hover:border-white/40 hover:bg-white/10"
                                                         )}
                                                     >
                                                         {hasConfirmedTransfer ? (
@@ -503,13 +503,13 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                                         ) : (
                                                             <div className="flex flex-col items-center">
                                                                 <div className="w-1.5 h-1.5 bg-white/20 rounded-full animate-ping" />
-                                                                <span className="text-[8px] font-black mt-1">TAP</span>
+                                                                <span className="text font-black mt-1">TAP</span>
                                                             </div>
                                                         )}
                                                     </button>
                                                     <div className="space-y-1">
-                                                        <p className="text-[10px] font-black uppercase tracking-widest text-white/90 leading-relaxed">Payment Confirmation Protocol</p>
-                                                        <p className="text-[9px] font-bold text-white/40 uppercase">I have successfully finalized the transfer of {formatCurrency(total, currencySymbol)}</p>
+                                                        <p className="text font-black uppercase tracking-widest text-white/90 leading-relaxed">Payment Confirmation Protocol</p>
+                                                        <p className="text font-bold text-white/40 uppercase">I have successfully finalized the transfer of {formatCurrency(total, currencySymbol)}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -518,9 +518,9 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                 )}
                             </div>
                         ) : (
-                            <div className="py-24 text-center space-y-6 opacity-40 bg-muted/20 rounded-[3rem] border-2 border-dashed">
+                            <div className="py-24 text-center space-y-6 opacity-40 bg-muted/20 rounded border-2 border-dashed">
                                 <AlertTriangle className="h-16 w-16 mx-auto" strokeWidth={1} />
-                                <p className="text-[10px] font-black uppercase tracking-[0.3em]">Channel Maintenance active</p>
+                                <p className="text font-black uppercase tracking">Channel Maintenance active</p>
                             </div>
                         )}
                     </div>
@@ -529,14 +529,14 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                 {step === 'processing' && (
                     <div className="h-full flex flex-col items-center justify-center py-32 space-y-10 animate-in fade-in duration-500">
                         <div className="relative">
-                            <div className="h-32 w-32 rounded-[3.5rem] border-4 border-primary/10 border-t-primary animate-spin" />
+                            <div className="h-32 w-32 rounded border-4 border-primary/10 border-t-primary animate-spin" />
                             <div className="absolute inset-0 flex items-center justify-center">
                                 <ShieldCheck className="h-10 w-10 text-primary" strokeWidth={3} />
                             </div>
                         </div>
                         <div className="text-center space-y-3">
                             <h3 className="text-3xl font-black tracking-tighter uppercase leading-none">Security Check</h3>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] animate-pulse">Syncing Distributed Registry...</p>
+                            <p className="text font-black text-slate-400 uppercase tracking animate-pulse">Syncing Distributed Registry...</p>
                         </div>
                     </div>
                 )}
@@ -544,11 +544,11 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
         </ScrollArea>
 
         {step !== 'processing' && (
-            <footer className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border-t border-slate-100 dark:border-slate-800 p-8 rounded-t-[3rem] shadow-[0_-20px_50px_rgba(0,0,0,0.1)] z-50 pb-10">
+            <footer className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border-t border-slate-100 dark:border-slate-800 p-8 rounded-t z-50 pb-10">
                 {step === 'details' ? (
                     <Button 
                         onClick={() => setStep('payment')}
-                        className="w-full h-16 rounded-[1.5rem] bg-primary text-white font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-primary/30 group transition-all active:scale-[0.98]"
+                        className="w-full h-16 rounded bg-primary text-white font-black uppercase text-xs tracking   group transition-all active:scale"
                     >
                         Proceed to Payment
                         <ChevronRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={3} />
@@ -559,7 +559,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                         isLoading={step === 'processing'}
                         disabled={paymentMethod === 'Bank Transfer' && !hasConfirmedTransfer}
                         loadingText="Processing..."
-                        className="w-full h-16 rounded-[1.5rem] bg-primary text-white font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-primary/30 group transition-all active:scale-[0.98]"
+                        className="w-full h-16 rounded bg-primary text-white font-black uppercase text-xs tracking   group transition-all active:scale"
                     >
                         Complete Purchase
                         <ChevronRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={3} />

@@ -27,7 +27,7 @@ export function AdProvider({ children }: { children: React.ReactNode }) {
 
   const storeId = useMemo(() => {
       const parts = pathname.split('/');
-      // Check if we are in /store/[storeId] or /store-app/[storeId]
+      // Check if we are in /store/[storeId] or /store
       if ((parts[1] === 'store' || parts[1] === 'store-app') && parts[2]) {
           return parts[2];
       }

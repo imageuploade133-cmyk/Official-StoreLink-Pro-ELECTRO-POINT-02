@@ -77,7 +77,7 @@ export function HeroCarouselSettings({ settingsData, isLoading, storeId }: HeroC
   }
 
   return (
-    <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+    <Card className=" border-none ring-1 ring-border overflow-hidden">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader className="bg-muted/30 border-b">
@@ -111,18 +111,18 @@ export function HeroCarouselSettings({ settingsData, isLoading, storeId }: HeroC
                                 className="py-4"
                             />
                         </FormControl>
-                        <FormDescription className="text-[10px]">Adjust how long each slide stays on screen before transitioning.</FormDescription>
+                        <FormDescription className="text">Adjust how long each slide stays on screen before transitioning.</FormDescription>
                         <FormMessage />
                     </FormItem>
                 )}
             />
           </CardContent>
           <CardFooter className="bg-muted/30 border-t p-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
-            <Button type="submit" disabled={isSaving} className="font-black uppercase tracking-widest text-xs h-12 px-8 shadow-xl shadow-primary/20">
+            <Button type="submit" disabled={isSaving} className="font-black uppercase tracking-widest text-xs h-12 px-8  ">
               {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Save className="mr-2 h-4 w-4" />}
               Save Carousel Timing
             </Button>
-            <Button type="button" variant="outline" onClick={handleReset} disabled={isSaving} className="font-bold uppercase tracking-widest text-[10px]">
+            <Button type="button" variant="outline" onClick={handleReset} disabled={isSaving} className="font-bold uppercase tracking-widest text">
               <RotateCcw className="mr-2 h-4 w-4" /> Reset to Default
             </Button>
           </CardFooter>

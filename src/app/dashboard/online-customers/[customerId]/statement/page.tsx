@@ -360,7 +360,7 @@ export default function OnlineCustomerStatementPage() {
 
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-8 border-b-2 border-primary/10">
         <div className="flex items-center gap-4">
-          <div className="bg-primary p-3 rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center overflow-hidden w-16 h-16">
+          <div className="bg-primary p-3 rounded-xl   flex items-center justify-center overflow-hidden w-16 h-16">
             {settings?.invoiceLogoUrl ? (
               <div className="relative w-full h-full">
                 <Image 
@@ -388,7 +388,7 @@ export default function OnlineCustomerStatementPage() {
         </div>
       </header>
 
-      <div className="flex flex-wrap items-center justify-between gap-4 no-print bg-white dark:bg-slate-800 p-4 rounded-xl border shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-4 no-print bg-white dark:bg-slate-800 p-4 rounded-xl border ">
         <div className="flex items-center gap-4 flex-grow">
             <div className="relative flex-grow max-w-xs">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -413,56 +413,56 @@ export default function OnlineCustomerStatementPage() {
           <Button variant="outline" onClick={handlePrint} className="gap-2 font-bold h-11">
             <Printer className="h-4 w-4" /> Print
           </Button>
-          <Button onClick={handlePrint} className="bg-primary hover:bg-primary/90 gap-2 font-bold shadow-lg shadow-primary/20 h-11">
+          <Button onClick={handlePrint} className="bg-primary hover:bg-primary/90 gap-2 font-bold   h-11">
             <Download className="h-4 w-4" /> Export PDF
           </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-white dark:bg-slate-800 border-l-4 border-slate-400 shadow-lg ring-1 ring-black/5">
+        <Card className="bg-white dark:bg-slate-800 border-l-4 border-slate-400  ring-1 ring-black/5">
           <CardContent className="p-6">
             <div className="flex justify-between items-start mb-4">
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">Gross Volume</p>
+              <p className="text font-black text-slate-500 uppercase tracking-widest leading-none">Gross Volume</p>
               <Receipt className="h-5 w-5 text-slate-400" />
             </div>
             <p className="text-2xl font-black tracking-tighter">{formatCurrency(customer?.totalSpent || 0, currencySymbol)}</p>
-            <p className="text-[9px] text-slate-400 font-medium mt-2 uppercase">Lifetime Activity</p>
+            <p className="text text-slate-400 font-medium mt-2 uppercase">Lifetime Activity</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-slate-800 border-l-4 border-emerald-500 shadow-lg ring-1 ring-black/5">
+        <Card className="bg-white dark:bg-slate-800 border-l-4 border-emerald-500  ring-1 ring-black/5">
           <CardContent className="p-6">
             <div className="flex justify-between items-start mb-4">
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">Settlements</p>
+              <p className="text font-black text-slate-500 uppercase tracking-widest leading-none">Settlements</p>
               <Wallet className="h-5 w-5 text-emerald-500/40" />
             </div>
             <p className="text-2xl font-black tracking-tighter text-emerald-600">{formatCurrency((customer?.totalSpent || 0) - (customer?.outstandingCredit || 0), currencySymbol)}</p>
-            <p className="text-[9px] text-slate-400 font-medium mt-2 uppercase">Verified Payments</p>
+            <p className="text text-slate-400 font-medium mt-2 uppercase">Verified Payments</p>
           </CardContent>
         </Card>
 
-        <Card className={cn("border-l-4 shadow-lg ring-1 ring-black/5", (customer?.outstandingCredit || 0) > 0.01 ? "bg-red-50 dark:bg-red-950/20 border-red-500" : "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-500")}>
+        <Card className={cn("border-l-4  ring-1 ring-black/5", (customer?.outstandingCredit || 0) > 0.01 ? "bg-red-50 dark:bg-red-950/20 border-red-500" : "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-500")}>
           <CardContent className="p-6">
             <div className="flex justify-between items-start mb-4">
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">Pending Debt</p>
+              <p className="text font-black text-slate-500 uppercase tracking-widest leading-none">Pending Debt</p>
               <AlertTriangle className="h-5 w-5 text-red-500/40" />
             </div>
             <p className={cn("text-2xl font-black tracking-tighter", (customer?.outstandingCredit || 0) > 0.01 ? "text-red-600" : "text-emerald-600")}>
               {(customer?.outstandingCredit || 0) <= 0.01 ? "SETTLED" : formatCurrency(customer?.outstandingCredit || 0, currencySymbol)}
             </p>
-            <p className="text-[9px] font-bold mt-2 uppercase">Active Credit Liability</p>
+            <p className="text font-bold mt-2 uppercase">Active Credit Liability</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-slate-800 border-l-4 border-primary shadow-lg ring-1 ring-black/5">
+        <Card className="bg-white dark:bg-slate-800 border-l-4 border-primary  ring-1 ring-black/5">
           <CardContent className="p-6">
             <div className="flex justify-between items-start mb-4">
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">Account Credit</p>
+              <p className="text font-black text-slate-500 uppercase tracking-widest leading-none">Account Credit</p>
               <PiggyBank className="h-5 w-5 text-primary/40" />
             </div>
             <p className="text-2xl font-black tracking-tighter text-primary">{formatCurrency(customer?.creditBalance || 0, currencySymbol)}</p>
-            <p className="text-[9px] text-slate-400 font-medium mt-2 uppercase">Unallocated Deposits</p>
+            <p className="text text-slate-400 font-medium mt-2 uppercase">Unallocated Deposits</p>
           </CardContent>
         </Card>
       </div>
@@ -472,17 +472,17 @@ export default function OnlineCustomerStatementPage() {
             <History className="h-5 w-5 text-primary" />
             Account Activity Ledger
         </h3>
-        <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xl bg-white dark:bg-slate-800">
+        <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700  bg-white dark:bg-slate-800">
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50 dark:bg-slate-900/50 hover:bg-transparent">
-                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Date</TableHead>
-                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Ref ID</TableHead>
-                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Detail</TableHead>
-                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest text-center">Source</TableHead>
-                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest text-right">Debit (+)</TableHead>
-                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest text-right">Credit (-)</TableHead>
-                <TableHead className="no-print text-center w-[100px] text-[10px] font-black uppercase text-slate-500 tracking-widest">Actions</TableHead>
+                <TableHead className="text font-black uppercase text-slate-500 tracking-widest">Date</TableHead>
+                <TableHead className="text font-black uppercase text-slate-500 tracking-widest">Ref ID</TableHead>
+                <TableHead className="text font-black uppercase text-slate-500 tracking-widest">Detail</TableHead>
+                <TableHead className="text font-black uppercase text-slate-500 tracking-widest text-center">Source</TableHead>
+                <TableHead className="text font-black uppercase text-slate-500 tracking-widest text-right">Debit (+)</TableHead>
+                <TableHead className="text font-black uppercase text-slate-500 tracking-widest text-right">Credit (-)</TableHead>
+                <TableHead className="no-print text-center w text font-black uppercase text-slate-500 tracking-widest">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -506,11 +506,11 @@ export default function OnlineCustomerStatementPage() {
                       <TableCell className="text-xs font-bold whitespace-nowrap py-4">
                         {format(entry.date, 'EEEE - MMM- dd- yyyy')}
                       </TableCell>
-                      <TableCell className="font-mono text-[10px] font-bold text-primary">{entry.reference}</TableCell>
+                      <TableCell className="font-mono text font-bold text-primary">{entry.reference}</TableCell>
                       <TableCell className="text-sm font-medium max-w-xs truncate" title={entry.description}>{entry.description}</TableCell>
                       <TableCell className="text-center">
                         <Badge variant="outline" className={cn(
-                            "text-[9px] font-black uppercase tracking-tighter px-2", 
+                            "text font-black uppercase tracking-tighter px-2", 
                             entry.type === 'order' ? "bg-blue-50 text-blue-700 border-blue-200" :
                             entry.type === 'sale' ? (entry.isCreditSale ? "bg-orange-50 text-orange-600 border-orange-200" : "bg-slate-100 text-slate-600") : 
                             "bg-emerald-50 text-emerald-600 border-emerald-200"
@@ -529,7 +529,7 @@ export default function OnlineCustomerStatementPage() {
                           <Button 
                             variant="ghost" 
                             size="sm" 
-                            className="h-7 px-2 text-[10px] font-black uppercase bg-primary/10 text-primary hover:bg-primary hover:text-white"
+                            className="h-7 px-2 text font-black uppercase bg-primary/10 text-primary hover:bg-primary hover:text-white"
                             onClick={() => entry.originalSale && handleRecordPayment(entry.originalSale)}
                           >
                             <DollarSign className="h-3 w-3 mr-1" /> Settle
@@ -573,8 +573,8 @@ export default function OnlineCustomerStatementPage() {
       </div>
 
       <footer className="mt-16 pt-12 border-t text-center space-y-6">
-        <p className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">End of Official Audit Report</p>
-        <div className="flex justify-center items-center gap-8 text-[10px] font-bold text-slate-500 uppercase">
+        <p className="text-xs font-black text-slate-400 uppercase tracking">End of Official Audit Report</p>
+        <div className="flex justify-center items-center gap-8 text font-bold text-slate-500 uppercase">
           <span className="flex items-center gap-1.5"><History className="h-3 w-3 text-primary" /> Generated: {format(new Date(), 'PP p')}</span>
           <span className="flex items-center gap-1.5"><FileText className="h-3 w-3 text-primary" /> Audit ID: WEB-{customer?.name.substring(0, 3).toUpperCase() || 'GST'}-{format(new Date(), 'yyyyMMdd')}</span>
         </div>
@@ -605,7 +605,7 @@ export default function OnlineCustomerStatementPage() {
         @media print {
           body { background: white !important; }
           .no-print { display: none !important; }
-          main, div { padding: 0 !important; margin: 0 !important; max-width: 100% !important; box-shadow: none !important; border: none !important; }
+          main, div { padding: 0 !important; margin: 0 !important; max-width: 100% !important; box-: none !important; border: none !important; }
           @page { size: A4; margin: 15mm; }
         }
       `}</style>

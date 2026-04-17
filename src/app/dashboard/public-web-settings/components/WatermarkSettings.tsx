@@ -136,7 +136,7 @@ export function WatermarkSettings({ settingsData, isLoading, storeId }: Watermar
   }
 
   return (
-    <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+    <Card className=" border-none ring-1 ring-border overflow-hidden">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader className="bg-muted/30 border-b">
@@ -152,10 +152,10 @@ export function WatermarkSettings({ settingsData, isLoading, storeId }: Watermar
                     control={form.control}
                     name="webWatermarkEnabled"
                     render={({ field }) => (
-                    <FormItem className="flex flex-row items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background shadow-lg">
+                    <FormItem className="flex flex-row items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background ">
                         <div className="flex items-center gap-2">
                             {field.value ? <Eye className="h-4 w-4 text-green-600" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
-                            <FormLabel className="text-[10px] font-black uppercase tracking-widest dark:text-black">{field.value ? 'Watermark ON' : 'Watermark OFF'}</FormLabel>
+                            <FormLabel className="text font-black uppercase tracking-widest dark:text-black">{field.value ? 'Watermark ON' : 'Watermark OFF'}</FormLabel>
                         </div>
                         <FormControl>
                         <Switch
@@ -168,13 +168,13 @@ export function WatermarkSettings({ settingsData, isLoading, storeId }: Watermar
                 />
             </div>
           </CardHeader>
-          <CardContent className={cn("space-y-10 pt-8 transition-opacity duration-500", !isEnabled && "opacity-40 grayscale-[0.5] pointer-events-none")}>
+          <CardContent className={cn("space-y-10 pt-8 transition-opacity duration-500", !isEnabled && "opacity-40 grayscale pointer-events-none")}>
             <FormField
               control={form.control}
               name="webWatermarkType"
               render={({ field }) => (
                 <FormItem className="space-y-4">
-                  <FormLabel className="text-xs font-black uppercase tracking-[0.2em] text-primary">Watermark Media Type</FormLabel>
+                  <FormLabel className="text-xs font-black uppercase tracking text-primary">Watermark Media Type</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
@@ -245,7 +245,7 @@ export function WatermarkSettings({ settingsData, isLoading, storeId }: Watermar
                             render={({ field }) => (
                                 <FormItem className="space-y-4">
                                     <div className="flex justify-between items-center">
-                                        <FormLabel className="text-[10px] font-black uppercase tracking-widest">Opacity ({Math.round(field.value * 100)}%)</FormLabel>
+                                        <FormLabel className="text font-black uppercase tracking-widest">Opacity ({Math.round(field.value * 100)}%)</FormLabel>
                                     </div>
                                     <FormControl>
                                         <Slider
@@ -265,7 +265,7 @@ export function WatermarkSettings({ settingsData, isLoading, storeId }: Watermar
                             render={({ field }) => (
                                 <FormItem className="space-y-4">
                                     <div className="flex justify-between items-center">
-                                        <FormLabel className="text-[10px] font-black uppercase tracking-widest">Rotation ({field.value}°)</FormLabel>
+                                        <FormLabel className="text font-black uppercase tracking-widest">Rotation ({field.value}°)</FormLabel>
                                     </div>
                                     <FormControl>
                                         <Slider
@@ -287,7 +287,7 @@ export function WatermarkSettings({ settingsData, isLoading, storeId }: Watermar
                         render={({ field }) => (
                             <FormItem className="space-y-4">
                                 <div className="flex justify-between items-center">
-                                    <FormLabel className="text-[10px] font-black uppercase tracking-widest">
+                                    <FormLabel className="text font-black uppercase tracking-widest">
                                         {type === 'text' ? `Font Size (${field.value}px)` : `Logo Width (${field.value}px)`}
                                     </FormLabel>
                                 </div>
@@ -306,8 +306,8 @@ export function WatermarkSettings({ settingsData, isLoading, storeId }: Watermar
                 </div>
 
                 <div className="space-y-4">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Internal Simulation</h4>
-                    <div className="p-8 rounded-[2.5rem] border-2 border-dashed bg-muted/5 flex flex-col items-center justify-center text-center relative overflow-hidden aspect-video">
+                    <h4 className="text font-black uppercase tracking-widest text-muted-foreground">Internal Simulation</h4>
+                    <div className="p-8 rounded border-2 border-dashed bg-muted/5 flex flex-col items-center justify-center text-center relative overflow-hidden aspect-video">
                         <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none opacity-50">
                             <div 
                                 style={{ 
@@ -327,17 +327,17 @@ export function WatermarkSettings({ settingsData, isLoading, storeId }: Watermar
                                 )}
                             </div>
                         </div>
-                        <p className="text-[10px] text-muted-foreground font-black uppercase relative z-10 bg-background/80 backdrop-blur-sm px-4 py-2 rounded-full border">Watermark Preview Area</p>
+                        <p className="text text-muted-foreground font-black uppercase relative z-10 bg-background/80 backdrop-blur-sm px-4 py-2 rounded-full border">Watermark Preview Area</p>
                     </div>
                 </div>
             </div>
           </CardContent>
           <CardFooter className="bg-muted/30 border-t p-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
-            <Button type="submit" disabled={isSaving || isUploading} size="lg" className="px-10 h-12 font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20 transition-all active:scale-95">
+            <Button type="submit" disabled={isSaving || isUploading} size="lg" className="px-10 h-12 font-black uppercase text-xs tracking-widest   transition-all active:scale-95">
               {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Save className="mr-2 h-4 w-4" />}
               Synchronize Watermark
             </Button>
-            <Button type="button" variant="outline" onClick={handleReset} disabled={isSaving || isUploading} className="font-bold uppercase tracking-widest text-[10px]">
+            <Button type="button" variant="outline" onClick={handleReset} disabled={isSaving || isUploading} className="font-bold uppercase tracking-widest text">
               <RotateCcw className="mr-2 h-4 w-4" /> Reset to Default
             </Button>
           </CardFooter>

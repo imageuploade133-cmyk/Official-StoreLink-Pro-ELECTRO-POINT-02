@@ -325,7 +325,7 @@ export default function BulkWhatsAppPage() {
           <MessageSquare className="mr-3 h-8 w-8 text-green-600" /> WhatsApp Marketing
         </h1>
         <WhatsappDashboard />
-        <Card className="shadow-lg">
+        <Card className="">
           <CardHeader>
             <Skeleton className="h-7 w-2/5" />
             <Skeleton className="h-4 w-4/5 mt-1" />
@@ -364,7 +364,7 @@ export default function BulkWhatsAppPage() {
 
       <WhatsappDashboard />
 
-      <Card className="shadow-lg">
+      <Card className="">
         <CardHeader>
           <CardTitle className="font-headline text-xl">Send WhatsApp Messages</CardTitle>
           <CardDescription>
@@ -404,11 +404,11 @@ export default function BulkWhatsAppPage() {
               </div>
               {filteredCustomers.length > 0 ? (
                 <>
-                  <ScrollArea className="h-[300px] border rounded-md">
+                  <ScrollArea className="h border rounded-md">
                     <Table>
                       <TableHeader className="sticky top-0 bg-card">
                         <TableRow>
-                          <TableHead className="w-[50px]">
+                          <TableHead className="w">
                             <Checkbox
                               checked={isAllCustomersSelected}
                               onCheckedChange={(checked) => handleSelectAllCustomers(checked as boolean)}
@@ -469,11 +469,11 @@ export default function BulkWhatsAppPage() {
               </div>
               {filteredStaff.length > 0 ? (
                 <>
-                  <ScrollArea className="h-[300px] border rounded-md">
+                  <ScrollArea className="h border rounded-md">
                     <Table>
                       <TableHeader className="sticky top-0 bg-card">
                         <TableRow>
-                          <TableHead className="w-[50px]">
+                          <TableHead className="w">
                             <Checkbox
                               checked={isAllStaffSelected}
                               onCheckedChange={(checked) => handleSelectAllStaff(checked as boolean)}
@@ -584,7 +584,7 @@ export default function BulkWhatsAppPage() {
             onClick={handleSendMessage} 
             disabled={isSending || selectedRecipientCount === 0 || !message.trim() || isMessageTooLong}
             size="lg"
-            className="bg-green-600 hover:bg-green-700 text-white min-w-[280px]"
+            className="bg-green-600 hover:bg-green-700 text-white min-w"
           >
             {isSending ? (
               <Loader2 className="mr-2 h-5 w-5 animate-spin" />

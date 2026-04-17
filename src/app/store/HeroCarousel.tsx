@@ -160,7 +160,7 @@ export function HeroCarousel() {
     const size = useIndividual
       ? (settings?.storeHeroBtnSize || 'lg')
       : (settings?.storeBtnSize || 'md');
-    const shadow = useIndividual
+    const  = useIndividual
       ? (settings?.storeHeroBtnShadow || 'md')
       : 'md';
     
@@ -175,30 +175,30 @@ export function HeroCarousel() {
       none: 'rounded-none',
       sm: 'rounded-sm',
       md: 'rounded-md',
-      lg: 'rounded-[2rem]',
+      lg: 'rounded',
       full: 'rounded-full'
     };
 
     const shadowClasses: Record<string, string> = {
-      none: 'shadow-none',
-      sm: 'shadow-sm',
-      md: 'shadow-md',
-      lg: 'shadow-lg',
-      xl: 'shadow-xl',
-      '2xl': 'shadow-2xl',
-      inner: 'shadow-inner'
+      none: '',
+      sm: '',
+      md: '',
+      lg: '',
+      xl: '',
+      '2xl': '',
+      inner: ''
     };
     
     const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
-    const shapeClass = shapeClasses[shape] || 'rounded-[2rem]';
-    const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-md';
+    const shapeClass = shapeClasses[shape] || 'rounded';
+    const shadowClass = shadowClasses[ as keyof typeof shadowClasses] || '';
 
     return `${shapeClass} ${sizeClass} ${shadowClass}`;
   }, [settings]);
 
   if (isLoading) {
     return (
-      <div className="w-full aspect-[21/7]">
+      <div className="w-full aspect">
         <Skeleton className="w-full h-full" />
       </div>
     );
@@ -206,7 +206,7 @@ export function HeroCarousel() {
 
   if (!slides || slides.length === 0) {
     return (
-      <section className="w-full aspect-[21/7] bg-slate-900 flex items-center justify-center">
+      <section className="w-full aspect bg-slate-900 flex items-center justify-center">
         <div className="text-center text-white p-6">
           <h2 className="text-4xl font-black">Welcome to Our Store</h2>
           <p className="mt-4 text-slate-300 text-lg">New premium content coming soon!</p>
@@ -229,7 +229,7 @@ export function HeroCarousel() {
             return (
               <div 
                 key={slide.id} 
-                className="relative flex-[0_0_100%] min-w-0 aspect-[21/7]"
+                className="relative flex-[0_0_100%] min-w-0 aspect"
               >
                 {/* Proportional Media Container */}
                 <div className="relative z-0 w-full h-full">
@@ -265,7 +265,7 @@ export function HeroCarousel() {
                   )}
                   
                   {slide.showOverlay === true && (
-                    <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
+                    <div className="absolute inset-0 bg-black/40 backdrop-blur" />
                   )}
 
                   {/* Content Overlay - Centered within the proportional media */}
@@ -273,7 +273,7 @@ export function HeroCarousel() {
                     <div className="max-w-site-container mx-auto px-6 sm:px-10 lg:px-12 w-full">
                       <div className="max-w-4xl text-center mx-auto space-y-2 md:space-y-10">
                         {slide.pretitle && (
-                          <p className="text-white/80 text-[8px] md:text-sm font-black tracking-[0.2em] md:tracking-[0.4em] uppercase animate-in fade-in slide-in-from-bottom-4 duration-700">
+                          <p className="text-white/80 text md:text-sm font-black tracking md:tracking uppercase animate-in fade-in slide-in-from-bottom-4 duration-700">
                             {slide.pretitle}
                           </p>
                         )}
@@ -283,13 +283,13 @@ export function HeroCarousel() {
                           </h1>
                         )}
                         {slide.description && (
-                          <p className="text-slate-200 text-[10px] sm:text-lg md:text-2xl font-medium max-w-2xl leading-tight md:leading-relaxed mx-auto opacity-90 line-clamp-2 sm:line-clamp-none animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+                          <p className="text-slate-200 text sm:text-lg md:text-2xl font-medium max-w-2xl leading-tight md:leading-relaxed mx-auto opacity-90 line-clamp-2 sm:line-clamp-none animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
                             {slide.description}
                           </p>
                         )}
                         {slide.showActionButton && (
                           <div className="pt-2 md:pt-10 animate-in fade-in zoom-in-95 duration-1000 delay-300">
-                            <Button asChild style={buttonStyle} className={`group relative overflow-hidden font-black shadow-2xl active:scale-95 border-none transition-all duration-500 ${buttonClasses}`}>
+                            <Button asChild style={buttonStyle} className={`group relative overflow-hidden font-black  active:scale-95 border-none transition-all duration-500 ${buttonClasses}`}>
                               <Link href="/store/shop">
                                 <span className="relative z-10 flex items-center gap-2 md:gap-4">
                                   {heroBtnText}
@@ -342,12 +342,12 @@ export function HeroCarousel() {
           >
             <div 
               className={cn(`w-full rounded-full transition-all duration-700 ease-out ${
-                index === selectedIndex ? 'h-full bg-primary shadow-[0_0_20px_rgba(59,130,246,0.8)]' : 'h-2 md:h-3 bg-white/20 group-hover:bg-white/40'
+                index === selectedIndex ? 'h-full bg-primary' : 'h-2 md:h-3 bg-white/20 group-hover:bg-white/40'
               }`)} 
             />
           </button>
         ))}
-        <div className="pl-2 md:pl-6 text-[8px] md:text-xs font-black tracking-[0.2em] md:tracking-[0.3em] text-white/40 uppercase flex items-center gap-2 md:gap-3">
+        <div className="pl-2 md:pl-6 text md:text-xs font-black tracking md:tracking text-white/40 uppercase flex items-center gap-2 md:gap-3">
           <span className="text-white text-xs md:text-base">{String(selectedIndex + 1).padStart(2, '0')}</span>
           <span className="opacity-20 text-sm md:text-lg">/</span>
           <span>{String(slides.length).padStart(2, '0')}</span>
@@ -355,7 +355,7 @@ export function HeroCarousel() {
       </div>
 
       {/* Design Decoration */}
-      <div className="absolute top-0 left-4 md:left-16 w-[1px] h-full bg-white/10 z-10" />
+      <div className="absolute top-0 left-4 md:left-16 w h-full bg-white/10 z-10" />
     </div>
   );
 }

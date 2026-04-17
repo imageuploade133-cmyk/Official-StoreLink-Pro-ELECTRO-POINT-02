@@ -98,8 +98,8 @@ function HubHero({ slides, settings, getStoreUrl }: { slides: SlideShow[], setti
                         <Image src={bannerImg} alt="Sales Hub" fill className="object-cover opacity-40" />
                     ) : (
                         <>
-                            <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-white/10 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2" />
-                            <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-black/10 rounded-full blur-[120px] translate-x-1/2 translate-y-1/2" />
+                            <div className="absolute top-0 left-0 w h bg-white/10 rounded-full blur -translate-x-1/2 -translate-y-1/2" />
+                            <div className="absolute bottom-0 right-0 w h bg-black/10 rounded-full blur translate-x-1/2 translate-y-1/2" />
                         </>
                     )}
                     <div 
@@ -111,11 +111,11 @@ function HubHero({ slides, settings, getStoreUrl }: { slides: SlideShow[], setti
                 </div>
                 
                 <div className="max-w-site-container mx-auto px-6 relative z-10 text-center space-y-8">
-                    <Link href={getStoreUrl('/store/shop')} className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors font-black text-[10px] uppercase tracking-[0.2em] mb-4">
+                    <Link href={getStoreUrl('/store/shop')} className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors font-black text uppercase tracking mb-4">
                         <ArrowLeft className="h-3 w-3" /> Back to Catalog
                     </Link>
                     <div className="flex justify-center">
-                        <div className="bg-white/10 p-3 rounded-2xl shadow-2xl rotate-3 animate-bounce border border-white/20 backdrop-blur-md">
+                        <div className="bg-white/10 p-3 rounded-2xl  rotate-3 animate-bounce border border-white/20 backdrop-blur-md">
                             {iconUrl ? (
                                 <div className="relative h-12 w-12 rounded-xl overflow-hidden bg-white">
                                     <Image src={iconUrl} alt="Sale Icon" fill className="object-cover" />
@@ -147,7 +147,7 @@ function HubHero({ slides, settings, getStoreUrl }: { slides: SlideShow[], setti
                                    (index === slides.length - 1 && slidesInView.includes(0));
 
                     return (
-                        <div key={slide.id} className="relative flex-[0_0_100%] min-w-0 aspect-[21/7]">
+                        <div key={slide.id} className="relative flex-[0_0_100%] min-w-0 aspect">
                             <div className="relative w-full h-full">
                                 {isLoaded ? (
                                     <>
@@ -162,11 +162,11 @@ function HubHero({ slides, settings, getStoreUrl }: { slides: SlideShow[], setti
                                 ) : (
                                     <div className="w-full h-full bg-slate-900" />
                                 )}
-                                {slide.showOverlay && <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />}
+                                {slide.showOverlay && <div className="absolute inset-0 bg-black/40 backdrop-blur" />}
                                 
                                 <div className="absolute inset-0 flex items-center">
                                     <div className="max-w-site-container mx-auto px-10 w-full text-center space-y-6">
-                                        {slide.pretitle && <p className="text-white/80 text-[10px] md:text-sm font-black tracking-[0.4em] uppercase">{slide.pretitle}</p>}
+                                        {slide.pretitle && <p className="text-white/80 text md:text-sm font-black tracking uppercase">{slide.pretitle}</p>}
                                         {slide.title && <h1 className="text-white text-3xl md:text-7xl font-black tracking-tighter leading-none">{slide.title}</h1>}
                                         {slide.description && <p className="text-slate-200 text-sm md:text-xl font-medium max-w-2xl mx-auto">{slide.description}</p>}
                                     </div>
@@ -287,9 +287,9 @@ export default function AllFlashSalesPage() {
 
   if (!today) {
     return (
-      <div className="flex h-[60vh] flex-col items-center justify-center gap-4">
+      <div className="flex h flex-col items-center justify-center gap-4">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">Synchronizing Hub...</p>
+        <p className="text font-black uppercase tracking text-muted-foreground">Synchronizing Hub...</p>
       </div>
     );
   }
@@ -304,7 +304,7 @@ export default function AllFlashSalesPage() {
         {isLoading && sections.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-32 gap-4">
                 <Loader2 className="h-10 w-10 animate-spin text-primary opacity-20" />
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Retrieving Live Events...</p>
+                <p className="text font-black uppercase tracking-widest text-muted-foreground">Retrieving Live Events...</p>
             </div>
         ) : activeSections.length > 0 ? (
           <div className="space-y-4">
@@ -323,7 +323,7 @@ export default function AllFlashSalesPage() {
                         <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                             <Zap className="h-5 w-5 fill-current" />
                         </div>
-                        <p className="text-xs font-black uppercase text-muted-foreground tracking-[0.2em]">
+                        <p className="text-xs font-black uppercase text-muted-foreground tracking">
                             Registry Page {currentPage} of {totalPages} <span className="mx-2 text-slate-200">|</span> {totalSectionCount} Active Events
                         </p>
                     </div>
@@ -352,14 +352,14 @@ export default function AllFlashSalesPage() {
           </div>
         ) : (
           <div className="max-w-4xl mx-auto px-6 py-32 text-center">
-            <div className="bg-muted h-32 w-32 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 shadow-inner">
+            <div className="bg-muted h-32 w-32 rounded flex items-center justify-center mx-auto mb-8 ">
                 <ShoppingBag className="h-14 w-14 text-slate-300" />
             </div>
             <h2 className="text-3xl font-black tracking-tight uppercase">No Active Flash Sales</h2>
             <p className="text-slate-500 mt-4 text-lg font-medium">
               Our automated merchandising engine is currently preparing the next round of exclusive events. Check back shortly.
             </p>
-            <Button asChild size="lg" className="mt-10 rounded-2xl h-14 px-10 font-black uppercase text-xs tracking-widest shadow-xl">
+            <Button asChild size="lg" className="mt-10 rounded-2xl h-14 px-10 font-black uppercase text-xs tracking-widest ">
                 <Link href={getStoreUrl('/store/shop')}>Explore Catalog</Link>
             </Button>
           </div>

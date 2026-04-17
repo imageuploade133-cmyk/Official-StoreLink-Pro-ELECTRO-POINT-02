@@ -179,7 +179,7 @@ export function OrderAuditTab({ storeId }: OrderAuditTabProps) {
 
   return (
     <div className="space-y-6">
-      <Card className="shadow-none bg-muted/10 border-dashed border-2">
+      <Card className=" bg-muted/10 border-dashed border-2">
         <CardContent className="pt-6">
           <div className="flex flex-col md:flex-row gap-4 items-center">
             <div className="relative flex-grow">
@@ -217,7 +217,7 @@ export function OrderAuditTab({ storeId }: OrderAuditTabProps) {
         </CardContent>
       </Card>
 
-      <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <CardHeader className="border-b bg-muted/10">
           <div className="flex items-center gap-3">
             <ClipboardList className="h-6 w-6 text-primary" />
@@ -232,10 +232,10 @@ export function OrderAuditTab({ storeId }: OrderAuditTabProps) {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/50 hover:bg-transparent">
-                  <TableHead className="pl-6 font-black uppercase text-[10px] tracking-widest">Timestamp</TableHead>
-                  <TableHead className="font-black uppercase text-[10px] tracking-widest">Order Reference</TableHead>
-                  <TableHead className="text-center font-black uppercase text-[10px] tracking-widest">Status Shift</TableHead>
-                  <TableHead className="pr-6 font-black uppercase text-[10px] tracking-widest">Processed By</TableHead>
+                  <TableHead className="pl-6 font-black uppercase text tracking-widest">Timestamp</TableHead>
+                  <TableHead className="font-black uppercase text tracking-widest">Order Reference</TableHead>
+                  <TableHead className="text-center font-black uppercase text tracking-widest">Status Shift</TableHead>
+                  <TableHead className="pr-6 font-black uppercase text tracking-widest">Processed By</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -258,22 +258,22 @@ export function OrderAuditTab({ storeId }: OrderAuditTabProps) {
                           <div className="text-xs font-bold text-gray-900 dark:text-gray-100">
                             {date ? format(date, 'EEEE - dd- yyyy') : 'N/A'}
                           </div>
-                          <div className="text-[10px] text-muted-foreground uppercase font-black">
+                          <div className="text text-muted-foreground uppercase font-black">
                             {date ? `time ${format(date, 'hh:mm a')}` : ''}
                           </div>
                         </TableCell>
                         <TableCell>
                           <p className="font-mono text-xs font-black text-primary">#{log.orderId.substring(0, 12).toUpperCase()}</p>
-                          <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mt-1">Operational Event</p>
+                          <p className="text text-muted-foreground uppercase tracking-widest font-bold mt-1">Operational Event</p>
                         </TableCell>
                         <TableCell className="text-center">
                           <div className="flex items-center justify-center gap-3">
-                            <Badge variant="outline" className={cn("h-6 gap-1.5 px-3 uppercase text-[9px] font-black tracking-tighter", getStatusColor(log.oldStatus))}>
+                            <Badge variant="outline" className={cn("h-6 gap-1.5 px-3 uppercase text font-black tracking-tighter", getStatusColor(log.oldStatus))}>
                                 {getStatusIcon(log.oldStatus)}
                                 {log.oldStatus}
                             </Badge>
                             <ArrowRight className="h-4 w-4 text-muted-foreground opacity-30" />
-                            <Badge variant="outline" className={cn("h-6 gap-1.5 px-3 uppercase text-[9px] font-black tracking-tighter shadow-sm", getStatusColor(log.newStatus))}>
+                            <Badge variant="outline" className={cn("h-6 gap-1.5 px-3 uppercase text font-black tracking-tighter ", getStatusColor(log.newStatus))}>
                                 {getStatusIcon(log.newStatus)}
                                 {log.newStatus}
                             </Badge>
@@ -286,7 +286,7 @@ export function OrderAuditTab({ storeId }: OrderAuditTabProps) {
                             </div>
                             <div className="min-w-0">
                                 <p className="text-xs font-bold text-gray-900 truncate">{log.staffName}</p>
-                                <p className="text-[10px] text-muted-foreground truncate">{log.staffEmail}</p>
+                                <p className="text text-muted-foreground truncate">{log.staffEmail}</p>
                             </div>
                           </div>
                         </TableCell>

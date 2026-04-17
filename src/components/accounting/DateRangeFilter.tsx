@@ -40,7 +40,7 @@ export function DateRangeFilter({ dateRange, onDateChange }: DateRangeFilterProp
         </div>
         <Popover>
             <PopoverTrigger asChild>
-                <Button id="date" variant={"outline"} className={cn("w-full sm:w-[260px] justify-start text-left font-normal h-9", !dateRange && "text-muted-foreground", activePreset === 'custom' && "border-primary ring-1 ring-primary")}>
+                <Button id="date" variant={"outline"} className={cn("w-full sm:w justify-start text-left font-normal h-9", !dateRange && "text-muted-foreground", activePreset === 'custom' && "border-primary ring-1 ring-primary")}>
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {dateRange?.from ? (dateRange.to ? (<>{format(dateRange.from, "LLL dd, y")} - {format(dateRange.to, "LLL dd, y")}</>) : (format(dateRange.from, "LLL dd, y"))) : (<span>Pick a date</span>)}
                 </Button>

@@ -163,7 +163,7 @@ export function RestockForm({
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                <PopoverContent className="w-[--radix-popover-trigger p-0">
                   <Command>
                     <CommandInput placeholder="Search by name, SKU, or barcode..." />
                     <CommandList>
@@ -244,7 +244,7 @@ export function RestockForm({
                           </FormLabel>
                           <div className="flex items-start gap-4">
                               {field.value && (
-                                  <div className="relative w-20 h-20 rounded-lg border overflow-hidden shrink-0 shadow-sm bg-muted flex items-center justify-center">
+                                  <div className="relative w-20 h-20 rounded-lg border overflow-hidden shrink-0  bg-muted flex items-center justify-center">
                                       {field.value.match(/\.(jpeg|jpg|gif|png)$/) != null || field.value.includes('imgbb') ? (
                                         <Image src={field.value} alt="Receipt" fill className="object-contain" unoptimized />
                                       ) : (

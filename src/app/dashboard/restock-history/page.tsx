@@ -296,7 +296,7 @@ export default function RestockHistoryPage() {
             currencySymbol={currencySymbol}
         />
         
-        <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+        <Card className=" border-none ring-1 ring-border overflow-hidden">
           <CardHeader className="bg-muted/10 border-b">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
@@ -341,14 +341,14 @@ export default function RestockHistoryPage() {
                             <TableHead className="text-right">Cost/Unit</TableHead>
                             <TableHead className="text-right">Total Cost</TableHead>
                             <TableHead>User</TableHead>
-                            <TableHead className="w-[80px] text-center">Actions</TableHead>
+                            <TableHead className="w text-center">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {filteredEntries.map((entry) => (
                             <TableRow key={entry.id} className="group hover:bg-muted/30 transition-colors">
                             <TableCell className="font-medium">{entry.productName}</TableCell>
-                            <TableCell className="text-[10px] font-bold">
+                            <TableCell className="text font-bold">
                                 {entry.restockDate instanceof Date ? format(entry.restockDate, 'PP p') : 'N/A'}
                             </TableCell>
                             <TableCell className="text-right font-medium">
@@ -359,7 +359,7 @@ export default function RestockHistoryPage() {
                             </TableCell>
                             <TableCell className="text-right text-xs">{formatCurrency(entry.costPricePerUnit, currencySymbol)}</TableCell>
                             <TableCell className="text-right font-black text-sm">{formatCurrency(entry.totalCost, currencySymbol)}</TableCell>
-                            <TableCell className="text-[10px] uppercase font-black text-muted-foreground truncate max-w-[80px]" title={entry.userEmail}>{entry.userEmail?.split('@')[0] || 'N/A'}</TableCell>
+                            <TableCell className="text uppercase font-black text-muted-foreground truncate max-w" title={entry.userEmail}>{entry.userEmail?.split('@')[0] || 'N/A'}</TableCell>
                             <TableCell className="text-center">
                                 <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-primary/10 hover:text-primary" onClick={() => handleOpenActionsModal(entry)} disabled={!canModify}>
                                     <MoreHorizontal className="h-4 w-4" />
@@ -445,7 +445,7 @@ export default function RestockHistoryPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
                         <div className="space-y-4">
                             <div>
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Transaction Info</Label>
+                                <Label className="text font-black uppercase tracking-widest text-muted-foreground">Transaction Info</Label>
                                 <div className="mt-1 p-3 rounded-xl bg-muted/30 border border-dashed space-y-2">
                                     <div className="flex justify-between text-sm">
                                         <span className="text-muted-foreground font-medium">Quantity Adjusted:</span>
@@ -458,17 +458,17 @@ export default function RestockHistoryPage() {
                                         <span className="font-bold">{formatCurrency(entry.costPricePerUnit, currencySymbol)}</span>
                                     </div>
                                     <div className="flex justify-between text-sm pt-2 border-t">
-                                        <span className="text-muted-foreground font-black uppercase text-[10px]">Total Investment:</span>
+                                        <span className="text-muted-foreground font-black uppercase text">Total Investment:</span>
                                         <span className="font-black text-primary">{formatCurrency(entry.totalCost, currencySymbol)}</span>
                                     </div>
                                 </div>
                             </div>
                             
                             <div>
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Recorder Info</Label>
+                                <Label className="text font-black uppercase tracking-widest text-muted-foreground">Recorder Info</Label>
                                 <div className="mt-1 p-3 rounded-xl bg-muted/30 border border-dashed">
                                     <div className="text-sm font-bold truncate">{entry.userEmail}</div>
-                                    <div className="text-[10px] text-muted-foreground uppercase font-black mt-1">
+                                    <div className="text text-muted-foreground uppercase font-black mt-1">
                                         Logged: {entry.createdAt instanceof Date ? format(entry.createdAt, 'PP p') : 'N/A'}
                                     </div>
                                 </div>
@@ -477,13 +477,13 @@ export default function RestockHistoryPage() {
                         
                         <div className="space-y-4">
                             <div>
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Supplier Information</Label>
+                                <Label className="text font-black uppercase tracking-widest text-muted-foreground">Supplier Information</Label>
                                 <div className="mt-1 p-3 rounded-xl bg-muted/30 border border-dashed space-y-2">
                                     <div className="flex items-start gap-2">
                                         <Truck className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
                                         <div className="text-sm">
                                             <div className="font-bold">{entry.supplierName || entry.supplierBusinessName || 'N/A'}</div>
-                                            <div className="text-[10px] text-muted-foreground uppercase">Company / Distributor</div>
+                                            <div className="text text-muted-foreground uppercase">Company / Distributor</div>
                                         </div>
                                     </div>
                                     {entry.supplierContactName && (
@@ -491,7 +491,7 @@ export default function RestockHistoryPage() {
                                             <Info className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
                                             <div className="text-sm">
                                                 <div className="font-bold">{entry.supplierContactName}</div>
-                                                <div className="text-[10px] text-muted-foreground uppercase">Contact Person</div>
+                                                <div className="text text-muted-foreground uppercase">Contact Person</div>
                                             </div>
                                         </div>
                                     )}
@@ -514,7 +514,7 @@ export default function RestockHistoryPage() {
                             
                             {entry.notes && (
                                 <div>
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Notes</Label>
+                                    <Label className="text font-black uppercase tracking-widest text-muted-foreground">Notes</Label>
                                     <div className="mt-1 p-3 rounded-xl bg-muted/30 border border-dashed text-sm italic">
                                         "{entry.notes}"
                                     </div>
@@ -525,7 +525,7 @@ export default function RestockHistoryPage() {
                     
                     {entry.receiptUrl && (
                         <div className="mt-4 pt-4 border-t">
-                            <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2 block">Stock Document / Receipt</Label>
+                            <Label className="text font-black uppercase tracking-widest text-muted-foreground mb-2 block">Stock Document / Receipt</Label>
                             <div className="relative w-full h-48 rounded-xl overflow-hidden border-2 border-dashed bg-muted flex items-center justify-center group">
                                 {entry.receiptUrl.match(/\.(jpeg|jpg|gif|png)$/) != null || entry.receiptUrl.includes('imgbb') ? (
                                     <Image src={entry.receiptUrl} alt="Receipt" fill className="object-contain" unoptimized />

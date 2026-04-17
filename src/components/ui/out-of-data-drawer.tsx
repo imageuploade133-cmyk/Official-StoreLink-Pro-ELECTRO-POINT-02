@@ -42,7 +42,7 @@ export function OutOfDataDrawer({
 
   return (
     <Drawer open={isOpen} onOpenChange={onOpenChange}>
-      <DrawerContent className="rounded-t-[2rem] border-t-2">
+      <DrawerContent className="rounded-t border-t-2">
         <div className="mx-auto w-full max-w-sm">
           <DrawerHeader className="flex flex-col items-center pt-8">
             <div className="mb-6 rounded-full bg-primary/10 p-6 ring-8 ring-primary/5">
@@ -55,7 +55,7 @@ export function OutOfDataDrawer({
           </DrawerHeader>
           <DrawerFooter className="pb-10 pt-6 px-6">
             <DrawerClose asChild>
-              <Button size="lg" className="w-full h-14 rounded-2xl text-base font-bold shadow-xl shadow-primary/20 active:scale-95 transition-transform">
+              <Button size="lg" className="w-full h-14 rounded-2xl text-base font-bold   active:scale-95 transition-transform">
                 Got it, Thanks
               </Button>
             </DrawerClose>

@@ -61,7 +61,7 @@ export function PromoCountdown({ endDate, className }: PromoCountdownProps) {
       "flex items-center gap-3 p-4 rounded-2xl bg-primary/5 border border-primary/10 animate-in fade-in slide-in-from-top-1 duration-500 mb-4",
       className
     )}>
-      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-primary whitespace-nowrap">
+      <div className="flex items-center gap-2 text font-black uppercase tracking text-primary whitespace-nowrap">
         <Timer className="h-3.5 w-3.5 animate-pulse" />
         Time Left:
       </div>

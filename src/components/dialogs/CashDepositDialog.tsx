@@ -123,7 +123,7 @@ export function CashDepositDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !isSubmitting && onClose()}>
-      <DialogContent className="max-w-2xl h-[95vh] sm:h-auto sm:max-h-[90vh] flex flex-col p-0">
+      <DialogContent className="max-w-2xl h sm:h-auto sm:max-h flex flex-col p-0">
         <DialogHeader className="p-6 pb-4 border-b">
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Landmark className="h-6 w-6 text-primary" />

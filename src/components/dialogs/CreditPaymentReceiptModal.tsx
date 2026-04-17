@@ -120,7 +120,7 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
       @media print {
         body { font-family: 'Lato', sans-serif; font-size: 10pt; color: #333; line-height: 1.5; }
         @page { size: A4; margin: 20mm; }
-        .invoice-container { max-width: 190mm; margin: auto; padding: 0; border: none; box-shadow: none; position: relative; }
+        .invoice-container { max-width: 190mm; margin: auto; padding: 0; border: none; box-: none; position: relative; }
         .invoice-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 2px solid #eee; }
         .invoice-header-left { flex-grow: 1; }
         .invoice-header img { max-height: 50px; max-width: 140px; object-fit: contain; margin-bottom: 12px; }
@@ -271,7 +271,7 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-xl md:max-w-2xl lg:max-w-3xl p-0 h-[85vh] flex flex-col">
+      <DialogContent className="max-w-xl md:max-w-2xl lg:max-w-3xl p-0 h flex flex-col">
         <DialogHeader className="p-6 pb-4 border-b no-print">
           <DialogTitle className="text-2xl font-bold flex items-center gap-2 text-gray-800">
              {activeFormat === 'small' ? 'Credit Payment Receipt' : 'Credit Payment Invoice'} Preview
@@ -297,7 +297,7 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
 
           <ScrollArea className="flex-1 overflow-y-auto p-4 md:p-6 bg-muted/30">
             <TabsContent value="small" className="m-0 p-0">
-              <div id="printable-credit-receipt-small" className="receipt-container w-full max-w-xs mx-auto text-sm bg-white text-black font-mono p-4 border rounded-md shadow-sm">
+              <div id="printable-credit-receipt-small" className="receipt-container w-full max-w-xs mx-auto text-sm bg-white text-black font-mono p-4 border rounded-md ">
                   <header className="receipt-header">
                     {storeLogoUrl && (
                       <img 
@@ -344,7 +344,7 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
             </TabsContent>
 
             <TabsContent value="a4" className="m-0 p-0">
-               <div id="printable-credit-receipt-a4" className="invoice-container bg-white text-gray-800 font-sans p-6 md:p-8 rounded-lg shadow-xl border border-gray-100 max-w-4xl mx-auto my-4">
+               <div id="printable-credit-receipt-a4" className="invoice-container bg-white text-gray-800 font-sans p-6 md:p-8 rounded-lg  border border-gray-100 max-w-4xl mx-auto my-4">
                   <header className="invoice-header">
                     <div className="invoice-header-left">
                       {invoiceLogoUrl && <img src={invoiceLogoUrl} alt={storeName} className="invoice-logo" />}

@@ -42,7 +42,7 @@ export function AdvancedVideoManager() {
             <h4 className="text-sm font-black uppercase tracking-widest text-primary flex items-center gap-2">
                 <Video className="h-4 w-4" /> Multimedia Gallery
             </h4>
-            <p className="text-[10px] text-muted-foreground font-bold mt-1 uppercase">Social Media & Direct Video Links</p>
+            <p className="text text-muted-foreground font-bold mt-1 uppercase">Social Media & Direct Video Links</p>
         </div>
         <Button 
             type="button" 
@@ -60,12 +60,12 @@ export function AdvancedVideoManager() {
             <div className="text-center py-12 border-2 border-dashed rounded-2xl bg-muted/10">
                 <Video className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
                 <p className="text-sm font-medium text-muted-foreground uppercase tracking-widest">No additional videos</p>
-                <p className="text-[10px] text-muted-foreground mt-1">Add YouTube, TikTok or Social links to your gallery.</p>
+                <p className="text text-muted-foreground mt-1">Add YouTube, TikTok or Social links to your gallery.</p>
             </div>
         ) : (
             <div className="space-y-3">
                 {fields.map((field, index) => (
-                    <div key={field.id} className="p-6 border rounded-[2rem] bg-muted/5 space-y-4 relative group transition-all hover:border-primary/20">
+                    <div key={field.id} className="p-6 border rounded bg-muted/5 space-y-4 relative group transition-all hover:border-primary/20">
                         <div className="absolute top-4 right-4 flex gap-2">
                             <Button 
                                 type="button" 
@@ -111,7 +111,7 @@ export function AdvancedVideoManager() {
                                     name={`videos.${index}.type`}
                                     render={({ field: typeField }) => (
                                         <FormItem>
-                                            <FormLabel className="text-[10px] font-black uppercase text-primary tracking-widest">Platform</FormLabel>
+                                            <FormLabel className="text font-black uppercase text-primary tracking-widest">Platform</FormLabel>
                                             <Select onValueChange={typeField.onChange} value={typeField.value}>
                                                 <FormControl>
                                                     <SelectTrigger className="h-11 bg-background rounded-xl">
@@ -137,7 +137,7 @@ export function AdvancedVideoManager() {
                                         name={`videos.${index}.title`}
                                         render={({ field: titleField }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black uppercase text-primary tracking-widest">Video Title</FormLabel>
+                                                <FormLabel className="text font-black uppercase text-primary tracking-widest">Video Title</FormLabel>
                                                 <FormControl><Input placeholder="e.g., Unboxing Experience" {...titleField} className="h-11 bg-background rounded-xl" /></FormControl>
                                             </FormItem>
                                         )}
@@ -147,7 +147,7 @@ export function AdvancedVideoManager() {
                                         name={`videos.${index}.url`}
                                         render={({ field: urlField }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-black uppercase text-primary tracking-widest">Media Reference</FormLabel>
+                                                <FormLabel className="text font-black uppercase text-primary tracking-widest">Media Reference</FormLabel>
                                                 <FormControl><Input placeholder="Paste URL or <iframe> code" {...urlField} className="h-11 bg-background rounded-xl" /></FormControl>
                                             </FormItem>
                                         )}
@@ -163,7 +163,7 @@ export function AdvancedVideoManager() {
       
       <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10 flex gap-4 items-start">
           <Info className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-          <div className="text-[10px] space-y-1">
+          <div className="text space-y-1">
               <p className="font-bold text-primary uppercase">Elite Embedding Engine</p>
               <p className="text-muted-foreground leading-relaxed font-medium">
                   Supports pasting full YouTube/Facebook/TikTok embed codes or direct URLs. Vertical videos will automatically use portrait mode.

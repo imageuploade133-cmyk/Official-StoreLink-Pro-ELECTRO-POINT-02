@@ -176,7 +176,7 @@ export function PublicFooter() {
                 <ElysiumLogo className="h-6 w-6" style={{ color: textColor }} />
               ) : null}
               {showPublicStoreName && (
-                <span className={'font-extrabold tracking-tighter text-2xl whitespace-pre-wrap break-words leading-tight max-w-[200px] sm:max-w-[250px]'} style={{ color: 'inherit' }}>{storeName}</span>
+                <span className={'font-extrabold tracking-tighter text-2xl whitespace-pre-wrap break-words leading-tight max-w sm:max-w'} style={{ color: 'inherit' }}>{storeName}</span>
               )}
             </Link>
             {showFooterDescription && footerDescription && <p className="text-sm mb-6" style={{ color: textColor }}>{footerDescription}</p>}
@@ -279,7 +279,7 @@ export function PublicFooter() {
         {footerBannerUrl && (
           <div 
             className={cn(
-              "mb-10 w-full overflow-hidden rounded-2xl border border-white/10 shadow-2xl transition-all duration-500",
+              "mb-10 w-full overflow-hidden rounded-2xl border border-white/10  transition-all duration-500",
               (footerBannerSize === 'small' || (typeof footerBannerSize === 'number' && footerBannerSize <= 200)) && "max-w-4xl mx-auto"
             )}
             style={typeof footerBannerSize === 'number' ? { height: `${footerBannerSize}px` } : {}}

@@ -31,7 +31,7 @@ export default function DynamicPublicPage() {
   if (isLoading) {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <Skeleton className="h-[250px] w-full mb-8 rounded-3xl" />
+        <Skeleton className="h w-full mb-8 rounded-3xl" />
         <Skeleton className="h-12 w-3/4 mb-8" />
         <div className="space-y-4">
           <Skeleton className="h-6 w-full" />
@@ -75,7 +75,7 @@ export default function DynamicPublicPage() {
             <div className="relative max-w-5xl mx-auto px-6 sm:px-10 lg:px-12 py-24 md:py-32 text-center space-y-6">
                 <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-xl border border-white/10 px-4 py-1.5 rounded-full mb-2">
                     <Calendar className="h-3.5 w-3.5 text-primary" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">
+                    <span className="text font-black uppercase tracking text-white/80">
                         Updated {updatedAt ? format(updatedAt, 'MMMM yyyy') : 'Recently'}
                     </span>
                 </div>
@@ -85,7 +85,7 @@ export default function DynamicPublicPage() {
         </header>
 
         <main className="max-w-5xl mx-auto px-6 sm:px-10 lg:px-12 py-20">
-            <div className="bg-white dark:bg-slate-900 rounded-[3rem] p-8 md:p-16 border-2 border-slate-50 dark:border-slate-800 shadow-2xl">
+            <div className="bg-white dark:bg-slate-900 rounded p-8 md:p-16 border-2 border-slate-50 dark:border-slate-800 ">
                 <article className="prose dark:prose-invert lg:prose-xl max-w-none">
                     <div className="rich-content">
                         <ReactMarkdown 
@@ -99,7 +99,7 @@ export default function DynamicPublicPage() {
             </div>
             
             <footer className="mt-16 text-center">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+                <p className="text font-black uppercase tracking text-slate-400">
                     Official Documentation • {page.title}
                 </p>
             </footer>

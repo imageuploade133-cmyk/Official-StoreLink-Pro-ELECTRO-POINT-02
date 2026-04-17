@@ -294,7 +294,7 @@ function SearchPageContent() {
                 <SlidersHorizontal className="h-4 w-4 flex-shrink-0" />
                 <span className="truncate">{showFilters ? 'Hide' : 'Show'} Filters</span>
                 {activeFilters > 0 && (
-                  <span className="absolute -top-2 -right-2 h-5 w-5 bg-amber-500 text-white text-[10px] font-black rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="absolute -top-2 -right-2 h-5 w-5 bg-amber-500 text-white text font-black rounded-full flex items-center justify-center flex-shrink-0">
                     {activeFilters}
                   </span>
                 )}
@@ -314,7 +314,7 @@ function SearchPageContent() {
 
               {/* Sort Dropdown */}
               <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm flex-shrink-0">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 hidden sm:inline">Sort:</span>
+                <span className="text font-black uppercase tracking-widest text-slate-400 hidden sm:inline">Sort:</span>
                 <select 
                   value={sortBy} 
                   onChange={(e) => { setSortBy(e.target.value); setCurrentPage(1); }}
@@ -370,7 +370,7 @@ function SearchPageContent() {
 
             {/* Search Filter */}
             <div className="space-y-3">
-              <Label className="text-xs font-black uppercase tracking-[0.2em] text-primary">Direct Search</Label>
+              <Label className="text-xs font-black uppercase tracking text-primary">Direct Search</Label>
               <div className="relative group">
                 {isLoading ? (
                   <Loader2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary animate-spin flex-shrink-0" />
@@ -388,7 +388,7 @@ function SearchPageContent() {
 
             {/* Categories Filter */}
             <div className="space-y-3 border-t border-slate-200 dark:border-slate-800 pt-6">
-              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white">Collections</h3>
+              <h3 className="text-xs font-black uppercase tracking text-slate-900 dark:text-white">Collections</h3>
               <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
                 {categories?.map(cat => (
                   <label key={cat.id} className="flex items-center gap-3 cursor-pointer group">
@@ -407,7 +407,7 @@ function SearchPageContent() {
 
             {/* Price Filter */}
             <div className="space-y-4 border-t border-slate-200 dark:border-slate-800 pt-6">
-              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white">Price Range</h3>
+              <h3 className="text-xs font-black uppercase tracking text-slate-900 dark:text-white">Price Range</h3>
               <Slider
                 value={priceRange}
                 onValueChange={(val) => { setPriceRange(val as [number, number]); setCurrentPage(1); }}
@@ -423,7 +423,7 @@ function SearchPageContent() {
 
             {/* Sale Filter */}
             <div className="space-y-3 border-t border-slate-200 dark:border-slate-800 pt-6">
-              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white">Flash Deals</h3>
+              <h3 className="text-xs font-black uppercase tracking text-slate-900 dark:text-white">Flash Deals</h3>
               <label className="flex items-center gap-3 cursor-pointer p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30 transition-all">
                 <Checkbox 
                   checked={onlyOnSale}
@@ -498,7 +498,7 @@ function SearchPageContent() {
                 {/* Pagination */}
                 {totalPages > 1 && (
                   <div className="flex flex-col sm:flex-row items-center justify-between pt-8 border-t border-slate-200 dark:border-slate-800 gap-4 sm:gap-6">
-                    <p className="text-xs font-black uppercase text-muted-foreground tracking-[0.2em] text-center sm:text-left">
+                    <p className="text-xs font-black uppercase text-muted-foreground tracking text-center sm:text-left">
                       Page {currentPage} of {totalPages}
                     </p>
                     <div className="flex items-center gap-2 sm:gap-3">

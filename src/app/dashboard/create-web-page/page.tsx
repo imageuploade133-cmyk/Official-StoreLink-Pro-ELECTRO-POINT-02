@@ -165,7 +165,7 @@ export default function CreateWebPage() {
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
               <CardTitle>Page Designer</CardTitle>
               <CardDescription>Fill in the details for your new page. Max image size: {settings?.imageMaxFileSizeMb || 5}MB.</CardDescription>
@@ -205,7 +205,7 @@ export default function CreateWebPage() {
                     <FormLabel className="font-bold">Banner Image (Optional)</FormLabel>
                     <div className="flex items-start gap-4">
                       {bannerImage && (
-                        <div className="w-32 h-20 rounded-xl overflow-hidden relative border shadow-sm">
+                        <div className="w-32 h-20 rounded-xl overflow-hidden relative border ">
                           <Image src={bannerImage} alt="Banner preview" fill style={{ objectFit: 'cover' }} unoptimized/>
                         </div>
                       )}
@@ -222,7 +222,7 @@ export default function CreateWebPage() {
                             </Button>
                             <Input id="banner-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isSaving || isUploading} />
                         </div>
-                        <FormDescription className="text-[10px]">Recommended size: 1920x600 pixels for hero banners.</FormDescription>
+                        <FormDescription className="text">Recommended size: 1920x600 pixels for hero banners.</FormDescription>
                       </div>
                     </div>
                     <FormMessage />
@@ -278,7 +278,7 @@ export default function CreateWebPage() {
                        <div className="flex flex-row items-center justify-between rounded-2xl border p-4 bg-primary/5">
                         <div className="space-y-0.5">
                           <FormLabel className="font-black text-xs uppercase tracking-widest">Publish Page</FormLabel>
-                          <FormDescription className="text-[10px]">
+                          <FormDescription className="text">
                             Make this page live and accessible to the public.
                           </FormDescription>
                         </div>
@@ -295,7 +295,7 @@ export default function CreateWebPage() {
               </div>
             </CardContent>
             <CardFooter className="bg-muted/30 border-t p-6">
-              <Button type="submit" disabled={isSaving || isUploading} size="lg" className="px-10 h-14 font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20">
+              <Button type="submit" disabled={isSaving || isUploading} size="lg" className="px-10 h-14 font-black uppercase text-xs tracking-widest  ">
                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                 {isSaving ? 'Synchronizing...' : 'Publish Web Page'}
               </Button>

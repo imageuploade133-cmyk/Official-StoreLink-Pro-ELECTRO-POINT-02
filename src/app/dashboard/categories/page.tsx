@@ -305,9 +305,9 @@ export default function CategoriesPage() {
                                         <div className="text-left">
                                             <div className="flex items-center gap-2">
                                                 <span className="font-bold text-primary">{category.name}</span>
-                                                <Badge variant="secondary" className="text-[10px] h-5 px-1.5">{category.products.length}</Badge>
+                                                <Badge variant="secondary" className="text h-5 px-1.5">{category.products.length}</Badge>
                                                 {isPromoActive && (
-                                                    <Badge className="bg-rose-500 text-white font-black h-5 px-1.5 border-none shadow-sm animate-pulse flex items-center gap-1">
+                                                    <Badge className="bg-rose-500 text-white font-black h-5 px-1.5 border-none  animate-pulse flex items-center gap-1">
                                                         <Zap className="h-2.5 w-2.5 fill-current" />
                                                         {category.flashSaleDiscountType === 'percentage' ? `${category.flashSaleDiscountValue}%` : `${currencySymbol}${category.flashSaleDiscountValue}`}
                                                     </Badge>
@@ -320,7 +320,7 @@ export default function CategoriesPage() {
                                             </div>
                                             {category.description && (
                                                 <p 
-                                                    className="text-[10px] text-muted-foreground truncate max-w-[200px]"
+                                                    className="text text-muted-foreground truncate max-w"
                                                     dangerouslySetInnerHTML={{ __html: category.description }}
                                                 />
                                             )}
@@ -348,12 +348,12 @@ export default function CategoriesPage() {
                                     </div>}
                                 </div>
                             </AccordionTrigger>
-                            <AccordionContent className="bg-muted/30 overflow-y-auto max-h-[350px]">
+                            <AccordionContent className="bg-muted/30 overflow-y-auto max-h">
                                 {category.products.length === 0 ? (
                                     <div className="text-center py-8 text-muted-foreground"><PackageSearch className="mx-auto h-10 w-10 mb-2" /><p>No products are assigned to this category.</p></div>
                                 ) : (
                                     <Table>
-                                        <TableHeader><TableRow><TableHead className="w-[60px]">Image</TableHead><TableHead>Product Name</TableHead><TableHead className="text-right">Stock</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-center w-[120px]">Action</TableHead></TableRow></TableHeader>
+                                        <TableHeader><TableRow><TableHead className="w">Image</TableHead><TableHead>Product Name</TableHead><TableHead className="text-right">Stock</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-center w">Action</TableHead></TableRow></TableHeader>
                                         <TableBody>
                                             {category.products.map((product) => (
                                                 <TableRow key={product.id}>
@@ -427,7 +427,7 @@ export default function CategoriesPage() {
                 </Card>
             </div>
             
-            <Card className="shadow-lg">
+            <Card className="">
                 <CardHeader>
                     <CardTitle className="font-headline text-xl">Category Registry</CardTitle>
                     <CardDescription>Fetched incrementally to ensure performance and cost efficiency.</CardDescription>

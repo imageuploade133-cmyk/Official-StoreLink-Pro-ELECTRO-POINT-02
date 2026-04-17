@@ -128,7 +128,7 @@ export function ProfileSettingsView({ onClose }: ProfileSettingsViewProps) {
                 <div className="flex items-center gap-4">
                     <button 
                         onClick={onClose}
-                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
+                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800  border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
                     >
                         <ArrowLeft className="h-5 w-5" strokeWidth={3} />
                     </button>
@@ -145,7 +145,7 @@ export function ProfileSettingsView({ onClose }: ProfileSettingsViewProps) {
 
                     <Form {...profileForm}>
                         <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-8">
-                            <Card className="rounded-[2.5rem] shadow-xl border-none ring-1 ring-slate-100 dark:ring-slate-800">
+                            <Card className="rounded  border-none ring-1 ring-slate-100 dark:ring-slate-800">
                                 <CardHeader className="bg-muted/20 pb-6">
                                     <CardTitle className="text-lg uppercase font-black tracking-tight flex items-center gap-3">
                                         <UserCircle className="h-5 w-5 text-primary" /> Basic Identity
@@ -154,22 +154,22 @@ export function ProfileSettingsView({ onClose }: ProfileSettingsViewProps) {
                                 <CardContent className="pt-8 space-y-6">
                                     <FormField control={profileForm.control} name="name" render={({ field }) => (
                                         <FormItem className="space-y-2">
-                                            <FormLabel className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Legal Name</FormLabel>
-                                            <FormControl><Input {...field} className="h-14 rounded-2xl bg-slate-50 dark:bg-slate-900 border-none shadow-inner font-bold" /></FormControl>
+                                            <FormLabel className="text font-black uppercase text-slate-400 tracking-widest ml-1">Legal Name</FormLabel>
+                                            <FormControl><Input {...field} className="h-14 rounded-2xl bg-slate-50 dark:bg-slate-900 border-none  font-bold" /></FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )} />
                                     <FormField control={profileForm.control} name="email" render={({ field }) => (
                                         <FormItem className="space-y-2">
-                                            <FormLabel className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Registry Email</FormLabel>
-                                            <FormControl><Input {...field} disabled className="h-14 rounded-2xl bg-muted/50 border-none shadow-none font-bold opacity-60" /></FormControl>
-                                            <FormDescription className="text-[8px] font-bold uppercase tracking-widest px-1">Email changes require support validation.</FormDescription>
+                                            <FormLabel className="text font-black uppercase text-slate-400 tracking-widest ml-1">Registry Email</FormLabel>
+                                            <FormControl><Input {...field} disabled className="h-14 rounded-2xl bg-muted/50 border-none  font-bold opacity-60" /></FormControl>
+                                            <FormDescription className="text font-bold uppercase tracking-widest px-1">Email changes require support validation.</FormDescription>
                                         </FormItem>
                                     )} />
                                 </CardContent>
                             </Card>
 
-                            <Card className="rounded-[2.5rem] shadow-xl border-none ring-1 ring-slate-100 dark:ring-slate-800">
+                            <Card className="rounded  border-none ring-1 ring-slate-100 dark:ring-slate-800">
                                 <CardHeader className="bg-muted/20 pb-6">
                                     <CardTitle className="text-lg uppercase font-black tracking-tight flex items-center gap-3">
                                         <MapPin className="h-5 w-5 text-primary" /> Delivery Logistics
@@ -178,21 +178,21 @@ export function ProfileSettingsView({ onClose }: ProfileSettingsViewProps) {
                                 <CardContent className="pt-8 space-y-6">
                                     <FormField control={profileForm.control} name="alternativePhoneNumber" render={({ field }) => (
                                         <FormItem className="space-y-2">
-                                            <FormLabel className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Contact Protocol</FormLabel>
-                                            <FormControl><Input type="tel" {...field} className="h-14 rounded-2xl bg-slate-50 dark:bg-slate-900 border-none shadow-inner font-bold" placeholder="+1..." /></FormControl>
+                                            <FormLabel className="text font-black uppercase text-slate-400 tracking-widest ml-1">Contact Protocol</FormLabel>
+                                            <FormControl><Input type="tel" {...field} className="h-14 rounded-2xl bg-slate-50 dark:bg-slate-900 border-none  font-bold" placeholder="+1..." /></FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )} />
                                     <FormField control={profileForm.control} name="deliveryAddress" render={({ field }) => (
                                         <FormItem className="space-y-2">
-                                            <FormLabel className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Master Fulfillment Address</FormLabel>
-                                            <FormControl><Textarea {...field} className="min-h-[120px] rounded-[2rem] bg-slate-50 dark:bg-slate-900 border-none shadow-inner font-bold resize-none py-4" /></FormControl>
+                                            <FormLabel className="text font-black uppercase text-slate-400 tracking-widest ml-1">Master Fulfillment Address</FormLabel>
+                                            <FormControl><Textarea {...field} className="min-h rounded bg-slate-50 dark:bg-slate-900 border-none  font-bold resize-none py-4" /></FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )} />
                                 </CardContent>
                                 <CardFooter className="pb-8 px-8">
-                                    <Button type="submit" disabled={isSavingProfile} className="w-full h-14 rounded-[1.5rem] font-black uppercase text-xs tracking-[0.2em] shadow-2xl">
+                                    <Button type="submit" disabled={isSavingProfile} className="w-full h-14 rounded font-black uppercase text-xs tracking ">
                                         {isSavingProfile ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5 mr-3" />}
                                         Synchronize Profile
                                     </Button>
@@ -205,7 +205,7 @@ export function ProfileSettingsView({ onClose }: ProfileSettingsViewProps) {
 
                     <Form {...passForm}>
                         <form onSubmit={passForm.handleSubmit(onPasswordSubmit)}>
-                            <Card className="rounded-[2.5rem] shadow-xl border-none ring-1 ring-slate-100 dark:ring-slate-800">
+                            <Card className="rounded  border-none ring-1 ring-slate-100 dark:ring-slate-800">
                                 <CardHeader className="bg-muted/20 pb-6">
                                     <CardTitle className="text-lg uppercase font-black tracking-tight flex items-center gap-3">
                                         <Lock className="h-5 w-5 text-primary" /> Security Layer
@@ -214,28 +214,28 @@ export function ProfileSettingsView({ onClose }: ProfileSettingsViewProps) {
                                 <CardContent className="pt-8 space-y-6">
                                     <FormField control={passForm.control} name="currentPassword" render={({ field }) => (
                                         <FormItem className="space-y-2">
-                                            <FormLabel className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Current Verification</FormLabel>
-                                            <FormControl><Input type="password" {...field} className="h-14 rounded-2xl bg-slate-50 dark:bg-slate-900 border-none shadow-inner font-bold" /></FormControl>
+                                            <FormLabel className="text font-black uppercase text-slate-400 tracking-widest ml-1">Current Verification</FormLabel>
+                                            <FormControl><Input type="password" {...field} className="h-14 rounded-2xl bg-slate-50 dark:bg-slate-900 border-none  font-bold" /></FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )} />
                                     <FormField control={passForm.control} name="newPassword" render={({ field }) => (
                                         <FormItem className="space-y-2">
-                                            <FormLabel className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">New Security Phrase</FormLabel>
-                                            <FormControl><Input type="password" {...field} className="h-14 rounded-2xl bg-slate-50 dark:bg-slate-900 border-none shadow-inner font-bold" /></FormControl>
+                                            <FormLabel className="text font-black uppercase text-slate-400 tracking-widest ml-1">New Security Phrase</FormLabel>
+                                            <FormControl><Input type="password" {...field} className="h-14 rounded-2xl bg-slate-50 dark:bg-slate-900 border-none  font-bold" /></FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )} />
                                     <FormField control={passForm.control} name="confirmPassword" render={({ field }) => (
                                         <FormItem className="space-y-2">
-                                            <FormLabel className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Confirm Shift</FormLabel>
-                                            <FormControl><Input type="password" {...field} className="h-14 rounded-2xl bg-slate-50 dark:bg-slate-900 border-none shadow-inner font-bold" /></FormControl>
+                                            <FormLabel className="text font-black uppercase text-slate-400 tracking-widest ml-1">Confirm Shift</FormLabel>
+                                            <FormControl><Input type="password" {...field} className="h-14 rounded-2xl bg-slate-50 dark:bg-slate-900 border-none  font-bold" /></FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )} />
                                 </CardContent>
                                 <CardFooter className="pb-8 px-8">
-                                    <Button type="submit" disabled={isSavingPassword} variant="secondary" className="w-full h-14 rounded-[1.5rem] font-black uppercase text-xs tracking-[0.2em] shadow-xl">
+                                    <Button type="submit" disabled={isSavingPassword} variant="secondary" className="w-full h-14 rounded font-black uppercase text-xs tracking ">
                                         {isSavingPassword ? <Loader2 className="h-5 w-5 animate-spin" /> : <ShieldCheck className="h-5 w-5 mr-3" />}
                                         Update Credentials
                                     </Button>

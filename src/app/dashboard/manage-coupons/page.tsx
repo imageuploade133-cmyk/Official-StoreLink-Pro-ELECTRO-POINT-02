@@ -335,7 +335,7 @@ export default function ManageCouponsPage() {
                 <RotateCcw className={cn("mr-2 h-4 w-4", isLoadingCoupons && "animate-spin")} />
                 Sync
             </Button>
-            <Button onClick={handleOpenAddModal} className="gap-2 h-11 font-bold shadow-lg shadow-primary/20">
+            <Button onClick={handleOpenAddModal} className="gap-2 h-11 font-bold  ">
                 <PlusCircle className="h-4 w-4" /> Generate New Code
             </Button>
         </div>
@@ -343,9 +343,9 @@ export default function ManageCouponsPage() {
 
       {/* Analytics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card className="bg-primary/5 border-primary/10 shadow-none">
+        <Card className="bg-primary/5 border-primary/10 ">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center justify-between">
+            <CardTitle className="text font-black uppercase tracking-widest text-primary flex items-center justify-between">
                 Total Codes <Ticket className="h-3.5 w-3.5" />
             </CardTitle>
           </CardHeader>
@@ -354,9 +354,9 @@ export default function ManageCouponsPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-green-50 border-green-100 shadow-none">
+        <Card className="bg-green-50 border-green-100 ">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-green-600 flex items-center justify-between">
+            <CardTitle className="text font-black uppercase tracking-widest text-green-600 flex items-center justify-between">
                 Active in Batch <CalendarCheck className="h-3.5 w-3.5" />
             </CardTitle>
           </CardHeader>
@@ -365,9 +365,9 @@ export default function ManageCouponsPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-red-50 border-red-100 shadow-none">
+        <Card className="bg-red-50 border-red-100 ">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-red-600 flex items-center justify-between">
+            <CardTitle className="text font-black uppercase tracking-widest text-red-600 flex items-center justify-between">
                 Expired in Batch <CalendarX className="h-3.5 w-3.5" />
             </CardTitle>
           </CardHeader>
@@ -376,9 +376,9 @@ export default function ManageCouponsPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-indigo-50 border-indigo-100 shadow-none">
+        <Card className="bg-indigo-50 border-indigo-100 ">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-indigo-600 flex items-center justify-between">
+            <CardTitle className="text font-black uppercase tracking-widest text-indigo-600 flex items-center justify-between">
                 Batch Usage <Activity className="h-3.5 w-3.5" />
             </CardTitle>
           </CardHeader>
@@ -387,9 +387,9 @@ export default function ManageCouponsPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-amber-50 border-amber-100 shadow-none">
+        <Card className="bg-amber-50 border-amber-100 ">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-amber-600 flex items-center justify-between">
+            <CardTitle className="text font-black uppercase tracking-widest text-amber-600 flex items-center justify-between">
                 Latest Usage <MousePointerClick className="h-3.5 w-3.5" />
             </CardTitle>
           </CardHeader>
@@ -399,7 +399,7 @@ export default function ManageCouponsPage() {
         </Card>
       </div>
 
-      <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <CardHeader className="bg-muted/10 border-b">
           <CardTitle>Catalog of Promo Codes</CardTitle>
           <CardDescription>Live promo codes currently available for use during checkout. Incremental fetching active.</CardDescription>
@@ -460,7 +460,7 @@ export default function ManageCouponsPage() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="outline" className="capitalize text-[10px] font-bold">
+                            <Badge variant="outline" className="capitalize text font-bold">
                               {coupon.type === 'percentage' ? <Percent className="h-3 w-3 mr-1" /> : <DollarSign className="h-3 w-3 mr-1" />}
                               {coupon.type}
                             </Badge>
@@ -468,7 +468,7 @@ export default function ManageCouponsPage() {
                           <TableCell className="font-bold">
                             {coupon.type === 'percentage' ? `${coupon.value}%` : formatCurrency(coupon.value, currencySymbol)}
                           </TableCell>
-                          <TableCell className="text-[10px] text-muted-foreground font-medium uppercase">
+                          <TableCell className="text text-muted-foreground font-medium uppercase">
                             {start || end ? (
                               <div className="space-y-0.5">
                                   {start && <p>From: {format(start, 'PP p')}</p>}
@@ -479,7 +479,7 @@ export default function ManageCouponsPage() {
                           <TableCell className="text-center">
                               <div className="flex flex-col items-center">
                                   <span className="font-black text-lg leading-none">{coupon.usageCount || 0}</span>
-                                  <span className="text-[10px] uppercase text-muted-foreground tracking-tighter mt-1">Orders</span>
+                                  <span className="text uppercase text-muted-foreground tracking-tighter mt-1">Orders</span>
                               </div>
                           </TableCell>
                           <TableCell>
@@ -488,7 +488,7 @@ export default function ManageCouponsPage() {
                                 checked={coupon.isActive} 
                                 onCheckedChange={() => handleToggleStatus(coupon)}
                               />
-                              <Badge variant={coupon.isActive ? 'default' : 'secondary'} className="text-[10px] h-5 uppercase font-black">
+                              <Badge variant={coupon.isActive ? 'default' : 'secondary'} className="text h-5 uppercase font-black">
                                 {coupon.isActive ? 'Live' : 'Paused'}
                               </Badge>
                             </div>

@@ -171,7 +171,7 @@ export default function CreateSlidePage() {
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+          <Card className=" border-none ring-1 ring-border overflow-hidden">
             <CardHeader className="bg-muted/30">
               <CardTitle>Slide Placement & Content</CardTitle>
               <CardDescription>Configure where and how this slide appears.</CardDescription>
@@ -199,7 +199,7 @@ export default function CreateSlidePage() {
                                         </SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <FormDescription className="text-[10px]">Choose which page carousel this slide belongs to.</FormDescription>
+                                <FormDescription className="text">Choose which page carousel this slide belongs to.</FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -227,7 +227,7 @@ export default function CreateSlidePage() {
                             <FormLabel className="font-bold">Background Asset <span className="text-destructive">*</span></FormLabel>
                             <div className="flex items-start gap-6">
                                 {imageUrl && (
-                                    <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border-2 border-white shadow-xl flex-shrink-0">
+                                    <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border-2 border-white  flex-shrink-0">
                                         <Image src={imageUrl} alt="Background preview" fill className="object-cover" unoptimized/>
                                     </div>
                                 )}
@@ -243,7 +243,7 @@ export default function CreateSlidePage() {
                                             </label>
                                         </Button>
                                         <Input id="image-upload" type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'imageUrl')} disabled={isSaving || isUploading} />
-                                        <p className="text-[10px] text-muted-foreground font-medium uppercase">Ideal size: 1920x600px</p>
+                                        <p className="text text-muted-foreground font-medium uppercase">Ideal size: 1920x600px</p>
                                     </div>
                                 </div>
                             </div>
@@ -253,7 +253,7 @@ export default function CreateSlidePage() {
                 )}
 
                 {mediaType === 'video' && (
-                    <div className="space-y-6 p-6 border-2 border-primary/10 rounded-[2rem] bg-primary/5">
+                    <div className="space-y-6 p-6 border-2 border-primary/10 rounded bg-primary/5">
                         <FormField control={form.control} name="videoUrl" render={({ field }) => (
                             <FormItem>
                                 <FormLabel className="font-bold">Background Video URL (Direct MP4) <span className="text-destructive">*</span></FormLabel>
@@ -266,7 +266,7 @@ export default function CreateSlidePage() {
                                 <FormLabel className="font-bold">Video Poster Image (Optional)</FormLabel>
                                 <div className="flex items-start gap-6">
                                 {videoPosterUrl && (
-                                    <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border-2 border-white shadow-xl flex-shrink-0">
+                                    <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border-2 border-white  flex-shrink-0">
                                         <Image src={videoPosterUrl} alt="Poster preview" fill className="object-cover" unoptimized/>
                                     </div>
                                 )}
@@ -285,7 +285,7 @@ export default function CreateSlidePage() {
                                     </div>
                                 </div>
                                 </div>
-                                <FormDescription className="text-[10px]">Shown while video loads. Same recommended size as background image.</FormDescription>
+                                <FormDescription className="text">Shown while video loads. Same recommended size as background image.</FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )} />
@@ -309,7 +309,7 @@ export default function CreateSlidePage() {
                     <FormItem>
                       <FormLabel className="font-bold">Carousel Sequence Order</FormLabel>
                       <FormControl><Input type="number" placeholder="0" {...field} disabled={isSaving || isUploading} className="h-11" /></FormControl>
-                      <FormDescription className="text-[10px]">Slides with lower numbers appear first in the loop.</FormDescription>
+                      <FormDescription className="text">Slides with lower numbers appear first in the loop.</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -340,7 +340,7 @@ export default function CreateSlidePage() {
                         <FormItem className="flex flex-row items-center justify-between rounded-2xl border p-4 bg-muted/20">
                           <div className="space-y-0.5">
                             <FormLabel className="text-xs font-bold uppercase tracking-wider">Show CTA Button</FormLabel>
-                            <FormDescription className="text-[10px]">Toggle 'Shop Collection' button visibility.</FormDescription>
+                            <FormDescription className="text">Toggle 'Shop Collection' button visibility.</FormDescription>
                           </div>
                           <FormControl>
                             <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -355,7 +355,7 @@ export default function CreateSlidePage() {
                         <FormItem className="flex flex-row items-center justify-between rounded-2xl border p-4 bg-muted/20">
                           <div className="space-y-0.5">
                             <FormLabel className="text-xs font-bold uppercase tracking-wider">Contrast Overlay</FormLabel>
-                            <FormDescription className="text-[10px]">Subtle dimming for better text readability.</FormDescription>
+                            <FormDescription className="text">Subtle dimming for better text readability.</FormDescription>
                           </div>
                           <FormControl>
                             <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -366,7 +366,7 @@ export default function CreateSlidePage() {
                 </div>
             </CardContent>
             <CardFooter className="bg-muted/30 border-t p-8 flex justify-between">
-              <Button type="submit" disabled={isSaving || isUploading} size="lg" className="px-12 h-14 rounded-2xl font-black uppercase text-xs tracking-widest shadow-2xl shadow-primary/20 transition-all active:scale-95">
+              <Button type="submit" disabled={isSaving || isUploading} size="lg" className="px-12 h-14 rounded-2xl font-black uppercase text-xs tracking-widest   transition-all active:scale-95">
                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                 {isSaving ? 'Processing...' : 'Publish New Slide'}
               </Button>

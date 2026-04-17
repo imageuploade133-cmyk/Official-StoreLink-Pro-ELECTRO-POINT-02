@@ -165,7 +165,7 @@ export default function StoreLoginPage() {
         </div>
       </div>
       <div className="flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[350px] gap-6">
+        <div className="mx-auto grid w gap-6">
           <div className="grid gap-2 text-center">
              <div className="flex justify-center mb-4 h-10">
                 {storeLogo ? (

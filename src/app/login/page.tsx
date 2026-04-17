@@ -147,7 +147,7 @@ export default function AdminLoginPage() {
                     </div>
                 </div>
                 <div className="flex items-center justify-center py-12 px-4">
-                    <div className="mx-auto grid w-[350px] gap-6">
+                    <div className="mx-auto grid w gap-6">
                         <div className="grid gap-2 text-center">
                             <div className="flex justify-center mb-4">
                                 <ElysiumLogo className="h-10 w-10 text-primary" />
@@ -172,7 +172,7 @@ export default function AdminLoginPage() {
                                     <StoreIcon className="mr-4 h-5 w-5 text-primary" />
                                     <div className="text-left">
                                         <div className="font-bold">{s.name}</div>
-                                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground opacity-70">DB: {s.databaseId || '(default)'}</div>
+                                        <div className="text uppercase tracking-wider text-muted-foreground opacity-70">DB: {s.databaseId || '(default)'}</div>
                                     </div>
                                 </Button>
                             ))}
@@ -228,7 +228,7 @@ export default function AdminLoginPage() {
         </div>
       </div>
       <div className="flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[350px] gap-6">
+        <div className="mx-auto grid w gap-6">
           <div className="grid gap-2 text-center">
              <div className="flex justify-center mb-4">
                 <ElysiumLogo className="h-10 w-10 text-primary" />

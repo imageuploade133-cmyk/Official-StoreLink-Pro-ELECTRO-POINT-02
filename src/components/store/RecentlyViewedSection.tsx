@@ -90,19 +90,19 @@ export function RecentlyViewedSection({ excludeId, onViewAll }: RecentlyViewedSe
             <History className="h-7 w-7 text-primary" />
             Recently Viewed
           </h2>
-          <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Pick up where you left off</p>
+          <p className="text font-black uppercase text-slate-400 tracking-widest">Pick up where you left off</p>
         </div>
         
         {onViewAll ? (
           <Button 
             variant="ghost" 
-            className="font-black text-[10px] uppercase tracking-widest text-primary p-0 h-auto hover:bg-transparent"
+            className="font-black text uppercase tracking-widest text-primary p-0 h-auto hover:bg-transparent"
             onClick={onViewAll}
           >
             View Full History <ChevronRight className="h-4 w-4 ml-2" />
           </Button>
         ) : (
-          <Button asChild variant="ghost" className="font-black text-[10px] uppercase tracking-widest text-primary p-0 h-auto hover:bg-transparent">
+          <Button asChild variant="ghost" className="font-black text uppercase tracking-widest text-primary p-0 h-auto hover:bg-transparent">
             <Link href={getStoreUrl('/store/recently-viewed')} className="flex items-center gap-2">
               View Full History <ChevronRight className="h-4 w-4" />
             </Link>

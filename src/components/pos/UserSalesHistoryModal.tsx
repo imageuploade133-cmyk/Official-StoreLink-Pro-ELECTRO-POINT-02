@@ -229,7 +229,7 @@ export function UserSalesHistoryModal({
     <>
       <Dialog open={isOpen} onOpenChange={handleModalClose}>
         <DialogContent 
-          className="max-w-5xl h-[95vh] sm:h-[90vh] flex flex-col p-0 overflow-hidden"
+          className="max-w-5xl h sm:h flex flex-col p-0 overflow-hidden"
           onPointerDownOutside={(e) => e.preventDefault()}
         >
           <DialogHeader className="p-6 pb-4 border-b shrink-0 bg-background">
@@ -275,7 +275,7 @@ export function UserSalesHistoryModal({
                             <div className="p-3 border-b bg-muted/20">
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="space-y-1">
-                                        <Label htmlFor="pos-date-from" className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">From Date</Label>
+                                        <Label htmlFor="pos-date-from" className="text font-black text-muted-foreground uppercase tracking-widest">From Date</Label>
                                         <Input
                                             id="pos-date-from"
                                             type="date"
@@ -288,7 +288,7 @@ export function UserSalesHistoryModal({
                                         />
                                     </div>
                                     <div className="space-y-1">
-                                        <Label htmlFor="pos-date-to" className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">To Date</Label>
+                                        <Label htmlFor="pos-date-to" className="text font-black text-muted-foreground uppercase tracking-widest">To Date</Label>
                                         <Input
                                             id="pos-date-to"
                                             type="date"
@@ -321,25 +321,25 @@ export function UserSalesHistoryModal({
           {/* Summary Banner */}
            <div className="px-6 py-4 grid grid-cols-1 md:grid-cols-4 gap-4 bg-primary/5 shrink-0 border-b">
             <div className="space-y-1">
-                 <p className="text-[10px] font-black uppercase text-primary tracking-widest flex items-center gap-1.5">
+                 <p className="text font-black uppercase text-primary tracking-widest flex items-center gap-1.5">
                     <DollarSign className="h-3 w-3" /> Net Revenue
                  </p>
                  {isLoading ? <Skeleton className="h-8 w-24" /> : <div className="text-xl font-bold tracking-tight text-primary">{formatCurrency(stats.totalSales, currencySymbol)}</div>}
             </div>
             <div className="space-y-1">
-                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest flex items-center gap-1.5">
+                <p className="text font-black uppercase text-muted-foreground tracking-widest flex items-center gap-1.5">
                     <ShoppingBag className="h-3 w-3" /> Volume
                 </p>
                 {isLoading ? <Skeleton className="h-8 w-12" /> : <div className="text-xl font-bold">{stats.count}</div>}
             </div>
             <div className="space-y-1">
-                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest flex items-center gap-1.5">
+                <p className="text font-black uppercase text-muted-foreground tracking-widest flex items-center gap-1.5">
                     <TrendingUp className="h-3 w-3" /> Avg Sale
                 </p>
                 {isLoading ? <Skeleton className="h-8 w-20" /> : <div className="text-xl font-bold">{formatCurrency(stats.count > 0 ? stats.totalSales / stats.count : 0, currencySymbol)}</div>}
             </div>
             <div className="space-y-1 text-right">
-                <p className="text-[10px] font-black uppercase text-orange-600 tracking-widest flex items-center justify-end gap-1.5">
+                <p className="text font-black uppercase text-orange-600 tracking-widest flex items-center justify-end gap-1.5">
                     <Undo2 className="h-3 w-3" /> Refunds
                 </p>
                 {isLoading ? <Skeleton className="h-8 w-20 ml-auto" /> : <div className="text-xl font-bold text-orange-600">{formatCurrency(stats.refunds, currencySymbol)}</div>}
@@ -383,7 +383,7 @@ export function UserSalesHistoryModal({
                         <Table>
                             <TableHeader className="sticky top-0 bg-background z-10">
                                 <TableRow className="hover:bg-transparent">
-                                    <TableHead className="w-[120px]">Date</TableHead>
+                                    <TableHead className="w">Date</TableHead>
                                     <TableHead>Customer</TableHead>
                                     <TableHead className="text-right">Net Total</TableHead>
                                     <TableHead>Status</TableHead>
@@ -401,22 +401,22 @@ export function UserSalesHistoryModal({
                                           <div className="font-bold">{saleDate ? format(saleDate, 'EEEE - MMM- dd- yyyy') : 'N/A'}</div>
                                           <div className="text-muted-foreground">{saleDate ? format(saleDate, 'h:mm a') : ''}</div>
                                         </TableCell>
-                                        <TableCell className="max-w-[180px] py-4">
+                                        <TableCell className="max-w py-4">
                                           <div className="truncate font-semibold" title={sale.customerName || 'Walk-in'}>
                                             {sale.customerName || 'Walk-in Customer'}
                                           </div>
-                                          <div className="text-[10px] text-muted-foreground uppercase font-mono">#{sale.id.substring(0, 8)}</div>
+                                          <div className="text text-muted-foreground uppercase font-mono">#{sale.id.substring(0, 8)}</div>
                                         </TableCell>
                                         <TableCell className="text-right py-4">
                                           <div className="font-bold text-sm">{formatCurrency(total, currencySymbol)}</div>
-                                          <div className="text-[10px] text-muted-foreground">{sale.paymentMethod}</div>
+                                          <div className="text text-muted-foreground">{sale.paymentMethod}</div>
                                         </TableCell>
                                         <TableCell className="py-4">
-                                          <Badge variant="outline" className={cn("text-[9px] font-black uppercase px-2 py-0", status.color)}>
+                                          <Badge variant="outline" className={cn("text font-black uppercase px-2 py-0", status.color)}>
                                             {status.text}
                                           </Badge>
                                           {(sale.returnedAmount || 0) > 0 && (
-                                            <Badge variant="destructive" className="ml-1 text-[8px] px-1 py-0 h-4">RET</Badge>
+                                            <Badge variant="destructive" className="ml-1 text px-1 py-0 h-4">RET</Badge>
                                           )}
                                         </TableCell>
                                         <TableCell className="text-right py-4">
@@ -440,9 +440,9 @@ export function UserSalesHistoryModal({
           </div>
 
           {/* Pagination */}
-          <DialogFooter className="p-6 py-4 border-t flex flex-row justify-between items-center shrink-0 bg-background shadow-[0_-4px_10px_rgba(0,0,0,0.03)]">
+          <DialogFooter className="p-6 py-4 border-t flex flex-row justify-between items-center shrink-0 bg-background">
             <div className="flex items-center gap-2">
-                <div className="bg-muted p-1 rounded-md text-[10px] font-black uppercase text-muted-foreground px-2">
+                <div className="bg-muted p-1 rounded-md text font-black uppercase text-muted-foreground px-2">
                     {filteredSales.length} Records
                 </div>
             </div>
@@ -457,7 +457,7 @@ export function UserSalesHistoryModal({
                     >
                       <ChevronLeft className="h-4 w-4"/>
                     </Button>
-                    <div className="text-[11px] font-bold tabular-nums min-w-[40px] text-center">
+                    <div className="text font-bold tabular-nums min-w text-center">
                         {currentPage} / {totalPages || 1}
                     </div>
                     <Button 

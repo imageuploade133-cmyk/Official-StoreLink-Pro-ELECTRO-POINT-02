@@ -267,7 +267,7 @@ export default function ManageSlideShowPage() {
         </div>
       </div>
 
-      <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <CardHeader className="bg-muted/10 border-b">
           <CardTitle>Carousel Registry (Homepage)</CardTitle>
           <CardDescription>Incremental fetching active. Use reorder arrows to swap positions within current view.</CardDescription>
@@ -302,7 +302,7 @@ export default function ManageSlideShowPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                          <div className="w-[80px] h-[45px] rounded-lg bg-muted overflow-hidden relative border shadow-sm">
+                          <div className="w h rounded-lg bg-muted overflow-hidden relative border ">
                           {slide.mediaType === 'image' && slide.imageUrl ? (
                                     <Image src={slide.imageUrl} alt="" fill className="object-cover" unoptimized />
                                 ) : slide.mediaType === 'video' && slide.videoPosterUrl ? (
@@ -318,13 +318,13 @@ export default function ManageSlideShowPage() {
                         {slide.title || <span className="text-muted-foreground italic font-normal">Untitled</span>}
                       </TableCell>
                       <TableCell>
-                          <Badge variant="outline" className="capitalize text-[9px] h-5 font-black bg-background">
+                          <Badge variant="outline" className="capitalize text h-5 font-black bg-background">
                             {slide.mediaType === 'image' ? <ImageIcon className="h-3 w-3 mr-1" /> : <Video className="h-3 w-3 mr-1" />}
                             {slide.mediaType}
                           </Badge>
                       </TableCell>
                       <TableCell>
-                          <Badge variant="secondary" className="capitalize text-[9px] h-5 font-black flex items-center gap-1.5 px-2">
+                          <Badge variant="secondary" className="capitalize text h-5 font-black flex items-center gap-1.5 px-2">
                             {slide.placement === 'flash-hub' ? <Zap className="h-3 w-3 text-rose-500" /> : <LayoutGrid className="h-3 w-3" />}
                             {slide.placement || 'homepage'}
                           </Badge>
@@ -333,7 +333,7 @@ export default function ManageSlideShowPage() {
                         <div className="flex items-center gap-3">
                            <Switch checked={slide.published} onCheckedChange={() => handleTogglePublished(slide)} disabled={isToggling === slide.id}/>
                             {isToggling === slide.id ? <Loader2 className="h-4 w-4 animate-spin text-primary"/> : (
-                                <Badge variant={slide.published ? 'default' : 'secondary'} className={cn("text-[9px] font-black h-5 uppercase", slide.published ? 'bg-green-100 text-green-800' : '')}>
+                                <Badge variant={slide.published ? 'default' : 'secondary'} className={cn("text font-black h-5 uppercase", slide.published ? 'bg-green-100 text-green-800' : '')}>
                                     {slide.published ? 'Live' : 'Draft'}
                                 </Badge>
                             )}

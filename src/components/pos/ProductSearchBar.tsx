@@ -45,7 +45,7 @@ export function ProductSearchBar({
 }: ProductSearchBarProps) {
 
   return (
-    <Card className="mb-2 sm:mb-4 shadow-sm border-input">
+    <Card className="mb-2 sm:mb-4  border-input">
       <CardHeader className="p-2 sm:p-3">
         <CardTitle className="text-xs sm:text-base">Find Products</CardTitle>
       </CardHeader>
@@ -61,7 +61,7 @@ export function ProductSearchBar({
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             {isSearchDropdownOpen && liveSearchResults.length > 0 && (
-              <Card className="absolute top-full left-0 right-0 mt-1 z-50 max-h-80 overflow-y-auto shadow-xl border">
+              <Card className="absolute top-full left-0 right-0 mt-1 z-50 max-h-80 overflow-y-auto  border">
                 <CardContent className="p-0">
                   {liveSearchResults.map((product) => {
                     const effectivePrice = calculateEffectivePrice(product, today);

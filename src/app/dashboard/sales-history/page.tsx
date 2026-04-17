@@ -481,11 +481,11 @@ function SalesHistoryContent() {
                                 </div>
                                 <div className="grid grid-cols-2 gap-2">
                                     <div className="space-y-1">
-                                        <Label className="text-[10px] font-black uppercase text-muted-foreground">From</Label>
+                                        <Label className="text font-black uppercase text-muted-foreground">From</Label>
                                         <Input type="date" className="h-8 text-xs" value={dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : ''} onChange={(e) => handleCustomDateChange({ ...dateRange, from: e.target.value ? new Date(e.target.value + 'T00:00:00') : undefined })} />
                                     </div>
                                     <div className="space-y-1">
-                                        <Label className="text-[10px] font-black uppercase text-muted-foreground">To</Label>
+                                        <Label className="text font-black uppercase text-muted-foreground">To</Label>
                                         <Input type="date" className="h-8 text-xs" value={dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : ''} onChange={(e) => handleCustomDateChange({ ...dateRange, to: e.target.value ? new Date(e.target.value + 'T00:00:00') : undefined })} />
                                     </div>
                                 </div>
@@ -508,20 +508,20 @@ function SalesHistoryContent() {
         </CardContent>
     </Card>
 
-      <Card className="shadow-lg overflow-hidden border-none ring-1 ring-border">
+      <Card className=" overflow-hidden border-none ring-1 ring-border">
         <CardContent className="p-0">
-          <ScrollArea className="h-[600px]"> 
+          <ScrollArea className="h"> 
             <Table>
-              <TableHeader className="sticky top-0 bg-background z-10 shadow-sm">
+              <TableHeader className="sticky top-0 bg-background z-10 ">
                 <TableRow>
-                    <TableHead className="w-[80px]">Sale ID</TableHead>
-                    <TableHead className="w-[150px]">Date & Time</TableHead>
+                    <TableHead className="w">Sale ID</TableHead>
+                    <TableHead className="w">Date & Time</TableHead>
                     <TableHead>Customer</TableHead>
                     <TableHead>Staff</TableHead>
-                    <TableHead className="text-right w-[120px]">Net Total</TableHead>
-                    <TableHead className="w-[100px]">Payment</TableHead>
-                    <TableHead className="w-[160px]">Status</TableHead>
-                    <TableHead className="w-[80px] text-right">Actions</TableHead>
+                    <TableHead className="text-right w">Net Total</TableHead>
+                    <TableHead className="w">Payment</TableHead>
+                    <TableHead className="w">Status</TableHead>
+                    <TableHead className="w text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -555,31 +555,31 @@ function SalesHistoryContent() {
                     
                     return (
                       <TableRow key={sale.id} className="hover:bg-muted/30 transition-colors group">
-                        <TableCell className="font-mono text-[10px] font-bold text-primary">#{sale.id.substring(0, 8).toUpperCase()}</TableCell>
-                        <TableCell className="text-[10px] py-4">
+                        <TableCell className="font-mono text font-bold text-primary">#{sale.id.substring(0, 8).toUpperCase()}</TableCell>
+                        <TableCell className="text py-4">
                           <div className="font-black">{saleDate ? format(saleDate, 'MMM dd, yyyy') : 'N/A'}</div>
                           <div className="text-muted-foreground font-medium">{saleDate ? format(saleDate, 'h:mm a') : ''}</div>
                         </TableCell>
-                        <TableCell className="text-sm truncate max-w-[180px]" title={sale.customerName || 'N/A'}>
+                        <TableCell className="text-sm truncate max-w" title={sale.customerName || 'N/A'}>
                             <p className="font-bold leading-none">{sale.customerName || 'Walk-in'}</p>
                         </TableCell>
                         <TableCell className="text-xs">
                           <div className="flex items-center gap-1.5" title={processedByStaff?.name || sale.staffId}>
                             <UserCircle className="h-3 w-3 text-muted-foreground" />
-                            <span className="truncate max-w-[100px] font-medium">{processedByStaff?.name || 'Admin'}</span>
+                            <span className="truncate max-w font-medium">{processedByStaff?.name || 'Admin'}</span>
                           </div>
                         </TableCell>
                         <TableCell className="text-right font-black text-sm">
                           <div className="flex flex-col items-end">
                             {formatCurrency(netTotal, currencySymbol)}
                             {sale.returnedAmount && sale.returnedAmount > 0 ? (
-                                <span className="text-[8px] text-orange-600 font-bold uppercase tracking-tighter">Refunded: {formatCurrency(sale.returnedAmount, currencySymbol)}</span>
+                                <span className="text text-orange-600 font-bold uppercase tracking-tighter">Refunded: {formatCurrency(sale.returnedAmount, currencySymbol)}</span>
                             ) : null}
                           </div>
                         </TableCell>
-                        <TableCell className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{sale.paymentMethod}</TableCell>
+                        <TableCell className="text font-bold uppercase tracking-widest text-muted-foreground">{sale.paymentMethod}</TableCell>
                         <TableCell>
-                          <Badge variant={"outline"} className={cn("text-[9px] font-black uppercase", statusInfo.colorClasses)}>
+                          <Badge variant={"outline"} className={cn("text font-black uppercase", statusInfo.colorClasses)}>
                             <IconComponent className="mr-1 h-3 w-3" />{statusInfo.text}
                           </Badge>
                         </TableCell>

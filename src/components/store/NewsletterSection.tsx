@@ -54,7 +54,7 @@ export function NewsletterSection() {
                 <input className="flex-1 px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-primary focus:border-primary bg-white dark:bg-slate-800 outline-none" placeholder="Enter your email" type="email"/>
                 <button style={buttonStyle} className="px-8 py-3 rounded-lg font-bold transition-colors" type="submit">Subscribe</button>
             </form>
-            <p className="text-[10px] text-slate-500 mt-4">By subscribing, you agree to our Terms of Service and Privacy Policy.</p>
+            <p className="text text-slate-500 mt-4">By subscribing, you agree to our Terms of Service and Privacy Policy.</p>
         </div>
     </section>
   );

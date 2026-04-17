@@ -43,7 +43,7 @@ export function StockLevelTable({ products, isLoading, onRestock, title, descrip
       <Table>
           <TableHeader>
               <TableRow>
-                  <TableHead className="w-[80px]">Image</TableHead>
+                  <TableHead className="w">Image</TableHead>
                   <TableHead>Product</TableHead>
                   <TableHead className="text-center">Current Stock</TableHead>
                   <TableHead className="text-center">Threshold</TableHead>

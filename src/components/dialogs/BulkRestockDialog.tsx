@@ -83,7 +83,7 @@ export function BulkRestockDialog({ isOpen, onOpenChange, products, isSubmitting
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-0">
+      <DialogContent className="max-w-4xl max-h flex flex-col p-0">
         <DialogHeader className="p-6 pb-4 border-b">
           <DialogTitle>Bulk Stock Adjustment</DialogTitle>
           <DialogDescription>
@@ -115,15 +115,15 @@ export function BulkRestockDialog({ isOpen, onOpenChange, products, isSubmitting
               </div>
             </div>
 
-            <div className="flex-grow min-h-[200px] px-6">
+            <div className="flex-grow min-h px-6">
                 <ScrollArea className="h-full border rounded-md">
                     <Table>
                         <TableHeader className="sticky top-0 bg-muted z-10">
                             <TableRow>
                                 <TableHead className="w-1/2 pl-4">Product</TableHead>
-                                <TableHead className="w-[100px]">Quantity</TableHead>
-                                <TableHead className="w-[120px]">Cost / Unit</TableHead>
-                                <TableHead className="w-[50px] text-right pr-4">Action</TableHead>
+                                <TableHead className="w">Quantity</TableHead>
+                                <TableHead className="w">Cost / Unit</TableHead>
+                                <TableHead className="w text-right pr-4">Action</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>

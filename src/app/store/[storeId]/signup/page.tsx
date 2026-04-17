@@ -224,7 +224,7 @@ export default function StoreSignupPage() {
                 setIsCongratulationOpen(open);
                 if (!open) router.replace('/store/account');
             }}>
-                <DialogContent className="sm:max-w-md p-0 overflow-hidden border-none shadow-2xl rounded-[3rem]" style={{ backgroundColor: bgColor }}>
+                <DialogContent className="sm:max-w-md p-0 overflow-hidden border-none  rounded" style={{ backgroundColor: bgColor }}>
                     <DialogHeader className="sr-only">
                         <DialogTitle>Congratulations</DialogTitle>
                         <DialogDescription>Welcome to our store</DialogDescription>
@@ -238,7 +238,7 @@ export default function StoreSignupPage() {
                     )}
 
                     <div className="p-10 flex flex-col items-center text-center space-y-6" style={{ color: textColor }}>
-                        <div className="size-20 rounded-[2rem] flex items-center justify-center mb-2 animate-bounce shadow-inner" style={{ backgroundColor: `${iconColor}15` }}>
+                        <div className="size-20 rounded flex items-center justify-center mb-2 animate-bounce " style={{ backgroundColor: `${iconColor}15` }}>
                             <SelectedIcon className="size-10" style={{ color: iconColor }} strokeWidth={3} />
                         </div>
                         <div className="space-y-2">
@@ -252,8 +252,8 @@ export default function StoreSignupPage() {
 
                         {activeBonus > 0 && (
                             <div className="w-full pt-4">
-                                <div className="p-6 rounded-[2.5rem] bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 backdrop-blur-md">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-50 mb-2">Initial Credit Verified</p>
+                                <div className="p-6 rounded bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 backdrop-blur-md">
+                                    <p className="text font-black uppercase tracking opacity-50 mb-2">Initial Credit Verified</p>
                                     <p className="text-4xl font-black tracking-tighter" style={{ color: iconColor }}>
                                         {formatCurrency(activeBonus, settings.currency || '$')}
                                     </p>
@@ -267,7 +267,7 @@ export default function StoreSignupPage() {
                                     setIsCongratulationOpen(false);
                                     router.replace('/store/account');
                                 }}
-                                className="w-full h-16 rounded-[1.5rem] font-black uppercase text-[10px] tracking-[0.3em] shadow-xl transition-all active:scale-95"
+                                className="w-full h-16 rounded font-black uppercase text tracking  transition-all active:scale-95"
                             >
                                 Start Discovery <ArrowRight className="ml-3 h-4 w-4" strokeWidth={3} />
                             </Button>
@@ -289,7 +289,7 @@ export default function StoreSignupPage() {
   return (
     <div className="w-full min-h-screen grid lg:grid-cols-2">
       <div className="flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[400px] gap-6 px-4">
+        <div className="mx-auto grid w gap-6 px-4">
           <div className="grid gap-2 text-center">
              <div className="flex justify-center mb-4 h-10">
                 {storeLogo ? (
@@ -348,7 +348,7 @@ export default function StoreSignupPage() {
                       <FormMessage /></FormItem>
                 )}/>
                 <FormField control={form.control} name="address" render={({ field }) => (
-                    <FormItem><FormLabel>Delivery Address</FormLabel><FormControl><Textarea placeholder="Full street address..." {...field} disabled={isSubmitting} className="min-h-[100px]" /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Delivery Address</FormLabel><FormControl><Textarea placeholder="Full street address..." {...field} disabled={isSubmitting} className="min-h" /></FormControl><FormMessage /></FormItem>
                 )}/>
 
                 <Button type="submit" style={buttonStyle} className="w-full mt-2 h-12 font-bold border-none" disabled={isSubmitting}>

@@ -39,7 +39,7 @@ import { Separator } from '@/components/ui/separator';
 const voiceSettingsSchema = z.object({
   voiceExperiencePreTitle: z.string().min(2, 'Pre-title is too short.').max(40, 'Pre-title is too long.'),
   voiceExperienceTitle: z.string().min(2, 'Title is too short.').max(60, 'Title is too long.'),
-  voiceExperienceColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default('#3b82f6'),
+  voiceExperienceColor: z.string().regex(/^#[0-9a-fA{6}$/i, 'Must be a valid hex color').default('#3b82f6'),
   voiceExperienceIconUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
 });
 
@@ -158,7 +158,7 @@ export default function VoiceSettingsPage() {
     return (
       <div className="space-y-6">
         <PageHeader icon={Volume2} title="Voice Experience Settings" description="Loading configuration..." />
-        <Skeleton className="h-[500px] w-full rounded-3xl" />
+        <Skeleton className="h w-full rounded-3xl" />
       </div>
     );
   }
@@ -182,7 +182,7 @@ export default function VoiceSettingsPage() {
         <div className="lg:col-span-2">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b">
                     <CardTitle className="text-xl">Display Text & Branding</CardTitle>
                     <CardDescription>Adjust the labels and primary color of the audio player.</CardDescription>
@@ -194,7 +194,7 @@ export default function VoiceSettingsPage() {
                         name="voiceExperiencePreTitle"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-primary">Micro-Label (Pre-Title)</FormLabel>
+                                <FormLabel className="text font-black uppercase tracking-widest text-primary">Micro-Label (Pre-Title)</FormLabel>
                                 <FormControl><Input placeholder="e.g., Listen to Audio Signature" {...field} className="h-11 font-bold" /></FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -205,7 +205,7 @@ export default function VoiceSettingsPage() {
                         name="voiceExperienceTitle"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-primary">Main Experience Heading</FormLabel>
+                                <FormLabel className="text font-black uppercase tracking-widest text-primary">Main Experience Heading</FormLabel>
                                 <FormControl><Input placeholder="e.g., Expert Insights & Detailed Pitch" {...field} className="h-11 font-black" /></FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -225,7 +225,7 @@ export default function VoiceSettingsPage() {
                         name="voiceExperienceIconUrl"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="text-[10px] font-black uppercase tracking-widest text-primary">Custom Player Icon (Optional)</FormLabel>
+                            <FormLabel className="text font-black uppercase tracking-widest text-primary">Custom Player Icon (Optional)</FormLabel>
                             <div className="flex flex-col gap-4">
                                 {iconUrl && (
                                     <div className="relative w-24 h-24 rounded-2xl overflow-hidden border bg-white group">
@@ -251,7 +251,7 @@ export default function VoiceSettingsPage() {
                                     <input id="voice-icon-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isUploading} />
                                 </div>
                             </div>
-                            <FormDescription className="text-[10px]">Recommended: 200x200px PNG with transparency.</FormDescription>
+                            <FormDescription className="text">Recommended: 200x200px PNG with transparency.</FormDescription>
                             <FormMessage />
                         </FormItem>
                         )}
@@ -259,7 +259,7 @@ export default function VoiceSettingsPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="bg-muted/30 border-t p-6">
-                  <Button type="submit" disabled={isSaving} className="font-black uppercase tracking-widest text-xs h-12 px-8 shadow-xl shadow-primary/20">
+                  <Button type="submit" disabled={isSaving} className="font-black uppercase tracking-widest text-xs h-12 px-8  ">
                     {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                     Sync Voice Configuration
                   </Button>
@@ -271,22 +271,22 @@ export default function VoiceSettingsPage() {
 
         <div className="lg:col-span-1">
           <div className="sticky top-24 space-y-6">
-            <Card className="shadow-lg border-none ring-1 ring-border">
+            <Card className=" border-none ring-1 ring-border">
                 <CardHeader className="bg-muted/10">
-                    <CardTitle className="text-sm font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                    <CardTitle className="text-sm font-black uppercase tracking text-primary flex items-center gap-2">
                         <Volume2 className="h-4 w-4" /> Real-time Insight
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-8">
                     {/* The Simulation */}
                     <div 
-                        className="bg-primary text-white p-6 rounded-[2rem] shadow-2xl flex items-center gap-4 relative overflow-hidden transition-colors duration-500"
+                        className="bg-primary text-white p-6 rounded  flex items-center gap-4 relative overflow-hidden transition-colors duration-500"
                         style={{ backgroundColor: cardColor }}
                     >
                         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
                         <div className="absolute -right-4 -top-4 opacity-10">
                             {iconUrl ? (
-                                <div className="relative h-24 w-24 rounded-xl overflow-hidden grayscale brightness-[2]">
+                                <div className="relative h-24 w-24 rounded-xl overflow-hidden grayscale brightness">
                                     <Image src={iconUrl} alt="Icon" fill className="object-cover" unoptimized />
                                 </div>
                             ) : (
@@ -297,13 +297,13 @@ export default function VoiceSettingsPage() {
                         <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-md text-white border-2 border-white/30 shadow-xl relative z-10 flex-shrink-0"
+                            className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-md text-white border-2 border-white/30  relative z-10 flex-shrink-0"
                         >
                             <Play className="h-6 w-6 fill-current ml-1" />
                         </Button>
                         
                         <div className="relative z-10 space-y-0.5 overflow-hidden">
-                            <span className="text-[8px] font-black uppercase tracking-[0.3em] opacity-80 block truncate">
+                            <span className="text font-black uppercase tracking opacity-80 block truncate">
                                 {form.watch('voiceExperiencePreTitle')}
                             </span>
                             <h4 className="text-sm font-black tracking-tight leading-tight truncate">
@@ -311,11 +311,11 @@ export default function VoiceSettingsPage() {
                             </h4>
                         </div>
                     </div>
-                    <p className="text-[10px] text-muted-foreground font-black uppercase text-center mt-4 tracking-widest">Storefront Preview Simulation</p>
+                    <p className="text text-muted-foreground font-black uppercase text-center mt-4 tracking-widest">Storefront Preview Simulation</p>
                 </CardContent>
             </Card>
 
-            <div className="p-6 bg-primary/5 rounded-[2rem] border-2 border-dashed border-primary/10 flex gap-4 items-start">
+            <div className="p-6 bg-primary/5 rounded border-2 border-dashed border-primary/10 flex gap-4 items-start">
                 <Palette className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                 <div className="text-xs space-y-2">
                     <p className="font-bold text-primary uppercase tracking-wider">Multimedia Branding</p>

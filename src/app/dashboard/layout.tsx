@@ -277,11 +277,11 @@ export default function DashboardLayout({
   return (
     <div
       className={cn(
-        'grid h-[100dvh] w-full overflow-hidden',
-        showSidebar && 'transition-[grid-template-columns] duration-300 ease-in-out',
+        'grid h w-full overflow-hidden',
+        showSidebar && 'transition-[grid-template duration-300 ease-in-out',
         showSidebar && (isMinimized
-          ? 'md:grid-cols-[80px_1fr]'
-          : 'md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]'),
+          ? 'md:grid-cols'
+          : 'md:grid-cols lg:grid-cols'),
         !showSidebar && 'grid-cols-1'
       )}
     >
@@ -290,7 +290,7 @@ export default function DashboardLayout({
         <aside className="hidden border-r bg-sidebar-background md:flex md:flex-col overflow-hidden dark:bg-sidebar-background dark:border-sidebar-border">
           <div
             className={cn(
-              'flex h-14 shrink-0 items-center border-b dark:border-sidebar-border lg:h-[60px]',
+              'flex h-14 shrink-0 items-center border-b dark:border-sidebar-border lg:h',
               isMinimized ? 'justify-center px-2' : 'px-4 lg:px-6'
             )}
           >
@@ -371,7 +371,7 @@ export default function DashboardLayout({
                       {showBadge && (
                         <Badge 
                           variant="destructive" 
-                          className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full px-0 text-[10px] animate-pulse"
+                          className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full px-0 text animate-pulse"
                         >
                           {pendingCount}
                         </Badge>
@@ -388,7 +388,7 @@ export default function DashboardLayout({
       {/* Content Area */}
       <div className="flex flex-col overflow-hidden dark:bg-black">
         {/* Header */}
-        <header className="flex h-14 shrink-0 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6 dark:bg-card dark:border-border/50">
+        <header className="flex h-14 shrink-0 items-center gap-4 border-b bg-card px-4 lg:h lg:px-6 dark:bg-card dark:border-border/50">
           {showSidebar && (
             <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <SheetTrigger asChild>

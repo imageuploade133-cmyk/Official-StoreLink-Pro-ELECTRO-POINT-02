@@ -28,10 +28,10 @@ import { Code2 } from 'lucide-react';
 
 const footerSettingsSchema = z.object({
   footerBackgroundStyle: z.enum(['solid', 'gradient']).optional(),
-  footerColorBackground: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').optional(),
-  footerBackgroundGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').optional(),
-  footerBackgroundGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').optional(),
-  footerTextColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').optional(),
+  footerColorBackground: z.string().regex(/^#[0-9a-fA{6}$/i, 'Must be a valid hex color').optional(),
+  footerBackgroundGradientStart: z.string().regex(/^#[0-9a-fA{6}$/i, 'Must be a valid hex color').optional(),
+  footerBackgroundGradientEnd: z.string().regex(/^#[0-9a-fA{6}$/i, 'Must be a valid hex color').optional(),
+  footerTextColor: z.string().regex(/^#[0-9a-fA{6}$/i, 'Must be a valid hex color').optional(),
   footerDesign: z.enum(['standard', 'modern', 'minimal']).optional(),
   footerBannerUrl: z.string().url('Must be a valid URL.').or(z.literal('')).optional(),
   footerBannerSize: z.union([z.enum(['small', 'big']), z.coerce.number()]).optional(),
@@ -206,7 +206,7 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
   }
 
   return (
-    <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+    <Card className=" border-none ring-1 ring-border overflow-hidden">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader className="bg-muted/30 border-b">
@@ -219,7 +219,7 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
           <CardContent className="space-y-10 pt-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <div className="space-y-8">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                    <h4 className="text font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                         <ImageIcon className="h-3.5 w-3.5" /> Footer Banner Asset
                     </h4>
                     
@@ -232,7 +232,7 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
                           <div className="flex flex-col gap-4">
                             {field.value && (
                               <div
-                                className="relative w-full rounded-xl overflow-hidden border shadow-inner bg-muted/20 transition-all duration-500"
+                                className="relative w-full rounded-xl overflow-hidden border  bg-muted/20 transition-all duration-500"
                                 style={{
                                   height: typeof form.watch('footerBannerSize') === 'number'
                                     ? `${Math.min(form.watch('footerBannerSize') as number / 2, 200)}px`
@@ -264,7 +264,7 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
                               <Input id="footer-banner-upload" type="file" accept="image/*" className="hidden" onChange={handleBannerUpload} disabled={isSaving || isUploadingBanner} />
                             </div>
                           </div>
-                          <FormDescription className="text-[10px]">A promotional banner displayed at the very bottom of your footer.</FormDescription>
+                          <FormDescription className="text">A promotional banner displayed at the very bottom of your footer.</FormDescription>
                         </FormItem>
                       )}
                     />
@@ -307,7 +307,7 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
                       name="footerDesign"
                       render={({ field }) => (
                         <FormItem className="space-y-4">
-                          <FormLabel className="text-xs font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                          <FormLabel className="text-xs font-black uppercase tracking text-primary flex items-center gap-2">
                             <Layout className="h-4 w-4" /> Footer UI Design
                           </FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
@@ -332,7 +332,7 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
                       name="footerBackgroundStyle"
                       render={({ field }) => (
                         <FormItem className="space-y-4">
-                          <FormLabel className="text-xs font-black uppercase tracking-[0.2em] text-primary">Background Mode</FormLabel>
+                          <FormLabel className="text-xs font-black uppercase tracking text-primary">Background Mode</FormLabel>
                           <FormControl>
                             <RadioGroup
                               onValueChange={field.onChange}
@@ -358,7 +358,7 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
             <Separator className="border-dashed" />
 
             <div className="space-y-8">
-                <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                <h4 className="text font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                     <ImageIcon className="h-3.5 w-3.5" /> Footer Background Branding (Text/Image)
                 </h4>
                 
@@ -419,7 +419,7 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
                                 <FormLabel className="text-sm font-bold">Background Image</FormLabel>
                                 <div className="flex flex-col gap-4">
                                   {field.value && (
-                                    <div className="relative w-full aspect-video rounded-xl overflow-hidden border shadow-inner bg-muted/20">
+                                    <div className="relative w-full aspect-video rounded-xl overflow-hidden border  bg-muted/20">
                                       <Image src={field.value} alt="Footer BG" fill className="object-contain" unoptimized />
                                       <Button 
                                         type="button" 
@@ -511,7 +511,7 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <div className="space-y-6">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                    <h4 className="text font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                         <Palette className="h-3.5 w-3.5" /> Color Merchandising
                     </h4>
                     {footerBackgroundStyle === 'solid' ? (
@@ -530,7 +530,7 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
 
             <div className="space-y-8">
                 <div className="flex items-center justify-between">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                    <h4 className="text font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                         <Code2 className="h-3.5 w-3.5" /> Footer HTML Customization
                     </h4>
                     <FormField
@@ -562,7 +562,7 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
                         <Textarea 
                           {...field} 
                           placeholder="<div style='text-align: center;'>Your custom footer content here</div>"
-                          className="font-mono min-h-[200px] bg-muted/20 border-2 transition-all focus:border-primary"
+                          className="font-mono min-h bg-muted/20 border-2 transition-all focus:border-primary"
                         />
                       </FormControl>
                       <FormDescription>
@@ -575,11 +575,11 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
             </div>
           </CardContent>
           <CardFooter className="bg-muted/30 border-t p-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
-            <Button type="submit" disabled={isSaving} size="lg" className="px-10 h-12 font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20">
+            <Button type="submit" disabled={isSaving} size="lg" className="px-10 h-12 font-black uppercase text-xs tracking-widest  ">
               {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Save className="mr-2 h-4 w-4" />}
               Apply Footer Styles
             </Button>
-            <Button type="button" variant="outline" onClick={resetToDefault} className="font-bold uppercase tracking-widest text-[10px]">
+            <Button type="button" variant="outline" onClick={resetToDefault} className="font-bold uppercase tracking-widest text">
                 <RotateCcw className="mr-2 h-4 w-4" /> Reset to Default
             </Button>
           </CardFooter>

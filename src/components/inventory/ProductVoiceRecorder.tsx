@@ -247,7 +247,7 @@ const startRecording = async (index: number) => {
             variant="outline" 
             size="sm" 
             onClick={handleAddTrack}
-            className="rounded-full h-10 px-6 font-black uppercase text-[10px] tracking-widest border-primary/20 text-primary hover:bg-primary hover:text-white transition-all shadow-lg"
+            className="rounded-full h-10 px-6 font-black uppercase text tracking-widest border-primary/20 text-primary hover:bg-primary hover:text-white transition-all "
         >
             <Plus className="h-4 w-4 mr-2" /> Add Track
         </Button>
@@ -255,7 +255,7 @@ const startRecording = async (index: number) => {
 
       <div className="space-y-6">
         {fields.length === 0 ? (
-            <div className="text-center py-20 border-2 border-dashed rounded-[3rem] bg-muted/10">
+            <div className="text-center py-20 border-2 border-dashed rounded bg-muted/10">
                 <Mic className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-10" />
                 <p className="text-lg font-black tracking-tight text-muted-foreground uppercase">No Audio Signatures</p>
                 <p className="text-sm text-muted-foreground mt-2">Personalize your product with a professional audio pitch.</p>
@@ -274,8 +274,8 @@ const startRecording = async (index: number) => {
 
                     return (
                         <div key={field.id} className={cn(
-                            "p-8 border-2 rounded-[3rem] transition-all duration-700 relative group overflow-hidden",
-                            isTrackRecording ? "bg-rose-50 border-rose-500 ring-8 ring-rose-500/5" : "bg-white dark:bg-slate-950 border-slate-100 dark:border-slate-800 hover:border-primary/30 shadow-xl"
+                            "p-8 border-2 rounded transition-all duration-700 relative group overflow-hidden",
+                            isTrackRecording ? "bg-rose-50 border-rose-500 ring-8 ring-rose-500/5" : "bg-white dark:bg-slate-950 border-slate-100 dark:border-slate-800 hover:border-primary/30 "
                         )}>
                             {/* Real-time Progress Bar Overlay */}
                             {isTrackRecording && (
@@ -330,7 +330,7 @@ const startRecording = async (index: number) => {
                                     
                                     <div className="flex flex-col items-center -my-1">
                                         <GripVertical className="h-5 w-5 text-muted-foreground/40" />
-                                        <span className="text-[8px] font-black text-muted-foreground/30 uppercase tracking-widest mt-0.5">0{index + 1}</span>
+                                        <span className="text font-black text-muted-foreground/30 uppercase tracking-widest mt-0.5">0{index + 1}</span>
                                     </div>
 
                                     <Button 
@@ -354,7 +354,7 @@ const startRecording = async (index: number) => {
                                                 name={`voiceSignatures.${index}.title`}
                                                 render={({ field: titleField }) => (
                                                     <FormItem className="space-y-2">
-                                                        <FormLabel className="text-[10px] font-black uppercase text-primary tracking-[0.2em]">Track Identity</FormLabel>
+                                                        <FormLabel className="text font-black uppercase text-primary tracking">Track Identity</FormLabel>
                                                         <FormControl>
                                                             <Input 
                                                                 placeholder="e.g., Founder's Expert Pitch" 
@@ -367,17 +367,17 @@ const startRecording = async (index: number) => {
                                             />
 
                                             <div className="space-y-3">
-                                                <Label className="text-[10px] font-black uppercase text-primary tracking-[0.2em]">Audio Input Protocol</Label>
+                                                <Label className="text font-black uppercase text-primary tracking">Audio Input Protocol</Label>
                                                 <FormField
                                                     control={control}
                                                     name={`voiceSignatures.${index}.mode`}
                                                     render={({ field: modeField }) => (
                                                         <Tabs value={modeField.value || 'mic'} onValueChange={modeField.onChange} className="w-full">
                                                             <TabsList className="grid w-full grid-cols-2 h-11 p-1 bg-muted/30 rounded-2xl">
-                                                                <TabsTrigger value="mic" className="text-[10px] font-black uppercase tracking-widest gap-2 rounded-xl">
+                                                                <TabsTrigger value="mic" className="text font-black uppercase tracking-widest gap-2 rounded-xl">
                                                                     <Mic className="h-3.5 w-3.5" /> Studio Mic
                                                                 </TabsTrigger>
-                                                                <TabsTrigger value="link" className="text-[10px] font-black uppercase tracking-widest gap-2 rounded-xl">
+                                                                <TabsTrigger value="link" className="text font-black uppercase tracking-widest gap-2 rounded-xl">
                                                                     <LinkIcon className="h-3.5 w-3.5" /> Stream Link
                                                                 </TabsTrigger>
                                                             </TabsList>
@@ -387,15 +387,15 @@ const startRecording = async (index: number) => {
                                             </div>
                                         </div>
                                         
-                                        <div className="flex flex-col justify-end gap-4 min-w-[240px]">
+                                        <div className="flex flex-col justify-end gap-4 min-w">
                                             {currentMode === 'mic' ? (
                                                 <div className="space-y-4">
                                                     {isTrackRecording ? (
                                                         <div className="space-y-4 animate-in zoom-in-95 duration-300">
-                                                            <div className="bg-white p-6 rounded-[2rem] border-2 border-rose-200 shadow-lg space-y-4 text-center">
+                                                            <div className="bg-white p-6 rounded border-2 border-rose-200  space-y-4 text-center">
                                                                 <div className="flex items-center justify-center gap-3">
                                                                     <div className="h-3 w-3 rounded-full bg-rose-500 animate-pulse" />
-                                                                    <span className="text-xs font-black uppercase tracking-[0.2em] text-rose-600">Mic Live</span>
+                                                                    <span className="text-xs font-black uppercase tracking text-rose-600">Mic Live</span>
                                                                 </div>
                                                                 <div className={cn(
                                                                     "text-4xl font-black font-mono tracking-tighter transition-colors",
@@ -403,13 +403,13 @@ const startRecording = async (index: number) => {
                                                                 )}>
                                                                     {formatTime(currentDuration)}
                                                                 </div>
-                                                                <div className="text-[10px] font-bold text-muted-foreground uppercase">Recording Logic Active...</div>
+                                                                <div className="text font-bold text-muted-foreground uppercase">Recording Logic Active...</div>
                                                             </div>
                                                             <Button 
                                                                 type="button" 
                                                                 variant="destructive" 
                                                                 onClick={stopRecording}
-                                                                className="rounded-2xl w-full h-14 font-black uppercase text-xs tracking-widest shadow-xl shadow-rose-200 transition-all active:scale-95"
+                                                                className="rounded-2xl w-full h-14 font-black uppercase text-xs tracking-widest  -200 transition-all active:scale-95"
                                                             >
                                                                 <StopCircle className="h-5 w-5 mr-3" /> Finish Recording
                                                             </Button>
@@ -419,7 +419,7 @@ const startRecording = async (index: number) => {
                                                             type="button" 
                                                             variant={hasAudio ? "outline" : "default"}
                                                             onClick={() => startRecording(index)}
-                                                            className="rounded-2xl w-full h-14 font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/10 hover:shadow-primary/20 transition-all active:scale-[0.98]"
+                                                            className="rounded-2xl w-full h-14 font-black uppercase text-xs tracking-widest   hover: transition-all active:scale"
                                                             disabled={isConverting}
                                                         >
                                                             {isConverting ? (
@@ -436,7 +436,7 @@ const startRecording = async (index: number) => {
                                                     name={`voiceSignatures.${index}.audioDataUri`}
                                                     render={({ field: uriField }) => (
                                                         <FormItem className="space-y-2">
-                                                            <FormLabel className="text-[10px] font-black uppercase text-muted-foreground tracking-[0.2em]">Audio Source Link</FormLabel>
+                                                            <FormLabel className="text font-black uppercase text-muted-foreground tracking">Audio Source Link</FormLabel>
                                                             <FormControl>
                                                                 <Input 
                                                                     placeholder="https://cdn.example.com/pitch.mp3" 
@@ -455,7 +455,7 @@ const startRecording = async (index: number) => {
                                                     type="button" 
                                                     variant="secondary"
                                                     onClick={() => togglePlayback(field.id, track.audioDataUri)}
-                                                    className="rounded-2xl h-14 w-full flex items-center justify-center gap-3 font-black uppercase text-xs tracking-widest bg-slate-900 text-white hover:bg-slate-800 shadow-xl transition-all active:scale-95"
+                                                    className="rounded-2xl h-14 w-full flex items-center justify-center gap-3 font-black uppercase text-xs tracking-widest bg-slate-900 text-white hover:bg-slate-800  transition-all active:scale-95"
                                                 >
                                                     {isPlayingId === field.id ? (
                                                         <><Pause className="h-5 w-5 fill-current" /> Stop Preview</>
@@ -468,12 +468,12 @@ const startRecording = async (index: number) => {
                                     </div>
 
                                     {hasAudio && currentMode === 'mic' && !isTrackRecording && (
-                                        <div className="p-5 bg-primary/5 rounded-[2rem] border-2 border-dashed border-primary/10 animate-in fade-in duration-700">
-                                            <div className="flex justify-between items-center text-[10px] font-black uppercase text-primary mb-2 tracking-widest">
+                                        <div className="p-5 bg-primary/5 rounded border-2 border-dashed border-primary/10 animate-in fade-in duration-700">
+                                            <div className="flex justify-between items-center text font-black uppercase text-primary mb-2 tracking-widest">
                                                 <span className="flex items-center gap-2"><Code className="h-3 w-3" /> Binary Integrity Synced</span>
                                                 <span className="opacity-50">Local Buffer Valid</span>
                                             </div>
-                                            <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden shadow-inner">
+                                            <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden ">
                                                 <div className={cn("h-full bg-primary transition-all duration-1000 ease-out", isPlayingId === field.id ? "w-full" : "w-0")} />
                                             </div>
                                         </div>
@@ -487,8 +487,8 @@ const startRecording = async (index: number) => {
         )}
       </div>
       
-      <div className="p-6 bg-primary/5 rounded-[3rem] border-2 border-dashed border-primary/10 flex gap-6 items-start">
-          <div className="h-12 w-12 rounded-2xl bg-white dark:bg-slate-900 flex items-center justify-center shadow-lg shrink-0">
+      <div className="p-6 bg-primary/5 rounded border-2 border-dashed border-primary/10 flex gap-6 items-start">
+          <div className="h-12 w-12 rounded-2xl bg-white dark:bg-slate-900 flex items-center justify-center  shrink-0">
             <AlertTriangle className="h-6 w-6 text-amber-500" />
           </div>
           <div className="text-xs space-y-2">

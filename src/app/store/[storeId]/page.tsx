@@ -95,18 +95,18 @@ export default function StoreHomePage() {
                   <CarouselItem key={index} className="pl-4 md:pl-8 basis-full sm:basis-1/2 lg:basis-1/4">
                     <div 
                       className={cn(
-                        "flex flex-col items-center text-center p-8 rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 transition-all duration-500 group h-full",
-                        settings?.brandValuesEnableShadow !== false && "shadow-sm hover:shadow-2xl",
+                        "flex flex-col items-center text-center p-8 rounded bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 transition-all duration-500 group h-full",
+                        settings?.brandValuesEnableShadow !== false && " hover:",
                         settings?.brandValuesEnableZoom !== false && "hover:-translate-y-1.5"
                       )}
                     >
                       <div className={cn(
-                        "h-16 w-16 mb-6 rounded-2xl bg-primary/5 flex items-center justify-center text-primary transition-all duration-500 shadow-inner",
+                        "h-16 w-16 mb-6 rounded-2xl bg-primary/5 flex items-center justify-center text-primary transition-all duration-500 ",
                         settings?.brandValuesEnableZoom !== false && "group-hover:scale-110 group-hover:bg-primary group-hover:text-white"
                       )}>
                         <DynamicIcon name={value.icon} />
                       </div>
-                      <h4 className="font-black text-xs md:text-sm uppercase tracking-[0.2em] mb-2 text-slate-900 dark:text-white">
+                      <h4 className="font-black text-xs md:text-sm uppercase tracking mb-2 text-slate-900 dark:text-white">
                         {value.title}
                       </h4>
                       <p className="text-xs font-bold text-slate-400 dark:text-slate-500 leading-relaxed uppercase tracking-tighter">
@@ -120,11 +120,11 @@ export default function StoreHomePage() {
               {/* Premium Integrated Controls */}
               <div className="flex justify-center items-center gap-6 mt-12 animate-in fade-in slide-in-from-bottom-2 duration-700">
                 <CarouselPrevious 
-                    className="static translate-y-0 h-12 w-12 rounded-full border-[3px] border-primary/20 bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-xl" 
+                    className="static translate-y-0 h-12 w-12 rounded-full border border-primary/20 bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 " 
                 />
                 <div className="h-1 w-12 rounded-full bg-primary/10" />
                 <CarouselNext 
-                    className="static translate-y-0 h-12 w-12 rounded-full border-[3px] border-primary/20 bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-xl" 
+                    className="static translate-y-0 h-12 w-12 rounded-full border border-primary/20 bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 " 
                 />
               </div>
             </Carousel>

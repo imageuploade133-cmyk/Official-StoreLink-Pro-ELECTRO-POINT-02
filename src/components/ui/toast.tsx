@@ -16,7 +16,7 @@ const ToastViewport = React.forwardRef<
   <ToastPrimitives.Viewport
     ref={ref}
     className={cn(
-      "fixed top-0 z-[100] flex max-h-screen w-full flex-col",
+      "fixed top-0 z flex max-h-screen w-full flex-col",
       className
     )}
     suppressHydrationWarning
@@ -63,7 +63,7 @@ const Toast = React.forwardRef<
       className={cn(
         toastVariants({ variant }), 
         className, 
-        'overflow-hidden hover:[&_.countdown-bar]:[animation-play-state:paused] cursor-default'
+        'overflow-hidden hover:[&_.countdown:[animation-play-state:paused] cursor-default'
       )}
       onOpenChange={onOpenChange}
       // Critical: Set duration to Infinity so Radix doesn't close it with its own timer.
@@ -74,7 +74,7 @@ const Toast = React.forwardRef<
       {props.children}
       <div className="absolute bottom-0 left-0 h-1 w-full bg-foreground/10 pointer-events-none">
         <div
-          className="h-full bg-success-foreground/50 group-[.destructive]:bg-destructive-foreground/50 countdown-bar"
+          className="h-full bg-success-foreground/50 group:bg-destructive-foreground/50 countdown-bar"
           style={{
             animationDuration: `${duration}ms`,
           }}
@@ -93,7 +93,7 @@ const ToastAction = React.forwardRef<
   <ToastPrimitives.Action
     ref={ref}
     className={cn(
-      "inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-muted/40 group-[.destructive]:hover:border-destructive/30 group-[.destructive]:hover:bg-destructive group-[.destructive]:hover:text-destructive-foreground group-[.destructive]:focus:ring-destructive",
+      "inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group:border-muted/40 group:hover:border-destructive/30 group:hover:bg-destructive group:hover:text-destructive-foreground group:focus:ring-destructive",
       className
     )}
     {...props}
@@ -108,7 +108,7 @@ const ToastClose = React.forwardRef<
   <ToastPrimitives.Close
     ref={ref}
     className={cn(
-      "absolute right-2 top-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600",
+      "absolute right-2 top-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group:text-red-300 group:hover:text-red-50 group:focus:ring-red-400 group:focus:ring-offset-red-600",
       className
     )}
     toast-close=""

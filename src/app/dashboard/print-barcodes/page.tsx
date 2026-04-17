@@ -75,7 +75,7 @@ const BarcodeImage = ({ value }: { value: string }) => {
         }
     }, [value]);
 
-    if (!dataUrl) return <Skeleton className="h-[50px] w-full" />;
+    if (!dataUrl) return <Skeleton className="h w-full" />;
 
     // eslint-disable-next-line @next/next/no-img-element
     return <img src={dataUrl} alt={`Barcode for ${value}`} className="barcode-img" />;
@@ -94,7 +94,7 @@ const A4Preview = ({ products, currencySymbol, settings, generatingBarcode, gene
     const { labelWidth, labelHeight, marginTop, marginLeft, verticalGap, horizontalGap } = settings;
 
     return (
-        <div className="a4-sheet mx-auto origin-top shadow-lg print:shadow-none print:m-0">
+        <div className="a4-sheet mx-auto origin-top  print: print:m-0">
             {products.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground p-8">
                     <Tags className="w-16 h-16 mb-4 text-gray-300" />
@@ -417,7 +417,7 @@ const PrintBarcodePage = () => {
                         onBarcodeRegenerate={generateBarcode}
                     />
 
-                    <Button onClick={handlePrint} disabled={selectedProducts.length === 0} className="w-full mt-2 h-12 text-lg font-black shadow-lg shadow-primary/20">
+                    <Button onClick={handlePrint} disabled={selectedProducts.length === 0} className="w-full mt-2 h-12 text-lg font-black  ">
                         <Printer className="mr-2 h-5 w-5" /> 
                         Print ({selectedProducts.reduce((acc, p) => acc + p.quantity, 0)}) Labels
                     </Button>
@@ -425,7 +425,7 @@ const PrintBarcodePage = () => {
                 
                 <div className="flex-grow lg:sticky top-6 print-area">
                     {isLoading && selectedProducts.length === 0 ? (
-                        <Skeleton className="w-full h-[500px] rounded-2xl" />
+                        <Skeleton className="w-full h rounded-2xl" />
                     ) : (
                         <A4Preview 
                             products={selectedProducts} 
@@ -448,7 +448,7 @@ const PrintBarcodePage = () => {
                   width: 100% !important; 
                   height: auto !important; 
                   overflow: visible !important; 
-                  box-shadow: none !important; 
+                  box-: none !important; 
                   border: none !important; 
                   margin: 0 !important; 
                   padding: 0 !important; 

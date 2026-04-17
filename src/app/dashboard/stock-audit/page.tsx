@@ -163,12 +163,12 @@ export default function StockAuditPage() {
 
   const getTypeBadge = (type: string) => {
     switch (type) {
-      case 'SALE': return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 gap-1.5 h-5 font-black uppercase text-[9px]"><ShoppingCart className="h-2.5 w-2.5" /> Sale</Badge>;
-      case 'RESTOCK': return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 gap-1.5 h-5 font-black uppercase text-[9px]"><Truck className="h-2.5 w-2.5" /> Restock</Badge>;
-      case 'RETURN': return <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 gap-1.5 h-5 font-black uppercase text-[9px]"><Undo2 className="h-2.5 w-2.5" /> Return</Badge>;
-      case 'ADJUSTMENT': return <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 gap-1.5 h-5 font-black uppercase text-[9px]"><Settings2 className="h-2.5 w-2.5" /> Adjust</Badge>;
-      case 'DELETE': return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 gap-1.5 h-5 font-black uppercase text-[9px]"><Trash2 className="h-2.5 w-2.5" /> Deletion</Badge>;
-      default: return <Badge variant="secondary" className="h-5 text-[9px] font-black uppercase">{type}</Badge>;
+      case 'SALE': return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 gap-1.5 h-5 font-black uppercase text"><ShoppingCart className="h-2.5 w-2.5" /> Sale</Badge>;
+      case 'RESTOCK': return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 gap-1.5 h-5 font-black uppercase text"><Truck className="h-2.5 w-2.5" /> Restock</Badge>;
+      case 'RETURN': return <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 gap-1.5 h-5 font-black uppercase text"><Undo2 className="h-2.5 w-2.5" /> Return</Badge>;
+      case 'ADJUSTMENT': return <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 gap-1.5 h-5 font-black uppercase text"><Settings2 className="h-2.5 w-2.5" /> Adjust</Badge>;
+      case 'DELETE': return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 gap-1.5 h-5 font-black uppercase text"><Trash2 className="h-2.5 w-2.5" /> Deletion</Badge>;
+      default: return <Badge variant="secondary" className="h-5 text font-black uppercase">{type}</Badge>;
     }
   };
 
@@ -196,21 +196,21 @@ export default function StockAuditPage() {
 
       {/* Analytics Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-primary/5 border-primary/10 shadow-none">
+        <Card className="bg-primary/5 border-primary/10 ">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center justify-between">
+            <CardTitle className="text font-black uppercase tracking-widest text-primary flex items-center justify-between">
                 Registry Depth <Info className="h-3.5 w-3.5" />
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-black text-primary">{totalRegistryCount.toLocaleString()}</div>
-            <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Total Events Cataloged</p>
+            <p className="text text-muted-foreground mt-1 uppercase font-bold">Total Events Cataloged</p>
           </CardContent>
         </Card>
         
-        <Card className="bg-green-50/50 border-green-100 shadow-none">
+        <Card className="bg-green-50/50 border-green-100 ">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-green-600 flex items-center justify-between">
+            <CardTitle className="text font-black uppercase tracking-widest text-green-600 flex items-center justify-between">
                 Recent Batch Restocks <ArrowUpRight className="h-3.5 w-3.5" />
             </CardTitle>
           </CardHeader>
@@ -218,13 +218,13 @@ export default function StockAuditPage() {
             <div className="text-3xl font-black text-green-700">
                 {auditLogs.filter(l => l.change > 0).reduce((acc, l) => acc + l.change, 0)}
             </div>
-            <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Units added in current view</p>
+            <p className="text text-muted-foreground mt-1 uppercase font-bold">Units added in current view</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-rose-50/50 border-rose-100 shadow-none">
+        <Card className="bg-rose-50/50 border-rose-100 ">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-rose-600 flex items-center justify-between">
+            <CardTitle className="text font-black uppercase tracking-widest text-rose-600 flex items-center justify-between">
                 Recent Batch Outflow <ArrowDownLeft className="h-3.5 w-3.5" />
             </CardTitle>
           </CardHeader>
@@ -232,12 +232,12 @@ export default function StockAuditPage() {
             <div className="text-3xl font-black text-rose-700">
                 {Math.abs(auditLogs.filter(l => l.change < 0).reduce((acc, l) => acc + l.change, 0))}
             </div>
-            <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Units depleted in current view</p>
+            <p className="text text-muted-foreground mt-1 uppercase font-bold">Units depleted in current view</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <CardHeader className="border-b bg-muted/10">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
             <div>
@@ -260,7 +260,7 @@ export default function StockAuditPage() {
                     )}
                 </div>
                 <Select value={typeFilter} onValueChange={setTypeFilter}>
-                    <SelectTrigger className="w-full sm:w-[160px] h-10">
+                    <SelectTrigger className="w-full sm:w h-10">
                         <Filter className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                         <SelectValue placeholder="Event Type" />
                     </SelectTrigger>
@@ -289,7 +289,7 @@ export default function StockAuditPage() {
         </CardHeader>
         <CardContent className="p-0">
           <div className="w-full overflow-x-auto">
-            <Table className="min-w-[1000px] md:min-w-full">
+            <Table className="min-w md:min-w-full">
               <TableHeader>
                 <TableRow className="bg-muted/50 hover:bg-transparent">
                   <TableHead className="pl-6">Timestamp</TableHead>
@@ -323,13 +323,13 @@ export default function StockAuditPage() {
                           <div className="text-xs font-bold text-gray-900">
                             {time ? format(time, 'EEEE - dd- yyyy') : 'N/A'}
                           </div>
-                          <div className="text-[10px] text-muted-foreground uppercase">
+                          <div className="text text-muted-foreground uppercase">
                             {time ? `time ${format(time, 'hh:mm a')}` : ''}
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="font-bold text-sm leading-tight text-gray-900">{log.productName}</div>
-                          <div className="text-[10px] font-mono text-muted-foreground uppercase">Ref: {log.referenceId?.substring(0, 12)}...</div>
+                          <div className="text font-mono text-muted-foreground uppercase">Ref: {log.referenceId?.substring(0, 12)}...</div>
                         </TableCell>
                         <TableCell>
                           {getTypeBadge(log.type)}
@@ -356,7 +356,7 @@ export default function StockAuditPage() {
                             </div>
                             <div className="min-w-0">
                                 <p className="text-xs font-bold text-gray-900 truncate">{log.staffName}</p>
-                                <p className="text-[10px] text-muted-foreground font-black uppercase tracking-tighter">Verified Agent</p>
+                                <p className="text text-muted-foreground font-black uppercase tracking-tighter">Verified Agent</p>
                             </div>
                           </div>
                         </TableCell>

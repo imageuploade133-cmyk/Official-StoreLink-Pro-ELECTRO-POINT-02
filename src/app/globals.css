@@ -217,13 +217,11 @@
     @apply backdrop-blur-xl transition-all duration-500;
     background: rgba(255, 255, 255, 0.75);
     border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
   }
   
   .dark .glass-card {
     background: rgba(22, 27, 34, 0.75);
     border: 1px solid rgba(48, 54, 61, 0.8);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   }
 
   .glass-nav {
@@ -235,7 +233,6 @@
   .dark .glass-nav {
     background: rgba(22, 27, 34, 0.9);
     border-color: rgba(48, 54, 61, 0.8);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
 
   /* Custom Scrollbar Styles - Anderd Dark Mood */
@@ -270,7 +267,6 @@
 
   .dark ::-webkit-scrollbar-thumb:hover {
     background-color: #059669;
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
   }
   
   html.dark ::-webkit-scrollbar-thumb {
@@ -282,18 +278,15 @@
 
   html.dark ::-webkit-scrollbar-thumb:hover {
     background-color: #059669;
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
   }
 
   /* Clean Border Focus Animation */
   @keyframes border-glow {
     0%, 100% { 
       border-color: hsl(217 100% 56% / 0.3);
-      box-shadow: 0 0 0 0px hsl(217 100% 56% / 0);
     }
     50% { 
       border-color: hsl(217 100% 56% / 0.6);
-      box-shadow: 0 0 12px 2px hsl(217 100% 56% / 0.15);
     }
   }
   .animate-border-glow {
@@ -367,7 +360,6 @@
   .dark .anderd-card:hover {
     background: hsl(215 23% 18%);
     border-color: hsl(217 100% 56% / 0.3);
-    box-shadow: 0 4px 12px hsl(0 0% 0% / 0.2);
   }
 
   /* Dark mode input styling - Complete with custom dark colors */
@@ -378,7 +370,6 @@
     border: 1px solid #3a3f4b;
     color: #f1f5f9;
     transition: all 0.25s ease;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
   }
 
   .dark input::placeholder,
@@ -391,14 +382,12 @@
   .dark select:hover {
     border-color: #4a5059;
     background-color: #323849;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
   }
 
   .dark input:focus,
   .dark textarea:focus,
   .dark select:focus {
     border-color: hsl(var(--primary));
-    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.15), inset 0 1px 3px rgba(0, 0, 0, 0.3);
     outline: none;
     background-color: #323849;
   }
@@ -442,7 +431,6 @@
 
   .dark .input-wrapper:focus-within {
     border-color: hsl(var(--primary));
-    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
   }
 
   .dark .input-wrapper input {
@@ -454,14 +442,14 @@
 
   /* Custom Global Button Styles */
   .btn-back {
-    @apply border-2 border-slate-200 bg-white text-slate-900 shadow-sm transition-all duration-200 !important;
+    @apply border-2 border-slate-200 bg-white text-slate-900  transition-all duration-200 !important;
     border-radius: 0.75rem;
     padding-left: 1rem !important;
     padding-right: 1.25rem !important;
   }
 
   .btn-back:hover {
-    @apply border-slate-300 bg-slate-50 shadow-md !important;
+    @apply border-slate-300 bg-slate-50  !important;
     transform: translateY(-1px);
   }
 
@@ -474,19 +462,18 @@
   }
 
   .btn-save {
-    @apply border-2 border-emerald-600/20 bg-emerald-600 text-white shadow-sm transition-all duration-200 !important;
+    @apply border-2 border-emerald-600/20 bg-emerald-600 text-white  transition-all duration-200 !important;
     border-radius: 0.75rem;
   }
 
   .btn-save:hover {
-    @apply bg-emerald-700 shadow-emerald-200/50 shadow-lg !important;
+    @apply bg-emerald-700 -200/50  !important;
     transform: translateY(-1px);
   }
 
   /* Select dropdown styling with nice borders */
   .dark [class*="SelectTrigger"] {
     border: 1px solid hsl(var(--border)) !important;
-    box-shadow: inset 0 1px 2px hsl(0 0% 0% / 0.05) !important;
   }
 
   .dark [class*="SelectTrigger"]:hover {
@@ -496,7 +483,6 @@
   .dark [class*="SelectTrigger"]:focus,
   .dark [class*="SelectTrigger"][data-state="open"] {
     border-color: hsl(var(--primary)) !important;
-    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1), inset 0 1px 2px hsl(0 0% 0% / 0.08) !important;
   }
 }
 
@@ -626,8 +612,7 @@
 }
 
 /* Shadow and depth for dark cards */
-.dark [class*="shadow"] {
-  box-shadow: 0 4px 12px hsl(0 0% 0% / 0.3);
+.dark [class*=""] {
 }
 
 /* Header icon dark mode - Ensure icons are visible */
@@ -753,13 +738,11 @@
     background-color: #0f172a !important;
     border: 2px solid rgba(148, 163, 184, 0.3) !important;
     color: #f8fafc !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
   }
 
   .dark .btn-back:hover {
     background-color: #1e293b !important;
     border-color: rgba(148, 163, 184, 0.5) !important;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4) !important;
     transform: translateY(-1px);
   }
 
@@ -776,7 +759,6 @@
   .dark .btn-save:hover {
     background-color: #10b981 !important;
     border-color: rgba(52, 211, 153, 0.6) !important;
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3) !important;
   }
 
   .dark .btn-back svg, 
@@ -828,20 +810,20 @@
     color: hsl(var(--foreground)) !important;
   }
 
-  /* ON/OFF badge/label text in dark mode - uppercase variant */
+  /* ON/OFF badge/label text in dark mode - White for visibility */
   .dark label[class*="uppercase"],
   .dark label[class*="font-black"] {
-    color: #000000 !important;
+    color: #ffffff !important;
   }
 
   /* Small text labels (like 10px) */
   .dark label.text-\[10px\] {
-    color: #000000 !important;
+    color: #ffffff !important;
   }
 
   /* Watermark and toggle text styling */
   .dark label.font-black.uppercase {
-    color: #000000 !important;
+    color: #ffffff !important;
   }
 
 .dark label.text-sm {
@@ -1300,7 +1282,6 @@
 .dark aside {
   border-right: 1px solid hsl(217 20% 12%) !important;
   background: linear-gradient(180deg, hsl(222 33% 5%) 0%, hsl(222 30% 4%) 100%) !important;
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* ═════════════���═════════════════════════════════
@@ -1311,7 +1292,6 @@
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
   border-bottom: 1px solid rgba(96, 165, 250, 0.1) !important;
-  box-shadow: 0 1px 20px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* ═══════════════════════════════════════════════
@@ -1321,13 +1301,11 @@
 .dark [class*="rounded-lg"]:not(button):not(a):not(nav *) {
   background: hsl(220 25% 10%) !important;
   border: 1px solid hsl(217 20% 17%) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35) !important;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+  transition: border-color 0.2s ease, box- 0.2s ease !important;
 }
 
 .dark .card:hover {
   border-color: hsl(217 40% 25%) !important;
-  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* ═══════════════════════════════════════════════
@@ -1420,7 +1398,6 @@
 .dark textarea:focus,
 .dark select:focus {
   border-color: hsl(217 91% 60%) !important;
-  box-shadow: 0 0 0 3px hsl(217 91% 60% / 0.15), inset 0 1px 3px rgba(0, 0, 0, 0.4) !important;
   outline: none !important;
   background-color: hsl(220 26% 14%) !important;
 }
@@ -1438,7 +1415,6 @@
   border-color: hsl(217 50% 45%) !important;
   background: hsl(217 40% 15%) !important;
   color: hsl(217 91% 70%) !important;
-  box-shadow: 0 0 12px hsl(217 91% 60% / 0.15) !important;
 }
 
 /* ═══════════════════════════════════════════════
@@ -1503,7 +1479,6 @@
 .dark a[href*="/add"]:hover {
   background-color: #16a34a !important;
   border-color: #15803d !important;
-  box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
   transform: translateY(-1px);
 }
 
@@ -1553,7 +1528,6 @@
   color: #ffffff !important;
   background-color: #ef4444 !important;
   border-color: #dc2626 !important;
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
 }
 
 .dark button[variant="destructive"] svg,

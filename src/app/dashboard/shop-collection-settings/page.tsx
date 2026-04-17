@@ -163,9 +163,9 @@ export default function ShopCollectionSettingsPage() {
       <div className="space-y-6">
         <PageHeader icon={ShoppingBag} title="Shop Our Collection" description="Loading..." />
         <div className="space-y-6">
-            <Skeleton className="h-[400px] w-full" />
-            <Skeleton className="h-[400px] w-full" />
-            <Skeleton className="h-[400px] w-full" />
+            <Skeleton className="h w-full" />
+            <Skeleton className="h w-full" />
+            <Skeleton className="h w-full" />
         </div>
       </div>
     );
@@ -184,7 +184,7 @@ export default function ShopCollectionSettingsPage() {
       />
 
       <div className="grid grid-cols-1 gap-6">
-        <Card className="border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="border-slate-200 dark:border-slate-800  hover: transition-">
           <CardHeader>
             <div className="flex items-start gap-3 flex-1">
                 <div className="p-2 rounded-lg bg-primary/10 flex-shrink-0">
@@ -249,26 +249,26 @@ export default function ShopCollectionSettingsPage() {
                       <FormLabel className="font-semibold text-base">Shop Banner Image</FormLabel>
                       <div className="space-y-4">
                         {field.value ? (
-                          <div className="relative aspect-[21/9] w-full rounded-xl overflow-hidden border-2 border-primary/20 bg-muted group shadow-inner">
+                          <div className="relative aspect w-full rounded-xl overflow-hidden border-2 border-primary/20 bg-muted group ">
                             <img
                               src={field.value}
                               alt="Shop Banner"
                               className="w-full h-full object-cover"
                             />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur">
                               <Button
                                 type="button"
                                 variant="destructive"
                                 size="sm"
                                 onClick={() => field.onChange('')}
-                                className="gap-2 shadow-lg"
+                                className="gap-2 "
                               >
                                 <X className="h-4 w-4" /> Remove Banner
                               </Button>
                             </div>
                           </div>
                         ) : (
-                          <div className="aspect-[21/9] w-full rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex flex-col items-center justify-center gap-3 transition-colors">
+                          <div className="aspect w-full rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex flex-col items-center justify-center gap-3 transition-colors">
                             <div className="p-4 rounded-full bg-slate-100 dark:bg-slate-800">
                                 <ImageIcon className="h-8 w-8 text-slate-400 dark:text-slate-600" />
                             </div>
@@ -283,7 +283,7 @@ export default function ShopCollectionSettingsPage() {
                               variant="outline"
                               size="sm"
                               disabled={isUploading}
-                              className="shadow-sm"
+                              className=""
                             >
                               <label htmlFor="banner-upload" className="cursor-pointer">
                                 {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
@@ -330,7 +330,7 @@ export default function ShopCollectionSettingsPage() {
                           className={cn(
                             "flex flex-col items-center gap-3 p-6 rounded-xl border-2 transition-all duration-200",
                             field.value === 'left'
-                              ? 'border-primary bg-primary/5 shadow-sm ring-1 ring-primary/20'
+                              ? 'border-primary bg-primary/5  ring-1 ring-primary/20'
                               : 'border-slate-200 dark:border-slate-800 hover:border-primary/30 bg-card'
                           )}
                         >
@@ -348,7 +348,7 @@ export default function ShopCollectionSettingsPage() {
                           className={cn(
                             "flex flex-col items-center gap-3 p-6 rounded-xl border-2 transition-all duration-200",
                             field.value === 'center'
-                              ? 'border-primary bg-primary/5 shadow-sm ring-1 ring-primary/20'
+                              ? 'border-primary bg-primary/5  ring-1 ring-primary/20'
                               : 'border-slate-200 dark:border-slate-800 hover:border-primary/30 bg-card'
                           )}
                         >
@@ -370,7 +370,7 @@ export default function ShopCollectionSettingsPage() {
                 />
 
                 <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800">
-                  <Button type="submit" disabled={isSaving} className="gap-2 min-w-[140px] shadow-lg">
+                  <Button type="submit" disabled={isSaving} className="gap-2 min-w ">
                     {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                     Save Changes
                   </Button>

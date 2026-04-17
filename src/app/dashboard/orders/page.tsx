@@ -356,7 +356,7 @@ export default function WebsiteOrdersPage() {
                 variant="ghost" 
                 size="sm" 
                 onClick={() => setShowSecondaryStats(!showSecondaryStats)}
-                className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground gap-2 hover:bg-transparent hover:text-primary border border-muted-foreground/20 rounded-full px-6 py-4 h-auto shadow-sm"
+                className="text-xs font-black uppercase tracking text-muted-foreground gap-2 hover:bg-transparent hover:text-primary border border-muted-foreground/20 rounded-full px-6 py-4 h-auto "
             >
                 {showSecondaryStats ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 {showSecondaryStats ? 'Hide Detailed Attrition' : 'See Attrition Insights'}
@@ -387,16 +387,16 @@ export default function WebsiteOrdersPage() {
 
       <Tabs value={activeMainTab} onValueChange={setActiveMainTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-6 h-12 p-1 bg-muted/50 rounded-2xl border">
-          <TabsTrigger value="registry" className="rounded-xl font-bold uppercase text-[10px] tracking-widest gap-2">
+          <TabsTrigger value="registry" className="rounded-xl font-bold uppercase text tracking-widest gap-2">
             <ShoppingBag className="h-3.5 w-3.5" /> Active Registry
           </TabsTrigger>
-          <TabsTrigger value="audit" className="rounded-xl font-bold uppercase text-[10px] tracking-widest gap-2">
+          <TabsTrigger value="audit" className="rounded-xl font-bold uppercase text tracking-widest gap-2">
             <ClipboardList className="h-3.5 w-3.5" /> Fulfillment Audit
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="registry" className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-          <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+          <Card className=" border-none ring-1 ring-border overflow-hidden">
             <CardHeader className="pb-4 bg-muted/10 border-b">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <CardTitle className="text-lg flex items-center gap-2">
@@ -413,7 +413,7 @@ export default function WebsiteOrdersPage() {
                     />
                   </div>
                   <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v as any); setCurrentPage(1); }}>
-                    <SelectTrigger className="w-[160px] h-10">
+                    <SelectTrigger className="w h-10">
                       <SelectValue placeholder="All Statuses" />
                     </SelectTrigger>
                     <SelectContent>
@@ -436,7 +436,7 @@ export default function WebsiteOrdersPage() {
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-muted/50">
-                        <TableHead className="w-[140px] pl-6">Order ID</TableHead>
+                        <TableHead className="w pl-6">Order ID</TableHead>
                         <TableHead>Date & Time</TableHead>
                         <TableHead>Customer</TableHead>
                         <TableHead className="text-right">Total Amount</TableHead>
@@ -477,11 +477,11 @@ export default function WebsiteOrdersPage() {
                                 <div className="text-muted-foreground">{createdAt ? format(createdAt, 'p') : ''}</div>
                               </TableCell>
                               <TableCell>
-                                <div className="font-semibold text-sm truncate max-w-[150px]">{order.guestInfo?.name || 'Registered User'}</div>
+                                <div className="font-semibold text-sm truncate max-w">{order.guestInfo?.name || 'Registered User'}</div>
                                 <div className="flex flex-col gap-0.5">
-                                  <div className="text-[10px] text-muted-foreground truncate max-w-[150px]">{order.guestInfo?.email || 'Authenticated'}</div>
+                                  <div className="text text-muted-foreground truncate max-w">{order.guestInfo?.email || 'Authenticated'}</div>
                                   {order.guestInfo?.phone && (
-                                    <div className="text-[10px] font-bold text-primary flex items-center gap-1">
+                                    <div className="text font-bold text-primary flex items-center gap-1">
                                       <Phone className="h-2.5 w-2.5" /> {order.guestInfo.phone}
                                     </div>
                                   )}
@@ -498,7 +498,7 @@ export default function WebsiteOrdersPage() {
                               </TableCell>
                               <TableCell>
                                 <Badge variant="outline" className={cn(
-                                  "font-bold uppercase text-[10px] tracking-tight",
+                                  "font-bold uppercase text tracking-tight",
                                   order.fulfillmentType === 'delivery'
                                     ? "bg-blue-50 text-blue-700 border-blue-200"
                                     : "bg-orange-50 text-orange-700 border-orange-200"

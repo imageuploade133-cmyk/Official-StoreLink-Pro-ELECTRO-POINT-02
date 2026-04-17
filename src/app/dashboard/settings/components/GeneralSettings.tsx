@@ -140,7 +140,7 @@ export function GeneralSettings({ settingsData, isLoading }: GeneralSettingsProp
 
   return (
     <div className="space-y-6">
-      <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <CardHeader className="bg-muted/30 border-b">
@@ -236,7 +236,7 @@ export function GeneralSettings({ settingsData, isLoading }: GeneralSettingsProp
                       render={({ field }) => (
                         <FormItem className="space-y-4">
                           <div className="flex justify-between items-center">
-                            <FormLabel className="text-[10px] font-black uppercase tracking-widest">Footer Logo Width ({field.value}px)</FormLabel>
+                            <FormLabel className="text font-black uppercase tracking-widest">Footer Logo Width ({field.value}px)</FormLabel>
                           </div>
                           <FormControl>
                             <Slider
@@ -319,7 +319,7 @@ export function GeneralSettings({ settingsData, isLoading }: GeneralSettingsProp
       </Card>
 
       {/* Public Access Hub */}
-      <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <CardHeader className="bg-primary/5 border-b">
             <CardTitle className="flex items-center gap-2 text-xl font-black uppercase tracking-tight">
                 <Globe className="h-5 w-5 text-primary" />
@@ -330,23 +330,23 @@ export function GeneralSettings({ settingsData, isLoading }: GeneralSettingsProp
         <CardContent className="pt-8 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Storefront Link */}
-                <div className="p-6 rounded-[2rem] border-2 border-dashed border-primary/10 bg-white dark:bg-slate-900 flex flex-col justify-between gap-6 transition-all hover:border-primary/30 group">
+                <div className="p-6 rounded border-2 border-dashed border-primary/10 bg-white dark:bg-slate-900 flex flex-col justify-between gap-6 transition-all hover:border-primary/30 group">
                     <div className="flex items-center gap-4">
-                        <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform shadow-inner">
+                        <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform ">
                             <Globe className="h-6 w-6" />
                         </div>
                         <div className="space-y-0.5">
                             <h4 className="font-black text-sm uppercase tracking-wider">Web Storefront</h4>
-                            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Public Catalog & Shopping</p>
+                            <p className="text text-muted-foreground font-bold uppercase tracking-widest">Public Catalog & Shopping</p>
                         </div>
                     </div>
                     <div className="space-y-3">
-                        <div className="bg-muted/30 p-3 rounded-xl border font-mono text-[10px] truncate opacity-60">
+                        <div className="bg-muted/30 p-3 rounded-xl border font-mono text truncate opacity-60">
                             {origin}/store/{currentStoreId || 'global'}
                         </div>
                         <Button 
                             variant="secondary" 
-                            className="w-full h-12 rounded-xl font-black uppercase text-[10px] tracking-widest gap-2 shadow-lg active:scale-95 transition-all"
+                            className="w-full h-12 rounded-xl font-black uppercase text tracking-widest gap-2  active:scale-95 transition-all"
                             onClick={() => copyToClipboard(`/store/${currentStoreId || 'global'}`, 'Storefront URL')}
                         >
                             <Copy className="h-3.5 w-3.5" />
@@ -356,23 +356,23 @@ export function GeneralSettings({ settingsData, isLoading }: GeneralSettingsProp
                 </div>
 
                 {/* Store-App Link */}
-                <div className="p-6 rounded-[2rem] border-2 border-dashed border-primary/10 bg-white dark:bg-slate-900 flex flex-col justify-between gap-6 transition-all hover:border-primary/30 group">
+                <div className="p-6 rounded border-2 border-dashed border-primary/10 bg-white dark:bg-slate-900 flex flex-col justify-between gap-6 transition-all hover:border-primary/30 group">
                     <div className="flex items-center gap-4">
-                        <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform shadow-inner">
+                        <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform ">
                             <Smartphone className="h-6 w-6" />
                         </div>
                         <div className="space-y-0.5">
                             <h4 className="font-black text-sm uppercase tracking-wider">App Interface</h4>
-                            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Mobile-Optimized Experience</p>
+                            <p className="text text-muted-foreground font-bold uppercase tracking-widest">Mobile-Optimized Experience</p>
                         </div>
                     </div>
                     <div className="space-y-3">
-                        <div className="bg-muted/30 p-3 rounded-xl border font-mono text-[10px] truncate opacity-60">
+                        <div className="bg-muted/30 p-3 rounded-xl border font-mono text truncate opacity-60">
                             {origin}/store-app/{currentStoreId || 'global'}
                         </div>
                         <Button 
                             variant="secondary" 
-                            className="w-full h-12 rounded-xl font-black uppercase text-[10px] tracking-widest gap-2 shadow-lg active:scale-95 transition-all"
+                            className="w-full h-12 rounded-xl font-black uppercase text tracking-widest gap-2  active:scale-95 transition-all"
                             onClick={() => copyToClipboard(`/store-app/${currentStoreId || 'global'}`, 'Store-App URL')}
                         >
                             <Copy className="h-3.5 w-3.5" />

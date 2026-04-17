@@ -54,7 +54,7 @@ export function ProductSelectionCard({
   const currentDisplayProducts = products;
 
   return (
-    <Card className="shadow-md rounded-lg flex flex-col">
+    <Card className=" rounded-lg flex flex-col">
       <CardHeader className="p-4 border-b">
         <div className="flex flex-col sm:flex-row gap-2 mb-3">
           <Button 

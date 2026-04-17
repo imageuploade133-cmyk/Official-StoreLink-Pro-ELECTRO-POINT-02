@@ -279,7 +279,7 @@ export function SaleReturnDialog({ isOpen, onOpenChange, saleTransaction, curren
                      </TableHead>
                     <TableHead className="w-1/2">Product</TableHead>
                     <TableHead className="text-center">Returnable</TableHead>
-                    <TableHead className="text-center w-[120px]">Qty to Return</TableHead>
+                    <TableHead className="text-center w">Qty to Return</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

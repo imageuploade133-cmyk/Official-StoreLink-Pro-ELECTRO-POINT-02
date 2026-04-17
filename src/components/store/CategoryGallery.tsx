@@ -129,7 +129,7 @@ export function CategoryGallery() {
         <div className="space-y-3">
             {showPreTitle && sectionPreTitle && (
                 <div 
-                    className="inline-flex items-center gap-2 font-black text-[10px] uppercase tracking-[0.3em] animate-in fade-in slide-in-from-left-4 duration-700"
+                    className="inline-flex items-center gap-2 font-black text uppercase tracking animate-in fade-in slide-in-from-left-4 duration-700"
                     style={{ color: sectionTextColor }}
                 >
                     <LayoutGrid className="h-3.5 w-3.5" />
@@ -149,7 +149,7 @@ export function CategoryGallery() {
                 {sectionDescription}
             </p>
         </div>
-        <Button asChild variant="ghost" className="font-black text-[10px] uppercase tracking-[0.2em] gap-3 hover:bg-primary/5 p-0 h-auto group/btn self-start md:self-auto animate-in fade-in zoom-in-95 duration-1000 delay-200 dark:text-black" style={{ color: sectionTextColor }}>
+        <Button asChild variant="ghost" className="font-black text uppercase tracking gap-3 hover:bg-primary/5 p-0 h-auto group/btn self-start md:self-auto animate-in fade-in zoom-in-95 duration-1000 delay-200 dark:text-black" style={{ color: sectionTextColor }}>
             <Link href={getStoreUrl('/store/categories')}>
                 View All Collections <ChevronRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1 dark:text-black" strokeWidth={3} />
             </Link>
@@ -172,7 +172,7 @@ export function CategoryGallery() {
                   href={getStoreUrl(`/store/shop?category=${category.id}`)}
                   className="flex flex-col items-center group/item"
                 >
-                  <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-500 group-hover/item:shadow-2xl group-hover/item:border-primary/30 group-hover/item:-translate-y-2 group-hover/item:ring-4 group-hover/item:ring-primary/5">
+                  <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800  transition-all duration-500 group-hover/item: group-hover/item:border-primary/30 group-hover/item:-translate-y-2 group-hover/item:ring-4 group-hover/item:ring-primary/5">
                     <Image
                       alt={category.name}
                       src={category.imageUrl || `https://picsum.photos/seed/${category.id}/300/300`}
@@ -185,7 +185,7 @@ export function CategoryGallery() {
                     <div className="absolute inset-0 bg-black/0 group-hover/item:bg-primary/10 transition-colors duration-500" />
                   </div>
                   <span 
-                    className="mt-4 text-[10px] md:text-xs font-black text-center line-clamp-1 group-hover/item:text-primary transition-colors uppercase tracking-[0.1em]"
+                    className="mt-4 text md:text-xs font-black text-center line-clamp-1 group-hover/item:text-primary transition-colors uppercase tracking"
                     style={{ color: sectionTextColor }}
                   >
                     {category.name}
@@ -201,18 +201,18 @@ export function CategoryGallery() {
                         disabled={isLoadingMore}
                         className="flex flex-col items-center group/more w-full h-full"
                     >
-                        <div className="relative aspect-square w-full rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 flex flex-col items-center justify-center gap-2 transition-all duration-500 group-hover/more:border-primary group-hover/more:bg-primary/5 group-hover/more:-translate-y-2 group-hover/more:shadow-xl">
+                        <div className="relative aspect-square w-full rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 flex flex-col items-center justify-center gap-2 transition-all duration-500 group-hover/more:border-primary group-hover/more:bg-primary/5 group-hover/more:-translate-y-2 group-hover/more:">
                             {isLoadingMore ? (
                                 <Loader2 className="h-6 w-6 animate-spin text-primary" />
                             ) : (
                                 <Plus className="h-8 w-8 text-slate-400 group-hover/more:text-primary transition-transform group-hover/more:rotate-90 duration-500" />
                             )}
-                            <span className="text-[8px] font-black uppercase text-slate-400 group-hover/more:text-primary tracking-[0.2em]">
+                            <span className="text font-black uppercase text-slate-400 group-hover/more:text-primary tracking">
                                 {isLoadingMore ? 'Syncing' : 'Load More'}
                             </span>
                         </div>
                         <span 
-                            className="mt-4 text-[10px] font-black uppercase tracking-widest opacity-60"
+                            className="mt-4 text font-black uppercase tracking-widest opacity-60"
                             style={{ color: sectionTextColor }}
                         >
                             Discover All
@@ -223,8 +223,8 @@ export function CategoryGallery() {
           </CarouselContent>
           
           <div className="hidden md:block">
-            <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 h-14 w-14 rounded-full border-2 border-slate-200 bg-white/90 backdrop-blur-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all duration-500 hover:scale-110 hover:bg-white active:scale-95 disabled:hidden" />
-            <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 h-14 w-14 rounded-full border-2 border-slate-200 bg-white/90 backdrop-blur-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all duration-500 hover:scale-110 hover:bg-white active:scale-95 disabled:hidden" />
+            <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 h-14 w-14 rounded-full border-2 border-slate-200 bg-white/90 backdrop-blur-md  opacity-0 group-hover:opacity-100 transition-all duration-500 hover:scale-110 hover:bg-white active:scale-95 disabled:hidden" />
+            <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 h-14 w-14 rounded-full border-2 border-slate-200 bg-white/90 backdrop-blur-md  opacity-0 group-hover:opacity-100 transition-all duration-500 hover:scale-110 hover:bg-white active:scale-95 disabled:hidden" />
           </div>
         </Carousel>
       </div>

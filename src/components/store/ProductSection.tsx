@@ -88,7 +88,7 @@ function SectionCountdown({ endDate }: { endDate: Date }) {
 
     return (
         <div className="flex items-center gap-1.5 md:gap-3 text-white font-black">
-            <span className="text-[10px] md:text-sm uppercase opacity-80 tracking-widest hidden sm:inline">Time Left:</span>
+            <span className="text md:text-sm uppercase opacity-80 tracking-widest hidden sm:inline">Time Left:</span>
             <div className="flex items-center gap-1 md:gap-2 text-sm md:text-2xl tracking-tighter">
                 <span className="bg-black/20 px-1.5 py-0.5 rounded-md">{timeLeft.h}h</span>
                 <span className="opacity-50">:</span>
@@ -351,14 +351,14 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
     const shape = useIndividual
         ? (settings?.storeExploreBtnShape || 'full')
         : (settings?.storeBtnShape || 'full');
-    const shadow = useIndividual
+    const  = useIndividual
         ? (settings?.storeExploreBtnShadow || 'sm')
         : 'sm';
 
     const sizeClasses = {
-        sm: 'h-10 px-8 text-[10px]',
-        md: 'h-12 px-10 text-[10px]',
-        lg: 'h-14 px-12 text-[10px] md:text-xs',
+        sm: 'h-10 px-8 text',
+        md: 'h-12 px-10 text',
+        lg: 'h-14 px-12 text md:text-xs',
         xl: 'h-16 px-14 text-sm'
     };
 
@@ -371,18 +371,18 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
     };
 
     const shadowClasses: Record<string, string> = {
-        none: 'shadow-none',
-        sm: 'shadow-sm',
-        md: 'shadow-md',
-        lg: 'shadow-lg',
-        xl: 'shadow-xl',
-        '2xl': 'shadow-2xl',
-        inner: 'shadow-inner'
+        none: '',
+        sm: '',
+        md: '',
+        lg: '',
+        xl: '',
+        '2xl': '',
+        inner: ''
     };
 
     const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
     const shapeClass = shapeClasses[shape] || 'rounded-full';
-    const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
+    const shadowClass = shadowClasses[ as keyof typeof shadowClasses] || '';
 
     return `${sizeClass} ${shapeClass} ${shadowClass}`;
   }, [settings]);
@@ -415,7 +415,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
   }, [section.slideIcon]);
 
   const navButtonClasses = useMemo(() => {
-    const base = "static translate-y-0 h-14 w-14 transition-all duration-300 shadow-xl hover:scale-110 active:scale-95 border-[3px]";
+    const base = "static translate-y-0 h-14 w-14 transition-all duration-300  hover:scale-110 active:scale-95 border";
     let styleClasses = "";
     
     switch (section.slideStyle) {
@@ -429,7 +429,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
         styleClasses = "rounded-full bg-transparent";
         break;
       case 'ghost':
-        styleClasses = "rounded-full bg-transparent border-none shadow-none";
+        styleClasses = "rounded-full bg-transparent border-none ";
         break;
       case 'default':
       default:
@@ -461,7 +461,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
         >
             {isPromoActive ? (
                 <div 
-                    className="px-6 md:px-10 py-6 md:py-8 mb-12 flex flex-col md:flex-row items-center justify-between shadow-2xl group relative overflow-hidden gap-6"
+                    className="px-6 md:px-10 py-6 md:py-8 mb-12 flex flex-col md:flex-row items-center justify-between  group relative overflow-hidden gap-6"
                     style={{ 
                         backgroundColor: hubColor,
                         boxShadow: `0 25px 50px -12px ${hubColor}33`,
@@ -472,7 +472,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
                     
                     <div className="flex items-center gap-3 md:gap-5 relative z-10">
                         <div 
-                            className="p-2.5 rounded-xl shadow-lg rotate-3 group-hover:rotate-12 transition-transform duration-500"
+                            className="p-2.5 rounded-xl  rotate-3 group-hover:rotate-12 transition-transform duration-500"
                             style={{ backgroundColor: hubIconColor }}
                         >
                             <Zap 
@@ -580,7 +580,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
                 
                 {!isLoading && (section.productIds?.length || 0) > BATCH_SIZE && (
                     <div className="flex flex-col sm:flex-row items-center justify-between pt-12 border-t border-dashed gap-6">
-                        <p className="text-[10px] font-black uppercase text-muted-foreground tracking-[0.2em]">
+                        <p className="text font-black uppercase text-muted-foreground tracking">
                             Registry Page {currentPage} <span className="mx-2 text-slate-200">|</span> Batch discovery active
                         </p>
                         <div className="flex items-center gap-6">
@@ -590,7 +590,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
                                 onClick={handlePrevPage} 
                                 disabled={currentPage === 1 || isLoading}
                                 className={cn(
-                                    "static translate-y-0 h-14 w-14 rounded-full border-[3px] transition-all duration-300 shadow-xl hover:scale-110",
+                                    "static translate-y-0 h-14 w-14 rounded-full border transition-all duration-300  hover:scale-110",
                                     isPromoActive 
                                         ? "bg-white/10 text-white border-white/60 hover:bg-white hover:text-black dark:text-white dark:hover:text-black" 
                                         : "bg-background border-primary/20 hover:bg-primary hover:text-white dark:text-black dark:hover:text-white"
@@ -604,7 +604,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
                                 onClick={handleNextPage} 
                                 disabled={isLastPage || isLoading}
                                 className={cn(
-                                    "static translate-y-0 h-14 w-14 rounded-full border-[3px] transition-all duration-300 shadow-xl hover:scale-110",
+                                    "static translate-y-0 h-14 w-14 rounded-full border transition-all duration-300  hover:scale-110",
                                     isPromoActive 
                                         ? "bg-white/10 text-white border-white/60 hover:bg-white hover:text-black dark:text-white dark:hover:text-black" 
                                         : "bg-background border-primary/20 hover:bg-primary hover:text-white dark:text-black dark:hover:text-white"
@@ -624,7 +624,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
                 <Button
                     asChild
                     className={cn(
-                        "font-black uppercase tracking-[0.25em] shadow-2xl transition-all hover:-translate-y-1 active:translate-y-0 border-none",
+                        "font-black uppercase tracking  transition-all hover:-translate-y-1 active:translate-y-0 border-none",
                         buttonClasses
                     )}
                     style={isPromoActive ? {

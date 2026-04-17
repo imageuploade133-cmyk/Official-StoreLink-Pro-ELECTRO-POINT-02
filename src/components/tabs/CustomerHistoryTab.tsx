@@ -66,7 +66,7 @@ export default function CustomerHistoryTab() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <ScrollArea className="h-[600px] border rounded-md">
+                <ScrollArea className="h border rounded-md">
                     {isLoading && !history ? (
                         <div className="p-4 space-y-3">
                              {[...Array(10)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}

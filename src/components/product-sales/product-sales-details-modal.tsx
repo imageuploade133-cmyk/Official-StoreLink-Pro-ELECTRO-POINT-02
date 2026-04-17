@@ -84,7 +84,7 @@ export function ProductSalesDetailsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0 grid grid-rows-[auto_1fr]">
+      <DialogContent className="max-w-4xl h flex flex-col p-0 grid grid-rows">
         <DialogHeader className="flex flex-row items-start justify-between p-6 pb-4 border-b sticky top-0 bg-background z-10">
             <div>
                 <DialogTitle className="text-2xl font-bold flex items-center gap-3">
@@ -113,7 +113,7 @@ export function ProductSalesDetailsModal({
                             alt={product.name}
                             width={120}
                             height={120}
-                            className="rounded-lg object-cover aspect-square border-2 shadow-sm"
+                            className="rounded-lg object-cover aspect-square border-2 "
                             data-ai-hint={product.dataAiHint || product.name.toLowerCase().split(' ').slice(0,2).join(' ')}
                         />
                         <div className="text-sm mt-4 text-center md:text-left">
@@ -161,7 +161,7 @@ export function ProductSalesDetailsModal({
                         <Table>
                             <TableHeader className="bg-muted/50">
                                 <TableRow>
-                                    <TableHead className="w-[180px]"><CalendarDays className="h-4 w-4 inline mr-1.5"/>Date & Time</TableHead>
+                                    <TableHead className="w"><CalendarDays className="h-4 w-4 inline mr-1.5"/>Date & Time</TableHead>
                                     <TableHead className="text-right">Qty Sold</TableHead>
                                     <TableHead className="text-right">Unit Price</TableHead>
                                     <TableHead><UserCircle className="h-4 w-4 inline mr-1.5"/>Staff Member</TableHead>
@@ -176,7 +176,7 @@ export function ProductSalesDetailsModal({
                                         <Badge variant="secondary" className="font-semibold">{entry.quantitySold}</Badge>
                                     </TableCell>
                                     <TableCell className="text-right font-mono">{formatCurrency(entry.unitPrice, currencySymbol)}</TableCell>
-                                    <TableCell className="truncate max-w-[150px]" title={entry.staffName}>{entry.staffName}</TableCell>
+                                    <TableCell className="truncate max-w" title={entry.staffName}>{entry.staffName}</TableCell>
                                     <TableCell className="text-center">
                                         <Button 
                                           variant="ghost" 

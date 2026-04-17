@@ -162,7 +162,7 @@ export default function EditWebPage() {
     return (
         <div className="space-y-6">
             <Skeleton className="h-10 w-1/3" />
-            <Skeleton className="h-[500px] w-full" />
+            <Skeleton className="h w-full" />
         </div>
     );
   }
@@ -196,7 +196,7 @@ export default function EditWebPage() {
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
               <CardTitle>Page Designer</CardTitle>
               <CardDescription>Make changes to your page below. Use the designer for layouts and styling.</CardDescription>
@@ -211,7 +211,7 @@ export default function EditWebPage() {
                   <FormItem>
                     <FormLabel className="font-bold">Banner Image (Optional)</FormLabel>
                     <div className="flex items-start gap-4">
-                      {bannerImage && ( <div className="w-32 h-20 rounded-xl overflow-hidden relative border shadow-sm"> <Image src={bannerImage} alt="Banner preview" fill style={{ objectFit: 'cover' }} unoptimized/> </div> )}
+                      {bannerImage && ( <div className="w-32 h-20 rounded-xl overflow-hidden relative border "> <Image src={bannerImage} alt="Banner preview" fill style={{ objectFit: 'cover' }} unoptimized/> </div> )}
                       <div className="flex-grow space-y-2">
                         <div className="flex gap-2">
                             <FormControl><Input placeholder="https://example.com/banner.png" {...field} value={field.value || ''} disabled={isSaving || isUploading} /></FormControl>
@@ -223,7 +223,7 @@ export default function EditWebPage() {
                             </Button>
                             <Input id="banner-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isSaving || isUploading} />
                         </div>
-                        <FormDescription className="text-[10px]">Recommended: 1920x600 pixels.</FormDescription>
+                        <FormDescription className="text">Recommended: 1920x600 pixels.</FormDescription>
                       </div>
                     </div>
                     <FormMessage />
@@ -272,7 +272,7 @@ export default function EditWebPage() {
                        <div className="flex flex-row items-center justify-between rounded-2xl border p-4 bg-primary/5">
                         <div className="space-y-0.5">
                           <FormLabel className="font-black text-xs uppercase tracking-widest">Publish Page</FormLabel>
-                          <FormDescription className="text-[10px]"> Make this page live and accessible to the public. </FormDescription>
+                          <FormDescription className="text"> Make this page live and accessible to the public. </FormDescription>
                         </div>
                         <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
                       </div>
@@ -281,7 +281,7 @@ export default function EditWebPage() {
               </div>
             </CardContent>
             <CardFooter className="bg-muted/30 border-t p-6 flex justify-between">
-              <Button type="submit" disabled={isSaving || isUploading} size="lg" className="px-10 h-14 font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20">
+              <Button type="submit" disabled={isSaving || isUploading} size="lg" className="px-10 h-14 font-black uppercase text-xs tracking-widest  ">
                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                 {isSaving ? 'Synchronizing...' : 'Save Changes'}
               </Button>

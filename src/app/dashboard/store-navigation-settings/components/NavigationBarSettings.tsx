@@ -199,7 +199,7 @@ export function NavigationBarSettings({ settingsData, isLoading }: NavigationBar
   };
 
   if (isLoading) {
-    return <Skeleton className="h-[600px] w-full" />;
+    return <Skeleton className="h w-full" />;
   }
 
   return (
@@ -369,7 +369,7 @@ export function NavigationBarSettings({ settingsData, isLoading }: NavigationBar
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select shadow" />
+                              <SelectValue placeholder="Select " />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>

@@ -82,7 +82,7 @@ export function ExpenseHistory({ expenses, isLoading, isAdmin, onReturnExpense }
             </div>
             <Popover>
                 <PopoverTrigger asChild>
-                <Button id="date" variant={"outline"} className={cn("w-full sm:w-[260px] justify-start text-left font-normal h-9", !dateRange && "text-muted-foreground", activePreset === 'custom' && "border-primary ring-1 ring-primary")}>
+                <Button id="date" variant={"outline"} className={cn("w-full sm:w justify-start text-left font-normal h-9", !dateRange && "text-muted-foreground", activePreset === 'custom' && "border-primary ring-1 ring-primary")}>
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {dateRange?.from ? (dateRange.to ? (<>{formatDate(dateRange.from, "LLL dd, y")} - {formatDate(dateRange.to, "LLL dd, y")}</>) : (formatDate(dateRange.from, "LLL dd, y"))) : (<span>Pick a date</span>)}
                 </Button>
@@ -91,7 +91,7 @@ export function ExpenseHistory({ expenses, isLoading, isAdmin, onReturnExpense }
                     <div className="p-3 border-b bg-muted/20">
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                                <Label htmlFor="manual-from" className="text-[10px] font-bold uppercase text-muted-foreground">From</Label>
+                                <Label htmlFor="manual-from" className="text font-bold uppercase text-muted-foreground">From</Label>
                                 <Input 
                                     id="manual-from" 
                                     type="date" 
@@ -104,7 +104,7 @@ export function ExpenseHistory({ expenses, isLoading, isAdmin, onReturnExpense }
                                 />
                             </div>
                             <div className="space-y-1">
-                                <Label htmlFor="manual-to" className="text-[10px] font-bold uppercase text-muted-foreground">To</Label>
+                                <Label htmlFor="manual-to" className="text font-bold uppercase text-muted-foreground">To</Label>
                                 <Input 
                                     id="manual-to" 
                                     type="date" 

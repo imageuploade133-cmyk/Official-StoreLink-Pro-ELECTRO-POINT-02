@@ -158,7 +158,7 @@ export default function EditProductPage() {
     return (
       <div className="space-y-6">
         <PageHeader icon={PackagePlus} title="Edit Product" description="Loading distributed data parts..." />
-        <Skeleton className="h-[600px] w-full" />
+        <Skeleton className="h w-full" />
       </div>
     );
   }

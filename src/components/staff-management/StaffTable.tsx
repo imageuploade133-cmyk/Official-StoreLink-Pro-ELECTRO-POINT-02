@@ -30,13 +30,13 @@ export default function StaffTable({ staff, isLoading, onOpenActions, roles }: S
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="min-w-[200px]">Member</TableHead>
+              <TableHead className="min-w">Member</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Today's Sales</TableHead>
               <TableHead className="text-right">Total Sales</TableHead>
               <TableHead className="text-right">Transactions</TableHead>
-              <TableHead className="w-[100px] text-right">Actions</TableHead>
+              <TableHead className="w text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -83,13 +83,13 @@ export default function StaffTable({ staff, isLoading, onOpenActions, roles }: S
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="min-w-[200px]">Member</TableHead>
+              <TableHead className="min-w">Member</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Today's Sales</TableHead>
               <TableHead className="text-right">Total Sales</TableHead>
               <TableHead className="text-right">Transactions</TableHead>
-              <TableHead className="w-[100px] text-right">Actions</TableHead>
+              <TableHead className="w text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -102,8 +102,8 @@ export default function StaffTable({ staff, isLoading, onOpenActions, roles }: S
                       <AvatarFallback>{staffMember.name ? staffMember.name.substring(0, 2).toUpperCase() : 'ST'}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium truncate max-w-[150px]">{staffMember.name}</p>
-                      <p className="text-xs text-muted-foreground truncate max-w-[150px]">{staffMember.email}</p>
+                      <p className="font-medium truncate max-w">{staffMember.name}</p>
+                      <p className="text-xs text-muted-foreground truncate max-w">{staffMember.email}</p>
                     </div>
                   </div>
                 </TableCell>

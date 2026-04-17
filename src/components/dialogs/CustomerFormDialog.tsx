@@ -66,7 +66,7 @@ export function CustomerFormDialog({ open, onOpenChange, onSubmit, defaultValues
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[100vw] h-[100dvh] sm:w-full sm:max-w-lg sm:h-auto sm:max-h-[90vh] p-0 flex flex-col overflow-hidden border-none sm:border left-0 top-0 translate-x-0 translate-y-0 sm:left-[50%] sm:top-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%]">
+      <DialogContent className="w h sm:w-full sm:max-w-lg sm:h-auto sm:max-h p-0 flex flex-col overflow-hidden border-none sm:border left-0 top-0 translate-x-0 translate-y-0 sm:left-[50%] sm:top-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%]">
         <DialogHeader className="p-4 sm:p-6 border-b shrink-0">
           <DialogTitle>{isEditing ? 'Edit Customer' : 'Add New Customer'}</DialogTitle>
           <DialogDescription className="text-xs sm:text-sm">
@@ -115,7 +115,7 @@ export function CustomerFormDialog({ open, onOpenChange, onSubmit, defaultValues
                 render={({ field }) => (
                     <FormItem>
                     <FormLabel className="text-sm font-bold">Address (Optional)</FormLabel>
-                    <FormControl><Textarea placeholder="123 Main St, Anytown..." {...field} value={field.value ?? ''} disabled={isSaving} className="min-h-[80px]" /></FormControl>
+                    <FormControl><Textarea placeholder="123 Main St, Anytown..." {...field} value={field.value ?? ''} disabled={isSaving} className="min-h" /></FormControl>
                     <FormMessage />
                     </FormItem>
                 )}
@@ -136,7 +136,7 @@ export function CustomerFormDialog({ open, onOpenChange, onSubmit, defaultValues
                                 <Phone className="h-4 w-4 text-blue-500" />
                                 Receive SMS
                                 </FormLabel>
-                                <FormDescription className="text-[10px] sm:text-xs">
+                                <FormDescription className="text sm:text-xs">
                                     Allow sending bulk SMS messages.
                                 </FormDescription>
                             </div>
@@ -160,7 +160,7 @@ export function CustomerFormDialog({ open, onOpenChange, onSubmit, defaultValues
                                 <MessageSquare className="h-4 w-4 text-green-500" />
                                 Receive WhatsApp
                                 </FormLabel>
-                                <FormDescription className="text-[10px] sm:text-xs">
+                                <FormDescription className="text sm:text-xs">
                                     Allow sending bulk WhatsApp messages.
                                 </FormDescription>
                             </div>

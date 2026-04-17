@@ -58,7 +58,7 @@ export default function EditHomepageSectionPage() {
                 title="Edit Homepage Section"
                 description="Modify an existing product section on your homepage."
             />
-            <Skeleton className="h-[600px] w-full" />
+            <Skeleton className="h w-full" />
         </div>
        )
     }

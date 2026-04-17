@@ -49,7 +49,7 @@ export const ProductCard = React.memo(({ product, onAddToCart, priority, currenc
         setIsValidPrice(true); 
         return;
         }
-        const validPriceRegex = /^[0-9]*(\.[0-9]{0,2})?$/;
+        const validPriceRegex = /^[0*(\.[0{0,2})?$/;
         if (!validPriceRegex.test(newStringValue)) {
         setIsValidPrice(false);
         return;
@@ -119,12 +119,12 @@ export const ProductCard = React.memo(({ product, onAddToCart, priority, currenc
     
     return (
         <Card className={cn(
-            "overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-200 flex flex-col group border-2",
+            "overflow-hidden  hover: transition- duration-200 flex flex-col group border-2",
             isSmallMode ? "rounded-xl" : "rounded-2xl"
         )}>
         <div className={cn(
             "relative w-full overflow-hidden bg-muted/20",
-            isSmallMode ? "aspect-square" : "aspect-[4/3]"
+            isSmallMode ? "aspect-square" : "aspect"
         )}>
             <Image
             src={product.imageUrl || defaultImageUrl}
@@ -140,8 +140,8 @@ export const ProductCard = React.memo(({ product, onAddToCart, priority, currenc
             <Badge
                 variant="destructive"
                 className={cn(
-                    "absolute font-bold shadow-md",
-                    isSmallMode ? "top-1.5 right-1.5 text-[8px] px-1 py-0" : "top-3 right-3 text-xs px-2 py-1"
+                    "absolute font-bold ",
+                    isSmallMode ? "top-1.5 right-1.5 text px-1 py-0" : "top-3 right-3 text-xs px-2 py-1"
                 )}
             >
                 PROMO
@@ -151,7 +151,7 @@ export const ProductCard = React.memo(({ product, onAddToCart, priority, currenc
         <CardHeader className={cn("p-3 sm:p-2", !isSmallMode && "sm:p-4")}>
             <CardTitle className={cn(
                 "font-bold truncate",
-                isSmallMode ? "text-[10px] sm:text-sm" : "text-sm sm:text-base"
+                isSmallMode ? "text sm:text-sm" : "text-sm sm:text-base"
             )} title={product.name}>{product.name}</CardTitle>
         </CardHeader>
         <CardContent className={cn("p-3 pt-0 sm:p-2 sm:pt-0 flex-grow space-y-3", !isSmallMode && "sm:p-4 sm:pt-0")}>
@@ -159,7 +159,7 @@ export const ProductCard = React.memo(({ product, onAddToCart, priority, currenc
                 {hasActivePromo && (
                     <div className="flex items-center gap-1.5 text-muted-foreground">
                         <Tag className="h-3 w-3" />
-                        <span className="text-[10px] font-bold line-through decoration-destructive/50">
+                        <span className="text font-bold line-through decoration-destructive/50">
                             Was: {formatCurrency(product.sellingPrice, currencySymbol)}
                         </span>
                     </div>
@@ -167,14 +167,14 @@ export const ProductCard = React.memo(({ product, onAddToCart, priority, currenc
                 <div className="flex items-center gap-1.5">
                     {!isSmallMode && <span className="text-sm font-black text-primary/60">{currencySymbol}</span>}
                     <div className="relative flex-grow">
-                        {isSmallMode && <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] font-black text-primary/60">{currencySymbol}</span>}
+                        {isSmallMode && <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text font-black text-primary/60">{currencySymbol}</span>}
                         <Input
                             type="string" 
                             inputMode="decimal"
                             aria-label={`Price for ${product.name}`}
                             className={cn(
                                 "font-black border-muted-foreground/30 hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary bg-muted/20",
-                                isSmallMode ? "h-8 text-[10px] sm:text-xs pl-4 pr-1" : "h-10 text-base sm:text-lg p-2"
+                                isSmallMode ? "h-8 text sm:text-xs pl-4 pr-1" : "h-10 text-base sm:text-lg p-2"
                             )}
                             value={priceInputString}
                             onChange={handlePriceInputChange}
@@ -200,18 +200,18 @@ export const ProductCard = React.memo(({ product, onAddToCart, priority, currenc
             {!isSmallMode && (
                 <div className="flex flex-wrap gap-2">
                     {product.stock <= 0 ? (
-                    <Badge variant="destructive" className="text-[10px] px-2 py-0.5 uppercase font-black">Sold Out</Badge>
+                    <Badge variant="destructive" className="text px-2 py-0.5 uppercase font-black">Sold Out</Badge>
                     ) : product.stock <= lowStockThreshold && product.stock > 0 ? (
-                    <Badge variant="outline" className="text-[10px] px-2 py-0.5 border-orange-500 text-orange-600 font-bold bg-orange-50">Low: {product.stock}</Badge>
+                    <Badge variant="outline" className="text px-2 py-0.5 border-orange-500 text-orange-600 font-bold bg-orange-50">Low: {product.stock}</Badge>
                     ) : product.stock > lowStockThreshold ? ( 
-                    <Badge variant="default" className="text-[10px] px-2 py-0.5 bg-green-100 text-green-700 border-green-200 hover:bg-green-200 font-bold">
+                    <Badge variant="default" className="text px-2 py-0.5 bg-green-100 text-green-700 border-green-200 hover:bg-green-200 font-bold">
                         {product.stock} In Stock
                         </Badge>
                     ) : null}
                 </div>
             )}
             {isSmallMode && product.stock <= lowStockThreshold && product.stock > 0 && (
-                <div className="text-[10px] font-black text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200 w-fit">
+                <div className="text font-black text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200 w-fit">
                     LOW: {product.stock}
                 </div>
             )}
@@ -222,7 +222,7 @@ export const ProductCard = React.memo(({ product, onAddToCart, priority, currenc
             size={isSmallMode ? "sm" : "lg"}
             className={cn(
                 "w-full font-black uppercase tracking-tight",
-                isSmallMode ? "h-8 text-[8px]" : "h-11 text-xs"
+                isSmallMode ? "h-8 text" : "h-11 text-xs"
             )}
             onClick={handleAddToCartClick}
             disabled={isAddToCartDisabled}

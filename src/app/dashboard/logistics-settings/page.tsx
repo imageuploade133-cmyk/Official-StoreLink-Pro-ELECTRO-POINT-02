@@ -154,7 +154,7 @@ export default function LogisticsSettingsPage() {
     return (
       <div className="space-y-6">
         <PageHeader icon={Truck} title="Logistics Settings" description="Loading..." />
-        <Skeleton className="h-[500px] w-full" />
+        <Skeleton className="h w-full" />
       </div>
     );
   }
@@ -174,7 +174,7 @@ export default function LogisticsSettingsPage() {
         <Button 
             onClick={form.handleSubmit(onSubmit)} 
             disabled={isSaving || isUploading}
-            className="h-12 px-8 font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all active:scale-95"
+            className="h-12 px-8 font-black uppercase tracking-widest   transition-all active:scale-95"
         >
             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Save Fulfillment Settings
@@ -185,7 +185,7 @@ export default function LogisticsSettingsPage() {
         <div className="lg:col-span-2 space-y-8">
           <Form {...form}>
             <form className="space-y-8">
-              <Card className={cn("shadow-2xl border-none ring-1 ring-border overflow-hidden", !isLogisticsVisible && "opacity-60 grayscale-[0.5]")}>
+              <Card className={cn(" border-none ring-1 ring-border overflow-hidden", !isLogisticsVisible && "opacity-60 grayscale")}>
                 <CardHeader className="bg-muted/30 border-b">
                   <div className="flex justify-between items-center">
                     <div>
@@ -196,10 +196,10 @@ export default function LogisticsSettingsPage() {
                         control={form.control}
                         name="showLogisticsOnPublicSite"
                         render={({ field }) => (
-                        <FormItem className="flex flex-row items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background shadow-lg">
+                        <FormItem className="flex flex-row items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background ">
                             <div className="flex items-center gap-2">
                                 {field.value ? <Eye className="h-4 w-4 text-green-600" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
-                                <FormLabel className="text-[10px] font-black uppercase tracking-widest">{field.value ? 'Live on Web' : 'Hidden'}</FormLabel>
+                                <FormLabel className="text font-black uppercase tracking-widest">{field.value ? 'Live on Web' : 'Hidden'}</FormLabel>
                             </div>
                             <FormControl>
                             <Switch
@@ -223,7 +223,7 @@ export default function LogisticsSettingsPage() {
                         </FormLabel>
                         <div className="flex flex-col sm:flex-row items-start gap-6">
                             {currentImageUrl ? (
-                              <div className="relative w-full sm:w-64 aspect-video rounded-3xl overflow-hidden border-4 border-white shadow-2xl bg-white flex-shrink-0 group">
+                              <div className="relative w-full sm:w-64 aspect-video rounded-3xl overflow-hidden border-4 border-white  bg-white flex-shrink-0 group">
                                 <Image 
                                     src={currentImageUrl} 
                                     alt="Logistics preview" 
@@ -235,7 +235,7 @@ export default function LogisticsSettingsPage() {
                                     type="button" 
                                     variant="destructive" 
                                     size="icon" 
-                                    className="absolute top-2 right-2 h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-xl"
+                                    className="absolute top-2 right-2 h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity "
                                     onClick={() => form.setValue('logisticsImageUrl', '')}
                                 >
                                     <X className="h-4 w-4" />
@@ -244,7 +244,7 @@ export default function LogisticsSettingsPage() {
                             ) : (
                               <div className="w-full sm:w-64 aspect-video rounded-3xl border-2 border-dashed border-primary/20 flex flex-col items-center justify-center text-muted-foreground bg-primary/5 flex-shrink-0">
                                 <ImageIcon className="h-10 w-10 opacity-20 mb-2" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/40">Media Pending</span>
+                                <span className="text font-black uppercase tracking text-primary/40">Media Pending</span>
                               </div>
                             )}
                             <div className="flex-grow space-y-4 w-full">
@@ -259,7 +259,7 @@ export default function LogisticsSettingsPage() {
                                         </label>
                                     </Button>
                                     <Input id="logistics-image-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isSaving || isUploading} />
-                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">Recommended: 1200x600 PNG or JPG</p>
+                                    <p className="text font-bold text-muted-foreground uppercase tracking-tighter">Recommended: 1200x600 PNG or JPG</p>
                                 </div>
                             </div>
                         </div>
@@ -270,7 +270,7 @@ export default function LogisticsSettingsPage() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-2xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b">
                     <CardTitle className="text-xl">Fulfillment Policies</CardTitle>
                     <CardDescription>Use the designer below to craft authoritative logistics documentation.</CardDescription>
@@ -320,7 +320,7 @@ export default function LogisticsSettingsPage() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-2xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b flex flex-row justify-between items-center pr-6">
                     <div>
                         <CardTitle className="text-xl">Question & Answer Registry</CardTitle>
@@ -339,7 +339,7 @@ export default function LogisticsSettingsPage() {
                 <CardContent className="pt-8">
                     <div className="space-y-6">
                         {fields.length === 0 ? (
-                            <div className="text-center py-12 border-2 border-dashed rounded-[2rem] bg-muted/5">
+                            <div className="text-center py-12 border-2 border-dashed rounded bg-muted/5">
                                 <HelpCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
                                 <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">No custom FAQs yet</p>
                                 <Button 
@@ -353,7 +353,7 @@ export default function LogisticsSettingsPage() {
                         ) : (
                             <div className="space-y-4">
                                 {fields.map((field, index) => (
-                                    <div key={field.id} className="p-6 border rounded-[2rem] bg-muted/10 space-y-4 relative group transition-all hover:border-primary/20">
+                                    <div key={field.id} className="p-6 border rounded bg-muted/10 space-y-4 relative group transition-all hover:border-primary/20">
                                         <Button 
                                             type="button" 
                                             variant="ghost" 
@@ -394,7 +394,7 @@ export default function LogisticsSettingsPage() {
                                                     name={`logisticsFaq.${index}.question`}
                                                     render={({ field: qField }) => (
                                                         <FormItem className="space-y-1">
-                                                            <FormLabel className="text-[10px] font-black uppercase text-primary tracking-[0.2em]">Question</FormLabel>
+                                                            <FormLabel className="text font-black uppercase text-primary tracking">Question</FormLabel>
                                                             <FormControl><Input placeholder="e.g., How do I monitor my order trajectory?" {...qField} className="h-11 font-bold bg-background" /></FormControl>
                                                             <FormMessage />
                                                         </FormItem>
@@ -405,8 +405,8 @@ export default function LogisticsSettingsPage() {
                                                     name={`logisticsFaq.${index}.answer`}
                                                     render={({ field: aField }) => (
                                                         <FormItem className="space-y-1">
-                                                            <FormLabel className="text-[10px] font-black uppercase text-primary tracking-[0.2em]">Answer</FormLabel>
-                                                            <FormControl><RichTextEditor value={aField.value} onChange={aField.onChange} placeholder="Provide a clear, detailed explanation..." className="min-h-[150px]" /></FormControl>
+                                                            <FormLabel className="text font-black uppercase text-primary tracking">Answer</FormLabel>
+                                                            <FormControl><RichTextEditor value={aField.value} onChange={aField.onChange} placeholder="Provide a clear, detailed explanation..." className="min-h" /></FormControl>
                                                             <FormMessage />
                                                         </FormItem>
                                                     )}
@@ -426,7 +426,7 @@ export default function LogisticsSettingsPage() {
 
         <div className="lg:col-span-1">
           <div className="sticky top-24 space-y-6">
-            <Card className="bg-primary text-primary-foreground border-none shadow-2xl overflow-hidden rounded-[2.5rem]">
+            <Card className="bg-primary text-primary-foreground border-none  overflow-hidden rounded">
                 <CardHeader className="pt-10 px-8">
                     <div className="h-14 w-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center mb-4">
                         <Info className="h-8 w-8" />
@@ -457,7 +457,7 @@ export default function LogisticsSettingsPage() {
                     </div>
                     <Separator className="bg-white/20" />
                     <div className="p-4 bg-white/10 rounded-2xl border border-white/10">
-                        <p className="text-[10px] font-black uppercase tracking-widest mb-2 opacity-60">Status Check</p>
+                        <p className="text font-black uppercase tracking-widest mb-2 opacity-60">Status Check</p>
                         <div className="flex items-center gap-2">
                             <div className={cn("h-2 w-2 rounded-full animate-pulse", isLogisticsVisible ? "bg-green-400" : "bg-red-400")} />
                             <span className="text-xs font-bold">{isLogisticsVisible ? 'Fulfillment Page is LIVE' : 'Fulfillment Page is HIDDEN'}</span>
@@ -466,7 +466,7 @@ export default function LogisticsSettingsPage() {
                 </CardContent>
             </Card>
 
-            <div className="p-8 border-2 border-dashed rounded-[3rem] bg-muted/10 space-y-4 text-center group transition-all hover:bg-muted/20 hover:border-primary/20">
+            <div className="p-8 border-2 border-dashed rounded bg-muted/10 space-y-4 text-center group transition-all hover:bg-muted/20 hover:border-primary/20">
                 <div className="h-16 w-16 rounded-full bg-background border-2 border-muted flex items-center justify-center mx-auto transition-transform duration-500 group-hover:scale-110">
                     <MessageSquare className="h-8 w-8 text-primary/40" />
                 </div>

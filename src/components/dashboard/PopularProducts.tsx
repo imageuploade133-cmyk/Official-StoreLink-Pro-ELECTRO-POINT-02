@@ -28,11 +28,11 @@ export function PopularProducts({ isLoading, popularProductsData }: PopularProdu
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <div className="h-[300px] flex flex-col justify-center space-y-3 px-2">
+          <div className="h flex flex-col justify-center space-y-3 px-2">
             <Skeleton className="h-8 w-full" /> <Skeleton className="h-8 w-full" /> <Skeleton className="h-8 w-full" /> <Skeleton className="h-8 w-4/5" /> <Skeleton className="h-8 w-3/5" />
           </div>
         ) : (
-          <ScrollArea className="h-[300px]">
+          <ScrollArea className="h">
             <Table>
               <TableHeader>
                 <TableRow><TableHead>Product</TableHead><TableHead className="text-right">Sales Qty</TableHead></TableRow>
@@ -41,7 +41,7 @@ export function PopularProducts({ isLoading, popularProductsData }: PopularProdu
                 {popularProductsData.length > 0 ? (
                   popularProductsData.map((item) => (
                     <TableRow key={item.id}>
-                      <TableCell className="font-medium truncate max-w-[150px]" title={item.product}>{item.product}</TableCell>
+                      <TableCell className="font-medium truncate max-w" title={item.product}>{item.product}</TableCell>
                       <TableCell className="text-right">{item.quantity}</TableCell>
                     </TableRow>
                   ))

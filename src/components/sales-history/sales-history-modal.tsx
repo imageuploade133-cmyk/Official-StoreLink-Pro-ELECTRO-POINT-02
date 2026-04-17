@@ -136,7 +136,7 @@ export function SalesHistoryModal({ isOpen, onOpenChange, currencySymbol }: { is
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0">
+        <DialogContent className="max-w-4xl h flex flex-col p-0">
           <DialogHeader className="p-6 pb-4 border-b">
             <DialogTitle className="text-2xl font-bold flex items-center gap-3">
               <ListChecks className="h-7 w-7 text-primary"/> Sales History
@@ -151,7 +151,7 @@ export function SalesHistoryModal({ isOpen, onOpenChange, currencySymbol }: { is
               </div>
               <Popover>
                   <PopoverTrigger asChild>
-                      <Button variant={"outline"} className={cn("w-full md:w-[280px] justify-start text-left font-normal", !dateRange && "text-muted-foreground")}>
+                      <Button variant={"outline"} className={cn("w-full md:w justify-start text-left font-normal", !dateRange && "text-muted-foreground")}>
                           <CalendarIcon className="mr-2 h-4 w-4" />
                           {dateRange?.from ? (dateRange.to ? (<>{format(dateRange.from, "LLL dd, y")} - {format(dateRange.to, "LLL dd, y")}</>) : format(dateRange.from, "LLL dd, y")) : (<span>Pick a date range</span>)}
                       </Button>

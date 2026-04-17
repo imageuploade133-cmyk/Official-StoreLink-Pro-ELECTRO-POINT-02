@@ -73,7 +73,7 @@ export function ProductVideoGallery({ videos, title, description }: ProductVideo
                 <h2 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white uppercase">
                     {title || 'Multimedia Showcase'}
                 </h2>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mt-1">
+                <p className="text font-black uppercase tracking text-slate-400 mt-1">
                     {description || 'Cinematic product insights & social proof'}
                 </p>
             </div>
@@ -89,7 +89,7 @@ export function ProductVideoGallery({ videos, title, description }: ProductVideo
             <div 
               key={video.id || idx} 
               className={cn(
-                "group relative flex flex-col bg-white dark:bg-slate-900 rounded-[3rem] border-2 border-slate-100 dark:border-slate-800 overflow-hidden shadow-2xl transition-all duration-500 hover:border-primary/30 hover:shadow-primary/5 w-full",
+                "group relative flex flex-col bg-white dark:bg-slate-900 rounded border-2 border-slate-100 dark:border-slate-800 overflow-hidden  transition-all duration-500 hover:border-primary/30 hover: w-full",
               )}
             >
               {video.title && (
@@ -108,7 +108,7 @@ export function ProductVideoGallery({ videos, title, description }: ProductVideo
 
               <div className={cn(
                 "relative w-full overflow-hidden bg-black",
-                isVertical ? "aspect-[9/16]" : "aspect-video"
+                isVertical ? "aspect" : "aspect-video"
               )}>
                 {video.type === 'direct' ? (
                   <video 

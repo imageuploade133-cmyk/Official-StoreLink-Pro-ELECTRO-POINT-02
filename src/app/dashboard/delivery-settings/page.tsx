@@ -112,7 +112,7 @@ export default function DeliverySettingsPage() {
     return (
       <div className="space-y-6">
         <PageHeader icon={Truck} title="Delivery Settings" description="Loading..." />
-        <Skeleton className="h-[500px] w-full" />
+        <Skeleton className="h w-full" />
       </div>
     );
   }
@@ -132,7 +132,7 @@ export default function DeliverySettingsPage() {
         <Button 
             onClick={form.handleSubmit(onSubmit)} 
             disabled={isSaving}
-            className="h-12 px-8 font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all active:scale-95"
+            className="h-12 px-8 font-black uppercase tracking-widest   transition-all active:scale-95"
         >
             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Save Delivery Settings
@@ -143,7 +143,7 @@ export default function DeliverySettingsPage() {
         <div className="lg:col-span-2 space-y-8">
           <Form {...form}>
             <form className="space-y-8">
-              <Card className="shadow-2xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b">
                   <CardTitle className="text-xl">Fulfillment Options</CardTitle>
                   <CardDescription>Enable or disable pickup and delivery services.</CardDescription>
@@ -153,7 +153,7 @@ export default function DeliverySettingsPage() {
                     control={form.control}
                     name="enablePickUp"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 ">
                         <div className="space-y-0.5">
                           <FormLabel className="text-base">Enable Pick Up</FormLabel>
                           <FormDescription>
@@ -173,7 +173,7 @@ export default function DeliverySettingsPage() {
                     control={form.control}
                     name="enableDelivery"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 ">
                         <div className="space-y-0.5">
                           <FormLabel className="text-base">Enable Delivery</FormLabel>
                           <FormDescription>
@@ -192,7 +192,7 @@ export default function DeliverySettingsPage() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-2xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b flex flex-row justify-between items-center pr-6">
                     <div>
                         <CardTitle className="text-xl">Delivery Locations & Pricing</CardTitle>
@@ -211,7 +211,7 @@ export default function DeliverySettingsPage() {
                 <CardContent className="pt-8">
                     <div className="space-y-6">
                         {fields.length === 0 ? (
-                            <div className="text-center py-12 border-2 border-dashed rounded-[2rem] bg-muted/5">
+                            <div className="text-center py-12 border-2 border-dashed rounded bg-muted/5">
                                 <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
                                 <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">No delivery locations yet</p>
                                 <Button 
@@ -225,7 +225,7 @@ export default function DeliverySettingsPage() {
                         ) : (
                             <div className="space-y-4">
                                 {fields.map((field, index) => (
-                                    <div key={field.id} className="p-6 border rounded-[2rem] bg-muted/10 space-y-4 relative group transition-all hover:border-primary/20">
+                                    <div key={field.id} className="p-6 border rounded bg-muted/10 space-y-4 relative group transition-all hover:border-primary/20">
                                         <Button 
                                             type="button" 
                                             variant="ghost" 
@@ -242,7 +242,7 @@ export default function DeliverySettingsPage() {
                                                 name={`deliveryLocations.${index}.name`}
                                                 render={({ field: nameField }) => (
                                                     <FormItem className="space-y-1">
-                                                        <FormLabel className="text-[10px] font-black uppercase text-primary tracking-[0.2em]">Location Name</FormLabel>
+                                                        <FormLabel className="text font-black uppercase text-primary tracking">Location Name</FormLabel>
                                                         <FormControl><Input placeholder="e.g., Lagos Central" {...nameField} className="h-11 font-bold bg-background" /></FormControl>
                                                         <FormMessage />
                                                     </FormItem>
@@ -253,7 +253,7 @@ export default function DeliverySettingsPage() {
                                                 name={`deliveryLocations.${index}.price`}
                                                 render={({ field: priceField }) => (
                                                     <FormItem className="space-y-1">
-                                                        <FormLabel className="text-[10px] font-black uppercase text-primary tracking-[0.2em]">Delivery Price</FormLabel>
+                                                        <FormLabel className="text font-black uppercase text-primary tracking">Delivery Price</FormLabel>
                                                         <FormControl><Input type="number" placeholder="0.00" {...priceField} className="h-11 font-bold bg-background" /></FormControl>
                                                         <FormMessage />
                                                     </FormItem>

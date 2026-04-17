@@ -163,7 +163,7 @@ export function OrderDetailsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl h-[90vh] flex flex-col p-0 overflow-hidden">
+      <DialogContent className="max-w-3xl h flex flex-col p-0 overflow-hidden">
         <DialogHeader className="p-6 pb-4 border-b bg-background sticky top-0 z-10">
           <div className="flex justify-between items-start">
             <div className="space-y-1 text-left">
@@ -229,9 +229,9 @@ export function OrderDetailsModal({
             {/* Top Grid: Info Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Customer Info */}
-              <Card className="bg-muted/20 border-none shadow-none">
+              <Card className="bg-muted/20 border-none ">
                 <CardContent className="pt-6 space-y-4">
-                  <div className="flex items-center gap-2 text-[10px] font-black uppercase text-muted-foreground tracking-[0.2em]">
+                  <div className="flex items-center gap-2 text font-black uppercase text-muted-foreground tracking">
                     <User className="h-3.5 w-3.5" /> Customer Identity
                   </div>
                   <div className="space-y-3">
@@ -248,7 +248,7 @@ export function OrderDetailsModal({
                     </div>
                     <Separator className="bg-gray-200" />
                     <div className="space-y-1.5">
-                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                      <p className="text font-black text-muted-foreground uppercase tracking-widest">
                         {order.fulfillmentType === 'pickup' ? 'Store Pickup' : 'Delivery Route'}
                       </p>
                       <div className="flex items-start gap-2 text-xs leading-relaxed font-bold">
@@ -264,7 +264,7 @@ export function OrderDetailsModal({
                         </p>
                       </div>
                       {order.deliveryLocationId && (
-                        <p className="text-[10px] text-muted-foreground">
+                        <p className="text text-muted-foreground">
                           Location ID: {order.deliveryLocationId}
                         </p>
                       )}
@@ -274,32 +274,32 @@ export function OrderDetailsModal({
               </Card>
 
               {/* Payment & Status */}
-              <Card className="bg-muted/20 border-none shadow-none">
+              <Card className="bg-muted/20 border-none ">
                 <CardContent className="pt-6 space-y-4">
-                  <div className="flex items-center gap-2 text-[10px] font-black uppercase text-muted-foreground tracking-[0.2em]">
+                  <div className="flex items-center gap-2 text font-black uppercase text-muted-foreground tracking">
                     <CreditCard className="h-3.5 w-3.5" /> Logistics & Payment
                   </div>
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Method</p>
+                        <p className="text font-black text-muted-foreground uppercase tracking-widest">Method</p>
                         <p className="text-sm font-bold">{order.paymentMethod}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Reference</p>
+                        <p className="text font-black text-muted-foreground uppercase tracking-widest">Reference</p>
                         <p className="text-sm font-mono font-bold text-primary">{order.paymentReference || 'N/A'}</p>
                       </div>
                     </div>
                     {order.selectedBankAccount && (
-                      <div className="p-3 bg-white border rounded-xl flex items-center gap-3 shadow-sm">
+                      <div className="p-3 bg-white border rounded-xl flex items-center gap-3 ">
                         <Landmark className="h-5 w-5 text-primary" />
                         <div className="min-w-0">
-                          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest leading-none mb-1">Target Bank</p>
+                          <p className="text font-black text-muted-foreground uppercase tracking-widest leading-none mb-1">Target Bank</p>
                           <p className="text-xs font-bold truncate">{order.selectedBankAccount.bankName}</p>
                         </div>
                       </div>
                     )}
-                    <div className="flex items-center gap-2 text-[10px] font-black uppercase text-muted-foreground pt-2">
+                    <div className="flex items-center gap-2 text font-black uppercase text-muted-foreground pt-2">
                       <Calendar className="h-3.5 w-3.5" />
                       Placed: {createdAt ? format(createdAt, 'PP p') : 'N/A'}
                     </div>
@@ -310,17 +310,17 @@ export function OrderDetailsModal({
 
             {/* Items Table */}
             <div className="space-y-4">
-              <h3 className="text-[10px] font-black uppercase text-muted-foreground tracking-[0.2em] flex items-center gap-2">
+              <h3 className="text font-black uppercase text-muted-foreground tracking flex items-center gap-2">
                 <Package className="h-4 w-4" /> Fulfillment List
               </h3>
-              <div className="border rounded-xl overflow-hidden bg-white shadow-sm">
+              <div className="border rounded-xl overflow-hidden bg-white ">
                 <table className="w-full text-sm">
                   <thead className="bg-muted/50 border-b">
                     <tr>
-                      <th className="px-4 py-3 text-left font-black uppercase text-[10px] text-slate-500 tracking-widest">Product</th>
-                      <th className="px-4 py-3 text-center font-black uppercase text-[10px] text-slate-500 tracking-widest">Qty</th>
-                      <th className="px-4 py-3 text-right font-black uppercase text-[10px] text-slate-500 tracking-widest">Price</th>
-                      <th className="px-4 py-3 text-right font-black uppercase text-[10px] text-slate-500 tracking-widest">Total</th>
+                      <th className="px-4 py-3 text-left font-black uppercase text text-slate-500 tracking-widest">Product</th>
+                      <th className="px-4 py-3 text-center font-black uppercase text text-slate-500 tracking-widest">Qty</th>
+                      <th className="px-4 py-3 text-right font-black uppercase text text-slate-500 tracking-widest">Price</th>
+                      <th className="px-4 py-3 text-right font-black uppercase text text-slate-500 tracking-widest">Total</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -332,9 +332,9 @@ export function OrderDetailsModal({
                                 {item.productName}
                             </span>
                             {!item.exists && (
-                                <Badge variant="destructive" className="w-fit mt-1 text-[9px] h-4 uppercase font-black">Order not Available</Badge>
+                                <Badge variant="destructive" className="w-fit mt-1 text h-4 uppercase font-black">Order not Available</Badge>
                             )}
-                            <p className="text-[10px] text-muted-foreground font-mono mt-0.5">ID: {item.productId.substring(0, 8)}</p>
+                            <p className="text text-muted-foreground font-mono mt-0.5">ID: {item.productId.substring(0, 8)}</p>
                           </div>
                         </td>
                         <td className="px-4 py-4 text-center font-bold">{item.quantity}</td>
@@ -360,7 +360,7 @@ export function OrderDetailsModal({
                 </div>
                 <Separator />
                 <div className="flex justify-between items-end pt-2">
-                  <span className="text-[10px] font-black uppercase text-primary tracking-widest mb-1">Grand Total</span>
+                  <span className="text font-black uppercase text-primary tracking-widest mb-1">Grand Total</span>
                   <span className="text-3xl font-black text-gray-900 tracking-tighter">{formatCurrency(order.totalAmount, currencySymbol)}</span>
                 </div>
               </div>
@@ -456,7 +456,7 @@ export function OrderDetailsModal({
             </div>
         </div>
 
-        <DialogFooter className="p-6 border-t flex flex-col sm:flex-row justify-between items-center gap-4 bg-background shadow-lg">
+        <DialogFooter className="p-6 border-t flex flex-col sm:flex-row justify-between items-center gap-4 bg-background ">
           <div className="flex flex-wrap items-center gap-2">
             {statusActions
               .filter(action => action.status !== order.status)

@@ -213,7 +213,7 @@ export function CustomerManagementModal({ isOpen, onOpenChange, onCustomerSelect
         <DialogContent 
           className={cn(
             "flex flex-col p-0 overflow-hidden",
-            isMobile ? "w-[100vw] h-[100dvh] max-w-none m-0 rounded-none border-none left-0 top-0 translate-x-0 translate-y-0" : "w-[95vw] max-w-6xl h-[90vh] rounded-xl"
+            isMobile ? "w h max-w-none m-0 rounded-none border-none left-0 top-0 translate-x-0 translate-y-0" : "w max-w-6xl h rounded-xl"
           )}
           onPointerDownOutside={(e) => e.preventDefault()}
         >
@@ -232,7 +232,7 @@ export function CustomerManagementModal({ isOpen, onOpenChange, onCustomerSelect
               <Button 
                 onClick={() => setIsRegisterOpen(true)}
                 size={isMobile ? "sm" : "default"}
-                className="gap-2 font-bold shadow-lg shadow-primary/20 shrink-0 mr-6 sm:mr-8"
+                className="gap-2 font-bold   shrink-0 mr-6 sm:mr-8"
               >
                 <PlusCircle className="h-4 w-4" />
                 <span className="hidden sm:inline">Add New Profile</span>

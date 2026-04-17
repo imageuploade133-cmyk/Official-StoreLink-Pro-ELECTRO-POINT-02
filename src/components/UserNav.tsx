@@ -49,7 +49,7 @@ export function UserNav() {
 
   const getInitials = (email?: string | null) => {
     if (!email) return 'U'
-    const parts = email.split('@')[0].replace(/[^a-zA-Z]/g, ' ').split(' ').filter(Boolean)
+    const parts = email.split('@')[0].replace(/[^a-zA/g, ' ').split(' ').filter(Boolean)
      if (parts.length > 1) {
         return (parts[0][0] + (parts[1][0] || '')).toUpperCase()
     }

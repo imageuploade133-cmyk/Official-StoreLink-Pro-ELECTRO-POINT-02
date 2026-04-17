@@ -387,38 +387,38 @@ export default function ManageWebCatalogPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-primary/5 border-primary/10 shadow-none">
+        <Card className="bg-primary/5 border-primary/10 ">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-primary">Registry Capacity</CardTitle>
+            <CardTitle className="text font-black uppercase tracking-widest text-primary">Registry Capacity</CardTitle>
           </CardHeader>
           <CardContent>
             {isLoadingProducts && totalRegistryCount === 0 ? <Skeleton className="h-8 w-16" /> : <div className="text-3xl font-black">{totalRegistryCount.toLocaleString()}</div>}
-            <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Total Products in Web Store</p>
+            <p className="text text-muted-foreground mt-1 uppercase font-bold">Total Products in Web Store</p>
           </CardContent>
         </Card>
-        <Card className="shadow-none bg-green-50/50">
+        <Card className=" bg-green-50/50">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-green-600">Batch View</CardTitle>
+            <CardTitle className="text font-black uppercase tracking-widest text-green-600">Batch View</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-black text-green-700">{products.length} Items</div>
-            <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Products in current viewport</p>
+            <p className="text text-muted-foreground mt-1 uppercase font-bold">Products in current viewport</p>
           </CardContent>
         </Card>
-        <Card className="shadow-none bg-blue-50/50">
+        <Card className=" bg-blue-50/50">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-blue-600">Catalog Health</CardTitle>
+            <CardTitle className="text font-black uppercase tracking-widest text-blue-600">Catalog Health</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-black text-blue-700">
               {products.length > 0 ? Math.round((products.filter(p => p.description && p.imageUrl).length / products.length) * 100) : 0}%
             </div>
-            <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Media completion in batch</p>
+            <p className="text text-muted-foreground mt-1 uppercase font-bold">Media completion in batch</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <CardHeader className="bg-muted/10 border-b">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
@@ -443,10 +443,10 @@ export default function ManageWebCatalogPage() {
         </CardHeader>
         <CardContent className="p-0">
           <div className="w-full overflow-x-auto">
-            <Table className="min-w-[1000px] md:min-w-full">
+            <Table className="min-w md:min-w-full">
               <TableHeader>
                 <TableRow className="bg-muted/50 hover:bg-muted/50">
-                  <TableHead className="w-[80px] pl-6">Preview</TableHead>
+                  <TableHead className="w pl-6">Preview</TableHead>
                   <TableHead>Product Identity</TableHead>
                   <TableHead>Collection</TableHead>
                   <TableHead className="text-right">Public Price</TableHead>
@@ -498,7 +498,7 @@ export default function ManageWebCatalogPage() {
                     return (
                       <TableRow key={product.id} className="group transition-colors hover:bg-muted/30">
                         <TableCell className="pl-6">
-                          <div className="relative w-12 h-12 rounded-xl overflow-hidden border-2 border-white shadow-md bg-white">
+                          <div className="relative w-12 h-12 rounded-xl overflow-hidden border-2 border-white  bg-white">
                               <Image 
                                   src={product.imageUrl || defaultProductImageUrl} 
                                   alt={product.name} 
@@ -510,18 +510,18 @@ export default function ManageWebCatalogPage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-col gap-1">
-                            <div className="font-black text-sm text-gray-900 leading-tight truncate max-w-[200px]" title={product.name}>
+                            <div className="font-black text-sm text-gray-900 leading-tight truncate max-w" title={product.name}>
                                 {product.name}
                             </div>
                             <div className="flex items-center gap-2">
-                                <div className="text-[10px] font-mono text-muted-foreground uppercase">SKU: {product.sku || 'N/A'}</div>
+                                <div className="text font-mono text-muted-foreground uppercase">SKU: {product.sku || 'N/A'}</div>
                                 {hasVoice && (
-                                    <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 text-[8px] h-4 px-1.5 uppercase font-black tracking-tighter">
+                                    <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 text h-4 px-1.5 uppercase font-black tracking-tighter">
                                         <Mic className="h-2 w-2 mr-1" /> Voice
                                     </Badge>
                                 )}
                                 {isSaleActive && (
-                                    <Badge variant="outline" className="bg-rose-50 text-rose-600 border-rose-200 text-[8px] h-4 px-1.5 uppercase font-black tracking-tighter">
+                                    <Badge variant="outline" className="bg-rose-50 text-rose-600 border-rose-200 text h-4 px-1.5 uppercase font-black tracking-tighter">
                                         <Zap className="h-2 w-2 mr-1 fill-current" /> Sale
                                     </Badge>
                                 )}
@@ -529,7 +529,7 @@ export default function ManageWebCatalogPage() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className="text-[9px] font-black uppercase tracking-tighter bg-slate-50">
+                          <Badge variant="outline" className="text font-black uppercase tracking-tighter bg-slate-50">
                               {categoryMap.get(product.categoryId || '') || 'Uncategorized'}
                           </Badge>
                         </TableCell>
@@ -537,7 +537,7 @@ export default function ManageWebCatalogPage() {
                           <div className="flex flex-col items-end gap-1">
                             {product.newPrice ? (
                                 <>
-                                    <div className="text-[10px] text-muted-foreground line-through decoration-destructive/50 font-bold">
+                                    <div className="text text-muted-foreground line-through decoration-destructive/50 font-bold">
                                         {formatCurrency(product.sellingPrice, currencySymbol)}
                                     </div>
                                     <div className="font-black text-base tracking-tighter text-green-600">
@@ -548,7 +548,7 @@ export default function ManageWebCatalogPage() {
                                 <div className="font-black text-base tracking-tighter">{formatCurrency(product.sellingPrice, currencySymbol)}</div>
                             )}
                             {product.promo?.isActive && (
-                                <Badge className="bg-amber-500 text-white text-[8px] h-4 py-0 font-black border-none px-1.5 mt-1">OFFER ACTIVE</Badge>
+                                <Badge className="bg-amber-500 text-white text h-4 py-0 font-black border-none px-1.5 mt-1">OFFER ACTIVE</Badge>
                             )}
                           </div>
                         </TableCell>
@@ -560,11 +560,11 @@ export default function ManageWebCatalogPage() {
                                   disabled={isToggling === product.id}
                               />
                               {product.isVisibleOnWeb ? (
-                                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-[10px] h-5 uppercase font-black px-2">
+                                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text h-5 uppercase font-black px-2">
                                       LIVE
                                   </Badge>
                               ) : (
-                                  <Badge variant="outline" className="bg-slate-100 text-slate-500 border-slate-200 text-[10px] h-5 uppercase font-black px-2">
+                                  <Badge variant="outline" className="bg-slate-100 text-slate-500 border-slate-200 text h-5 uppercase font-black px-2">
                                       DRAFT
                                   </Badge>
                               )}
@@ -633,7 +633,7 @@ export default function ManageWebCatalogPage() {
             <Separator className="my-2" />
             <Button
               variant="ghost"
-              className="justify-start h-11 font-black uppercase text-[10px] tracking-widest text-destructive hover:bg-destructive/5"
+              className="justify-start h-11 font-black uppercase text tracking-widest text-destructive hover:bg-destructive/5"
               onClick={() => handleDeleteProductClick()}
             >
               <Trash2 className="mr-2 h-4 w-4" /> Delete Product Permanently

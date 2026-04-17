@@ -230,7 +230,7 @@ export function BulkPaymentDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !isSubmitting && onOpenChange(open)}>
-      <DialogContent className="sm:max-w-md p-0 overflow-hidden h-full sm:h-auto max-h-[90vh] flex flex-col">
+      <DialogContent className="sm:max-w-md p-0 overflow-hidden h-full sm:h-auto max-h flex flex-col">
         <DialogHeader className="p-6 pb-4 border-b shrink-0 bg-background">
           <DialogTitle className="flex items-center gap-3 text-2xl font-bold">
             <Wallet className="h-7 w-7 text-primary" />
@@ -243,15 +243,15 @@ export function BulkPaymentDialog({
 
         <ScrollArea className="flex-1">
           <div className="p-6 space-y-6">
-            <Card className="bg-primary/5 border-primary/10 shadow-none">
+            <Card className="bg-primary/5 border-primary/10 ">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-end">
                   <div>
-                    <p className="text-[10px] font-black uppercase text-primary tracking-widest mb-1">Total Debt Owed</p>
+                    <p className="text font-black uppercase text-primary tracking-widest mb-1">Total Debt Owed</p>
                     <p className="text-3xl font-black tracking-tighter text-primary">{formatCurrency(customer.outstandingCredit, currencySymbol)}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest mb-1">Account ID</p>
+                    <p className="text font-black uppercase text-muted-foreground tracking-widest mb-1">Account ID</p>
                     <p className="text-xs font-mono font-bold">#{customer.id.substring(0, 8).toUpperCase()}</p>
                   </div>
                 </div>
@@ -329,7 +329,7 @@ export function BulkPaymentDialog({
                 />
 
                 <div className="p-4 rounded-xl border border-yellow-200 bg-yellow-50 text-yellow-800 space-y-2">
-                  <div className="flex items-center gap-2 font-black text-[10px] uppercase tracking-widest">
+                  <div className="flex items-center gap-2 font-black text uppercase tracking-widest">
                     <Info className="h-4 w-4" />
                     Auto-Allocation Logic
                   </div>
@@ -351,7 +351,7 @@ export function BulkPaymentDialog({
           <Button 
             onClick={form.handleSubmit(onSubmit)} 
             disabled={isSubmitting || !form.formState.isValid}
-            className="h-11 px-8 font-black uppercase tracking-tighter shadow-lg shadow-primary/20"
+            className="h-11 px-8 font-black uppercase tracking-tighter  "
           >
             {isSubmitting ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

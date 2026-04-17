@@ -78,7 +78,7 @@ export function PosProductSizeSettings({ settingsData, isLoading, storeId }: Pos
   const currentSize = form.watch('posProductSize');
 
   return (
-    <Card className="shadow-lg border-none ring-1 ring-border">
+    <Card className=" border-none ring-1 ring-border">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader>
@@ -127,7 +127,7 @@ export function PosProductSizeSettings({ settingsData, isLoading, storeId }: Pos
                                         <FormLabel className="text-base font-bold">Custom Column Count</FormLabel>
                                         <FormDescription>Set precisely how many product cards fit in a row.</FormDescription>
                                     </div>
-                                    <div className="h-12 w-12 bg-primary text-primary-foreground rounded-xl flex items-center justify-center text-xl font-black shadow-lg">
+                                    <div className="h-12 w-12 bg-primary text-primary-foreground rounded-xl flex items-center justify-center text-xl font-black ">
                                         {field.value}
                                     </div>
                                 </div>
@@ -141,7 +141,7 @@ export function PosProductSizeSettings({ settingsData, isLoading, storeId }: Pos
                                         className="py-4"
                                     />
                                 </FormControl>
-                                <div className="flex justify-between text-[10px] font-black uppercase text-muted-foreground tracking-tighter">
+                                <div className="flex justify-between text font-black uppercase text-muted-foreground tracking-tighter">
                                     <span>Single Focus (1)</span>
                                     <span>Max Density (6)</span>
                                 </div>
@@ -164,7 +164,7 @@ export function PosProductSizeSettings({ settingsData, isLoading, storeId }: Pos
             </div>
           </CardContent>
           <CardFooter className="bg-muted/30 border-t p-6">
-            <Button type="submit" disabled={isSaving} className="font-bold min-w-[180px]">
+            <Button type="submit" disabled={isSaving} className="font-bold min-w">
               {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Save className="mr-2 h-4 w-4" />}
               Save Layout Changes
             </Button>

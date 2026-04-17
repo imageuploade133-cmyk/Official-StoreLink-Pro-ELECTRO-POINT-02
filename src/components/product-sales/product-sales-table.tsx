@@ -34,13 +34,13 @@ export function ProductSalesTable({ products, onViewDetails, currencySymbol }: P
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[80px]">Image</TableHead>
+          <TableHead className="w">Image</TableHead>
           <TableHead>Product Name</TableHead>
           <TableHead className="text-right">Qty Sold</TableHead>
           <TableHead className="text-right">Revenue</TableHead>
           <TableHead className="text-right">Profit</TableHead>
           <TableHead className="text-right">Stock Level</TableHead>
-          <TableHead className="w-[100px] text-center">Actions</TableHead>
+          <TableHead className="w text-center">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

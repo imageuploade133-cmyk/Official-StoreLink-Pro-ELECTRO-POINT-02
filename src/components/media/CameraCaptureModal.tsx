@@ -151,7 +151,7 @@ export function CameraCaptureModal({ isOpen, onClose, onImageCaptured }: CameraC
 
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DrawerContent className="h-[100dvh] flex flex-col rounded-none border-none mt-0">
+      <DrawerContent className="h flex flex-col rounded-none border-none mt-0">
         <DrawerHeader className="p-6 pb-4 border-b shrink-0">
           <DrawerTitle className="flex items-center gap-3 font-black text-2xl">
             <Camera className="h-8 w-8 text-primary" />
@@ -165,7 +165,7 @@ export function CameraCaptureModal({ isOpen, onClose, onImageCaptured }: CameraC
         <div className="flex-1 p-4 overflow-hidden flex flex-col justify-center bg-black/5">
           <canvas ref={canvasRef} className="hidden" />
           {error ? (
-            <div className="flex flex-col items-center justify-center h-full gap-6 text-center p-8 bg-background rounded-3xl shadow-inner">
+            <div className="flex flex-col items-center justify-center h-full gap-6 text-center p-8 bg-background rounded-3xl ">
               <Camera className="h-20 w-20 text-muted-foreground opacity-30" />
               <div>
                 <h3 className="font-bold text-lg mb-2 text-destructive">{error}</h3>
@@ -178,7 +178,7 @@ export function CameraCaptureModal({ isOpen, onClose, onImageCaptured }: CameraC
             </div>
           ) : capturedImage ? (
             <div className="flex flex-col items-center justify-center h-full gap-6 p-4">
-              <div className="relative w-full aspect-square max-w-sm rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white">
+              <div className="relative w-full aspect-square max-w-sm rounded overflow-hidden  border-4 border-white">
                 <img 
                   src={capturedImage} 
                   alt="Captured product" 
@@ -191,7 +191,7 @@ export function CameraCaptureModal({ isOpen, onClose, onImageCaptured }: CameraC
               </div>
               <div className="flex flex-col gap-3 w-full max-w-sm">
                 <Button 
-                  className="w-full h-16 gap-2 font-black text-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-2xl shadow-xl shadow-purple-500/20" 
+                  className="w-full h-16 gap-2 font-black text-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-2xl  -500/20" 
                   onClick={removeBackgroundFromImage} 
                   disabled={isUploading}
                 >
@@ -216,7 +216,7 @@ export function CameraCaptureModal({ isOpen, onClose, onImageCaptured }: CameraC
               </div>
             </div>
           ) : isCapturing ? (
-            <div className="relative w-full aspect-[3/4] max-h-[70vh] md:max-h-none md:flex-1 rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-primary/20 bg-black">
+            <div className="relative w-full aspect max-h md:max-h-none md:flex-1 rounded overflow-hidden  border-4 border-primary/20 bg-black">
               <video 
                 ref={videoRef} 
                 className="w-full h-full object-cover"
@@ -228,7 +228,7 @@ export function CameraCaptureModal({ isOpen, onClose, onImageCaptured }: CameraC
               </div>
               <Button
                 onClick={capturePhoto}
-                className="absolute bottom-8 left-1/2 -translate-x-1/2 h-24 w-24 rounded-full bg-white hover:bg-white/90 shadow-2xl border-[6px] border-primary/20 flex items-center justify-center active:scale-90 transition-all group"
+                className="absolute bottom-8 left-1/2 -translate-x-1/2 h-24 w-24 rounded-full bg-white hover:bg-white/90  border border-primary/20 flex items-center justify-center active:scale-90 transition-all group"
               >
                 <div className="h-16 w-16 rounded-full border-4 border-primary/10 group-hover:border-primary/20 transition-all flex items-center justify-center">
                     <Camera className="h-10 w-10 text-primary" />

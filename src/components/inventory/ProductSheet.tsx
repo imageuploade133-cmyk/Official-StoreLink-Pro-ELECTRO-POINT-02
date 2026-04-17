@@ -136,7 +136,7 @@ export function ProductSheet({ trigger }: ProductSheetProps) {
         )}
       </SheetTrigger>
       <SheetContent 
-        className="w-full sm:max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl max-w-[95vw] flex flex-col p-0 overflow-hidden"
+        className="w-full sm:max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl max-w flex flex-col p-0 overflow-hidden"
         side="right"
       >
         {/* Drag Handle Indicator */}

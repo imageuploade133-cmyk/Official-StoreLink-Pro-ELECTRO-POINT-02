@@ -590,7 +590,7 @@ export function WebStoreProductForm() {
           placeholder="Search categories (e.g. Shoes, Luxury...)"
           value={categorySearchTerm}
           onChange={(e) => setCategorySearchTerm(e.target.value)}
-          className="pl-12 h-14 bg-muted/40 border-primary/10 focus:border-primary/30 rounded-2xl shadow-sm text-base transition-all"
+          className="pl-12 h-14 bg-muted/40 border-primary/10 focus:border-primary/30 rounded-2xl  text-base transition-all"
         />
       </div>
       <div
@@ -598,7 +598,7 @@ export function WebStoreProductForm() {
         onScroll={handleCategoryScroll}
         className={cn(
           "h-80 overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-muted-foreground/20",
-          isMobile && "h-[calc(100vh-400px)] min-h-[300px]"
+          isMobile && "h-[calc(100vh-400px)] min-h"
         )}
       >
         {isLoadingPaginatedCategories ? (
@@ -614,7 +614,7 @@ export function WebStoreProductForm() {
             <SearchIcon className="h-12 w-12 text-muted-foreground/20" />
             <div className="space-y-1">
               <p className="font-bold text-muted-foreground">No matches found</p>
-              <p className="text-xs text-muted-foreground/60 max-w-[200px]">Try a different search term or create a new category.</p>
+              <p className="text-xs text-muted-foreground/60 max-w">Try a different search term or create a new category.</p>
             </div>
           </div>
         ) : (
@@ -624,7 +624,7 @@ export function WebStoreProductForm() {
                 key={cat.id}
                 type="button"
                 className={cn(
-                  "group relative flex flex-col items-center p-4 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl",
+                  "group relative flex flex-col items-center p-4 rounded-2xl border-2 transition-all duration-300 hover:",
                   form.watch('categoryId') === cat.id
                     ? "border-primary bg-primary/5 ring-4 ring-primary/10"
                     : "border-muted-foreground/10 bg-background hover:border-primary/30 hover:bg-primary/5"
@@ -635,7 +635,7 @@ export function WebStoreProductForm() {
                   setCategorySearchTerm('');
                 }}
               >
-                <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-muted mb-3 shadow-inner">
+                <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-muted mb-3 ">
                   <Image
                     src={cat.imageUrl || `https://picsum.photos/seed/${cat.id}/200/200`}
                     alt={cat.name}
@@ -645,8 +645,8 @@ export function WebStoreProductForm() {
                     unoptimized
                   />
                   {form.watch('categoryId') === cat.id && (
-                    <div className="absolute inset-0 bg-primary/40 backdrop-blur-[2px] flex items-center justify-center animate-in fade-in duration-300">
-                      <div className="bg-white text-primary rounded-full p-2 shadow-2xl scale-110">
+                    <div className="absolute inset-0 bg-primary/40 backdrop-blur flex items-center justify-center animate-in fade-in duration-300">
+                      <div className="bg-white text-primary rounded-full p-2  scale-110">
                         <Check className="h-5 w-5" strokeWidth={4} />
                       </div>
                     </div>
@@ -675,7 +675,7 @@ export function WebStoreProductForm() {
         {!hasMoreCategories && paginatedCategories.length > 0 && !categorySearchTerm && (
           <div className="flex items-center justify-center gap-2 py-6">
             <div className="h-px w-8 bg-muted" />
-            <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest whitespace-nowrap">
+            <div className="text font-black text-muted-foreground uppercase tracking-widest whitespace-nowrap">
               End of Catalog ({paginatedCategories.length})
             </div>
             <div className="h-px w-8 bg-muted" />
@@ -723,12 +723,12 @@ export function WebStoreProductForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-primary/5 border border-primary/10 p-3 rounded-xl flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-primary animate-in fade-in slide-in-from-top-2">
+          <div className="bg-primary/5 border border-primary/10 p-3 rounded-xl flex items-center gap-3 text font-black uppercase tracking-widest text-primary animate-in fade-in slide-in-from-top-2">
             <Info className="h-4 w-4" />
             Note: Fields marked with an asterisk (*) are mandatory for catalog integrity.
           </div>
 
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
               <CardTitle>Core Information</CardTitle>
               <CardDescription>Fundamental details for your web catalog.</CardDescription>
@@ -924,7 +924,7 @@ export function WebStoreProductForm() {
             </CardContent>
           </Card>
 
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
               <CardTitle>Visuals & Assets</CardTitle>
               <CardDescription>Control how the product appears visually across the web.</CardDescription>
@@ -956,7 +956,7 @@ export function WebStoreProductForm() {
           </Card>
 
           {/* Voice Signature Experience Card */}
-          <Card className={cn("shadow-xl border-none ring-1 ring-border transition-all", !watchVoiceEnabled && "opacity-60")}>
+          <Card className={cn(" border-none ring-1 ring-border transition-all", !watchVoiceEnabled && "opacity-60")}>
             <CardHeader className="bg-muted/30 border-b">
               <div className="flex justify-between items-center">
                 <div>
@@ -982,7 +982,7 @@ export function WebStoreProductForm() {
           </Card>
 
           {/* Video Experience Section */}
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
               <div className="flex justify-between items-center">
                 <div>
@@ -1037,7 +1037,7 @@ export function WebStoreProductForm() {
                                             </label>
                                         </Button>
                                         <input id="poster-image-upload" type="file" accept="image/*" className="hidden" onChange={(e) => handleMediaUpload(e, 'videoPosterUrl')} disabled={isSaving || isUploadingPoster} />
-                                        <p className="text-[10px] text-muted-foreground font-medium uppercase">Recommended: 1200x800px</p>
+                                        <p className="text text-muted-foreground font-medium uppercase">Recommended: 1200x800px</p>
                                     </div>
                                 </div>
                             </div>
@@ -1049,7 +1049,7 @@ export function WebStoreProductForm() {
           </Card>
 
           {/* Social Media & Gallery Multi-Video Section */}
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
                 <div className="flex justify-between items-center">
                     <div className="flex-1 mr-4">
@@ -1097,7 +1097,7 @@ export function WebStoreProductForm() {
                             name="videosDescription"
                             render={({ field }) => (
                             <FormItem className="space-y-1">
-                                <FormLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Subtitle / Tagline</FormLabel>
+                                <FormLabel className="text font-black uppercase tracking-widest text-muted-foreground">Subtitle / Tagline</FormLabel>
                                 <FormControl>
                                     <Input {...field} value={field.value || ''} placeholder="Cinematic product insights & social proof" className="h-8 text-xs w-64" />
                                 </FormControl>
@@ -1113,7 +1113,7 @@ export function WebStoreProductForm() {
           </Card>
 
           {/* Trust Badges Section */}
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
               <CardTitle>Trust & Service Badges</CardTitle>
               <CardDescription>Customize the trust indicators shown on the product detail page.</CardDescription>
@@ -1230,7 +1230,7 @@ export function WebStoreProductForm() {
           </Card>
 
           {/* Key Features Section */}
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
               <div className="flex justify-between items-center">
                 <div className="flex-1 mr-4">
@@ -1269,7 +1269,7 @@ export function WebStoreProductForm() {
                             {isSpecsTitleLocked ? <Lock className="h-4 w-4" /> : <LockKeyholeOpen className="h-4 w-4" />}
                           </Button>
                         </div>
-                        <FormDescription className="text-[10px]">Customize the heading shown on the storefront.</FormDescription>
+                        <FormDescription className="text">Customize the heading shown on the storefront.</FormDescription>
                       </FormItem>
                     )}
                   />
@@ -1334,7 +1334,7 @@ export function WebStoreProductForm() {
                             render={({ field: subField }) => (
                               <FormItem className="space-y-1">
                                 <FormControl><Input placeholder="Label (e.g. Battery Life)" {...subField} className="h-10 text-sm" /></FormControl>
-                                <FormMessage className="text-[10px]" />
+                                <FormMessage className="text" />
                               </FormItem>
                             )}
                           />
@@ -1344,7 +1344,7 @@ export function WebStoreProductForm() {
                             render={({ field: subField }) => (
                               <FormItem className="space-y-1">
                                 <FormControl><Input placeholder="Value (e.g. 24 Hours)" {...subField} className="h-10 text-sm" /></FormControl>
-                                <FormMessage className="text-[10px]" />
+                                <FormMessage className="text" />
                               </FormItem>
                             )}
                           />
@@ -1367,7 +1367,7 @@ export function WebStoreProductForm() {
           </Card>
 
           {/* Whats In The Box Section */}
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
               <div className="flex justify-between items-center">
                 <div className="flex-1 mr-4">
@@ -1406,7 +1406,7 @@ export function WebStoreProductForm() {
                             {isBoxTitleLocked ? <Lock className="h-4 w-4" /> : <LockKeyholeOpen className="h-4 w-4" />}
                           </Button>
                         </div>
-                        <FormDescription className="text-[10px]">Customize the heading shown on the storefront.</FormDescription>
+                        <FormDescription className="text">Customize the heading shown on the storefront.</FormDescription>
                       </FormItem>
                     )}
                   />
@@ -1471,7 +1471,7 @@ export function WebStoreProductForm() {
                             render={({ field: subField }) => (
                               <FormItem className="space-y-1">
                                 <FormControl><Input placeholder="Item name (e.g. Charging Cable)" {...subField} className="h-10 text-sm" /></FormControl>
-                                <FormMessage className="text-[10px]" />
+                                <FormMessage className="text" />
                               </FormItem>
                             )}
                           />
@@ -1494,7 +1494,7 @@ export function WebStoreProductForm() {
           </Card>
 
           {/* Variations & Sizing Section */}
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
               <div className="flex justify-between items-center">
                 <div className="flex-1 mr-4">
@@ -1533,7 +1533,7 @@ export function WebStoreProductForm() {
                             {isVariationsTitleLocked ? <Lock className="h-4 w-4" /> : <LockKeyholeOpen className="h-4 w-4" />}
                           </Button>
                         </div>
-                        <FormDescription className="text-[10px]">Customize the heading shown on the storefront.</FormDescription>
+                        <FormDescription className="text">Customize the heading shown on the storefront.</FormDescription>
                       </FormItem>
                     )}
                   />
@@ -1598,7 +1598,7 @@ export function WebStoreProductForm() {
                             render={({ field: subField }) => (
                               <FormItem className="space-y-1">
                                 <FormControl><Input placeholder="Variation (e.g. Space Gray Finish)" {...subField} className="h-10 text-sm" /></FormControl>
-                                <FormMessage className="text-[10px]" />
+                                <FormMessage className="text" />
                               </FormItem>
                             )}
                           />
@@ -1630,7 +1630,7 @@ export function WebStoreProductForm() {
                     </FormLabel>
                     <div className="flex items-start gap-4">
                         {field.value && (
-                            <div className="relative w-32 h-32 rounded-xl border overflow-hidden shrink-0 shadow-sm">
+                            <div className="relative w-32 h-32 rounded-xl border overflow-hidden shrink-0 ">
                                 <Image src={field.value} alt="Size guide" fill className="object-contain" unoptimized />
                                 <Button type="button" variant="destructive" size="icon" className="absolute top-1 right-1 h-6 w-6 rounded-full" onClick={() => form.setValue('sizeGuideImageUrl', '')}>
                                     <X className="h-3 w-3" />
@@ -1648,7 +1648,7 @@ export function WebStoreProductForm() {
                                 </label>
                             </Button>
                             <input id="size-guide-upload" type="file" accept="image/*" className="hidden" onChange={handleSizeGuideUpload} disabled={isSaving || isUploadingSizeGuide} />
-                            <FormDescription className="text-[10px]">Recommended: High-resolution PNG or JPG with transparent background.</FormDescription>
+                            <FormDescription className="text">Recommended: High-resolution PNG or JPG with transparent background.</FormDescription>
                         </div>
                     </div>
                     <FormMessage />
@@ -1660,7 +1660,7 @@ export function WebStoreProductForm() {
         </div>
 
         <div className="lg:col-span-1 space-y-6">
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-primary/5">
               <CardTitle className="text-lg flex items-center gap-2">
                   <MonitorSmartphone className="h-5 w-5 text-primary" />
@@ -1677,7 +1677,7 @@ export function WebStoreProductForm() {
                       <FormLabel className="font-black text-xs uppercase tracking-wider flex items-center gap-2">
                           <Globe className="h-3.5 w-3.5 text-blue-500" /> Web Store
                       </FormLabel>
-                      <p className="text-[10px] text-muted-foreground">Show on public website</p>
+                      <p className="text text-muted-foreground">Show on public website</p>
                     </div>
                     <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} disabled={isSaving} /></FormControl>
                   </FormItem>
@@ -1692,7 +1692,7 @@ export function WebStoreProductForm() {
                       <FormLabel className="font-black text-xs uppercase tracking-wider flex items-center gap-2">
                           <Store className="h-3.5 w-3.5 text-green-600" /> POS Terminal
                       </FormLabel>
-                      <p className="text-[10px] text-muted-foreground">Show in cashier interface</p>
+                      <p className="text text-muted-foreground">Show in cashier interface</p>
                     </div>
                     <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} disabled={isSaving} /></FormControl>
                   </FormItem>
@@ -1707,7 +1707,7 @@ export function WebStoreProductForm() {
                       <FormLabel className="font-black text-xs uppercase tracking-wider flex items-center gap-2">
                           <Info className="h-3.5 w-3.5 text-primary" /> Product Insight
                       </FormLabel>
-                      <p className="text-[10px] text-muted-foreground">Show "Listed Since" metrics</p>
+                      <p className="text text-muted-foreground">Show "Listed Since" metrics</p>
                     </div>
                     <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} disabled={isSaving} /></FormControl>
                   </FormItem>
@@ -1717,7 +1717,7 @@ export function WebStoreProductForm() {
           </Card>
 
           {/* Public Store Section Visibility - Red Color */}
-          <Card className="shadow-xl border-none ring-1 ring-destructive/30">
+          <Card className=" border-none ring-1 ring-destructive/30">
             <CardHeader className="bg-destructive/10">
               <CardTitle className="text-lg flex items-center gap-2 text-destructive">
                   <Eye className="h-5 w-5" />
@@ -1725,7 +1725,7 @@ export function WebStoreProductForm() {
               </CardTitle>
               <CardDescription className="text-destructive/70 text-xs">
                 Control which sections appear on the public product page.
-                <span className="block mt-1 font-bold text-[10px] uppercase tracking-tighter">Note: Global settings can override these.</span>
+                <span className="block mt-1 font-bold text uppercase tracking-tighter">Note: Global settings can override these.</span>
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -1738,7 +1738,7 @@ export function WebStoreProductForm() {
                       <FormLabel className="font-black text-xs uppercase tracking-wider flex items-center gap-2 text-destructive">
                           <ListChecks className="h-3.5 w-3.5" /> Technical Specs
                       </FormLabel>
-                      <p className="text-[10px] text-muted-foreground">Show specifications, variations, sizing</p>
+                      <p className="text text-muted-foreground">Show specifications, variations, sizing</p>
                     </div>
                     <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} disabled={isSaving} /></FormControl>
                   </FormItem>
@@ -1753,7 +1753,7 @@ export function WebStoreProductForm() {
                       <FormLabel className="font-black text-xs uppercase tracking-wider flex items-center gap-2 text-destructive">
                           <Truck className="h-3.5 w-3.5" /> Logistics Info
                       </FormLabel>
-                      <p className="text-[10px] text-muted-foreground">Show shipping & returns tab</p>
+                      <p className="text text-muted-foreground">Show shipping & returns tab</p>
                     </div>
                     <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} disabled={isSaving} /></FormControl>
                   </FormItem>
@@ -1768,7 +1768,7 @@ export function WebStoreProductForm() {
                       <FormLabel className="font-black text-xs uppercase tracking-wider flex items-center gap-2 text-destructive">
                           <Star className="h-3.5 w-3.5" /> Verified Reviews
                       </FormLabel>
-                      <p className="text-[10px] text-muted-foreground">Show customer reviews & ratings</p>
+                      <p className="text text-muted-foreground">Show customer reviews & ratings</p>
                     </div>
                     <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} disabled={isSaving} /></FormControl>
                   </FormItem>
@@ -1777,7 +1777,7 @@ export function WebStoreProductForm() {
             </CardContent>
           </Card>
 
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
               <CardHeader className="bg-muted/30">
                   <CardTitle className="text-lg">Merchandising Settings</CardTitle>
               </CardHeader>
@@ -1785,7 +1785,7 @@ export function WebStoreProductForm() {
                   <StoreMerchandisingSettings />
               </CardContent>
               <CardFooter className="flex flex-col gap-4 border-t pt-6 bg-muted/10">
-                  <Button type="submit" disabled={isSaving || isUploadingSizeGuide || isUploadingPoster} className="w-full h-14 text-lg font-bold shadow-lg shadow-primary/20">
+                  <Button type="submit" disabled={isSaving || isUploadingSizeGuide || isUploadingPoster} className="w-full h-14 text-lg font-bold  ">
                   {isSaving ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -1798,7 +1798,7 @@ export function WebStoreProductForm() {
                     </>
                   )}
                   </Button>
-                  <div className="flex items-start gap-2 text-[10px] text-muted-foreground leading-relaxed">
+                  <div className="flex items-start gap-2 text text-muted-foreground leading-relaxed">
                       <Info className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
                       <p>New products are instantly live across all enabled channels. Prices and stock levels will sync in real-time.</p>
                   </div>

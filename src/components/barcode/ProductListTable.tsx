@@ -56,7 +56,7 @@ export function ProductListTable({
         </label>
         <span className="text-xs font-medium text-muted-foreground w-20 text-center">Qty</span>
       </div>
-      <ScrollArea className="h-[240px]"> 
+      <ScrollArea className="h"> 
         <div className="divide-y divide-border">
           {products.map((product) => (
             <div key={product.id} className="flex items-center py-2.5 px-3 hover:bg-slate-50/70 dark:hover:bg-slate-800/70 transition-colors" style={{ height: '48px' }}>

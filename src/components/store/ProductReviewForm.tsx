@@ -65,11 +65,11 @@ export function ProductReviewForm({ productId }: ProductReviewFormProps) {
 
   if (!user) {
     return (
-      <div className="p-8 border-2 border-dashed rounded-[2rem] text-center bg-muted/30">
+      <div className="p-8 border-2 border-dashed rounded text-center bg-muted/30">
         <MessageCircle className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
         <h4 className="text-xl font-black tracking-tight mb-2">Share Your Thoughts</h4>
         <p className="text-sm text-muted-foreground mb-6">You must be logged in to write a review for this product.</p>
-        <Button asChild variant="outline" className="rounded-xl font-black uppercase text-[10px] tracking-widest px-8">
+        <Button asChild variant="outline" className="rounded-xl font-black uppercase text tracking-widest px-8">
           <Link href={getStoreUrl('/store/login')}>Login to Review</Link>
         </Button>
       </div>
@@ -77,7 +77,7 @@ export function ProductReviewForm({ productId }: ProductReviewFormProps) {
   }
 
   return (
-    <div className="p-8 border-2 rounded-[2rem] bg-white dark:bg-slate-900/50 shadow-sm">
+    <div className="p-8 border-2 rounded bg-white dark:bg-slate-900/50 ">
       <h4 className="text-xl font-black tracking-tight mb-6 flex items-center gap-3">
         <Star className="h-6 w-6 text-primary fill-current" /> Write a Review
       </h4>
@@ -88,7 +88,7 @@ export function ProductReviewForm({ productId }: ProductReviewFormProps) {
             name="rating"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Overall Rating</FormLabel>
+                <FormLabel className="text font-black uppercase text-slate-400 tracking-widest">Overall Rating</FormLabel>
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
@@ -120,11 +120,11 @@ export function ProductReviewForm({ productId }: ProductReviewFormProps) {
             name="comment"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Your Experience</FormLabel>
+                <FormLabel className="text font-black uppercase text-slate-400 tracking-widest">Your Experience</FormLabel>
                 <FormControl>
                   <Textarea
                     placeholder="What did you like or dislike? How was the quality?"
-                    className="min-h-[120px] rounded-2xl bg-slate-50 dark:bg-slate-800 border-none resize-none focus-visible:ring-primary"
+                    className="min-h rounded-2xl bg-slate-50 dark:bg-slate-800 border-none resize-none focus-visible:ring-primary"
                     {...field}
                     disabled={isSubmitting}
                   />
@@ -137,7 +137,7 @@ export function ProductReviewForm({ productId }: ProductReviewFormProps) {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full h-14 rounded-2xl font-black uppercase text-xs tracking-[0.2em] shadow-xl shadow-primary/20"
+            className="w-full h-14 rounded-2xl font-black uppercase text-xs tracking  "
           >
             {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
             Submit My Review

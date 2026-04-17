@@ -29,7 +29,7 @@ export function PublicPageSkeleton() {
 
       {/* Main Content Skeleton */}
       <main className="flex-1 pt-16" suppressHydrationWarning>
-        <div className="max-w-[95rem] mx-auto px-4 sm:px-6 lg:px-8 py-16" suppressHydrationWarning>
+        <div className="max-w mx-auto px-4 sm:px-6 lg:px-8 py-16" suppressHydrationWarning>
           <div className="space-y-16" suppressHydrationWarning>
             {/* Fluid aspect ratio skeleton for hero */}
             <Skeleton className="aspect-video w-full rounded-3xl" />

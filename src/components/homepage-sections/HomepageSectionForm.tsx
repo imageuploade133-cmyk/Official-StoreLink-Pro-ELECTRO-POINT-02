@@ -344,7 +344,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                 onScroll={handleCategoryScroll}
                 className={cn(
                     "h-80 overflow-y-auto border rounded-xl bg-muted/5 p-3",
-                    isMobile && "h-[calc(100vh-400px)] min-h-[300px]"
+                    isMobile && "h-[calc(100vh-400px)] min-h"
                 )}
             >
                 {isLoadingPaginatedCategories ? (
@@ -363,7 +363,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                 key={cat.id}
                                 type="button"
                                 className={cn(
-                                    "group relative flex flex-col items-center p-3 rounded-xl border-2 transition-all duration-300 hover:shadow-lg",
+                                    "group relative flex flex-col items-center p-3 rounded-xl border-2 transition-all duration-300 hover:",
                                     currentCategoryId === cat.id 
                                         ? "border-primary bg-primary/5 ring-2 ring-primary/20" 
                                         : "border-transparent bg-background hover:border-primary/30 hover:bg-muted/50"
@@ -441,7 +441,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
         <>
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                <Card className="shadow-xl border-none ring-1 ring-border">
+                <Card className=" border-none ring-1 ring-border">
                     <CardHeader className="bg-muted/30">
                         <CardTitle>Section Configuration</CardTitle>
                         <CardDescription>Define how products are selected and displayed on the homepage.</CardDescription>
@@ -469,7 +469,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                 <FormItem> 
                                     <FormLabel className="font-bold">Sort Order</FormLabel> 
                                     <FormControl><Input type="number" {...field} /></FormControl> 
-                                    <FormDescription className="text-[10px]">Lower numbers appear first.</FormDescription> 
+                                    <FormDescription className="text">Lower numbers appear first.</FormDescription> 
                                     <FormMessage /> 
                                 </FormItem> 
                             )}/>
@@ -627,7 +627,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                         />
                         
                         <div className="space-y-6 pt-8 border-t border-dashed">
-                            <h3 className="text-sm font-black uppercase tracking-[0.2em] text-primary">Target Merchandising</h3>
+                            <h3 className="text-sm font-black uppercase tracking text-primary">Target Merchandising</h3>
                             <FormField control={form.control} name="selectionType" render={({ field }) => (
                                 <FormItem className="space-y-3">
                                     <FormLabel className="font-bold">Selection Strategy</FormLabel>
@@ -674,7 +674,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                             )}
                                         />
                                     </div>
-                                    <p className="text-[10px] text-muted-foreground italic">Automatically pulls all visible products from this category.</p>
+                                    <p className="text text-muted-foreground italic">Automatically pulls all visible products from this category.</p>
                                     <FormField control={form.control} name="categoryId" render={() => <FormMessage />} />
                                 </div>
                             )}
@@ -689,7 +689,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                                 Search the master catalog to add items...
                                             </Button>
                                         </PopoverTrigger>
-                                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                                        <PopoverContent className="w-[--radix-popover-trigger p-0" align="start">
                                             <Command shouldFilter={false}>
                                                 <CommandInput placeholder="Type product name..." value={productSearchTerm} onValueChange={setProductSearchTerm}/>
                                                 <CommandList>
@@ -706,7 +706,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                             </Command>
                                         </PopoverContent>
                                     </Popover>
-                                    <div className="bg-muted/10 p-4 rounded-2xl border-2 border-dashed min-h-[120px]">
+                                    <div className="bg-muted/10 p-4 rounded-2xl border-2 border-dashed min-h">
                                         {selectedProductIds.length === 0 ? (
                                             <p className="text-sm text-center text-muted-foreground pt-8">No products curated yet. Search above to begin.</p>
                                         ) : (
@@ -714,7 +714,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                                 {selectedProductIds.map(id => {
                                                     const product = productMap.get(id);
                                                     return (
-                                                        <Badge key={id} variant="secondary" className="pl-3 pr-1 py-1.5 gap-2 text-xs font-bold border shadow-sm">
+                                                        <Badge key={id} variant="secondary" className="pl-3 pr-1 py-1.5 gap-2 text-xs font-bold border ">
                                                             {product?.name || 'Loading...'}
                                                             <Button type="button" variant="ghost" size="icon" className="h-5 w-5 hover:bg-destructive hover:text-white rounded-full transition-colors" onClick={() => handleProductDeselect(id)}>
                                                                 <X className="h-3 w-3"/>
@@ -733,7 +733,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                 </Card>
 
                 {/* Flash Sale Card */}
-                <Card className={cn("shadow-xl border-none ring-1 ring-border transition-all", isFlashSale ? "border-rose-500 ring-rose-500/20" : "")}>
+                <Card className={cn(" border-none ring-1 ring-border transition-all", isFlashSale ? "border-rose-500 ring-rose-500/20" : "")}>
                     <CardHeader className={cn("bg-muted/30 transition-colors", isFlashSale ? "bg-rose-500/10" : "")}>
                         <div className="flex justify-between items-center">
                             <div>
@@ -838,11 +838,11 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                                             field.onChange(newDate);
                                                         }}
                                                     />
-                                                    <Button variant="ghost" size="sm" onClick={() => field.onChange(null)} className="h-8 text-[10px] font-black uppercase">Clear</Button>
+                                                    <Button variant="ghost" size="sm" onClick={() => field.onChange(null)} className="h-8 text font-black uppercase">Clear</Button>
                                                 </div>
                                             </PopoverContent>
                                         </Popover>
-                                        <FormDescription className="text-[10px]">When the flash sale banner should appear.</FormDescription>
+                                        <FormDescription className="text">When the flash sale banner should appear.</FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -891,11 +891,11 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                                             field.onChange(newDate);
                                                         }}
                                                     />
-                                                    <Button variant="ghost" size="sm" onClick={() => field.onChange(null)} className="h-8 text-[10px] font-black uppercase">Clear</Button>
+                                                    <Button variant="ghost" size="sm" onClick={() => field.onChange(null)} className="h-8 text font-black uppercase">Clear</Button>
                                                 </div>
                                             </PopoverContent>
                                         </Popover>
-                                        <FormDescription className="text-[10px]">When the sale automatically deactivates.</FormDescription>
+                                        <FormDescription className="text">When the sale automatically deactivates.</FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -917,7 +917,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                 </Card>
 
                 <div className="flex justify-end gap-4">
-                    <Button type="submit" disabled={isSaving} size="lg" className="min-w-[200px] h-14 text-lg font-black shadow-lg shadow-primary/20">
+                    <Button type="submit" disabled={isSaving} size="lg" className="min-w h-14 text-lg font-black  ">
                         {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                         {isSaving ? 'Syncing...' : 'Save Configuration'}
                     </Button>

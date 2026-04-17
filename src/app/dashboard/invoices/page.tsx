@@ -170,10 +170,10 @@ export default function ManageInvoicesPage() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'paid': return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 gap-1.5 h-5 font-black uppercase text-[9px]"><CheckCircle2 className="h-2.5 w-2.5" /> Paid</Badge>;
-      case 'credit': return <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 gap-1.5 h-5 font-black uppercase text-[9px]"><Clock className="h-2.5 w-2.5" /> Credit</Badge>;
-      case 'draft': return <Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-200 gap-1.5 h-5 font-black uppercase text-[9px]"><FileWarning className="h-2.5 w-2.5" /> Draft</Badge>;
-      default: return <Badge variant="secondary" className="h-5 text-[9px] font-black uppercase">{status}</Badge>;
+      case 'paid': return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 gap-1.5 h-5 font-black uppercase text"><CheckCircle2 className="h-2.5 w-2.5" /> Paid</Badge>;
+      case 'credit': return <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 gap-1.5 h-5 font-black uppercase text"><Clock className="h-2.5 w-2.5" /> Credit</Badge>;
+      case 'draft': return <Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-200 gap-1.5 h-5 font-black uppercase text"><FileWarning className="h-2.5 w-2.5" /> Draft</Badge>;
+      default: return <Badge variant="secondary" className="h-5 text font-black uppercase">{status}</Badge>;
     }
   };
 
@@ -200,7 +200,7 @@ export default function ManageInvoicesPage() {
         </div>
       </div>
 
-      <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <CardHeader className="border-b bg-muted/10">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
             <div>
@@ -218,7 +218,7 @@ export default function ManageInvoicesPage() {
                     />
                 </div>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-full sm:w-[160px] h-10">
+                    <SelectTrigger className="w-full sm:w h-10">
                         <Filter className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                         <SelectValue placeholder="All Status" />
                     </SelectTrigger>
@@ -237,12 +237,12 @@ export default function ManageInvoicesPage() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/50 hover:bg-transparent">
-                  <TableHead className="pl-6 font-black uppercase text-[10px] tracking-widest">Date</TableHead>
-                  <TableHead className="font-black uppercase text-[10px] tracking-widest">Serial Identifier</TableHead>
-                  <TableHead className="font-black uppercase text-[10px] tracking-widest">Client Identity</TableHead>
-                  <TableHead className="text-right font-black uppercase text-[10px] tracking-widest">Magnitude</TableHead>
-                  <TableHead className="text-center font-black uppercase text-[10px] tracking-widest">Status</TableHead>
-                  <TableHead className="pr-6 text-right font-black uppercase text-[10px] tracking-widest">Protocol</TableHead>
+                  <TableHead className="pl-6 font-black uppercase text tracking-widest">Date</TableHead>
+                  <TableHead className="font-black uppercase text tracking-widest">Serial Identifier</TableHead>
+                  <TableHead className="font-black uppercase text tracking-widest">Client Identity</TableHead>
+                  <TableHead className="text-right font-black uppercase text tracking-widest">Magnitude</TableHead>
+                  <TableHead className="text-center font-black uppercase text tracking-widest">Status</TableHead>
+                  <TableHead className="pr-6 text-right font-black uppercase text tracking-widest">Protocol</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -270,7 +270,7 @@ export default function ManageInvoicesPage() {
                       <TableCell>
                         <div className="flex flex-col">
                             <span className="font-bold text-sm text-gray-900 dark:text-gray-100">{inv.customerName}</span>
-                            <span className="text-[10px] text-muted-foreground truncate max-w-[150px]">{inv.customerEmail}</span>
+                            <span className="text text-muted-foreground truncate max-w">{inv.customerEmail}</span>
                         </div>
                       </TableCell>
                       <TableCell className="text-right font-black">

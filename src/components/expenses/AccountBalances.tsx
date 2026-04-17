@@ -26,7 +26,7 @@ export function AccountBalances({ isLoading, totalBankBalance, totalCashOnHand, 
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card className="shadow-lg border-teal-500/20 bg-teal-500/5">
+                  <Card className=" border-teal-500/20 bg-teal-500/5">
                       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                           <CardTitle className="text-sm font-semibold text-teal-600">Total In Bank</CardTitle>
                           <Landmark className="h-5 w-5 text-teal-600" />
@@ -36,7 +36,7 @@ export function AccountBalances({ isLoading, totalBankBalance, totalCashOnHand, 
                           <p className="text-xs text-teal-600/80">Sum of all non-cash balances.</p>
                       </CardContent>
                   </Card>
-                  <Card className="shadow-lg border-yellow-500/20 bg-yellow-500/5">
+                  <Card className=" border-yellow-500/20 bg-yellow-500/5">
                       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                           <CardTitle className="text-sm font-semibold text-yellow-700">Total Cash on Hand</CardTitle>
                           <Wallet className="h-5 w-5 text-yellow-700" />
@@ -52,7 +52,7 @@ export function AccountBalances({ isLoading, totalBankBalance, totalCashOnHand, 
                       Array.from({length:5}).map((_,i) => <Skeleton key={i} className="h-24 w-full" />)
                   ) : paymentMethods.length > 0 ? (
                       paymentMethods.map(method => (
-                          <Card key={method} className="text-center p-4 flex flex-col justify-between shadow-sm h-full hover:bg-muted/50 transition-colors">
+                          <Card key={method} className="text-center p-4 flex flex-col justify-between  h-full hover:bg-muted/50 transition-colors">
                               <div>
                                 <p className="text-sm font-semibold text-muted-foreground">{method}</p>
                                 <p className={cn("text-2xl font-bold", (balanceByMethod[method] || 0) >= 0 ? 'text-primary' : 'text-destructive' )}>

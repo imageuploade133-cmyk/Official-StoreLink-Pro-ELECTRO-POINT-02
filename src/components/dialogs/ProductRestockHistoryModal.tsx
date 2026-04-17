@@ -70,7 +70,7 @@ export function ProductRestockHistoryModal({ isOpen, onClose, productId, product
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl h-[70vh] flex flex-col">
+      <DialogContent className="max-w-3xl h flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <History className="h-6 w-6 text-primary" />

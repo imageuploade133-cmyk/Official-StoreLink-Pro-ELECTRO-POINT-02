@@ -154,7 +154,7 @@ export default function AddUISectionPage() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+            <Card className=" border-none ring-1 ring-border overflow-hidden">
               <CardHeader className="bg-muted/30 border-b">
                 <CardTitle>Creative Architecture</CardTitle>
                 <CardDescription>Configure the underlying technology and content for this section.</CardDescription>
@@ -186,14 +186,14 @@ export default function AddUISectionPage() {
                                     <RadioGroupItem value="image" id="type-image" className="peer sr-only" />
                                     <Label htmlFor="type-image" className="flex items-center gap-4 p-6 rounded-2xl border-2 bg-muted/5 cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 transition-all">
                                         <ImageIcon className="h-6 w-6" />
-                                        <div><p className="font-bold">Image Visual</p><p className="text-[10px] text-muted-foreground uppercase">Overlay & Banners</p></div>
+                                        <div><p className="font-bold">Image Visual</p><p className="text text-muted-foreground uppercase">Overlay & Banners</p></div>
                                     </Label>
                                 </div>
                                 <div className="relative">
                                     <RadioGroupItem value="html" id="type-html" className="peer sr-only" />
                                     <Label htmlFor="type-html" className="flex items-center gap-4 p-6 rounded-2xl border-2 bg-muted/5 cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 transition-all">
                                         <Code className="h-6 w-6" />
-                                        <div><p className="font-bold">Bespoke HTML</p><p className="text-[10px] text-muted-foreground uppercase">Raw Code Injection</p></div>
+                                        <div><p className="font-bold">Bespoke HTML</p><p className="text text-muted-foreground uppercase">Raw Code Injection</p></div>
                                     </Label>
                                 </div>
                             </RadioGroup>
@@ -210,7 +210,7 @@ export default function AddUISectionPage() {
                                 <FormLabel className="font-bold">Primary Design Asset <span className="text-destructive">*</span></FormLabel>
                                 <div className="flex items-start gap-6">
                                     {imageUrl ? (
-                                        <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border shadow-xl bg-white shrink-0">
+                                        <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border  bg-white shrink-0">
                                             <Image src={imageUrl} alt="Preview" fill className="object-cover" unoptimized />
                                         </div>
                                     ) : (
@@ -248,7 +248,7 @@ export default function AddUISectionPage() {
 
                         <FormField control={form.control} name="alignment" render={({ field }) => (
                             <FormItem>
-                                <FormLabel className="font-black text-[10px] uppercase tracking-widest text-primary">Content Alignment</FormLabel>
+                                <FormLabel className="font-black text uppercase tracking-widest text-primary">Content Alignment</FormLabel>
                                 <Select onValueChange={field.onChange} value={field.value}>
                                     <FormControl><SelectTrigger className="h-11"><SelectValue /></SelectTrigger></FormControl>
                                     <SelectContent>
@@ -269,7 +269,7 @@ export default function AddUISectionPage() {
                                         {...field} 
                                         value={field.value || ''} 
                                         placeholder="<div class='custom-banner'>...</div>"
-                                        className="min-h-[300px] font-mono text-sm leading-relaxed bg-slate-950 text-emerald-400 p-6 rounded-2xl"
+                                        className="min-h font-mono text-sm leading-relaxed bg-slate-950 text-emerald-400 p-6 rounded-2xl"
                                     />
                                 </FormControl>
                                 <FormDescription>Note: Use standard Tailwind utility classes for consistent styling.</FormDescription>
@@ -283,7 +283,7 @@ export default function AddUISectionPage() {
           </div>
 
           <div className="lg:col-span-1 space-y-6">
-            <Card className="shadow-xl border-none ring-1 ring-border">
+            <Card className=" border-none ring-1 ring-border">
               <CardHeader className="bg-primary/5">
                 <CardTitle className="text-lg flex items-center gap-2">
                     <Monitor className="h-5 w-5 text-primary" /> Display Strategy
@@ -293,10 +293,10 @@ export default function AddUISectionPage() {
                 <FormField control={form.control} name="fullWidth" render={({ field }) => (
                     <FormItem className="flex items-center justify-between p-4 border rounded-2xl bg-muted/5 transition-all hover:bg-muted/10">
                         <div className="space-y-0.5">
-                            <FormLabel className="font-black text-[10px] uppercase tracking-wider flex items-center gap-2">
+                            <FormLabel className="font-black text uppercase tracking-wider flex items-center gap-2">
                                 <Maximize className="h-3.5 w-3.5 text-blue-500" /> Edge-to-Edge
                             </FormLabel>
-                            <p className="text-[8px] font-bold text-muted-foreground uppercase">Disable container padding</p>
+                            <p className="text font-bold text-muted-foreground uppercase">Disable container padding</p>
                         </div>
                         <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
                     </FormItem>
@@ -308,7 +308,7 @@ export default function AddUISectionPage() {
                             <Palette className="h-3.5 w-3.5" /> Background Color
                         </FormLabel>
                         <div className="flex items-center gap-3">
-                            <FormControl><Input type="color" {...field} className="p-1 h-10 w-12 cursor-pointer border-none shadow-sm" /></FormControl>
+                            <FormControl><Input type="color" {...field} className="p-1 h-10 w-12 cursor-pointer border-none " /></FormControl>
                             <span className="text-xs font-mono font-bold text-muted-foreground">{field.value}</span>
                         </div>
                     </FormItem>
@@ -324,15 +324,15 @@ export default function AddUISectionPage() {
                 )} />
               </CardContent>
               <CardFooter className="pt-6 border-t bg-muted/10">
-                <Button type="submit" disabled={isSaving || isUploading} className="w-full h-14 text-lg font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all active:scale-[0.98]">
+                <Button type="submit" disabled={isSaving || isUploading} className="w-full h-14 text-lg font-black uppercase tracking-widest   transition-all active:scale">
                     {isSaving ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                     Publish UI Section
                 </Button>
               </CardFooter>
             </Card>
 
-            <div className="p-6 border-2 border-dashed rounded-[2.5rem] bg-muted/5 space-y-4">
-                <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center shadow-md">
+            <div className="p-6 border-2 border-dashed rounded bg-muted/5 space-y-4">
+                <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center ">
                     <Info className="h-6 w-6 text-primary" />
                 </div>
                 <h4 className="font-black text-sm uppercase tracking-tight">Technical Protocol</h4>

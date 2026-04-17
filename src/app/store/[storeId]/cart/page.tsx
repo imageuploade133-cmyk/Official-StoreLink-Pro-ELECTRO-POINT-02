@@ -246,7 +246,7 @@ export default function CartPage() {
                           </div>
                       )}
 
-                      <Card className="shadow-sm overflow-hidden">
+                      <Card className=" overflow-hidden">
                           <CardHeader className="bg-muted/20 border-b">
                               <div className="flex justify-between items-center">
                                 <CardTitle className="text-lg">Cart Items ({cartCount})</CardTitle>
@@ -254,7 +254,7 @@ export default function CartPage() {
                               </div>
                           </CardHeader>
                           <CardContent className="p-0">
-                              <ScrollArea className="h-auto max-h-[600px]">
+                              <ScrollArea className="h-auto max-h">
                                   <div className="divide-y">
                                       {realTimeCartItems.map(item => (
                                           <div key={item.id} className={cn("flex flex-col sm:flex-row sm:items-center p-6 gap-6", (item.isUnavailable || item.isOutOfStock) && "bg-destructive/5")}>
@@ -313,7 +313,7 @@ export default function CartPage() {
                   </div>
 
                   <div className="lg:col-span-1 sticky top-32">
-                      <div className="bg-card p-8 rounded-2xl shadow-xl border space-y-8">
+                      <div className="bg-card p-8 rounded-2xl  border space-y-8">
                           <h2 className="text-2xl font-black tracking-tight">Summary</h2>
                           
                           <div className="space-y-4 text-base">
@@ -379,7 +379,7 @@ export default function CartPage() {
                                   )}
                               </div>
                               {appliedCoupon && (
-                                <p className="text-[10px] text-green-600 font-bold uppercase tracking-widest">
+                                <p className="text text-green-600 font-bold uppercase tracking-widest">
                                     Coupon Applied Successfully
                                 </p>
                               )}
@@ -395,14 +395,14 @@ export default function CartPage() {
                           {activeRewardAd && !rewardAdClicked && (
                             <button
                                 onClick={handleRewardClick}
-                                className="w-full relative group overflow-hidden h-14 rounded-[1.25rem] transition-all active:scale-[0.98] shadow-xl mb-4"
+                                className="w-full relative group overflow-hidden h-14 rounded transition-all active:scale  mb-4"
                             >
                                 <div className="absolute inset-0 bg-slate-950 dark:bg-slate-900" />
                                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(251,191,36,0.15),transparent_70%)]" />
-                                <div className="absolute inset-0 opacity-20 group-hover:opacity-100 transition-opacity duration-700 bg-[conic-gradient(from_0deg,transparent,rgba(251,191,36,0.3),transparent)] animate-[spin_4s_linear_infinite]" />
+                                <div className="absolute inset-0 opacity-20 group-hover:opacity-100 transition-opacity duration-700 bg-[conic-gradient(from_0deg,transparent,rgba(251,191,36,0.3),transparent)] animate" />
                                 <div className="relative flex items-center justify-center gap-3">
                                     <Sparkles className="h-4 w-4 text-amber-400 group-hover:rotate-12 transition-transform" />
-                                    <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white">
+                                    <span className="text font-black uppercase tracking text-white">
                                         Unlock {activeRewardAd.rewardDiscountType === 'percentage' ? activeRewardAd.rewardDiscountValue + '%' : currencySymbol + activeRewardAd.rewardDiscountValue} Reward
                                     </span>
                                     <Sparkles className="h-4 w-4 text-amber-400 group-hover:-rotate-12 transition-transform" />
@@ -410,13 +410,13 @@ export default function CartPage() {
                             </button>
                           )}
 
-                          <Button asChild size="lg" style={buttonStyle} className="w-full h-14 text-lg font-bold shadow-lg shadow-primary/20 border-none" disabled={hasIssues || subtotal === 0}>
+                          <Button asChild size="lg" style={buttonStyle} className="w-full h-14 text-lg font-bold   border-none" disabled={hasIssues || subtotal === 0}>
                              <Link href={getStoreUrl('/store/checkout')}>
                                Checkout Now <ArrowRight className="ml-2 h-5 w-5" />
                              </Link>
                           </Button>
 
-                          <div className="flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground pt-4">
+                          <div className="flex items-center justify-center gap-2 text font-black uppercase tracking-widest text-muted-foreground pt-4">
                               <ShoppingCart className="h-3 w-3" /> Secure Checkout Powered by StoreLink
                           </div>
                       </div>

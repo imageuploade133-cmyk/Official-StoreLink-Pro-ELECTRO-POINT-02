@@ -137,7 +137,7 @@ export default function StaffFormDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col">
+      <DialogContent className="sm:max-w-2xl max-h flex flex-col">
         <DialogHeader>
           <DialogTitle>{existingStaff ? 'Edit Staff Member' : 'Add New Staff'}</DialogTitle>
           <DialogDescription>
@@ -365,7 +365,7 @@ export default function StaffFormDialog({
                                           <FormLabel className="text-sm font-normal cursor-pointer">
                                             {permission.name}
                                             {isDisabledByDependency && (
-                                              <span className="ml-2 inline-flex items-center text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded uppercase font-bold tracking-tighter">
+                                              <span className="ml-2 inline-flex items-center text bg-primary/10 text-primary px-1.5 py-0.5 rounded uppercase font-bold tracking-tighter">
                                                 <AlertCircle className="mr-1 h-2.5 w-2.5" /> Required for POS
                                               </span>
                                             )}

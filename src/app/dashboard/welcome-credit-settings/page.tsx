@@ -69,16 +69,16 @@ const welcomeCreditSchema = z.object({
   welcomePopupMessage: z.string().min(2, 'Message is too short.').max(300, 'Message is too long.').default('Your digital profile has been initialized with a premium starter credit.'),
   welcomePopupImageUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
   welcomePopupIcon: z.string().default('PartyPopper'),
-  welcomePopupIconColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default('#3b82f6'),
-  welcomePopupBgColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default('#ffffff'),
-  welcomePopupTextColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default('#000000'),
+  welcomePopupIconColor: z.string().regex(/^#[0-9a-fA{6}$/i, 'Must be a valid hex color').default('#3b82f6'),
+  welcomePopupBgColor: z.string().regex(/^#[0-9a-fA{6}$/i, 'Must be a valid hex color').default('#ffffff'),
+  welcomePopupTextColor: z.string().regex(/^#[0-9a-fA{6}$/i, 'Must be a valid hex color').default('#000000'),
 });
 
 type FormValues = z.infer<typeof welcomeCreditSchema>;
 
 const ColorInput = ({ field, label }: { field: any; label: string }) => (
     <FormItem>
-        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{label}</FormLabel>
+        <FormLabel className="text font-black uppercase tracking-widest text-muted-foreground">{label}</FormLabel>
         <div className="relative flex items-center">
              <FormControl>
                 <Input type="color" {...field} value={field.value || '#ffffff'} className="p-1 h-10 w-12 cursor-pointer rounded-lg border-2" />
@@ -187,7 +187,7 @@ export default function WelcomeCreditSettingsPage() {
     return (
       <div className="space-y-6">
         <PageHeader icon={Coins} title="Welcome Bonus Settings" description="Loading registry..." />
-        <Skeleton className="h-[500px] w-full rounded-3xl" />
+        <Skeleton className="h w-full rounded-3xl" />
       </div>
     );
   }
@@ -207,7 +207,7 @@ export default function WelcomeCreditSettingsPage() {
         <Button 
             onClick={form.handleSubmit(onSubmit)} 
             disabled={isSaving || isUploading}
-            className="h-12 px-8 font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all active:scale-95"
+            className="h-12 px-8 font-black uppercase tracking-widest   transition-all active:scale-95"
         >
             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Sync Bonus Protocol
@@ -218,7 +218,7 @@ export default function WelcomeCreditSettingsPage() {
         <div className="lg:col-span-2 space-y-10">
           <Form {...form}>
             <form className="space-y-10">
-              <Card className={cn("shadow-xl border-none ring-1 ring-border overflow-hidden", !isEnabled && "opacity-60 grayscale-[0.5]")}>
+              <Card className={cn(" border-none ring-1 ring-border overflow-hidden", !isEnabled && "opacity-60 grayscale")}>
                 <CardHeader className="bg-muted/30 border-b flex flex-row items-center justify-between">
                   <div>
                     <CardTitle className="text-xl">Bonus Configuration</CardTitle>
@@ -228,10 +228,10 @@ export default function WelcomeCreditSettingsPage() {
                     control={form.control}
                     name="enableWelcomeCredit"
                     render={({ field }) => (
-                      <FormItem className="flex items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background shadow-lg">
+                      <FormItem className="flex items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background ">
                         <div className="flex items-center gap-2">
                             {field.value ? <Eye className="h-4 w-4 text-green-600" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
-                            <FormLabel className="text-[10px] font-black uppercase tracking-widest">{field.value ? 'Active' : 'Disabled'}</FormLabel>
+                            <FormLabel className="text font-black uppercase tracking-widest">{field.value ? 'Active' : 'Disabled'}</FormLabel>
                         </div>
                         <FormControl>
                           <Switch
@@ -270,7 +270,7 @@ export default function WelcomeCreditSettingsPage() {
               </Card>
 
               {/* Congratulation Pop-up Customization */}
-              <Card className={cn("shadow-2xl border-none ring-1 ring-border overflow-hidden", !isPopupEnabled && "opacity-60")}>
+              <Card className={cn(" border-none ring-1 ring-border overflow-hidden", !isPopupEnabled && "opacity-60")}>
                 <CardHeader className="bg-muted/30 border-b flex flex-row items-center justify-between">
                     <div>
                         <CardTitle className="text-xl flex items-center gap-2">
@@ -377,9 +377,9 @@ export default function WelcomeCreditSettingsPage() {
                                 </FormLabel>
                                 <div className="flex flex-col gap-4">
                                     {field.value && (
-                                        <div className="relative w-full aspect-video max-w-sm rounded-[2rem] overflow-hidden border-2 shadow-xl group">
+                                        <div className="relative w-full aspect-video max-w-sm rounded overflow-hidden border-2  group">
                                             <Image src={field.value} alt="Welcome Visual" fill className="object-cover" unoptimized />
-                                            <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-xl" onClick={() => field.onChange('')}><X className="h-4 w-4" /></Button>
+                                            <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity " onClick={() => field.onChange('')}><X className="h-4 w-4" /></Button>
                                         </div>
                                     )}
                                     <div className="flex gap-3">
@@ -392,7 +392,7 @@ export default function WelcomeCreditSettingsPage() {
                                         <input id="welcome-img-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
                                     </div>
                                 </div>
-                                <FormDescription className="text-[10px]">Displayed at the top of the congratulation pop-up. Optimized for 800x400px.</FormDescription>
+                                <FormDescription className="text">Displayed at the top of the congratulation pop-up. Optimized for 800x400px.</FormDescription>
                             </FormItem>
                         )}
                     />
@@ -404,45 +404,45 @@ export default function WelcomeCreditSettingsPage() {
 
         <div className="lg:col-span-1">
           <div className="sticky top-24 space-y-6">
-            <Card className="shadow-2xl border-none ring-1 ring-border overflow-hidden rounded-[2.5rem]">
+            <Card className=" border-none ring-1 ring-border overflow-hidden rounded">
                 <CardHeader className="bg-muted/10 border-b">
-                    <CardTitle className="text-sm font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                    <CardTitle className="text-sm font-black uppercase tracking text-primary flex items-center gap-2">
                         <Eye className="h-4 w-4" /> Live Simulation
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-8 pb-10 flex flex-col items-center">
                     {/* The Simulation Pop-up View */}
                     <div 
-                        className="w-full rounded-[2.5rem] overflow-hidden shadow-2xl border transition-all duration-500 scale-95 origin-top"
+                        className="w-full rounded overflow-hidden  border transition-all duration-500 scale-95 origin-top"
                         style={{ backgroundColor: form.watch('welcomePopupBgColor'), color: form.watch('welcomePopupTextColor') }}
                     >
                         {form.watch('welcomePopupImageUrl') && (
-                            <div className="relative aspect-[2/1] w-full border-b">
+                            <div className="relative aspect w-full border-b">
                                 <Image src={form.watch('welcomePopupImageUrl')!} alt="" fill className="object-cover" unoptimized />
                             </div>
                         )}
                         <div className="p-8 flex flex-col items-center text-center space-y-4">
-                            <div className="size-16 rounded-[1.5rem] flex items-center justify-center mb-2 shadow-inner" style={{ backgroundColor: `${iconColor}15` }}>
+                            <div className="size-16 rounded flex items-center justify-center mb-2 " style={{ backgroundColor: `${iconColor}15` }}>
                                 <SelectedIcon className="size-8" style={{ color: iconColor }} strokeWidth={3} />
                             </div>
                             <div className="space-y-2">
                                 <h3 className="text-2xl font-black tracking-tighter uppercase leading-none">{form.watch('welcomePopupTitle')}</h3>
-                                <p className="text-[10px] font-medium opacity-70 leading-relaxed px-4">{form.watch('welcomePopupMessage')}</p>
+                                <p className="text font-medium opacity-70 leading-relaxed px-4">{form.watch('welcomePopupMessage')}</p>
                             </div>
                             <div className="pt-4 w-full">
                                 <div className="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
-                                    <p className="text-[8px] font-black uppercase tracking-widest opacity-50 mb-1">Bonus Verified</p>
+                                    <p className="text font-black uppercase tracking-widest opacity-50 mb-1">Bonus Verified</p>
                                     <p className="text-3xl font-black tracking-tighter" style={{ color: iconColor }}>{formatCurrency(form.watch('welcomeCreditAmount') || 0, currencySymbol)}</p>
                                 </div>
                             </div>
-                            <Button variant="ghost" className="text-[8px] font-black uppercase tracking-widest pointer-events-none mt-2 opacity-40">Dismiss Hub</Button>
+                            <Button variant="ghost" className="text font-black uppercase tracking-widest pointer-events-none mt-2 opacity-40">Dismiss Hub</Button>
                         </div>
                     </div>
-                    <p className="text-[10px] text-muted-foreground font-black uppercase text-center mt-6 tracking-widest">Onboarding Overlay Projection</p>
+                    <p className="text text-muted-foreground font-black uppercase text-center mt-6 tracking-widest">Onboarding Overlay Projection</p>
                 </CardContent>
             </Card>
 
-            <div className="p-6 bg-primary/5 rounded-[2rem] border-2 border-dashed border-primary/10 flex gap-4 items-start">
+            <div className="p-6 bg-primary/5 rounded border-2 border-dashed border-primary/10 flex gap-4 items-start">
                 <Info className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                 <div className="text-xs space-y-2">
                     <p className="font-bold text-primary uppercase tracking-wider">Conversion Strategy</p>

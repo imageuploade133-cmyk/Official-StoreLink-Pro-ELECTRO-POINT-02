@@ -33,9 +33,9 @@ export function CustomUISection({ section }: CustomUISectionProps) {
             dangerouslySetInnerHTML={{ __html: section.htmlContent || '' }}
         />
       ) : (
-        <div className="relative group overflow-hidden rounded-[3rem] shadow-2xl">
+        <div className="relative group overflow-hidden rounded ">
             {section.imageUrl && (
-                <div className="relative aspect-video md:aspect-[21/9] w-full overflow-hidden">
+                <div className="relative aspect-video md:aspect w-full overflow-hidden">
                     <Image 
                         src={section.imageUrl} 
                         alt={section.title} 
@@ -43,7 +43,7 @@ export function CustomUISection({ section }: CustomUISectionProps) {
                         className="object-cover transition-transform duration-700 group-hover:scale-110" 
                         unoptimized
                     />
-                    <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] transition-opacity group-hover:opacity-40" />
+                    <div className="absolute inset-0 bg-black/30 backdrop-blur transition-opacity group-hover:opacity-40" />
                 </div>
             )}
 
@@ -64,7 +64,7 @@ export function CustomUISection({ section }: CustomUISectionProps) {
                     )}
                     {(section.buttonText && section.linkUrl) && (
                         <div className="pt-4">
-                            <Button asChild size="lg" className="rounded-full h-14 md:h-16 px-10 md:px-14 font-black uppercase text-xs tracking-[0.25em] shadow-2xl shadow-primary/30 group/btn transition-all active:scale-95">
+                            <Button asChild size="lg" className="rounded-full h-14 md:h-16 px-10 md:px-14 font-black uppercase text-xs tracking   group/btn transition-all active:scale-95">
                                 <Link href={section.linkUrl}>
                                     {section.buttonText}
                                     <ArrowRight className="ml-3 h-5 w-5 transition-transform group-hover/btn:translate-x-2" strokeWidth={3} />

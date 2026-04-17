@@ -9,7 +9,7 @@ import type { Settings } from '@/lib/types';
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const { settings } = useSettings();
-  const { setTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
 
   useEffect(() => {
     if (settings?.theme) {
@@ -29,6 +29,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           // Robust default matching premium wideness
           root.style.setProperty('--container-width', '95rem'); 
       }
+
+      const isDark = resolvedTheme === 'dark';
 
       // Define which CSS variables are customizable
       const customColorVars = ['--primary', '--success', '--destructive', '--background'];
@@ -68,15 +70,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
               body.style.backgroundPosition = 'center';
               body.style.backgroundAttachment = 'fixed';
               // Use a slightly more transparent background for cards when an image is active
-              if (settings.colorBackground) {
+              if (settings.colorBackground && !isDark) {
                   root.style.setProperty('--background', hexToHslString(settings.colorBackground));
+              } else {
+                  root.style.removeProperty('--background');
               }
-          } else if (backgroundStyle === 'gradient' && settings.backgroundGradientStart && settings.backgroundGradientEnd) {
+          } else if (backgroundStyle === 'gradient' && settings.backgroundGradientStart && settings.backgroundGradientEnd && !isDark) {
               body.style.backgroundImage = `linear-gradient(to bottom right, ${settings.backgroundGradientStart}, ${settings.backgroundGradientEnd})`;
               body.style.backgroundAttachment = 'fixed';
               // Fallback for UI components
               root.style.setProperty('--background', hexToHslString(settings.backgroundGradientStart));
-          } else if (backgroundStyle === 'solid' && settings.colorBackground) {
+          } else if (backgroundStyle === 'solid' && settings.colorBackground && !isDark) {
               // Set both body and UI background from the same source
               root.style.setProperty('--background', hexToHslString(settings.colorBackground));
               body.style.backgroundColor = settings.colorBackground;
@@ -84,13 +88,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
               // The video is handled by a separate component.
               body.style.backgroundColor = '#000';
               // Set the UI background color for cards, etc.
-              if (settings.colorBackground) {
+              if (settings.colorBackground && !isDark) {
                   root.style.setProperty('--background', hexToHslString(settings.colorBackground));
+              } else {
+                  root.style.removeProperty('--background');
               }
           } else {
-              // No specific background setting, remove custom property to use default from CSS
+              // No specific background setting or in dark mode
               root.style.removeProperty('--background');
-              // Ensure body gets the CSS variable background in dark mode
               body.style.backgroundColor = '';
           }
       } else {
@@ -100,13 +105,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       }
       
       // Always ensure the body uses the CSS variable background as fallback
-      if (!body.style.backgroundImage) {
+      if (!body.style.backgroundImage && !body.style.backgroundColor) {
         body.style.backgroundColor = '';
       }
     };
     
     applyTheme();
-  }, [settings]);
+  }, [settings, resolvedTheme]);
 
   return <>{children}</>;
 }

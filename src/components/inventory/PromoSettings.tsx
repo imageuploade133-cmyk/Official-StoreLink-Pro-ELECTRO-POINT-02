@@ -37,7 +37,7 @@ export function PromoSettings() {
   return (
     <div className="pt-4 border-t border-dashed space-y-4">
       <div className="flex items-center justify-between">
-          <h4 className="text-[10px] font-black uppercase text-muted-foreground tracking-widest flex items-center gap-2">
+          <h4 className="text font-black uppercase text-muted-foreground tracking-widest flex items-center gap-2">
               <Zap className="h-3.5 w-3.5 text-amber-500 fill-current" /> Promotional Pricing
           </h4>
           <FormField
@@ -52,7 +52,7 @@ export function PromoSettings() {
       </div>
 
       {isPromoEnabled && (
-        <Card className="border-amber-200 bg-amber-50/10 shadow-none animate-in fade-in slide-in-from-top-2 duration-300">
+        <Card className="border-amber-200 bg-amber-50/10  animate-in fade-in slide-in-from-top-2 duration-300">
           <CardContent className="pt-6 space-y-6">
             <FormField
               control={control}
@@ -153,7 +153,7 @@ export function PromoSettings() {
                 )}
               />
             </div>
-            <p className="text-[10px] text-amber-600 font-medium italic">
+            <p className="text text-amber-600 font-medium italic">
                 Leave dates empty to keep the promotion active indefinitely.
             </p>
           </CardContent>

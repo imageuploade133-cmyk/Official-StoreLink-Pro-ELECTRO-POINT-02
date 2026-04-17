@@ -109,7 +109,7 @@ export function RecentlyViewedView({ onClose, onSelectProduct }: RecentlyViewedV
                 <div className="flex items-center gap-4">
                     <button 
                         onClick={onClose}
-                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
+                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800  border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
                     >
                         <ArrowLeft className="h-5 w-5" strokeWidth={3} />
                     </button>
@@ -126,10 +126,10 @@ export function RecentlyViewedView({ onClose, onSelectProduct }: RecentlyViewedV
 
             <div className="px-6 py-4 flex items-center justify-between">
                 <div className="flex flex-col">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Discovery Registry</p>
+                    <p className="text font-black uppercase tracking text-slate-400">Discovery Registry</p>
                     <p className="text-sm font-bold">{viewedProductIds.length} Items Found</p>
                 </div>
-                <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest bg-white dark:bg-slate-800 px-4 py-2 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 active:scale-95 transition-all">
+                <button className="flex items-center gap-2 text font-black uppercase tracking-widest bg-white dark:bg-slate-800 px-4 py-2 rounded-xl  border border-slate-100 dark:border-slate-800 active:scale-95 transition-all">
                     <Filter className="h-3.5 w-3.5" strokeWidth={3} />
                     Filter
                 </button>
@@ -140,21 +140,21 @@ export function RecentlyViewedView({ onClose, onSelectProduct }: RecentlyViewedV
                     <div className="grid grid-cols-2 gap-4 p-2 py-6">
                         {[...Array(4)].map((_, i) => (
                             <div key={i} className="space-y-3">
-                                <div className="aspect-[4/5] w-full bg-slate-200 dark:bg-slate-800 rounded-[2rem] animate-pulse" />
+                                <div className="aspect w-full bg-slate-200 dark:bg-slate-800 rounded animate-pulse" />
                                 <div className="h-4 w-3/4 bg-slate-200 dark:bg-slate-800 rounded-full animate-pulse" />
                             </div>
                         ))}
                     </div>
                 ) : viewedProductIds.length === 0 ? (
                     <div className="py-32 text-center space-y-8 animate-in fade-in zoom-in-95 duration-700">
-                        <div className="h-32 w-32 bg-slate-100 dark:bg-slate-800/50 rounded-[3rem] flex items-center justify-center mx-auto shadow-inner group">
+                        <div className="h-32 w-32 bg-slate-100 dark:bg-slate-800/50 rounded flex items-center justify-center mx-auto  group">
                             <History className="h-14 w-14 text-slate-300 group-hover:rotate-180 transition-transform duration-1000" />
                         </div>
                         <div className="space-y-2">
                             <h3 className="text-2xl font-black tracking-tight uppercase">Registry Empty</h3>
-                            <p className="text-sm text-slate-500 font-medium max-w-[220px] mx-auto leading-relaxed">Your browsing history will be archived here for instant retrieval.</p>
+                            <p className="text-sm text-slate-500 font-medium max-w mx-auto leading-relaxed">Your browsing history will be archived here for instant retrieval.</p>
                         </div>
-                        <Button onClick={onClose} size="lg" className="rounded-2xl font-black uppercase text-[10px] tracking-widest px-10 h-14 shadow-xl active:scale-95 transition-transform">Begin Exploration</Button>
+                        <Button onClick={onClose} size="lg" className="rounded-2xl font-black uppercase text tracking-widest px-10 h-14  active:scale-95 transition-transform">Begin Exploration</Button>
                     </div>
                 ) : (
                     <div className="grid grid-cols-2 gap-4 p-2">
@@ -167,7 +167,7 @@ export function RecentlyViewedView({ onClose, onSelectProduct }: RecentlyViewedV
                                     className="group relative flex flex-col gap-3 animate-in fade-in slide-in-from-bottom-2 duration-500"
                                 >
                                     <div 
-                                        className="relative w-full aspect-[4/5] overflow-hidden rounded-[2rem] bg-white dark:bg-slate-800 shadow-lg border border-slate-100 dark:border-slate-800 active:scale-[0.98] transition-all"
+                                        className="relative w-full aspect overflow-hidden rounded bg-white dark:bg-slate-800  border border-slate-100 dark:border-slate-800 active:scale transition-all"
                                         onClick={() => onSelectProduct(product.id)}
                                     >
                                         <Image 
@@ -181,20 +181,20 @@ export function RecentlyViewedView({ onClose, onSelectProduct }: RecentlyViewedV
                                         
                                         <button 
                                             onClick={(e) => handleRemoveItem(e, product.id)}
-                                            className="absolute top-3 right-3 size-9 flex items-center justify-center bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl shadow-xl text-slate-400 hover:text-rose-500 hover:scale-110 transition-all active:scale-90 z-30 border border-white/50"
+                                            className="absolute top-3 right-3 size-9 flex items-center justify-center bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl  text-slate-400 hover:text-rose-500 hover:scale-110 transition-all active:scale-90 z-30 border border-white/50"
                                         >
                                             <X className="h-5 w-5" strokeWidth={3} />
                                         </button>
 
                                         {product.promo?.isActive && (
                                             <div className="absolute bottom-3 left-3">
-                                                <Badge className="bg-rose-500 text-white font-black text-2xs uppercase tracking-widest px-2 py-0.5 border-none shadow-lg">On Offer</Badge>
+                                                <Badge className="bg-rose-500 text-white font-black text-2xs uppercase tracking-widest px-2 py-0.5 border-none ">On Offer</Badge>
                                             </div>
                                         )}
                                     </div>
 
                                     <div className="flex flex-col gap-1 px-1">
-                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-primary/60 truncate">{product.categoryName}</p>
+                                        <p className="text font-black uppercase tracking text-primary/60 truncate">{product.categoryName}</p>
                                         <h4 className="font-black text-sm text-slate-900 dark:text-white truncate leading-tight tracking-tight">{product.name}</h4>
                                         <p className="text-primary font-black text-base tracking-tighter mt-0.5">{formatCurrency(price, currencySymbol)}</p>
                                     </div>

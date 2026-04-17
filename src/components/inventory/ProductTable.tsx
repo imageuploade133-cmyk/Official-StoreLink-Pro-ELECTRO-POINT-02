@@ -125,14 +125,14 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[80px]">Preview</TableHead>
+            <TableHead className="w">Preview</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Category</TableHead>
             <TableHead>Supplier</TableHead>
             <TableHead>SKU</TableHead>
             <TableHead className="text-right">Price</TableHead>
             <TableHead className="text-right">Stock</TableHead>
-            <TableHead className="w-[100px] text-center">Actions</TableHead>
+            <TableHead className="w text-center">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -151,7 +151,7 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
                 )}
               >
                 <TableCell>
-                    <div className="relative w-12 h-12 rounded-lg overflow-hidden border-2 border-background shadow-sm bg-muted flex items-center justify-center shrink-0">
+                    <div className="relative w-12 h-12 rounded-lg overflow-hidden border-2 border-background  bg-muted flex items-center justify-center shrink-0">
                         <Image
                             src={(product.imageUrl && product.imageUrl.trim() !== "") ? product.imageUrl : defaultProductImageUrl}
                             alt={product.name}
@@ -175,7 +175,7 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
                     </div>
                 </TableCell>
                 <TableCell>
-                    <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-tighter">
+                    <Badge variant="secondary" className="text font-bold uppercase tracking-tighter">
                         {product.categoryName}
                     </Badge>
                 </TableCell>
@@ -183,7 +183,7 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
                     {product.supplierName ? (
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                             <Truck className="h-3 w-3" />
-                            <span className="truncate max-w-[120px]">{product.supplierName}</span>
+                            <span className="truncate max-w">{product.supplierName}</span>
                         </div>
                     ) : (
                         <span className="text-xs text-slate-300 italic">No Supplier</span>
@@ -194,7 +194,7 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
                     <div className="flex flex-col items-end">
                         {product.newPrice ? (
                             <>
-                                <span className="text-[10px] text-muted-foreground line-through decoration-destructive/50">
+                                <span className="text text-muted-foreground line-through decoration-destructive/50">
                                     {formatCurrency(product.sellingPrice || 0, currencySymbol)}
                                 </span>
                                 <span className="text-green-600">
@@ -208,7 +208,7 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
                 </TableCell>
                 <TableCell className="text-right">
                   {isOutOfStock ? (
-                    <Badge variant="destructive" className="font-black uppercase tracking-tighter text-[10px]">Out of Stock</Badge>
+                    <Badge variant="destructive" className="font-black uppercase tracking-tighter text">Out of Stock</Badge>
                   ) : isLowStock ? (
                     <Badge variant="outline" className="text-orange-600 border-orange-500 font-black bg-white dark:bg-slate-900">
                         {product.stock}

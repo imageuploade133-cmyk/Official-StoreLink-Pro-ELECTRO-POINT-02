@@ -25,11 +25,11 @@ export function RecentTransfers({ isLoading, recentStockTransfers }: RecentTrans
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <div className="max-h-[300px] space-y-2">
+          <div className="max-h space-y-2">
             <Skeleton className="h-10 w-full" /><Skeleton className="h-10 w-full" /><Skeleton className="h-10 w-full" />
           </div>
         ) : (
-          <ScrollArea className="max-h-[300px]">
+          <ScrollArea className="max-h">
             <Table>
               <TableHeader><TableRow><TableHead>Product</TableHead><TableHead className="text-right">Qty</TableHead><TableHead>From → To</TableHead><TableHead>Date</TableHead></TableRow></TableHeader>
               <TableBody>

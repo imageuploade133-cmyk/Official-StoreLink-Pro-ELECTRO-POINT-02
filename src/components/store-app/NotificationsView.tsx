@@ -96,13 +96,13 @@ export function NotificationsView({ onClose, onNavigate }: NotificationsViewProp
                 <div className="flex items-center gap-4">
                     <button 
                         onClick={onClose}
-                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
+                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800  border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
                     >
                         <ArrowLeft className="h-5 w-5" strokeWidth={3} />
                     </button>
                     <h1 className="text-xl font-black leading-tight tracking-tighter uppercase">Alerts</h1>
                 </div>
-                <button className="text-[10px] font-black uppercase tracking-widest text-primary hover:opacity-70 transition-opacity">
+                <button className="text font-black uppercase tracking-widest text-primary hover:opacity-70 transition-opacity">
                     Mark Read
                 </button>
             </header>
@@ -122,17 +122,17 @@ export function NotificationsView({ onClose, onNavigate }: NotificationsViewProp
                         </div>
                     ) : !user ? (
                         <div className="py-32 text-center space-y-8 animate-in fade-in zoom-in-95 duration-700">
-                            <div className="size-32 bg-slate-100 dark:bg-slate-800/50 rounded-[3rem] flex items-center justify-center mx-auto shadow-inner group">
+                            <div className="size-32 bg-slate-100 dark:bg-slate-800/50 rounded flex items-center justify-center mx-auto  group">
                                 <ShieldCheck className="size-14 text-slate-300 group-hover:scale-110 transition-transform duration-500" strokeWidth={1.5} />
                             </div>
                             <div className="space-y-2">
                                 <h3 className="text-2xl font-black tracking-tight uppercase">Unlock Alerts</h3>
-                                <p className="text-sm font-medium text-slate-500 max-w-[220px] mx-auto leading-relaxed">Sign in to receive real-time fulfillment telemetry and exclusive updates.</p>
+                                <p className="text-sm font-medium text-slate-500 max-w mx-auto leading-relaxed">Sign in to receive real-time fulfillment telemetry and exclusive updates.</p>
                             </div>
                             <Button 
                                 onClick={() => onNavigate?.('profile')} 
                                 size="lg" 
-                                className="rounded-2xl font-black uppercase text-[10px] tracking-widest px-10 h-14 shadow-xl active:scale-95 transition-transform"
+                                className="rounded-2xl font-black uppercase text tracking-widest px-10 h-14  active:scale-95 transition-transform"
                             >
                                 Enter Profile
                             </Button>
@@ -147,16 +147,16 @@ export function NotificationsView({ onClose, onNavigate }: NotificationsViewProp
                                 return (
                                     <div 
                                         key={order.id} 
-                                        className="relative p-6 bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-lg group active:scale-[0.98] transition-all"
+                                        className="relative p-6 bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-800  group active:scale transition-all"
                                     >
                                         <div className="flex gap-5">
-                                            <div className={cn("size-12 rounded-2xl flex items-center justify-center shrink-0 shadow-inner", config.color)}>
+                                            <div className={cn("size-12 rounded-2xl flex items-center justify-center shrink-0 ", config.color)}>
                                                 <StatusIcon className="size-6" strokeWidth={2.5} />
                                             </div>
                                             <div className="flex-1 min-w-0 space-y-1">
                                                 <div className="flex justify-between items-start">
                                                     <h3 className="font-black text-sm uppercase tracking-tight text-slate-900 dark:text-white">{config.title}</h3>
-                                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">
+                                                    <p className="text font-black text-slate-400 uppercase tracking-widest">
                                                         {date ? format(date, 'h:mm a') : 'Now'}
                                                     </p>
                                                 </div>
@@ -178,17 +178,17 @@ export function NotificationsView({ onClose, onNavigate }: NotificationsViewProp
                         </div>
                     ) : (
                         <div className="py-32 text-center space-y-8 animate-in fade-in zoom-in-95 duration-700">
-                            <div className="size-32 bg-slate-100 dark:bg-slate-800/50 rounded-[3rem] flex items-center justify-center mx-auto shadow-inner group">
+                            <div className="size-32 bg-slate-100 dark:bg-slate-800/50 rounded flex items-center justify-center mx-auto  group">
                                 <Bell className="size-14 text-slate-300 group-hover:rotate-12 transition-transform duration-500" />
                             </div>
                             <div className="space-y-2">
                                 <h3 className="text-2xl font-black tracking-tight uppercase">Registry Clear</h3>
-                                <p className="text-sm font-medium text-slate-500 max-w-[220px] mx-auto leading-relaxed">No new fulfillment updates recorded. You&apos;re all caught up!</p>
+                                <p className="text-sm font-medium text-slate-500 max-w mx-auto leading-relaxed">No new fulfillment updates recorded. You&apos;re all caught up!</p>
                             </div>
                             <Button 
                                 onClick={onClose} 
                                 size="lg" 
-                                className="rounded-2xl font-black uppercase text-[10px] tracking-widest px-10 h-14 shadow-xl active:scale-95 transition-transform"
+                                className="rounded-2xl font-black uppercase text tracking-widest px-10 h-14  active:scale-95 transition-transform"
                             >
                                 Return Home
                             </Button>

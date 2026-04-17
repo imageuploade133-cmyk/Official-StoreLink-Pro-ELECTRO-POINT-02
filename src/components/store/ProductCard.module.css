@@ -1,11 +1,9 @@
 /* Card Container */
 .cardContainer {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .cardContainer:hover {
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
   transform: translateY(-4px);
 }
 
@@ -91,7 +89,6 @@
 
 .cartButton:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
 }
 
 .cartButton:active:not(:disabled) {
@@ -194,7 +191,6 @@
 
 .mobileCartButton:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
 }
 
 .mobileCartIcon {
@@ -220,7 +216,6 @@
 /* Dark Mode Adjustments */
 @media (prefers-color-scheme: dark) {
   .cardContainer:hover {
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
   }
 
   .quickAddBar {

@@ -12,8 +12,8 @@ import { useSettings } from '@/contexts/settings-context';
 
 const ProductCardSkeleton = () => {
     return (
-      <Card className="overflow-hidden shadow-md flex flex-col">
-        <Skeleton className="relative w-full aspect-[4/3] bg-muted/50" />
+      <Card className="overflow-hidden  flex flex-col">
+        <Skeleton className="relative w-full aspect bg-muted/50" />
         <CardHeader className="p-4">
           <Skeleton className="h-6 w-3/4" />
         </CardHeader>

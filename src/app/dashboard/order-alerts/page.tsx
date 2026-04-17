@@ -118,7 +118,7 @@ export default function OrderAlertsPage() {
     return (
       <div className="space-y-6">
         <PageHeader icon={BellRing} title="Order Alerts" description="Configure WhatsApp notifications for new website orders." />
-        <Skeleton className="h-[400px] w-full" />
+        <Skeleton className="h w-full" />
       </div>
     );
   }
@@ -204,7 +204,7 @@ export default function OrderAlertsPage() {
                       </div>
                     ) : (
                       configuredNumbers.map((num, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-4 border rounded-xl bg-background shadow-sm animate-in fade-in slide-in-from-top-1">
+                        <div key={idx} className="flex items-center justify-between p-4 border rounded-xl bg-background  animate-in fade-in slide-in-from-top-1">
                           <div className="flex items-center gap-3">
                             <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                               <Smartphone className="h-4 w-4" />
@@ -226,7 +226,7 @@ export default function OrderAlertsPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="border-t pt-6">
-                  <Button type="submit" disabled={isSaving} size="lg" className="min-w-[200px] font-bold">
+                  <Button type="submit" disabled={isSaving} size="lg" className="min-w font-bold">
                     {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                     Save Alert Settings
                   </Button>
@@ -237,7 +237,7 @@ export default function OrderAlertsPage() {
         </div>
 
         <div className="lg:col-span-1">
-          <Card className="bg-primary/5 border-primary/20 shadow-none sticky top-6">
+          <Card className="bg-primary/5 border-primary/20  sticky top-6">
             <CardHeader>
               <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary uppercase tracking-widest">
                 <Info className="h-4 w-4" /> Pro Tips

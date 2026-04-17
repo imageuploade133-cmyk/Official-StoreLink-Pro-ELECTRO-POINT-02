@@ -36,7 +36,7 @@ export function CalculatorDialog({ isOpen, onOpenChange }: CalculatorDialogProps
         event.preventDefault();
       }
       
-      if (/[0-9]/.test(key)) handleButtonClick(key);
+      if (/[0/.test(key)) handleButtonClick(key);
       else if (key === '.') handleButtonClick('.');
       else if (key === '+') handleButtonClick('+');
       else if (key === '-') handleButtonClick('-');
@@ -132,7 +132,7 @@ export function CalculatorDialog({ isOpen, onOpenChange }: CalculatorDialogProps
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xs p-0 flex flex-col h-auto max-h-[90vh]">
+      <DialogContent className="sm:max-w-xs p-0 flex flex-col h-auto max-h">
         <DialogHeader className="p-4 pb-2 border-b">
           <DialogTitle className="flex items-center gap-2 text-lg">
             <CalculatorIcon className="h-5 w-5 text-primary" /> Calculator

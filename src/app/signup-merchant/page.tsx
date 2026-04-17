@@ -267,7 +267,7 @@ export default function MerchantSignupPage() {
             <div className="relative">
                 <PageSpinner label="StoreLink Pro" subLabel={isSuccessfullySubmitted ? "Account created! Redirecting to login..." : "Preparing your workspace…"} />
                 {isSuccessfullySubmitted && (
-                    <div className="fixed bottom-10 left-0 right-0 z-[60] flex flex-col items-center gap-3">
+                    <div className="fixed bottom-10 left-0 right-0 z flex flex-col items-center gap-3">
                         <p className="text-slate-400 text-xs animate-pulse">If you are not redirected automatically, click the button below.</p>
                         <Button 
                             variant="outline" 
@@ -286,7 +286,7 @@ export default function MerchantSignupPage() {
   return (
     <div className="w-full min-h-screen grid lg:grid-cols-2">
       <div className="flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[400px] gap-6 px-4">
+        <div className="mx-auto grid w gap-6 px-4">
           <div className="grid gap-2 text-center">
              <div className="flex justify-center mb-4 h-10">
                 <ElysiumLogo className="h-10 w-10 text-primary" />
@@ -331,7 +331,7 @@ export default function MerchantSignupPage() {
                     <FormItem>
                         <FormLabel>Database ID (Optional)</FormLabel>
                         <FormControl><Input placeholder="(default)" {...field} disabled={isSubmitting || isLoading} /></FormControl>
-                        <p className="text-[10px] text-muted-foreground italic">Leave as <strong>(default)</strong> unless you have specifically created a separate Firestore database for this project.</p>
+                        <p className="text text-muted-foreground italic">Leave as <strong>(default)</strong> unless you have specifically created a separate Firestore database for this project.</p>
                         <FormMessage />
                     </FormItem>
                 )}/>

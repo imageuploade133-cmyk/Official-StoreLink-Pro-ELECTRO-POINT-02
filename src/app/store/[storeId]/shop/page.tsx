@@ -314,7 +314,7 @@ function ShopPageContent() {
             {/* Category Auto-Switch Notification */}
             {categoryNotification.show && (
                 <div className="fixed top-24 left-1/2 -translate-x-1/2 z-40 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3">
+                    <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-lg  flex items-center gap-3">
                         <div className="h-2 w-2 bg-white rounded-full animate-pulse"></div>
                         <span className="text-sm font-semibold">{categoryNotification.message}</span>
                     </div>
@@ -327,17 +327,17 @@ function ShopPageContent() {
                 showHeader ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
             )}>
                 {settings?.shopBannerImageUrl ? (
-                    <div className="w-full h-[200px] sm:h-[300px] lg:h-[400px] relative overflow-hidden">
+                    <div className="w-full h sm:h lg:h relative overflow-hidden">
                         <img
                             src={settings.shopBannerImageUrl}
                             alt="Shop Banner"
                             className="w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center px-4">
-                            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tighter text-white drop-shadow-lg">
+                            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tighter text-white drop-">
                                 {currentCategory ? currentCategory.name : (settings?.shopCollectionTitle || 'Shop Our Collection')}
                             </h1>
-                            <p className="mt-2 sm:mt-4 max-w-2xl mx-auto text-sm sm:text-base text-white/90 font-medium drop-shadow-md">
+                            <p className="mt-2 sm:mt-4 max-w-2xl mx-auto text-sm sm:text-base text-white/90 font-medium drop-">
                                 {currentCategory?.description ? (
                                     <span dangerouslySetInnerHTML={{ __html: currentCategory.description }} />
                                 ) : (settings?.shopCollectionDescription || 'Discover products that are crafted with quality and designed for life.')}
@@ -401,7 +401,7 @@ function ShopPageContent() {
                         
                         {/* Search Suggestions Dropdown */}
                         {(showSuggestions || isLoadingSuggestions) && searchTerm.trim() && (
-                            <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg  z-50 max-h-80 overflow-y-auto">
                                 {isLoadingSuggestions ? (
                                     <div className="p-4 text-center">
                                         <Loader2 className="h-4 w-4 animate-spin mx-auto text-primary" />
@@ -459,7 +459,7 @@ function ShopPageContent() {
                     </form>
                     <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
                         <Select value={categoryFromUrl} onValueChange={handleCategoryChange} disabled={isLoadingCategories}>
-                            <SelectTrigger className="flex-1 sm:flex-none sm:w-[200px] h-10 rounded-lg text-sm">
+                            <SelectTrigger className="flex-1 sm:flex-none sm:w h-10 rounded-lg text-sm">
                                 <SelectValue placeholder="Filter category" />
                             </SelectTrigger>
                             <SelectContent>
@@ -496,7 +496,7 @@ function ShopPageContent() {
                         
                         {/* Pagination Footer */}
                         <div className="flex flex-col sm:flex-row items-center justify-between pt-8 sm:pt-12 border-t border-slate-200 dark:border-slate-800 gap-4 sm:gap-6">
-                            <p className="text-xs font-black uppercase text-muted-foreground tracking-[0.2em] text-center sm:text-left">
+                            <p className="text-xs font-black uppercase text-muted-foreground tracking text-center sm:text-left">
                                 Page {currentPage} of {totalPages || 1} • {totalProductsCount} Items
                             </p>
                             <div className="flex items-center gap-2 sm:gap-3">

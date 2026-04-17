@@ -11,7 +11,7 @@ export function ProductReviewsSettings() {
   const { control } = useFormContext();
 
   return (
-    <Card className="shadow-lg border-none ring-1 ring-border">
+    <Card className=" border-none ring-1 ring-border">
       <CardHeader className="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-lg bg-yellow-100 dark:bg-yellow-900/40">

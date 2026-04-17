@@ -181,7 +181,7 @@ export function DailySalesPerformanceTab({ transactions, products, currencySymbo
   };
 
   return (
-    <Card className="shadow-md rounded-lg">
+    <Card className=" rounded-lg">
       <CardHeader>
         <CardTitle>Daily Sales Performance</CardTitle>
         <CardDescription>
@@ -223,12 +223,12 @@ export function DailySalesPerformanceTab({ transactions, products, currencySymbo
           </h3>
           <Card className="border">
             <CardContent className="p-0">
-              <ScrollArea className="h-[400px]">
+              <ScrollArea className="h">
                 {soldItemsListData.length > 0 ? (
                   <Table>
                     <TableHeader className="sticky top-0 bg-muted/95 z-10">
                       <TableRow>
-                        <TableHead className="w-[70px] px-4">Image</TableHead>
+                        <TableHead className="w px-4">Image</TableHead>
                         <TableHead className="px-4">Product Name</TableHead>
                         <TableHead className="text-center px-4">Stock Before</TableHead>
                         <TableHead className="text-center text-destructive px-4">Qty Sold</TableHead>
@@ -270,7 +270,7 @@ export function DailySalesPerformanceTab({ transactions, products, currencySymbo
         
         <div>
             <h3 className="text-lg font-semibold mb-2">Daily Data Breakdown</h3>
-            <ScrollArea className="h-[400px] border rounded-md">
+            <ScrollArea className="h border rounded-md">
                  <Table>
                     <TableHeader className="sticky top-0 bg-muted/95 z-10">
                         <TableRow>

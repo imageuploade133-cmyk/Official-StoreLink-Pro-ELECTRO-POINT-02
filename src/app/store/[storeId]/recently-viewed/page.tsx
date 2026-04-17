@@ -96,7 +96,7 @@ export default function RecentlyViewedPage() {
             ))}
           </div>
         ) : viewedProductIds.length === 0 ? (
-          <div className="text-center py-32 border-2 border-dashed rounded-[3rem] bg-muted/10">
+          <div className="text-center py-32 border-2 border-dashed rounded bg-muted/10">
             <ShoppingBag className="mx-auto h-16 w-16 text-slate-300 mb-6" />
             <h3 className="text-2xl font-black tracking-tight">Your history is empty</h3>
             <p className="mt-2 text-muted-foreground max-w-sm mx-auto">Start exploring our collection to keep track of items you love.</p>

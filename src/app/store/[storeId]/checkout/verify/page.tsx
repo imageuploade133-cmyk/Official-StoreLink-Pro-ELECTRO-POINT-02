@@ -51,7 +51,7 @@ export default function VerifyPaymentPage() {
 
   if (status === 'verifying') {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+      <div className="flex flex-col items-center justify-center min-h space-y-4">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
         <p className="text-xl font-medium">{message}</p>
       </div>
@@ -60,7 +60,7 @@ export default function VerifyPaymentPage() {
 
   if (status === 'success') {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6 text-center px-4">
+      <div className="flex flex-col items-center justify-center min-h space-y-6 text-center px-4">
         <CheckCircle2 className="h-20 w-20 text-green-500" />
         <h1 className="text-3xl font-bold">Payment Confirmed!</h1>
         <p className="text-muted-foreground max-w-md">{message}</p>
@@ -72,7 +72,7 @@ export default function VerifyPaymentPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6 text-center px-4">
+    <div className="flex flex-col items-center justify-center min-h space-y-6 text-center px-4">
       <XCircle className="h-20 w-20 text-destructive" />
       <h1 className="text-3xl font-bold">Payment Failed</h1>
       <p className="text-muted-foreground max-w-md">{message}</p>

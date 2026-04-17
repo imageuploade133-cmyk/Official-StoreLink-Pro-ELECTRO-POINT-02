@@ -153,7 +153,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
     const size = useIndividual
       ? (settings?.storeGridCartSize || 'md')
       : (settings?.storeBtnSize || 'md');
-    const shadow = useIndividual
+    const  = useIndividual
       ? (settings?.storeGridCartShadow || 'sm')
       : 'sm';
     
@@ -173,18 +173,18 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
     };
 
     const shadowClasses: Record<string, string> = {
-      none: 'shadow-none',
-      sm: 'shadow-sm',
-      md: 'shadow-md',
-      lg: 'shadow-lg',
-      xl: 'shadow-xl',
-      '2xl': 'shadow-2xl',
-      inner: 'shadow-inner'
+      none: '',
+      sm: '',
+      md: '',
+      lg: '',
+      xl: '',
+      '2xl': '',
+      inner: ''
     };
     
     const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.md;
     const shapeClass = shapeClasses[shape] || 'rounded-2xl';
-    const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
+    const shadowClass = shadowClasses[ as keyof typeof shadowClasses] || '';
 
     return `${shapeClass} ${sizeClass} ${shadowClass}`;
   }, [settings]);
@@ -196,7 +196,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
   // Get card designer settings with defaults
   const cardStyle = settings?.productCardStyle || 'default';
   const borderRadius = settings?.productCardBorderRadius || 'lg';
-  const shadow = settings?.productCardShadow || 'md';
+  const  = settings?.productCardShadow || 'md';
   const borderWidth = settings?.productCardBorderWidth || 'thin';
   const borderColor = settings?.productCardBorderColor || '#e2e8f0';
   const bgColor = settings?.productCardBgColor || '#ffffff';
@@ -219,14 +219,14 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
     'full': 'rounded-3xl',
   }[borderRadius] || 'rounded-lg';
 
-  // Map shadow to Tailwind class
+  // Map  to Tailwind class
   const shadowClass = {
-    'none': 'shadow-none',
-    'sm': 'shadow-sm',
-    'md': 'shadow-md',
-    'lg': 'shadow-lg',
-    'xl': 'shadow-xl',
-  }[shadow] || 'shadow-md';
+    'none': '',
+    'sm': '',
+    'md': '',
+    'lg': '',
+    'xl': '',
+  }[] || '';
 
   // Map border width to Tailwind class
   const borderWidthClass = {
@@ -241,7 +241,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
     'none': '',
     'lift': 'hover:-translate-y-2',
     'zoom': '',
-    'glow': 'hover:shadow-2xl hover:shadow-primary/20',
+    'glow': 'hover: hover:',
     'border': 'hover:border-primary',
   }[hoverEffect] || 'hover:-translate-y-2';
 
@@ -308,14 +308,14 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
         {showBadges && (
         <div className="absolute top-4 left-4 flex flex-col gap-2 z-10 pointer-events-none">
           {product.isOfficialBrand && (
-            <Badge className={`bg-gradient-to-r from-blue-600 to-blue-700 text-white font-black text-[9px] uppercase tracking-widest px-3 py-1.5 shadow-lg border-none rounded-full w-fit ${styles.badgeSlide}`}>
+            <Badge className={`bg-gradient-to-r from-blue-600 to-blue-700 text-white font-black text uppercase tracking-widest px-3 py-1.5  border-none rounded-full w-fit ${styles.badgeSlide}`}>
               <CheckCircle2 className="h-3.5 w-3.5 mr-2 fill-current" /> Official
             </Badge>
           )}
           
           {isDiscounted && !isOutOfStock && today && (
             <Badge 
-              className={`text-white font-black text-[10px] uppercase tracking-widest px-3 py-1.5 shadow-lg border-none rounded-full w-fit ${styles.discountBadge}`}
+              className={`text-white font-black text uppercase tracking-widest px-3 py-1.5  border-none rounded-full w-fit ${styles.discountBadge}`}
               style={{ 
                   background: `linear-gradient(135deg, ${settings?.flashHubColor || '#e11d48'}, ${settings?.flashHubColor || '#e11d48'}dd)`,
                   boxShadow: `0 8px 16px ${settings?.flashHubColor || '#e11d48'}44`
@@ -335,7 +335,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
         {showWishlist && (
         <button
           className={cn(
-            `absolute top-4 right-4 h-11 w-11 flex items-center justify-center rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-lg transition-all duration-300 z-10 border border-white/30 dark:border-slate-600 hover:scale-110 active:scale-95 dark:hover:border-rose-500`,
+            `absolute top-4 right-4 h-11 w-11 flex items-center justify-center rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl  transition-all duration-300 z-10 border border-white/30 dark:border-slate-600 hover:scale-110 active:scale-95 dark:hover:border-rose-500`,
             isInWishlist && `text-rose-500 ${styles.wishlistPulse}`
           )}
           onClick={handleWishlistToggle}
@@ -351,7 +351,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
             onClick={handleAddToCart}
             disabled={isOutOfStock}
             style={buttonStyle}
-            className={`w-full font-black text-sm uppercase tracking-wide shadow-xl transition-all active:scale-95 ${styles.cartButton} ${buttonClasses} hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed`}
+            className={`w-full font-black text-sm uppercase tracking-wide  transition-all active:scale-95 ${styles.cartButton} ${buttonClasses} hover: disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             <GridCartIcon className={`h-5 w-5 mr-2 transition-all ${styles.cartIcon}`} />
             {settings?.storeGridCartText || 'Add to Bag'}
@@ -365,11 +365,11 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
       <div className={`flex flex-col flex-1 p-5 space-y-4 ${styles.contentArea}`}>
         <div className="flex-1 space-y-3">
           <div className="flex justify-between items-start gap-2">
-            <p className={`text-[10px] font-black uppercase tracking-widest text-primary/60 truncate flex-1 transition-colors ${styles.categoryText}`}>
+            <p className={`text font-black uppercase tracking-widest text-primary/60 truncate flex-1 transition-colors ${styles.categoryText}`}>
                 {category?.name || product.categoryName || 'Collection'}
             </p>
             {isOutOfStock && (
-              <Badge variant="destructive" className="text-[8px] h-5 uppercase font-black tracking-wider px-2 rounded-full bg-red-500/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-900">
+              <Badge variant="destructive" className="text h-5 uppercase font-black tracking-wider px-2 rounded-full bg-red-500/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-900">
                 Sold Out
               </Badge>
             )}
@@ -398,12 +398,12 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
           
           <div className="flex flex-wrap gap-2">
             {product.isNewArrival && (
-              <Badge variant="secondary" className={`bg-gradient-to-r from-indigo-50 to-indigo-100 dark:from-indigo-900/30 dark:to-indigo-800/30 text-indigo-700 dark:text-indigo-300 text-[9px] font-black uppercase tracking-widest border border-indigo-200 dark:border-indigo-700 rounded-full h-5 px-2.5 ${styles.badgeNew}`}>
+              <Badge variant="secondary" className={`bg-gradient-to-r from-indigo-50 to-indigo-100 dark:from-indigo-900/30 dark:to-indigo-800/30 text-indigo-700 dark:text-indigo-300 text font-black uppercase tracking-widest border border-indigo-200 dark:border-indigo-700 rounded-full h-5 px-2.5 ${styles.badgeNew}`}>
                 <Sparkles className="h-3 w-3 mr-1" /> New
               </Badge>
             )}
             {product.isPopular && (
-              <Badge variant="secondary" className={`bg-gradient-to-r from-rose-50 to-rose-100 dark:from-rose-900/30 dark:to-rose-800/30 text-rose-700 dark:text-rose-300 text-[9px] font-black uppercase tracking-widest border border-rose-200 dark:border-rose-700 rounded-full h-5 px-2.5 ${styles.badgePopular}`}>
+              <Badge variant="secondary" className={`bg-gradient-to-r from-rose-50 to-rose-100 dark:from-rose-900/30 dark:to-rose-800/30 text-rose-700 dark:text-rose-300 text font-black uppercase tracking-widest border border-rose-200 dark:border-rose-700 rounded-full h-5 px-2.5 ${styles.badgePopular}`}>
                 <TrendingUp className="h-3 w-3 mr-1" /> Best
               </Badge>
             )}
@@ -431,7 +431,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
                     {formatCurrency(effectivePrice, currencySymbol)}
                   </span>
                   {isDiscounted && (
-                    <span className={`text-[10px] text-slate-400 dark:text-slate-500 line-through font-bold mt-1.5 truncate transition-colors ${styles.originalPrice}`}>
+                    <span className={`text text-slate-400 dark:text-slate-500 line-through font-bold mt-1.5 truncate transition-colors ${styles.originalPrice}`}>
                       {formatCurrency(product.sellingPrice, currencySymbol)}
                     </span>
                   )}
@@ -444,7 +444,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
               <Button 
                 size="icon" 
                 style={buttonStyle}
-                className={`shadow-lg shadow-primary/30 active:scale-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${buttonClasses} ${styles.mobileCartButton}`}
+                className={`  active:scale-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${buttonClasses} ${styles.mobileCartButton}`}
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
               >

@@ -335,7 +335,7 @@ export default function MySalesHistoryPage() {
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-6 px-0 font-black uppercase tracking-widest text-[10px] text-primary hover:bg-transparent">
+                <Button variant="ghost" size="sm" className="h-6 px-0 font-black uppercase tracking-widest text text-primary hover:bg-transparent">
                   {incomePeriod === 'today' ? "Today's Income" : "Yesterday's Income"}
                   <ChevronDown className="ml-1 h-3 w-3" />
                 </Button>
@@ -351,7 +351,7 @@ export default function MySalesHistoryPage() {
             <div className="text-2xl font-bold tracking-tight">
               {formatCurrency(incomePeriod === 'today' ? incomeStats.todayTotal : incomeStats.yesterdayTotal, currencySymbol)}
             </div>
-            <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Net Personal Earnings</p>
+            <p className="text text-muted-foreground mt-1 uppercase font-bold">Net Personal Earnings</p>
           </CardContent>
         </Card>
         <Card>
@@ -361,7 +361,7 @@ export default function MySalesHistoryPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{sales.length}</div>
-            <p className="text-[10px] text-muted-foreground mt-1">Transactions on current page</p>
+            <p className="text text-muted-foreground mt-1">Transactions on current page</p>
           </CardContent>
         </Card>
         <Card>
@@ -373,7 +373,7 @@ export default function MySalesHistoryPage() {
             <div className="text-2xl font-bold">
                 {formatCurrency(sales.length > 0 ? sales.reduce((s, d) => s + (d.grandTotal - (d.returnedAmount || 0)), 0) / sales.length : 0, currencySymbol)}
             </div>
-            <p className="text-[10px] text-muted-foreground mt-1">Per transaction in view</p>
+            <p className="text text-muted-foreground mt-1">Per transaction in view</p>
           </CardContent>
         </Card>
         <Card>
@@ -383,7 +383,7 @@ export default function MySalesHistoryPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold capitalize">{activeTab}</div>
-            <p className="text-[10px] text-muted-foreground mt-1">Active filter strategy</p>
+            <p className="text text-muted-foreground mt-1">Active filter strategy</p>
           </CardContent>
         </Card>
       </div>
@@ -436,12 +436,12 @@ export default function MySalesHistoryPage() {
             </CardContent>
         </Card>
 
-        <Card className="shadow-lg overflow-hidden border-none ring-1 ring-border">
+        <Card className=" overflow-hidden border-none ring-1 ring-border">
             <CardContent className="p-0">
             <Table>
                 <TableHeader>
                 <TableRow>
-                    <TableHead className="w-[120px]">Date & Time</TableHead>
+                    <TableHead className="w">Date & Time</TableHead>
                     <TableHead>Customer</TableHead>
                     <TableHead className="text-right">Net Total</TableHead>
                     <TableHead>Method</TableHead>
@@ -478,26 +478,26 @@ export default function MySalesHistoryPage() {
                     const net = (sale.grandTotal || 0) - (sale.returnedAmount || 0);
                     return (
                         <TableRow key={sale.id} className="hover:bg-muted/30 transition-colors group">
-                        <TableCell className="font-medium text-[10px] py-4">
+                        <TableCell className="font-medium text py-4">
                             <div className="font-bold">{saleDate ? format(saleDate, 'MMM dd, yyyy') : 'N/A'}</div>
                             <div className="text-muted-foreground">{saleDate ? format(saleDate, 'h:mm a') : ''}</div>
                         </TableCell>
                         <TableCell>
-                            <div className="font-semibold text-sm truncate max-w-[180px]">{sale.customerName || 'Walk-in'}</div>
-                            <div className="text-[10px] font-mono text-muted-foreground uppercase">#{sale.id.substring(0, 8)}</div>
+                            <div className="font-semibold text-sm truncate max-w">{sale.customerName || 'Walk-in'}</div>
+                            <div className="text font-mono text-muted-foreground uppercase">#{sale.id.substring(0, 8)}</div>
                         </TableCell>
                         <TableCell className="text-right font-bold text-sm">
                             {formatCurrency(net, currencySymbol)}
                         </TableCell>
-                        <TableCell className="text-[10px] font-black uppercase text-muted-foreground tracking-tighter">{sale.paymentMethod}</TableCell>
+                        <TableCell className="text font-black uppercase text-muted-foreground tracking-tighter">{sale.paymentMethod}</TableCell>
                         <TableCell>
                             {sale.isCreditSale && !sale.isPaid ? (
-                            <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 text-[10px] font-black uppercase px-2 py-0">Credit</Badge>
+                            <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 text font-black uppercase px-2 py-0">Credit</Badge>
                             ) : (
-                            <Badge variant="secondary" className="bg-green-100 text-green-800 text-[10px] font-black uppercase px-2 py-0">Paid</Badge>
+                            <Badge variant="secondary" className="bg-green-100 text-green-800 text font-black uppercase px-2 py-0">Paid</Badge>
                             )}
                             {sale.returnedAmount && sale.returnedAmount > 0 ? (
-                                <Badge variant="destructive" className="ml-1 text-[9px] px-1 py-0 h-4">RET</Badge>
+                                <Badge variant="destructive" className="ml-1 text px-1 py-0 h-4">RET</Badge>
                             ) : null}
                         </TableCell>
                         <TableCell className="text-right">

@@ -24,7 +24,7 @@ import { cn } from '@/lib/utils';
 
 const recommendationsSchema = z.object({
   showRelatedProducts: z.boolean().default(true),
-  relatedProductsBackgroundColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default('#f8fafc'),
+  relatedProductsBackgroundColor: z.string().regex(/^#[0-9a-fA{6}$/i, 'Must be a valid hex color').default('#f8fafc'),
   relatedProductsTitle: z.string().min(3, 'Title must be at least 3 characters.'),
   relatedProductsDescription: z.string().optional().or(z.literal('')),
 });
@@ -107,7 +107,7 @@ export default function RecommendationsSettingsPage() {
     return (
       <div className="space-y-6">
         <PageHeader icon={Sparkles} title="Recommendation Settings" description="Loading..." />
-        <Skeleton className="h-[400px] w-full" />
+        <Skeleton className="h w-full" />
       </div>
     );
   }
@@ -139,7 +139,7 @@ export default function RecommendationsSettingsPage() {
                         control={form.control}
                         name="showRelatedProducts"
                         render={({ field }) => (
-                        <FormItem className="flex flex-row items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background shadow-sm">
+                        <FormItem className="flex flex-row items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background ">
                             <div className="flex items-center gap-2">
                                 {field.value ? <Eye className="h-4 w-4 text-green-600" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
                                 <FormLabel className="text-xs font-bold uppercase tracking-widest">{field.value ? 'Visible' : 'Hidden'}</FormLabel>
@@ -223,7 +223,7 @@ export default function RecommendationsSettingsPage() {
                   />
                 </CardContent>
                 <CardFooter className="border-t pt-6">
-                  <Button type="submit" disabled={isSaving} size="lg" className="min-w-[200px] font-bold">
+                  <Button type="submit" disabled={isSaving} size="lg" className="min-w font-bold">
                     {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                     Save Recommendation Settings
                   </Button>
@@ -234,7 +234,7 @@ export default function RecommendationsSettingsPage() {
         </div>
 
         <div className="lg:col-span-1">
-          <Card className="bg-primary/5 border-primary/20 shadow-none sticky top-6">
+          <Card className="bg-primary/5 border-primary/20  sticky top-6">
             <CardHeader>
               <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary uppercase tracking-widest">
                 <Info className="h-4 w-4" /> Recommendation Engine

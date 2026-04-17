@@ -315,16 +315,16 @@ export default function EarnMoneyAdsPage() {
                 <RotateCcw className={cn("mr-2 h-4 w-4", isLoadingAds && "animate-spin")} />
                 Sync
             </Button>
-            <Button onClick={handleOpenAddModal} className="gap-2 h-11 font-bold shadow-lg shadow-primary/20">
+            <Button onClick={handleOpenAddModal} className="gap-2 h-11 font-bold  ">
                 <PlusCircle className="h-4 w-4" /> Add New Ad Link
             </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-primary/5 border-primary/10 shadow-none">
+        <Card className="bg-primary/5 border-primary/10 ">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center justify-between">
+            <CardTitle className="text font-black uppercase tracking-widest text-primary flex items-center justify-between">
                 Total Ads <Layout className="h-3.5 w-3.5" />
             </CardTitle>
           </CardHeader>
@@ -333,9 +333,9 @@ export default function EarnMoneyAdsPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-green-50 border-green-100 shadow-none">
+        <Card className="bg-green-50 border-green-100 ">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-green-600 flex items-center justify-between">
+            <CardTitle className="text font-black uppercase tracking-widest text-green-600 flex items-center justify-between">
                 Active Ads <CheckCircle2 className="h-3.5 w-3.5" />
             </CardTitle>
           </CardHeader>
@@ -344,9 +344,9 @@ export default function EarnMoneyAdsPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-rose-50 border-rose-100 shadow-none">
+        <Card className="bg-rose-50 border-rose-100 ">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-rose-600 flex items-center justify-between">
+            <CardTitle className="text font-black uppercase tracking-widest text-rose-600 flex items-center justify-between">
                 Total Clicks <MousePointerClick className="h-3.5 w-3.5" />
             </CardTitle>
           </CardHeader>
@@ -355,9 +355,9 @@ export default function EarnMoneyAdsPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-cyan-50 border-cyan-100 shadow-none">
+        <Card className="bg-cyan-50 border-cyan-100 ">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-cyan-600 flex items-center justify-between">
+            <CardTitle className="text font-black uppercase tracking-widest text-cyan-600 flex items-center justify-between">
                 Banner Views <Monitor className="h-3.5 w-3.5" />
             </CardTitle>
           </CardHeader>
@@ -368,9 +368,9 @@ export default function EarnMoneyAdsPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="bg-amber-50 border-amber-100 shadow-none">
+        <Card className="bg-amber-50 border-amber-100 ">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-amber-600 flex items-center justify-between">
+            <CardTitle className="text font-black uppercase tracking-widest text-amber-600 flex items-center justify-between">
                 Reward Ads <Gift className="h-3.5 w-3.5" />
             </CardTitle>
           </CardHeader>
@@ -379,9 +379,9 @@ export default function EarnMoneyAdsPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-indigo-50 border-indigo-100 shadow-none">
+        <Card className="bg-indigo-50 border-indigo-100 ">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-indigo-600 flex items-center justify-between">
+            <CardTitle className="text font-black uppercase tracking-widest text-indigo-600 flex items-center justify-between">
                 Background Ads <Settings2 className="h-3.5 w-3.5" />
             </CardTitle>
           </CardHeader>
@@ -390,9 +390,9 @@ export default function EarnMoneyAdsPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-blue-50 border-blue-100 shadow-none">
+        <Card className="bg-blue-50 border-blue-100 ">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-blue-600 flex items-center justify-between">
+            <CardTitle className="text font-black uppercase tracking-widest text-blue-600 flex items-center justify-between">
                 Banner Ads <Monitor className="h-3.5 w-3.5" />
             </CardTitle>
           </CardHeader>
@@ -402,7 +402,7 @@ export default function EarnMoneyAdsPage() {
         </Card>
       </div>
 
-      <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <CardHeader className="bg-muted/10 border-b">
           <CardTitle>Ad Configurations</CardTitle>
           <CardDescription>Manage your monetization links and how they appear to customers.</CardDescription>
@@ -441,15 +441,15 @@ export default function EarnMoneyAdsPage() {
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">
                           {ad.adType === 'banner' ? (
-                            <code className="text-[10px] text-muted-foreground truncate max-w-[200px]">Script Embedded</code>
+                            <code className="text text-muted-foreground truncate max-w">Script Embedded</code>
                           ) : (
                             <>
-                              <code className="text-xs text-muted-foreground truncate max-w-[200px]">{ad.adLink}</code>
+                              <code className="text-xs text-muted-foreground truncate max-w">{ad.adLink}</code>
                               <a href={ad.adLink} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline"><ExternalLink className="h-3 w-3" /></a>
                             </>
                           )}
                         </div>
-                        <Badge variant={ad.adType === 'reward' ? 'outline' : ad.adType === 'banner' ? 'default' : 'secondary'} className="w-fit text-[10px] font-bold uppercase">
+                        <Badge variant={ad.adType === 'reward' ? 'outline' : ad.adType === 'banner' ? 'default' : 'secondary'} className="w-fit text font-bold uppercase">
                           {ad.adType}
                         </Badge>
                       </div>
@@ -467,7 +467,7 @@ export default function EarnMoneyAdsPage() {
                           {ad.frequency.replace(/_/g, ' ')}
                         </div>
                         {ad.adType === 'background' && ad.frequencyTime && (
-                          <span className="text-[10px] text-muted-foreground ml-5">Every {ad.frequencyTime}s</span>
+                          <span className="text text-muted-foreground ml-5">Every {ad.frequencyTime}s</span>
                         )}
                       </div>
                     </TableCell>
@@ -481,12 +481,12 @@ export default function EarnMoneyAdsPage() {
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2 text-xs font-bold">
                           <MousePointerClick className="h-3 w-3 text-rose-500" />
-                          {ad.clicks || 0} <span className="text-[10px] text-muted-foreground font-normal">clicks</span>
+                          {ad.clicks || 0} <span className="text text-muted-foreground font-normal">clicks</span>
                         </div>
                         {ad.adType === 'banner' && (
                           <div className="flex items-center gap-2 text-xs font-bold">
                             <Monitor className="h-3 w-3 text-cyan-500" />
-                            {ad.views || 0} <span className="text-[10px] text-muted-foreground font-normal">views</span>
+                            {ad.views || 0} <span className="text text-muted-foreground font-normal">views</span>
                           </div>
                         )}
                       </div>
@@ -497,7 +497,7 @@ export default function EarnMoneyAdsPage() {
                               checked={ad.status === 'active'} 
                               onCheckedChange={() => handleToggleStatus(ad)}
                             />
-                        <Badge variant={ad.status === 'active' ? 'default' : 'secondary'} className="text-[10px] h-5 uppercase font-black">
+                        <Badge variant={ad.status === 'active' ? 'default' : 'secondary'} className="text h-5 uppercase font-black">
                           {ad.status === 'active' ? 'Live' : 'Paused'}
                         </Badge>
                       </div>
@@ -603,7 +603,7 @@ export default function EarnMoneyAdsPage() {
                     <RadioGroupItem value="background" id="bg" className="sr-only" />
                     <Settings2 className={cn("mb-2 h-6 w-6", adForm.adType === "background" ? "text-primary" : "text-indigo-600")} />
                     <span className="text-xs font-bold uppercase">Background</span>
-                    <span className="text-[10px] text-muted-foreground mt-1 text-center">Automated Click</span>
+                    <span className="text text-muted-foreground mt-1 text-center">Automated Click</span>
                   </Label>
 
                   <Label
@@ -616,7 +616,7 @@ export default function EarnMoneyAdsPage() {
                     <RadioGroupItem value="reward" id="rew" className="sr-only" />
                     <Gift className={cn("mb-2 h-6 w-6", adForm.adType === "reward" ? "text-primary" : "text-amber-600")} />
                     <span className="text-xs font-bold uppercase">Reward</span>
-                    <span className="text-[10px] text-muted-foreground mt-1 text-center">Discount Incentive</span>
+                    <span className="text text-muted-foreground mt-1 text-center">Discount Incentive</span>
                   </Label>
 
                   <Label
@@ -629,7 +629,7 @@ export default function EarnMoneyAdsPage() {
                     <RadioGroupItem value="banner" id="banner" className="sr-only" />
                     <Monitor className={cn("mb-2 h-6 w-6", adForm.adType === "banner" ? "text-primary" : "text-blue-600")} />
                     <span className="text-xs font-bold uppercase">Banner</span>
-                    <span className="text-[10px] text-muted-foreground mt-1 text-center">Custom Script</span>
+                    <span className="text text-muted-foreground mt-1 text-center">Custom Script</span>
                   </Label>
                 </RadioGroup>
               </div>
@@ -777,13 +777,13 @@ export default function EarnMoneyAdsPage() {
                             onChange={e => setAdForm(prev => ({...prev, frequencyTime: Number(e.target.value)}))} 
                             min={1}
                           />
-                          <span className="absolute right-3 top-3 text-[10px] font-bold text-muted-foreground">SEC</span>
+                          <span className="absolute right-3 top-3 text font-bold text-muted-foreground">SEC</span>
                         </div>
                       </div>
                     )}
                   </div>
                   {adForm.adType === 'background' && (
-                    <p className="text-[10px] text-primary font-medium flex items-center gap-1 mt-1">
+                    <p className="text text-primary font-medium flex items-center gap-1 mt-1">
                       <Clock className="h-3 w-3" /> Auto-click will trigger every {adForm.frequencyTime}s
                     </p>
                   )}
@@ -799,7 +799,7 @@ export default function EarnMoneyAdsPage() {
             <Button 
               onClick={handleSaveAd} 
               disabled={isSaving || (adForm.adType === 'banner' ? !adForm.adScript : !adForm.adLink)}
-              className="px-8 font-black shadow-lg shadow-primary/20 gap-2 h-11 order-1 sm:order-2"
+              className="px-8 font-black   gap-2 h-11 order-1 sm:order-2"
             >
               {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
               {editingAd ? 'Update Ad Configuration' : 'Activate & Save Ad'}

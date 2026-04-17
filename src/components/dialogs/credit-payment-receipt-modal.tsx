@@ -216,7 +216,7 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-xl md:max-w-2xl lg:max-w-4xl p-0 h-[85vh] flex flex-col">
+      <DialogContent className="max-w-xl md:max-w-2xl lg:max-w-4xl p-0 h flex flex-col">
         <DialogHeader className="p-6 pb-4 border-b no-print">
           <DialogTitle className="text-2xl font-bold flex items-center gap-2 text-gray-800">
              Payment Receipt Preview
@@ -240,7 +240,7 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
 
           <ScrollArea className="flex-1 p-4 md:p-8 bg-muted/30">
             <TabsContent value="small" className="m-0 p-0">
-              <div id="printable-credit-receipt-small" className="terminal-receipt bg-white mx-auto shadow-xl rounded-sm">
+              <div id="printable-credit-receipt-small" className="terminal-receipt bg-white mx-auto  rounded-sm">
                 <header className="terminal-header">
                   {storeLogoUrl && (
                     <img 
@@ -308,7 +308,7 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
             </TabsContent>
 
             <TabsContent value="a4" className="m-0 p-0">
-               <div id="printable-credit-receipt-a4" className="invoice-container shadow-2xl rounded-xl overflow-hidden max-w-4xl mx-auto my-4">
+               <div id="printable-credit-receipt-a4" className="invoice-container  rounded-xl overflow-hidden max-w-4xl mx-auto my-4">
                  <div className="paid-watermark">RECEIPT</div>
                  
                  <div className="status-banner no-print" style={{backgroundColor: 'rgba(236, 91, 19, 0.05)'}}>
@@ -328,7 +328,7 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
                                 {getReceiptTitle('a4')} <span className="brand-color">#PAY-{jsPaymentDate ? format(jsPaymentDate, 'yyyy') : '2024'}-{paymentInfo.id.substring(0, 4).toUpperCase()}</span>
                             </h1>
                             <div>
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Payment Date</p>
+                                <p className="text font-black text-gray-400 uppercase tracking-widest mb-1">Payment Date</p>
                                 <p className="text-gray-700 font-bold">{jsPaymentDate ? format(jsPaymentDate, 'MMMM dd, yyyy') : 'N/A'}</p>
                             </div>
                         </div>
@@ -336,7 +336,7 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
                             {invoiceLogoUrl ? (
                                 <img src={invoiceLogoUrl} alt={storeName} style={{ maxHeight: `${invoiceLogoHeight}px`, width: 'auto', objectFit: 'contain' }} className="mb-2" />
                             ) : (
-                                <div className="brand-bg px-6 py-2 rounded-full text-white font-black text-lg tracking-widest shadow-md">
+                                <div className="brand-bg px-6 py-2 rounded-full text-white font-black text-lg tracking-widest ">
                                     RECEIVED
                                 </div>
                             )}
@@ -363,7 +363,7 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
                     </div>
 
                     <div className="bg-slate-50 p-8 rounded-2xl border border-gray-100 mb-12">
-                        <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">Payment Summary</h4>
+                        <h4 className="text font-black text-gray-400 uppercase tracking-widest mb-6">Payment Summary</h4>
                         <div className="grid grid-cols-2 gap-8">
                             <div>
                                 <p className="text-sm text-gray-500 mb-1 font-medium">Payment Method</p>
@@ -378,7 +378,7 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
                         </div>
                         {paymentRecord.notes && (
                             <div className="mt-6 pt-6 border-t border-gray-200">
-                                <p className="text-[10px] text-gray-400 uppercase font-black tracking-widest mb-2">Notes</p>
+                                <p className="text text-gray-400 uppercase font-black tracking-widest mb-2">Notes</p>
                                 <p className="text-sm text-gray-600 italic">"{paymentRecord.notes}"</p>
                             </div>
                         )}
@@ -397,7 +397,7 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
                             <div className="pt-4 border-t-2 border-gray-100">
                                 <div className="flex justify-between items-end">
                                     <div className="flex flex-col">
-                                        <span className="text-[10px] font-black brand-color uppercase tracking-widest">New Balance</span>
+                                        <span className="text font-black brand-color uppercase tracking-widest">New Balance</span>
                                         <span className="text-xs text-gray-400">Total Owed</span>
                                     </div>
                                     <span className="text-3xl font-black text-gray-900 tracking-tighter">
@@ -409,8 +409,8 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
                     </div>
                      
                     <footer className="pt-10 border-t border-gray-100 text-center space-y-2">
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{storeName}</p>
-                        <p className="text-[10px] text-gray-400">Payment Processed via StoreLink Pro POS</p>
+                        <p className="text font-bold text-gray-400 uppercase tracking-widest">{storeName}</p>
+                        <p className="text text-gray-400">Payment Processed via StoreLink Pro POS</p>
                     </footer>
                  </div>
                </div>

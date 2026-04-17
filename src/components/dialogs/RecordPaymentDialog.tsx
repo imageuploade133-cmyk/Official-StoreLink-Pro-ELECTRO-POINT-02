@@ -99,10 +99,10 @@ const getPaymentMethodIcon = (method: string) => {
 
 function SaleSummaryCard({ sale, remainingDue, currencySymbol }: { sale: SaleTransaction, remainingDue: number, currencySymbol: string }) {
   return (
-    <Card className="bg-muted/50 border-none shadow-none">
+    <Card className="bg-muted/50 border-none ">
       <CardHeader className="flex-row items-center justify-between p-4">
         <CardTitle className="text-sm font-black uppercase tracking-widest text-muted-foreground">Sale Context</CardTitle>
-        <span className="text-[10px] font-mono text-muted-foreground bg-white px-2 py-0.5 rounded border">ID: {sale.id.substring(0, 8).toUpperCase()}</span>
+        <span className="text font-mono text-muted-foreground bg-white px-2 py-0.5 rounded border">ID: {sale.id.substring(0, 8).toUpperCase()}</span>
       </CardHeader>
       <CardContent className="text-sm space-y-2 p-4 pt-0">
         <div className="flex justify-between">
@@ -155,11 +155,11 @@ function PaymentInputForm({ state, dispatch, remainingDue, currencySymbol, payme
           />
         </div>
         <div className="flex justify-between items-center px-1">
-            <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">
+            <p className="text font-black uppercase text-muted-foreground tracking-widest">
                 New Balance: <span className={cn("ml-1", newBalance > 0.01 ? "text-primary" : "text-green-600")}>{formatCurrency(newBalance, currencySymbol)}</span>
             </p>
             {isOverpayment && (
-                <p className="text-[10px] font-black uppercase text-orange-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" />Limit Exceeded</p>
+                <p className="text font-black uppercase text-orange-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" />Limit Exceeded</p>
             )}
         </div>
       </div>
@@ -206,7 +206,7 @@ function PaymentConfirmationView({ state, remainingDue, changeDue, currencySymbo
 
   return (
     <div className="space-y-6">
-      <Card className="border-none shadow-none bg-primary/5 p-6 space-y-4">
+      <Card className="border-none  bg-primary/5 p-6 space-y-4">
         <div className="flex items-baseline justify-between pb-4 border-b border-primary/10">
           <p className="text-sm font-black uppercase text-muted-foreground tracking-widest">Amount Paying:</p>
           <p className="text-3xl font-black text-primary tracking-tighter">{formatCurrency(paymentAmount, currencySymbol)}</p>
@@ -215,14 +215,14 @@ function PaymentConfirmationView({ state, remainingDue, changeDue, currencySymbo
         <div className="space-y-3 text-sm">
           <div className="flex justify-between items-center">
             <span className="text-muted-foreground font-medium">Via Method:</span>
-            <div className="flex items-center gap-2 font-bold bg-white px-3 py-1 rounded-full border shadow-sm">
+            <div className="flex items-center gap-2 font-bold bg-white px-3 py-1 rounded-full border ">
                 {getPaymentMethodIcon(state.paymentMethod)}
                 <span>{state.paymentMethod}</span>
             </div>
           </div>
           {state.notes.trim() && (
             <div className="pt-2">
-              <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Payment Note:</span>
+              <span className="text font-black uppercase text-muted-foreground tracking-widest">Payment Note:</span>
               <p className="italic text-muted-foreground mt-1 bg-white/50 p-2 rounded border">"{state.notes}"</p>
             </div>
           )}
@@ -391,7 +391,7 @@ export function RecordPaymentDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !state.isSubmitting && !open && onClose()}>
-      <DialogContent className="sm:max-w-md h-full sm:h-auto max-h-[100dvh] sm:max-h-[95vh] flex flex-col p-0 overflow-hidden" onPointerDownOutside={e => e.preventDefault()}>
+      <DialogContent className="sm:max-w-md h-full sm:h-auto max-h sm:max-h flex flex-col p-0 overflow-hidden" onPointerDownOutside={e => e.preventDefault()}>
         <DialogHeader className="p-6 pb-4 border-b shrink-0 bg-background">
           <DialogTitle className="text-2xl font-bold flex items-center gap-3">
             <DollarSign className="h-6 w-6 text-primary" />
@@ -410,7 +410,7 @@ export function RecordPaymentDialog({
           </div>
         </ScrollArea>
 
-        <DialogFooter className="p-6 pt-4 border-t flex flex-row justify-between items-center shrink-0 bg-background shadow-[0_-4px_10px_rgba(0,0,0,0.03)] mt-auto">
+        <DialogFooter className="p-6 pt-4 border-t flex flex-row justify-between items-center shrink-0 bg-background mt-auto">
           {state.step === 1 ? (
              <DialogClose asChild>
                 <Button variant="outline" disabled={state.isSubmitting} className="h-11">Cancel</Button>
@@ -429,7 +429,7 @@ export function RecordPaymentDialog({
             <Button
               onClick={handleConfirmPayment}
               disabled={state.isSubmitting}
-              className="bg-green-600 hover:bg-green-700 text-white font-bold h-11 px-8 shadow-md"
+              className="bg-green-600 hover:bg-green-700 text-white font-bold h-11 px-8 "
             >
               {state.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
               Post Payment

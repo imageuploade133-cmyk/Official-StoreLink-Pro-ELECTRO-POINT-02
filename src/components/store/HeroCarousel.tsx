@@ -90,7 +90,7 @@ export function HeroCarousel() {
 
   if (isLoading) {
     return (
-      <div className="w-full aspect-[21/7]">
+      <div className="w-full aspect">
         <Skeleton className="w-full h-full" />
       </div>
     );
@@ -98,7 +98,7 @@ export function HeroCarousel() {
 
   if (!slides || slides.length === 0) {
     return (
-      <section className="w-full aspect-[21/7] bg-slate-900 flex items-center justify-center">
+      <section className="w-full aspect bg-slate-900 flex items-center justify-center">
         <div className="text-center text-white">
           <h2 className="text-3xl font-bold">Welcome to Our Store</h2>
           <p className="mt-2 text-slate-300">New content coming soon!</p>
@@ -121,7 +121,7 @@ export function HeroCarousel() {
             return (
               <div 
                 key={slide.id} 
-                className="relative flex-[0_0_100%] min-w-0 aspect-[21/7]"
+                className="relative flex-[0_0_100%] min-w-0 aspect"
               >
                 <div className="relative z-0 w-full h-full">
                   {isLoaded ? (
@@ -160,12 +160,12 @@ export function HeroCarousel() {
                   <div className="max-w-7xl mx-auto px-10 w-full">
                     <div className="max-w-2xl">
                       {slide.pretitle && (
-                        <p className="text-white/60 text-xs font-bold tracking-[0.3em] uppercase mb-4 animate-in slide-in-from-left duration-700">
+                        <p className="text-white/60 text-xs font-bold tracking uppercase mb-4 animate-in slide-in-from-left duration-700">
                           {slide.pretitle}
                         </p>
                       )}
                       {slide.title && (
-                        <h1 className="text-white text-5xl md:text-7xl font-extrabold mb-8 leading-[1.1] tracking-tight">
+                        <h1 className="text-white text-5xl md:text-7xl font-extrabold mb-8 leading tracking-tight">
                           {slide.title.split(',').map((part, i) => (
                             <React.Fragment key={i}>
                               {part.trim()}
@@ -234,12 +234,12 @@ export function HeroCarousel() {
             />
           </button>
         ))}
-        <div className="pl-4 text-[10px] font-bold tracking-widest text-white/40 uppercase">
+        <div className="pl-4 text font-bold tracking-widest text-white/40 uppercase">
           {String(selectedIndex + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
         </div>
       </div>
 
-      <div className="absolute top-0 left-10 w-[1px] h-full bg-white/5 z-10" />
+      <div className="absolute top-0 left-10 w h-full bg-white/5 z-10" />
     </div>
   );
 }

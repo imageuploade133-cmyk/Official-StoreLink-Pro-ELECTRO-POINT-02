@@ -242,7 +242,7 @@ export function PublicNavbar() {
         ) : null}
         {showPublicStoreName && (
           <span 
-              className={'font-black tracking-tighter text-primary group-hover:opacity-80 transition-opacity whitespace-pre-wrap break-words leading-tight max-w-[150px] sm:max-w-[200px] md:max-w-[250px]'}
+              className={'font-black tracking-tighter text-primary group-hover:opacity-80 transition-opacity whitespace-pre-wrap break-words leading-tight max-w sm:max-w md:max-w'}
               style={{ fontSize: `${storeNameFontSize}px` }}
           >
             {storeName}
@@ -253,7 +253,7 @@ export function PublicNavbar() {
 
     const getInitials = (email?: string | null) => {
         if (!email) return 'U';
-        const parts = email.split('@')[0].replace(/[^a-zA-Z]/g, ' ').split(' ').filter(Boolean);
+        const parts = email.split('@')[0].replace(/[^a-zA/g, ' ').split(' ').filter(Boolean);
          if (parts.length > 1) {
             return (parts[0][0] + (parts[1][0] || '')).toUpperCase();
         }
@@ -280,13 +280,13 @@ export function PublicNavbar() {
         
         // Shadow
         const shadowClasses: Record<string, string> = {
-            none: 'shadow-none',
-            sm: 'shadow-sm',
-            md: 'shadow-md',
-            lg: 'shadow-lg',
-            xl: 'shadow-xl',
+            none: '',
+            sm: '',
+            md: '',
+            lg: '',
+            xl: '',
         };
-        const shadowClass = shadowClasses[navbarShadow] || 'shadow-none';
+        const shadowClass = shadowClasses[navbarShadow] || '';
 
         // Blur effect
         const blurClass = navbarBlurEffect ? "backdrop-blur-2xl" : "";
@@ -300,14 +300,14 @@ export function PublicNavbar() {
                 styleClasses = `bg-white/90 dark:bg-slate-900/90 ${blurClass} border-slate-200/80 dark:border-slate-800/80 ${shadowClass}`;
             }
         } else if (navbarStyle === 'transparent') {
-            styleClasses = "bg-transparent border-transparent shadow-none";
+            styleClasses = "bg-transparent border-transparent ";
         } else if (navbarStyle === 'minimal') {
-            styleClasses = scrolled ? "bg-white/90 dark:bg-slate-900/90 border-b shadow-sm" : "bg-transparent border-transparent";
+            styleClasses = scrolled ? "bg-white/90 dark:bg-slate-900/90 border-b " : "bg-transparent border-transparent";
         } else {
             // standard
             styleClasses = scrolled 
                 ? `bg-white/90 dark:bg-slate-900/90 ${blurClass} border-slate-200/80 dark:border-slate-800/80 ${shadowClass}`
-                : "bg-transparent border-transparent shadow-none";
+                : "bg-transparent border-transparent ";
         }
 
         return cn(baseClasses, positionClass, styleClasses);
@@ -342,12 +342,12 @@ export function PublicNavbar() {
                             </div>
                             <Input 
                                 readOnly
-                                className="w-full pl-14 pr-12 bg-slate-100/40 dark:bg-slate-800/40 border-2 border-primary/10 animate-border-glow hover:border-primary/40 rounded-[2rem] h-12 text-sm font-bold tracking-tight cursor-pointer shadow-inner"
+                                className="w-full pl-14 pr-12 bg-slate-100/40 dark:bg-slate-800/40 border-2 border-primary/10 animate-border-glow hover:border-primary/40 rounded h-12 text-sm font-bold tracking-tight cursor-pointer "
                                 placeholder="Find products, categories or SKUs..."
                                 onClick={() => setIsSearchFocused(true)}
                             />
                             <div className="absolute inset-y-0 right-4 flex items-center">
-                                <div className="h-6 w-10 rounded-md border bg-white dark:bg-slate-800 flex items-center justify-center text-[10px] font-black text-slate-400 opacity-50 shadow-sm pointer-events-none uppercase tracking-tighter">
+                                <div className="h-6 w-10 rounded-md border bg-white dark:bg-slate-800 flex items-center justify-center text font-black text-slate-400 opacity-50  pointer-events-none uppercase tracking-tighter">
                                     Click
                                 </div>
                             </div>
@@ -359,7 +359,7 @@ export function PublicNavbar() {
                       "flex items-center gap-3",
                       navbarLogoPosition === 'center' ? "order-3 ml-auto" : "order-3"
                   )}>
-                    <div className="hidden lg:flex items-center gap-8 mr-8 font-black text-xs uppercase tracking-[0.2em]">
+                    <div className="hidden lg:flex items-center gap-8 mr-8 font-black text-xs uppercase tracking">
                         {navbarShowShopLink && (
                             <Link className="hover:text-primary transition-colors relative group py-2" href={getStoreUrl('/store/shop')} onClick={() => setIsMenuOpen(false)}>
                             Shop
@@ -377,15 +377,15 @@ export function PublicNavbar() {
                         {navbarShowCollectionsLink && (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" className="hover:text-primary transition-colors p-0 m-0 h-auto font-black text-xs uppercase tracking-[0.2em] flex items-center gap-2 dark:text-slate-300">
+                                    <Button variant="ghost" className="hover:text-primary transition-colors p-0 m-0 h-auto font-black text-xs uppercase tracking flex items-center gap-2 dark:text-slate-300">
                                         Collections
                                         <ChevronDown className="h-3.5 w-3.5 opacity-50 dark:opacity-60" strokeWidth={3} />
                                     </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-72 p-2 rounded-3xl shadow-2xl border-slate-200 dark:border-slate-800">
-                                    <DropdownMenuLabel className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Discover</DropdownMenuLabel>
+                                <DropdownMenuContent className="w-72 p-2 rounded-3xl  border-slate-200 dark:border-slate-800">
+                                    <DropdownMenuLabel className="px-4 py-3 text font-black uppercase tracking-widest text-slate-400">Discover</DropdownMenuLabel>
                                     <DropdownMenuSeparator />
-                                    <div className="max-h-[400px] overflow-y-auto py-2">
+                                    <div className="max-h overflow-y-auto py-2">
                                         {isLoadingCategories ? (
                                             <div className="p-4 flex items-center gap-3 text-muted-foreground">
                                                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -395,7 +395,7 @@ export function PublicNavbar() {
                                             categories?.map(category => (
                                                 <DropdownMenuItem key={category.id} asChild className="cursor-pointer p-3 focus:bg-primary/5 rounded-2xl mx-1 my-0.5">
                                                     <Link href={getStoreUrl(`/store/shop?category=${category.id}`)} className="flex items-center gap-4 w-full" onClick={() => setIsMenuOpen(false)}>
-                                                        <div className="relative h-10 w-10 rounded-xl overflow-hidden bg-muted flex-shrink-0 shadow-sm">
+                                                        <div className="relative h-10 w-10 rounded-xl overflow-hidden bg-muted flex-shrink-0 ">
                                                             <Image
                                                                 src={category.imageUrl || `https://picsum.photos/seed/${category.id}/100/100`}
                                                                 alt={category.name}
@@ -412,7 +412,7 @@ export function PublicNavbar() {
                                     </div>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem asChild className="cursor-pointer p-4 focus:bg-primary text-primary focus:text-white rounded-2xl m-1 transition-all">
-                                        <Link href={getStoreUrl('/store/categories')} className="flex items-center justify-between font-black uppercase text-[10px] tracking-widest w-full" onClick={() => setIsMenuOpen(false)}>
+                                        <Link href={getStoreUrl('/store/categories')} className="flex items-center justify-between font-black uppercase text tracking-widest w-full" onClick={() => setIsMenuOpen(false)}>
                                             View All Collections <ChevronRight className="h-3 w-3" />
                                         </Link>
                                     </DropdownMenuItem>
@@ -425,10 +425,10 @@ export function PublicNavbar() {
                         {navbarShowCreditBadge && user && customer && (
                             <Link 
                                 href={getStoreUrl('/store/account')}
-                                className="hidden md:flex items-center gap-2.5 bg-primary/10 text-primary px-4 py-1.5 rounded-full border border-primary/20 shadow-sm hover:bg-primary hover:text-white transition-all duration-500 group/credit active:scale-95 dark:bg-primary/20"
+                                className="hidden md:flex items-center gap-2.5 bg-primary/10 text-primary px-4 py-1.5 rounded-full border border-primary/20  hover:bg-primary hover:text-white transition-all duration-500 group/credit active:scale-95 dark:bg-primary/20"
                             >
                                 <Coins className="h-3.5 w-3.5 group-hover/credit:rotate-12 transition-transform dark:text-primary" strokeWidth={3} />
-                                <span className="text-[10px] font-black uppercase tracking-widest">
+                                <span className="text font-black uppercase tracking-widest">
                                     Bonus: {formatCurrency(customer.creditBalance || 0, settings?.currency || '$')}
                                 </span>
                             </Link>
@@ -441,7 +441,7 @@ export function PublicNavbar() {
                                 <Link href={getStoreUrl('/store/wishlist')}>
                                     <Heart className={cn("h-5.5 w-5.5 transition-transform duration-300 group-hover:scale-110 dark:text-slate-200", wishlistCount > 0 && "fill-current text-rose-500")} />
                                     {wishlistCount > 0 && (
-                                        <span className="absolute top-1.5 right-1.5 h-4 w-4 bg-rose-500 text-white text-[9px] flex items-center justify-center rounded-full font-black border-2 border-white dark:border-slate-900 animate-in zoom-in duration-300">
+                                        <span className="absolute top-1.5 right-1.5 h-4 w-4 bg-rose-500 text-white text flex items-center justify-center rounded-full font-black border-2 border-white dark:border-slate-900 animate-in zoom-in duration-300">
                                             {wishlistCount}
                                         </span>
                                     )}
@@ -453,7 +453,7 @@ export function PublicNavbar() {
                             <Link href={getStoreUrl('/store/cart')}>
                                 <ShoppingBag className={cn("h-5.5 w-5.5 transition-transform duration-300 group-hover:scale-110 dark:text-slate-200", cartCount > 0 && "text-primary dark:text-primary")} />
                                 {cartCount > 0 && (
-                                    <span className="absolute top-1.5 right-1.5 h-4 w-4 bg-primary text-white text-[9px] flex items-center justify-center rounded-full font-black border-2 border-white dark:border-slate-900 animate-in zoom-in duration-300">
+                                    <span className="absolute top-1.5 right-1.5 h-4 w-4 bg-primary text-white text flex items-center justify-center rounded-full font-black border-2 border-white dark:border-slate-900 animate-in zoom-in duration-300">
                                         {cartCount}
                                     </span>
                                 )}
@@ -474,7 +474,7 @@ export function PublicNavbar() {
                                     <span className="sr-only">Open menu</span>
                                 </Button>
                                 </SheetTrigger>
-                                <SheetContent side="left" className="w-[300px] sm:w-[350px] border-none shadow-2xl p-0 overflow-hidden bg-white dark:bg-slate-950">
+                                <SheetContent side="left" className="w sm:w border-none  p-0 overflow-hidden bg-white dark:bg-slate-950">
                                 <div className="h-full flex flex-col">
                                     <SheetHeader className="p-6 border-b bg-slate-50/50 dark:bg-slate-900/50">
                                         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
@@ -485,7 +485,7 @@ export function PublicNavbar() {
                                          {navbarShowSearch && (
                                              <Button 
                                                 variant="outline"
-                                                className="w-full pl-10 pr-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 h-10 text-sm font-medium shadow-sm justify-start relative text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                                                className="w-full pl-10 pr-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 h-10 text-sm font-medium  justify-start relative text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                                                 onClick={() => {
                                                     setIsMenuOpen(false);
                                                     setIsSearchFocused(true);
@@ -497,12 +497,12 @@ export function PublicNavbar() {
                                          )}
                                         
                                         {navbarShowCreditBadge && customer && (
-                                            <div className="mt-4 p-4 bg-primary text-white rounded-xl shadow-md relative overflow-hidden group">
+                                            <div className="mt-4 p-4 bg-primary text-white rounded-xl  relative overflow-hidden group">
                                                 <div className="absolute top-0 right-0 p-3 opacity-10">
                                                     <Wallet className="h-12 w-12" />
                                                 </div>
                                                 <div className="relative z-10 space-y-0.5">
-                                                    <p className="text-[10px] font-bold uppercase tracking-wider opacity-80">Account Credit</p>
+                                                    <p className="text font-bold uppercase tracking-wider opacity-80">Account Credit</p>
                                                     <p className="text-xl font-bold tracking-tight">{formatCurrency(customer.creditBalance || 0, settings?.currency || "$")}</p>
                                                 </div>
                                             </div>
@@ -535,7 +535,7 @@ export function PublicNavbar() {
                                             )}
                                             {navbarShowCollectionsLink && (
                                                 <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
-                                                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-4">Collections</p>
+                                                    <p className="text font-bold uppercase tracking-widest text-slate-500 mb-4">Collections</p>
                                                     <div className="grid grid-cols-1 gap-3">
                                                         {isLoadingCategories ? (
                                                             <div className="p-4 flex items-center gap-3 text-muted-foreground">
@@ -545,14 +545,14 @@ export function PublicNavbar() {
                                                         ) : (
                                                             categories?.slice(0, 6).map(cat => (
                                                                 <Link key={cat.id} href={getStoreUrl(`/store/shop?category=${cat.id}`)} className="flex items-center gap-3 group p-2 -mx-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors" onClick={() => setIsMenuOpen(false)}>
-                                                                    <div className="relative h-10 w-10 rounded-lg bg-muted overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm shrink-0">
+                                                                    <div className="relative h-10 w-10 rounded-lg bg-muted overflow-hidden border border-slate-200 dark:border-slate-800  shrink-0">
                                                                         <Image src={cat.imageUrl || `https://picsum.photos/seed/${cat.id}/100/100`} alt={cat.name} fill className="object-cover" unoptimized/>
                                                                     </div>
                                                                     <span className="font-semibold text-sm group-hover:text-primary transition-colors">{cat.name}</span>
                                                                 </Link>
                                                             ))
                                                         )}
-                                                        <Link href={getStoreUrl("/store/categories")} className="flex items-center gap-2 text-primary font-bold uppercase text-[10px] tracking-widest pt-2 px-2" onClick={() => setIsMenuOpen(false)}>
+                                                        <Link href={getStoreUrl("/store/categories")} className="flex items-center gap-2 text-primary font-bold uppercase text tracking-widest pt-2 px-2" onClick={() => setIsMenuOpen(false)}>
                                                             Browse All <ArrowRight className="h-3 w-3" strokeWidth={3} />
                                                         </Link>
                                                     </div>
@@ -563,17 +563,17 @@ export function PublicNavbar() {
 
                                     <div className="p-6 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 mt-auto">
                                         {navbarShowAccount && user ? (
-                                            <Button asChild size="lg" className="w-full h-12 rounded-xl font-bold uppercase text-xs tracking-wider gap-2 shadow-sm" onClick={() => setIsMenuOpen(false)}>
+                                            <Button asChild size="lg" className="w-full h-12 rounded-xl font-bold uppercase text-xs tracking-wider gap-2 " onClick={() => setIsMenuOpen(false)}>
                                                 <Link href={getStoreUrl("/store/account")}>
                                                     <UserCircle className="h-4 w-4" /> My Account
                                                 </Link>
                                             </Button>
                                         ) : navbarShowAccount && !user ? (
                                             <div className="grid grid-cols-2 gap-3">
-                                                <Button asChild variant="outline" size="lg" className="rounded-xl font-bold uppercase text-[10px] tracking-wider h-12 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm" onClick={() => setIsMenuOpen(false)}>
+                                                <Button asChild variant="outline" size="lg" className="rounded-xl font-bold uppercase text tracking-wider h-12 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 " onClick={() => setIsMenuOpen(false)}>
                                                     <Link href={getStoreUrl("/store/login")}>Log In</Link>
                                                 </Button>
-                                                <Button asChild size="lg" className="rounded-xl font-bold uppercase text-[10px] tracking-wider h-12 shadow-sm" onClick={() => setIsMenuOpen(false)}>
+                                                <Button asChild size="lg" className="rounded-xl font-bold uppercase text tracking-wider h-12 " onClick={() => setIsMenuOpen(false)}>
                                                     <Link href={getStoreUrl("/store/signup")}>Join Now</Link>
                                                 </Button>
                                             </div>
@@ -591,7 +591,7 @@ export function PublicNavbar() {
 
           {/* Full Screen Immersive Search Overlay */}
           {isSearchFocused && (
-            <div className="fixed inset-0 z-[100] bg-white/95 dark:bg-slate-950/95 backdrop-blur-3xl animate-in fade-in duration-500 flex flex-col">
+            <div className="fixed inset-0 z bg-white/95 dark:bg-slate-950/95 backdrop-blur-3xl animate-in fade-in duration-500 flex flex-col">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none" />
                 
                 <div className="max-w-site-container mx-auto w-full px-6 sm:px-10 lg:px-12 flex flex-col h-full py-10 md:py-20 relative z-10">
@@ -601,7 +601,7 @@ export function PublicNavbar() {
                                 <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-6 w-6 text-primary" strokeWidth={3} />
                                 <Input 
                                     autoFocus
-                                    className="w-full pl-14 pr-12 bg-slate-100/50 dark:bg-slate-800/50 border-2 border-primary/20 focus:bg-white dark:focus:bg-slate-900 rounded-3xl h-16 text-xl md:text-2xl font-bold tracking-tight transition-all shadow-inner"
+                                    className="w-full pl-14 pr-12 bg-slate-100/50 dark:bg-slate-800/50 border-2 border-primary/20 focus:bg-white dark:focus:bg-slate-900 rounded-3xl h-16 text-xl md:text-2xl font-bold tracking-tight transition-all "
                                     placeholder="Search products, collections or SKUs..."
                                     value={navbarSearch}
                                     onChange={(e) => setNavbarSearch(e.target.value)}
@@ -624,7 +624,7 @@ export function PublicNavbar() {
                                 setIsSearchFocused(false);
                                 setNavbarSearch('');
                             }}
-                            className="h-16 w-16 rounded-full border-2 border-slate-100 dark:border-slate-800 hover:border-primary/20 hover:bg-primary/5 transition-all group shrink-0 shadow-sm active:scale-95 flex items-center justify-center"
+                            className="h-16 w-16 rounded-full border-2 border-slate-100 dark:border-slate-800 hover:border-primary/20 hover:bg-primary/5 transition-all group shrink-0  active:scale-95 flex items-center justify-center"
                         >
                             <X className="h-8 w-8 text-slate-400 group-hover:text-primary group-hover:rotate-90 transition-all duration-500" strokeWidth={3} />
                         </Button>
@@ -633,11 +633,11 @@ export function PublicNavbar() {
                     <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-16 overflow-hidden">
                         <div className="lg:col-span-8 flex flex-col min-h-0">
                             <div className="flex items-baseline justify-between mb-8 pb-4 border-b border-slate-100 dark:border-slate-800">
-                                <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400">
+                                <h3 className="text-xs font-black uppercase tracking text-slate-400">
                                     {navbarSearch ? 'Universal Registry Matches' : 'Discovery Feed'}
                                 </h3>
                                 {navbarSearch && (
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-primary bg-primary/5 px-3 py-1 rounded-full border border-primary/10">
+                                    <span className="text font-black uppercase tracking-widest text-primary bg-primary/5 px-3 py-1 rounded-full border border-primary/10">
                                         {searchResults.length + categoryMatches.length} Matches Found
                                     </span>
                                 )}
@@ -650,7 +650,7 @@ export function PublicNavbar() {
                                             {/* Category Results */}
                                             {categoryMatches.length > 0 && (
                                                 <div className="space-y-4">
-                                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                                                    <h4 className="text font-black uppercase tracking-widest text-primary flex items-center gap-2">
                                                         <LayoutGrid className="h-3 w-3" /> Related Collections
                                                     </h4>
                                                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -678,10 +678,10 @@ export function PublicNavbar() {
                                                         <Link 
                                                             key={product.id}
                                                             href={getStoreUrl(`/store/product/${product.id}`)}
-                                                            className="flex items-center gap-6 p-6 bg-white dark:bg-slate-900 rounded-[2rem] transition-all border border-slate-100 dark:border-slate-800 hover:border-primary/30 group shadow-lg hover:shadow-2xl active:scale-[0.98]"
+                                                            className="flex items-center gap-6 p-6 bg-white dark:bg-slate-900 rounded transition-all border border-slate-100 dark:border-slate-800 hover:border-primary/30 group  hover: active:scale"
                                                             onClick={() => setIsSearchFocused(false)}
                                                         >
-                                                            <div className="relative h-20 w-20 md:h-24 md:w-24 rounded-2xl overflow-hidden border bg-white flex-shrink-0 shadow-sm">
+                                                            <div className="relative h-20 w-20 md:h-24 md:w-24 rounded-2xl overflow-hidden border bg-white flex-shrink-0 ">
                                                                 <Image 
                                                                     src={product.imageUrl || 'https://placehold.co/200x200.png'} 
                                                                     alt={product.name} 
@@ -694,14 +694,14 @@ export function PublicNavbar() {
                                                                 <p className="text-lg md:text-xl font-black text-slate-900 dark:text-white truncate group-hover:text-primary transition-colors tracking-tight leading-tight">
                                                                     {product.name}
                                                                 </p>
-                                                                <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                                                                <p className="text font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
                                                                     {categories?.find(c => c.id === product.categoryId)?.name || 'Premium Registry'}
                                                                 </p>
                                                                 <p className="text-base font-black text-primary tracking-tight mt-2">
                                                                     {formatCurrency(calculateEffectivePrice(product as any, new Date()), settings?.currency || '$')}
                                                                 </p>
                                                             </div>
-                                                            <div className="h-12 w-12 rounded-full bg-primary text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-xl group-hover:translate-x-2 shrink-0">
+                                                            <div className="h-12 w-12 rounded-full bg-primary text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all  group-hover:translate-x-2 shrink-0">
                                                                 <ArrowRight className="h-5 w-5" strokeWidth={3} />
                                                             </div>
                                                         </Link>
@@ -716,7 +716,7 @@ export function PublicNavbar() {
                                             {/* Smart Suggestions: Similar Products */}
                                             {similarSuggestions.length > 0 && (
                                                 <div className="pt-10 border-t border-slate-100 dark:border-slate-800 space-y-6">
-                                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                                                    <h4 className="text font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                                                         <Sparkles className="h-3.5 w-3.5 text-amber-500" /> AI Suggestions & Related
                                                     </h4>
                                                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -727,7 +727,7 @@ export function PublicNavbar() {
                                                                 className="group block space-y-3"
                                                                 onClick={() => setIsSearchFocused(false)}
                                                             >
-                                                                <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border bg-slate-50">
+                                                                <div className="relative aspect rounded-2xl overflow-hidden border bg-slate-50">
                                                                     <Image src={p.imageUrl || ''} alt="" fill className="object-cover transition-transform group-hover:scale-110" unoptimized />
                                                                 </div>
                                                                 <p className="text-xs font-bold truncate px-1">{p.name}</p>
@@ -752,7 +752,7 @@ export function PublicNavbar() {
                                     <div className="space-y-16 py-10">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                                             <div className="space-y-6">
-                                                <h4 className="text-[10px] font-black uppercase tracking-[0.25em] text-primary flex items-center gap-2">
+                                                <h4 className="text font-black uppercase tracking text-primary flex items-center gap-2">
                                                     <TrendingUp className="h-3 w-3" /> Popular Registry Requests
                                                 </h4>
                                                 <div className="flex flex-col gap-4">
@@ -770,7 +770,7 @@ export function PublicNavbar() {
                                                 </div>
                                             </div>
                                             <div className="space-y-6">
-                                                <h4 className="text-[10px] font-black uppercase tracking-[0.25em] text-primary flex items-center gap-2">
+                                                <h4 className="text font-black uppercase tracking text-primary flex items-center gap-2">
                                                     <History className="h-3 w-3" /> Direct Access
                                                 </h4>
                                                 <div className="flex flex-wrap gap-3">
@@ -778,7 +778,7 @@ export function PublicNavbar() {
                                                         <Button 
                                                             key={tag} 
                                                             variant="outline" 
-                                                            className="rounded-full px-6 py-6 font-black text-[10px] uppercase tracking-widest border-slate-200 dark:border-slate-800 hover:border-primary hover:text-primary transition-all bg-white dark:bg-slate-900 shadow-sm active:scale-95"
+                                                            className="rounded-full px-6 py-6 font-black text uppercase tracking-widest border-slate-200 dark:border-slate-800 hover:border-primary hover:text-primary transition-all bg-white dark:bg-slate-900  active:scale-95"
                                                             onClick={() => {
                                                                 setNavbarSearch(tag);
                                                             }}
@@ -796,7 +796,7 @@ export function PublicNavbar() {
                             {navbarSearch && (searchResults.length > 0 || categoryMatches.length > 0) && (
                                 <div className="pt-8 border-t border-slate-100 dark:border-slate-800">
                                     <Button 
-                                        className="w-full h-16 rounded-[1.5rem] bg-primary text-white font-black uppercase text-xs tracking-[0.25em] shadow-2xl shadow-primary/20 hover:scale-[1.01] transition-transform"
+                                        className="w-full h-16 rounded bg-primary text-white font-black uppercase text-xs tracking   hover:scale transition-transform"
                                         asChild
                                     >
                                         <Link href={getStoreUrl(`/store/search?q=${encodeURIComponent(navbarSearch)}`)} onClick={() => setIsSearchFocused(false)}>
@@ -809,7 +809,7 @@ export function PublicNavbar() {
 
                         <div className="lg:col-span-4 hidden lg:flex flex-col space-y-10 border-l border-slate-100 dark:border-slate-800 pl-16">
                             <div>
-                                <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 mb-8">Premium Collections</h3>
+                                <h3 className="text-xs font-black uppercase tracking text-slate-400 mb-8">Premium Collections</h3>
                                 <div className="space-y-4">
                                     {categories?.slice(0, 10).map(cat => (
                                         <Link 
@@ -860,11 +860,11 @@ function UserButton({ isLoading, user, staffMember, router, handleLogout, getIni
                         </Avatar>
                     </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 rounded-2xl shadow-2xl border-slate-200 dark:border-slate-800">
+                <DropdownMenuContent align="end" className="w-56 rounded-2xl  border-slate-200 dark:border-slate-800">
                     <DropdownMenuLabel className="p-4">
                         <div className="flex flex-col space-y-1">
                             <p className="text-sm font-black leading-none">{user.displayName || 'You'}</p>
-                            <p className="text-[10px] font-medium leading-none text-muted-foreground uppercase tracking-widest mt-1">
+                            <p className="text font-medium leading-none text-muted-foreground uppercase tracking-widest mt-1">
                             {user.email}
                             </p>
                         </div>
@@ -891,13 +891,13 @@ function UserButton({ isLoading, user, staffMember, router, handleLogout, getIni
     }
     return (
         <div className="hidden sm:flex items-center gap-3 ml-2">
-            <Button variant="ghost" asChild className="group relative overflow-hidden text-xs font-black uppercase tracking-[0.2em] h-10">
+            <Button variant="ghost" asChild className="group relative overflow-hidden text-xs font-black uppercase tracking h-10">
                 <Link href={getStoreUrl('/store/login')}>
                     Log In
                     <span className="absolute bottom-0 left-0 h-0.5 bg-primary w-0 transition-all duration-300 ease-out group-hover:w-full"></span>
                 </Link>
             </Button>
-            <Button asChild className="rounded-full px-8 font-black uppercase text-[10px] tracking-[0.25em] h-10 shadow-lg shadow-primary/20">
+            <Button asChild className="rounded-full px-8 font-black uppercase text tracking h-10  ">
                 <Link href={getStoreUrl('/store/signup')}>Sign Up</Link>
             </Button>
         </div>

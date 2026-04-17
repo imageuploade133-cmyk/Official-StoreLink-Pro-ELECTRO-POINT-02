@@ -62,8 +62,8 @@ const DEFAULT_CORNER_RADIUS = 24;
 const flashHubSettingsSchema = z.object({
   flashHubTitle: z.string().min(2, 'Title is required.'),
   flashHubDescription: z.string().optional().or(z.literal('')),
-  flashHubColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default(DEFAULT_HUB_COLOR),
-  flashHubIconColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default(DEFAULT_ICON_COLOR),
+  flashHubColor: z.string().regex(/^#[0-9a-fA{6}$/i, 'Must be a valid hex color').default(DEFAULT_HUB_COLOR),
+  flashHubIconColor: z.string().regex(/^#[0-9a-fA{6}$/i, 'Must be a valid hex color').default(DEFAULT_ICON_COLOR),
   flashHubIconUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
   flashHubBannerImageUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
   flashHubBannerVideoUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
@@ -242,8 +242,8 @@ export default function FlashHubManagerPage() {
     return (
       <div className="space-y-6">
         <PageHeader icon={Zap} title="Flash Hub Manager" description="Syncing hub configurations..." />
-        <Skeleton className="h-[400px] w-full rounded-3xl" />
-        <Skeleton className="h-[300px] w-full rounded-3xl" />
+        <Skeleton className="h w-full rounded-3xl" />
+        <Skeleton className="h w-full rounded-3xl" />
       </div>
     );
   }
@@ -273,7 +273,7 @@ export default function FlashHubManagerPage() {
             <Button 
                 onClick={form.handleSubmit(onSubmit)} 
                 disabled={isSaving || isUploading || isUploadingIcon}
-                className="rounded-xl h-11 px-8 font-black uppercase tracking-widest shadow-xl shadow-primary/20"
+                className="rounded-xl h-11 px-8 font-black uppercase tracking-widest  "
             >
                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                 Sync Flash Hub
@@ -285,7 +285,7 @@ export default function FlashHubManagerPage() {
         <div className="lg:col-span-2 space-y-10">
           <Form {...form}>
             <form className="space-y-10">
-              <Card className="shadow-2xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader 
                     className="text-white p-8 transition-all duration-500"
                     style={{ 
@@ -299,7 +299,7 @@ export default function FlashHubManagerPage() {
                         <CardDescription className="text-white/80 font-medium">Customize the header and landing experience.</CardDescription>
                     </div>
                     {iconUrl ? (
-                        <div className="relative h-12 w-12 rounded-xl overflow-hidden border-2 border-white shadow-xl bg-white">
+                        <div className="relative h-12 w-12 rounded-xl overflow-hidden border-2 border-white  bg-white">
                             <Image src={iconUrl} alt="Hub Icon" fill className="object-cover" unoptimized />
                         </div>
                     ) : (
@@ -353,13 +353,13 @@ export default function FlashHubManagerPage() {
                                         variant="ghost" 
                                         size="sm" 
                                         onClick={handleResetColor}
-                                        className="h-auto p-0 text-[10px] font-black text-primary uppercase tracking-widest hover:bg-transparent hover:underline flex items-center gap-1 mt-1"
+                                        className="h-auto p-0 text font-black text-primary uppercase tracking-widest hover:bg-transparent hover:underline flex items-center gap-1 mt-1"
                                     >
                                         <Undo2 className="h-2.5 w-2.5" /> Reset Default
                                     </Button>
                                 </div>
                             </div>
-                            <FormDescription className="text-[10px]">Applies to the hub header and thematic accents.</FormDescription>
+                            <FormDescription className="text">Applies to the hub header and thematic accents.</FormDescription>
                             <FormMessage />
                         </FormItem>
                         )}
@@ -384,13 +384,13 @@ export default function FlashHubManagerPage() {
                                         variant="ghost" 
                                         size="sm" 
                                         onClick={handleResetIconColor}
-                                        className="h-auto p-0 text-[10px] font-black text-primary uppercase tracking-widest hover:bg-transparent hover:underline flex items-center gap-1 mt-1"
+                                        className="h-auto p-0 text font-black text-primary uppercase tracking-widest hover:bg-transparent hover:underline flex items-center gap-1 mt-1"
                                     >
                                         <Undo2 className="h-2.5 w-2.5" /> Reset Default
                                     </Button>
                                 </div>
                             </div>
-                            <FormDescription className="text-[10px]">Customize the accent color of the Hub badge.</FormDescription>
+                            <FormDescription className="text">Customize the accent color of the Hub badge.</FormDescription>
                             <FormMessage />
                         </FormItem>
                         )}
@@ -421,7 +421,7 @@ export default function FlashHubManagerPage() {
                                     className="py-4"
                                 />
                             </FormControl>
-                            <FormDescription className="text-[10px]">Adjust the "smoothness" of the Flash Sale banner corners.</FormDescription>
+                            <FormDescription className="text">Adjust the "smoothness" of the Flash Sale banner corners.</FormDescription>
                             <FormMessage />
                         </FormItem>
                         )}
@@ -433,7 +433,7 @@ export default function FlashHubManagerPage() {
                                 className="w-24 h-12 mx-auto border-2 border-primary/20 bg-primary/10 transition-all duration-300"
                                 style={{ borderRadius: `${cornerRadius}px` }}
                             />
-                            <p className="text-[8px] font-black uppercase text-muted-foreground">Rounding Preview</p>
+                            <p className="text font-black uppercase text-muted-foreground">Rounding Preview</p>
                         </div>
                     </div>
                   </div>
@@ -441,7 +441,7 @@ export default function FlashHubManagerPage() {
                   <Separator className="border-dashed" />
 
                   <div className="space-y-6">
-                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
+                    <h4 className="text font-black uppercase tracking text-muted-foreground flex items-center gap-2">
                         <ImageIcon className="h-3.5 w-3.5" /> Hub Brand Assets
                     </h4>
                     
@@ -454,7 +454,7 @@ export default function FlashHubManagerPage() {
                                 <FormLabel className="text-xs font-bold">Custom Icon Image (Optional)</FormLabel>
                                 <div className="flex flex-col gap-4">
                                     {iconUrl && (
-                                        <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-2 border-primary/10 shadow-lg bg-white group">
+                                        <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-2 border-primary/10  bg-white group">
                                             <Image src={iconUrl} alt="Custom Icon" fill className="object-cover" unoptimized />
                                             <Button 
                                                 type="button" 
@@ -477,7 +477,7 @@ export default function FlashHubManagerPage() {
                                         <input id="hub-icon-upload" type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'flashHubIconUrl')} disabled={isUploadingIcon} />
                                     </div>
                                 </div>
-                                <FormDescription className="text-[10px]">Replaces the Zap icon. 200x200px recommended.</FormDescription>
+                                <FormDescription className="text">Replaces the Zap icon. 200x200px recommended.</FormDescription>
                                 <FormMessage />
                             </FormItem>
                             )}
@@ -506,7 +506,7 @@ export default function FlashHubManagerPage() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b flex flex-row items-center justify-between p-8">
                   <div>
                     <CardTitle className="text-xl">Flash Hub Slideshow</CardTitle>
@@ -517,13 +517,13 @@ export default function FlashHubManagerPage() {
                         control={form.control}
                         name="flashHubShowSlideshow"
                         render={({ field }) => (
-                        <FormItem className="flex items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background shadow-lg">
-                            <FormLabel className="text-[10px] font-black uppercase tracking-widest">{field.value ? 'Active' : 'Off'}</FormLabel>
+                        <FormItem className="flex items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background ">
+                            <FormLabel className="text font-black uppercase tracking-widest">{field.value ? 'Active' : 'Off'}</FormLabel>
                             <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
                         </FormItem>
                         )}
                     />
-                    <Button asChild variant="secondary" className="rounded-xl font-bold h-10 px-6 shadow-sm">
+                    <Button asChild variant="secondary" className="rounded-xl font-bold h-10 px-6 ">
                         <Link href="/dashboard/web-slide-show/create?placement=flash-hub">
                             <PlusCircle className="h-4 w-4 mr-2" /> Add Hub Slide
                         </Link>
@@ -547,7 +547,7 @@ export default function FlashHubManagerPage() {
                                 <TableRow key={slide.id} className="group hover:bg-muted/30 transition-colors">
                                     <TableCell className="text-center font-black text-primary">{slide.order}</TableCell>
                                     <TableCell>
-                                        <div className="relative w-20 h-12 rounded-lg overflow-hidden border shadow-sm bg-slate-100 flex items-center justify-center">
+                                        <div className="relative w-20 h-12 rounded-lg overflow-hidden border  bg-slate-100 flex items-center justify-center">
                                             {slide.mediaType === 'image' && slide.imageUrl ? (
                                                 <Image src={slide.imageUrl} alt="" fill className="object-cover" unoptimized />
                                             ) : slide.mediaType === 'video' && slide.videoPosterUrl ? (
@@ -559,7 +559,7 @@ export default function FlashHubManagerPage() {
                                     </TableCell>
                                     <TableCell className="font-bold text-sm">{slide.title || 'Untitled Slide'}</TableCell>
                                     <TableCell>
-                                        <Badge variant={slide.published ? 'default' : 'secondary'} className={cn("text-[9px] font-black h-5 uppercase", slide.published ? 'bg-green-100 text-green-800' : '')}>
+                                        <Badge variant={slide.published ? 'default' : 'secondary'} className={cn("text font-black h-5 uppercase", slide.published ? 'bg-green-100 text-green-800' : '')}>
                                             {slide.published ? 'Live' : 'Draft'}
                                         </Badge>
                                     </TableCell>
@@ -593,10 +593,10 @@ export default function FlashHubManagerPage() {
         </div>
 
         <div className="lg:col-span-1 space-y-10">
-          <Card className="bg-primary text-primary-foreground border-none shadow-2xl rounded-[3rem] overflow-hidden relative group">
+          <Card className="bg-primary text-primary-foreground border-none  rounded overflow-hidden relative group">
             <CardHeader className="pt-12 px-10">
                 <CardTitle className="text-3xl font-black tracking-tighter uppercase leading-tight">Sales Hub Registry</CardTitle>
-                <CardDescription className="text-primary-foreground/70 font-bold text-[10px] uppercase tracking-[0.2em] pt-2">Active Flash Sections</CardDescription>
+                <CardDescription className="text-primary-foreground/70 font-bold text uppercase tracking pt-2">Active Flash Sections</CardDescription>
             </CardHeader>
             <CardContent className="px-10 pb-12 space-y-8 relative z-10">
                 <div className="space-y-4">
@@ -613,12 +613,12 @@ export default function FlashHubManagerPage() {
                                         <p className="font-bold text-sm truncate pr-2">{section.title}</p>
                                         <div className="flex items-center gap-2 mt-1">
                                             <Badge className={cn(
-                                                "h-4 px-1.5 text-[8px] font-black uppercase border-none",
+                                                "h-4 px-1.5 text font-black uppercase border-none",
                                                 isActive ? "bg-green-400 text-green-950" : "bg-blue-400 text-blue-950"
                                             )}>
                                                 {isActive ? 'LIVE' : 'WAITING'}
                                             </Badge>
-                                            <span className="text-[10px] text-primary-foreground/60 font-mono">
+                                            <span className="text text-primary-foreground/60 font-mono">
                                                 {section.flashSaleDiscountType === 'percentage' ? `-${section.flashSaleDiscountValue}%` : `-${section.flashSaleDiscountValue}`}
                                             </span>
                                         </div>
@@ -642,7 +642,7 @@ export default function FlashHubManagerPage() {
                 <div className="p-4 bg-white/5 rounded-2xl space-y-3">
                     <div className="flex items-center gap-2 text-amber-400">
                         <div className="h-2 w-2 rounded-full animate-pulse bg-current" />
-                        <h4 className="text-[10px] font-black uppercase tracking-widest">Merchandising Tip</h4>
+                        <h4 className="text font-black uppercase tracking-widest">Merchandising Tip</h4>
                     </div>
                     <p className="text-xs leading-relaxed text-primary-foreground/80 font-medium">
                         The Flash Hub automatically pulls any homepage section with the <strong>Flash Sale Engine</strong> active. Use the color picker to set the primary thematic accent for the entire hub.

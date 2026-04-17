@@ -320,7 +320,7 @@ export default function OnlineCustomersPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-black">{totalRegistryCount.toLocaleString()}</div>
-            <p className="text-[10px] text-muted-foreground mt-1">Users with active web accounts</p>
+            <p className="text text-muted-foreground mt-1">Users with active web accounts</p>
           </CardContent>
         </Card>
         <Card>
@@ -331,7 +331,7 @@ export default function OnlineCustomersPage() {
             <div className="text-3xl font-black text-green-600">
               {customers.length}
             </div>
-            <p className="text-[10px] text-muted-foreground mt-1">Customers on current page</p>
+            <p className="text text-muted-foreground mt-1">Customers on current page</p>
           </CardContent>
         </Card>
         <Card>
@@ -342,12 +342,12 @@ export default function OnlineCustomersPage() {
             <div className="text-3xl font-black text-blue-600">
               {formatCurrency(customers.reduce((acc, c) => acc + (c.totalSpent || 0), 0), currencySymbol)}
             </div>
-            <p className="text-[10px] text-muted-foreground mt-1">Gross sales from customers in view</p>
+            <p className="text text-muted-foreground mt-1">Gross sales from customers in view</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="shadow-sm border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <CardHeader>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <CardTitle className="text-lg font-bold">Member Directory</CardTitle>
@@ -396,7 +396,7 @@ export default function OnlineCustomersPage() {
                     <TableRow key={customer.id} className="group transition-colors hover:bg-muted/30">
                       <TableCell>
                         <div className="font-bold text-sm text-gray-900">{customer.name}</div>
-                        <div className="text-[10px] font-mono text-muted-foreground uppercase">UID: {customer.uid?.substring(0, 12)}...</div>
+                        <div className="text font-mono text-muted-foreground uppercase">UID: {customer.uid?.substring(0, 12)}...</div>
                       </TableCell>
                       <TableCell className="text-xs">
                         <div className="flex items-center gap-1.5"><Mail className="h-3 w-3 text-muted-foreground" /> {customer.email}</div>
@@ -412,7 +412,7 @@ export default function OnlineCustomersPage() {
                         {formatCurrency(customer.outstandingCredit || 0, currencySymbol)}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={customer.status === 'active' ? 'default' : 'destructive'} className="capitalize text-[10px] h-5">
+                        <Badge variant={customer.status === 'active' ? 'default' : 'destructive'} className="capitalize text h-5">
                           {customer.status}
                         </Badge>
                       </TableCell>

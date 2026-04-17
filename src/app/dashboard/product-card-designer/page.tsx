@@ -66,11 +66,11 @@ const borderRadiusOptions = [
 ];
 
 const shadowOptions = [
-  { value: 'none', label: 'None', class: 'shadow-none' },
-  { value: 'sm', label: 'Small', class: 'shadow-sm' },
-  { value: 'md', label: 'Medium', class: 'shadow-md' },
-  { value: 'lg', label: 'Large', class: 'shadow-lg' },
-  { value: 'xl', label: 'Extra Large', class: 'shadow-xl' },
+  { value: 'none', label: 'None', class: '' },
+  { value: 'sm', label: 'Small', class: '' },
+  { value: 'md', label: 'Medium', class: '' },
+  { value: 'lg', label: 'Large', class: '' },
+  { value: 'xl', label: 'Extra Large', class: '' },
 ];
 
 const borderWidthOptions = [
@@ -255,7 +255,7 @@ export default function ProductCardDesignerPage() {
   }
 
   const borderRadiusClass = borderRadiusOptions.find(o => o.value === settings.productCardBorderRadius)?.class || 'rounded-lg';
-  const shadowClass = shadowOptions.find(o => o.value === settings.productCardShadow)?.class || 'shadow-md';
+  const shadowClass = shadowOptions.find(o => o.value === settings.productCardShadow)?.class || '';
   const borderWidthClass = borderWidthOptions.find(o => o.value === settings.productCardBorderWidth)?.class || 'border';
 
   return (
@@ -678,7 +678,7 @@ export default function ProductCardDesignerPage() {
                   onClick={handleSave}
                   disabled={isSaving}
                   className={cn(
-                    'flex-[2]',
+                    'flex',
                     saveStatus === 'success' && 'bg-green-600 hover:bg-green-700',
                     saveStatus === 'error' && 'bg-red-600 hover:bg-red-700'
                   )}
@@ -724,7 +724,7 @@ export default function ProductCardDesignerPage() {
                     onClick={() => setPreviewDevice('mobile')}
                     className={cn(
                       'p-2 rounded-md transition-all',
-                      previewDevice === 'mobile' ? 'bg-white dark:bg-slate-700 shadow-sm' : 'text-slate-500'
+                      previewDevice === 'mobile' ? 'bg-white dark:bg-slate-700 ' : 'text-slate-500'
                     )}
                   >
                     <Smartphone className="h-4 w-4" />
@@ -733,7 +733,7 @@ export default function ProductCardDesignerPage() {
                     onClick={() => setPreviewDevice('tablet')}
                     className={cn(
                       'p-2 rounded-md transition-all',
-                      previewDevice === 'tablet' ? 'bg-white dark:bg-slate-700 shadow-sm' : 'text-slate-500'
+                      previewDevice === 'tablet' ? 'bg-white dark:bg-slate-700 ' : 'text-slate-500'
                     )}
                   >
                     <Tablet className="h-4 w-4" />
@@ -742,7 +742,7 @@ export default function ProductCardDesignerPage() {
                     onClick={() => setPreviewDevice('desktop')}
                     className={cn(
                       'p-2 rounded-md transition-all',
-                      previewDevice === 'desktop' ? 'bg-white dark:bg-slate-700 shadow-sm' : 'text-slate-500'
+                      previewDevice === 'desktop' ? 'bg-white dark:bg-slate-700 ' : 'text-slate-500'
                     )}
                   >
                     <Monitor className="h-4 w-4" />
@@ -753,8 +753,8 @@ export default function ProductCardDesignerPage() {
             <CardContent>
               <div className={cn(
                 'mx-auto transition-all duration-300 bg-slate-50 dark:bg-slate-900 rounded-lg p-6',
-                previewDevice === 'mobile' && 'max-w-[375px]',
-                previewDevice === 'tablet' && 'max-w-[768px]',
+                previewDevice === 'mobile' && 'max-w',
+                previewDevice === 'tablet' && 'max-w',
                 previewDevice === 'desktop' && 'max-w-full'
               )}>
                 {/* Preview Grid */}
@@ -781,7 +781,7 @@ export default function ProductCardDesignerPage() {
                         shadowClass,
                         borderWidthClass,
                         settings.productCardHoverEffect === 'lift' && 'hover:-translate-y-2',
-                        settings.productCardHoverEffect === 'glow' && 'hover:shadow-2xl hover:shadow-primary/20',
+                        settings.productCardHoverEffect === 'glow' && 'hover: hover:',
                         settings.productCardHoverEffect === 'border' && 'hover:border-primary'
                       )}
                       style={{
@@ -795,8 +795,8 @@ export default function ProductCardDesignerPage() {
                         <div className={cn(
                           'relative overflow-hidden bg-slate-100 dark:bg-slate-700',
                           settings.productCardImageRatio === 'square' && 'aspect-square',
-                          settings.productCardImageRatio === 'portrait' && 'aspect-[3/4]',
-                          settings.productCardImageRatio === 'landscape' && 'aspect-[4/3]'
+                          settings.productCardImageRatio === 'portrait' && 'aspect',
+                          settings.productCardImageRatio === 'landscape' && 'aspect'
                         )}>
                           <img
                             src={sampleProduct.imageUrl}
@@ -809,17 +809,17 @@ export default function ProductCardDesignerPage() {
                           {/* Badges */}
                           {settings.productCardShowBadges && (
                             <div className="absolute top-3 left-3 flex flex-col gap-2">
-                              <Badge className="bg-blue-600 text-white text-[9px] uppercase">
+                              <Badge className="bg-blue-600 text-white text uppercase">
                                 Official
                               </Badge>
-                              <Badge className="bg-rose-500 text-white text-[9px] uppercase">
+                              <Badge className="bg-rose-500 text-white text uppercase">
                                 -20%
                               </Badge>
                             </div>
                           )}
                           {/* Wishlist */}
                           {settings.productCardShowWishlist && (
-                            <button className="absolute top-3 right-3 h-9 w-9 flex items-center justify-center rounded-full bg-white/90 dark:bg-slate-800/90 shadow-md">
+                            <button className="absolute top-3 right-3 h-9 w-9 flex items-center justify-center rounded-full bg-white/90 dark:bg-slate-800/90 ">
                               <Sparkles className="h-4 w-4 text-slate-400" />
                             </button>
                           )}
@@ -836,7 +836,7 @@ export default function ProductCardDesignerPage() {
 
                       {/* Content Area */}
                       <div className="p-4 space-y-3">
-                        <p className="text-[10px] font-bold uppercase text-primary/60 tracking-wider">
+                        <p className="text font-bold uppercase text-primary/60 tracking-wider">
                           {sampleCategory.name}
                         </p>
                         <h3
@@ -876,7 +876,7 @@ export default function ProductCardDesignerPage() {
                                 style={{ width: '60%' }}
                               />
                             </div>
-                            <p className="text-[10px] text-slate-500">In Stock (15)</p>
+                            <p className="text text-slate-500">In Stock (15)</p>
                           </div>
                         )}
 
@@ -904,7 +904,7 @@ export default function ProductCardDesignerPage() {
                       shadowClass,
                       borderWidthClass,
                       settings.productCardHoverEffect === 'lift' && 'hover:-translate-y-2',
-                      settings.productCardHoverEffect === 'glow' && 'hover:shadow-2xl hover:shadow-primary/20',
+                      settings.productCardHoverEffect === 'glow' && 'hover: hover:',
                       settings.productCardHoverEffect === 'border' && 'hover:border-primary'
                     )}
                     style={{
@@ -917,8 +917,8 @@ export default function ProductCardDesignerPage() {
                       <div className={cn(
                         'relative overflow-hidden bg-slate-100 dark:bg-slate-700',
                         settings.productCardImageRatio === 'square' && 'aspect-square',
-                        settings.productCardImageRatio === 'portrait' && 'aspect-[3/4]',
-                        settings.productCardImageRatio === 'landscape' && 'aspect-[4/3]'
+                        settings.productCardImageRatio === 'portrait' && 'aspect',
+                        settings.productCardImageRatio === 'landscape' && 'aspect'
                       )}>
                         <img
                           src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=600&fit=crop"
@@ -930,20 +930,20 @@ export default function ProductCardDesignerPage() {
                         />
                         {settings.productCardShowBadges && (
                           <div className="absolute top-3 left-3">
-                            <Badge className="bg-indigo-500 text-white text-[9px] uppercase">
+                            <Badge className="bg-indigo-500 text-white text uppercase">
                               New
                             </Badge>
                           </div>
                         )}
                         {settings.productCardShowWishlist && (
-                          <button className="absolute top-3 right-3 h-9 w-9 flex items-center justify-center rounded-full bg-white/90 dark:bg-slate-800/90 shadow-md">
+                          <button className="absolute top-3 right-3 h-9 w-9 flex items-center justify-center rounded-full bg-white/90 dark:bg-slate-800/90 ">
                             <Sparkles className="h-4 w-4 text-rose-500 fill-rose-500" />
                           </button>
                         )}
                       </div>
                     )}
                     <div className="p-4 space-y-3">
-                      <p className="text-[10px] font-bold uppercase text-primary/60 tracking-wider">
+                      <p className="text font-bold uppercase text-primary/60 tracking-wider">
                         Footwear
                       </p>
                       <h3
@@ -979,7 +979,7 @@ export default function ProductCardDesignerPage() {
                               style={{ width: '25%' }}
                             />
                           </div>
-                          <p className="text-[10px] text-amber-600">Low Stock (3)</p>
+                          <p className="text text-amber-600">Low Stock (3)</p>
                         </div>
                       )}
                       <div className={cn(
@@ -1008,7 +1008,7 @@ export default function ProductCardDesignerPage() {
 }
 
 // Default HTML Template
-const defaultHtmlTemplate = `<div class="group relative flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all duration-500 hover:border-primary/30 overflow-hidden h-full hover:-translate-y-1 hover:shadow-xl" style="height: {{cardHeight}}px;">
+const defaultHtmlTemplate = `<div class="group relative flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all duration-500 hover:border-primary/30 overflow-hidden h-full hover:-translate-y-1 hover:" style="height: {{cardHeight}}px;">
   <!-- Media Area -->
   <a href="/store/product/{{product.id}}" class="block relative overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900" style="height: 60%;">
     <img
@@ -1020,25 +1020,25 @@ const defaultHtmlTemplate = `<div class="group relative flex flex-col bg-white d
     <!-- Badges -->
     <div class="absolute top-4 left-4 flex flex-col gap-2 z-10">
       {{#if product.isOfficial}}
-      <span class="bg-gradient-to-r from-blue-600 to-blue-700 text-white font-black text-[9px] uppercase tracking-widest px-3 py-1.5 shadow-lg rounded-full">
+      <span class="bg-gradient-to-r from-blue-600 to-blue-700 text-white font-black text uppercase tracking-widest px-3 py-1.5  rounded-full">
         ✓ Official
       </span>
       {{/if}}
       {{#if product.discount}}
-      <span class="bg-rose-500 text-white font-black text-[10px] uppercase tracking-widest px-3 py-1.5 shadow-lg rounded-full">
+      <span class="bg-rose-500 text-white font-black text uppercase tracking-widest px-3 py-1.5  rounded-full">
         ⚡ -{{product.discount}}%
       </span>
       {{/if}}
     </div>
 
     <!-- Wishlist Button -->
-    <button class="absolute top-4 right-4 h-11 w-11 flex items-center justify-center rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-lg transition-all duration-300 hover:scale-110 z-10 border border-white/30">
+    <button class="absolute top-4 right-4 h-11 w-11 flex items-center justify-center rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl  transition-all duration-300 hover:scale-110 z-10 border border-white/30">
       ♡
     </button>
 
     <!-- Quick Add -->
     <div class="absolute inset-x-0 bottom-0 p-5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-gradient-to-t from-black/40 to-transparent">
-      <button class="w-full bg-primary text-white font-black text-sm uppercase tracking-wide shadow-xl py-3 rounded-lg hover:shadow-2xl transition-all active:scale-95">
+      <button class="w-full bg-primary text-white font-black text-sm uppercase tracking-wide  py-3 rounded-lg hover: transition-all active:scale-95">
         🛒 Add to Bag
       </button>
     </div>
@@ -1047,7 +1047,7 @@ const defaultHtmlTemplate = `<div class="group relative flex flex-col bg-white d
   <!-- Content Area -->
   <div class="flex flex-col flex-1 p-5 space-y-4">
     <div class="flex-1 space-y-3">
-      <p class="text-[10px] font-black uppercase tracking-widest text-primary/60 truncate">
+      <p class="text font-black uppercase tracking-widest text-primary/60 truncate">
         {{product.category}}
       </p>
       
@@ -1064,12 +1064,12 @@ const defaultHtmlTemplate = `<div class="group relative flex flex-col bg-white d
       <!-- Tags -->
       <div class="flex flex-wrap gap-2">
         {{#if product.isNew}}
-        <span class="bg-indigo-100 text-indigo-700 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">
+        <span class="bg-indigo-100 text-indigo-700 text font-black uppercase tracking-widest px-2.5 py-1 rounded-full">
           ✨ New
         </span>
         {{/if}}
         {{#if product.isPopular}}
-        <span class="bg-rose-100 text-rose-700 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">
+        <span class="bg-rose-100 text-rose-700 text font-black uppercase tracking-widest px-2.5 py-1 rounded-full">
           📈 Best
         </span>
         {{/if}}
@@ -1083,7 +1083,7 @@ const defaultHtmlTemplate = `<div class="group relative flex flex-col bg-white d
         <div class="h-1.5 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
           <div class="h-full bg-green-500 rounded-full" style="width: {{product.stockPercentage}}%"></div>
         </div>
-        <p class="text-[10px] font-medium text-slate-500">{{product.stockLabel}}</p>
+        <p class="text font-medium text-slate-500">{{product.stockLabel}}</p>
       </div>
 
       <div class="flex items-end justify-between">
@@ -1092,14 +1092,14 @@ const defaultHtmlTemplate = `<div class="group relative flex flex-col bg-white d
             {{currency}}{{product.price}}
           </span>
           {{#if product.originalPrice}}
-          <span class="text-[10px] text-slate-400 line-through font-bold">
+          <span class="text text-slate-400 line-through font-bold">
             {{currency}}{{product.originalPrice}}
           </span>
           {{/if}}
         </div>
         
         <!-- Mobile Cart -->
-        <button class="md:hidden h-10 w-10 flex items-center justify-center rounded-full bg-primary text-white shadow-lg active:scale-90 transition-all">
+        <button class="md:hidden h-10 w-10 flex items-center justify-center rounded-full bg-primary text-white  active:scale-90 transition-all">
           🛒
         </button>
       </div>
@@ -1108,7 +1108,7 @@ const defaultHtmlTemplate = `<div class="group relative flex flex-col bg-white d
 </div>`;
 
 // Minimal HTML Template
-const minimalHtmlTemplate = `<div class="group relative bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-300 hover:shadow-lg" style="height: {{cardHeight}}px;">
+const minimalHtmlTemplate = `<div class="group relative bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-300 hover:" style="height: {{cardHeight}}px;">
   <a href="/store/product/{{product.id}}" class="block">
     <div class="aspect-square overflow-hidden bg-slate-100">
       <img

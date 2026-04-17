@@ -795,7 +795,7 @@ export default function POSPage() {
   return (
     <TooltipProvider>
       <div className="min-h-screen lg:h-dvh flex flex-col lg:overflow-hidden bg-muted/30">
-        <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6">
+        <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b bg-card px-4 lg:h lg:px-6">
             <div className="flex items-center gap-3">
                 <div className="p-2 bg-muted rounded-md">
                     <Store className="h-6 w-6 text-primary" />
@@ -815,7 +815,7 @@ export default function POSPage() {
         />
 
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-5 lg:grid-rows-none gap-3 sm:gap-6 min-h-0 p-3 sm:p-6">
-          <div className="lg:col-span-3 h-full flex flex-col bg-card p-2 sm:p-4 rounded-xl shadow-lg lg:overflow-hidden">
+          <div className="lg:col-span-3 h-full flex flex-col bg-card p-2 sm:p-4 rounded-xl  lg:overflow-hidden">
             <ProductArea
               onAddToCart={handleAddToCart}
                onProductsLoaded={setProducts}

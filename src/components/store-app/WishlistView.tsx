@@ -88,15 +88,15 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
         const shape = useIndividual
             ? (settings?.storeGridCartShape || 'md')
             : (settings?.storeBtnShape || 'md');
-        const shadow = useIndividual
+        const  = useIndividual
             ? (settings?.storeGridCartShadow || 'sm')
             : 'sm';
         
         const sizeClasses = {
-            sm: 'h-8 text-[8px] px-3',
-            md: 'h-10 text-[9px] px-4',
-            lg: 'h-12 text-[10px] px-6',
-            xl: 'h-14 text-[11px] px-8'
+            sm: 'h-8 text px-3',
+            md: 'h-10 text px-4',
+            lg: 'h-12 text px-6',
+            xl: 'h-14 text px-8'
         };
 
         const shapeClasses: Record<string, string> = {
@@ -108,18 +108,18 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
         };
 
         const shadowClasses: Record<string, string> = {
-            none: 'shadow-none',
-            sm: 'shadow-sm',
-            md: 'shadow-md',
-            lg: 'shadow-lg',
-            xl: 'shadow-xl',
-            '2xl': 'shadow-2xl',
-            inner: 'shadow-inner'
+            none: '',
+            sm: '',
+            md: '',
+            lg: '',
+            xl: '',
+            '2xl': '',
+            inner: ''
         };
         
         const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
         const shapeClass = shapeClasses[shape] || 'rounded-2xl';
-        const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
+        const shadowClass = shadowClasses[ as keyof typeof shadowClasses] || '';
 
         return `${sizeClass} ${shapeClass} ${shadowClass}`;
     }, [settings]);
@@ -172,13 +172,13 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
                 <div className="flex items-center gap-4">
                     <button 
                         onClick={onClose}
-                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
+                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800  border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
                     >
                         <ArrowLeft className="h-5 w-5" strokeWidth={3} />
                     </button>
                     <h1 className="text-xl font-black leading-tight tracking-tighter uppercase">My Favorites</h1>
                 </div>
-                <Badge variant="secondary" className="font-black h-8 px-4 rounded-full shadow-sm">{wishlistCount}</Badge>
+                <Badge variant="secondary" className="font-black h-8 px-4 rounded-full ">{wishlistCount}</Badge>
             </header>
 
             <ScrollArea className="flex-1 px-4 pb-32">
@@ -186,21 +186,21 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
                     <div className="grid grid-cols-2 gap-4 p-2 py-6">
                         {[...Array(4)].map((_, i) => (
                             <div key={i} className="space-y-3">
-                                <div className="aspect-[4/5] w-full bg-slate-200 dark:bg-slate-800 rounded-[2rem] animate-pulse" />
+                                <div className="aspect w-full bg-slate-200 dark:bg-slate-800 rounded animate-pulse" />
                                 <div className="h-4 w-3/4 bg-slate-200 dark:bg-slate-800 rounded-full animate-pulse" />
                             </div>
                         ))}
                     </div>
                 ) : wishlistCount === 0 ? (
                     <div className="py-32 text-center space-y-8 animate-in fade-in zoom-in-95 duration-700">
-                        <div className="h-32 w-32 bg-slate-100 dark:bg-slate-800/50 rounded-[3rem] flex items-center justify-center mx-auto shadow-inner group">
+                        <div className="h-32 w-32 bg-slate-100 dark:bg-slate-800/50 rounded flex items-center justify-center mx-auto  group">
                             <Heart className="h-14 w-14 text-slate-300 group-hover:scale-110 transition-transform duration-500" strokeWidth={1.5} />
                         </div>
                         <div className="space-y-2">
                             <h3 className="text-2xl font-black tracking-tight uppercase">Registry Empty</h3>
-                            <p className="text-sm text-slate-500 font-medium max-w-[220px] mx-auto leading-relaxed">Save the premium items you love for instant retrieval here.</p>
+                            <p className="text-sm text-slate-500 font-medium max-w mx-auto leading-relaxed">Save the premium items you love for instant retrieval here.</p>
                         </div>
-                        <Button onClick={onClose} size="lg" className="rounded-2xl font-black uppercase text-[10px] tracking-widest px-10 h-14 shadow-xl active:scale-95 transition-transform">Start Curating</Button>
+                        <Button onClick={onClose} size="lg" className="rounded-2xl font-black uppercase text tracking-widest px-10 h-14  active:scale-95 transition-transform">Start Curating</Button>
                     </div>
                 ) : (
                     <div className="grid grid-cols-2 gap-4 p-2 py-6">
@@ -215,7 +215,7 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
                                     className="group relative flex flex-col gap-3 animate-in fade-in slide-in-from-bottom-2 duration-500"
                                 >
                                     <div 
-                                        className="relative w-full aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-800 active:scale-[0.98] transition-all"
+                                        className="relative w-full aspect overflow-hidden rounded bg-white dark:bg-slate-800  border border-slate-100 dark:border-slate-800 active:scale transition-all"
                                         onClick={() => onSelectProduct(product.id)}
                                     >
                                         <Image 
@@ -230,7 +230,7 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
                                         <div className="absolute top-3 right-3 flex flex-col gap-2">
                                             <button 
                                                 onClick={(e) => { e.stopPropagation(); removeFromWishlist(product.id); }}
-                                                className="size-9 flex items-center justify-center bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl shadow-xl text-rose-500 border border-white/50 z-30"
+                                                className="size-9 flex items-center justify-center bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl  text-rose-500 border border-white/50 z-30"
                                             >
                                                 <X className="h-5 w-5" strokeWidth={3} />
                                             </button>
@@ -249,11 +249,11 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
                                     </div>
 
                                     <div className="flex flex-col gap-1 px-2">
-                                        <p className="text-[8px] font-black uppercase tracking-[0.25em] text-primary/60 truncate">{catName}</p>
+                                        <p className="text font-black uppercase tracking text-primary/60 truncate">{catName}</p>
                                         <h4 className="font-black text-sm text-slate-900 dark:text-white truncate leading-tight tracking-tight">{product.name}</h4>
                                         <div className="flex items-center justify-between mt-1">
                                             <p className="text-primary font-black text-base tracking-tighter">{formatCurrency(price, currencySymbol)}</p>
-                                            {isOutOfStock && <Badge variant="destructive" className="text-[8px] h-4 uppercase font-black tracking-tighter">Depleted</Badge>}
+                                            {isOutOfStock && <Badge variant="destructive" className="text h-4 uppercase font-black tracking-tighter">Depleted</Badge>}
                                         </div>
                                     </div>
                                 </div>

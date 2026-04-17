@@ -40,8 +40,8 @@ const categorySettingsSchema = z.object({
   categorySectionPreTitle: z.string().min(2, 'Pre-title is too short.').max(40, 'Pre-title is too long.'),
   categorySectionTitle: z.string().min(2, 'Title is too short.').max(40, 'Title is too long.'),
   categorySectionDescription: z.string().min(2, 'Description is too short.').max(200, 'Description is too long.'),
-  categorySectionBackgroundColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default('#FFFFFF'),
-  categorySectionTextColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default('#000000'),
+  categorySectionBackgroundColor: z.string().regex(/^#[0-9a-fA{6}$/i, 'Must be a valid hex color').default('#FFFFFF'),
+  categorySectionTextColor: z.string().regex(/^#[0-9a-fA{6}$/i, 'Must be a valid hex color').default('#000000'),
 });
 
 type FormValues = z.infer<typeof categorySettingsSchema>;
@@ -142,7 +142,7 @@ export default function CategoryGallerySettingsPage() {
     return (
       <div className="space-y-6">
         <PageHeader icon={LayoutGrid} title="Category Section Settings" description="Loading configuration..." />
-        <Skeleton className="h-[500px] w-full rounded-3xl" />
+        <Skeleton className="h w-full rounded-3xl" />
       </div>
     );
   }
@@ -163,7 +163,7 @@ export default function CategoryGallerySettingsPage() {
         <div className="lg:col-span-2">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <Card className={cn("shadow-xl border-none ring-1 ring-border overflow-hidden", !isEnabled && "opacity-60 grayscale-[0.5]")}>
+              <Card className={cn(" border-none ring-1 ring-border overflow-hidden", !isEnabled && "opacity-60 grayscale")}>
                 <CardHeader className="bg-muted/30 border-b flex flex-row items-center justify-between">
                   <div>
                     <CardTitle className="text-xl">Content & Visibility</CardTitle>
@@ -173,10 +173,10 @@ export default function CategoryGallerySettingsPage() {
                     control={form.control}
                     name="showCategorySection"
                     render={({ field }) => (
-                      <FormItem className="flex items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background shadow-lg">
+                      <FormItem className="flex items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background ">
                         <div className="flex items-center gap-2">
                             {field.value ? <Eye className="h-4 w-4 text-green-600" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
-                            <FormLabel className="text-[10px] font-black uppercase tracking-widest">{field.value ? 'Visible' : 'Hidden'}</FormLabel>
+                            <FormLabel className="text font-black uppercase tracking-widest">{field.value ? 'Visible' : 'Hidden'}</FormLabel>
                         </div>
                         <FormControl>
                           <Switch
@@ -203,7 +203,7 @@ export default function CategoryGallerySettingsPage() {
                                             name="showCategorySectionPreTitle"
                                             render={({ field: subField }) => (
                                                 <FormItem className="flex items-center gap-2 space-y-0">
-                                                    <FormLabel className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">{subField.value ? 'Active' : 'Off'}</FormLabel>
+                                                    <FormLabel className="text font-black uppercase tracking-widest text-muted-foreground">{subField.value ? 'Active' : 'Off'}</FormLabel>
                                                     <FormControl><Switch checked={subField.value} onCheckedChange={subField.onChange} className="h-4 w-7 [&>span]:h-3 [&>span]:w-3 [&>span]:data-[state=checked]:translate-x-3" /></FormControl>
                                                 </FormItem>
                                             )}
@@ -256,7 +256,7 @@ export default function CategoryGallerySettingsPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="bg-muted/30 border-t p-6">
-                  <Button type="submit" disabled={isSaving} className="font-black uppercase tracking-widest text-xs h-12 px-8 shadow-xl shadow-primary/20">
+                  <Button type="submit" disabled={isSaving} className="font-black uppercase tracking-widest text-xs h-12 px-8  ">
                     {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                     Sync Category Configuration
                   </Button>
@@ -268,21 +268,21 @@ export default function CategoryGallerySettingsPage() {
 
         <div className="lg:col-span-1">
           <div className="sticky top-24 space-y-6">
-            <Card className="shadow-lg border-none ring-1 ring-border">
+            <Card className=" border-none ring-1 ring-border">
                 <CardHeader className="bg-muted/10">
-                    <CardTitle className="text-sm font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                    <CardTitle className="text-sm font-black uppercase tracking text-primary flex items-center gap-2">
                         <LayoutGrid className="h-4 w-4" /> Live Simulation
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-8">
                     <div 
-                        className="p-8 rounded-[2.5rem] border-2 border-dashed flex flex-col space-y-4 transition-colors duration-500"
+                        className="p-8 rounded border-2 border-dashed flex flex-col space-y-4 transition-colors duration-500"
                         style={{ backgroundColor: form.watch('categorySectionBackgroundColor') }}
                     >
                         <div className="space-y-3">
                             {isPreTitleEnabled && (
                                 <div 
-                                    className="inline-flex items-center gap-2 font-black text-[8px] uppercase tracking-widest animate-in fade-in slide-in-from-left-4"
+                                    className="inline-flex items-center gap-2 font-black text uppercase tracking-widest animate-in fade-in slide-in-from-left-4"
                                     style={{ color: form.watch('categorySectionTextColor') }}
                                 >
                                     <LayoutGrid className="h-3 w-3" />
@@ -296,7 +296,7 @@ export default function CategoryGallerySettingsPage() {
                                 {form.watch('categorySectionTitle')}
                             </h2>
                             <p 
-                                className="font-medium text-[10px] leading-relaxed max-w-xs opacity-70"
+                                className="font-medium text leading-relaxed max-w-xs opacity-70"
                                 style={{ color: form.watch('categorySectionTextColor') }}
                             >
                                 {form.watch('categorySectionDescription')}
@@ -308,11 +308,11 @@ export default function CategoryGallerySettingsPage() {
                             <div className="h-16 w-16 rounded-xl bg-muted animate-pulse opacity-50" />
                         </div>
                     </div>
-                    <p className="text-[10px] text-muted-foreground font-black uppercase text-center mt-4 tracking-widest">Storefront Header Preview</p>
+                    <p className="text text-muted-foreground font-black uppercase text-center mt-4 tracking-widest">Storefront Header Preview</p>
                 </CardContent>
             </Card>
 
-            <div className="p-6 bg-primary/5 rounded-[2rem] border-2 border-dashed border-primary/10 flex gap-4 items-start">
+            <div className="p-6 bg-primary/5 rounded border-2 border-dashed border-primary/10 flex gap-4 items-start">
                 <Palette className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                 <div className="text-xs space-y-2">
                     <p className="font-bold text-primary uppercase tracking-wider">Visual Merchandising</p>

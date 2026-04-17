@@ -116,7 +116,7 @@ function IndividualTrackPlayer({ track, branding }: { track: any, branding: any 
 
     return (
         <div 
-            className="p-5 rounded-[2rem] shadow-lg flex flex-col gap-4 relative overflow-hidden group/audio transition-all hover:scale-[1.01] text-white"
+            className="p-5 rounded  flex flex-col gap-4 relative overflow-hidden group/audio transition-all hover:scale text-white"
             style={{ backgroundColor: branding.color }}
         >
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-5" />
@@ -125,12 +125,12 @@ function IndividualTrackPlayer({ track, branding }: { track: any, branding: any 
                     onClick={togglePlayback}
                     variant="ghost" 
                     size="icon" 
-                    className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-md text-white border-2 border-white/30 shadow-xl relative z-10 flex-shrink-0"
+                    className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-md text-white border-2 border-white/30  relative z-10 flex-shrink-0"
                 >
                     {isPlaying ? <Pause className="h-7 w-7 fill-current" /> : <Play className="h-7 w-7 fill-current ml-1" />}
                 </Button>
                 <div className="relative z-10 space-y-0.5 overflow-hidden flex-1">
-                    <span className="text-[8px] font-black uppercase tracking-[0.3em] opacity-80">{branding.preTitle}</span>
+                    <span className="text font-black uppercase tracking opacity-80">{branding.preTitle}</span>
                     <h4 className="text-sm font-black tracking-tight leading-tight truncate pr-4">{track.title || branding.title}</h4>
                 </div>
             </div>
@@ -147,7 +147,7 @@ function IndividualTrackPlayer({ track, branding }: { track: any, branding: any 
                     }}
                     className="w-full h-1.5 bg-white/20 rounded-full appearance-none cursor-pointer accent-white"
                 />
-                <div className="flex justify-between text-[10px] font-black font-mono tracking-widest opacity-70">
+                <div className="flex justify-between text font-black font-mono tracking-widest opacity-70">
                     <span>{formatTime(currentTime)}</span>
                     <span>{formatTime(duration)}</span>
                 </div>
@@ -297,7 +297,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
             ? (settings?.storeAddToCartShape || 'lg')
             : (settings?.storeBtnShape || 'lg');
 
-        const shadow = useIndividual
+        const  = useIndividual
             ? (settings?.storeAddToCartShadow || 'sm')
             : 'sm';
 
@@ -317,18 +317,18 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
         };
 
         const shadowClasses: Record<string, string> = {
-            none: 'shadow-none',
-            sm: 'shadow-sm',
-            md: 'shadow-md',
-            lg: 'shadow-lg',
-            xl: 'shadow-xl',
-            '2xl': 'shadow-2xl',
-            inner: 'shadow-inner'
+            none: '',
+            sm: '',
+            md: '',
+            lg: '',
+            xl: '',
+            '2xl': '',
+            inner: ''
         };
 
         const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
         const shapeClass = shapeClasses[shape] || 'rounded-2xl';
-        const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
+        const shadowClass = shadowClasses[ as keyof typeof shadowClasses] || '';
 
         return `${sizeClass} ${shapeClass} ${shadowClass}`;
     }, [settings]);
@@ -368,7 +368,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
 
     return (
         <div className="flex flex-col h-full bg-white dark:bg-slate-900 animate-in slide-in-from-right-4 duration-500 pb-32">
-            <div className="relative aspect-[4/5] w-full overflow-hidden">
+            <div className="relative aspect w-full overflow-hidden">
                 {showVideo && product.videoUrl ? (
                     <video ref={videoRef} src={product.videoUrl} autoPlay loop muted playsInline className="w-full h-full object-cover" />
                 ) : (
@@ -396,7 +396,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                         key={url + idx} 
                         onClick={() => { setActiveImage(url); setShowVideo(false); }} 
                         className={cn(
-                            "relative w-20 h-20 rounded-[1.5rem] overflow-hidden border-2 transition-all duration-300 shadow-xl shrink-0",
+                            "relative w-20 h-20 rounded overflow-hidden border-2 transition-all duration-300  shrink-0",
                             !showVideo && activeImage === url ? "border-primary scale-110 z-10 ring-4 ring-primary/10" : "border-white dark:border-slate-800 opacity-90 hover:opacity-100"
                         )}
                     >
@@ -407,14 +407,14 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                     <button 
                         onClick={() => setShowVideo(true)} 
                         className={cn(
-                            "relative w-20 h-20 rounded-[1.5rem] overflow-hidden border-2 transition-all duration-300 shadow-xl shrink-0 bg-slate-900 group",
+                            "relative w-20 h-20 rounded overflow-hidden border-2 transition-all duration-300  shrink-0 bg-slate-900 group",
                             showVideo ? "border-primary scale-110 z-10 ring-4 ring-primary/10" : "border-white dark:border-slate-800 opacity-90 hover:opacity-100"
                         )}
                     >
                         {product.videoPosterUrl && <Image src={product.videoPosterUrl} alt="" fill className="object-cover opacity-40" unoptimized />}
                         <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
                             <Play className="h-6 w-6 fill-current mb-1 translate-x-0.5" />
-                            <span className="text-[8px] font-black uppercase tracking-widest">Play</span>
+                            <span className="text font-black uppercase tracking-widest">Play</span>
                         </div>
                     </button>
                 )}
@@ -435,7 +435,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                         </div>
                     <div className="text-right">
                         <p className="text-2xl font-black text-primary tracking-tighter">{formatCurrency(effectivePrice, currencySymbol)}</p>
-                        {isDiscounted && <p className="text-[10px] text-slate-400 line-through font-bold">{formatCurrency(product.sellingPrice, currencySymbol)}</p>}
+                        {isDiscounted && <p className="text text-slate-400 line-through font-bold">{formatCurrency(product.sellingPrice, currencySymbol)}</p>}
                     </div>
                 </div>
 
@@ -478,16 +478,16 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                             "grid w-full h-11 bg-muted/50 rounded-xl p-1",
                             settings?.showProductReviews ? "grid-cols-3" : "grid-cols-2"
                         )}>
-                            <TabsTrigger value="details" className="text-[10px] font-black uppercase tracking-widest">Specs</TabsTrigger>
-                            <TabsTrigger value="shipping" className="text-[10px] font-black uppercase tracking-widest">Shipping</TabsTrigger>
+                            <TabsTrigger value="details" className="text font-black uppercase tracking-widest">Specs</TabsTrigger>
+                            <TabsTrigger value="shipping" className="text font-black uppercase tracking-widest">Shipping</TabsTrigger>
                             {settings?.showProductReviews && (
-                                <TabsTrigger value="reviews" className="text-[10px] font-black uppercase tracking-widest">Reviews</TabsTrigger>
+                                <TabsTrigger value="reviews" className="text font-black uppercase tracking-widest">Reviews</TabsTrigger>
                             )}
                         </TabsList>
                         
                         <TabsContent value="details" className="pt-6 space-y-8">
                             {product.specifications && product.specifications.length > 0 && (
-                                <div className="space-y-3 bg-slate-50 dark:bg-slate-800/50 p-6 rounded-[2rem] border">
+                                <div className="space-y-3 bg-slate-50 dark:bg-slate-800/50 p-6 rounded border">
                                     <h4 className="font-bold text-sm uppercase tracking-wider mb-4">{product.specificationsTitle || 'Specifications'}</h4>
                                     {product.specifications.map((s, i) => (
                                         <div key={i} className="flex justify-between text-xs border-b border-slate-200/50 last:border-0 pb-3 last:pb-0">
@@ -499,7 +499,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                             )}
 
                             {product.whatsInTheBox && product.whatsInTheBox.length > 0 && (
-                                <div className="space-y-4 bg-muted/30 p-6 rounded-[2rem] border">
+                                <div className="space-y-4 bg-muted/30 p-6 rounded border">
                                     <h4 className="font-bold text-sm uppercase tracking-wider flex items-center gap-2">
                                         <Package className="h-4 w-4 text-primary" /> {product.whatsInTheBoxTitle || 'Inside the Box'}
                                     </h4>
@@ -514,13 +514,13 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                             )}
 
                             {product.variations && product.variations.length > 0 && (
-                                <div className="space-y-4 bg-muted/30 p-6 rounded-[2rem] border">
+                                <div className="space-y-4 bg-muted/30 p-6 rounded border">
                                     <h4 className="font-bold text-sm uppercase tracking-wider flex items-center gap-2">
                                         <Layers className="h-4 w-4 text-primary" /> {product.variationsTitle || 'Variations'}
                                     </h4>
                                     <div className="flex flex-wrap gap-2">
                                         {product.variations.map((v, i) => (
-                                            <Badge key={i} variant="secondary" className="px-3 py-1 rounded-full text-[10px] font-bold uppercase">{v.name}</Badge>
+                                            <Badge key={i} variant="secondary" className="px-3 py-1 rounded-full text font-bold uppercase">{v.name}</Badge>
                                         ))}
                                     </div>
                                 </div>
@@ -538,11 +538,11 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                             )}
 
                             {product.showProductInsight && (
-                                <div className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-[2rem] border space-y-4">
+                                <div className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded border space-y-4">
                                     <h4 className="font-bold text-sm uppercase tracking-wider flex items-center gap-2">
                                         <Info className="h-4 w-4 text-primary" /> Insights
                                     </h4>
-                                    <div className="grid grid-cols-2 gap-4 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                                    <div className="grid grid-cols-2 gap-4 text font-bold uppercase tracking-widest text-slate-500">
                                         <div className="space-y-1">
                                             <p className="opacity-60">Listed Since</p>
                                             <p className="text-slate-900 dark:text-white">{product.createdAt ? format(convertToDateSafely(product.createdAt)!, 'PP') : 'N/A'}</p>
@@ -557,7 +557,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                         </TabsContent>
 
                         <TabsContent value="shipping" className="pt-6">
-                            <div className="p-8 border-2 rounded-[2rem] space-y-6 bg-slate-50 dark:bg-slate-900/50">
+                            <div className="p-8 border-2 rounded space-y-6 bg-slate-50 dark:bg-slate-900/50">
                                 <div className="space-y-2">
                                     <Truck className="h-8 w-8 text-primary mb-2" />
                                     <h4 className="text-lg font-black uppercase tracking-tight">Fulfillment Protocol</h4>
@@ -573,19 +573,19 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                         </TabsContent>
 
                         <TabsContent value="reviews" className="pt-6 space-y-8">
-                            <div className="bg-slate-50 dark:bg-slate-900/50 p-8 rounded-[2rem] border text-center space-y-4">
+                            <div className="bg-slate-50 dark:bg-slate-900/50 p-8 rounded border text-center space-y-4">
                                 <p className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter">{reviewStats.avg}</p>
                                 <div className="flex justify-center text-amber-400">
                                     {[...Array(5)].map((_, i) => <Star key={i} className={cn("h-5 w-5 fill-current", i >= Math.floor(reviewStats.avg) && "text-slate-200 dark:text-slate-700")} />)}
                                 </div>
-                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Based on {reviewStats.count} Verified Ratings</p>
+                                <p className="text font-black text-slate-500 uppercase tracking">Based on {reviewStats.count} Verified Ratings</p>
                                 
                                 <div className="space-y-2 pt-4">
                                     {[5, 4, 3, 2, 1].map((stars, idx) => (
                                         <div key={stars} className="flex items-center gap-4">
-                                            <span className="w-10 text-[8px] font-black text-slate-400 uppercase">{stars} Stars</span>
+                                            <span className="w-10 text font-black text-slate-400 uppercase">{stars} Stars</span>
                                             <Progress value={reviewStats.distribution[idx]} className="h-1.5 flex-1" />
-                                            <span className="w-8 text-right text-[8px] font-bold text-slate-500">{reviewStats.distribution[idx]}%</span>
+                                            <span className="w-8 text-right text font-bold text-slate-500">{reviewStats.distribution[idx]}%</span>
                                         </div>
                                     ))}
                                 </div>
@@ -608,18 +608,18 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                                                             {[...Array(5)].map((_, i) => <Star key={i} className={cn("h-3 w-3 fill-current", i >= review.rating && "text-slate-200 dark:text-slate-700")} />)}
                                                         </div>
                                                         <p className="font-black text-sm">{review.userName}</p>
-                                                        <p className="text-[8px] font-black uppercase text-green-600 tracking-widest mt-0.5 flex items-center gap-1">
+                                                        <p className="text font-black uppercase text-green-600 tracking-widest mt-0.5 flex items-center gap-1">
                                                             <CheckCircle2 className="h-2 w-2 fill-current" /> Verified Purchase
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{review.createdAt ? format(convertToDateSafely(review.createdAt)!, 'PP') : 'Recently'}</span>
+                                                <span className="text font-black text-slate-400 uppercase tracking-widest">{review.createdAt ? format(convertToDateSafely(review.createdAt)!, 'PP') : 'Recently'}</span>
                                             </div>
                                             <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed italic">"{review.comment}"</p>
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="py-12 text-center border-2 border-dashed rounded-[2rem] bg-muted/10">
+                                    <div className="py-12 text-center border-2 border-dashed rounded bg-muted/10">
                                         <MessageSquare className="h-8 w-8 text-slate-300 mx-auto mb-2" />
                                         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">No reviews yet</p>
                                     </div>
@@ -633,18 +633,18 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                     <div className="space-y-6 pt-12 border-t border-slate-100 dark:border-slate-800">
                         <div className="flex justify-between items-center px-1">
                             <h3 className="text-lg font-black tracking-tight uppercase">You Might Also Like</h3>
-                            <Link href="/store/shop" className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline flex items-center gap-1">
+                            <Link href="/store/shop" className="text font-black text-primary uppercase tracking-widest hover:underline flex items-center gap-1">
                                 View all <ArrowRight className="h-3 w-3" />
                             </Link>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             {relatedProducts.filter(p => p.id !== id).slice(0, 4).map(p => (
-                                <div key={p.id} className="bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-lg p-3 group active:scale-95 transition-all">
+                                <div key={p.id} className="bg-white dark:bg-slate-800 rounded border border-slate-100 dark:border-slate-800 overflow-hidden  p-3 group active:scale-95 transition-all">
                                     <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted mb-3">
                                         <Image src={p.imageUrl || 'https://placehold.co/200x200.png'} alt={p.name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" unoptimized />
                                     </div>
                                     <div className="space-y-1 px-1">
-                                        <p className="text-[8px] font-black uppercase text-primary/60 tracking-widest">
+                                        <p className="text font-black uppercase text-primary/60 tracking-widest">
                                             {category?.name || 'Collection'}
                                         </p>
                                         <h4 className="font-bold text-xs truncate leading-tight">{p.name}</h4>
@@ -663,9 +663,9 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
             </div>
 
             {/* Floating Action Bar */}
-            <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+            <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 z-50">
                 <div className="flex gap-4">
-                    <button className="flex items-center justify-center w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-300 shadow-sm active:scale-90 transition-transform">
+                    <button className="flex items-center justify-center w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-300  active:scale-90 transition-transform">
                         <MessageSquare className="h-6 w-6" />
                     </button>
                     {!isOutOfStock ? (
@@ -682,7 +682,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                                 }}
                                 style={addToCartButtonStyle}
                                 className={cn(
-                                    "flex-1 rounded-2xl text-white font-black uppercase tracking-widest shadow-xl transition-all active:scale-[0.98] group",
+                                    "flex-1 rounded-2xl text-white font-black uppercase tracking-widest  transition-all active:scale group",
                                     addToCartButtonClasses
                                 )}
                             >

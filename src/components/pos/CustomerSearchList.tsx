@@ -72,7 +72,7 @@ export function CustomerSearchList({
       <div className="flex flex-col gap-4">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
           <div className="md:col-span-7 lg:col-span-8 space-y-2">
-            <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest ml-1">Identify Customer</Label>
+            <Label className="text font-black uppercase text-muted-foreground tracking-widest ml-1">Identify Customer</Label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
@@ -84,7 +84,7 @@ export function CustomerSearchList({
             </div>
           </div>
           <div className="md:col-span-5 lg:col-span-4 space-y-2">
-            <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest ml-1">Registry Filter</Label>
+            <Label className="text font-black uppercase text-muted-foreground tracking-widest ml-1">Registry Filter</Label>
             <Tabs value={registryFilter} onValueChange={(v) => onRegistryFilterChange(v as RegistryFilterType)} className="w-full">
               <TabsList className="grid grid-cols-3 h-11 w-full">
                 <TabsTrigger value="all" className="text-xs font-bold">All</TabsTrigger>
@@ -114,7 +114,7 @@ export function CustomerSearchList({
                 key={customer.id}
                 type="button"
                 className={cn(
-                  "group w-full flex justify-between items-center p-3 sm:p-4 border-2 rounded-xl transition-all shadow-sm text-left active:scale-[0.99]",
+                  "group w-full flex justify-between items-center p-3 sm:p-4 border-2 rounded-xl transition-all  text-left active:scale",
                   customer.status === 'active' 
                     ? "bg-card hover:border-primary/50 hover:bg-primary/5 border-transparent" 
                     : "opacity-50 cursor-not-allowed bg-muted border-transparent"
@@ -124,34 +124,34 @@ export function CustomerSearchList({
               >
                 <div className="flex-grow min-w-0 mr-2 space-y-1.5">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-black text-sm sm:text-base text-gray-900 dark:text-gray-100 truncate max-w-[150px] sm:max-w-none">{customer.name}</p>
+                    <p className="font-black text-sm sm:text-base text-gray-900 dark:text-gray-100 truncate max-w sm:max-w-none">{customer.name}</p>
                     {customer.uid ? (
-                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-[9px] h-4 sm:h-5 uppercase font-black px-1 sm:px-1.5">
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text h-4 sm:h-5 uppercase font-black px-1 sm:px-1.5">
                         <Globe className="h-2 w-2 sm:h-2.5 sm:w-2.5 mr-0.5 sm:mr-1" /> Web
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="bg-muted text-muted-foreground text-[9px] h-4 sm:h-5 uppercase font-black px-1 sm:px-1.5">
+                      <Badge variant="outline" className="bg-muted text-muted-foreground text h-4 sm:h-5 uppercase font-black px-1 sm:px-1.5">
                         <MonitorSmartphone className="h-2 w-2 sm:h-2.5 sm:w-2.5 mr-0.5 sm:mr-1" /> POS
                       </Badge>
                     )}
                   </div>
                   
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[10px] sm:text-xs text-muted-foreground font-medium">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text sm:text-xs text-muted-foreground font-medium">
                     {customer.phone && <span className="flex items-center gap-1"><Info className="h-2.5 w-2.5 sm:h-3 sm:w-3" /> {customer.phone}</span>}
                     {customer.email && <span className="flex items-center gap-1 shrink-0"><Users2 className="h-2.5 w-2.5 sm:h-3 sm:w-3" /> {customer.email}</span>}
                   </div>
 
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-0.5">
-                    <div className="text-[10px] sm:text-xs font-semibold text-muted-foreground">
+                    <div className="text sm:text-xs font-semibold text-muted-foreground">
                       Spent: <span className="text-primary font-bold">{formatCurrency(customer.totalSpent, currencySymbol)}</span>
                     </div>
                     {customer.outstandingCredit > 0.01 && (
-                      <div className="text-[10px] sm:text-xs font-semibold text-destructive flex items-center gap-1">
+                      <div className="text sm:text-xs font-semibold text-destructive flex items-center gap-1">
                         <BadgeDollarSign className="h-3 w-3 sm:h-3.5 sm:w-3.5" /> {formatCurrency(customer.outstandingCredit, currencySymbol)}
                       </div>
                     )}
                     {customer.creditBalance > 0.01 && (
-                      <div className="text-[10px] sm:text-xs font-semibold text-green-600 flex items-center gap-1">
+                      <div className="text sm:text-xs font-semibold text-green-600 flex items-center gap-1">
                         <PiggyBank className="h-3 w-3 sm:h-3.5 sm:w-3.5" /> {formatCurrency(customer.creditBalance, currencySymbol)}
                       </div>
                     )}
@@ -166,7 +166,7 @@ export function CustomerSearchList({
 
           {/* Pagination Controls */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 sm:py-6 mt-4 border-t">
-            <p className="text-[10px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest order-2 sm:order-1">
+            <p className="text sm:text-xs font-bold text-muted-foreground uppercase tracking-widest order-2 sm:order-1">
                 Page {page}
             </p>
             <div className="flex gap-2 w-full sm:w-auto order-1 sm:order-2">

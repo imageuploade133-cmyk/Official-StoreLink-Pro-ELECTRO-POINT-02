@@ -295,7 +295,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
   };
 
   return (
-    <div className={cn("border rounded-2xl overflow-hidden bg-background shadow-lg flex flex-col relative", className)}>
+    <div className={cn("border rounded-2xl overflow-hidden bg-background  flex flex-col relative", className)}>
       <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/*" className="hidden" />
 
       {/* Toolbar */}
@@ -314,7 +314,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
                 <PopoverTrigger asChild>
                     <Button type="button" variant="ghost" size="icon" className="h-9 w-9" title="Font Size"><Type className="h-4 w-4" /></Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-48 p-2 rounded-xl shadow-xl" align="start">
+                <PopoverContent className="w-48 p-2 rounded-xl " align="start">
                   <div className="flex flex-col gap-1">
                     {FONT_SIZES.map((size) => (
                       <Button
@@ -336,13 +336,13 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
                 <PopoverTrigger asChild>
                     <Button type="button" variant="ghost" size="icon" className="h-9 w-9" title="Text Color"><Palette className="h-4 w-4" /></Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-44 p-3 rounded-xl shadow-xl" align="start">
+                <PopoverContent className="w-44 p-3 rounded-xl " align="start">
                   <div className="grid grid-cols-4 gap-2">
                     {COLORS.map((c) => (
                       <button 
                         key={c.value} 
                         type="button" 
-                        className="h-7 w-7 rounded-full border-2 border-background shadow-md hover:scale-125 transition-transform" 
+                        className="h-7 w-7 rounded-full border-2 border-background  hover:scale-125 transition-transform" 
                         style={{ backgroundColor: c.value }} 
                         onMouseDown={(e) => executeCommand(e, 'foreColor', c.value)} 
                         title={c.name} 
@@ -386,19 +386,19 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
               </Button>
             </>
           ) : (
-            <div className="flex items-center h-9 px-3 text-[10px] font-black uppercase text-muted-foreground tracking-widest bg-muted/50 rounded-lg">
+            <div className="flex items-center h-9 px-3 text font-black uppercase text-muted-foreground tracking-widest bg-muted/50 rounded-lg">
               <Code className="mr-2 h-3.5 w-3.5" /> HTML Source Mode
             </div>
           )}
         </div>
 
-        <div className="inline-flex items-center justify-center rounded-xl text-muted-foreground h-10 bg-muted/50 p-1 border shadow-inner ml-2">
+        <div className="inline-flex items-center justify-center rounded-xl text-muted-foreground h-10 bg-muted/50 p-1 border  ml-2">
           <button
             type="button"
             onClick={() => { syncValue(); setActiveTab('visual'); }}
             className={cn(
               "inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-xs font-black ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 gap-2 uppercase tracking-wider",
-              activeTab === 'visual' ? "bg-background text-primary shadow-sm" : "hover:bg-background/50"
+              activeTab === 'visual' ? "bg-background text-primary " : "hover:bg-background/50"
             )}
           >
             <Pencil className="h-3 w-3" /> Designer
@@ -408,7 +408,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
             onClick={() => { syncValue(); setActiveTab('code'); }}
             className={cn(
               "inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-xs font-black ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 gap-2 uppercase tracking-wider",
-              activeTab === 'code' ? "bg-background text-primary shadow-sm" : "hover:bg-background/50"
+              activeTab === 'code' ? "bg-background text-primary " : "hover:bg-background/50"
             )}
           >
             <Code className="h-3 w-3" /> Source
@@ -417,7 +417,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
       </div>
 
       {/* Editor Content Area */}
-      <div className="relative flex-1 min-h-[400px] overflow-hidden">
+      <div className="relative flex-1 min-h overflow-hidden">
         {/* Visual Mode */}
         <div 
           className={cn("h-full", activeTab !== 'visual' && "hidden")}
@@ -432,7 +432,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
                 setIsFocused(false);
                 handleInput();
             }}
-            className="prose dark:prose-invert prose-sm max-w-none w-full h-full min-h-[400px] p-6 outline-none focus:ring-0 overflow-y-auto bg-background selection:bg-primary/20 rich-editor-content"
+            className="prose dark:prose-invert prose-sm max-w-none w-full h-full min-h p-6 outline-none focus:ring-0 overflow-y-auto bg-background selection:bg-primary/20 rich-editor-content"
             style={{ minHeight: '400px' }}
           />
           {!value && !isFocused && (
@@ -457,7 +457,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
                 <Button 
                     variant="destructive" 
                     size="sm" 
-                    className="h-8 px-3 rounded-full font-black text-[10px] uppercase shadow-xl"
+                    className="h-8 px-3 rounded-full font-black text uppercase "
                     onMouseDown={handleDeleteMedia}
                 >
                     <Trash2 className="h-3 w-3 mr-1.5" /> Remove
@@ -466,7 +466,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
 
               {/* Resize Handle */}
               <div 
-                className="absolute -bottom-2 -right-2 w-5 h-5 bg-primary border-4 border-background rounded-full cursor-nwse-resize pointer-events-auto shadow-lg hover:scale-125 transition-transform"
+                className="absolute -bottom-2 -right-2 w-5 h-5 bg-primary border-4 border-background rounded-full cursor-nwse-resize pointer-events-auto  hover:scale-125 transition-transform"
                 onMouseDown={handleResizeStart}
               />
             </div>
@@ -482,13 +482,13 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
             value={value || ''}
             onChange={(e) => onChange(e.target.value)}
             placeholder="Raw HTML source code..."
-            className="w-full h-full min-h-[400px] p-6 font-mono text-xs leading-relaxed bg-slate-950 text-emerald-400 outline-none resize-none border-none selection:bg-emerald-500/20"
+            className="w-full h-full min-h p-6 font-mono text-xs leading-relaxed bg-slate-950 text-emerald-400 outline-none resize-none border-none selection:bg-emerald-500/20"
             style={{ minHeight: '400px' }}
           />
         </div>
       </div>
       
-      <div className="px-4 py-2.5 bg-muted/20 border-t flex justify-between items-center text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">
+      <div className="px-4 py-2.5 bg-muted/20 border-t flex justify-between items-center text font-black text-muted-foreground uppercase tracking">
         <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5">
                 <div className="h-1.5 w-1.5 rounded-full bg-green-500" />

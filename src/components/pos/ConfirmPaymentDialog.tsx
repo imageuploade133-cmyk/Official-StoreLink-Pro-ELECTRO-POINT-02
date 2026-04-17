@@ -177,7 +177,7 @@ export function ConfirmPaymentDialog({
   if (saleData.isCreditSale) {
       return (
         <Dialog open={isOpen} onOpenChange={(open) => { if (!open && !isProcessing) onClose('cancel'); }}>
-            <DialogContent className="sm:max-w-lg p-6 bg-white rounded-lg shadow-xl" onPointerDownOutside={(e) => e.preventDefault()}>
+            <DialogContent className="sm:max-w-lg p-6 bg-white rounded-lg " onPointerDownOutside={(e) => e.preventDefault()}>
                 <DialogHeader className="mb-6">
                     <DialogTitle className="text-2xl font-bold text-gray-800 flex items-center gap-2">
                         <AlertTriangle className="text-orange-500 h-6 w-6"/> Confirm Credit Sale
@@ -185,7 +185,7 @@ export function ConfirmPaymentDialog({
                     <DialogDescription className="text-lg text-gray-600 mt-2">Review the details for <span className="font-extrabold text-primary">{saleData.customer?.name || 'this credit sale'}</span> before finalizing.</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-6 py-4 text-base">
-                    <Card className="border-2 border-green-200 bg-green-50 shadow-sm">
+                    <Card className="border-2 border-green-200 bg-green-50 ">
                         <CardContent className="pt-6 space-y-4">
                             <div className="flex justify-between items-center">
                                 <span className="text-lg font-medium text-gray-700 flex items-center gap-2"><DollarSign className="h-5 w-5 text-green-600"/> Sale Total:</span> 
@@ -202,7 +202,7 @@ export function ConfirmPaymentDialog({
                             </div>
                         </CardContent>
                     </Card>
-                     <Card className="border-2 border-gray-200 bg-gray-50 shadow-sm">
+                     <Card className="border-2 border-gray-200 bg-gray-50 ">
                         <CardContent className="pt-6 space-y-4">
                             <div className="flex justify-between items-center">
                                 <span className="text-lg font-medium text-gray-700 flex items-center gap-2"><CalendarDays className="h-5 w-5 text-purple-600"/> Payment Due Date:</span> 
@@ -225,7 +225,7 @@ export function ConfirmPaymentDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open && !isProcessing) onClose('cancel'); }}>
-      <DialogContent className="sm:max-w-lg p-0 h-auto max-h-[90vh] flex flex-col" onPointerDownOutside={(e) => e.preventDefault()}>
+      <DialogContent className="sm:max-w-lg p-0 h-auto max-h flex flex-col" onPointerDownOutside={(e) => e.preventDefault()}>
         <DialogHeader className="p-6 pb-4 border-b">
           <DialogTitle className="text-2xl font-bold text-gray-800 flex items-center gap-2">
             <DollarSign className="h-6 w-6 text-green-600" /> Finalize Payment

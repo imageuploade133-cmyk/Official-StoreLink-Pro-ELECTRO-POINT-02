@@ -35,7 +35,7 @@ function CategoryCard({ category }: { category: Category }) {
     return (
         <Link 
             href={getStoreUrl(`/store/shop?category=${category.id}`)}
-            className="group relative rounded-xl overflow-hidden border dark:border-slate-800 hover:shadow-xl transition-shadow duration-300 h-full block"
+            className="group relative rounded-xl overflow-hidden border dark:border-slate-800 hover: transition- duration-300 h-full block"
         >
             <div className="aspect-w-1 aspect-h-1 h-96 relative">
                 <Image
@@ -191,7 +191,7 @@ export default function AllCategoriesPage() {
 
                         {/* Pagination Footer */}
                         <div className="flex flex-col sm:flex-row items-center justify-between pt-12 border-t border-dashed gap-6">
-                            <p className="text-xs font-black uppercase text-muted-foreground tracking-[0.2em]">
+                            <p className="text-xs font-black uppercase text-muted-foreground tracking">
                                 Page {currentPage} of {totalPages || 1} <span className="mx-2 text-slate-200">|</span> {totalCount} Collections
                             </p>
                             <div className="flex items-center gap-3">
@@ -217,7 +217,7 @@ export default function AllCategoriesPage() {
                         </div>
                     </div>
                 ) : (
-                    <div className="text-center py-32 border-2 border-dashed rounded-[3rem] bg-muted/10">
+                    <div className="text-center py-32 border-2 border-dashed rounded bg-muted/10">
                         <Sparkles className="mx-auto h-16 w-16 text-slate-300 mb-6" />
                         <h3 className="text-2xl font-black tracking-tight">No Collections Found</h3>
                         <p className="mt-2 text-muted-foreground max-w-sm mx-auto">

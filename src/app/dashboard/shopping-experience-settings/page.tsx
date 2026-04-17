@@ -74,22 +74,22 @@ const buttonShapes = [
 ];
 
 const shadowOptions = [
-  { name: 'none', label: 'None', class: 'shadow-none' },
-  { name: 'sm', label: 'Small', class: 'shadow-sm' },
-  { name: 'md', label: 'Medium', class: 'shadow-md' },
-  { name: 'lg', label: 'Large', class: 'shadow-lg' },
-  { name: 'xl', label: 'X-Large', class: 'shadow-xl' },
-  { name: '2xl', label: '2X-Large', class: 'shadow-2xl' },
-  { name: 'inner', label: 'Inner', class: 'shadow-inner' },
+  { name: 'none', label: 'None', class: '' },
+  { name: 'sm', label: 'Small', class: '' },
+  { name: 'md', label: 'Medium', class: '' },
+  { name: 'lg', label: 'Large', class: '' },
+  { name: 'xl', label: 'X-Large', class: '' },
+  { name: '2xl', label: '2X-Large', class: '' },
+  { name: 'inner', label: 'Inner', class: '' },
 ];
 
 const shoppingExpSchema = z.object({
   storeAddToCartText: z.string().min(1, 'Label required').max(40, 'Label too long.'),
   storeAddToCartIcon: z.preprocess((val) => val || 'ShoppingCart', z.string()).default('ShoppingCart'),
   storeAddToCartStyle: z.preprocess((val) => val || 'standard', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost'])).default('standard'),
-  storeAddToCartColor: z.preprocess((val) => val || '#3b82f6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#3b82f6'),
-  storeAddToCartGradientStart: z.preprocess((val) => val || '#3b82f6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#3b82f6'),
-  storeAddToCartGradientEnd: z.preprocess((val) => val || '#1d4ed8', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#1d4ed8'),
+  storeAddToCartColor: z.preprocess((val) => val || '#3b82f6', z.string().regex(/^#[0-9a-fA{6}$/i)).default('#3b82f6'),
+  storeAddToCartGradientStart: z.preprocess((val) => val || '#3b82f6', z.string().regex(/^#[0-9a-fA{6}$/i)).default('#3b82f6'),
+  storeAddToCartGradientEnd: z.preprocess((val) => val || '#1d4ed8', z.string().regex(/^#[0-9a-fA{6}$/i)).default('#1d4ed8'),
   storeAddToCartImageUrl: z.string().url().or(z.literal('')).optional(),
   storeAddToCartSize: z.preprocess((val) => val || 'lg', z.enum(['sm', 'md', 'lg', 'xl'])).default('lg'),
   storeAddToCartShape: z.preprocess((val) => val || 'lg', z.enum(['none', 'sm', 'md', 'lg', 'full'])).default('lg'),
@@ -98,9 +98,9 @@ const shoppingExpSchema = z.object({
   storeGridCartText: z.string().min(1, 'Label required').max(20, 'Label too long.'),
   storeGridCartIcon: z.preprocess((val) => val || 'ShoppingCart', z.string()).default('ShoppingCart'),
   storeGridCartStyle: z.preprocess((val) => val || 'standard', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost'])).default('standard'),
-  storeGridCartColor: z.preprocess((val) => val || '#10b981', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#10b981'),
-  storeGridCartGradientStart: z.preprocess((val) => val || '#10b981', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#10b981'),
-  storeGridCartGradientEnd: z.preprocess((val) => val || '#059669', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#059669'),
+  storeGridCartColor: z.preprocess((val) => val || '#10b981', z.string().regex(/^#[0-9a-fA{6}$/i)).default('#10b981'),
+  storeGridCartGradientStart: z.preprocess((val) => val || '#10b981', z.string().regex(/^#[0-9a-fA{6}$/i)).default('#10b981'),
+  storeGridCartGradientEnd: z.preprocess((val) => val || '#059669', z.string().regex(/^#[0-9a-fA{6}$/i)).default('#059669'),
   storeGridCartImageUrl: z.string().url().or(z.literal('')).optional(),
   storeGridCartSize: z.preprocess((val) => val || 'md', z.enum(['sm', 'md', 'lg', 'xl'])).default('md'),
   storeGridCartShape: z.preprocess((val) => val || 'md', z.enum(['none', 'sm', 'md', 'lg', 'full'])).default('md'),
@@ -109,9 +109,9 @@ const shoppingExpSchema = z.object({
   storeHeroBtnText: z.string().min(1, 'Label required').max(40, 'Label too long.'),
   storeHeroBtnIcon: z.preprocess((val) => val || 'ArrowRight', z.string()).default('ArrowRight'),
   storeHeroBtnStyle: z.preprocess((val) => val || 'gradient', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost'])).default('gradient'),
-  storeHeroBtnColor: z.preprocess((val) => val || '#8b5cf6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#8b5cf6'),
-  storeHeroBtnGradientStart: z.preprocess((val) => val || '#8b5cf6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#8b5cf6'),
-  storeHeroBtnGradientEnd: z.preprocess((val) => val || '#7c3aed', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#7c3aed'),
+  storeHeroBtnColor: z.preprocess((val) => val || '#8b5cf6', z.string().regex(/^#[0-9a-fA{6}$/i)).default('#8b5cf6'),
+  storeHeroBtnGradientStart: z.preprocess((val) => val || '#8b5cf6', z.string().regex(/^#[0-9a-fA{6}$/i)).default('#8b5cf6'),
+  storeHeroBtnGradientEnd: z.preprocess((val) => val || '#7c3aed', z.string().regex(/^#[0-9a-fA{6}$/i)).default('#7c3aed'),
   storeHeroBtnImageUrl: z.string().url().or(z.literal('')).optional(),
   storeHeroBtnSize: z.preprocess((val) => val || 'lg', z.enum(['sm', 'md', 'lg', 'xl'])).default('lg'),
   storeHeroBtnShape: z.preprocess((val) => val || 'lg', z.enum(['none', 'sm', 'md', 'lg', 'full'])).default('lg'),
@@ -120,9 +120,9 @@ const shoppingExpSchema = z.object({
   storeExploreBtnText: z.string().min(1, 'Label required').max(40, 'Label too long.'),
   storeExploreBtnIcon: z.preprocess((val) => val || 'ArrowRight', z.string()).default('ArrowRight'),
   storeExploreBtnStyle: z.preprocess((val) => val || 'standard', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost'])).default('standard'),
-  storeExploreBtnColor: z.preprocess((val) => val || '#3b82f6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#3b82f6'),
-  storeExploreBtnGradientStart: z.preprocess((val) => val || '#3b82f6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#3b82f6'),
-  storeExploreBtnGradientEnd: z.preprocess((val) => val || '#1d4ed8', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#1d4ed8'),
+  storeExploreBtnColor: z.preprocess((val) => val || '#3b82f6', z.string().regex(/^#[0-9a-fA{6}$/i)).default('#3b82f6'),
+  storeExploreBtnGradientStart: z.preprocess((val) => val || '#3b82f6', z.string().regex(/^#[0-9a-fA{6}$/i)).default('#3b82f6'),
+  storeExploreBtnGradientEnd: z.preprocess((val) => val || '#1d4ed8', z.string().regex(/^#[0-9a-fA{6}$/i)).default('#1d4ed8'),
   storeExploreBtnImageUrl: z.string().url().or(z.literal('')).optional(),
   storeExploreBtnSize: z.preprocess((val) => val || 'lg', z.enum(['sm', 'md', 'lg', 'xl'])).default('lg'),
   storeExploreBtnShape: z.preprocess((val) => val || 'lg', z.enum(['none', 'sm', 'md', 'lg', 'full'])).default('lg'),
@@ -170,7 +170,7 @@ function ButtonStyleSelector({
         >
           <div className="w-10 h-10 bg-blue-500 rounded-lg" />
           <div className="text-center">
-            <p className="text-[10px] font-semibold">Solid</p>
+            <p className="text font-semibold">Solid</p>
           </div>
           {value === 'standard' && (
             <Check className="absolute top-1 right-1 h-3 w-3 text-primary" />
@@ -190,7 +190,7 @@ function ButtonStyleSelector({
         >
           <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg" />
           <div className="text-center">
-            <p className="text-[10px] font-semibold">Gradient</p>
+            <p className="text font-semibold">Gradient</p>
           </div>
           {value === 'gradient' && (
             <Check className="absolute top-1 right-1 h-3 w-3 text-primary" />
@@ -210,7 +210,7 @@ function ButtonStyleSelector({
         >
           <div className="w-10 h-10 border-2 border-primary rounded-lg flex items-center justify-center bg-background" />
           <div className="text-center">
-            <p className="text-[10px] font-semibold">Outline</p>
+            <p className="text font-semibold">Outline</p>
           </div>
           {value === 'outline' && (
             <Check className="absolute top-1 right-1 h-3 w-3 text-primary" />
@@ -230,7 +230,7 @@ function ButtonStyleSelector({
         >
           <div className="w-10 h-10 border-2 border-dashed border-muted-foreground/30 rounded-lg flex items-center justify-center bg-transparent" />
           <div className="text-center">
-            <p className="text-[10px] font-semibold">Ghost</p>
+            <p className="text font-semibold">Ghost</p>
           </div>
           {value === 'ghost' && (
             <Check className="absolute top-1 right-1 h-3 w-3 text-primary" />
@@ -256,7 +256,7 @@ function ButtonStyleSelector({
             </div>
           )}
           <div className="text-center">
-            <p className="text-[10px] font-semibold">Image</p>
+            <p className="text font-semibold">Image</p>
           </div>
           {value === 'image' && (
             <Check className="absolute top-1 right-1 h-3 w-3 text-primary" />
@@ -295,7 +295,7 @@ function ButtonShapeSelector({
           >
             <div className={cn("w-12 h-6 bg-primary/20 border border-primary/40", shape.class)} />
             <div className="text-center">
-              <p className="text-[10px] font-semibold">{shape.label}</p>
+              <p className="text font-semibold">{shape.label}</p>
             </div>
             {value === shape.name && (
               <Check className="absolute top-1 right-1 h-3 w-3 text-primary" />
@@ -321,23 +321,23 @@ function ButtonShadowSelector({
         <MousePointerClick className="h-4 w-4" /> Button Shadow
       </FormLabel>
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-        {shadowOptions.map((shadow) => (
+        {shadowOptions.map(() => (
           <button
-            key={shadow.name}
+            key={.name}
             type="button"
-            onClick={() => onChange(shadow.name)}
+            onClick={() => onChange(.name)}
             className={cn(
               "relative flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all",
-              value === shadow.name
+              value === .name
                 ? 'border-primary bg-primary/5'
                 : 'border-muted hover:border-primary/30 hover:bg-muted/30'
             )}
           >
-            <div className={cn("w-12 h-6 bg-background border border-muted", shadow.class)} />
+            <div className={cn("w-12 h-6 bg-background border border-muted", .class)} />
             <div className="text-center">
-              <p className="text-[10px] font-semibold">{shadow.label}</p>
+              <p className="text font-semibold">{.label}</p>
             </div>
-            {value === shadow.name && (
+            {value === .name && (
               <Check className="absolute top-1 right-1 h-3 w-3 text-primary" />
             )}
           </button>
@@ -364,7 +364,7 @@ function ButtonPreview({
   const style = settings[`${prefix}Style`] || 'standard';
   const size = settings[`${prefix}Size`] || 'md';
   const shape = settings[`${prefix}Shape`] || 'md';
-  const shadow = settings[`${prefix}Shadow`] || 'sm';
+  const  = settings[`${prefix}Shadow`] || 'sm';
 
   const getSizeClasses = (s: string) => {
     switch (s) {
@@ -383,7 +383,7 @@ function ButtonPreview({
 
   const getShadowClass = (shd: string) => {
     const found = shadowOptions.find(s => s.name === shd);
-    return found ? found.class : 'shadow-sm';
+    return found ? found.class : '';
   };
 
   const getStyleProperties = () => {
@@ -432,7 +432,7 @@ function ButtonPreview({
       <p className="text-xs font-semibold text-muted-foreground mb-3">Preview</p>
       <Button
         type="button"
-        className={cn(getSizeClasses(size), getShapeClass(shape), getShadowClass(shadow), "font-semibold")}
+        className={cn(getSizeClasses(size), getShapeClass(shape), getShadowClass(), "font-semibold")}
         style={getStyleProperties()}
       >
         {Icon && <Icon className="mr-2 h-4 w-4" />}
@@ -943,7 +943,7 @@ export default function ShoppingExperienceSettingsPage() {
     return (
       <div className="space-y-6">
         <PageHeader icon={MousePointerClick} title="Shopping Experience" description="Loading..." />
-        <Skeleton className="h-[800px] w-full" />
+        <Skeleton className="h w-full" />
       </div>
     );
   }
@@ -1063,7 +1063,7 @@ export default function ShoppingExperienceSettingsPage() {
             <Button
               type="submit"
               disabled={isSaving}
-              className="gap-2 min-w-[160px]"
+              className="gap-2 min-w"
             >
               {isSaving ? (
                 <>

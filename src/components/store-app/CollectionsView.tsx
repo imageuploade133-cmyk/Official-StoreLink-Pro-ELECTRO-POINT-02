@@ -125,23 +125,23 @@ export function CollectionsView({ onSelectCategory }: CollectionsViewProps) {
                 <div className="flex items-center gap-4">
                     <button 
                         onClick={() => window.history.back()}
-                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
+                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800  border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
                     >
                         <ArrowLeft className="h-5 w-5" strokeWidth={3} />
                     </button>
                     <h1 className="text-xl font-black leading-tight tracking-tighter uppercase">Collections</h1>
                 </div>
-                <Badge variant="secondary" className="font-black h-8 px-4 rounded-full shadow-sm">All</Badge>
+                <Badge variant="secondary" className="font-black h-8 px-4 rounded-full ">All</Badge>
             </header>
 
             <div className="px-6 pt-12 space-y-8">
                 <div className="space-y-3 text-center">
-                    <div className="inline-flex items-center gap-2 font-black text-[10px] uppercase tracking-[0.3em] text-primary bg-primary/5 px-4 py-1.5 rounded-full border border-primary/10">
+                    <div className="inline-flex items-center gap-2 font-black text uppercase tracking text-primary bg-primary/5 px-4 py-1.5 rounded-full border border-primary/10">
                         <LayoutGrid className="h-3.5 w-3.5" />
                         Master Registry
                     </div>
                     <h2 className="text-4xl font-black tracking-tighter uppercase leading-none">Discovery</h2>
-                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 max-w-[280px] mx-auto leading-relaxed">
+                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400 max-w mx-auto leading-relaxed">
                         Discover meticulously curated essentials through our automated discovery engine.
                     </p>
                 </div>
@@ -151,7 +151,7 @@ export function CollectionsView({ onSelectCategory }: CollectionsViewProps) {
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors" strokeWidth={2.5} />
                         <Input 
                             placeholder="Filter registry..." 
-                            className="h-14 pl-12 pr-4 rounded-[1.5rem] bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 shadow-xl text-lg font-bold tracking-tight focus-visible:ring-4 focus-visible:ring-primary/10 transition-all"
+                            className="h-14 pl-12 pr-4 rounded bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700  text-lg font-bold tracking-tight focus-visible:ring-4 focus-visible:ring-primary/10 transition-all"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -169,7 +169,7 @@ export function CollectionsView({ onSelectCategory }: CollectionsViewProps) {
                         size="icon" 
                         onClick={() => fetchCategories()} 
                         disabled={isLoading}
-                        className="h-14 w-14 rounded-[1.5rem] bg-white dark:bg-slate-800 border-none shadow-xl active:scale-90 transition-all"
+                        className="h-14 w-14 rounded bg-white dark:bg-slate-800 border-none  active:scale-90 transition-all"
                     >
                         <RotateCcw className={cn("h-5 w-5", isLoading && "animate-spin")} />
                     </Button>
@@ -181,7 +181,7 @@ export function CollectionsView({ onSelectCategory }: CollectionsViewProps) {
                     {isLoading && categories.length === 0 ? (
                         <div className="grid grid-cols-1 gap-6">
                             {[...Array(4)].map((_, i) => (
-                                <div key={i} className="h-48 w-full bg-slate-100 dark:bg-slate-800 rounded-[2.5rem] animate-pulse" />
+                                <div key={i} className="h-48 w-full bg-slate-100 dark:bg-slate-800 rounded animate-pulse" />
                             ))}
                         </div>
                     ) : filteredCategories.length > 0 ? (
@@ -190,7 +190,7 @@ export function CollectionsView({ onSelectCategory }: CollectionsViewProps) {
                                 <button 
                                     key={category.id}
                                     onClick={() => onSelectCategory(category.id)}
-                                    className="relative group w-full aspect-[16/9] rounded-[2.5rem] overflow-hidden shadow-xl transition-all active:scale-[0.98] border-2 border-slate-200 dark:border-slate-700 hover:border-primary/30"
+                                    className="relative group w-full aspect rounded overflow-hidden  transition-all active:scale border-2 border-slate-200 dark:border-slate-700 hover:border-primary/30"
                                 >
                                     <Image 
                                         src={category.imageUrl || `https://picsum.photos/seed/${category.id}/600/400`}
@@ -205,7 +205,7 @@ export function CollectionsView({ onSelectCategory }: CollectionsViewProps) {
                                         <div className="space-y-1 transform transition-transform duration-500 group-hover:-translate-y-2">
                                             <h3 className="text-2xl font-black tracking-tighter uppercase leading-none">{category.name}</h3>
                                             <div className="flex items-center gap-2">
-                                                <span className="text-[10px] font-black uppercase tracking-widest opacity-70">Browse Collection</span>
+                                                <span className="text font-black uppercase tracking-widest opacity-70">Browse Collection</span>
                                                 <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-1" strokeWidth={3} />
                                             </div>
                                         </div>
@@ -219,7 +219,7 @@ export function CollectionsView({ onSelectCategory }: CollectionsViewProps) {
                                         onClick={() => fetchCategories(true)}
                                         disabled={isLoadingMore}
                                         variant="ghost"
-                                        className="w-full h-20 rounded-[2rem] border-2 border-dashed border-primary/20 bg-primary/5 font-black uppercase text-[10px] tracking-[0.3em] gap-3 text-primary hover:bg-primary/10 hover:border-primary/40 transition-all active:scale-[0.98]"
+                                        className="w-full h-20 rounded border-2 border-dashed border-primary/20 bg-primary/5 font-black uppercase text tracking gap-3 text-primary hover:bg-primary/10 hover:border-primary/40 transition-all active:scale"
                                     >
                                         {isLoadingMore ? (
                                             <Loader2 className="h-5 w-5 animate-spin" />
@@ -232,16 +232,16 @@ export function CollectionsView({ onSelectCategory }: CollectionsViewProps) {
                         </div>
                     ) : (
                         <div className="py-24 text-center space-y-6 animate-in zoom-in-95 duration-700">
-                            <div className="h-32 w-32 bg-slate-100 dark:bg-slate-800/50 rounded-full flex items-center justify-center mx-auto shadow-inner group">
+                            <div className="h-32 w-32 bg-slate-100 dark:bg-slate-800/50 rounded-full flex items-center justify-center mx-auto  group">
                                 <Shirt className="h-14 w-14 text-slate-300 group-hover:rotate-12 transition-transform duration-500" strokeWidth={1.5} />
                             </div>
                             <div className="space-y-2">
                                 <h3 className="text-2xl font-black tracking-tight uppercase">Registry Empty</h3>
-                                <p className="text-sm text-slate-500 font-medium max-w-[220px] mx-auto leading-relaxed">No collections match your filter or the registry is currently empty.</p>
+                                <p className="text-sm text-slate-500 font-medium max-w mx-auto leading-relaxed">No collections match your filter or the registry is currently empty.</p>
                             </div>
                             <Button 
                                 variant="outline" 
-                                className="rounded-xl font-black uppercase text-[10px] tracking-widest px-8 h-12 shadow-sm" 
+                                className="rounded-xl font-black uppercase text tracking-widest px-8 h-12 " 
                                 onClick={() => { setSearchTerm(''); fetchCategories(); }}
                             >
                                 Synchronize Registry
@@ -251,7 +251,7 @@ export function CollectionsView({ onSelectCategory }: CollectionsViewProps) {
 
                     {totalCount > 0 && (
                         <div className="text-center py-10 opacity-40">
-                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">
+                            <p className="text font-black uppercase tracking text-slate-400">
                                 {categories.length} of {totalCount} Collections Loaded
                             </p>
                         </div>

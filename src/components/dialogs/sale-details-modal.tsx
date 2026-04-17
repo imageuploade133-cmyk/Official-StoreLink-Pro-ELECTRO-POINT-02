@@ -303,7 +303,7 @@ export function SaleDetailsModal({ isOpen, onOpenChange, saleTransaction, curren
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl p-0 h-[90vh] sm:h-[85vh] flex flex-col">
+      <DialogContent className="max-w-4xl p-0 h sm:h flex flex-col">
         <DialogHeader className="p-6 pb-4 border-b">
           <DialogTitle className="flex items-center justify-between">
             <span className="text-2xl font-bold tracking-tight">Transaction Details</span>

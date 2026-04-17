@@ -206,7 +206,7 @@ export function StaffSalesModal({ isOpen, onOpenChange, allSales, staffMap, curr
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0">
+      <DialogContent className="max-w-4xl h flex flex-col p-0">
         <DialogHeader className="p-6 pb-4 border-b flex-row justify-between items-center">
           <div>
             <DialogTitle className="text-2xl font-bold flex items-center gap-3">
@@ -236,7 +236,7 @@ export function StaffSalesModal({ isOpen, onOpenChange, allSales, staffMap, curr
                   <PopoverTrigger asChild>
                     <Button
                       variant={"outline"}
-                      className={cn("w-[240px] justify-start text-left font-normal", !selectedDate && "text-muted-foreground")}
+                      className={cn("w justify-start text-left font-normal", !selectedDate && "text-muted-foreground")}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {selectedDate ? formatDate(selectedDate, "PPP") : <span>Pick a date</span>}

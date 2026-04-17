@@ -229,7 +229,7 @@ export default function EditUISectionPage() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+            <Card className=" border-none ring-1 ring-border overflow-hidden">
               <CardHeader className="bg-muted/30 border-b">
                 <CardTitle>Creative Architecture</CardTitle>
                 <CardDescription>Modify the underlying technology and content for this section.</CardDescription>
@@ -261,14 +261,14 @@ export default function EditUISectionPage() {
                                     <RadioGroupItem value="image" id="type-image" className="peer sr-only" />
                                     <Label htmlFor="type-image" className="flex items-center gap-4 p-6 rounded-2xl border-2 bg-muted/5 cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 transition-all">
                                         <ImageIcon className="h-6 w-6" />
-                                        <div><p className="font-bold">Image Visual</p><p className="text-[10px] text-muted-foreground uppercase">Overlay & Banners</p></div>
+                                        <div><p className="font-bold">Image Visual</p><p className="text text-muted-foreground uppercase">Overlay & Banners</p></div>
                                     </Label>
                                 </div>
                                 <div className="relative">
                                     <RadioGroupItem value="html" id="type-html" className="peer sr-only" />
                                     <Label htmlFor="type-html" className="flex items-center gap-4 p-6 rounded-2xl border-2 bg-muted/5 cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 transition-all">
                                         <Code className="h-6 w-6" />
-                                        <div><p className="font-bold">Bespoke HTML</p><p className="text-[10px] text-muted-foreground uppercase">Raw Code Injection</p></div>
+                                        <div><p className="font-bold">Bespoke HTML</p><p className="text text-muted-foreground uppercase">Raw Code Injection</p></div>
                                     </Label>
                                 </div>
                             </RadioGroup>
@@ -285,7 +285,7 @@ export default function EditUISectionPage() {
                                 <FormLabel className="font-bold">Primary Design Asset <span className="text-destructive">*</span></FormLabel>
                                 <div className="flex items-start gap-6">
                                     {imageUrl ? (
-                                        <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border shadow-xl bg-white shrink-0">
+                                        <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border  bg-white shrink-0">
                                             <Image src={imageUrl} alt="Preview" fill className="object-cover" unoptimized />
                                         </div>
                                     ) : (
@@ -323,7 +323,7 @@ export default function EditUISectionPage() {
 
                         <FormField control={form.control} name="alignment" render={({ field }) => (
                             <FormItem>
-                                <FormLabel className="font-black text-[10px] uppercase tracking-widest text-primary">Content Alignment</FormLabel>
+                                <FormLabel className="font-black text uppercase tracking-widest text-primary">Content Alignment</FormLabel>
                                 <Select onValueChange={field.onChange} value={field.value}>
                                     <FormControl><SelectTrigger className="h-11"><SelectValue /></SelectTrigger></FormControl>
                                     <SelectContent>
@@ -344,7 +344,7 @@ export default function EditUISectionPage() {
                                         type="button" 
                                         variant="ghost" 
                                         size="sm" 
-                                        className="h-8 gap-2 font-black text-[10px] uppercase tracking-widest text-primary bg-primary/5 hover:bg-primary/10 rounded-full px-4"
+                                        className="h-8 gap-2 font-black text uppercase tracking-widest text-primary bg-primary/5 hover:bg-primary/10 rounded-full px-4"
                                         onClick={() => setShowHistoryModal(true)}
                                     >
                                         <History className="h-3.5 w-3.5" />
@@ -356,7 +356,7 @@ export default function EditUISectionPage() {
                                         {...field} 
                                         value={field.value || ''} 
                                         placeholder="<div class='custom-banner'>...</div>"
-                                        className="min-h-[300px] font-mono text-sm leading-relaxed bg-slate-950 text-emerald-400 p-6 rounded-2xl"
+                                        className="min-h font-mono text-sm leading-relaxed bg-slate-950 text-emerald-400 p-6 rounded-2xl"
                                     />
                                 </FormControl>
                                 <FormDescription>Note: Use standard Tailwind utility classes for consistent styling.</FormDescription>
@@ -370,7 +370,7 @@ export default function EditUISectionPage() {
           </div>
 
           <div className="lg:col-span-1 space-y-6">
-            <Card className="shadow-xl border-none ring-1 ring-border">
+            <Card className=" border-none ring-1 ring-border">
               <CardHeader className="bg-primary/5">
                 <CardTitle className="text-lg flex items-center gap-2">
                     <Monitor className="h-5 w-5 text-primary" /> Display Strategy
@@ -380,10 +380,10 @@ export default function EditUISectionPage() {
                 <FormField control={form.control} name="fullWidth" render={({ field }) => (
                     <FormItem className="flex items-center justify-between p-4 border rounded-2xl bg-muted/5 transition-all hover:bg-muted/10">
                         <div className="space-y-0.5">
-                            <FormLabel className="font-black text-[10px] uppercase tracking-wider flex items-center gap-2">
+                            <FormLabel className="font-black text uppercase tracking-wider flex items-center gap-2">
                                 <Maximize className="h-3.5 w-3.5 text-blue-500" /> Edge-to-Edge
                             </FormLabel>
-                            <p className="text-[8px] font-bold text-muted-foreground uppercase">Disable container padding</p>
+                            <p className="text font-bold text-muted-foreground uppercase">Disable container padding</p>
                         </div>
                         <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
                     </FormItem>
@@ -395,7 +395,7 @@ export default function EditUISectionPage() {
                             <Palette className="h-3.5 w-3.5" /> Background Color
                         </FormLabel>
                         <div className="flex items-center gap-3">
-                            <FormControl><Input type="color" {...field} className="p-1 h-10 w-12 cursor-pointer border-none shadow-sm" /></FormControl>
+                            <FormControl><Input type="color" {...field} className="p-1 h-10 w-12 cursor-pointer border-none " /></FormControl>
                             <span className="text-xs font-mono font-bold text-muted-foreground">{field.value}</span>
                         </div>
                     </FormItem>
@@ -411,15 +411,15 @@ export default function EditUISectionPage() {
                 )} />
               </CardContent>
               <CardFooter className="pt-6 border-t bg-muted/10">
-                <Button type="submit" disabled={isSaving || isUploading} className="w-full h-14 text-lg font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all active:scale-[0.98]">
+                <Button type="submit" disabled={isSaving || isUploading} className="w-full h-14 text-lg font-black uppercase tracking-widest   transition-all active:scale">
                     {isSaving ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                     Sync UI Section
                 </Button>
               </CardFooter>
             </Card>
 
-            <div className="p-6 border-2 border-dashed rounded-[2.5rem] bg-muted/5 space-y-4">
-                <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center shadow-md">
+            <div className="p-6 border-2 border-dashed rounded bg-muted/5 space-y-4">
+                <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center ">
                     <Info className="h-6 w-6 text-primary" />
                 </div>
                 <h4 className="font-black text-sm uppercase tracking-tight">Technical Protocol</h4>
@@ -436,15 +436,15 @@ export default function EditUISectionPage() {
           setShowSyncModal(open);
           if (!open) router.push('/dashboard/homepage-sections');
       }}>
-        <DialogContent className="sm:max-w-2xl rounded-[2.5rem] p-0 overflow-hidden border-none shadow-2xl">
+        <DialogContent className="sm:max-w-2xl rounded p-0 overflow-hidden border-none ">
             <DialogHeader className="p-8 bg-muted/30 border-b">
                 <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-2xl bg-green-500 text-white flex items-center justify-center shadow-lg">
+                    <div className="h-12 w-12 rounded-2xl bg-green-500 text-white flex items-center justify-center ">
                         <CheckCircle2 className="h-7 w-7" />
                     </div>
                     <div>
                         <DialogTitle className="text-2xl font-black tracking-tighter uppercase leading-none">Logic Synchronized</DialogTitle>
-                        <DialogDescription className="mt-1 font-bold text-[10px] uppercase tracking-widest text-green-600">Your bespoke HTML is now live in the homepage loop.</DialogDescription>
+                        <DialogDescription className="mt-1 font-bold text uppercase tracking-widest text-green-600">Your bespoke HTML is now live in the homepage loop.</DialogDescription>
                     </div>
                 </div>
             </DialogHeader>
@@ -452,7 +452,7 @@ export default function EditUISectionPage() {
                 <p className="text-sm font-medium text-slate-500 leading-relaxed">The following "Raw Code Injection" has been pushed to your storefront registry. You can select or copy this binary for external documentation.</p>
                 
                 <div className="relative group">
-                    <ScrollArea className="h-[300px] w-full rounded-[2rem] border-2 border-slate-100 bg-slate-950 p-6 shadow-inner">
+                    <ScrollArea className="h w-full rounded border-2 border-slate-100 bg-slate-950 p-6 ">
                         <pre className="text-xs text-emerald-400 font-mono leading-relaxed whitespace-pre-wrap break-all">
                             {syncedCode}
                         </pre>
@@ -461,7 +461,7 @@ export default function EditUISectionPage() {
                         type="button" 
                         variant="secondary" 
                         size="sm" 
-                        className="absolute top-4 right-4 h-10 px-4 rounded-xl font-black uppercase text-[10px] tracking-widest bg-white/10 text-white hover:bg-white/20 backdrop-blur-md transition-all active:scale-90"
+                        className="absolute top-4 right-4 h-10 px-4 rounded-xl font-black uppercase text tracking-widest bg-white/10 text-white hover:bg-white/20 backdrop-blur-md transition-all active:scale-90"
                         onClick={() => handleCopyCode(syncedCode)}
                     >
                         <Copy className="h-3.5 w-3.5 mr-2" /> Copy Binary
@@ -478,15 +478,15 @@ export default function EditUISectionPage() {
 
       {/* Historical Logic Retrieval Modal */}
       <Dialog open={showHistoryModal} onOpenChange={setShowHistoryModal}>
-        <DialogContent className="sm:max-w-2xl rounded-[2.5rem] p-0 overflow-hidden border-none shadow-2xl">
+        <DialogContent className="sm:max-w-2xl rounded p-0 overflow-hidden border-none ">
             <DialogHeader className="p-8 bg-primary/5 border-b">
                 <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg">
+                    <div className="h-12 w-12 rounded-2xl bg-primary text-white flex items-center justify-center ">
                         <History className="h-7 w-7" />
                     </div>
                     <div>
                         <DialogTitle className="text-2xl font-black tracking-tighter uppercase leading-none">Last Production logic</DialogTitle>
-                        <DialogDescription className="mt-1 font-bold text-[10px] uppercase tracking-widest text-primary">Currently stored in the master registry.</DialogDescription>
+                        <DialogDescription className="mt-1 font-bold text uppercase tracking-widest text-primary">Currently stored in the master registry.</DialogDescription>
                     </div>
                 </div>
             </DialogHeader>
@@ -494,7 +494,7 @@ export default function EditUISectionPage() {
                 <p className="text-sm font-medium text-slate-500 leading-relaxed">This is the HTML logic currently serving your live visitors. Use this to restore or compare your current changes.</p>
                 
                 <div className="relative group">
-                    <ScrollArea className="h-[300px] w-full rounded-[2rem] border-2 border-slate-100 bg-slate-950 p-6 shadow-inner">
+                    <ScrollArea className="h w-full rounded border-2 border-slate-100 bg-slate-950 p-6 ">
                         <pre className="text-xs text-emerald-400 font-mono leading-relaxed whitespace-pre-wrap break-all">
                             {section.htmlContent || '<!-- No HTML content found in registry -->'}
                         </pre>
@@ -503,7 +503,7 @@ export default function EditUISectionPage() {
                         type="button" 
                         variant="secondary" 
                         size="sm" 
-                        className="absolute top-4 right-4 h-10 px-4 rounded-xl font-black uppercase text-[10px] tracking-widest bg-white/10 text-white hover:bg-white/20 backdrop-blur-md transition-all active:scale-90"
+                        className="absolute top-4 right-4 h-10 px-4 rounded-xl font-black uppercase text tracking-widest bg-white/10 text-white hover:bg-white/20 backdrop-blur-md transition-all active:scale-90"
                         onClick={() => handleCopyCode(section.htmlContent || '')}
                     >
                         <Copy className="h-3.5 w-3.5 mr-2" /> Copy logic
@@ -514,7 +514,7 @@ export default function EditUISectionPage() {
                 <Button 
                     type="button" 
                     variant="default" 
-                    className="rounded-2xl font-black uppercase text-[10px] tracking-widest h-12 px-8 shadow-lg"
+                    className="rounded-2xl font-black uppercase text tracking-widest h-12 px-8 "
                     onClick={handleRestoreLogic}
                 >
                     <RotateCcw className="h-4 w-4 mr-2" /> Restore to Editor

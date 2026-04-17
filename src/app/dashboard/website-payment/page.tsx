@@ -442,7 +442,7 @@ export default function WebsitePaymentSettings() {
     return (
       <div className="space-y-6">
         <PageHeader icon={Landmark} title="Website Payment Method" description="Configure payment options for your public store." />
-        <Skeleton className="h-[500px] w-full" />
+        <Skeleton className="h w-full" />
       </div>
     );
   }
@@ -594,7 +594,7 @@ export default function WebsitePaymentSettings() {
                             toast({ title: 'Copied', description: 'Webhook URL copied to clipboard.' });
                           }}>Copy</Button>
                         </div>
-                        <p className="text-[0.8rem] text-muted-foreground">
+                        <p className="text text-muted-foreground">
                           Set this in your Paystack dashboard to receive payment notifications.
                         </p>
                       </div>
@@ -613,7 +613,7 @@ export default function WebsitePaymentSettings() {
               </Form>
             </div>
             <div className="lg:col-span-1">
-              <Card className="bg-primary/5 border-primary/20 shadow-none sticky top-6">
+              <Card className="bg-primary/5 border-primary/20  sticky top-6">
                 <CardHeader>
                   <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary">
                     <Info className="h-4 w-4" /> About Paystack
@@ -777,7 +777,7 @@ export default function WebsitePaymentSettings() {
               </Form>
             </div>
             <div className="lg:col-span-1">
-              <Card className="bg-primary/5 border-primary/20 shadow-none sticky top-6">
+              <Card className="bg-primary/5 border-primary/20  sticky top-6">
                 <CardHeader>
                   <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary">
                     <Info className="h-4 w-4" /> About Flutterwave
@@ -912,7 +912,7 @@ export default function WebsitePaymentSettings() {
               </Form>
             </div>
             <div className="lg:col-span-1">
-              <Card className="bg-primary/5 border-primary/20 shadow-none sticky top-6">
+              <Card className="bg-primary/5 border-primary/20  sticky top-6">
                 <CardHeader>
                   <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary">
                     <Info className="h-4 w-4" /> About Stripe
@@ -980,7 +980,7 @@ export default function WebsitePaymentSettings() {
               </Form>
             </div>
             <div className="lg:col-span-1">
-              <Card className="bg-primary/5 border-primary/20 shadow-none sticky top-6">
+              <Card className="bg-primary/5 border-primary/20  sticky top-6">
                 <CardHeader>
                   <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary">
                     <Info className="h-4 w-4" /> Cash on Delivery
@@ -1097,7 +1097,7 @@ export default function WebsitePaymentSettings() {
             </div>
 
             <div className="lg:col-span-1">
-              <Card className="bg-primary/5 border-primary/20 shadow-none sticky top-6">
+              <Card className="bg-primary/5 border-primary/20  sticky top-6">
                 <CardHeader>
                   <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary">
                     <Info className="h-4 w-4" /> Professional Transfers

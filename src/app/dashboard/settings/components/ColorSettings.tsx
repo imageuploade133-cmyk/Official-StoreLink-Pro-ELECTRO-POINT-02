@@ -23,13 +23,13 @@ import { Separator } from '@/components/ui/separator';
 
 const colorSettingsSchema = z.object({
   theme: z.enum(['light', 'dark', 'system']).optional(),
-  colorPrimary: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').optional(),
-  colorSuccess: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').optional(),
-  colorDestructive: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').optional(),
+  colorPrimary: z.string().regex(/^#[0-9a-fA{6}$/i, 'Must be a valid hex color').optional(),
+  colorSuccess: z.string().regex(/^#[0-9a-fA{6}$/i, 'Must be a valid hex color').optional(),
+  colorDestructive: z.string().regex(/^#[0-9a-fA{6}$/i, 'Must be a valid hex color').optional(),
   backgroundStyle: z.enum(['solid', 'gradient', 'image']).optional(),
-  colorBackground: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').optional(),
-  backgroundGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').optional(),
-  backgroundGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').optional(),
+  colorBackground: z.string().regex(/^#[0-9a-fA{6}$/i, 'Must be a valid hex color').optional(),
+  backgroundGradientStart: z.string().regex(/^#[0-9a-fA{6}$/i, 'Must be a valid hex color').optional(),
+  backgroundGradientEnd: z.string().regex(/^#[0-9a-fA{6}$/i, 'Must be a valid hex color').optional(),
   backgroundImageUrl: z.string().url('Must be a valid URL.').or(z.literal('')).optional(),
 });
 
@@ -229,7 +229,7 @@ export function ColorSettings({ settingsData, isLoading, storeId }: ColorSetting
                             onClick={() => field.onChange(option.value)}
                             className={`flex items-center justify-center gap-2 rounded-lg border-2 p-3 sm:p-4 cursor-pointer transition-all ${
                               field.value === option.value
-                                ? 'border-primary bg-primary/10 shadow-md'
+                                ? 'border-primary bg-primary/10 '
                                 : 'border-border hover:border-primary/50 hover:bg-card/50'
                             }`}
                           >

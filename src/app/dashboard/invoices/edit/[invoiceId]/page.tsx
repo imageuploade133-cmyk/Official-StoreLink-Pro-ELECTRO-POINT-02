@@ -269,13 +269,13 @@ export default function EditInvoicePage() {
           description={`Operational adjustment for record: ${invoiceNumber}`}
         />
         <div className="flex items-center gap-3">
-          <Button variant="outline" onClick={handleDownloadImage} disabled={isSaving} className="rounded-xl border-primary/20 text-primary h-11 px-6 font-bold shadow-sm">
+          <Button variant="outline" onClick={handleDownloadImage} disabled={isSaving} className="rounded-xl border-primary/20 text-primary h-11 px-6 font-bold ">
             <ImageIcon className="mr-2 h-4 w-4" /> Export Image
           </Button>
-          <Button variant="outline" onClick={handlePrint} disabled={isSaving} className="rounded-xl border-primary/20 text-primary h-11 px-6 font-bold shadow-sm">
+          <Button variant="outline" onClick={handlePrint} disabled={isSaving} className="rounded-xl border-primary/20 text-primary h-11 px-6 font-bold ">
             <Printer className="mr-2 h-4 w-4" /> Print / PDF
           </Button>
-          <Button onClick={handleSaveInvoice} disabled={isSaving} className="rounded-xl shadow-xl shadow-primary/20 font-black uppercase text-[10px] tracking-widest h-11 px-8">
+          <Button onClick={handleSaveInvoice} disabled={isSaving} className="rounded-xl   font-black uppercase text tracking-widest h-11 px-8">
             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Confirm Changes
           </Button>
@@ -285,19 +285,19 @@ export default function EditInvoicePage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Configuration Sidebar */}
         <div className="lg:col-span-4 space-y-6 no-print">
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
               <CardTitle>Identity & Protocol</CardTitle>
               <CardDescription>Adjust the lifecycle stage of this document.</CardDescription>
             </CardHeader>
             <CardContent className="pt-6 space-y-6">
               <div className="space-y-4">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-primary">Settlement Mode</Label>
+                <Label className="text font-black uppercase tracking-widest text-primary">Settlement Mode</Label>
                 <Tabs value={status} onValueChange={(v: any) => setStatus(v)} className="w-full">
                   <TabsList className="grid grid-cols-3 h-12 p-1 bg-muted/50 rounded-xl border">
-                    <TabsTrigger value="draft" className="text-[10px] font-black uppercase tracking-widest rounded-lg">Draft</TabsTrigger>
-                    <TabsTrigger value="paid" className="text-[10px] font-black uppercase tracking-widest rounded-lg text-green-600">Paid</TabsTrigger>
-                    <TabsTrigger value="credit" className="text-[10px] font-black uppercase tracking-widest rounded-lg text-orange-600">Unpaid</TabsTrigger>
+                    <TabsTrigger value="draft" className="text font-black uppercase tracking-widest rounded-lg">Draft</TabsTrigger>
+                    <TabsTrigger value="paid" className="text font-black uppercase tracking-widest rounded-lg text-green-600">Paid</TabsTrigger>
+                    <TabsTrigger value="credit" className="text font-black uppercase tracking-widest rounded-lg text-orange-600">Unpaid</TabsTrigger>
                   </TabsList>
                 </Tabs>
               </div>
@@ -343,21 +343,21 @@ export default function EditInvoicePage() {
             </CardContent>
           </Card>
 
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
               <CardTitle>Recipient Metadata</CardTitle>
               <CardDescription>Verified client profile linked to this record.</CardDescription>
             </CardHeader>
             <CardContent className="pt-6 space-y-6">
                 <div className="space-y-3 relative">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-primary">Search for existing customer</Label>
+                    <Label className="text font-black uppercase tracking-widest text-primary">Search for existing customer</Label>
                     <div className="relative group">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-primary transition-colors" />
                         <Input 
                             placeholder="Type name, email or phone..." 
                             value={customerSearch}
                             onChange={(e) => setCustomerSearch(e.target.value)}
-                            className="pl-10 h-11 rounded-xl shadow-inner border-none bg-slate-50"
+                            className="pl-10 h-11 rounded-xl  border-none bg-slate-50"
                         />
                         {customerSearch && (
                             <button onClick={() => setCustomerSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-primary transition-colors">
@@ -367,7 +367,7 @@ export default function EditInvoicePage() {
                     </div>
 
                     {filteredCustomers.length > 0 && (
-                        <div className="absolute top-full left-0 right-0 z-50 mt-2 bg-white dark:bg-slate-900 border rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95">
+                        <div className="absolute top-full left-0 right-0 z-50 mt-2 bg-white dark:bg-slate-900 border rounded-2xl  overflow-hidden animate-in zoom-in-95">
                             <ScrollArea className="max-h-64">
                                 <div className="p-2 space-y-1">
                                     {filteredCustomers.map(customer => (
@@ -378,7 +378,7 @@ export default function EditInvoicePage() {
                                         >
                                             <div className="min-w-0">
                                                 <p className="font-black text-sm truncate">{customer.name}</p>
-                                                <p className="text-[10px] text-muted-foreground truncate">{customer.email || customer.phone}</p>
+                                                <p className="text text-muted-foreground truncate">{customer.email || customer.phone}</p>
                                             </div>
                                             <Check className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100" strokeWidth={3} />
                                         </button>
@@ -411,7 +411,7 @@ export default function EditInvoicePage() {
 
         {/* Live Preview Area */}
         <div className="lg:col-span-8 space-y-8">
-          <div ref={printableRef} id="printable-area" className="relative bg-white dark:bg-slate-900 overflow-hidden min-h-[1100px] flex flex-col w-full max-w-[800px] mx-auto shadow-2xl rounded-[2.5rem] print:shadow-none print:max-w-none print:rounded-none">
+          <div ref={printableRef} id="printable-area" className="relative bg-white dark:bg-slate-900 overflow-hidden min-h flex flex-col w-full max-w mx-auto  rounded print: print:max-w-none print:rounded-none">
               
               {/* Full Document Background (Letterhead) */}
               {showBackground && (
@@ -428,7 +428,7 @@ export default function EditInvoicePage() {
 
               {/* Optional Top Banner (Letterhead) */}
               {settings?.invoiceShowTopBanner && settings.invoiceTopBannerUrl && (
-                <div className="w-full relative aspect-[21/4] mb-8 shrink-0 z-10">
+                <div className="w-full relative aspect mb-8 shrink-0 z-10">
                     <Image 
                         src={settings.invoiceTopBannerUrl} 
                         alt="Letterhead" 
@@ -441,9 +441,9 @@ export default function EditInvoicePage() {
 
               <div className="p-8 md:p-16 flex-grow flex flex-col pt-0 relative z-10">
                 {/* Status Watermark Overlay */}
-                <div className="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none select-none z-[1] opacity-[0.03] dark:opacity-[0.05]">
+                <div className="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none select-none z opacity dark:opacity">
                     <span className={cn(
-                    "text-[120px] font-black uppercase tracking-[0.2em] transform -rotate-45 whitespace-nowrap",
+                    "text font-black uppercase tracking transform -rotate-45 whitespace-nowrap",
                     status === 'paid' ? "text-green-600" : status === 'credit' ? "text-orange-600" : "text-slate-900 dark:text-white"
                     )}>
                     {status === 'paid' ? 'VERIFIED PAID' : status === 'credit' ? 'OUTSTANDING' : 'DRAFT'}
@@ -458,7 +458,7 @@ export default function EditInvoicePage() {
                                 <img src={settings.invoiceWatermarkImageUrl} alt="" className="w-full h-auto" />
                             </div>
                         ) : (
-                            <span className="font-black uppercase tracking-[0.2em] whitespace-nowrap" style={{ 
+                            <span className="font-black uppercase tracking whitespace-nowrap" style={{ 
                                 fontSize: `${settings.invoiceWatermarkFontSize || 120}px`,
                                 color: settings.invoiceWatermarkColor || '#000000',
                                 transform: `rotate(${settings.invoiceWatermarkRotation || -45}deg)`
@@ -475,8 +475,8 @@ export default function EditInvoicePage() {
                         settings?.invoiceHideStoreInfo ? "flex-row items-center justify-between w-full" : "flex-wrap items-start justify-between"
                     )}>
                     {!settings?.invoiceHideStoreInfo && (
-                        <div className="flex items-start gap-6 flex-1 min-w-[300px]">
-                            <div className="size-20 bg-primary/10 rounded-2xl flex items-center justify-center text-primary shadow-inner shrink-0">
+                        <div className="flex items-start gap-6 flex-1 min-w">
+                            <div className="size-20 bg-primary/10 rounded-2xl flex items-center justify-center text-primary  shrink-0">
                             {settings?.invoiceLogoUrl ? (
                                 <Image src={settings.invoiceLogoUrl} alt="Store Logo" width={80} height={80} className="object-contain" unoptimized />
                             ) : (
@@ -486,7 +486,7 @@ export default function EditInvoicePage() {
                             <div className="text-left">
                             <h3 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white uppercase">{storeName}</h3>
                             <p className="text-slate-500 text-sm font-medium mt-1">{settings?.storeAddress || 'Global Headquarters'}</p>
-                            <p className="text-slate-400 text-[10px] font-black uppercase mt-0.5">{settings?.storeEmail} | {settings?.storePhone}</p>
+                            <p className="text-slate-400 text font-black uppercase mt-0.5">{settings?.storeEmail} | {settings?.storePhone}</p>
                             </div>
                         </div>
                     )}
@@ -498,37 +498,37 @@ export default function EditInvoicePage() {
                             )} style={status === 'draft' ? { color: settings?.invoiceAccentColor } : {}}>INVOICE</h1>
                             <div className="flex gap-2">
                                 {status === 'paid' && (
-                                    <Badge className="bg-green-600 text-white font-black px-4 py-1 rounded-full uppercase tracking-widest text-[10px] shadow-lg border-none">
+                                    <Badge className="bg-green-600 text-white font-black px-4 py-1 rounded-full uppercase tracking-widest text  border-none">
                                         <CheckCircle2 className="h-3 w-3 mr-1.5" /> Fully Settled
                                     </Badge>
                                 )}
                                 {status === 'credit' && (
-                                    <Badge className="bg-orange-600 text-white font-black px-4 py-1 rounded-full uppercase tracking-widest text-[10px] shadow-lg border-none">
+                                    <Badge className="bg-orange-600 text-white font-black px-4 py-1 rounded-full uppercase tracking-widest text  border-none">
                                         <Clock className="h-3 w-3 mr-1.5" /> Due {format(new Date(dueDate), 'MMM dd')}
                                     </Badge>
                                 )}
                             </div>
                         </div>
                         <div className={cn(
-                            "bg-slate-50 dark:bg-slate-800 p-6 rounded-[1.5rem] border shadow-sm",
-                            settings?.invoiceHideStoreInfo ? "text-left min-w-[240px]" : "text-left inline-block min-w-[240px] mt-6"
+                            "bg-slate-50 dark:bg-slate-800 p-6 rounded border ",
+                            settings?.invoiceHideStoreInfo ? "text-left min-w" : "text-left inline-block min-w mt-6"
                         )}>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-1">Serial Identifier</p>
+                        <p className="text font-black uppercase tracking-widest text-primary mb-1">Serial Identifier</p>
                         <p className="text-lg font-mono font-black">{invoiceNumber}</p>
                         <Separator className="my-4" />
                         <div className={cn("grid gap-4", settings?.invoiceHideStoreInfo ? "grid-cols-2 gap-x-8" : "grid-cols-2")}>
                             <div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Issued</p>
+                            <p className="text font-black uppercase tracking-widest text-slate-400 mb-1">Issued</p>
                             <p className="text-xs font-bold">{date ? format(new Date(date), 'MMM dd, yyyy') : '---'}</p>
                             </div>
                             {status === 'credit' ? (
                             <div>
-                                <p className="text-[10px] font-black uppercase text-orange-500 mb-1">DUE DATE</p>
+                                <p className="text font-black uppercase text-orange-500 mb-1">DUE DATE</p>
                                 <p className="text-xs font-black text-orange-600">{dueDate ? format(new Date(dueDate), 'MMM dd, yyyy') : '---'}</p>
                             </div>
                             ) : status === 'paid' && (
                                 <div>
-                                    <p className="text-[10px] font-black uppercase text-green-600 mb-1">VERIFICATION</p>
+                                    <p className="text font-black uppercase text-green-600 mb-1">VERIFICATION</p>
                                     <p className="text-xs font-black text-green-700">{paymentMethod}</p>
                                 </div>
                             )}
@@ -538,25 +538,25 @@ export default function EditInvoicePage() {
                     </div>
 
                     <div className="flex flex-wrap gap-8">
-                    <div className={cn("min-w-[300px] p-8 rounded-[2rem] border bg-slate-50/50 dark:bg-slate-800/50 space-y-2 flex-1")}>
-                        <p className="text-primary text-[10px] font-black uppercase tracking-[0.2em]">Billed To</p>
+                    <div className={cn("min-w p-8 rounded border bg-slate-50/50 dark:bg-slate-800/50 space-y-2 flex-1")}>
+                        <p className="text-primary text font-black uppercase tracking">Billed To</p>
                         <p className="text-xl font-black text-slate-900 dark:text-white">{clientInfo.name || '---'}</p>
                         <p className="text-sm font-medium text-slate-500 leading-relaxed italic">{clientInfo.address}</p>
                     </div>
-                    <div className="flex-1 min-w-[300px] p-8 rounded-[2rem] border bg-slate-50/50 dark:bg-slate-800/50 space-y-4 no-print">
-                        <div className="flex items-center gap-2 text-primary text-[10px] font-black uppercase tracking-[0.2em]">
+                    <div className="flex-1 min-w p-8 rounded border bg-slate-50/50 dark:bg-slate-800/50 space-y-4 no-print">
+                        <div className="flex items-center gap-2 text-primary text font-black uppercase tracking">
                             <Package className="h-3.5 w-3.5" /> Find Products
                         </div>
                         <div className="relative group/psearch">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within/psearch:text-primary transition-colors" />
                             <Input 
                                 placeholder="Inject inventory item..." 
-                                className="h-12 pl-10 rounded-2xl border-none shadow-inner bg-white dark:bg-slate-900 font-bold"
+                                className="h-12 pl-10 rounded-2xl border-none  bg-white dark:bg-slate-900 font-bold"
                                 value={productSearch}
                                 onChange={(e) => setProductSearch(e.target.value)}
                             />
                             {filteredProducts.length > 0 && (
-                                <div className="absolute top-full left-0 right-0 z-50 mt-2 bg-white dark:bg-slate-900 border rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95">
+                                <div className="absolute top-full left-0 right-0 z-50 mt-2 bg-white dark:bg-slate-900 border rounded-2xl  overflow-hidden animate-in zoom-in-95">
                                     <ScrollArea className="max-h-64">
                                         <div className="p-2 space-y-1">
                                             {filteredProducts.map(product => (
@@ -567,7 +567,7 @@ export default function EditInvoicePage() {
                                                 >
                                                     <div className="min-w-0">
                                                         <p className="font-black text-sm truncate">{product.name}</p>
-                                                        <p className="text-[10px] text-muted-foreground uppercase font-mono tracking-tighter">SKU: {product.sku || 'N/A'}</p>
+                                                        <p className="text text-muted-foreground uppercase font-mono tracking-tighter">SKU: {product.sku || 'N/A'}</p>
                                                     </div>
                                                     <div className="text-right">
                                                         <p className="font-black text-xs text-primary">{formatCurrency(product.sellingPrice, currencySymbol)}</p>
@@ -584,19 +584,19 @@ export default function EditInvoicePage() {
 
                     <div className="space-y-4">
                     <div className="flex items-center justify-between px-4 no-print">
-                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Registry Items</h4>
-                        <button type="button" onClick={handleAddItem} className="h-8 rounded-full font-black text-[10px] uppercase gap-2 bg-primary/5 text-primary flex items-center px-4 shadow-sm">
+                        <h4 className="text font-black uppercase tracking text-slate-400">Registry Items</h4>
+                        <button type="button" onClick={handleAddItem} className="h-8 rounded-full font-black text uppercase gap-2 bg-primary/5 text-primary flex items-center px-4 ">
                         <Plus className="h-3.5 w-3.5" /> Manual Row
                         </button>
                     </div>
-                    <div className="rounded-[2rem] border overflow-hidden bg-transparent shadow-sm">
+                    <div className="rounded border overflow-hidden bg-transparent ">
                         <table className="w-full text-left">
                         <thead>
                             <tr className="bg-muted/50 border-b">
-                            <th className="px-8 py-5 text-[10px] font-black uppercase text-slate-500">Description</th>
-                            <th className="px-8 py-5 text-[10px] font-black uppercase text-slate-500 text-center">Qty</th>
-                            <th className="px-8 py-5 text-[10px] font-black uppercase text-slate-500 text-right">Unit Val</th>
-                            <th className="px-8 py-5 text-[10px] font-black uppercase text-slate-500 text-right">Magnitude</th>
+                            <th className="px-8 py-5 text font-black uppercase text-slate-500">Description</th>
+                            <th className="px-8 py-5 text font-black uppercase text-slate-500 text-center">Qty</th>
+                            <th className="px-8 py-5 text font-black uppercase text-slate-500 text-right">Unit Val</th>
+                            <th className="px-8 py-5 text font-black uppercase text-slate-500 text-right">Magnitude</th>
                             <th className="w-12 px-4 no-print"></th>
                             </tr>
                         </thead>
@@ -608,7 +608,7 @@ export default function EditInvoicePage() {
                                     <Input 
                                         value={item.description} 
                                         onChange={(e) => handleItemChange(item.id, 'description', e.target.value)}
-                                        className="border-none bg-transparent p-0 h-auto font-black text-sm focus-visible:ring-0 shadow-none"
+                                        className="border-none bg-transparent p-0 h-auto font-black text-sm focus-visible:ring-0 "
                                     />
                                 </div>
                                 <p className="hidden print:block font-black text-sm">{item.description}</p>
@@ -619,7 +619,7 @@ export default function EditInvoicePage() {
                                         type="number" 
                                         value={item.quantity} 
                                         onChange={(e) => handleItemChange(item.id, 'quantity', Number(e.target.value))}
-                                        className="border-none bg-transparent p-0 h-auto font-bold text-center focus-visible:ring-0 shadow-none w-16 mx-auto"
+                                        className="border-none bg-transparent p-0 h-auto font-bold text-center focus-visible:ring-0  w-16 mx-auto"
                                     />
                                 </div>
                                 <p className="hidden print:block font-bold text-center">{item.quantity}</p>
@@ -630,7 +630,7 @@ export default function EditInvoicePage() {
                                         type="number" 
                                         value={item.unitPrice} 
                                         onChange={(e) => handleItemChange(item.id, 'unitPrice', Number(e.target.value))}
-                                        className="border-none bg-transparent p-0 h-auto font-bold text-right focus-visible:ring-0 shadow-none w-24 ml-auto"
+                                        className="border-none bg-transparent p-0 h-auto font-bold text-right focus-visible:ring-0  w-24 ml-auto"
                                     />
                                 </div>
                                 <p className="hidden print:block font-bold text-right">{formatCurrency(item.unitPrice, currencySymbol)}</p>
@@ -657,7 +657,7 @@ export default function EditInvoicePage() {
                         invoiceAccentColor={settings?.invoiceAccentColor}
                     />
 
-                    <div className="min-w-[320px] space-y-4">
+                    <div className="min-w space-y-4">
                         <div className="space-y-3 px-4">
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-slate-400 font-bold uppercase">Subtotal</span>
@@ -665,26 +665,26 @@ export default function EditInvoicePage() {
                         </div>
                         <div className="flex justify-between items-center gap-4">
                             <div className="flex items-center gap-2 no-print">
-                            <Label className="text-slate-400 font-bold uppercase text-[10px]">Tax %</Label>
+                            <Label className="text-slate-400 font-bold uppercase text">Tax %</Label>
                             <Input type="number" value={taxRate} onChange={(e) => setTaxRate(Number(e.target.value))} className="h-8 w-16 text-center text-xs font-bold rounded-lg" />
                             </div>
-                            <span className="hidden print:inline text-slate-400 font-bold uppercase text-[10px]">Tax ({taxRate}%)</span>
+                            <span className="hidden print:inline text-slate-400 font-bold uppercase text">Tax ({taxRate}%)</span>
                             <span className="font-black">{formatCurrency(taxAmount, currencySymbol)}</span>
                         </div>
                         <div className="flex justify-between items-center gap-4">
                             <div className="flex items-center gap-2 no-print">
-                            <Label className="text-slate-400 font-bold uppercase text-[10px]">Discount</Label>
+                            <Label className="text-slate-400 font-bold uppercase text">Discount</Label>
                             <Input type="number" value={discount} onChange={(e) => setDiscount(Number(e.target.value))} className="h-8 w-24 text-right text-xs font-bold rounded-lg" />
                             </div>
-                            <span className="hidden print:inline text-slate-400 font-bold uppercase text-[10px]">Discount</span>
+                            <span className="hidden print:inline text-slate-400 font-bold uppercase text">Discount</span>
                             <span className="font-black text-green-600">-{formatCurrency(discount, currencySymbol)}</span>
                         </div>
                         </div>
                         <div className={cn(
-                        "mt-6 p-8 rounded-[2rem] text-white flex flex-col gap-1 shadow-2xl transition-all duration-500",
-                        status === 'paid' ? "bg-green-600 shadow-green-600/20" : status === 'credit' ? "bg-orange-600 shadow-orange-600/20" : "bg-primary shadow-primary/20"
+                        "mt-6 p-8 rounded text-white flex flex-col gap-1  transition-all duration-500",
+                        status === 'paid' ? "bg-green-600 -600/20" : status === 'credit' ? "bg-orange-600 -600/20" : "bg-primary "
                         )} style={status === 'draft' ? { backgroundColor: settings?.invoiceAccentColor } : {}}>
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-70">
+                        <span className="text font-black uppercase tracking opacity-70">
                             {status === 'paid' ? 'AMOUNT PAID' : status === 'credit' ? 'BALANCE DUE' : 'GRAND TOTAL'}
                         </span>
                         <div className="flex justify-between items-baseline">
@@ -699,7 +699,7 @@ export default function EditInvoicePage() {
                 {/* Document Baseline Footer */}
                 <footer className="mt-16 pt-12 border-t border-slate-100 dark:border-slate-800 text-center space-y-4 pb-16">
                     <div className="max-w-2xl mx-auto">
-                        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
+                        <p className="text font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
                             {settings?.invoiceFooterText || `Thank you for choosing ${storeName}. We appreciate your premium business.`}
                             {status === 'credit' && ` | Full settlement mandated by ${format(new Date(dueDate), 'PP')}.`}
                         </p>
@@ -715,7 +715,7 @@ export default function EditInvoicePage() {
           body { background: white !important; }
           .no-print { display: none !important; }
           main, .layout-container { padding: 0 !important; margin: 0 !important; }
-          .layout-content-container { border: none !important; box-shadow: none !important; padding: 0 !important; width: 100% !important; max-maxWidth: 100% !important; }
+          .layout-content-container { border: none !important; box-: none !important; padding: 0 !important; width: 100% !important; max-maxWidth: 100% !important; }
           #printable-area { 
             position: absolute;
             top: 0;
@@ -725,7 +725,7 @@ export default function EditInvoicePage() {
             margin: 0;
             padding: 0;
             border: none;
-            box-shadow: none;
+            box-: none;
           }
           @page { size: A4; margin: 0; }
         }

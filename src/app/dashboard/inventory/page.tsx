@@ -369,8 +369,8 @@ export default function InventoryPage() {
         <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-3 bg-muted/50 px-4 py-2 rounded-xl border border-dashed">
                 <div className="flex flex-col">
-                    <Label htmlFor="sharing-toggle" className="text-[10px] font-black uppercase tracking-widest cursor-pointer">Product Sharing</Label>
-                    <span className="text-[9px] text-muted-foreground uppercase font-bold">{settings?.enableProductSharing ? 'Active' : 'Disabled'}</span>
+                    <Label htmlFor="sharing-toggle" className="text font-black uppercase tracking-widest cursor-pointer">Product Sharing</Label>
+                    <span className="text text-muted-foreground uppercase font-bold">{settings?.enableProductSharing ? 'Active' : 'Disabled'}</span>
                 </div>
                 <Switch 
                     id="sharing-toggle"
@@ -407,7 +407,7 @@ export default function InventoryPage() {
         currencySymbol={currencySymbol}
       />
 
-      <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <CardContent className="p-0">
           {isLoadingProducts && products.length === 0 ? (
             <div className="p-6">

@@ -452,7 +452,7 @@ export default function CheckoutPage() {
 
   if (isAuthLoading || isLoadingSettings || isProfileLoading || isLoadingMethods) {
     return (
-      <div className="flex h-[60vh] items-center justify-center">
+      <div className="flex h items-center justify-center">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
       </div>
     );
@@ -563,7 +563,7 @@ export default function CheckoutPage() {
                       )}
                       <div className="space-y-2">
                         <Label htmlFor="address">Delivery Address</Label>
-                        <div className="relative"><MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Textarea id="address" name="address" placeholder="Enter your full street address..." className="pl-10 min-h-[100px]" value={formData.address} onChange={handleInputChange} required disabled={step !== 'details'} /></div>
+                        <div className="relative"><MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Textarea id="address" name="address" placeholder="Enter your full street address..." className="pl-10 min-h" value={formData.address} onChange={handleInputChange} required disabled={step !== 'details'} /></div>
                       </div>
                     </>
                   )}
@@ -626,7 +626,7 @@ export default function CheckoutPage() {
                                                 </div>
                                                 <div className="min-w-0">
                                                     <span className="font-bold block truncate">{acc.bankName}</span>
-                                                    <span className="text-[10px] text-muted-foreground block truncate">{acc.accountName}</span>
+                                                    <span className="text text-muted-foreground block truncate">{acc.accountName}</span>
                                                 </div>
                                             </Label>
                                         </div>
@@ -634,20 +634,20 @@ export default function CheckoutPage() {
                                 </RadioGroup>
 
                                 {selectedBankAccount && (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-background p-6 rounded-xl border shadow-sm">
-                                        <div className="space-y-1"><Label className="text-[10px] font-black uppercase text-muted-foreground">Bank Name</Label><p className="font-bold text-lg">{selectedBankAccount.bankName}</p></div>
-                                        <div className="space-y-1"><Label className="text-[10px] font-black uppercase text-muted-foreground">Account Name</Label><p className="font-bold text-lg">{selectedBankAccount.accountName}</p></div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-background p-6 rounded-xl border ">
+                                        <div className="space-y-1"><Label className="text font-black uppercase text-muted-foreground">Bank Name</Label><p className="font-bold text-lg">{selectedBankAccount.bankName}</p></div>
+                                        <div className="space-y-1"><Label className="text font-black uppercase text-muted-foreground">Account Name</Label><p className="font-bold text-lg">{selectedBankAccount.accountName}</p></div>
                                         <div className="space-y-1">
-                                            <Label className="text-[10px] font-black uppercase text-muted-foreground">Account Number</Label>
+                                            <Label className="text font-black uppercase text-muted-foreground">Account Number</Label>
                                             <div className="flex items-center gap-2"><p className="font-black text-xl tracking-tighter">{selectedBankAccount.accountNumber}</p><Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => copyToClipboard(selectedBankAccount.accountNumber, 'Account Number')}><Copy className="h-4 w-4" /></Button></div>
                                         </div>
                                         <div className="space-y-1">
-                                            <Label className="text-[10px] font-black uppercase text-muted-foreground">Payment Reference</Label>
+                                            <Label className="text font-black uppercase text-muted-foreground">Payment Reference</Label>
                                             <div className="flex items-center gap-2"><p className="font-black text-2xl text-primary tracking-widest">{paymentReference}</p><Button variant="ghost" size="icon" className="h-8 w-8 text-primary" onClick={() => copyToClipboard(paymentReference, 'Reference Code')}><Copy className="h-4 w-4"/></Button></div>
-                                            <p className="text-[10px] text-orange-600 font-bold">Enter this code in your transfer description.</p>
+                                            <p className="text text-orange-600 font-bold">Enter this code in your transfer description.</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <Label className="text-[10px] font-black uppercase text-muted-foreground">Upload Receipt (Optional)</Label>
+                                            <Label className="text font-black uppercase text-muted-foreground">Upload Receipt (Optional)</Label>
                                             <div className="flex flex-col gap-2">
                                                 {receiptUrl ? (
                                                     <div className="relative w-full h-32 rounded-xl overflow-hidden border">
@@ -672,11 +672,11 @@ export default function CheckoutPage() {
                                                         </Button>
                                                     </div>
                                                 )}
-                                                <p className="text-[10px] text-muted-foreground">Attach a screenshot of your successful transfer.</p>
+                                                <p className="text text-muted-foreground">Attach a screenshot of your successful transfer.</p>
                                             </div>
                                         </div>
                                         <div className="space-y-1">
-                                            <Label className="text-[10px] font-black uppercase text-muted-foreground">Confirm Transfer</Label>
+                                            <Label className="text font-black uppercase text-muted-foreground">Confirm Transfer</Label>
                                             <label className="flex items-center gap-3 cursor-pointer p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-primary/30 transition-all">
                                                 <Checkbox 
                                                     checked={hasConfirmedTransfer}
@@ -720,10 +720,10 @@ export default function CheckoutPage() {
           </div>
 
           <div className="lg:col-span-1 sticky top-32">
-            <Card className="shadow-lg border-none ring-1 ring-border">
+            <Card className=" border-none ring-1 ring-border">
               <CardHeader className="bg-muted/50"><CardTitle className="flex items-center gap-2 text-lg"><ShoppingBag className="h-5 w-5" /> Order Summary</CardTitle></CardHeader>
               <CardContent className="p-0">
-                <ScrollArea className="max-h-[300px]">
+                <ScrollArea className="max-h">
                   <div className="p-6 divide-y">
                     {cartItems.map((item) => (
                       <div key={item.id} className="py-3 flex justify-between gap-4">
@@ -759,7 +759,7 @@ export default function CheckoutPage() {
                   <div className="flex justify-between items-baseline pt-2"><span className="text-lg font-bold">Total</span><span className="text-2xl font-black text-primary tracking-tighter">{formatCurrency(total, currencySymbol)}</span></div>
                 </div>
               </CardContent>
-              <CardFooter className="p-6 bg-slate-50 dark:bg-slate-900 rounded-b-lg"><div className="flex items-center gap-3 text-[10px] text-muted-foreground font-medium uppercase tracking-widest leading-none"><ShieldCheck className="h-4 w-4 text-green-600" /> Secure Transaction Protected</div></CardFooter>
+              <CardFooter className="p-6 bg-slate-50 dark:bg-slate-900 rounded-b-lg"><div className="flex items-center gap-3 text text-muted-foreground font-medium uppercase tracking-widest leading-none"><ShieldCheck className="h-4 w-4 text-green-600" /> Secure Transaction Protected</div></CardFooter>
             </Card>
           </div>
         </div>

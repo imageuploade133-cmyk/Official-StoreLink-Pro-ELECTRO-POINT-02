@@ -19,7 +19,7 @@ export function PublicWatermark() {
   const rotation = settings.webWatermarkRotation ?? -30;
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-[5] flex items-center justify-center overflow-hidden select-none">
+    <div className="fixed inset-0 pointer-events-none z flex items-center justify-center overflow-hidden select-none">
       <div 
         style={{ 
           opacity, 

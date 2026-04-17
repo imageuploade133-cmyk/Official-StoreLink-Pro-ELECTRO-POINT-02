@@ -142,7 +142,7 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                 <div className="flex items-center gap-4">
                     <button 
                         onClick={onClose}
-                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
+                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800  border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
                     >
                         <ArrowLeft className="h-5 w-5" strokeWidth={3} />
                     </button>
@@ -154,7 +154,7 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                 {/* Fixed Header */}
                 <div className="px-6 pt-12 pb-6 space-y-4 flex-shrink-0 bg-background-light dark:bg-black border-b border-slate-100 dark:border-slate-800">
                     <div className="space-y-2">
-                        <div className="flex items-center gap-2 font-black text-[10px] uppercase tracking-[0.3em] text-primary">
+                        <div className="flex items-center gap-2 font-black text uppercase tracking text-primary">
                             <Sparkles className="h-3.5 w-3.5" />
                             Discovery Suite
                         </div>
@@ -169,7 +169,7 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                         <Input 
                             autoFocus={!initialCategoryId}
                             placeholder="Type name, iron, solar, etc..." 
-                            className="h-16 pl-14 pr-12 rounded-[1.5rem] bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 shadow-2xl text-lg font-bold tracking-tight focus-visible:ring-4 focus-visible:ring-primary/10 transition-all"
+                            className="h-16 pl-14 pr-12 rounded bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700  text-lg font-bold tracking-tight focus-visible:ring-4 focus-visible:ring-primary/10 transition-all"
                             value={searchQuery}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -185,7 +185,7 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
 
                     {selectedCategoryId && (
                         <div className="flex items-center gap-2 animate-in slide-in-from-left-2 duration-300">
-                            <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 px-4 py-2 rounded-xl flex items-center gap-2 font-black text-[10px] uppercase tracking-widest shadow-sm">
+                            <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 px-4 py-2 rounded-xl flex items-center gap-2 font-black text uppercase tracking-widest ">
                                 <Filter className="h-3 w-3" />
                                 {categories?.find(c => c.id === selectedCategoryId)?.name || 'Filtered Collection'}
                                 <button 
@@ -207,16 +207,16 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                     <div className="px-6 pt-6 space-y-6">
                         <div className="pb-32 space-y-6">
                     <div className="flex items-center justify-between px-1">
-                        <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">
+                        <h3 className="text font-black uppercase text-slate-400 tracking">
                             {searchQuery || selectedCategoryId ? 'Top Match Results' : 'Trending Registry'}
                         </h3>
-                        <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest border px-2 py-0.5 rounded-full">{totalFound} items matching</span>
+                        <span className="text font-black text-slate-400 uppercase tracking-widest border px-2 py-0.5 rounded-full">{totalFound} items matching</span>
                     </div>
                     
                     {isLoading && results.length === 0 ? (
                         <div className="grid grid-cols-1 gap-4">
                             {[...Array(4)].map((_, i) => (
-                                <div key={i} className="h-32 w-full bg-white dark:bg-slate-800 rounded-[2rem] animate-pulse" />
+                                <div key={i} className="h-32 w-full bg-white dark:bg-slate-800 rounded animate-pulse" />
                             ))}
                         </div>
                     ) : results.length > 0 ? (
@@ -225,9 +225,9 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                                 <div 
                                     key={p.id} 
                                     onClick={() => onSelectProduct(p.id)} 
-                                    className="flex items-center gap-5 p-5 bg-white dark:bg-slate-800 rounded-[2rem] shadow-xl border-2 border-slate-200 dark:border-slate-700 transition-all active:scale-[0.98] w-full text-left group cursor-pointer"
+                                    className="flex items-center gap-5 p-5 bg-white dark:bg-slate-800 rounded  border-2 border-slate-200 dark:border-slate-700 transition-all active:scale w-full text-left group cursor-pointer"
                                 >
-                                    <div className="relative h-20 w-20 rounded-2xl overflow-hidden shrink-0 border bg-muted shadow-sm">
+                                    <div className="relative h-20 w-20 rounded-2xl overflow-hidden shrink-0 border bg-muted ">
                                         <Image 
                                             src={p.imageUrl || 'https://placehold.co/200x200.png'} 
                                             alt={p.name} 
@@ -237,13 +237,13 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                                         />
                                     </div>
                                     <div className="flex-1 min-w-0 space-y-1">
-                                        <p className="text-[8px] font-black uppercase text-primary/60 tracking-widest">
+                                        <p className="text font-black uppercase text-primary/60 tracking-widest">
                                             {categories?.find(c => c.id === p.categoryId)?.name || 'Premium Series'}
                                         </p>
                                         <p className="font-black text-lg text-slate-900 dark:text-white truncate leading-tight tracking-tight">{p.name}</p>
                                         <p className="text-primary font-black text-sm mt-1">{formatCurrency(calculateEffectivePrice(p as any, new Date()), currencySymbol)}</p>
                                     </div>
-                                    <div className="h-10 w-10 rounded-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
+                                    <div className="h-10 w-10 rounded-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all ">
                                         <ChevronRight className="h-5 w-5" strokeWidth={3} />
                                     </div>
                                 </div>
@@ -255,7 +255,7 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                                         onClick={() => fetchResults(true)}
                                         disabled={isLoadingMore}
                                         variant="ghost"
-                                        className="w-full h-20 rounded-[2rem] border-2 border-dashed border-primary/20 bg-primary/5 font-black uppercase text-[10px] tracking-[0.3em] gap-3 text-primary hover:bg-primary/10 hover:border-primary/40 transition-all active:scale-[0.98]"
+                                        className="w-full h-20 rounded border-2 border-dashed border-primary/20 bg-primary/5 font-black uppercase text tracking gap-3 text-primary hover:bg-primary/10 hover:border-primary/40 transition-all active:scale"
                                     >
                                         {isLoadingMore ? (
                                             <Loader2 className="h-5 w-5 animate-spin" />
@@ -268,16 +268,16 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                         </div>
                     ) : (
                         <div className="py-24 text-center space-y-6 animate-in zoom-in-95 duration-700">
-                            <div className="h-32 w-32 bg-slate-100 dark:bg-slate-800/50 rounded-full flex items-center justify-center mx-auto shadow-inner group">
+                            <div className="h-32 w-32 bg-slate-100 dark:bg-slate-800/50 rounded-full flex items-center justify-center mx-auto  group">
                                 <SearchIcon className="h-14 w-14 text-slate-300 group-hover:scale-110 transition-transform duration-500" strokeWidth={1.5} />
                             </div>
                             <div className="space-y-2">
                                 <h3 className="text-2xl font-black tracking-tight uppercase">No matches found</h3>
-                                <p className="text-sm font-medium text-slate-500 max-w-[220px] mx-auto leading-relaxed">Search uses robust substring logic. Try "solar" instead of "portable solar".</p>
+                                <p className="text-sm font-medium text-slate-500 max-w mx-auto leading-relaxed">Search uses robust substring logic. Try "solar" instead of "portable solar".</p>
                             </div>
                             <Button 
                                 variant="outline" 
-                                className="rounded-xl font-black uppercase text-[10px] tracking-widest px-8 h-12 shadow-sm" 
+                                className="rounded-xl font-black uppercase text tracking-widest px-8 h-12 " 
                                 onClick={() => { setSearchTerm(''); setSelectedCategoryId(null); if (onClearCategory) onClearCategory(); }}
                             >
                                 Reset Registry Exploration

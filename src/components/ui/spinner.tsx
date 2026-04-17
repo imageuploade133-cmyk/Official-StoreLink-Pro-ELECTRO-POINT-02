@@ -14,7 +14,7 @@ interface SpinnerProps {
 
 export function Spinner({ className, size = 'sm' }: SpinnerProps) {
   const sizeMap = {
-    xs: 'h-3 w-3 border-[1.5px]',
+    xs: 'h-3 w-3 border',
     sm: 'h-4 w-4 border-2',
     md: 'h-5 w-5 border-2',
   };
@@ -53,7 +53,7 @@ export function SectionSpinner({ className, label }: SectionSpinnerProps) {
         <span className="absolute inset-0 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
         {/* Inner ring — counter spin */}
         <span
-          className="absolute inset-[6px] rounded-full border-2 border-primary/10 border-b-primary/60"
+          className="absolute inset rounded-full border-2 border-primary/10 border-b-primary/60"
           style={{ animation: 'spin 0.8s linear infinite reverse' }}
         />
       </div>
@@ -126,7 +126,7 @@ export function PageSpinner({
         />
         {/* Logo centered */}
         <div
-          className="relative z-10 flex items-center justify-center rounded-xl bg-[hsl(220,25%,10%)] shadow-lg"
+          className="relative z-10 flex items-center justify-center rounded-xl bg-[hsl(220,25%,10%)] "
           style={{ width: 36, height: 36 }}
         >
           <ElysiumLogo className="h-6 w-6" />

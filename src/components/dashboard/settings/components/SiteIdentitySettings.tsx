@@ -249,7 +249,7 @@ export function SiteIdentitySettings({ settingsData, isLoading }: SiteIdentitySe
                                         </Tooltip>
                                     </TooltipProvider>
                                 </div>
-                                <span className="text-[10px] text-muted-foreground">
+                                <span className="text text-muted-foreground">
                                     Header Height: ~{navbarHeight}px
                                 </span>
                             </div>
@@ -276,7 +276,7 @@ export function SiteIdentitySettings({ settingsData, isLoading }: SiteIdentitySe
                                         className="bg-primary/10 rounded flex items-center justify-center transition-all duration-300"
                                         style={{ width: `${Math.min(logoWidth, 200)}px`, height: `${Math.min(logoHeight, 80)}px` }}
                                     >
-                                        <span className="text-[10px] font-bold text-primary">{logoWidth}px</span>
+                                        <span className="text font-bold text-primary">{logoWidth}px</span>
                                     </div>
                                 )}
                             </div>
@@ -292,7 +292,7 @@ export function SiteIdentitySettings({ settingsData, isLoading }: SiteIdentitySe
                                     className="py-2"
                                 />
                             </FormControl>
-                            <div className="flex justify-between text-[10px] text-muted-foreground px-1">
+                            <div className="flex justify-between text text-muted-foreground px-1">
                                 <span>40px</span>
                                 <span className="flex items-center gap-1 text-primary">
                                     <ArrowUpDown className="h-3 w-3" />

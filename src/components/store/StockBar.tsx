@@ -62,10 +62,10 @@ export function StockBar({
   // Default color logic matching the "items left" image style (Orange for low/selling)
   const barColorClass = !activeColor ? (
     isActualOutOfStock 
-      ? "bg-destructive shadow-[0_0_10px_rgba(239,68,68,0.4)]" 
+      ? "bg-destructive" 
       : isActualLowStock 
-        ? "bg-orange-500 shadow-[0_0_10px_rgba(245,158,11,0.4)]" 
-        : "bg-primary shadow-[0_0_10px_hsl(var(--primary)/0.3)]"
+        ? "bg-orange-500" 
+        : "bg-primary"
   ) : "";
 
   // Calculate percentage for display (capped at 100%)
@@ -75,7 +75,7 @@ export function StockBar({
   return (
     <div className={cn("space-y-2", className)}>
       {showLabels && (
-        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
+        <div className="flex justify-between items-center text font-black uppercase tracking-widest">
           <span 
             className={cn(
                 "opacity-80",
@@ -87,7 +87,7 @@ export function StockBar({
           </span>
         </div>
       )}
-      <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden shadow-inner">
+      <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden ">
         <div 
           className={cn(
             "h-full rounded-full transition-all duration-1000 ease-in-out",

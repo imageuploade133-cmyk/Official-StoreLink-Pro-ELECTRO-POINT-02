@@ -53,14 +53,14 @@ import { cn } from '@/lib/utils';
 import { InvoiceTrustAssets } from '@/components/invoices/InvoiceTrustAssets';
 
 const invoicingSchema = z.object({
-  invoiceAccentColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default('#0b50da'),
+  invoiceAccentColor: z.string().regex(/^#[0-9a-fA{6}$/i, 'Must be a valid hex color').default('#0b50da'),
   invoiceFooterText: z.string().optional().or(z.literal('')),
   invoiceBankDetails: z.string().optional().or(z.literal('')),
   invoiceEnableTextWatermark: z.boolean().default(false),
   invoiceWatermarkType: z.enum(['text', 'image']).default('text'),
   invoiceWatermarkText: z.string().optional().or(z.literal('')),
   invoiceWatermarkImageUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
-  invoiceWatermarkColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default('#000000'),
+  invoiceWatermarkColor: z.string().regex(/^#[0-9a-fA{6}$/i, 'Must be a valid hex color').default('#000000'),
   invoiceWatermarkOpacity: z.coerce.number().min(0).max(1).default(0.05),
   invoiceWatermarkFontSize: z.coerce.number().min(10).max(300).default(120),
   invoiceWatermarkImageWidth: z.coerce.number().min(50).max(1000).default(400),
@@ -196,7 +196,7 @@ export default function InvoicingSettingsPage() {
     return (
       <div className="space-y-6">
         <PageHeader icon={FileText} title="Invoicing Protocol" description="Loading registry..." />
-        <Skeleton className="h-[600px] w-full rounded-3xl" />
+        <Skeleton className="h w-full rounded-3xl" />
       </div>
     );
   }
@@ -224,7 +224,7 @@ export default function InvoicingSettingsPage() {
         <Button 
             onClick={form.handleSubmit(onSubmit)} 
             disabled={isSaving || !!uploadingField}
-            className="h-12 px-8 font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all active:scale-95"
+            className="h-12 px-8 font-black uppercase tracking-widest   transition-all active:scale-95"
         >
             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Sync Protocol
@@ -236,7 +236,7 @@ export default function InvoicingSettingsPage() {
           <Form {...form}>
             <form className="space-y-8">
               {/* Top Banner Section */}
-              <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b">
                     <div className="flex justify-between items-center">
                         <div>
@@ -265,9 +265,9 @@ export default function InvoicingSettingsPage() {
                                 <FormLabel className="font-bold">Banner Media URL (Transparent PNG recommended)</FormLabel>
                                 <div className="flex flex-col gap-4">
                                     {field.value && (
-                                        <div className="relative w-full aspect-[21/4] rounded-2xl overflow-hidden border-2 bg-slate-50 flex items-center justify-center group">
+                                        <div className="relative w-full aspect rounded-2xl overflow-hidden border-2 bg-slate-50 flex items-center justify-center group">
                                             <Image src={field.value} alt="Top Banner" fill className="object-contain p-2" unoptimized />
-                                            <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg" onClick={() => field.onChange('')}><X className="h-4 w-4" /></Button>
+                                            <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity " onClick={() => field.onChange('')}><X className="h-4 w-4" /></Button>
                                         </div>
                                     )}
                                     <div className="flex gap-2">
@@ -279,7 +279,7 @@ export default function InvoicingSettingsPage() {
                                         </Button>
                                         <input id="banner-upload" type="file" accept="image/png" className="hidden" onChange={(e) => handleImageUpload(e, 'invoiceTopBannerUrl')} />
                                     </div>
-                                    <FormDescription className="text-[10px]">Ideal size: 1200x200px. This banner will be centered at the very top of the A4 layout.</FormDescription>
+                                    <FormDescription className="text">Ideal size: 1200x200px. This banner will be centered at the very top of the A4 layout.</FormDescription>
                                 </div>
                             </FormItem>
                         )}
@@ -288,7 +288,7 @@ export default function InvoicingSettingsPage() {
               </Card>
 
               {/* Full Background Section */}
-              <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b">
                     <div className="flex justify-between items-center">
                         <div>
@@ -317,9 +317,9 @@ export default function InvoicingSettingsPage() {
                                 <FormLabel className="font-bold">Background Asset URL</FormLabel>
                                 <div className="flex flex-col gap-4">
                                     {field.value && (
-                                        <div className="relative w-full aspect-[1/1.4] max-w-[200px] rounded-2xl overflow-hidden border-2 bg-slate-50 flex items-center justify-center group shadow-xl mx-auto">
+                                        <div className="relative w-full aspect max-w rounded-2xl overflow-hidden border-2 bg-slate-50 flex items-center justify-center group  mx-auto">
                                             <Image src={field.value} alt="Full Background" fill className="object-cover" unoptimized />
-                                            <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg" onClick={() => field.onChange('')}><X className="h-4 w-4" /></Button>
+                                            <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity " onClick={() => field.onChange('')}><X className="h-4 w-4" /></Button>
                                         </div>
                                     )}
                                     <div className="flex gap-2">
@@ -331,7 +331,7 @@ export default function InvoicingSettingsPage() {
                                         </Button>
                                         <input id="bg-upload" type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'invoiceBackgroundUrl')} />
                                     </div>
-                                    <FormDescription className="text-[10px]">Recommended: A4 aspect ratio (2480x3508px) for maximum precision.</FormDescription>
+                                    <FormDescription className="text">Recommended: A4 aspect ratio (2480x3508px) for maximum precision.</FormDescription>
                                 </div>
                             </FormItem>
                         )}
@@ -340,7 +340,7 @@ export default function InvoicingSettingsPage() {
               </Card>
 
               {/* Branding Section */}
-              <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b">
                     <CardTitle className="text-xl flex items-center gap-3">
                         <Palette className="h-5 w-5 text-primary" /> Visual Identity & Visibility
@@ -361,7 +361,7 @@ export default function InvoicingSettingsPage() {
                                         </FormControl>
                                         <span className="text-sm font-mono font-bold text-muted-foreground">{field.value}</span>
                                     </div>
-                                    <FormDescription className="text-[10px]">Applies to headings and magnitude totals.</FormDescription>
+                                    <FormDescription className="text">Applies to headings and magnitude totals.</FormDescription>
                                 </FormItem>
                             )}
                         />
@@ -375,12 +375,12 @@ export default function InvoicingSettingsPage() {
                                         <FormLabel className="text-xs font-black uppercase tracking-wider flex items-center gap-2">
                                             <Building className="h-3.5 w-3.5" /> Header Identity Visibility
                                         </FormLabel>
-                                        <p className="text-[8px] font-bold text-muted-foreground uppercase">Show store name & contact in header</p>
+                                        <p className="text font-bold text-muted-foreground uppercase">Show store name & contact in header</p>
                                     </div>
                                     <FormControl>
                                         <div className="flex flex-col items-center gap-1">
                                             <Switch checked={!field.value} onCheckedChange={(val) => field.onChange(!val)} />
-                                            <span className="text-[8px] font-black uppercase">{!field.value ? 'Visible' : 'Hidden'}</span>
+                                            <span className="text font-black uppercase">{!field.value ? 'Visible' : 'Hidden'}</span>
                                         </div>
                                     </FormControl>
                                 </FormItem>
@@ -391,7 +391,7 @@ export default function InvoicingSettingsPage() {
               </Card>
 
               {/* Settlement Section */}
-              <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b">
                     <div className="flex justify-between items-center">
                         <div>
@@ -407,7 +407,7 @@ export default function InvoicingSettingsPage() {
                                 <FormControl>
                                     <div className="flex flex-col items-center gap-1">
                                         <Switch checked={!field.value} onCheckedChange={(val) => field.onChange(!val)} />
-                                        <span className="text-[8px] font-black uppercase">{!field.value ? 'Visible' : 'Hidden'}</span>
+                                        <span className="text font-black uppercase">{!field.value ? 'Visible' : 'Hidden'}</span>
                                     </div>
                                 </FormControl>
                             )}
@@ -441,7 +441,7 @@ export default function InvoicingSettingsPage() {
               </Card>
 
               {/* Stamp & Signature Section */}
-              <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b">
                     <CardTitle className="text-xl flex items-center gap-2">
                         <Stamp className="h-5 w-5 text-primary" /> Trust Assets
@@ -462,7 +462,7 @@ export default function InvoicingSettingsPage() {
                                         </Label>
                                         <div className="flex flex-col items-center gap-1">
                                             <Switch checked={!field.value} onCheckedChange={(val) => field.onChange(!val)} />
-                                            <span className="text-[8px] font-black uppercase">{!field.value ? 'Visible' : 'Hidden'}</span>
+                                            <span className="text font-black uppercase">{!field.value ? 'Visible' : 'Hidden'}</span>
                                         </div>
                                     </div>
                                 )}
@@ -475,14 +475,14 @@ export default function InvoicingSettingsPage() {
                                         <FormLabel className="font-bold flex items-center gap-2">Official Stamp (Transparent PNG)</FormLabel>
                                         <div className="space-y-4">
                                             {field.value ? (
-                                                <div className="relative w-full aspect-square max-w-[160px] rounded-2xl overflow-hidden border-2 border-dashed bg-slate-50 flex items-center justify-center p-4 group">
+                                                <div className="relative w-full aspect-square max-w rounded-2xl overflow-hidden border-2 border-dashed bg-slate-50 flex items-center justify-center p-4 group">
                                                     <Image src={field.value} alt="Stamp" width={120} height={120} className="object-contain" unoptimized />
-                                                    <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg" onClick={() => field.onChange('')}><X className="h-4 w-4" /></Button>
+                                                    <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity " onClick={() => field.onChange('')}><X className="h-4 w-4" /></Button>
                                                 </div>
                                             ) : (
-                                                <div className="w-full aspect-square max-w-[160px] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground bg-muted/10">
+                                                <div className="w-full aspect-square max-w rounded-2xl border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground bg-muted/10">
                                                     <Stamp className="h-8 w-8 opacity-20 mb-2" />
-                                                    <span className="text-[8px] font-black uppercase tracking-widest">Stamp Missing</span>
+                                                    <span className="text font-black uppercase tracking-widest">Stamp Missing</span>
                                                 </div>
                                             )}
                                             <div className="flex gap-2">
@@ -512,7 +512,7 @@ export default function InvoicingSettingsPage() {
                                         </Label>
                                         <div className="flex flex-col items-center gap-1">
                                             <Switch checked={!field.value} onCheckedChange={(val) => field.onChange(!val)} />
-                                            <span className="text-[8px] font-black uppercase">{!field.value ? 'Visible' : 'Hidden'}</span>
+                                            <span className="text font-black uppercase">{!field.value ? 'Visible' : 'Hidden'}</span>
                                         </div>
                                     </div>
                                 )}
@@ -525,14 +525,14 @@ export default function InvoicingSettingsPage() {
                                         <FormLabel className="font-bold flex items-center gap-2">Authorized Signature</FormLabel>
                                         <div className="space-y-4">
                                             {field.value ? (
-                                                <div className="relative w-full aspect-[3/1] max-w-[240px] rounded-2xl overflow-hidden border-2 border-dashed bg-slate-50 flex items-center justify-center p-4 group">
+                                                <div className="relative w-full aspect max-w rounded-2xl overflow-hidden border-2 border-dashed bg-slate-50 flex items-center justify-center p-4 group">
                                                     <Image src={field.value} alt="Signature" width={200} height={60} className="object-contain" unoptimized />
-                                                    <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg" onClick={() => field.onChange('')}><X className="h-4 w-4" /></Button>
+                                                    <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity " onClick={() => field.onChange('')}><X className="h-4 w-4" /></Button>
                                                 </div>
                                             ) : (
-                                                <div className="w-full aspect-[3/1] max-w-[240px] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground bg-muted/10">
+                                                <div className="w-full aspect max-w rounded-2xl border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground bg-muted/10">
                                                     <PenTool className="h-8 w-8 opacity-20 mb-2" />
-                                                    <span className="text-[8px] font-black uppercase tracking-widest">Signature Missing</span>
+                                                    <span className="text font-black uppercase tracking-widest">Signature Missing</span>
                                                 </div>
                                             )}
                                             <div className="flex gap-2">
@@ -558,7 +558,7 @@ export default function InvoicingSettingsPage() {
                                         <FormControl>
                                             <Input placeholder="Authorized Operational Signature" {...field} value={field.value || ''} className="h-11 font-black uppercase text-xs tracking-wider" />
                                         </FormControl>
-                                        <FormDescription className="text-[10px]">Customize the fine print below the signature line.</FormDescription>
+                                        <FormDescription className="text">Customize the fine print below the signature line.</FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -569,7 +569,7 @@ export default function InvoicingSettingsPage() {
               </Card>
 
               {/* Watermark Section */}
-              <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b">
                     <div className="flex justify-between items-center">
                         <div>
@@ -595,7 +595,7 @@ export default function InvoicingSettingsPage() {
                       name="invoiceWatermarkType"
                       render={({ field }) => (
                         <FormItem className="space-y-4">
-                          <FormLabel className="text-xs font-black uppercase tracking-[0.2em] text-primary">Watermark Media Type</FormLabel>
+                          <FormLabel className="text-xs font-black uppercase tracking text-primary">Watermark Media Type</FormLabel>
                           <FormControl>
                             <RadioGroup
                               onValueChange={field.onChange}
@@ -658,7 +658,7 @@ export default function InvoicingSettingsPage() {
                                     render={({ field }) => (
                                         <FormItem className="space-y-4">
                                             <div className="flex justify-between items-center">
-                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest">Opacity ({Math.round(field.value * 100)}%)</FormLabel>
+                                                <FormLabel className="text font-black uppercase tracking-widest">Opacity ({Math.round(field.value * 100)}%)</FormLabel>
                                             </div>
                                             <FormControl>
                                                 <Slider
@@ -678,7 +678,7 @@ export default function InvoicingSettingsPage() {
                                     render={({ field }) => (
                                         <FormItem className="space-y-4">
                                             <div className="flex justify-between items-center">
-                                                <FormLabel className="text-[10px] font-black uppercase tracking-widest">Rotation ({field.value}°)</FormLabel>
+                                                <FormLabel className="text font-black uppercase tracking-widest">Rotation ({field.value}°)</FormLabel>
                                             </div>
                                             <FormControl>
                                                 <Slider
@@ -700,7 +700,7 @@ export default function InvoicingSettingsPage() {
                                 render={({ field }) => (
                                     <FormItem className="space-y-4">
                                         <div className="flex justify-between items-center">
-                                            <FormLabel className="text-[10px] font-black uppercase tracking-widest">
+                                            <FormLabel className="text font-black uppercase tracking-widest">
                                                 {watermarkType === 'text' ? `Font Size (${field.value}px)` : `Logo Width (${field.value}px)`}
                                             </FormLabel>
                                         </div>
@@ -719,8 +719,8 @@ min={watermarkType === 'text' ? 20 : 50}
                         </div>
 
                         <div className="space-y-4">
-                            <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Simulation View</h4>
-                            <div className="aspect-video bg-muted/5 rounded-[2rem] border-2 border-dashed flex items-center justify-center relative overflow-hidden">
+                            <h4 className="text font-black uppercase text-slate-400 tracking-widest">Simulation View</h4>
+                            <div className="aspect-video bg-muted/5 rounded border-2 border-dashed flex items-center justify-center relative overflow-hidden">
                                 <div 
                                     className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none z-30 transition-all duration-75"
                                     style={{
@@ -738,7 +738,7 @@ min={watermarkType === 'text' ? 20 : 50}
                                         )
                                     )}
                                 </div>
-                                <p className="relative z-10 text-[8px] font-black uppercase bg-background/80 backdrop-blur-sm px-3 py-1 rounded-full border">Watermark Projection Area</p>
+                                <p className="relative z-10 text font-black uppercase bg-background/80 backdrop-blur-sm px-3 py-1 rounded-full border">Watermark Projection Area</p>
                             </div>
                         </div>
                     </div>
@@ -750,7 +750,7 @@ min={watermarkType === 'text' ? 20 : 50}
 
         <div className="lg:col-span-1">
           <div className="sticky top-24 space-y-6">
-            <Card className="bg-primary text-primary-foreground border-none shadow-2xl rounded-[2.5rem] overflow-hidden">
+            <Card className="bg-primary text-primary-foreground border-none  rounded overflow-hidden">
                 <CardHeader className="pt-10 px-8">
                     <div className="size-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center mb-4">
                         <ShieldCheck className="h-8 w-8" />
@@ -760,9 +760,9 @@ min={watermarkType === 'text' ? 20 : 50}
                 </CardHeader>
                 <CardContent className="px-8 pb-10 space-y-6">
                     <div className="p-4 bg-white/10 rounded-2xl border border-white/10">
-                        <p className="text-[10px] font-black uppercase tracking-widest mb-4 opacity-60">Live Simulation Hub</p>
-                        <div className="bg-white rounded-xl overflow-hidden scale-90 -mx-4 shadow-2xl">
-                            <div className="p-4 min-h-[200px] flex flex-col justify-end relative">
+                        <p className="text font-black uppercase tracking-widest mb-4 opacity-60">Live Simulation Hub</p>
+                        <div className="bg-white rounded-xl overflow-hidden scale-90 -mx-4 ">
+                            <div className="p-4 min-h flex flex-col justify-end relative">
                                 <InvoiceTrustAssets 
                                     settings={simulatedSettings} 
                                     status="draft" 
@@ -789,8 +789,8 @@ min={watermarkType === 'text' ? 20 : 50}
                 </CardContent>
             </Card>
 
-            <div className="p-8 border-2 border-dashed rounded-[3rem] bg-muted/10 space-y-4 group transition-all hover:bg-muted/20 hover:border-primary/20">
-                <div className="size-16 rounded-full bg-background border-2 border-muted flex items-center justify-center mx-auto transition-transform duration-500 group-hover:scale-110 shadow-lg">
+            <div className="p-8 border-2 border-dashed rounded bg-muted/10 space-y-4 group transition-all hover:bg-muted/20 hover:border-primary/20">
+                <div className="size-16 rounded-full bg-background border-2 border-muted flex items-center justify-center mx-auto transition-transform duration-500 group-hover:scale-110 ">
                     <Info className="h-8 w-8 text-primary/40" />
                 </div>
                 <h4 className="font-black text-lg tracking-tight uppercase">Registry Tip</h4>

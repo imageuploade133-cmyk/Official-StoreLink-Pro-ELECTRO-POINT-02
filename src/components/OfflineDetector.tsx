@@ -13,7 +13,7 @@ export function OfflineDetector({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background p-6 text-center animate-in fade-in duration-500">
+    <div className="fixed inset-0 z flex flex-col items-center justify-center bg-background p-6 text-center animate-in fade-in duration-500">
       <div className="mb-8 relative">
         <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl animate-pulse" />
         <div className="relative rounded-full bg-primary/10 p-8 ring-8 ring-primary/5">
@@ -27,7 +27,7 @@ export function OfflineDetector({ children }: { children: React.ReactNode }) {
       <Button 
         onClick={() => window.location.reload()} 
         size="lg"
-        className="h-14 px-8 rounded-2xl text-base font-bold shadow-xl shadow-primary/20 active:scale-95 transition-all flex items-center gap-3"
+        className="h-14 px-8 rounded-2xl text-base font-bold   active:scale-95 transition-all flex items-center gap-3"
       >
         <RefreshCw className="h-5 w-5" />
         RETRY CONNECTION

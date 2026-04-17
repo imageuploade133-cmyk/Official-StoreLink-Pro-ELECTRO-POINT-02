@@ -35,7 +35,7 @@ export function StoreMerchandisingSettings() {
     <div className="space-y-6">
       {/* Merchandising Labels */}
       <div className="space-y-4">
-        <h4 className="text-[10px] font-black uppercase text-muted-foreground tracking-widest flex items-center gap-2">
+        <h4 className="text font-black uppercase text-muted-foreground tracking-widest flex items-center gap-2">
           <Tag className="h-3.5 w-3.5 text-primary" /> Merchandising Labels
         </h4>
         
@@ -50,7 +50,7 @@ export function StoreMerchandisingSettings() {
                   <Sparkles className={cn("h-4 w-4", field.value ? "text-indigo-500" : "text-muted-foreground")} />
                   New Arrival
                 </FormLabel>
-                <p className="text-[10px] text-muted-foreground">Show fresh inventory tag</p>
+                <p className="text text-muted-foreground">Show fresh inventory tag</p>
               </div>
               <FormControl>
                 <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -70,7 +70,7 @@ export function StoreMerchandisingSettings() {
                   <TrendingUp className={cn("h-4 w-4", field.value ? "text-rose-500" : "text-muted-foreground")} />
                   Popular Choice
                 </FormLabel>
-                <p className="text-[10px] text-muted-foreground">Flag as "Best Seller"</p>
+                <p className="text text-muted-foreground">Flag as "Best Seller"</p>
               </div>
               <FormControl>
                 <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -90,7 +90,7 @@ export function StoreMerchandisingSettings() {
                   <History className={cn("h-4 w-4", field.value ? "text-slate-500" : "text-muted-foreground")} />
                   Old Stock
                 </FormLabel>
-                <p className="text-[10px] text-muted-foreground">Highlight as clearance</p>
+                <p className="text text-muted-foreground">Highlight as clearance</p>
               </div>
               <FormControl>
                 <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -113,7 +113,7 @@ export function StoreMerchandisingSettings() {
                 <CheckCircle2 className={cn("h-4 w-4", field.value ? "text-primary" : "text-muted-foreground")} />
                 Official Brand Item
               </FormLabel>
-              <p className="text-[10px] text-muted-foreground">Show "Verified Brand" badge on storefront</p>
+              <p className="text text-muted-foreground">Show "Verified Brand" badge on storefront</p>
             </div>
             <FormControl>
               <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -133,7 +133,7 @@ export function StoreMerchandisingSettings() {
                 <Gift className={cn("h-4 w-4", field.value ? "text-amber-500" : "text-muted-foreground")} />
                 Reward Ads Monetization
               </FormLabel>
-              <p className="text-[10px] text-muted-foreground">Allow customers to unlock discounts via ads</p>
+              <p className="text text-muted-foreground">Allow customers to unlock discounts via ads</p>
             </div>
             <FormControl>
               <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -144,7 +144,7 @@ export function StoreMerchandisingSettings() {
 
       {/* Stock Alerts */}
       <div className="space-y-4">
-        <h4 className="text-[10px] font-black uppercase text-muted-foreground tracking-widest flex items-center gap-2">
+        <h4 className="text font-black uppercase text-muted-foreground tracking-widest flex items-center gap-2">
           <BellRing className="h-3.5 w-3.5 text-orange-500" /> Web Stock Alerts
         </h4>
         <FormField
@@ -163,7 +163,7 @@ export function StoreMerchandisingSettings() {
                   className="h-10 text-sm"
                 />
               </FormControl>
-              <FormDescription className="text-[10px]">Overrides business-wide alert setting if specified.</FormDescription>
+              <FormDescription className="text">Overrides business-wide alert setting if specified.</FormDescription>
               <FormMessage />
             </FormItem>
           )}

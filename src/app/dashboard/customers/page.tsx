@@ -506,7 +506,7 @@ export default function CustomersPage() {
                       </CardContent>
                   </Card>
 
-                  <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+                  <Card className=" border-none ring-1 ring-border overflow-hidden">
                       <CardHeader>
                           <CardTitle className="font-headline text-xl">Directory</CardTitle>
                           <CardDescription>
@@ -542,16 +542,16 @@ export default function CustomersPage() {
                               </div>
                           ) : (
                               <div className="w-full overflow-x-auto">
-                                  <Table className="min-w-[1200px] md:min-w-full">
+                                  <Table className="min-w md:min-w-full">
                                       <TableHeader className="bg-muted/50">
                                           <TableRow>
-                                              <TableHead className="w-[60px] pl-6">Avatar</TableHead>
-                                              <TableHead className="min-w-[150px]">Name & Contact</TableHead>
+                                              <TableHead className="w pl-6">Avatar</TableHead>
+                                              <TableHead className="min-w">Name & Contact</TableHead>
                                               <TableHead className="text-right">Total Spent</TableHead>
                                               <TableHead className="text-right">Credit Due</TableHead>
                                               <TableHead className="text-right">Deposit Bal</TableHead>
                                               <TableHead>Status</TableHead>
-                                              <TableHead className="min-w-[100px] text-center pr-6">Actions</TableHead>
+                                              <TableHead className="min-w text-center pr-6">Actions</TableHead>
                                           </TableRow>
                                       </TableHeader>
                                       <TableBody>
@@ -563,14 +563,14 @@ export default function CustomersPage() {
                                                               src={(customer as any).profileImageUrl || defaultProfileImageUrl}
                                                               alt={customer.name}
                                                               width={40} height={40}
-                                                              className="rounded-full object-cover aspect-square shadow-sm"
+                                                              className="rounded-full object-cover aspect-square "
                                                               data-ai-hint="person face"
                                                               onError={(e: any) => { e.target.src = defaultProfileImageUrl; }}
                                                           />
                                                       </TableCell>
                                                       <TableCell className="font-medium">
-                                                          <div className="truncate max-w-[160px] text-sm font-bold" title={customer.name}>{customer.name}</div>
-                                                          {customer.email && <div className="text-xs text-muted-foreground truncate max-w-[160px]" title={customer.email}>{customer.email}</div>}
+                                                          <div className="truncate max-w text-sm font-bold" title={customer.name}>{customer.name}</div>
+                                                          {customer.email && <div className="text-xs text-muted-foreground truncate max-w" title={customer.email}>{customer.email}</div>}
                                                           {customer.phone && <div className="text-xs text-muted-foreground">Phone: {customer.phone}</div>}
                                                       </TableCell>
                                                       <TableCell className="text-right font-medium text-muted-foreground">
@@ -584,11 +584,11 @@ export default function CustomersPage() {
                                                       </TableCell>
                                                       <TableCell>
                                                           {customer.status === 'active' ? (
-                                                              <Badge variant="default" className="bg-green-50 text-green-700 border-green-200 dark:bg-green-800/30 dark:text-green-300 dark:border-green-700 h-5 px-2 text-[10px] font-black uppercase tracking-tighter">
+                                                              <Badge variant="default" className="bg-green-50 text-green-700 border-green-200 dark:bg-green-800/30 dark:text-green-300 dark:border-green-700 h-5 px-2 text font-black uppercase tracking-tighter">
                                                                   Active
                                                               </Badge>
                                                           ) : (
-                                                              <Badge variant="destructive" className="h-5 px-2 text-[10px] font-black uppercase tracking-tighter">
+                                                              <Badge variant="destructive" className="h-5 px-2 text font-black uppercase tracking-tighter">
                                                                   {customer.status}
                                                               </Badge>
                                                           )}
@@ -656,11 +656,11 @@ export default function CustomersPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-2 bg-muted/30 p-3 rounded-lg border">
                     <div className="text-center">
-                        <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Total Spent</p>
+                        <p className="text font-black uppercase text-muted-foreground tracking-widest">Total Spent</p>
                         <p className="text-sm font-bold">{formatCurrency(selectedCustomerForActions.totalSpent || 0, currencySymbol)}</p>
                     </div>
                     <div className="text-center border-l">
-                        <p className="text-[10px] font-black uppercase text-destructive tracking-widest">Debt Due</p>
+                        <p className="text font-black uppercase text-destructive tracking-widest">Debt Due</p>
                         <p className="text-sm font-bold text-destructive">{formatCurrency(selectedCustomerForActions.outstandingCredit || 0, currencySymbol)}</p>
                     </div>
                 </div>
@@ -685,12 +685,12 @@ export default function CustomersPage() {
                 <Separator />
                 
                 <div className="space-y-3">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Account Status</Label>
+                  <Label className="text font-black uppercase tracking-widest text-muted-foreground">Account Status</Label>
                   <div className="grid grid-cols-3 gap-2">
                     <Button 
                       variant={selectedCustomerForActions.status === 'active' ? 'default' : 'outline'} 
                       size="sm" 
-                      className={cn("h-8 text-[10px] font-black uppercase", selectedCustomerForActions.status === 'active' && "bg-green-600 hover:bg-green-700")}
+                      className={cn("h-8 text font-black uppercase", selectedCustomerForActions.status === 'active' && "bg-green-600 hover:bg-green-700")}
                       onClick={() => setCustomerStatus(selectedCustomerForActions.id, 'active', selectedCustomerForActions.name)}
                       disabled={isUpdatingStatus || selectedCustomerForActions.status === 'active'}
                     >
@@ -700,7 +700,7 @@ export default function CustomersPage() {
                     <Button 
                       variant={selectedCustomerForActions.status === 'inactive' ? 'secondary' : 'outline'} 
                       size="sm" 
-                      className="h-8 text-[10px] font-black uppercase"
+                      className="h-8 text font-black uppercase"
                       onClick={() => setCustomerStatus(selectedCustomerForActions.id, 'inactive', selectedCustomerForActions.name)}
                       disabled={isUpdatingStatus || selectedCustomerForActions.status === 'inactive'}
                     >
@@ -709,7 +709,7 @@ export default function CustomersPage() {
                     <Button 
                       variant={selectedCustomerForActions.status === 'banned' ? 'destructive' : 'outline'} 
                       size="sm" 
-                      className="h-8 text-[10px] font-black uppercase"
+                      className="h-8 text font-black uppercase"
                       onClick={() => setCustomerStatus(selectedCustomerForActions.id, 'banned', selectedCustomerForActions.name)}
                       disabled={isUpdatingStatus || selectedCustomerForActions.status === 'banned'}
                     >
@@ -721,7 +721,7 @@ export default function CustomersPage() {
                 <Separator />
 
                 <div className="space-y-3">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Communication Prefs</Label>
+                  <Label className="text font-black uppercase tracking-widest text-muted-foreground">Communication Prefs</Label>
                   <div className="flex items-center justify-between p-2 border rounded-md">
                     <span className="text-xs font-medium flex items-center gap-2"><Phone className="h-3.5 w-3.5 text-blue-500"/> Allow SMS</span>
                     <Switch 
@@ -740,7 +740,7 @@ export default function CustomersPage() {
 
                 <Separator />
 
-                <Button variant="ghost" className="w-full text-destructive hover:bg-destructive/10 text-[10px] font-black uppercase h-8" onClick={() => handleDeleteCustomer(selectedCustomerForActions)} disabled={!permissions.canDeleteCustomers}>
+                <Button variant="ghost" className="w-full text-destructive hover:bg-destructive/10 text font-black uppercase h-8" onClick={() => handleDeleteCustomer(selectedCustomerForActions)} disabled={!permissions.canDeleteCustomers}>
                   <Trash2 className="mr-2 h-3.5 w-3.5" /> Delete Account Permanently
                 </Button>
               </div>

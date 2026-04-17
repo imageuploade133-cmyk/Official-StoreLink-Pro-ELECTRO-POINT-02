@@ -40,7 +40,7 @@ export function DateRangePicker({
 
   return (
     <div className={cn('grid gap-2', className)}>
-      <div className="relative w-full sm:w-[300px]">
+      <div className="relative w-full sm:w">
         <Popover open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>
             <Button

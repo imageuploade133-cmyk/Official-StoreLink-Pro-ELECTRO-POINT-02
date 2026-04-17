@@ -187,7 +187,7 @@ export default function EditSlidePage() {
     return (
         <div className="space-y-6">
             <Skeleton className="h-10 w-1/3" />
-            <Skeleton className="h-[500px] w-full" />
+            <Skeleton className="h w-full" />
         </div>
     );
   }
@@ -223,7 +223,7 @@ export default function EditSlidePage() {
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+          <Card className=" border-none ring-1 ring-border overflow-hidden">
             <CardHeader className="bg-muted/30">
               <CardTitle>Slide Placement & Content</CardTitle>
               <CardDescription>Make changes to your slide attributes below.</CardDescription>
@@ -278,7 +278,7 @@ export default function EditSlidePage() {
                             <FormLabel className="font-bold">Background Asset <span className="text-destructive">*</span></FormLabel>
                             <div className="flex items-start gap-6">
                                 {imageUrl && (
-                                    <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border-2 border-white shadow-xl flex-shrink-0">
+                                    <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border-2 border-white  flex-shrink-0">
                                         <Image src={imageUrl} alt="Background preview" fill className="object-cover" unoptimized/>
                                     </div>
                                 )}
@@ -303,14 +303,14 @@ export default function EditSlidePage() {
                 )}
                 
                 {mediaType === 'video' && (
-                    <div className="space-y-6 p-6 border-2 border-primary/10 rounded-[2rem] bg-primary/5">
+                    <div className="space-y-6 p-6 border-2 border-primary/10 rounded bg-primary/5">
                         <FormField control={form.control} name="videoUrl" render={({ field }) => (<FormItem><FormLabel>Background Video URL <span className="text-destructive">*</span></FormLabel><FormControl><Input placeholder="https://example.com/video.mp4" {...field} value={field.value || ''} className="h-11" /></FormControl><FormMessage /></FormItem>)} />
                         <FormField control={form.control} name="videoPosterUrl" render={({ field }) => (
                             <FormItem>
                                 <FormLabel className="font-bold">Video Poster Image (Optional)</FormLabel>
                                 <div className="flex items-start gap-4">
                                 {videoPosterUrl && (
-                                    <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border-2 border-white shadow-xl flex-shrink-0">
+                                    <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border-2 border-white  flex-shrink-0">
                                         <Image src={videoPosterUrl} alt="Poster preview" fill className="object-cover" unoptimized/>
                                     </div>
                                 )}
@@ -403,7 +403,7 @@ export default function EditSlidePage() {
                 </div>
             </CardContent>
             <CardFooter className="bg-muted/30 border-t p-8 flex justify-between">
-              <Button type="submit" disabled={isSaving || isUploading || isUploadingPoster} size="lg" className="px-12 h-14 rounded-2xl font-black uppercase text-xs tracking-widest shadow-2xl shadow-primary/20 transition-all active:scale-95">
+              <Button type="submit" disabled={isSaving || isUploading || isUploadingPoster} size="lg" className="px-12 h-14 rounded-2xl font-black uppercase text-xs tracking-widest   transition-all active:scale-95">
                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                 {isSaving ? 'Synchronizing...' : 'Save Changes'}
               </Button>

@@ -152,7 +152,7 @@ export default function EditStoreProductPage() {
     return (
         <div className="space-y-6">
             <PageHeader icon={Globe} title="Edit Store Product" description="Syncing distributed assets..." />
-            <Skeleton className="h-[600px] w-full rounded-2xl" />
+            <Skeleton className="h w-full rounded-2xl" />
         </div>
     );
   }

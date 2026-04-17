@@ -319,7 +319,7 @@ export default function ProductSalesPage() {
             </div>
             <Popover>
               <PopoverTrigger asChild>
-                  <Button id="date" variant={"outline"} className={cn("w-full sm:w-[260px] justify-start text-left font-normal h-9", !dateRange && "text-muted-foreground", activePreset === 'custom' && "border-primary ring-1 ring-primary")}>
+                  <Button id="date" variant={"outline"} className={cn("w-full sm:w justify-start text-left font-normal h-9", !dateRange && "text-muted-foreground", activePreset === 'custom' && "border-primary ring-1 ring-primary")}>
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {dateRange?.from ? (dateRange.to ? (<>{format(dateRange.from, "LLL dd, y")} - {format(dateRange.to, "LLL dd, y")}</>) : (format(dateRange.from, "LLL dd, y"))) : (<span>Pick a date</span>)}
                   </Button>
@@ -380,14 +380,14 @@ export default function ProductSalesPage() {
             <TabsTrigger value="dailySalesPerformance">Daily Trends</TabsTrigger>
         </TabsList>
         <TabsContent value="allProducts">
-            <Card className="shadow-md rounded-lg overflow-hidden border-none ring-1 ring-border">
+            <Card className=" rounded-lg overflow-hidden border-none ring-1 ring-border">
                 <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 gap-3 bg-white dark:bg-slate-900 border-b">
                     <div>
                         <CardTitle className="text-lg">Product Performance Ranking</CardTitle>
                         <CardDescription>Sales summary for the period {getDateRangeTitle()}</CardDescription>
                     </div>
                     <div className="flex items-center gap-2 w-full sm:w-auto">
-                        <div className="relative flex-grow sm:w-[280px]">
+                        <div className="relative flex-grow sm:w">
                             <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                             <Input
                                 type="search"

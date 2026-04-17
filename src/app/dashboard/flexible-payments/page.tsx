@@ -217,7 +217,7 @@ export default function FlexiblePaymentsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-orange-50 border-orange-100 shadow-none">
+        <Card className="bg-orange-50 border-orange-100 ">
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-black uppercase tracking-widest text-orange-600 flex items-center justify-between">
                 Current Batch Debt <ArrowUpRight className="h-4 w-4" />
@@ -225,11 +225,11 @@ export default function FlexiblePaymentsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-black text-orange-700">{formatCurrency(stats.totalOwed, currencySymbol)}</div>
-            <p className="text-[10px] text-orange-600/70 font-bold uppercase mt-1">Sum of active credit sales in view</p>
+            <p className="text text-orange-600/70 font-bold uppercase mt-1">Sum of active credit sales in view</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-green-50 border-green-100 shadow-none">
+        <Card className="bg-green-50 border-green-100 ">
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-black uppercase tracking-widest text-green-600 flex items-center justify-between">
                 Current Batch Balances <ArrowDownLeft className="h-4 w-4" />
@@ -237,11 +237,11 @@ export default function FlexiblePaymentsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-black text-green-700">{formatCurrency(stats.totalDeposits, currencySymbol)}</div>
-            <p className="text-[10px] text-green-600/70 font-bold uppercase mt-1">Unallocated funds in view</p>
+            <p className="text text-green-600/70 font-bold uppercase mt-1">Unallocated funds in view</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-blue-50 border-blue-100 shadow-none">
+        <Card className="bg-blue-50 border-blue-100 ">
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-black uppercase tracking-widest text-blue-600 flex items-center justify-between">
                 Total Registry Members <Users className="h-4 w-4" />
@@ -249,23 +249,23 @@ export default function FlexiblePaymentsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-black text-blue-700">{totalCustomerCount.toLocaleString()}</div>
-            <p className="text-[10px] text-blue-600/70 font-bold uppercase mt-1">Registered accounts in database</p>
+            <p className="text text-blue-600/70 font-bold uppercase mt-1">Registered accounts in database</p>
           </CardContent>
         </Card>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-6 h-12 p-1 bg-muted/50 rounded-2xl border">
-          <TabsTrigger value="registry" className="rounded-xl font-bold uppercase text-[10px] tracking-widest gap-2">
+          <TabsTrigger value="registry" className="rounded-xl font-bold uppercase text tracking-widest gap-2">
             <Users className="h-3.5 w-3.5" /> Account Registry
           </TabsTrigger>
-          <TabsTrigger value="audit" className="rounded-xl font-bold uppercase text-[10px] tracking-widest gap-2">
+          <TabsTrigger value="audit" className="rounded-xl font-bold uppercase text tracking-widest gap-2">
             <History className="h-3.5 w-3.5" /> Deposit Audit Log
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="registry" className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-          <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+          <Card className=" border-none ring-1 ring-border overflow-hidden">
             <CardHeader className="border-b bg-muted/10">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
@@ -287,11 +287,11 @@ export default function FlexiblePaymentsPage() {
               <Table>
                 <TableHeader className="bg-muted/50">
                   <TableRow>
-                    <TableHead className="font-black uppercase text-[10px] tracking-widest pl-6">Customer</TableHead>
-                    <TableHead className="text-right font-black uppercase text-[10px] tracking-widest">Debt Due</TableHead>
-                    <TableHead className="text-right font-black uppercase text-[10px] tracking-widest">Credit Bal</TableHead>
-                    <TableHead className="text-right font-black uppercase text-[10px] tracking-widest">Net Position</TableHead>
-                    <TableHead className="text-right font-black uppercase text-[10px] tracking-widest pr-6">Account Tools</TableHead>
+                    <TableHead className="font-black uppercase text tracking-widest pl-6">Customer</TableHead>
+                    <TableHead className="text-right font-black uppercase text tracking-widest">Debt Due</TableHead>
+                    <TableHead className="text-right font-black uppercase text tracking-widest">Credit Bal</TableHead>
+                    <TableHead className="text-right font-black uppercase text tracking-widest">Net Position</TableHead>
+                    <TableHead className="text-right font-black uppercase text tracking-widest pr-6">Account Tools</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -322,7 +322,7 @@ export default function FlexiblePaymentsPage() {
                         <TableRow key={customer.id} className="group hover:bg-muted/30 transition-colors">
                           <TableCell className="py-4 pl-6">
                             <p className="font-bold text-gray-900">{customer.name}</p>
-                            <p className="text-[10px] text-muted-foreground uppercase">{customer.phone || customer.email || 'No contact info'}</p>
+                            <p className="text text-muted-foreground uppercase">{customer.phone || customer.email || 'No contact info'}</p>
                           </TableCell>
                           <TableCell className="text-right font-bold text-orange-600">
                             {debt > 0 ? formatCurrency(debt, currencySymbol) : '-'}
@@ -332,7 +332,7 @@ export default function FlexiblePaymentsPage() {
                           </TableCell>
                           <TableCell className="text-right">
                             <Badge variant="outline" className={cn(
-                                "font-black text-[9px] uppercase px-2 h-5",
+                                "font-black text uppercase px-2 h-5",
                                 net >= 0 ? "bg-green-50 text-green-700 border-green-200" : "bg-red-50 text-red-700 border-red-200"
                             )}>
                                 {net >= 0 ? `CREDIT: ${formatCurrency(net, currencySymbol)}` : `OWED: ${formatCurrency(Math.abs(net), currencySymbol)}`}
@@ -340,13 +340,13 @@ export default function FlexiblePaymentsPage() {
                           </TableCell>
                           <TableCell className="text-right pr-6">
                             <div className="flex justify-end gap-2">
-                                <Button variant="outline" size="sm" className="h-8 text-[10px] font-black uppercase tracking-tighter gap-1.5 border-primary/20 hover:bg-primary/5 text-primary" onClick={() => handleOpenDeposit(customer)}>
+                                <Button variant="outline" size="sm" className="h-8 text font-black uppercase tracking-tighter gap-1.5 border-primary/20 hover:bg-primary/5 text-primary" onClick={() => handleOpenDeposit(customer)}>
                                     <HandCoins className="h-3.5 w-3.5" /> Deposit
                                 </Button>
-                                <Button variant="ghost" size="sm" className="h-8 text-[10px] font-black uppercase tracking-tighter gap-1.5" onClick={() => handleOpenHistory(customer)}>
+                                <Button variant="ghost" size="sm" className="h-8 text font-black uppercase tracking-tighter gap-1.5" onClick={() => handleOpenHistory(customer)}>
                                     <History className="h-3.5 w-3.5" /> History
                                 </Button>
-                                <Button variant="ghost" size="sm" className="h-8 text-[10px] font-black uppercase tracking-tighter gap-1.5 bg-primary/5 text-primary hover:bg-primary hover:text-white" asChild>
+                                <Button variant="ghost" size="sm" className="h-8 text font-black uppercase tracking-tighter gap-1.5 bg-primary/5 text-primary hover:bg-primary hover:text-white" asChild>
                                     <Link href={statementPath}>
                                         <FileText className="h-3.5 w-3.5" /> Statement
                                     </Link>

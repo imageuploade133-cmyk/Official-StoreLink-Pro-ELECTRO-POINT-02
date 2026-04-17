@@ -218,7 +218,7 @@ export function ProductImageGallery({
             <Label className="text-sm font-black uppercase tracking-widest text-primary flex items-center gap-2">
             <ImageIcon className="h-4 w-4" /> Visual Catalog Management
             </Label>
-            <p className="text-[10px] text-muted-foreground font-bold mt-1 uppercase tracking-tighter">
+            <p className="text text-muted-foreground font-bold mt-1 uppercase tracking-tighter">
                 First image is your Hero. Max size: {settings?.imageMaxFileSizeMb || 5}MB.
             </p>
         </div>
@@ -286,8 +286,8 @@ export function ProductImageGallery({
           <div 
             key={item.url + index} 
             className={cn(
-                "group relative aspect-square rounded-[1.5rem] overflow-hidden border-2 transition-all duration-300 shadow-lg",
-                item.isPrimary ? "border-primary scale-105 z-10 ring-4 ring-primary/10" : "border-muted bg-muted grayscale-[0.2] hover:grayscale-0"
+                "group relative aspect-square rounded overflow-hidden border-2 transition-all duration-300 ",
+                item.isPrimary ? "border-primary scale-105 z-10 ring-4 ring-primary/10" : "border-muted bg-muted grayscale hover:grayscale-0"
             )}
           >
             <Image 
@@ -300,7 +300,7 @@ export function ProductImageGallery({
             
             <div className="absolute top-2 left-2 right-2 flex justify-between items-start">
                 <Badge className={cn(
-                    "text-[8px] font-black uppercase tracking-widest py-0.5",
+                    "text font-black uppercase tracking-widest py-0.5",
                     item.isPrimary ? "bg-primary text-white" : "bg-black/50 text-white backdrop-blur-sm"
                 )}>
                     {item.isPrimary ? <CheckCircle2 className="h-2 w-2 mr-1" /> : null}
@@ -372,7 +372,7 @@ export function ProductImageGallery({
                         type="button" 
                         variant="secondary" 
                         size="sm" 
-                        className="h-7 px-2 rounded-lg bg-primary text-white font-black text-[8px] uppercase tracking-widest hover:bg-white hover:text-primary transition-colors"
+                        className="h-7 px-2 rounded-lg bg-primary text-white font-black text uppercase tracking-widest hover:bg-white hover:text-primary transition-colors"
                         onClick={() => makePrimary(index)}
                         disabled={disabled || isUploading}
                     >
@@ -384,14 +384,14 @@ export function ProductImageGallery({
         ))}
 
         {isUploading && (
-          <div className="aspect-square rounded-[1.5rem] border-2 border-dashed border-primary/30 flex flex-col items-center justify-center bg-primary/5 animate-pulse gap-2">
+          <div className="aspect-square rounded border-2 border-dashed border-primary/30 flex flex-col items-center justify-center bg-primary/5 animate-pulse gap-2">
             <Loader2 className="h-8 w-8 text-primary animate-spin" />
-            <span className="text-[10px] font-black uppercase text-primary">Optimizing...</span>
+            <span className="text font-black uppercase text-primary">Optimizing...</span>
           </div>
         )}
 
         {allImages.length === 0 && !isUploading && (
-          <div className="col-span-full py-16 border-2 border-dashed rounded-[2rem] flex flex-col items-center justify-center text-muted-foreground bg-muted/10">
+          <div className="col-span-full py-16 border-2 border-dashed rounded flex flex-col items-center justify-center text-muted-foreground bg-muted/10">
             <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
                 <Upload className="h-8 w-8 opacity-20" />
             </div>
@@ -403,7 +403,7 @@ export function ProductImageGallery({
 
       {/* Full Screen Preview Dialog */}
       <Dialog open={!!previewUrl} onOpenChange={(open) => !open && setPreviewUrl(null)}>
-        <DialogContent className="max-w-[95vw] md:max-w-4xl p-0 overflow-hidden bg-black/90 border-none shadow-2xl">
+        <DialogContent className="max-w md:max-w-4xl p-0 overflow-hidden bg-black/90 border-none ">
           <DialogHeader className="sr-only">
             <DialogTitle>Image Preview</DialogTitle>
             <DialogDescription>Full screen view of the selected image.</DialogDescription>

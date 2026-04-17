@@ -229,7 +229,7 @@ export default function ReturnsPage() {
         />
       </div>
 
-      <Card className="shadow-lg overflow-hidden border-none ring-1 ring-border">
+      <Card className=" overflow-hidden border-none ring-1 ring-border">
         <CardHeader className="bg-muted/10 border-b">
           <CardTitle>Returned Sales Log</CardTitle>
           <CardDescription>
@@ -270,10 +270,10 @@ export default function ReturnsPage() {
                   const updatedAt = convertToDateSafely(sale.updatedAt);
                   return (
                     <TableRow key={sale.id} className="hover:bg-muted/30 transition-colors">
-                      <TableCell className="font-mono text-[10px] font-bold text-primary">#{sale.id.substring(0, 8).toUpperCase()}</TableCell>
+                      <TableCell className="font-mono text font-bold text-primary">#{sale.id.substring(0, 8).toUpperCase()}</TableCell>
                       <TableCell className="text-xs">
                         <div className="font-bold">{updatedAt ? format(updatedAt, 'PP') : 'N/A'}</div>
-                        <div className="text-[10px] text-muted-foreground">{updatedAt ? format(updatedAt, 'p') : ''}</div>
+                        <div className="text text-muted-foreground">{updatedAt ? format(updatedAt, 'p') : ''}</div>
                       </TableCell>
                       <TableCell className="font-semibold text-sm">{sale.customerName || 'Walk-in'}</TableCell>
                       <TableCell className="text-right font-medium text-xs">
@@ -283,7 +283,7 @@ export default function ReturnsPage() {
                         -{formatCurrency(sale.returnedAmount || 0, currencySymbol)}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={sale.returnStatus === 'fullyReturned' ? 'destructive' : 'secondary'} className="text-[9px] font-black uppercase tracking-tighter">
+                        <Badge variant={sale.returnStatus === 'fullyReturned' ? 'destructive' : 'secondary'} className="text font-black uppercase tracking-tighter">
                           {sale.returnStatus === 'fullyReturned' ? 'Full Return' : 'Partial Return'}
                         </Badge>
                       </TableCell>

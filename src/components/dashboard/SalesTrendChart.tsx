@@ -58,11 +58,11 @@ export function SalesTrendChart({ isLoading, salesTrendData, dateRange }: SalesT
       </CardHeader>
       <CardContent className="pl-2">
         {isLoading ? (
-          <div className="h-[300px] flex items-center justify-center">
+          <div className="h flex items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : salesTrendData.length > 0 ? (
-          <ChartContainer config={chartConfig} className="h-[300px] w-full">
+          <ChartContainer config={chartConfig} className="h w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={salesTrendData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -89,7 +89,7 @@ export function SalesTrendChart({ isLoading, salesTrendData, dateRange }: SalesT
             </ResponsiveContainer>
           </ChartContainer>
         ) : (
-          <div className="h-[300px] flex items-center justify-center text-muted-foreground">No sales data for the selected period.</div>
+          <div className="h flex items-center justify-center text-muted-foreground">No sales data for the selected period.</div>
         )}
       </CardContent>
     </Card>

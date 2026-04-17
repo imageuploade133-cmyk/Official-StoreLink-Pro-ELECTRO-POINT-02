@@ -230,7 +230,7 @@ export function BulkStockUpdateDialog({
   // Desktop Dialog View
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl max-h-[90vh] flex flex-col p-0">
+      <DialogContent className="sm:max-w-xl max-h flex flex-col p-0">
         <DialogHeader className="p-6 pb-4 border-b">
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Boxes className="h-6 w-6 text-primary"/> 

@@ -162,7 +162,7 @@ export function DepositAuditTab({ currencySymbol }: DepositAuditTabProps) {
 
   return (
     <div className="space-y-6">
-      <Card className="shadow-none bg-muted/10 border-dashed border-2">
+      <Card className=" bg-muted/10 border-dashed border-2">
         <CardContent className="pt-6">
           <div className="flex flex-col md:flex-row gap-4 items-center">
             <div className="relative flex-grow">
@@ -200,7 +200,7 @@ export function DepositAuditTab({ currencySymbol }: DepositAuditTabProps) {
         </CardContent>
       </Card>
 
-      <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <CardHeader className="border-b bg-muted/10">
           <div className="flex items-center gap-3">
             <History className="h-6 w-6 text-primary" />
@@ -215,12 +215,12 @@ export function DepositAuditTab({ currencySymbol }: DepositAuditTabProps) {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/50 hover:bg-transparent">
-                  <TableHead className="pl-6 font-black uppercase text-[10px] tracking-widest">Timestamp</TableHead>
-                  <TableHead className="font-black uppercase text-[10px] tracking-widest">Account Registry</TableHead>
-                  <TableHead className="text-right font-black uppercase text-[10px] tracking-widest">Amount Recv.</TableHead>
-                  <TableHead className="font-black uppercase text-[10px] tracking-widest">Protocol</TableHead>
-                  <TableHead className="font-black uppercase text-[10px] tracking-widest">Performed By</TableHead>
-                  <TableHead className="pr-6 font-black uppercase text-[10px] tracking-widest">Audit Narration</TableHead>
+                  <TableHead className="pl-6 font-black uppercase text tracking-widest">Timestamp</TableHead>
+                  <TableHead className="font-black uppercase text tracking-widest">Account Registry</TableHead>
+                  <TableHead className="text-right font-black uppercase text tracking-widest">Amount Recv.</TableHead>
+                  <TableHead className="font-black uppercase text tracking-widest">Protocol</TableHead>
+                  <TableHead className="font-black uppercase text tracking-widest">Performed By</TableHead>
+                  <TableHead className="pr-6 font-black uppercase text tracking-widest">Audit Narration</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -244,13 +244,13 @@ export function DepositAuditTab({ currencySymbol }: DepositAuditTabProps) {
                           <div className="text-xs font-bold text-gray-900 dark:text-gray-100">
                             {date ? format(date, 'EEEE - dd- yyyy') : 'N/A'}
                           </div>
-                          <div className="text-[10px] text-muted-foreground uppercase font-black">
+                          <div className="text text-muted-foreground uppercase font-black">
                             {date ? `time ${format(date, 'hh:mm a')}` : ''}
                           </div>
                         </TableCell>
                         <TableCell>
                           <p className="font-black text-sm text-gray-900 dark:text-gray-100 leading-tight">{p.customerName}</p>
-                          <p className="text-[10px] text-muted-foreground uppercase font-mono tracking-tighter">REF: {p.id.substring(0, 12).toUpperCase()}</p>
+                          <p className="text text-muted-foreground uppercase font-mono tracking-tighter">REF: {p.id.substring(0, 12).toUpperCase()}</p>
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="text-base font-black text-emerald-600">
@@ -258,7 +258,7 @@ export function DepositAuditTab({ currencySymbol }: DepositAuditTabProps) {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className="h-5 text-[9px] font-black uppercase tracking-tighter bg-background shadow-sm border-primary/20 text-primary">
+                          <Badge variant="outline" className="h-5 text font-black uppercase tracking-tighter bg-background  border-primary/20 text-primary">
                             {p.paymentMethod}
                           </Badge>
                         </TableCell>
@@ -269,11 +269,11 @@ export function DepositAuditTab({ currencySymbol }: DepositAuditTabProps) {
                             </div>
                             <div className="min-w-0">
                                 <p className="text-xs font-bold text-gray-900 truncate">{staff?.name || 'Authorized Agent'}</p>
-                                <p className="text-[10px] text-muted-foreground truncate">{staff?.email || ''}</p>
+                                <p className="text text-muted-foreground truncate">{staff?.email || ''}</p>
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell className="pr-6 max-w-[200px]">
+                        <TableCell className="pr-6 max-w">
                           <p className="text-xs text-muted-foreground line-clamp-2 italic font-medium" title={p.notes || ''}>
                             {p.notes ? `"${p.notes}"` : 'No additional narration provided.'}
                           </p>

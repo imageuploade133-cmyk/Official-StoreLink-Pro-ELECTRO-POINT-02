@@ -85,7 +85,7 @@ export function ImageUploadSettings({ settingsData, isLoading, storeId }: ImageU
   }
 
   return (
-    <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+    <Card className=" border-none ring-1 ring-border overflow-hidden">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader className="bg-muted/30 border-b">
@@ -117,7 +117,7 @@ export function ImageUploadSettings({ settingsData, isLoading, storeId }: ImageU
                                         className="py-4"
                                     />
                                 </FormControl>
-                                <FormDescription className="text-[10px]">Files larger than this will be rejected instantly to save bandwidth.</FormDescription>
+                                <FormDescription className="text">Files larger than this will be rejected instantly to save bandwidth.</FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -142,7 +142,7 @@ export function ImageUploadSettings({ settingsData, isLoading, storeId }: ImageU
                                         className="py-4"
                                     />
                                 </FormControl>
-                                <FormDescription className="text-[10px]">Higher quality results in larger file sizes and slower load times.</FormDescription>
+                                <FormDescription className="text">Higher quality results in larger file sizes and slower load times.</FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -167,7 +167,7 @@ export function ImageUploadSettings({ settingsData, isLoading, storeId }: ImageU
                                         className="py-4"
                                     />
                                 </FormControl>
-                                <FormDescription className="text-[10px]">Images wider than this will be scaled down automatically.</FormDescription>
+                                <FormDescription className="text">Images wider than this will be scaled down automatically.</FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -197,11 +197,11 @@ export function ImageUploadSettings({ settingsData, isLoading, storeId }: ImageU
             </div>
           </CardContent>
           <CardFooter className="bg-muted/30 border-t p-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
-            <Button type="submit" disabled={isSaving} className="font-black uppercase tracking-widest text-xs h-12 px-8 shadow-xl shadow-primary/20">
+            <Button type="submit" disabled={isSaving} className="font-black uppercase tracking-widest text-xs h-12 px-8  ">
               {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Save className="mr-2 h-4 w-4" />}
               Save Optimization Profile
             </Button>
-            <Button type="button" variant="outline" onClick={handleReset} disabled={isSaving} className="font-bold uppercase tracking-widest text-[10px]">
+            <Button type="button" variant="outline" onClick={handleReset} disabled={isSaving} className="font-bold uppercase tracking-widest text">
               <RotateCcw className="mr-2 h-4 w-4" /> Reset to Default
             </Button>
           </CardFooter>

@@ -108,7 +108,7 @@ export function CustomerDepositsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl h-[80vh] flex flex-col p-0 overflow-hidden">
+      <DialogContent className="max-w-3xl h flex flex-col p-0 overflow-hidden">
         <DialogHeader className="p-6 pb-4 border-b bg-background">
           <div className="flex items-center gap-3">
             <History className="h-7 w-7 text-primary" />
@@ -121,13 +121,13 @@ export function CustomerDepositsModal({
 
         <div className="px-6 py-4 bg-primary/5 border-b flex justify-between items-center">
             <div className="space-y-1">
-                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest leading-none">Net Position</p>
+                <p className="text font-black uppercase text-muted-foreground tracking-widest leading-none">Net Position</p>
                 <p className={cn("text-xl font-black tracking-tighter", outstanding > 0 ? "text-red-600" : "text-green-600")}>
                     {formatCurrency(netPosition, currencySymbol)}
                 </p>
             </div>
             <div className="text-right">
-                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest leading-none">Lifetime Deposits</p>
+                <p className="text font-black uppercase text-muted-foreground tracking-widest leading-none">Lifetime Deposits</p>
                 <p className="text-xl font-black tracking-tighter text-primary">
                     {formatCurrency(payments.reduce((s, p) => s + (p.amount || 0), 0), currencySymbol)}
                 </p>
@@ -150,10 +150,10 @@ export function CustomerDepositsModal({
               <Table>
                 <TableHeader>
                   <TableRow className="hover:bg-transparent">
-                    <TableHead className="text-[10px] font-black uppercase tracking-widest">Date</TableHead>
-                    <TableHead className="text-[10px] font-black uppercase tracking-widest">Method</TableHead>
-                    <TableHead className="text-right text-[10px] font-black uppercase tracking-widest">Amount Paid</TableHead>
-                    <TableHead className="text-right text-[10px] font-black uppercase tracking-widest">Actions</TableHead>
+                    <TableHead className="text font-black uppercase tracking-widest">Date</TableHead>
+                    <TableHead className="text font-black uppercase tracking-widest">Method</TableHead>
+                    <TableHead className="text-right text font-black uppercase tracking-widest">Amount Paid</TableHead>
+                    <TableHead className="text-right text font-black uppercase tracking-widest">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -165,10 +165,10 @@ export function CustomerDepositsModal({
                           <div className="font-bold text-sm">
                             {date ? format(date, 'EEEE - MMM- dd- yyyy') : 'N/A'}
                           </div>
-                          <div className="text-[10px] text-muted-foreground uppercase">{date ? format(date, 'h:mm a') : ''}</div>
+                          <div className="text text-muted-foreground uppercase">{date ? format(date, 'h:mm a') : ''}</div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className="text-[10px] font-black uppercase px-2 h-5 bg-background shadow-sm">
+                          <Badge variant="outline" className="text font-black uppercase px-2 h-5 bg-background ">
                             {payment.paymentMethod}
                           </Badge>
                         </TableCell>
@@ -181,7 +181,7 @@ export function CustomerDepositsModal({
                           <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="h-8 gap-2 font-black text-[10px] uppercase tracking-tighter hover:bg-primary/10 hover:text-primary rounded-lg"
+                            className="h-8 gap-2 font-black text uppercase tracking-tighter hover:bg-primary/10 hover:text-primary rounded-lg"
                             onClick={() => handlePrintReceipt(payment)}
                           >
                             <Printer className="h-3.5 w-3.5" />
@@ -198,7 +198,7 @@ export function CustomerDepositsModal({
         </ScrollArea>
 
         <DialogFooter className="p-6 border-t bg-background shrink-0 flex flex-row justify-between items-center">
-          <Button variant="ghost" className="h-11 font-black uppercase tracking-widest text-[10px] gap-2 bg-primary/10 text-primary hover:bg-primary hover:text-white" asChild>
+          <Button variant="ghost" className="h-11 font-black uppercase tracking-widest text gap-2 bg-primary/10 text-primary hover:bg-primary hover:text-white" asChild>
             <Link href={statementPath}>
                 <FileText className="h-4 w-4" /> Full Statement of Account
             </Link>

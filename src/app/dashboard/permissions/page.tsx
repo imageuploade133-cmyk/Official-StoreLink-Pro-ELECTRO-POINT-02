@@ -47,7 +47,7 @@ export default function PermissionsPage() {
               <CardDescription>{role.description}</CardDescription>
             </CardHeader>
             <CardContent className="flex-grow">
-                <ScrollArea className="h-[450px] pr-4">
+                <ScrollArea className="h pr-4">
                     <div className="space-y-6">
                         {Object.entries(permissionsByModule).map(([moduleName, perms]) => (
                             <div key={moduleName}>
