@@ -65,8 +65,14 @@ export function OrderDetailsModal({
   const createdAt = convertToDateSafely(order.createdAt);
   
   const isAwaitingPayment = useMemo(() => {
-    return order.status === 'pending' && (order.paymentMethod === 'Bank Transfer' || order.paymentMethod === 'manual-bank-transfer');
+    return order.status === 'pending' && (
+      order.paymentMethod === 'Bank Transfer' || 
+      order.paymentMethod === 'manual-bank-transfer' ||
+      order.paymentMethod === 'Pay on Delivery'
+    );
   }, [order.status, order.paymentMethod]);
+
+  const isPayOnDelivery = order.paymentMethod === 'Pay on Delivery';
 
   const itemsWithAvailability = useMemo(() => {
     return order.items.map(item => {
@@ -193,12 +199,14 @@ export function OrderDetailsModal({
             {isAwaitingPayment && (
                 <div className="bg-orange-50 border-2 border-orange-200 p-4 rounded-xl flex items-start gap-4 text-orange-800 animate-in fade-in slide-in-from-top-2">
                     <div className="bg-orange-500 p-2 rounded-full text-white">
-                        <Clock className="h-5 w-5" />
+                        {isPayOnDelivery ? <Truck className="h-5 w-5" /> : <Clock className="h-5 w-5" />}
                     </div>
                     <div>
-                        <h4 className="font-black text-sm uppercase tracking-wider">Awaiting Payment</h4>
+                        <h4 className="font-black text-sm uppercase tracking-wider">{isPayOnDelivery ? 'Pay on Delivery' : 'Awaiting Payment'}</h4>
                         <p className="text-sm mt-1 leading-relaxed">
-                            This customer chose <strong>Bank Transfer</strong>. Please verify the funds in your account using reference <strong>{order.paymentReference}</strong> before processing.
+                            {isPayOnDelivery 
+                                ? "This order will be paid for upon delivery. Ensure the courier is prepared to collect payment."
+                                : `This customer chose Bank Transfer. Please verify the funds in your account using reference ${order.paymentReference} before processing.`}
                         </p>
                     </div>
                 </div>

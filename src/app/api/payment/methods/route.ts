@@ -45,10 +45,12 @@ export async function GET(request: Request) {
         id: data.providerName,
         name: data.providerName === 'paystack' ? 'Pay with Card (Paystack)' : 
               data.providerName === 'flutterwave' ? 'Pay with Card (Flutterwave)' :
-              data.providerName === 'manual' ? 'Bank Transfer' : data.providerName,
+              data.providerName === 'manual' ? 'Bank Transfer' :
+              data.providerName === 'pay_on_delivery' ? 'Pay on Delivery' : data.providerName,
         provider: data.providerName,
         publicKey: publicKey, // Only expose correct public key
         mode: mode,
+        instructions: config.instructions || '',
       });
     });
 
