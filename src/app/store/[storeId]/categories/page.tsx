@@ -28,10 +28,13 @@ import Link from 'next/link';
 
 import { useStoreUrl } from '@/hooks/use-store-url';
 
+import { useSettings } from '@/contexts/settings-context';
+
 const ITEMS_PER_PAGE = 12;
 
 function CategoryCard({ category }: { category: Category }) {
     const { getStoreUrl } = useStoreUrl();
+    const { settings } = useSettings();
     return (
         <Link 
             href={getStoreUrl(`/store/shop?category=${category.id}`)}
@@ -40,7 +43,10 @@ function CategoryCard({ category }: { category: Category }) {
             <div className="aspect-w-1 aspect-h-1 h-96 relative">
                 <Image
                     alt={category.name}
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    className={cn(
+                        "object-cover transition-transform duration-500",
+                        settings?.enableHoverZoom !== false && "group-hover:scale-110"
+                    )}
                     src={category.imageUrl || `https://placehold.co/400x500.png?text=${encodeURIComponent(category.name)}`}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"

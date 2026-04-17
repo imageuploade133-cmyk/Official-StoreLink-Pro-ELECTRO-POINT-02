@@ -232,7 +232,10 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                                             src={p.imageUrl || 'https://placehold.co/200x200.png'} 
                                             alt={p.name} 
                                             fill 
-                                            className="object-cover group-hover:scale-110 transition-transform duration-700" 
+                                            className={cn(
+                                                "object-cover transition-transform duration-700",
+                                                settings?.enableHoverZoom !== false && "group-hover:scale-110"
+                                            )}
                                             unoptimized 
                                         />
                                     </div>

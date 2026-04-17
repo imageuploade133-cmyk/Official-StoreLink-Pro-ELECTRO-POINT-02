@@ -222,7 +222,11 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
                                             src={product.imageUrl || defaultImageUrl} 
                                             alt={product.name} 
                                             fill 
-                                            className={cn("object-cover transition-transform duration-1000 group-hover:scale-110", isOutOfStock && "grayscale opacity-50")} 
+                                            className={cn(
+                                                "object-cover transition-transform duration-1000",
+                                                settings?.enableHoverZoom !== false && "group-hover:scale-110",
+                                                isOutOfStock && "grayscale opacity-50"
+                                            )} 
                                             unoptimized 
                                         />
                                         

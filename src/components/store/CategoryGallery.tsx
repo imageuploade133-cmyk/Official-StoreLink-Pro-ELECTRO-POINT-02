@@ -177,7 +177,10 @@ export function CategoryGallery() {
                       alt={category.name}
                       src={category.imageUrl || `https://picsum.photos/seed/${category.id}/300/300`}
                       fill
-                      className="object-cover transition-transform duration-1000 ease-in-out group-hover/item:scale-110"
+                      className={cn(
+                        "object-cover transition-transform duration-1000 ease-in-out",
+                        settings?.enableHoverZoom !== false && "group-hover/item:scale-110"
+                      )}
                       sizes="(max-width: 640px) 33vw, (max-width: 1024px) 25vw, 15vw"
                       data-ai-hint="category tile"
                       unoptimized

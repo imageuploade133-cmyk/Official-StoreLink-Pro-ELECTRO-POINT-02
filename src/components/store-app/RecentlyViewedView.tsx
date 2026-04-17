@@ -174,7 +174,10 @@ export function RecentlyViewedView({ onClose, onSelectProduct }: RecentlyViewedV
                                             src={product.imageUrl || defaultImageUrl} 
                                             alt={product.name} 
                                             fill 
-                                            className="object-cover transition-transform duration-1000 group-hover:scale-110" 
+                                            className={cn(
+                                                "object-cover transition-transform duration-1000",
+                                                settings?.enableHoverZoom !== false && "group-hover:scale-110"
+                                            )}
                                             unoptimized 
                                         />
                                         <div className="absolute inset-0 bg-black/0 group-hover:bg-primary/5 transition-colors duration-500" />

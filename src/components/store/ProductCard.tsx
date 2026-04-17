@@ -280,7 +280,8 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
           borderRadiusClass,
           shadowClass,
           borderWidthClass,
-          hoverEffectClass
+          hoverEffectClass,
+          settings?.enableHoverZoom !== false && "enableZoom"
         )}
         style={{ 
           minHeight: `${totalCardHeight}px`,
@@ -299,7 +300,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
           className={cn(
             `object-cover transition-all duration-700 ${styles.productImage}`,
             isOutOfStock && "opacity-40 grayscale",
-            hoverEffect === 'zoom' && 'group-hover:scale-110'
+            (settings?.enableHoverZoom !== false && hoverEffect === 'zoom') && 'group-hover:scale-110'
           )}
           unoptimized
         />
