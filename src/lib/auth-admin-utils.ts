@@ -153,6 +153,10 @@ export async function checkStoreAuthorization(uid: string, storeId: string) {
     console.error('Error checking store authorization:', error);
     // Include error message in response to help debugging if needed
     // In production this would return a generic 'auth_check_failed' but here we can be more helpful
-    return { authorized: false, errorCode: `auth_check_failed: ${error.message}` };
+    const message = error.message || 'Unknown error';
+    if (message.includes('Could not load the default credentials')) {
+        return { authorized: false, errorCode: `auth_check_failed: Missing Google Cloud credentials. Please ensure FIREBASE_SERVICE_ACCOUNT_KEY is set in your environment.` };
+    }
+    return { authorized: false, errorCode: `auth_check_failed: ${message}` };
   }
 }

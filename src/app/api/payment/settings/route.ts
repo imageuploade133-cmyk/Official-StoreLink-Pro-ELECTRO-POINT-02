@@ -61,7 +61,11 @@ export async function GET(request: Request) {
     return NextResponse.json(providers);
   } catch (error: any) {
     console.error('Error fetching payment settings:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const message = error.message || 'Unknown error';
+    if (message.includes('Could not load the default credentials')) {
+        return NextResponse.json({ error: 'Missing Google Cloud credentials. Please ensure FIREBASE_SERVICE_ACCOUNT_KEY is set.' }, { status: 500 });
+    }
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -129,6 +133,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, id: providerId });
   } catch (error: any) {
     console.error('Error saving payment settings:', error);
-    return NextResponse.json({ error: error.message || 'Unknown error occurred' }, { status: 500 });
+    const message = error.message || 'Unknown error occurred';
+    if (message.includes('Could not load the default credentials')) {
+        return NextResponse.json({ error: 'Missing Google Cloud credentials. Please ensure FIREBASE_SERVICE_ACCOUNT_KEY is set.' }, { status: 500 });
+    }
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
