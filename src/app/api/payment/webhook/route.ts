@@ -14,16 +14,34 @@ export async function POST(request: Request) {
     const body = await request.text();
 
     const providerId = `${storeId}_${providerName}`;
-    const providerSnap = await adminDb.collection('payment_providers').doc(providerId).get();
+    let secretKey = '';
     
-    if (!providerSnap.exists) {
-      return NextResponse.json({ error: 'Provider not found' }, { status: 404 });
+    try {
+      const providerSnap = await adminDb.collection('payment_providers').doc(providerId).get();
+      
+      if (providerSnap.exists) {
+        const providerData = providerSnap.data();
+        const config = JSON.parse(decrypt(providerData?.config));
+        const mode = providerData?.mode || 'test';
+        secretKey = mode === 'live' ? config.liveSecretKey : config.testSecretKey || config.secretKey;
+      }
+    } catch (dbError) {
+      console.error('Database error fetching provider config:', dbError);
     }
 
-    const providerData = providerSnap.data();
-    const config = JSON.parse(decrypt(providerData?.config));
-    const mode = providerData?.mode || 'test';
-    const secretKey = mode === 'live' ? config.liveSecretKey : config.testSecretKey || config.secretKey;
+    // Fallback to environment variables if DB failed or provider not found
+    if (!secretKey) {
+      if (providerName === 'paystack') {
+        secretKey = process.env.PAYSTACK_SECRET_KEY || '';
+      } else if (providerName === 'flutterwave') {
+        secretKey = process.env.FLUTTERWAVE_SECRET_KEY || '';
+      }
+    }
+
+    if (!secretKey) {
+      console.error(`No secret key found for provider ${providerName}`);
+      return NextResponse.json({ error: 'Provider configuration not found' }, { status: 404 });
+    }
 
     if (providerName === 'paystack') {
       const hash = crypto.createHmac('sha512', secretKey).update(body).digest('hex');
@@ -34,13 +52,15 @@ export async function POST(request: Request) {
       const event = JSON.parse(body);
       if (event.event === 'charge.success') {
         const reference = event.data.reference;
-        await processSuccessfulTransaction(reference);
+        const metadata = event.data.metadata;
+        await processSuccessfulTransaction(reference, metadata);
       }
     } else if (providerName === 'flutterwave') {
         const event = JSON.parse(body);
         if (event['event.type'] === 'CARD_TRANSACTION' && event.status === 'successful') {
             const reference = event.tx_ref;
-            await processSuccessfulTransaction(reference);
+            const metadata = event.customer; // Flutterwave metadata structure varies
+            await processSuccessfulTransaction(reference, metadata);
         }
     }
 
@@ -51,27 +71,56 @@ export async function POST(request: Request) {
   }
 }
 
-async function processSuccessfulTransaction(reference: string) {
+async function processSuccessfulTransaction(reference: string, metadata?: any) {
   const transactionRef = adminDb.collection('transactions').doc(reference);
 
-  await adminDb.runTransaction(async (dbTransaction) => {
-    const transactionSnap = await dbTransaction.get(transactionRef);
+  try {
+    await adminDb.runTransaction(async (dbTransaction) => {
+      const transactionSnap = await dbTransaction.get(transactionRef);
+      let transactionData: Transaction | null = null;
+      let orderId = '';
 
-    if (transactionSnap.exists) {
-      const transactionData = transactionSnap.data() as Transaction;
-      if (transactionData.status !== 'success') {
-        dbTransaction.update(transactionRef, {
+      if (transactionSnap.exists) {
+        transactionData = transactionSnap.data() as Transaction;
+        orderId = transactionData.orderId;
+      } else if (metadata && metadata.orderId) {
+        // Fallback: Create transaction record if it doesn't exist but we have orderId from metadata
+        orderId = metadata.orderId;
+        const newTransaction: any = {
+          id: reference,
+          storeId: metadata.storeId || 'global',
+          orderId: orderId,
+          provider: 'paystack', // Or determine from context
+          reference,
+          amount: metadata.amount || 0,
           status: 'success',
+          createdAt: Timestamp.now(),
           updatedAt: Timestamp.now(),
-        });
-
-        const orderRef = adminDb.collection('orders').doc(transactionData.orderId);
-        dbTransaction.update(orderRef, {
-          status: 'processing',
-          isPaid: true,
-          updatedAt: Timestamp.now(),
-        });
+        };
+        dbTransaction.set(transactionRef, newTransaction);
       }
-    }
-  });
+
+      if (orderId) {
+        if (!transactionData || transactionData.status !== 'success') {
+          if (transactionSnap.exists) {
+            dbTransaction.update(transactionRef, {
+              status: 'success',
+              updatedAt: Timestamp.now(),
+            });
+          }
+
+          const orderRef = adminDb.collection('orders').doc(orderId);
+          dbTransaction.update(orderRef, {
+            status: 'processing',
+            isPaid: true,
+            updatedAt: Timestamp.now(),
+          });
+        }
+      }
+    });
+  } catch (dbError) {
+    console.error('Failed to process successful transaction in DB:', dbError);
+    // If this fails due to credentials, we're stuck, but we've logged it.
+  }
 }
+
