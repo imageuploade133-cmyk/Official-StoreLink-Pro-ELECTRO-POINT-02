@@ -66,23 +66,23 @@ export function CustomerFormDialog({ open, onOpenChange, onSubmit, defaultValues
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] flex flex-col">
-        <DialogHeader className="px-6 pt-6">
+      <DialogContent className="w-[100vw] h-[100dvh] sm:w-full sm:max-w-lg sm:h-auto sm:max-h-[90vh] p-0 flex flex-col overflow-hidden border-none sm:border left-0 top-0 translate-x-0 translate-y-0 sm:left-[50%] sm:top-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%]">
+        <DialogHeader className="p-4 sm:p-6 border-b shrink-0">
           <DialogTitle>{isEditing ? 'Edit Customer' : 'Add New Customer'}</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-xs sm:text-sm">
             {isEditing ? `Update details for ${defaultValues?.name}.` : 'Fill in the details for the new customer.'}
           </DialogDescription>
         </DialogHeader>
-        <div className="flex-1 overflow-y-auto px-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
             <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} id="customer-form" className="space-y-4 py-4">
+            <form onSubmit={form.handleSubmit(handleSubmit)} id="customer-form" className="space-y-4 py-2 sm:py-4">
                 <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Full Name <span className="text-destructive">*</span></FormLabel>
-                    <FormControl><Input placeholder="e.g., John Doe" {...field} disabled={isSaving} /></FormControl>
+                    <FormLabel className="text-sm font-bold">Full Name <span className="text-destructive">*</span></FormLabel>
+                    <FormControl><Input placeholder="e.g., John Doe" {...field} disabled={isSaving} className="h-11" /></FormControl>
                     <FormMessage />
                     </FormItem>
                 )}
@@ -92,8 +92,8 @@ export function CustomerFormDialog({ open, onOpenChange, onSubmit, defaultValues
                 name="email"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Email Address (Optional)</FormLabel>
-                    <FormControl><Input type="email" placeholder="john.doe@example.com" {...field} value={field.value ?? ''} disabled={isSaving} /></FormControl>
+                    <FormLabel className="text-sm font-bold">Email Address (Optional)</FormLabel>
+                    <FormControl><Input type="email" placeholder="john.doe@example.com" {...field} value={field.value ?? ''} disabled={isSaving} className="h-11" /></FormControl>
                     <FormMessage />
                     </FormItem>
                 )}
@@ -103,8 +103,8 @@ export function CustomerFormDialog({ open, onOpenChange, onSubmit, defaultValues
                 name="phone"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Phone Number (Optional)</FormLabel>
-                    <FormControl><Input type="tel" placeholder="08012345678" {...field} value={field.value ?? ''} disabled={isSaving} /></FormControl>
+                    <FormLabel className="text-sm font-bold">Phone Number (Optional)</FormLabel>
+                    <FormControl><Input type="tel" placeholder="08012345678" {...field} value={field.value ?? ''} disabled={isSaving} className="h-11" /></FormControl>
                     <FormMessage />
                     </FormItem>
                 )}
@@ -114,29 +114,29 @@ export function CustomerFormDialog({ open, onOpenChange, onSubmit, defaultValues
                 name="address"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Address (Optional)</FormLabel>
-                    <FormControl><Textarea placeholder="123 Main St, Anytown..." {...field} value={field.value ?? ''} disabled={isSaving} /></FormControl>
+                    <FormLabel className="text-sm font-bold">Address (Optional)</FormLabel>
+                    <FormControl><Textarea placeholder="123 Main St, Anytown..." {...field} value={field.value ?? ''} disabled={isSaving} className="min-h-[80px]" /></FormControl>
                     <FormMessage />
                     </FormItem>
                 )}
                 />
 
-                <Card className="mt-4 border-dashed">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-base">Communication Preferences</CardTitle>
+                <Card className="mt-4 border-dashed bg-muted/20">
+                    <CardHeader className="pb-2 p-4 sm:p-6">
+                        <CardTitle className="text-sm font-bold">Communication Preferences</CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4 pt-2">
+                    <CardContent className="space-y-4 pt-0 p-4 sm:p-6 sm:pt-0">
                         <FormField
                         control={form.control}
                         name="allowSms"
                         render={({ field }) => (
-                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                            <FormItem className="flex flex-row items-center justify-between rounded-lg border bg-background p-3">
                             <div className="space-y-0.5">
-                                <FormLabel className="flex items-center gap-2">
+                                <FormLabel className="flex items-center gap-2 text-sm">
                                 <Phone className="h-4 w-4 text-blue-500" />
                                 Receive SMS
                                 </FormLabel>
-                                <FormDescription className="text-xs">
+                                <FormDescription className="text-[10px] sm:text-xs">
                                     Allow sending bulk SMS messages.
                                 </FormDescription>
                             </div>
@@ -154,13 +154,13 @@ export function CustomerFormDialog({ open, onOpenChange, onSubmit, defaultValues
                         control={form.control}
                         name="allowWhatsapp"
                         render={({ field }) => (
-                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                            <FormItem className="flex flex-row items-center justify-between rounded-lg border bg-background p-3">
                             <div className="space-y-0.5">
-                                <FormLabel className="flex items-center gap-2">
+                                <FormLabel className="flex items-center gap-2 text-sm">
                                 <MessageSquare className="h-4 w-4 text-green-500" />
                                 Receive WhatsApp
                                 </FormLabel>
-                                <FormDescription className="text-xs">
+                                <FormDescription className="text-[10px] sm:text-xs">
                                     Allow sending bulk WhatsApp messages.
                                 </FormDescription>
                             </div>
@@ -179,14 +179,14 @@ export function CustomerFormDialog({ open, onOpenChange, onSubmit, defaultValues
             </form>
             </Form>
         </div>
-        <DialogFooter className="px-6 pb-6 pt-4 border-t mt-auto">
-            <DialogClose asChild>
-                <Button type="button" variant="outline" disabled={isSaving}>Cancel</Button>
-            </DialogClose>
-            <Button type="submit" form="customer-form" disabled={isSaving}>
+        <DialogFooter className="p-4 sm:p-6 border-t mt-auto flex flex-col gap-2">
+            <Button type="submit" form="customer-form" disabled={isSaving} className="w-full sm:w-auto h-11 font-bold">
                 {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isEditing ? 'Save Changes' : 'Create Customer'}
             </Button>
+            <DialogClose asChild>
+                <Button type="button" variant="outline" disabled={isSaving} className="w-full sm:w-auto h-11 font-bold">Cancel</Button>
+            </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>
