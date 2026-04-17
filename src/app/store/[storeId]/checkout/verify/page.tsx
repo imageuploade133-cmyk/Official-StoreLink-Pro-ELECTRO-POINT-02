@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter, useParams } from 'next/navigation';
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -9,6 +9,8 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function VerifyPaymentPage() {
   const searchParams = useSearchParams();
+  const params = useParams();
+  const storeId = params?.storeId as string;
   const router = useRouter();
   const { toast } = useToast();
   const [status, setStatus] = useState<'verifying' | 'success' | 'failed'>('verifying');
@@ -26,7 +28,7 @@ export default function VerifyPaymentPage() {
       }
 
       try {
-        const res = await fetch(`/api/payment/verify?reference=${reference}&provider=${provider}`);
+        const res = await fetch(`/api/payment/verify?reference=${reference}&provider=${provider}&storeId=${storeId}`);
         const data = await res.json();
 
         if (data.success) {
@@ -45,7 +47,7 @@ export default function VerifyPaymentPage() {
     };
 
     verifyPayment();
-  }, [searchParams, toast]);
+  }, [searchParams, toast, storeId]);
 
   if (status === 'verifying') {
     return (

@@ -139,9 +139,10 @@ export default function CheckoutPage() {
   const [isLoadingMethods, setIsLoadingMethods] = useState(true);
 
   useEffect(() => {
+    if (!storeId) return;
     const fetchMethods = async () => {
       try {
-        const res = await fetch('/api/payment/methods');
+        const res = await fetch(`/api/payment/methods?storeId=${storeId}`);
         const data = await res.json();
         if (Array.isArray(data)) {
           setAvailablePaymentMethods(data);
@@ -153,7 +154,7 @@ export default function CheckoutPage() {
       }
     };
     fetchMethods();
-  }, []);
+  }, [storeId]);
 
   useEffect(() => {
     if (settings) {
@@ -353,6 +354,7 @@ export default function CheckoutPage() {
             email: formData.email,
             providerName: selectedMethod.provider,
             userId: user?.uid || 'GUEST',
+            storeId: storeId,
           }),
         });
         const initData = await initRes.json();
@@ -483,7 +485,7 @@ export default function CheckoutPage() {
     };
   }, [settings]);
 
-  if (isAuthLoading || isLoadingSettings || isProfileLoading) {
+  if (isAuthLoading || isLoadingSettings || isProfileLoading || isLoadingMethods) {
     return (
       <div className="flex h-[60vh] items-center justify-center">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />

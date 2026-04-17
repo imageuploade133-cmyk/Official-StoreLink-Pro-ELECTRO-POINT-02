@@ -12,8 +12,13 @@ export async function GET(request: Request) {
     
     let querySnapshot;
     try {
-      const q = providersRef.where('storeId', '==', storeId).where('isActive', '==', true);
-      querySnapshot = await q.get();
+      // Try querying by storeId (new format)
+      querySnapshot = await providersRef.where('storeId', '==', storeId).where('isActive', '==', true).get();
+      
+      // If empty and not global, try store_id (migrated format)
+      if (querySnapshot.empty && storeId !== 'global') {
+        querySnapshot = await providersRef.where('store_id', '==', storeId).where('isActive', '==', true).get();
+      }
     } catch (dbError: any) {
       console.error('Database error fetching payment providers:', dbError);
       
