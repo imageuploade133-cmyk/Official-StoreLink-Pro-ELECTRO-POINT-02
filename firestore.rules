@@ -99,6 +99,10 @@ service cloud.firestore {
       allow write: if isSignedIn() && hasStoreAccess();
     }
 
+    match /payment_providers/{docId=**} {
+      allow read, write: if false;
+    }
+
     match /adLinks/{docId=**} {
       allow read: if true;
       allow update: if (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['clicks', 'views'])) || (isSignedIn() && hasStoreAccess());

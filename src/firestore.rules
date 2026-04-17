@@ -36,6 +36,10 @@ service cloud.firestore {
       allow write: if isSignedIn();
     }
 
+    match /payment_providers/{document=**} {
+      allow read, write: if false;
+    }
+
     /* ✅ ADD THIS */
     match /settings/{document=**} {
       allow read: if true;          // public can read settings/global

@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useFirestore, useDoc } from '@/firebase';
 import { doc } from 'firebase/firestore';
-import { saveGlobalSettings } from '@/firebase/firestore/settings';
+import { saveGlobalSettings, saveStoreSettings } from '@/firebase/firestore/settings';
 import type { AppSettings, BankAccount } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
@@ -71,7 +71,7 @@ type FlutterwaveFormValues = z.infer<typeof flutterwaveSchema>;
 
 export default function WebsitePaymentSettings() {
   const firestore = useFirestore();
-  const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
+  const { permissions, isLoading: isAuthLoading, store, staffMember, user } = useAuth();
   const { toast } = useToast();
   
   const [isSaving, setIsSaving] = useState(false);
@@ -85,8 +85,14 @@ export default function WebsitePaymentSettings() {
   const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const fetchProviders = async () => {
+    if (!user) return;
     try {
-      const res = await fetch(`/api/payment/settings?storeId=${currentStoreId || 'global'}`);
+      const token = await user.getIdToken();
+      const res = await fetch(`/api/payment/settings?storeId=${currentStoreId || 'global'}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       const data = await res.json();
       if (Array.isArray(data)) {
         setProviders(data);
@@ -160,6 +166,7 @@ export default function WebsitePaymentSettings() {
   }, [paystackProvider, flutterwaveProvider, paystackForm, flutterwaveForm]);
 
   const saveProviderSettings = async (providerName: string, values: any) => {
+    if (!user) return;
     setIsSaving(true);
     try {
       const { isActive, mode, ...config } = values;
@@ -171,9 +178,13 @@ export default function WebsitePaymentSettings() {
         }
       });
 
+      const token = await user.getIdToken();
       const res = await fetch('/api/payment/settings', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           providerName,
           isActive,
@@ -195,9 +206,15 @@ export default function WebsitePaymentSettings() {
   };
 
   const testConnection = async (providerName: string) => {
+    if (!user) return;
     setIsSaving(true);
     try {
-      const res = await fetch(`/api/payment/test-connection?provider=${providerName}&storeId=${currentStoreId || 'global'}`);
+      const token = await user.getIdToken();
+      const res = await fetch(`/api/payment/test-connection?provider=${providerName}&storeId=${currentStoreId || 'global'}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       const data = await res.json();
       if (data.success) {
         toast({ title: 'Success', description: `${providerName} connection is valid.` });
@@ -382,6 +399,7 @@ export default function WebsitePaymentSettings() {
         <TabsList className="bg-muted/50 p-1">
           <TabsTrigger value="paystack">Paystack</TabsTrigger>
           <TabsTrigger value="flutterwave">Flutterwave</TabsTrigger>
+          <TabsTrigger value="stripe">Stripe</TabsTrigger>
           <TabsTrigger value="manual">Manual Transfer</TabsTrigger>
         </TabsList>
 
@@ -696,6 +714,24 @@ export default function WebsitePaymentSettings() {
               </Card>
             </div>
           </div>
+        </TabsContent>
+
+        <TabsContent value="stripe" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Stripe Settings</CardTitle>
+              <CardDescription>Accept global payments via cards and digital wallets.</CardDescription>
+            </CardHeader>
+            <CardContent className="py-12 flex flex-col items-center justify-center text-center">
+              <div className="bg-primary/10 p-4 rounded-full mb-4">
+                <PlusCircle className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-lg font-bold">Coming Soon</h3>
+              <p className="text-muted-foreground max-w-sm">
+                We are currently working on integrating Stripe. You will be able to accept international payments soon.
+              </p>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="manual" className="space-y-6">

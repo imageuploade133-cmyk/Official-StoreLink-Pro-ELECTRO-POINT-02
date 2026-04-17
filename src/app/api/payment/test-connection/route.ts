@@ -2,15 +2,25 @@ import { NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase-admin';
 import { decrypt } from '@/lib/encryption';
 import { PaymentProvider } from '@/lib/types';
+import { verifyAuth, isStoreAuthorized } from '@/lib/auth-admin-utils';
 
 export async function GET(request: Request) {
   try {
+    const decodedToken = await verifyAuth(request);
+    if (!decodedToken) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const providerName = searchParams.get('provider');
     const storeId = searchParams.get('storeId') || 'global';
 
     if (!providerName) {
       return NextResponse.json({ error: 'Provider name is required' }, { status: 400 });
+    }
+
+    if (!(await isStoreAuthorized(decodedToken.uid, storeId))) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const providerId = `${storeId}_${providerName}`;
