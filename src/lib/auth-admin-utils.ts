@@ -51,48 +51,38 @@ export async function isStoreAuthorized(uid: string, storeId: string) {
     }
 
     // Check if user is staff with manage_settings permission
-    // Check multiple possible document formats
-    const staffDocs = await Promise.all([
-      adminDb.collection('staff').doc(uid).get(),
-      adminDb.collection('staff').doc(`${uid}_${storeId}`).get()
-    ]);
+    // Try direct document access first (fastest and most reliable)
+    const directStaffDoc = await adminDb.collection('staff').doc(uid).get();
+    if (directStaffDoc.exists) {
+      const staffData = directStaffDoc.data();
+      if ((staffData?.store_id === storeId || staffData?.storeId === storeId || staffData?.store_id === 'global') &&
+          (staffData?.role === 'admin' || staffData?.permissions?.pages?.includes('manage_settings'))) {
+        return true;
+      }
+    }
     
-    for (const staffDoc of staffDocs) {
-      if (staffDoc.exists) {
-        const staffData = staffDoc.data();
-        if (staffData?.store_id === storeId || staffData?.storeId === storeId) {
-            if (staffData?.role === 'admin' || staffData?.permissions?.pages?.includes('manage_settings')) {
-              return true;
-            }
+    // Also try uid_storeId format
+    const combinedStaffDoc = await adminDb.collection('staff').doc(`${uid}_${storeId}`).get();
+    if (combinedStaffDoc.exists) {
+        const staffData = combinedStaffDoc.data();
+        if (staffData?.role === 'admin' || staffData?.permissions?.pages?.includes('manage_settings')) {
+            return true;
         }
-      }
     }
 
-    // Also check by query in case doc IDs are random
-    const staffQuery = await adminDb.collection('staff')
-      .where('uid', '==', uid)
-      .where('store_id', '==', storeId)
-      .limit(1)
-      .get();
+    // Search for staff documents with this uid
+    // Use a simple query on uid to avoid compound index requirements
+    const staffQuery = await adminDb.collection('staff').where('uid', '==', uid).get();
     
-    if (!staffQuery.empty) {
-      const staffData = staffQuery.docs[0].data();
-      if (staffData?.role === 'admin' || staffData?.permissions?.pages?.includes('manage_settings')) {
-        return true;
-      }
-    }
-
-    // Also check for storeId with capital I
-    const staffQueryCapital = await adminDb.collection('staff')
-      .where('uid', '==', uid)
-      .where('storeId', '==', storeId)
-      .limit(1)
-      .get();
-    
-    if (!staffQueryCapital.empty) {
-      const staffData = staffQueryCapital.docs[0].data();
-      if (staffData?.role === 'admin' || staffData?.permissions?.pages?.includes('manage_settings')) {
-        return true;
+    for (const doc of staffQuery.docs) {
+      const staffData = doc.data();
+      const belongsToStore = staffData.store_id === storeId || staffData.storeId === storeId;
+      const isGlobalAdmin = staffData.role === 'admin' && (staffData.store_id === 'global' || !staffData.store_id);
+      
+      if (belongsToStore || isGlobalAdmin) {
+        if (staffData.role === 'admin' || staffData.permissions?.pages?.includes('manage_settings')) {
+          return true;
+        }
       }
     }
 
@@ -112,6 +102,7 @@ export async function checkStoreAuthorization(uid: string, storeId: string) {
   }
 
   try {
+    // 1. Check if user is the store owner
     const storeDoc = await adminDb.collection('stores').doc(storeId).get();
     if (storeDoc.exists) {
       const storeData = storeDoc.data();
@@ -121,70 +112,47 @@ export async function checkStoreAuthorization(uid: string, storeId: string) {
       }
     }
 
-    // Check if user is staff with manage_settings permission
-    // Check multiple possible document formats
-    const staffDocs = await Promise.all([
-      adminDb.collection('staff').doc(uid).get(),
-      adminDb.collection('staff').doc(`${uid}_${storeId}`).get()
-    ]);
+    // 2. Check staff collection
+    // Try direct document access first (fastest and most reliable)
+    const directStaffDoc = await adminDb.collection('staff').doc(uid).get();
+    if (directStaffDoc.exists) {
+      const staffData = directStaffDoc.data();
+      if ((staffData?.store_id === storeId || staffData?.storeId === storeId || staffData?.store_id === 'global') &&
+          (staffData?.role === 'admin' || staffData?.permissions?.pages?.includes('manage_settings'))) {
+        return { authorized: true, errorCode: null };
+      }
+    }
     
-    for (const staffDoc of staffDocs) {
-      if (staffDoc.exists) {
-        const staffData = staffDoc.data();
-        if (staffData?.store_id === storeId || staffData?.storeId === storeId) {
-            if (staffData?.role === 'admin' || staffData?.permissions?.pages?.includes('manage_settings')) {
-              return { authorized: true, errorCode: null };
-            }
+    // Also try uid_storeId format
+    const combinedStaffDoc = await adminDb.collection('staff').doc(`${uid}_${storeId}`).get();
+    if (combinedStaffDoc.exists) {
+        const staffData = combinedStaffDoc.data();
+        if (staffData?.role === 'admin' || staffData?.permissions?.pages?.includes('manage_settings')) {
+            return { authorized: true, errorCode: null };
+        }
+    }
+
+    // 3. Search for staff documents with this uid
+    // Use a simple query on uid to avoid compound index requirements
+    const staffQuery = await adminDb.collection('staff').where('uid', '==', uid).get();
+    
+    for (const doc of staffQuery.docs) {
+      const staffData = doc.data();
+      const belongsToStore = staffData.store_id === storeId || staffData.storeId === storeId;
+      const isGlobalAdmin = staffData.role === 'admin' && (staffData.store_id === 'global' || !staffData.store_id);
+      
+      if (belongsToStore || isGlobalAdmin) {
+        if (staffData.role === 'admin' || staffData.permissions?.pages?.includes('manage_settings')) {
+          return { authorized: true, errorCode: null };
         }
       }
     }
 
-    // Also check by query in case doc IDs are random
-    const staffQuery = await adminDb.collection('staff')
-      .where('uid', '==', uid)
-      .where('store_id', '==', storeId)
-      .limit(1)
-      .get();
-    
-    if (!staffQuery.empty) {
-      const staffData = staffQuery.docs[0].data();
-      if (staffData?.role === 'admin' || staffData?.permissions?.pages?.includes('manage_settings')) {
-        return { authorized: true, errorCode: null };
-      }
-    }
-
-    // One more check for storeId with capital I in the query
-    const staffQuery2 = await adminDb.collection('staff')
-      .where('uid', '==', uid)
-      .where('storeId', '==', storeId)
-      .limit(1)
-      .get();
-    
-    if (!staffQuery2.empty) {
-      const staffData = staffQuery2.docs[0].data();
-      if (staffData?.role === 'admin' || staffData?.permissions?.pages?.includes('manage_settings')) {
-        return { authorized: true, errorCode: null };
-      }
-    }
-
-    // Final fallback: if the user is a global admin (staff with role admin and no specific store or store_id is global)
-    const globalAdminQuery = await adminDb.collection('staff')
-      .where('uid', '==', uid)
-      .where('role', '==', 'admin')
-      .limit(1)
-      .get();
-    
-    if (!globalAdminQuery.empty) {
-      const globalStaffData = globalAdminQuery.docs[0].data();
-      if (globalStaffData.store_id === 'global' || !globalStaffData.store_id) {
-        return { authorized: true, errorCode: null };
-      }
-    }
-
-  } catch (error) {
+    return { authorized: false, errorCode: 'not_store_owner' };
+  } catch (error: any) {
     console.error('Error checking store authorization:', error);
-    return { authorized: false, errorCode: 'auth_check_failed' };
+    // Include error message in response to help debugging if needed
+    // In production this would return a generic 'auth_check_failed' but here we can be more helpful
+    return { authorized: false, errorCode: `auth_check_failed: ${error.message}` };
   }
-
-  return { authorized: false, errorCode: 'not_store_owner' };
 }

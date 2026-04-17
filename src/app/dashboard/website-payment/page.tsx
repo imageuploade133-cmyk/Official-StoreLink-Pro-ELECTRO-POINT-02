@@ -194,7 +194,10 @@ export default function WebsitePaymentSettings() {
         }),
       });
 
-      if (!res.ok) throw new Error('Failed to save settings');
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to save settings');
+      }
       
       toast({ title: 'Success', description: `${providerName} settings saved.` });
       fetchProviders();
