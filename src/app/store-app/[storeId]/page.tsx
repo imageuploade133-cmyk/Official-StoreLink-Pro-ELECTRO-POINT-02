@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -113,10 +112,6 @@ export default function StoreAppPage() {
         return parts.length > 1 ? (parts[0][0] + (parts[1][0] || '')).toUpperCase() : email.substring(0, 2).toUpperCase();
     };
 
-    if (isLoadingSettings) {
-        return <PageSpinner label="Loading Store" subLabel="Preparing your shopping experience…" />;
-    }
-
     // Navigation visibility logic
     const isFocusedSubView = ['search', 'orders', 'profile-settings', 'recently-viewed', 'notifications', 'login', 'signup'].includes(activeTab);
     const showNav = !selectedProductId && activeTab !== 'checkout' && !isFocusedSubView;
@@ -125,7 +120,10 @@ export default function StoreAppPage() {
         <>
             <ProductLoadingOverlay isVisible={isLoadingProduct} />
             <div className="bg-background-light dark:bg-black min-h-screen">
-              <div className="relative flex flex-col max-w-md mx-auto bg-background-light dark:bg-black shadow-2xl min-h-screen border-x dark:border-slate-800/50">
+              {isLoadingSettings ? (
+                <PageSpinner label="Loading Store" subLabel="Preparing your shopping experience…" />
+              ) : (
+                <div className="relative flex flex-col max-w-md mx-auto bg-background-light dark:bg-black shadow-2xl min-h-screen border-x dark:border-slate-800/50">
             
             {showNav && (
                 <header className="sticky top-0 z-50 bg-background-light/80 dark:bg-black/80 backdrop-blur-xl transition-all duration-500 border-b border-slate-200/50 dark:border-slate-800/50">
@@ -343,14 +341,15 @@ export default function StoreAppPage() {
                 })}
                 </nav>
             )}
-          </div>
+                </div>
+              )}
+            </div>
 
           <style jsx global>{`
             .hide-scrollbar::-webkit-scrollbar { display: none; }
             .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
             body { overscroll-behavior-y: contain; }
           `}</style>
-        </div>
         </>
     );
 }
