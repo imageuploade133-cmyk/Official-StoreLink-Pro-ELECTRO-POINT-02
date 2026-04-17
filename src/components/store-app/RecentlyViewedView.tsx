@@ -30,6 +30,8 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
+import { useStoreUrl } from '@/hooks/use-store-url';
+
 interface RecentlyViewedViewProps {
     onClose: () => void;
     onSelectProduct: (id: string) => void;
@@ -39,6 +41,7 @@ export function RecentlyViewedView({ onClose, onSelectProduct }: RecentlyViewedV
     const { viewedProductIds, clearHistory, removeViewedProduct } = useRecentlyViewed();
     const firestore = useFirestore();
     const { settings } = useSettings();
+    const { storeId } = useStoreUrl();
     const { addToCart } = useCart();
     const { wishlistProductIds, addToWishlist, removeFromWishlist } = useWishlist();
     const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
@@ -49,14 +52,22 @@ export function RecentlyViewedView({ onClose, onSelectProduct }: RecentlyViewedV
     const targetIds = useMemo(() => viewedProductIds.slice(0, 20), [viewedProductIds]);
 
     const productsQuery = useMemo(() => {
-        if (!firestore || targetIds.length === 0) return null;
-        return query(collection(firestore, 'products'), where(documentId(), 'in', targetIds));
-    }, [firestore, targetIds]);
+        if (!firestore || targetIds.length === 0 || !storeId) return null;
+        return query(
+            collection(firestore, 'products'), 
+            where('store_id', '==', storeId),
+            where(documentId(), 'in', targetIds)
+        );
+    }, [firestore, targetIds, storeId]);
     
     const categoriesQuery = useMemo(() => {
-        if (!firestore) return null;
-        return query(collection(firestore, 'categories'), orderBy('name'));
-    }, [firestore]);
+        if (!firestore || !storeId) return null;
+        return query(
+            collection(firestore, 'categories'), 
+            where('store_id', '==', storeId),
+            orderBy('name')
+        );
+    }, [firestore, storeId]);
 
     const { data: products, isLoading } = useCollection<Product>(productsQuery);
     const { data: categories } = useCollection<Category>(categoriesQuery);

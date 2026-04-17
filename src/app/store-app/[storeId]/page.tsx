@@ -34,14 +34,15 @@ import { ProfileSettingsView } from '@/components/store-app/ProfileSettingsView'
 import { NotificationsView } from '@/components/store-app/NotificationsView';
 import { LoginView } from '@/components/store-app/LoginView';
 import { SignupView } from '@/components/store-app/SignupView';
-import { useUser, useDoc, useFirestore } from '@/firebase';
+import { useUser, useDoc, useFirestore, useCollection } from '@/firebase';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { doc } from 'firebase/firestore';
+import { doc, collection, query, where, limit } from 'firebase/firestore';
 import type { Customer } from '@/lib/types';
 import { formatCurrency } from '@/lib/formatUtils';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { ProductLoadingOverlay } from '@/components/store/ProductLoadingOverlay';
 import { PageSpinner } from '@/components/ui/spinner';
+import { useParams } from 'next/navigation';
 
 type AppTab = 'home' | 'collections' | 'search' | 'cart' | 'profile' | 'recently-viewed' | 'checkout' | 'wishlist' | 'orders' | 'profile-settings' | 'notifications' | 'login' | 'signup';
 
@@ -56,10 +57,21 @@ export default function StoreAppPage() {
     const { wishlistCount } = useWishlist();
     const { user } = useUser();
     const firestore = useFirestore();
+    const params = useParams();
+    const storeId = params?.storeId as string;
 
     // Fetch customer record for bonus display
-    const customerRef = useMemo(() => (user && firestore) ? doc(firestore, 'customers', user.uid) : null, [user, firestore]);
-    const { data: customer } = useDoc<Customer>(customerRef);
+    const customersQuery = useMemo(() => {
+        if (!user || !firestore || !storeId) return null;
+        return query(
+            collection(firestore, 'customers'),
+            where('uid', '==', user.uid),
+            where('store_id', '==', storeId),
+            limit(1)
+        );
+    }, [user, firestore, storeId]);
+    const { data: customers } = useCollection<Customer>(customersQuery);
+    const customer = customers?.[0];
 
     const onSelectProduct = (id: string) => {
         setIsLoadingProduct(true);

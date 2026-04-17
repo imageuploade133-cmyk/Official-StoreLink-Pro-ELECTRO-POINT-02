@@ -32,6 +32,8 @@ import Autoplay from 'embla-carousel-autoplay';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 
+import { useStoreUrl } from '@/hooks/use-store-url';
+
 interface HomeViewProps {
     onSelectProduct: (id: string) => void;
     onViewAllCollections: () => void;
@@ -40,6 +42,7 @@ interface HomeViewProps {
 export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProps) {
     const firestore = useFirestore();
     const { settings } = useSettings();
+    const { storeId } = useStoreUrl();
     const { wishlistProductIds, addToWishlist, removeFromWishlist } = useWishlist();
     const { addToCart } = useCart();
     const { toast } = useToast();
@@ -227,37 +230,40 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
 
     // 1. Fetch Dynamic Slide Show Data from Firestore
     const slidesQuery = useMemo(() => {
-        if (!firestore) return null;
+        if (!firestore || !storeId) return null;
         return query(
             collection(firestore, 'slideShows'),
+            where('store_id', '==', storeId),
             where('published', '==', true),
             orderBy('order', 'asc'),
             limit(5)
         );
-    }, [firestore]);
+    }, [firestore, storeId]);
     const { data: slides, isLoading: isLoadingSlides } = useCollection<SlideShow>(slidesQuery);
 
     // 2. Fetch Categories for Registry Access
     const categoriesQuery = useMemo(() => {
-        if (!firestore) return null;
+        if (!firestore || !storeId) return null;
         return query(
             collection(firestore, 'categories'), 
+            where('store_id', '==', storeId),
             orderBy('name'), 
             limit(10)
         );
-    }, [firestore]);
+    }, [firestore, storeId]);
     const { data: categories, isLoading: isLoadingCategories } = useCollection<Category>(categoriesQuery);
 
     // 3. Fetch Trending Products for Discovery Feed
     const productsQuery = useMemo(() => {
-        if (!firestore) return null;
+        if (!firestore || !storeId) return null;
         return query(
             collection(firestore, 'products'), 
+            where('store_id', '==', storeId),
             where('isVisibleOnWeb', '==', true), 
             orderBy('createdAt', 'desc'), 
             limit(20)
         );
-    }, [firestore]);
+    }, [firestore, storeId]);
     const { data: products, isLoading: isLoadingProducts } = useCollection<Product>(productsQuery);
 
     const categoryMap = useMemo(() => {

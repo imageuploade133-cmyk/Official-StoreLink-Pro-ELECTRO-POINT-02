@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { 
   collection, 
   query, 
+  where,
   limit, 
   getDocs, 
   startAfter, 
@@ -34,6 +35,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
+import { useStoreUrl } from '@/hooks/use-store-url';
+
 const BATCH_SIZE = 12;
 
 interface CollectionsViewProps {
@@ -43,6 +46,7 @@ interface CollectionsViewProps {
 export function CollectionsView({ onSelectCategory }: CollectionsViewProps) {
     const firestore = useFirestore();
     const { settings } = useSettings();
+    const { storeId } = useStoreUrl();
     const [searchTerm, setSearchTerm] = useState('');
     
     // UI State
@@ -69,6 +73,7 @@ export function CollectionsView({ onSelectCategory }: CollectionsViewProps) {
         try {
             let q = query(
                 collection(firestore, 'categories'),
+                where('store_id', '==', storeId),
                 orderBy('name', 'asc'),
                 limit(BATCH_SIZE)
             );
@@ -78,7 +83,7 @@ export function CollectionsView({ onSelectCategory }: CollectionsViewProps) {
             }
 
             if (!isNextPage) {
-                const countSnap = await getCountFromServer(collection(firestore, 'categories'));
+                const countSnap = await getCountFromServer(query(collection(firestore, 'categories'), where('store_id', '==', storeId)));
                 setTotalCount(countSnap.data().count);
             }
 
@@ -102,7 +107,7 @@ export function CollectionsView({ onSelectCategory }: CollectionsViewProps) {
             setIsLoading(false);
             setIsLoadingMore(false);
         }
-    }, [firestore]);
+    }, [firestore, storeId]);
 
     useEffect(() => {
         fetchCategories();

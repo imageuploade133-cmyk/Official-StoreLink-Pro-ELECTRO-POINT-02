@@ -71,6 +71,8 @@ import { ProductVideoGallery } from '@/components/store/ProductVideoGallery';
 import { StockBar } from '@/components/store/StockBar';
 import { RecentlyViewedSection } from '@/components/store/RecentlyViewedSection';
 
+import { useStoreUrl } from '@/hooks/use-store-url';
+
 const iconMap = {
   Truck, 
   ShieldCheck, 
@@ -174,6 +176,7 @@ interface ProductDetailViewProps {
 export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToRecentlyViewed }: ProductDetailViewProps) {
     const firestore = useFirestore();
     const { settings } = useSettings();
+    const { storeId } = useStoreUrl();
     const { addToCart } = useCart();
     const { isProductInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
     const { addViewedProduct } = useRecentlyViewed();
@@ -212,7 +215,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
     const reviewsQuery = useMemo(() => firestore ? query(collection(firestore, 'products', id, 'reviews'), orderBy('createdAt', 'desc')) : null, [firestore, id]);
     const { data: reviews } = useCollection<ProductReview>(reviewsQuery);
 
-    const sectionsQuery = useMemo(() => firestore ? query(collection(firestore, 'homepageSections'), where('isFlashSale', '==', true), where('published', '==', true)) : null, [firestore]);
+    const sectionsQuery = useMemo(() => (firestore && storeId) ? query(collection(firestore, 'homepageSections'), where('store_id', '==', storeId), where('isFlashSale', '==', true), where('published', '==', true)) : null, [firestore, storeId]);
     const { data: flashSections } = useCollection<HomepageSection>(sectionsQuery);
 
     const activeSectionPromo = useMemo(() => {
@@ -238,7 +241,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
         return calculateEffectivePrice(product as any, new Date(), category);
     }, [product, activeSectionPromo, category]);
 
-    const relatedQuery = useMemo(() => firestore ? query(collection(firestore, 'products'), where('categoryId', '==', product?.categoryId || ''), where('isVisibleOnWeb', '==', true), limit(6)) : null, [firestore, product?.categoryId]);
+    const relatedQuery = useMemo(() => (firestore && storeId) ? query(collection(firestore, 'products'), where('store_id', '==', storeId), where('categoryId', '==', product?.categoryId || ''), where('isVisibleOnWeb', '==', true), limit(6)) : null, [firestore, product?.categoryId, storeId]);
     const { data: relatedProducts } = useCollection<Product>(relatedQuery);
 
     if (isFetching) return <div className="p-10 text-center"><Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" /></div>;
