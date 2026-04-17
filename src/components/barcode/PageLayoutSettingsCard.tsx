@@ -46,7 +46,7 @@ export function PageLayoutSettingsCard({
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
   return (
-    <Card className="shadow-md rounded-lg">
+    <Card className=" rounded-lg">
       <CardHeader className="flex flex-row items-center justify-between py-3 px-4 border-b">
         <div className="flex items-center gap-2">
           <SettingsIcon className="h-5 w-5 text-primary" />

@@ -27,7 +27,7 @@ export function OfflineDetector({ children }: { children: React.ReactNode }) {
       <Button 
         onClick={() => window.location.reload()} 
         size="lg"
-        className="h-14 px-8 rounded-2xl text-base font-bold shadow-xl shadow-primary/20 active:scale-95 transition-all flex items-center gap-3"
+        className="h-14 px-8 rounded-2xl text-base font-bold  shadow-primary/20 active:scale-95 transition-all flex items-center gap-3"
       >
         <RefreshCw className="h-5 w-5" />
         RETRY CONNECTION

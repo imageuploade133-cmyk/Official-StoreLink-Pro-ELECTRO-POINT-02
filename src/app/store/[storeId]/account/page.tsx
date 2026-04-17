@@ -96,7 +96,7 @@ export default function AccountPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="md:col-span-1 space-y-6">
-                <div className="bg-card p-6 rounded-3xl shadow-xl text-center border-t-4 border-primary">
+                <div className="bg-card p-6 rounded-3xl  text-center border-t-4 border-primary">
                      <Avatar className="h-24 w-24 mx-auto mb-4 border-4 border-primary/20">
                         <AvatarImage src={user.photoURL || ''} alt={user.displayName || 'User'} />
                         <AvatarFallback className="text-3xl font-black">{getInitials(user?.email)}</AvatarFallback>
@@ -109,7 +109,7 @@ export default function AccountPage() {
                 </div>
 
                 {/* Account Credit Display */}
-                <div className="bg-primary text-primary-foreground p-6 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
+                <div className="bg-primary text-primary-foreground p-6 rounded-[2.5rem]  relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:scale-110 transition-transform duration-1000">
                         <Coins className="h-20 w-20 -mr-4 -mt-4" />
                     </div>

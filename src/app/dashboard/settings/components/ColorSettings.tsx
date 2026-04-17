@@ -229,7 +229,7 @@ export function ColorSettings({ settingsData, isLoading, storeId }: ColorSetting
                             onClick={() => field.onChange(option.value)}
                             className={`flex items-center justify-center gap-2 rounded-lg border-2 p-3 sm:p-4 cursor-pointer transition-all ${
                               field.value === option.value
-                                ? 'border-primary bg-primary/10 shadow-md'
+                                ? 'border-primary bg-primary/10 '
                                 : 'border-border hover:border-primary/50 hover:bg-card/50'
                             }`}
                           >

@@ -229,7 +229,7 @@ export default function ReturnsPage() {
         />
       </div>
 
-      <Card className="shadow-lg overflow-hidden border-none ring-1 ring-border">
+      <Card className=" overflow-hidden border-none ring-1 ring-border">
         <CardHeader className="bg-muted/10 border-b">
           <CardTitle>Returned Sales Log</CardTitle>
           <CardDescription>

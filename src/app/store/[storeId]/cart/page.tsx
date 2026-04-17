@@ -246,7 +246,7 @@ export default function CartPage() {
                           </div>
                       )}
 
-                      <Card className="shadow-sm overflow-hidden">
+                      <Card className=" overflow-hidden">
                           <CardHeader className="bg-muted/20 border-b">
                               <div className="flex justify-between items-center">
                                 <CardTitle className="text-lg">Cart Items ({cartCount})</CardTitle>
@@ -313,7 +313,7 @@ export default function CartPage() {
                   </div>
 
                   <div className="lg:col-span-1 sticky top-32">
-                      <div className="bg-card p-8 rounded-2xl shadow-xl border space-y-8">
+                      <div className="bg-card p-8 rounded-2xl  border space-y-8">
                           <h2 className="text-2xl font-black tracking-tight">Summary</h2>
                           
                           <div className="space-y-4 text-base">
@@ -395,7 +395,7 @@ export default function CartPage() {
                           {activeRewardAd && !rewardAdClicked && (
                             <button
                                 onClick={handleRewardClick}
-                                className="w-full relative group overflow-hidden h-14 rounded-[1.25rem] transition-all active:scale-[0.98] shadow-xl mb-4"
+                                className="w-full relative group overflow-hidden h-14 rounded-[1.25rem] transition-all active:scale-[0.98]  mb-4"
                             >
                                 <div className="absolute inset-0 bg-slate-950 dark:bg-slate-900" />
                                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(251,191,36,0.15),transparent_70%)]" />
@@ -410,7 +410,7 @@ export default function CartPage() {
                             </button>
                           )}
 
-                          <Button asChild size="lg" style={buttonStyle} className="w-full h-14 text-lg font-bold shadow-lg shadow-primary/20 border-none" disabled={hasIssues || subtotal === 0}>
+                          <Button asChild size="lg" style={buttonStyle} className="w-full h-14 text-lg font-bold  shadow-primary/20 border-none" disabled={hasIssues || subtotal === 0}>
                              <Link href={getStoreUrl('/store/checkout')}>
                                Checkout Now <ArrowRight className="ml-2 h-5 w-5" />
                              </Link>

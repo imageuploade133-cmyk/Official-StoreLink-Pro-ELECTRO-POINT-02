@@ -200,7 +200,7 @@ export default function ManageInvoicesPage() {
         </div>
       </div>
 
-      <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <CardHeader className="border-b bg-muted/10">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
             <div>

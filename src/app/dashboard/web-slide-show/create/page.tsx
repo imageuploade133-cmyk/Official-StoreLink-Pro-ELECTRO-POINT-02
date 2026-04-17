@@ -171,7 +171,7 @@ export default function CreateSlidePage() {
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+          <Card className=" border-none ring-1 ring-border overflow-hidden">
             <CardHeader className="bg-muted/30">
               <CardTitle>Slide Placement & Content</CardTitle>
               <CardDescription>Configure where and how this slide appears.</CardDescription>
@@ -227,7 +227,7 @@ export default function CreateSlidePage() {
                             <FormLabel className="font-bold">Background Asset <span className="text-destructive">*</span></FormLabel>
                             <div className="flex items-start gap-6">
                                 {imageUrl && (
-                                    <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border-2 border-white shadow-xl flex-shrink-0">
+                                    <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border-2 border-white  flex-shrink-0">
                                         <Image src={imageUrl} alt="Background preview" fill className="object-cover" unoptimized/>
                                     </div>
                                 )}
@@ -266,7 +266,7 @@ export default function CreateSlidePage() {
                                 <FormLabel className="font-bold">Video Poster Image (Optional)</FormLabel>
                                 <div className="flex items-start gap-6">
                                 {videoPosterUrl && (
-                                    <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border-2 border-white shadow-xl flex-shrink-0">
+                                    <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border-2 border-white  flex-shrink-0">
                                         <Image src={videoPosterUrl} alt="Poster preview" fill className="object-cover" unoptimized/>
                                     </div>
                                 )}
@@ -366,7 +366,7 @@ export default function CreateSlidePage() {
                 </div>
             </CardContent>
             <CardFooter className="bg-muted/30 border-t p-8 flex justify-between">
-              <Button type="submit" disabled={isSaving || isUploading} size="lg" className="px-12 h-14 rounded-2xl font-black uppercase text-xs tracking-widest shadow-2xl shadow-primary/20 transition-all active:scale-95">
+              <Button type="submit" disabled={isSaving || isUploading} size="lg" className="px-12 h-14 rounded-2xl font-black uppercase text-xs tracking-widest  shadow-primary/20 transition-all active:scale-95">
                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                 {isSaving ? 'Processing...' : 'Publish New Slide'}
               </Button>

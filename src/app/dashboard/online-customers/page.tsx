@@ -347,7 +347,7 @@ export default function OnlineCustomersPage() {
         </Card>
       </div>
 
-      <Card className="shadow-sm border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <CardHeader>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <CardTitle className="text-lg font-bold">Member Directory</CardTitle>

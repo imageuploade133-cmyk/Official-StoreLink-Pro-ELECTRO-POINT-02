@@ -290,7 +290,7 @@ export function OrderDetailsModal({
                       </div>
                     </div>
                     {order.selectedBankAccount && (
-                      <div className="p-3 bg-white border rounded-xl flex items-center gap-3 shadow-sm">
+                      <div className="p-3 bg-white border rounded-xl flex items-center gap-3 ">
                         <Landmark className="h-5 w-5 text-primary" />
                         <div className="min-w-0">
                           <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest leading-none mb-1">Target Bank</p>
@@ -312,7 +312,7 @@ export function OrderDetailsModal({
               <h3 className="text-[10px] font-black uppercase text-muted-foreground tracking-[0.2em] flex items-center gap-2">
                 <Package className="h-4 w-4" /> Fulfillment List
               </h3>
-              <div className="border rounded-xl overflow-hidden bg-white shadow-sm">
+              <div className="border rounded-xl overflow-hidden bg-white ">
                 <table className="w-full text-sm">
                   <thead className="bg-muted/50 border-b">
                     <tr>
@@ -455,7 +455,7 @@ export function OrderDetailsModal({
             </div>
         </div>
 
-        <DialogFooter className="p-6 border-t flex flex-col sm:flex-row justify-between items-center gap-4 bg-background shadow-lg">
+        <DialogFooter className="p-6 border-t flex flex-col sm:flex-row justify-between items-center gap-4 bg-background ">
           <div className="flex flex-wrap items-center gap-2">
             {statusActions
               .filter(action => action.status !== order.status)

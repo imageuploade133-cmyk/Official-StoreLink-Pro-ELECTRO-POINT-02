@@ -82,7 +82,7 @@ export function ShopSettings({ settingsData, isLoading, storeId }: ShopSettingsP
   }
 
   return (
-    <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+    <Card className=" border-none ring-1 ring-border overflow-hidden">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader className="bg-muted/30 border-b">

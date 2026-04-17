@@ -67,10 +67,10 @@ const borderRadiusOptions = [
 
 const shadowOptions = [
   { value: 'none', label: 'None', class: 'shadow-none' },
-  { value: 'sm', label: 'Small', class: 'shadow-sm' },
-  { value: 'md', label: 'Medium', class: 'shadow-md' },
-  { value: 'lg', label: 'Large', class: 'shadow-lg' },
-  { value: 'xl', label: 'Extra Large', class: 'shadow-xl' },
+  { value: 'sm', label: 'Small', class: '' },
+  { value: 'md', label: 'Medium', class: '' },
+  { value: 'lg', label: 'Large', class: '' },
+  { value: 'xl', label: 'Extra Large', class: '' },
 ];
 
 const borderWidthOptions = [
@@ -255,7 +255,7 @@ export default function ProductCardDesignerPage() {
   }
 
   const borderRadiusClass = borderRadiusOptions.find(o => o.value === settings.productCardBorderRadius)?.class || 'rounded-lg';
-  const shadowClass = shadowOptions.find(o => o.value === settings.productCardShadow)?.class || 'shadow-md';
+  const shadowClass = shadowOptions.find(o => o.value === settings.productCardShadow)?.class || '';
   const borderWidthClass = borderWidthOptions.find(o => o.value === settings.productCardBorderWidth)?.class || 'border';
 
   return (
@@ -724,7 +724,7 @@ export default function ProductCardDesignerPage() {
                     onClick={() => setPreviewDevice('mobile')}
                     className={cn(
                       'p-2 rounded-md transition-all',
-                      previewDevice === 'mobile' ? 'bg-white dark:bg-slate-700 shadow-sm' : 'text-slate-500'
+                      previewDevice === 'mobile' ? 'bg-white dark:bg-slate-700 ' : 'text-slate-500'
                     )}
                   >
                     <Smartphone className="h-4 w-4" />
@@ -733,7 +733,7 @@ export default function ProductCardDesignerPage() {
                     onClick={() => setPreviewDevice('tablet')}
                     className={cn(
                       'p-2 rounded-md transition-all',
-                      previewDevice === 'tablet' ? 'bg-white dark:bg-slate-700 shadow-sm' : 'text-slate-500'
+                      previewDevice === 'tablet' ? 'bg-white dark:bg-slate-700 ' : 'text-slate-500'
                     )}
                   >
                     <Tablet className="h-4 w-4" />
@@ -742,7 +742,7 @@ export default function ProductCardDesignerPage() {
                     onClick={() => setPreviewDevice('desktop')}
                     className={cn(
                       'p-2 rounded-md transition-all',
-                      previewDevice === 'desktop' ? 'bg-white dark:bg-slate-700 shadow-sm' : 'text-slate-500'
+                      previewDevice === 'desktop' ? 'bg-white dark:bg-slate-700 ' : 'text-slate-500'
                     )}
                   >
                     <Monitor className="h-4 w-4" />
@@ -781,7 +781,7 @@ export default function ProductCardDesignerPage() {
                         shadowClass,
                         borderWidthClass,
                         settings.productCardHoverEffect === 'lift' && 'hover:-translate-y-2',
-                        settings.productCardHoverEffect === 'glow' && 'hover:shadow-2xl hover:shadow-primary/20',
+                        settings.productCardHoverEffect === 'glow' && 'hover: hover:shadow-primary/20',
                         settings.productCardHoverEffect === 'border' && 'hover:border-primary'
                       )}
                       style={{
@@ -819,7 +819,7 @@ export default function ProductCardDesignerPage() {
                           )}
                           {/* Wishlist */}
                           {settings.productCardShowWishlist && (
-                            <button className="absolute top-3 right-3 h-9 w-9 flex items-center justify-center rounded-full bg-white/90 dark:bg-slate-800/90 shadow-md">
+                            <button className="absolute top-3 right-3 h-9 w-9 flex items-center justify-center rounded-full bg-white/90 dark:bg-slate-800/90 ">
                               <Sparkles className="h-4 w-4 text-slate-400" />
                             </button>
                           )}
@@ -904,7 +904,7 @@ export default function ProductCardDesignerPage() {
                       shadowClass,
                       borderWidthClass,
                       settings.productCardHoverEffect === 'lift' && 'hover:-translate-y-2',
-                      settings.productCardHoverEffect === 'glow' && 'hover:shadow-2xl hover:shadow-primary/20',
+                      settings.productCardHoverEffect === 'glow' && 'hover: hover:shadow-primary/20',
                       settings.productCardHoverEffect === 'border' && 'hover:border-primary'
                     )}
                     style={{
@@ -936,7 +936,7 @@ export default function ProductCardDesignerPage() {
                           </div>
                         )}
                         {settings.productCardShowWishlist && (
-                          <button className="absolute top-3 right-3 h-9 w-9 flex items-center justify-center rounded-full bg-white/90 dark:bg-slate-800/90 shadow-md">
+                          <button className="absolute top-3 right-3 h-9 w-9 flex items-center justify-center rounded-full bg-white/90 dark:bg-slate-800/90 ">
                             <Sparkles className="h-4 w-4 text-rose-500 fill-rose-500" />
                           </button>
                         )}
@@ -1008,7 +1008,7 @@ export default function ProductCardDesignerPage() {
 }
 
 // Default HTML Template
-const defaultHtmlTemplate = `<div class="group relative flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all duration-500 hover:border-primary/30 overflow-hidden h-full hover:-translate-y-1 hover:shadow-xl" style="height: {{cardHeight}}px;">
+const defaultHtmlTemplate = `<div class="group relative flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all duration-500 hover:border-primary/30 overflow-hidden h-full hover:-translate-y-1 hover:" style="height: {{cardHeight}}px;">
   <!-- Media Area -->
   <a href="/store/product/{{product.id}}" class="block relative overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900" style="height: 60%;">
     <img
@@ -1020,25 +1020,25 @@ const defaultHtmlTemplate = `<div class="group relative flex flex-col bg-white d
     <!-- Badges -->
     <div class="absolute top-4 left-4 flex flex-col gap-2 z-10">
       {{#if product.isOfficial}}
-      <span class="bg-gradient-to-r from-blue-600 to-blue-700 text-white font-black text-[9px] uppercase tracking-widest px-3 py-1.5 shadow-lg rounded-full">
+      <span class="bg-gradient-to-r from-blue-600 to-blue-700 text-white font-black text-[9px] uppercase tracking-widest px-3 py-1.5  rounded-full">
         ✓ Official
       </span>
       {{/if}}
       {{#if product.discount}}
-      <span class="bg-rose-500 text-white font-black text-[10px] uppercase tracking-widest px-3 py-1.5 shadow-lg rounded-full">
+      <span class="bg-rose-500 text-white font-black text-[10px] uppercase tracking-widest px-3 py-1.5  rounded-full">
         ⚡ -{{product.discount}}%
       </span>
       {{/if}}
     </div>
 
     <!-- Wishlist Button -->
-    <button class="absolute top-4 right-4 h-11 w-11 flex items-center justify-center rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-lg transition-all duration-300 hover:scale-110 z-10 border border-white/30">
+    <button class="absolute top-4 right-4 h-11 w-11 flex items-center justify-center rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl  transition-all duration-300 hover:scale-110 z-10 border border-white/30">
       ♡
     </button>
 
     <!-- Quick Add -->
     <div class="absolute inset-x-0 bottom-0 p-5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-gradient-to-t from-black/40 to-transparent">
-      <button class="w-full bg-primary text-white font-black text-sm uppercase tracking-wide shadow-xl py-3 rounded-lg hover:shadow-2xl transition-all active:scale-95">
+      <button class="w-full bg-primary text-white font-black text-sm uppercase tracking-wide  py-3 rounded-lg hover: transition-all active:scale-95">
         🛒 Add to Bag
       </button>
     </div>
@@ -1099,7 +1099,7 @@ const defaultHtmlTemplate = `<div class="group relative flex flex-col bg-white d
         </div>
         
         <!-- Mobile Cart -->
-        <button class="md:hidden h-10 w-10 flex items-center justify-center rounded-full bg-primary text-white shadow-lg active:scale-90 transition-all">
+        <button class="md:hidden h-10 w-10 flex items-center justify-center rounded-full bg-primary text-white  active:scale-90 transition-all">
           🛒
         </button>
       </div>
@@ -1108,7 +1108,7 @@ const defaultHtmlTemplate = `<div class="group relative flex flex-col bg-white d
 </div>`;
 
 // Minimal HTML Template
-const minimalHtmlTemplate = `<div class="group relative bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-300 hover:shadow-lg" style="height: {{cardHeight}}px;">
+const minimalHtmlTemplate = `<div class="group relative bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-300 hover:" style="height: {{cardHeight}}px;">
   <a href="/store/product/{{product.id}}" class="block">
     <div class="aspect-square overflow-hidden bg-slate-100">
       <img

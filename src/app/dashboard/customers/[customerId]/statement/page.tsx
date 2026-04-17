@@ -339,7 +339,7 @@ export default function CustomerStatementPage() {
 
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-8 border-b-2 border-primary/10">
         <div className="flex items-center gap-4">
-          <div className="bg-primary p-3 rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center overflow-hidden w-16 h-16">
+          <div className="bg-primary p-3 rounded-xl  shadow-primary/20 flex items-center justify-center overflow-hidden w-16 h-16">
             {settings?.invoiceLogoUrl ? (
               <div className="relative w-full h-full">
                 <Image 
@@ -367,7 +367,7 @@ export default function CustomerStatementPage() {
         </div>
       </header>
 
-      <div className="flex flex-wrap items-center justify-between gap-4 no-print bg-white dark:bg-slate-800 p-4 rounded-xl border shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-4 no-print bg-white dark:bg-slate-800 p-4 rounded-xl border ">
         <div className="flex items-center gap-4 flex-grow">
             <div className="relative flex-grow max-w-xs">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -392,14 +392,14 @@ export default function CustomerStatementPage() {
           <Button variant="outline" onClick={handlePrint} className="gap-2 font-bold h-11">
             <Printer className="h-4 w-4" /> Print
           </Button>
-          <Button onClick={handlePrint} className="bg-primary hover:bg-primary/90 gap-2 font-bold shadow-lg shadow-primary/20 h-11">
+          <Button onClick={handlePrint} className="bg-primary hover:bg-primary/90 gap-2 font-bold  shadow-primary/20 h-11">
             <Download className="h-4 w-4" /> Export PDF
           </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border-l-4 border-slate-400 shadow-lg ring-1 ring-black/5">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border-l-4 border-slate-400  ring-1 ring-black/5">
           <div className="flex justify-between items-start mb-4">
             <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Gross Sales</p>
             <Receipt className="h-5 w-5 text-slate-400" />
@@ -408,7 +408,7 @@ export default function CustomerStatementPage() {
           <p className="text-[9px] text-slate-400 font-medium mt-2 uppercase">Lifetime Purchases</p>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border-l-4 border-emerald-500 shadow-lg ring-1 ring-black/5">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border-l-4 border-emerald-500  ring-1 ring-black/5">
           <div className="flex justify-between items-start mb-4">
             <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Account Credit</p>
             <PiggyBank className="h-5 w-5 text-emerald-500/40" />
@@ -417,7 +417,7 @@ export default function CustomerStatementPage() {
           <p className="text-[9px] text-slate-400 font-medium mt-2 uppercase">Unallocated Deposits</p>
         </div>
 
-        <div className={cn("p-6 rounded-xl border-l-4 shadow-lg ring-1 ring-black/5", (customer?.outstandingCredit || 0) > 0.01 ? "bg-red-50 dark:bg-red-950/20 border-red-500" : "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-500")}>
+        <div className={cn("p-6 rounded-xl border-l-4  ring-1 ring-black/5", (customer?.outstandingCredit || 0) > 0.01 ? "bg-red-50 dark:bg-red-950/20 border-red-500" : "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-500")}>
           <div className="flex justify-between items-start mb-4">
             <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Outstanding Debt</p>
             <AlertTriangle className="h-5 w-5 text-red-500/40" />
@@ -428,7 +428,7 @@ export default function CustomerStatementPage() {
           <p className="text-[9px] font-bold mt-2 uppercase">Active Pay-Small-Small</p>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border-l-4 border-primary shadow-lg ring-1 ring-black/5">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border-l-4 border-primary  ring-1 ring-black/5">
           <div className="flex justify-between items-start mb-4">
             <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Sync Metrics</p>
             <History className="h-5 w-5 text-primary/40" />
@@ -443,7 +443,7 @@ export default function CustomerStatementPage() {
             <FileText className="h-5 w-5 text-primary" />
             Transactional Ledger
         </h3>
-        <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xl bg-white dark:bg-slate-800">
+        <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700  bg-white dark:bg-slate-800">
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50 dark:bg-slate-900/50">

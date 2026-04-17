@@ -375,7 +375,7 @@ export default function StockAlertsPage() {
             </TabsList>
             
             <TabsContent value={activeTab} className="mt-4">
-                <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+                <Card className=" border-none ring-1 ring-border overflow-hidden">
                     <CardHeader className="flex flex-row justify-between items-center bg-muted/10 border-b">
                         <div>
                             <CardTitle>{activeTab === 'low_stock' ? 'Low Stock Inventory' : 'Depleted Inventory'}</CardTitle>

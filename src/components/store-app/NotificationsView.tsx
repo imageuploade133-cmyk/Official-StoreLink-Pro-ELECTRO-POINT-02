@@ -96,7 +96,7 @@ export function NotificationsView({ onClose, onNavigate }: NotificationsViewProp
                 <div className="flex items-center gap-4">
                     <button 
                         onClick={onClose}
-                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
+                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800  border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
                     >
                         <ArrowLeft className="h-5 w-5" strokeWidth={3} />
                     </button>
@@ -132,7 +132,7 @@ export function NotificationsView({ onClose, onNavigate }: NotificationsViewProp
                             <Button 
                                 onClick={() => onNavigate?.('profile')} 
                                 size="lg" 
-                                className="rounded-2xl font-black uppercase text-[10px] tracking-widest px-10 h-14 shadow-xl active:scale-95 transition-transform"
+                                className="rounded-2xl font-black uppercase text-[10px] tracking-widest px-10 h-14  active:scale-95 transition-transform"
                             >
                                 Enter Profile
                             </Button>
@@ -147,7 +147,7 @@ export function NotificationsView({ onClose, onNavigate }: NotificationsViewProp
                                 return (
                                     <div 
                                         key={order.id} 
-                                        className="relative p-6 bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-lg group active:scale-[0.98] transition-all"
+                                        className="relative p-6 bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-800  group active:scale-[0.98] transition-all"
                                     >
                                         <div className="flex gap-5">
                                             <div className={cn("size-12 rounded-2xl flex items-center justify-center shrink-0 shadow-inner", config.color)}>
@@ -188,7 +188,7 @@ export function NotificationsView({ onClose, onNavigate }: NotificationsViewProp
                             <Button 
                                 onClick={onClose} 
                                 size="lg" 
-                                className="rounded-2xl font-black uppercase text-[10px] tracking-widest px-10 h-14 shadow-xl active:scale-95 transition-transform"
+                                className="rounded-2xl font-black uppercase text-[10px] tracking-widest px-10 h-14  active:scale-95 transition-transform"
                             >
                                 Return Home
                             </Button>

@@ -142,7 +142,7 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                 <div className="flex items-center gap-4">
                     <button 
                         onClick={onClose}
-                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
+                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
                     >
                         <ArrowLeft className="h-5 w-5" strokeWidth={3} />
                     </button>
@@ -169,7 +169,7 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                         <Input 
                             autoFocus={!initialCategoryId}
                             placeholder="Type name, iron, solar, etc..." 
-                            className="h-16 pl-14 pr-12 rounded-[1.5rem] bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 shadow-2xl text-lg font-bold tracking-tight focus-visible:ring-4 focus-visible:ring-primary/10 transition-all"
+                            className="h-16 pl-14 pr-12 rounded-[1.5rem] bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 text-lg font-bold tracking-tight focus-visible:ring-4 focus-visible:ring-primary/10 transition-all"
                             value={searchQuery}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -185,7 +185,7 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
 
                     {selectedCategoryId && (
                         <div className="flex items-center gap-2 animate-in slide-in-from-left-2 duration-300">
-                            <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 px-4 py-2 rounded-xl flex items-center gap-2 font-black text-[10px] uppercase tracking-widest shadow-sm">
+                            <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 px-4 py-2 rounded-xl flex items-center gap-2 font-black text-[10px] uppercase tracking-widest">
                                 <Filter className="h-3 w-3" />
                                 {categories?.find(c => c.id === selectedCategoryId)?.name || 'Filtered Collection'}
                                 <button 
@@ -225,14 +225,14 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                                 <div 
                                     key={p.id} 
                                     onClick={() => onSelectProduct(p.id)} 
-                                    className="flex items-center gap-5 p-5 bg-white dark:bg-slate-800 rounded-[2rem] shadow-xl border-2 border-slate-200 dark:border-slate-700 transition-all active:scale-[0.98] w-full text-left group cursor-pointer"
+                                    className="flex items-center gap-5 p-5 bg-white dark:bg-slate-800 rounded-[2rem] border-2 border-slate-200 dark:border-slate-700 transition-all active:scale-[0.98] w-full text-left group cursor-pointer"
                                 >
-                                    <div className="relative h-20 w-20 rounded-2xl overflow-hidden shrink-0 border bg-muted shadow-sm">
+                                    <div className="relative h-20 w-20 rounded-2xl overflow-hidden shrink-0 border bg-muted">
                                         <Image 
                                             src={p.imageUrl || 'https://placehold.co/200x200.png'} 
                                             alt={p.name} 
                                             fill 
-                                            className="object-cover group-hover:scale-110 transition-transform duration-700" 
+                                            className="object-cover transition-transform duration-700" 
                                             unoptimized 
                                         />
                                     </div>
@@ -268,8 +268,8 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                         </div>
                     ) : (
                         <div className="py-24 text-center space-y-6 animate-in zoom-in-95 duration-700">
-                            <div className="h-32 w-32 bg-slate-100 dark:bg-slate-800/50 rounded-full flex items-center justify-center mx-auto shadow-inner group">
-                                <SearchIcon className="h-14 w-14 text-slate-300 group-hover:scale-110 transition-transform duration-500" strokeWidth={1.5} />
+                            <div className="h-32 w-32 bg-slate-100 dark:bg-slate-800/50 rounded-full flex items-center justify-center mx-auto group">
+                                <SearchIcon className="h-14 w-14 text-slate-300 transition-transform duration-500" strokeWidth={1.5} />
                             </div>
                             <div className="space-y-2">
                                 <h3 className="text-2xl font-black tracking-tight uppercase">No matches found</h3>
@@ -277,7 +277,7 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                             </div>
                             <Button 
                                 variant="outline" 
-                                className="rounded-xl font-black uppercase text-[10px] tracking-widest px-8 h-12 shadow-sm" 
+                                className="rounded-xl font-black uppercase text-[10px] tracking-widest px-8 h-12" 
                                 onClick={() => { setSearchTerm(''); setSelectedCategoryId(null); if (onClearCategory) onClearCategory(); }}
                             >
                                 Reset Registry Exploration

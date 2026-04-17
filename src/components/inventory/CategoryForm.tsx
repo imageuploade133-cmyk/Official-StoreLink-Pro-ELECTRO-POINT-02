@@ -195,7 +195,7 @@ export function CategoryForm({
                         <Input 
                           placeholder="e.g., Electronics, Home Decor" 
                           {...field} 
-                          className="h-12 text-base font-bold shadow-sm focus:ring-primary/20" 
+                          className="h-12 text-base font-bold  focus:ring-primary/20" 
                           autoFocus
                         />
                       </FormControl>
@@ -230,7 +230,7 @@ export function CategoryForm({
                       <FormLabel className="font-bold text-gray-700">Category Image</FormLabel>
                       <div className="flex flex-col sm:flex-row items-start gap-6 pt-2">
                         {imageUrl ? (
-                          <div className="relative w-full sm:w-28 aspect-square rounded-2xl overflow-hidden border-2 shadow-md bg-muted shrink-0 group ring-4 ring-primary/5">
+                          <div className="relative w-full sm:w-28 aspect-square rounded-2xl overflow-hidden border-2  bg-muted shrink-0 group ring-4 ring-primary/5">
                             <Image
                               src={imageUrl}
                               alt="Category preview"
@@ -242,7 +242,7 @@ export function CategoryForm({
                               type="button" 
                               variant="destructive" 
                               size="icon" 
-                              className="absolute top-2 right-2 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                              className="absolute top-2 right-2 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity "
                               onClick={() => setValue('imageUrl', '')}
                             >
                               <X className="h-4 w-4" />
@@ -256,7 +256,7 @@ export function CategoryForm({
                         )}
                         <div className="flex-grow space-y-4 w-full">
                           <FormControl>
-                            <Input placeholder="Direct URL or use upload button" {...field} value={field.value || ''} disabled={isSubmitting || isUploading} className="h-10 shadow-sm" />
+                            <Input placeholder="Direct URL or use upload button" {...field} value={field.value || ''} disabled={isSubmitting || isUploading} className="h-10 " />
                           </FormControl>
                           <div className="flex items-center gap-3">
                             <Button asChild variant="outline" size="sm" disabled={isSubmitting || isUploading} className="h-10 px-4 font-bold border-primary/30 text-primary hover:bg-primary/5 rounded-xl transition-all">
@@ -293,7 +293,7 @@ export function CategoryForm({
                 Cancel
               </Button>
             )}
-            <Button type="submit" disabled={isSubmitting || isUploading} className="min-w-[150px] font-bold shadow-lg shadow-primary/20 h-11">
+            <Button type="submit" disabled={isSubmitting || isUploading} className="min-w-[150px] font-bold  shadow-primary/20 h-11">
               {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
               Create Category
             </Button>
@@ -324,7 +324,7 @@ export function CategoryForm({
                     <FormItem>
                       <FormLabel className="font-bold text-gray-700">Category Name <span className="text-destructive">*</span></FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., Electronics, Home Decor" {...field} className="h-12 text-base font-bold shadow-sm" />
+                        <Input placeholder="e.g., Electronics, Home Decor" {...field} className="h-12 text-base font-bold " />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -357,7 +357,7 @@ export function CategoryForm({
                     <FormLabel className="font-bold text-gray-700">Representational Image</FormLabel>
                     <div className="flex flex-col sm:flex-row items-start gap-6 pt-2">
                       {imageUrl ? (
-                        <div className="relative w-full sm:w-32 aspect-square rounded-2xl overflow-hidden border-2 shadow-xl bg-muted shrink-0 group ring-4 ring-primary/5">
+                        <div className="relative w-full sm:w-32 aspect-square rounded-2xl overflow-hidden border-2  bg-muted shrink-0 group ring-4 ring-primary/5">
                           <Image
                               src={imageUrl}
                               alt="Category preview"
@@ -369,7 +369,7 @@ export function CategoryForm({
                             type="button" 
                             variant="destructive" 
                             size="icon" 
-                            className="absolute top-2 right-2 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                            className="absolute top-2 right-2 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity "
                             onClick={() => setValue('imageUrl', '')}
                           >
                             <X className="h-4 w-4" />
@@ -383,10 +383,10 @@ export function CategoryForm({
                       )}
                       <div className="flex-grow space-y-4 w-full">
                           <FormControl>
-                            <Input placeholder="Direct URL or use upload button" {...field} value={field.value || ''} disabled={isSubmitting || isUploading} className="h-11 shadow-sm" />
+                            <Input placeholder="Direct URL or use upload button" {...field} value={field.value || ''} disabled={isSubmitting || isUploading} className="h-11 " />
                           </FormControl>
                           <div className="flex items-center gap-3">
-                            <Button asChild variant="outline" size="lg" disabled={isSubmitting || isUploading} className="h-12 px-6 font-bold border-primary/30 text-primary hover:bg-primary/5 rounded-xl shadow-sm transition-all active:scale-95">
+                            <Button asChild variant="outline" size="lg" disabled={isSubmitting || isUploading} className="h-12 px-6 font-bold border-primary/30 text-primary hover:bg-primary/5 rounded-xl  transition-all active:scale-95">
                               <label htmlFor="category-image-upload" className="cursor-pointer">
                                 {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
                                 Upload Media
@@ -432,7 +432,7 @@ export function CategoryForm({
                   )}
                 />
 
-                <Card className={cn("shadow-xl border-none ring-1 ring-border transition-all overflow-hidden rounded-[2rem]", isFlashSale ? "border-rose-500 ring-rose-500/20" : "")}>
+                <Card className={cn(" border-none ring-1 ring-border transition-all overflow-hidden rounded-[2rem]", isFlashSale ? "border-rose-500 ring-rose-500/20" : "")}>
                   <CardHeader className={cn("bg-muted/30 transition-colors py-6", isFlashSale ? "bg-rose-500/10" : "bg-primary/5")}>
                       <div className="flex justify-between items-center">
                           <div className="space-y-1">
@@ -507,7 +507,7 @@ export function CategoryForm({
                                                   <Button
                                                       variant="outline"
                                                       className={cn(
-                                                          "w-full pl-4 text-left font-bold h-12 rounded-xl border-primary/10 shadow-sm",
+                                                          "w-full pl-4 text-left font-bold h-12 rounded-xl border-primary/10 ",
                                                           !field.value && "text-muted-foreground"
                                                       )}
                                                   >
@@ -556,7 +556,7 @@ export function CategoryForm({
                                                   <Button
                                                       variant="outline"
                                                       className={cn(
-                                                          "w-full pl-4 text-left font-bold h-12 rounded-xl border-primary/10 shadow-sm",
+                                                          "w-full pl-4 text-left font-bold h-12 rounded-xl border-primary/10 ",
                                                           !field.value && "text-muted-foreground"
                                                       )}
                                                   >
@@ -611,7 +611,7 @@ export function CategoryForm({
           </ScrollArea>
 
           <CardFooter className="bg-muted/30 border-t p-6 shrink-0 flex justify-between items-center gap-4 flex-wrap">
-            <Button type="submit" disabled={isSubmitting || isUploading} size="lg" className="px-8 h-12 font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20">
+            <Button type="submit" disabled={isSubmitting || isUploading} size="lg" className="px-8 h-12 font-black uppercase text-xs tracking-widest  shadow-primary/20">
               {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
               {isEditMode ? "Update Collection" : "Publish Category"}
             </Button>

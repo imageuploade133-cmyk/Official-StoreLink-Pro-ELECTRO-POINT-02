@@ -320,7 +320,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
   if (step === 'success') {
     return (
       <div className="h-full flex flex-col items-center justify-center p-8 text-center space-y-8 animate-in zoom-in-95 duration-500 bg-white dark:bg-slate-900">
-        <div className="w-24 h-24 rounded-[3rem] bg-primary/10 flex items-center justify-center text-primary shadow-2xl">
+        <div className="w-24 h-24 rounded-[3rem] bg-primary/10 flex items-center justify-center text-primary ">
           <CheckCircle2 className="h-12 w-12" strokeWidth={3} />
         </div>
         <div className="space-y-2">
@@ -335,7 +335,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                 </div>
             </Card>
         )}
-        <Button onClick={onClose} size="lg" className="w-full h-16 rounded-[1.5rem] font-black uppercase text-xs tracking-widest shadow-xl">Back to Store</Button>
+        <Button onClick={onClose} size="lg" className="w-full h-16 rounded-[1.5rem] font-black uppercase text-xs tracking-widest ">Back to Store</Button>
       </div>
     );
   }
@@ -346,12 +346,12 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
             <div className="flex items-center justify-between px-6 py-6">
                 <button 
                   onClick={step === 'details' ? onClose : () => setStep('details')} 
-                  className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-800 active:scale-90 transition-transform"
+                  className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white dark:bg-slate-800  border border-slate-100 dark:border-slate-800 active:scale-90 transition-transform"
                 >
                   <ArrowLeft className="h-6 w-6" />
                 </button>
                 <h1 className="text-xl font-black tracking-tighter uppercase">Checkout</h1>
-                <Badge variant="secondary" className="font-black h-8 px-4 rounded-full shadow-sm">{cartCount} items</Badge>
+                <Badge variant="secondary" className="font-black h-8 px-4 rounded-full ">{cartCount} items</Badge>
             </div>
             
             {/* Step Indicator */}
@@ -368,7 +368,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                     <div className="animate-in fade-in slide-in-from-top-2 duration-500">
                         <button 
                             onClick={() => setIsSummaryExpanded(!isSummaryExpanded)}
-                            className="w-full flex items-center justify-between p-5 bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm"
+                            className="w-full flex items-center justify-between p-5 bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-800 "
                         >
                             <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 rounded-2xl bg-primary/5 flex items-center justify-center text-primary">
@@ -383,7 +383,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                         </button>
                         
                         {isSummaryExpanded && (
-                            <div className="mt-2 p-6 bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-xl space-y-4 animate-in zoom-in-95 duration-300">
+                            <div className="mt-2 p-6 bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-100 dark:border-slate-800  space-y-4 animate-in zoom-in-95 duration-300">
                                 <div className="space-y-3">
                                     {cartItems.map(item => (
                                         <div key={item.id} className="flex justify-between items-center text-sm">
@@ -433,7 +433,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                 <Label className="text-[10px] font-black uppercase tracking-widest text-primary ml-1">Full Identity</Label>
                                 <div className="relative">
                                     <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                                    <Input name="name" value={formData.name} onChange={handleInputChange} placeholder="Recipient Name" className="h-14 pl-12 rounded-2xl border-none shadow-xl font-bold bg-white dark:bg-slate-800 focus-visible:ring-primary/20" />
+                                    <Input name="name" value={formData.name} onChange={handleInputChange} placeholder="Recipient Name" className="h-14 pl-12 rounded-2xl border-none  font-bold bg-white dark:bg-slate-800 focus-visible:ring-primary/20" />
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 gap-6">
@@ -441,14 +441,14 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-primary ml-1">Communication</Label>
                                     <div className="relative">
                                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                                        <Input name="email" value={formData.email} onChange={handleInputChange} type="email" placeholder="email@example.com" className="h-14 pl-12 rounded-2xl border-none shadow-xl font-bold bg-white dark:bg-slate-800 focus-visible:ring-primary/20" />
+                                        <Input name="email" value={formData.email} onChange={handleInputChange} type="email" placeholder="email@example.com" className="h-14 pl-12 rounded-2xl border-none  font-bold bg-white dark:bg-slate-800 focus-visible:ring-primary/20" />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-primary ml-1">Phone Protocol</Label>
                                     <div className="relative">
                                         <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                                        <Input name="phone" value={formData.phone} onChange={handleInputChange} type="tel" placeholder="+1..." className="h-14 pl-12 rounded-2xl border-none shadow-xl font-bold bg-white dark:bg-slate-800 focus-visible:ring-primary/20" />
+                                        <Input name="phone" value={formData.phone} onChange={handleInputChange} type="tel" placeholder="+1..." className="h-14 pl-12 rounded-2xl border-none  font-bold bg-white dark:bg-slate-800 focus-visible:ring-primary/20" />
                                     </div>
                                 </div>
                             </div>
@@ -468,7 +468,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                 >
                                     {enableDelivery && (
                                         <Label className={cn(
-                                            "flex flex-col items-center justify-center p-6 rounded-[2rem] border-2 cursor-pointer transition-all active:scale-95 shadow-lg",
+                                            "flex flex-col items-center justify-center p-6 rounded-[2rem] border-2 cursor-pointer transition-all active:scale-95 ",
                                             fulfillmentType === 'delivery' ? "bg-primary/5 border-primary" : "bg-white dark:bg-slate-800 border-transparent"
                                         )}>
                                             <RadioGroupItem value="delivery" className="sr-only" />
@@ -478,7 +478,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                     )}
                                     {enablePickUp && (
                                         <Label className={cn(
-                                            "flex flex-col items-center justify-center p-6 rounded-[2rem] border-2 cursor-pointer transition-all active:scale-95 shadow-lg",
+                                            "flex flex-col items-center justify-center p-6 rounded-[2rem] border-2 cursor-pointer transition-all active:scale-95 ",
                                             fulfillmentType === 'pickup' ? "bg-primary/5 border-primary" : "bg-white dark:bg-slate-800 border-transparent"
                                         )}>
                                             <RadioGroupItem value="pickup" className="sr-only" />
@@ -501,7 +501,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                                             className={cn(
                                                                 "flex items-center justify-between p-4 rounded-2xl border-2 transition-all",
                                                                 selectedLocationId === loc.id 
-                                                                    ? "bg-primary/5 border-primary shadow-md" 
+                                                                    ? "bg-primary/5 border-primary " 
                                                                     : "bg-white dark:bg-slate-800 border-transparent"
                                                             )}
                                                         >
@@ -525,7 +525,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                                     value={formData.address} 
                                                     onChange={handleInputChange} 
                                                     placeholder="Enter your full street address, house number, and city..." 
-                                                    className="min-h-[120px] pl-12 pt-4 rounded-[2rem] border-none shadow-xl font-bold bg-white dark:bg-slate-800 resize-none focus-visible:ring-primary/20" 
+                                                    className="min-h-[120px] pl-12 pt-4 rounded-[2rem] border-none  font-bold bg-white dark:bg-slate-800 resize-none focus-visible:ring-primary/20" 
                                                 />
                                             </div>
                                         </div>
@@ -569,7 +569,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                     {availablePaymentMethods.map((method) => (
                                         <div key={method.id} className="relative">
                                             <RadioGroupItem value={method.name} id={method.id} className="peer sr-only" />
-                                            <Label htmlFor={method.id} className="flex items-center gap-4 p-6 bg-white dark:bg-slate-800 rounded-[2rem] border-2 border-transparent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 shadow-lg cursor-pointer transition-all active:scale-[0.98]">
+                                            <Label htmlFor={method.id} className="flex items-center gap-4 p-6 bg-white dark:bg-slate-800 rounded-[2rem] border-2 border-transparent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5  cursor-pointer transition-all active:scale-[0.98]">
                                                 <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                                                     {method.name.toLowerCase().includes('transfer') ? <Landmark className="h-7 w-7" /> : 
                                                      method.name.toLowerCase().includes('card') ? <CreditCard className="h-7 w-7" /> :
@@ -599,7 +599,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                                         key={acc.id}
                                                         onClick={() => setSelectedBankId(acc.id)}
                                                         className={cn(
-                                                            "shrink-0 w-44 p-5 rounded-[2rem] border-2 transition-all text-left space-y-4 shadow-xl",
+                                                            "shrink-0 w-44 p-5 rounded-[2rem] border-2 transition-all text-left space-y-4 ",
                                                             selectedBankId === acc.id 
                                                                 ? "bg-slate-900 text-white border-primary ring-4 ring-primary/10" 
                                                                 : "bg-white dark:bg-slate-800 border-transparent text-slate-900 dark:text-white"
@@ -622,7 +622,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                         </div>
 
                                         {selectedBankAccount && (
-                                            <div className="p-8 bg-slate-900 text-white rounded-[2.5rem] shadow-2xl space-y-8 relative overflow-hidden">
+                                            <div className="p-8 bg-slate-900 text-white rounded-[2.5rem]  space-y-8 relative overflow-hidden">
                                                 <div className="absolute top-0 right-0 p-8 opacity-5">
                                                     <Landmark className="h-48 w-48 -mr-16 -mt-16" />
                                                 </div>
@@ -655,7 +655,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                                         onClick={() => setHasConfirmedTransfer(!hasConfirmedTransfer)}
                                                         className={cn(
                                                             "h-14 w-14 rounded-2xl flex items-center justify-center transition-all flex-shrink-0 group relative overflow-hidden",
-                                                            hasConfirmedTransfer ? "bg-primary text-white shadow-2xl shadow-primary/40 border-primary" : "bg-white/5 border-2 border-white/20 text-white/40 hover:border-white/40 hover:bg-white/10"
+                                                            hasConfirmedTransfer ? "bg-primary text-white  shadow-primary/40 border-primary" : "bg-white/5 border-2 border-white/20 text-white/40 hover:border-white/40 hover:bg-white/10"
                                                         )}
                                                     >
                                                         {hasConfirmedTransfer ? (
@@ -723,7 +723,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                         onClick={() => {
                           if (validateDetails()) setStep('payment');
                         }}
-                        className="w-full h-16 rounded-[1.5rem] bg-primary text-white font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-primary/30 group transition-all active:scale-[0.98]"
+                        className="w-full h-16 rounded-[1.5rem] bg-primary text-white font-black uppercase text-xs tracking-[0.2em]  shadow-primary/30 group transition-all active:scale-[0.98]"
                     >
                         Proceed to Payment
                         <ChevronRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={3} />
@@ -734,7 +734,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                         isLoading={step === 'processing'}
                         disabled={paymentMethod === 'Bank Transfer' && !hasConfirmedTransfer}
                         loadingText="Processing..."
-                        className="w-full h-16 rounded-[1.5rem] bg-primary text-white font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-primary/30 group transition-all active:scale-[0.98]"
+                        className="w-full h-16 rounded-[1.5rem] bg-primary text-white font-black uppercase text-xs tracking-[0.2em]  shadow-primary/30 group transition-all active:scale-[0.98]"
                     >
                         Complete Purchase
                         <ChevronRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={3} />

@@ -69,7 +69,7 @@ export function LoginView({ onClose, onNavigate }: LoginViewProps) {
                 <div className="flex items-center justify-between">
                     <button 
                         onClick={onClose} 
-                        className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-800 active:scale-90 transition-all"
+                        className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white dark:bg-slate-800  border border-slate-100 dark:border-slate-800 active:scale-90 transition-all"
                     >
                         <ArrowLeft className="h-6 w-6" />
                     </button>
@@ -90,7 +90,7 @@ export function LoginView({ onClose, onNavigate }: LoginViewProps) {
                                 <FormLabel className="text-[10px] font-black uppercase text-primary tracking-[0.2em] ml-1">Registry Email</FormLabel>
                                 <div className="relative">
                                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                                    <Input {...field} type="email" placeholder="name@example.com" className="h-14 pl-12 rounded-2xl border-none shadow-xl font-bold bg-white dark:bg-slate-800 focus-visible:ring-primary/20" />
+                                    <Input {...field} type="email" placeholder="name@example.com" className="h-14 pl-12 rounded-2xl border-none  font-bold bg-white dark:bg-slate-800 focus-visible:ring-primary/20" />
                                 </div>
                                 <FormMessage />
                             </FormItem>
@@ -108,7 +108,7 @@ export function LoginView({ onClose, onNavigate }: LoginViewProps) {
                                         {...field} 
                                         type={showPassword ? 'text' : 'password'} 
                                         placeholder="Enter your password" 
-                                        className="h-14 pl-12 pr-12 rounded-2xl border-none shadow-xl font-bold bg-white dark:bg-slate-800 focus-visible:ring-primary/20" 
+                                        className="h-14 pl-12 pr-12 rounded-2xl border-none  font-bold bg-white dark:bg-slate-800 focus-visible:ring-primary/20" 
                                     />
                                     <button 
                                         type="button"
@@ -126,7 +126,7 @@ export function LoginView({ onClose, onNavigate }: LoginViewProps) {
                             <Button 
                                 type="submit" 
                                 disabled={isProcessing} 
-                                className="w-full h-16 rounded-[1.5rem] bg-primary text-white font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-primary/30 group active:scale-[0.98] transition-all"
+                                className="w-full h-16 rounded-[1.5rem] bg-primary text-white font-black uppercase text-xs tracking-[0.2em]  shadow-primary/30 group active:scale-[0.98] transition-all"
                             >
                                 {isProcessing ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Authorize Session'}
                                 {!isProcessing && <ChevronRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={3} />}

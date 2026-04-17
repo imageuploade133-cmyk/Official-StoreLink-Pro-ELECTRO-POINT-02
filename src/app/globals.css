@@ -454,14 +454,14 @@
 
   /* Custom Global Button Styles */
   .btn-back {
-    @apply border-2 border-slate-200 bg-white text-slate-900 shadow-sm transition-all duration-200 !important;
+    @apply border-2 border-slate-200 bg-white text-slate-900 transition-all duration-200 !important;
     border-radius: 0.75rem;
     padding-left: 1rem !important;
     padding-right: 1.25rem !important;
   }
 
   .btn-back:hover {
-    @apply border-slate-300 bg-slate-50 shadow-md !important;
+    @apply border-slate-300 bg-slate-50 !important;
     transform: translateY(-1px);
   }
 
@@ -474,12 +474,12 @@
   }
 
   .btn-save {
-    @apply border-2 border-emerald-600/20 bg-emerald-600 text-white shadow-sm transition-all duration-200 !important;
+    @apply border-2 border-emerald-600/20 bg-emerald-600 text-white transition-all duration-200 !important;
     border-radius: 0.75rem;
   }
 
   .btn-save:hover {
-    @apply bg-emerald-700 shadow-emerald-200/50 shadow-lg !important;
+    @apply bg-emerald-700 !important;
     transform: translateY(-1px);
   }
 
@@ -627,7 +627,7 @@
 
 /* Shadow and depth for dark cards */
 .dark [class*="shadow"] {
-  box-shadow: 0 4px 12px hsl(0 0% 0% / 0.3);
+  box-shadow: none;
 }
 
 /* Header icon dark mode - Ensure icons are visible */
@@ -753,13 +753,13 @@
     background-color: #0f172a !important;
     border: 2px solid rgba(148, 163, 184, 0.3) !important;
     color: #f8fafc !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: none !important;
   }
 
   .dark .btn-back:hover {
     background-color: #1e293b !important;
     border-color: rgba(148, 163, 184, 0.5) !important;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4) !important;
+    box-shadow: none !important;
     transform: translateY(-1px);
   }
 
@@ -776,7 +776,7 @@
   .dark .btn-save:hover {
     background-color: #10b981 !important;
     border-color: rgba(52, 211, 153, 0.6) !important;
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3) !important;
+    box-shadow: none !important;
   }
 
   .dark .btn-back svg, 
@@ -1226,14 +1226,14 @@
 
 /* ══ ICON GLOW on hover — beautiful effect ══ */
 .dark aside nav a:hover svg {
-  filter: drop-shadow(0 0 6px currentColor) !important;
+  filter: none !important;
   transform: scale(1.15);
 }
 
 /* ══ Active link icon: full brightness + strong glow ══ */
 .dark aside nav a.active svg,
 .dark aside nav a[aria-current="page"] svg {
-  filter: drop-shadow(0 0 8px currentColor) !important;
+  filter: none !important;
   transform: scale(1.1);
   opacity: 1 !important;
 }
@@ -1300,10 +1300,10 @@
 .dark aside {
   border-right: 1px solid hsl(217 20% 12%) !important;
   background: linear-gradient(180deg, hsl(222 33% 5%) 0%, hsl(222 30% 4%) 100%) !important;
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: none !important;
 }
 
-/* ═════════════���═════════════════════════════════
+/* ════����════════���═════════════════════════════════
    HEADER — Frosted glass panel
    ═══════════════════════════════════════════════ */
 .dark header {
@@ -1311,7 +1311,7 @@
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
   border-bottom: 1px solid rgba(96, 165, 250, 0.1) !important;
-  box-shadow: 0 1px 20px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: none !important;
 }
 
 /* ═══════════════════════════════════════════════
@@ -1321,13 +1321,13 @@
 .dark [class*="rounded-lg"]:not(button):not(a):not(nav *) {
   background: hsl(220 25% 10%) !important;
   border: 1px solid hsl(217 20% 17%) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35) !important;
+  box-shadow: none !important;
   transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
 .dark .card:hover {
   border-color: hsl(217 40% 25%) !important;
-  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: none !important;
 }
 
 /* ═══════════════════════════════════════════════
@@ -1503,7 +1503,7 @@
 .dark a[href*="/add"]:hover {
   background-color: #16a34a !important;
   border-color: #15803d !important;
-  box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
+  box-shadow: none;
   transform: translateY(-1px);
 }
 
@@ -1553,7 +1553,7 @@
   color: #ffffff !important;
   background-color: #ef4444 !important;
   border-color: #dc2626 !important;
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+  box-shadow: none;
 }
 
 .dark button[variant="destructive"] svg,

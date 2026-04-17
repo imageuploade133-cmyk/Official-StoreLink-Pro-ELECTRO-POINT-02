@@ -178,7 +178,7 @@ export function CameraCaptureModal({ isOpen, onClose, onImageCaptured }: CameraC
             </div>
           ) : capturedImage ? (
             <div className="flex flex-col items-center justify-center h-full gap-6 p-4">
-              <div className="relative w-full aspect-square max-w-sm rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white">
+              <div className="relative w-full aspect-square max-w-sm rounded-[2.5rem] overflow-hidden  border-4 border-white">
                 <img 
                   src={capturedImage} 
                   alt="Captured product" 
@@ -191,7 +191,7 @@ export function CameraCaptureModal({ isOpen, onClose, onImageCaptured }: CameraC
               </div>
               <div className="flex flex-col gap-3 w-full max-w-sm">
                 <Button 
-                  className="w-full h-16 gap-2 font-black text-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-2xl shadow-xl shadow-purple-500/20" 
+                  className="w-full h-16 gap-2 font-black text-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-2xl  shadow-purple-500/20" 
                   onClick={removeBackgroundFromImage} 
                   disabled={isUploading}
                 >
@@ -216,7 +216,7 @@ export function CameraCaptureModal({ isOpen, onClose, onImageCaptured }: CameraC
               </div>
             </div>
           ) : isCapturing ? (
-            <div className="relative w-full aspect-[3/4] max-h-[70vh] md:max-h-none md:flex-1 rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-primary/20 bg-black">
+            <div className="relative w-full aspect-[3/4] max-h-[70vh] md:max-h-none md:flex-1 rounded-[2.5rem] overflow-hidden  border-4 border-primary/20 bg-black">
               <video 
                 ref={videoRef} 
                 className="w-full h-full object-cover"
@@ -228,7 +228,7 @@ export function CameraCaptureModal({ isOpen, onClose, onImageCaptured }: CameraC
               </div>
               <Button
                 onClick={capturePhoto}
-                className="absolute bottom-8 left-1/2 -translate-x-1/2 h-24 w-24 rounded-full bg-white hover:bg-white/90 shadow-2xl border-[6px] border-primary/20 flex items-center justify-center active:scale-90 transition-all group"
+                className="absolute bottom-8 left-1/2 -translate-x-1/2 h-24 w-24 rounded-full bg-white hover:bg-white/90  border-[6px] border-primary/20 flex items-center justify-center active:scale-90 transition-all group"
               >
                 <div className="h-16 w-16 rounded-full border-4 border-primary/10 group-hover:border-primary/20 transition-all flex items-center justify-center">
                     <Camera className="h-10 w-10 text-primary" />

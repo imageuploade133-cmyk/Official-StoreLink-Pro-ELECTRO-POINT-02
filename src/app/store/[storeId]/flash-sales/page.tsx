@@ -115,7 +115,7 @@ function HubHero({ slides, settings, getStoreUrl }: { slides: SlideShow[], setti
                         <ArrowLeft className="h-3 w-3" /> Back to Catalog
                     </Link>
                     <div className="flex justify-center">
-                        <div className="bg-white/10 p-3 rounded-2xl shadow-2xl rotate-3 animate-bounce border border-white/20 backdrop-blur-md">
+                        <div className="bg-white/10 p-3 rounded-2xl  rotate-3 animate-bounce border border-white/20 backdrop-blur-md">
                             {iconUrl ? (
                                 <div className="relative h-12 w-12 rounded-xl overflow-hidden bg-white">
                                     <Image src={iconUrl} alt="Sale Icon" fill className="object-cover" />
@@ -359,7 +359,7 @@ export default function AllFlashSalesPage() {
             <p className="text-slate-500 mt-4 text-lg font-medium">
               Our automated merchandising engine is currently preparing the next round of exclusive events. Check back shortly.
             </p>
-            <Button asChild size="lg" className="mt-10 rounded-2xl h-14 px-10 font-black uppercase text-xs tracking-widest shadow-xl">
+            <Button asChild size="lg" className="mt-10 rounded-2xl h-14 px-10 font-black uppercase text-xs tracking-widest ">
                 <Link href={getStoreUrl('/store/shop')}>Explore Catalog</Link>
             </Button>
           </div>

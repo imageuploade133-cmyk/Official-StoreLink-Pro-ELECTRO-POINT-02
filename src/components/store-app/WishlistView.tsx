@@ -109,17 +109,17 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
 
         const shadowClasses: Record<string, string> = {
             none: 'shadow-none',
-            sm: 'shadow-sm',
-            md: 'shadow-md',
-            lg: 'shadow-lg',
-            xl: 'shadow-xl',
-            '2xl': 'shadow-2xl',
+            sm: '',
+            md: '',
+            lg: '',
+            xl: '',
+            '2xl': '',
             inner: 'shadow-inner'
         };
         
         const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
         const shapeClass = shapeClasses[shape] || 'rounded-2xl';
-        const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
+        const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || '';
 
         return `${sizeClass} ${shapeClass} ${shadowClass}`;
     }, [settings]);
@@ -172,13 +172,13 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
                 <div className="flex items-center gap-4">
                     <button 
                         onClick={onClose}
-                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
+                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800  border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
                     >
                         <ArrowLeft className="h-5 w-5" strokeWidth={3} />
                     </button>
                     <h1 className="text-xl font-black leading-tight tracking-tighter uppercase">My Favorites</h1>
                 </div>
-                <Badge variant="secondary" className="font-black h-8 px-4 rounded-full shadow-sm">{wishlistCount}</Badge>
+                <Badge variant="secondary" className="font-black h-8 px-4 rounded-full ">{wishlistCount}</Badge>
             </header>
 
             <ScrollArea className="flex-1 px-4 pb-32">
@@ -200,7 +200,7 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
                             <h3 className="text-2xl font-black tracking-tight uppercase">Registry Empty</h3>
                             <p className="text-sm text-slate-500 font-medium max-w-[220px] mx-auto leading-relaxed">Save the premium items you love for instant retrieval here.</p>
                         </div>
-                        <Button onClick={onClose} size="lg" className="rounded-2xl font-black uppercase text-[10px] tracking-widest px-10 h-14 shadow-xl active:scale-95 transition-transform">Start Curating</Button>
+                        <Button onClick={onClose} size="lg" className="rounded-2xl font-black uppercase text-[10px] tracking-widest px-10 h-14  active:scale-95 transition-transform">Start Curating</Button>
                     </div>
                 ) : (
                     <div className="grid grid-cols-2 gap-4 p-2 py-6">
@@ -215,7 +215,7 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
                                     className="group relative flex flex-col gap-3 animate-in fade-in slide-in-from-bottom-2 duration-500"
                                 >
                                     <div 
-                                        className="relative w-full aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-800 active:scale-[0.98] transition-all"
+                                        className="relative w-full aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-white dark:bg-slate-800  border border-slate-100 dark:border-slate-800 active:scale-[0.98] transition-all"
                                         onClick={() => onSelectProduct(product.id)}
                                     >
                                         <Image 
@@ -230,7 +230,7 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
                                         <div className="absolute top-3 right-3 flex flex-col gap-2">
                                             <button 
                                                 onClick={(e) => { e.stopPropagation(); removeFromWishlist(product.id); }}
-                                                className="size-9 flex items-center justify-center bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl shadow-xl text-rose-500 border border-white/50 z-30"
+                                                className="size-9 flex items-center justify-center bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl  text-rose-500 border border-white/50 z-30"
                                             >
                                                 <X className="h-5 w-5" strokeWidth={3} />
                                             </button>

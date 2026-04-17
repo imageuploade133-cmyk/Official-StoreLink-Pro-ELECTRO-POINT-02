@@ -634,7 +634,7 @@ export default function CheckoutPage() {
                                 </RadioGroup>
 
                                 {selectedBankAccount && (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-background p-6 rounded-xl border shadow-sm">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-background p-6 rounded-xl border ">
                                         <div className="space-y-1"><Label className="text-[10px] font-black uppercase text-muted-foreground">Bank Name</Label><p className="font-bold text-lg">{selectedBankAccount.bankName}</p></div>
                                         <div className="space-y-1"><Label className="text-[10px] font-black uppercase text-muted-foreground">Account Name</Label><p className="font-bold text-lg">{selectedBankAccount.accountName}</p></div>
                                         <div className="space-y-1">
@@ -720,7 +720,7 @@ export default function CheckoutPage() {
           </div>
 
           <div className="lg:col-span-1 sticky top-32">
-            <Card className="shadow-lg border-none ring-1 ring-border">
+            <Card className=" border-none ring-1 ring-border">
               <CardHeader className="bg-muted/50"><CardTitle className="flex items-center gap-2 text-lg"><ShoppingBag className="h-5 w-5" /> Order Summary</CardTitle></CardHeader>
               <CardContent className="p-0">
                 <ScrollArea className="max-h-[300px]">

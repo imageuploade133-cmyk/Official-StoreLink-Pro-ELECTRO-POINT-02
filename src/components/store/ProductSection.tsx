@@ -372,17 +372,17 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
 
     const shadowClasses: Record<string, string> = {
         none: 'shadow-none',
-        sm: 'shadow-sm',
-        md: 'shadow-md',
-        lg: 'shadow-lg',
-        xl: 'shadow-xl',
-        '2xl': 'shadow-2xl',
+        sm: '',
+        md: '',
+        lg: '',
+        xl: '',
+        '2xl': '',
         inner: 'shadow-inner'
     };
 
     const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
     const shapeClass = shapeClasses[shape] || 'rounded-full';
-    const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
+    const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || '';
 
     return `${sizeClass} ${shapeClass} ${shadowClass}`;
   }, [settings]);
@@ -415,7 +415,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
   }, [section.slideIcon]);
 
   const navButtonClasses = useMemo(() => {
-    const base = "static translate-y-0 h-14 w-14 transition-all duration-300 shadow-xl hover:scale-110 active:scale-95 border-[3px]";
+    const base = "static translate-y-0 h-14 w-14 transition-all duration-300  hover:scale-110 active:scale-95 border-[3px]";
     let styleClasses = "";
     
     switch (section.slideStyle) {
@@ -461,7 +461,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
         >
             {isPromoActive ? (
                 <div 
-                    className="px-6 md:px-10 py-6 md:py-8 mb-12 flex flex-col md:flex-row items-center justify-between shadow-2xl group relative overflow-hidden gap-6"
+                    className="px-6 md:px-10 py-6 md:py-8 mb-12 flex flex-col md:flex-row items-center justify-between  group relative overflow-hidden gap-6"
                     style={{ 
                         backgroundColor: hubColor,
                         boxShadow: `0 25px 50px -12px ${hubColor}33`,
@@ -472,7 +472,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
                     
                     <div className="flex items-center gap-3 md:gap-5 relative z-10">
                         <div 
-                            className="p-2.5 rounded-xl shadow-lg rotate-3 group-hover:rotate-12 transition-transform duration-500"
+                            className="p-2.5 rounded-xl  rotate-3 group-hover:rotate-12 transition-transform duration-500"
                             style={{ backgroundColor: hubIconColor }}
                         >
                             <Zap 
@@ -590,7 +590,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
                                 onClick={handlePrevPage} 
                                 disabled={currentPage === 1 || isLoading}
                                 className={cn(
-                                    "static translate-y-0 h-14 w-14 rounded-full border-[3px] transition-all duration-300 shadow-xl hover:scale-110",
+                                    "static translate-y-0 h-14 w-14 rounded-full border-[3px] transition-all duration-300  hover:scale-110",
                                     isPromoActive 
                                         ? "bg-white/10 text-white border-white/60 hover:bg-white hover:text-black dark:text-white dark:hover:text-black" 
                                         : "bg-background border-primary/20 hover:bg-primary hover:text-white dark:text-black dark:hover:text-white"
@@ -604,7 +604,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
                                 onClick={handleNextPage} 
                                 disabled={isLastPage || isLoading}
                                 className={cn(
-                                    "static translate-y-0 h-14 w-14 rounded-full border-[3px] transition-all duration-300 shadow-xl hover:scale-110",
+                                    "static translate-y-0 h-14 w-14 rounded-full border-[3px] transition-all duration-300  hover:scale-110",
                                     isPromoActive 
                                         ? "bg-white/10 text-white border-white/60 hover:bg-white hover:text-black dark:text-white dark:hover:text-black" 
                                         : "bg-background border-primary/20 hover:bg-primary hover:text-white dark:text-black dark:hover:text-white"
@@ -624,7 +624,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
                 <Button
                     asChild
                     className={cn(
-                        "font-black uppercase tracking-[0.25em] shadow-2xl transition-all hover:-translate-y-1 active:translate-y-0 border-none",
+                        "font-black uppercase tracking-[0.25em]  transition-all hover:-translate-y-1 active:translate-y-0 border-none",
                         buttonClasses
                     )}
                     style={isPromoActive ? {

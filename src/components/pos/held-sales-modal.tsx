@@ -57,7 +57,7 @@ const HeldSaleCard = React.memo(({ sale, currencySymbol, onRestore, onDelete }: 
   const itemCount = sale.items.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="hover: transition-shadow">
       <CardContent className="p-4 flex flex-col sm:flex-row gap-4">
         <div className="flex-grow space-y-2">
           <div className="flex items-center text-sm font-semibold">

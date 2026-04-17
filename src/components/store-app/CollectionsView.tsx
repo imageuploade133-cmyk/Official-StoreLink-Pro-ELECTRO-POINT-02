@@ -125,13 +125,13 @@ export function CollectionsView({ onSelectCategory }: CollectionsViewProps) {
                 <div className="flex items-center gap-4">
                     <button 
                         onClick={() => window.history.back()}
-                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
+                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800  border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
                     >
                         <ArrowLeft className="h-5 w-5" strokeWidth={3} />
                     </button>
                     <h1 className="text-xl font-black leading-tight tracking-tighter uppercase">Collections</h1>
                 </div>
-                <Badge variant="secondary" className="font-black h-8 px-4 rounded-full shadow-sm">All</Badge>
+                <Badge variant="secondary" className="font-black h-8 px-4 rounded-full ">All</Badge>
             </header>
 
             <div className="px-6 pt-12 space-y-8">
@@ -151,7 +151,7 @@ export function CollectionsView({ onSelectCategory }: CollectionsViewProps) {
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors" strokeWidth={2.5} />
                         <Input 
                             placeholder="Filter registry..." 
-                            className="h-14 pl-12 pr-4 rounded-[1.5rem] bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 shadow-xl text-lg font-bold tracking-tight focus-visible:ring-4 focus-visible:ring-primary/10 transition-all"
+                            className="h-14 pl-12 pr-4 rounded-[1.5rem] bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700  text-lg font-bold tracking-tight focus-visible:ring-4 focus-visible:ring-primary/10 transition-all"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -169,7 +169,7 @@ export function CollectionsView({ onSelectCategory }: CollectionsViewProps) {
                         size="icon" 
                         onClick={() => fetchCategories()} 
                         disabled={isLoading}
-                        className="h-14 w-14 rounded-[1.5rem] bg-white dark:bg-slate-800 border-none shadow-xl active:scale-90 transition-all"
+                        className="h-14 w-14 rounded-[1.5rem] bg-white dark:bg-slate-800 border-none  active:scale-90 transition-all"
                     >
                         <RotateCcw className={cn("h-5 w-5", isLoading && "animate-spin")} />
                     </Button>
@@ -190,7 +190,7 @@ export function CollectionsView({ onSelectCategory }: CollectionsViewProps) {
                                 <button 
                                     key={category.id}
                                     onClick={() => onSelectCategory(category.id)}
-                                    className="relative group w-full aspect-[16/9] rounded-[2.5rem] overflow-hidden shadow-xl transition-all active:scale-[0.98] border-2 border-slate-200 dark:border-slate-700 hover:border-primary/30"
+                                    className="relative group w-full aspect-[16/9] rounded-[2.5rem] overflow-hidden  transition-all active:scale-[0.98] border-2 border-slate-200 dark:border-slate-700 hover:border-primary/30"
                                 >
                                     <Image 
                                         src={category.imageUrl || `https://picsum.photos/seed/${category.id}/600/400`}
@@ -241,7 +241,7 @@ export function CollectionsView({ onSelectCategory }: CollectionsViewProps) {
                             </div>
                             <Button 
                                 variant="outline" 
-                                className="rounded-xl font-black uppercase text-[10px] tracking-widest px-8 h-12 shadow-sm" 
+                                className="rounded-xl font-black uppercase text-[10px] tracking-widest px-8 h-12 " 
                                 onClick={() => { setSearchTerm(''); fetchCategories(); }}
                             >
                                 Synchronize Registry

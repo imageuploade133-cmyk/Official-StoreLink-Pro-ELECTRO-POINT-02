@@ -163,7 +163,7 @@ export default function CategoryGallerySettingsPage() {
         <div className="lg:col-span-2">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <Card className={cn("shadow-xl border-none ring-1 ring-border overflow-hidden", !isEnabled && "opacity-60 grayscale-[0.5]")}>
+              <Card className={cn(" border-none ring-1 ring-border overflow-hidden", !isEnabled && "opacity-60 grayscale-[0.5]")}>
                 <CardHeader className="bg-muted/30 border-b flex flex-row items-center justify-between">
                   <div>
                     <CardTitle className="text-xl">Content & Visibility</CardTitle>
@@ -173,7 +173,7 @@ export default function CategoryGallerySettingsPage() {
                     control={form.control}
                     name="showCategorySection"
                     render={({ field }) => (
-                      <FormItem className="flex items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background shadow-lg">
+                      <FormItem className="flex items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background ">
                         <div className="flex items-center gap-2">
                             {field.value ? <Eye className="h-4 w-4 text-green-600" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
                             <FormLabel className="text-[10px] font-black uppercase tracking-widest">{field.value ? 'Visible' : 'Hidden'}</FormLabel>
@@ -256,7 +256,7 @@ export default function CategoryGallerySettingsPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="bg-muted/30 border-t p-6">
-                  <Button type="submit" disabled={isSaving} className="font-black uppercase tracking-widest text-xs h-12 px-8 shadow-xl shadow-primary/20">
+                  <Button type="submit" disabled={isSaving} className="font-black uppercase tracking-widest text-xs h-12 px-8  shadow-primary/20">
                     {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                     Sync Category Configuration
                   </Button>
@@ -268,7 +268,7 @@ export default function CategoryGallerySettingsPage() {
 
         <div className="lg:col-span-1">
           <div className="sticky top-24 space-y-6">
-            <Card className="shadow-lg border-none ring-1 ring-border">
+            <Card className=" border-none ring-1 ring-border">
                 <CardHeader className="bg-muted/10">
                     <CardTitle className="text-sm font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
                         <LayoutGrid className="h-4 w-4" /> Live Simulation

@@ -119,17 +119,17 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
 
         const shadowClasses: Record<string, string> = {
             none: 'shadow-none',
-            sm: 'shadow-sm',
-            md: 'shadow-md',
-            lg: 'shadow-lg',
-            xl: 'shadow-xl',
-            '2xl': 'shadow-2xl',
+            sm: '',
+            md: '',
+            lg: '',
+            xl: '',
+            '2xl': '',
             inner: 'shadow-inner'
         };
 
         const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
         const shapeClass = shapeClasses[shape] || 'rounded-full';
-        const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-md';
+        const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || '';
 
         return `${sizeClass} ${shapeClass} ${shadowClass}`;
     }, [settings]);
@@ -205,17 +205,17 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
 
         const shadowClasses: Record<string, string> = {
             none: 'shadow-none',
-            sm: 'shadow-sm',
-            md: 'shadow-md',
-            lg: 'shadow-lg',
-            xl: 'shadow-xl',
-            '2xl': 'shadow-2xl',
+            sm: '',
+            md: '',
+            lg: '',
+            xl: '',
+            '2xl': '',
             inner: 'shadow-inner'
         };
         
         const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.md;
         const shapeClass = shapeClasses[shape] || 'rounded-2xl';
-        const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
+        const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || '';
 
         return `${sizeClass} ${shapeClass} ${shadowClass}`;
     }, [settings]);
@@ -328,7 +328,7 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                                     ) : (
                                         <img
                                             alt={slide.title || 'Slide'}
-                                            className="w-full h-full object-cover block transition-transform duration-1000 group-hover:scale-105"
+                                            className="w-full h-full object-cover block transition-transform duration-1000"
                                             src={slide.imageUrl || 'https://placehold.co/800x500.png'}
                                         />
                                     )}
@@ -340,7 +340,7 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
 
                                         <div className="relative p-8 w-full space-y-3 z-10">
                                             {slide.pretitle && (
-                                                <span className="inline-block px-4 py-1.5 text-[8px] font-black uppercase tracking-[0.3em] bg-primary text-white rounded-full shadow-2xl border border-white/20 animate-pulse">
+                                                <span className="inline-block px-4 py-1.5 text-[8px] font-black uppercase tracking-[0.3em] bg-primary text-white rounded-full  border border-white/20 animate-pulse">
                                                     {slide.pretitle}
                                                 </span>
                                             )}
@@ -360,7 +360,7 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                                                         asChild 
                                                         style={heroButtonStyle}
                                                         className={cn(
-                                                            "font-black uppercase tracking-widest bg-white text-slate-950 hover:bg-primary hover:text-white transition-all shadow-xl active:scale-90 border-none",
+                                                            "font-black uppercase tracking-widest bg-white text-slate-950 hover:bg-primary hover:text-white transition-all  active:scale-90 border-none",
                                                             heroButtonClasses
                                                         )}
                                                     >
@@ -383,7 +383,7 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
                                 <div className="relative p-8 w-full space-y-3">
-                                    <span className="inline-block px-4 py-1.5 text-[8px] font-black uppercase tracking-[0.3em] bg-primary text-white rounded-full shadow-2xl border border-white/20 animate-pulse">Registry Active</span>
+                                    <span className="inline-block px-4 py-1.5 text-[8px] font-black uppercase tracking-[0.3em] bg-primary text-white rounded-full  border border-white/20 animate-pulse">Registry Active</span>
                                     <h2 className="text-3xl font-black text-white leading-none tracking-tighter uppercase">Elite Discovery <br/>Waitlist</h2>
                                     <p className="text-slate-200 text-sm font-medium opacity-90 max-w-[240px] leading-relaxed">No slides configured. Add premium content via the admin dashboard.</p>
                                 </div>
@@ -453,7 +453,7 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
               </div>
               <button 
                 onClick={onViewAllCollections}
-                className="flex items-center gap-2 text-[10px] font-black uppercase text-primary tracking-[0.2em] px-4 py-2 rounded-full border-2 border-primary/20 bg-primary/5 hover:bg-primary hover:text-white transition-all duration-300 shadow-sm active:scale-95 group"
+                className="flex items-center gap-2 text-[10px] font-black uppercase text-primary tracking-[0.2em] px-4 py-2 rounded-full border-2 border-primary/20 bg-primary/5 hover:bg-primary hover:text-white transition-all duration-300  active:scale-95 group"
               >
                 View all <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-1" strokeWidth={3} />
               </button>
@@ -464,7 +464,7 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                 onClick={onViewAllCollections}
                 className="flex flex-col items-center gap-3 shrink-0 group active:scale-90 transition-transform"
               > 
-                <div className="w-16 h-16 rounded-[1.5rem] bg-primary flex items-center justify-center text-white shadow-xl shadow-primary/30 border-2 border-primary/20 ring-4 ring-primary/5">
+                <div className="w-16 h-16 rounded-[1.5rem] bg-primary flex items-center justify-center text-white  shadow-primary/30 border-2 border-primary/20 ring-4 ring-primary/5">
                   <LayoutGrid className="h-7 w-7" strokeWidth={2.5} /> 
                 </div>
                 <span className="text-[9px] font-black uppercase tracking-widest text-primary">Explore All</span>
@@ -485,9 +485,9 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                     }}
                     className="flex flex-col items-center gap-3 shrink-0 group active:scale-90 transition-transform"
                 >
-                  <div className="w-16 h-16 rounded-[1.5rem] bg-white dark:bg-slate-800 flex items-center justify-center border-2 border-slate-200 dark:border-slate-700 hover:border-primary/30 transition-all shadow-lg overflow-hidden relative">
+                  <div className="w-16 h-16 rounded-[1.5rem] bg-white dark:bg-slate-800 flex items-center justify-center border-2 border-slate-200 dark:border-slate-700 hover:border-primary/30 transition-all overflow-hidden relative">
                     {category.imageUrl ? (
-                        <Image src={category.imageUrl} alt={category.name} fill className="object-cover opacity-90 group-hover:scale-110 transition-transform duration-500" unoptimized />
+                        <Image src={category.imageUrl} alt={category.name} fill className="object-cover opacity-90 transition-transform duration-500" unoptimized />
                     ) : (
                         <Shirt className="h-6 w-6 text-slate-400 group-hover:text-primary transition-colors" strokeWidth={2.5} />
                     )}
@@ -536,10 +536,10 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                         onClick={() => onSelectProduct(product.id)} 
                         className="block w-full text-left cursor-pointer"
                     >
-                        <div className="relative aspect-[3/4] rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-800 mb-5 border-2 border-slate-200 dark:border-slate-700 shadow-2xl transition-all active:scale-[0.98] hover:border-primary/20">
+                        <div className="relative aspect-[3/4] rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-800 mb-5 border-2 border-slate-200 dark:border-slate-700 transition-all active:scale-[0.98] hover:border-primary/20">
                             <Image 
                                 alt={product.name}  
-                                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+                                className="w-full h-full object-cover transition-transform duration-1000" 
                                 src={product.imageUrl || 'https://placehold.co/400x600.png'}
                                 fill
                                 unoptimized
@@ -548,7 +548,7 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                             {/* Actions & Badges */}
                             <div 
                                 className={cn(
-                                    "absolute top-4 right-4 w-10 h-10 flex items-center justify-center backdrop-blur-xl rounded-2xl shadow-2xl transition-all active:scale-90 z-10 border border-white/20",
+                                    "absolute top-4 right-4 w-10 h-10 flex items-center justify-center backdrop-blur-xl rounded-2xl transition-all active:scale-90 z-10 border border-white/20",
                                     isLiked ? "bg-rose-500 text-white border-rose-400" : "bg-white/90 dark:bg-slate-900/90 text-slate-400"
                                 )}
                                 onClick={(e) => {
@@ -566,7 +566,7 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                                     size="icon" 
                                     style={gridCartButtonStyle}
                                     className={cn(
-                                        "rounded-2xl text-white shadow-2xl hover:scale-110 transition-transform active:scale-90 border-none",
+                                        "rounded-2xl text-white transition-transform active:scale-90 border-none",
                                         gridCartButtonClasses
                                     )}
                                     onClick={(e) => {
@@ -583,7 +583,7 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                             
                             {product.promo?.isActive && (
                                 <div className="absolute bottom-4 left-4">
-                                    <Badge className="bg-rose-500 text-white font-black text-[9px] uppercase tracking-widest px-3 py-1 border-none shadow-2xl animate-pulse">
+                                    <Badge className="bg-rose-500 text-white font-black text-[9px] uppercase tracking-widest px-3 py-1 border-none animate-pulse">
                                         <Zap className="h-3 w-3 mr-1.5 fill-current text-yellow-400" /> Special Offer
                                     </Badge>
                                 </div>

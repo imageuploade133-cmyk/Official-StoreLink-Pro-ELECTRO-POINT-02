@@ -5,7 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export function ProductCardSkeleton() {
   return (
-    <div className="flex flex-col bg-white dark:bg-slate-900 rounded-[2.5rem] border-2 border-slate-300 dark:border-slate-700 overflow-hidden h-full shadow-sm">
+    <div className="flex flex-col bg-white dark:bg-slate-900 rounded-[2.5rem] border-2 border-slate-300 dark:border-slate-700 overflow-hidden h-full ">
       <Skeleton className="relative aspect-[4/5] w-full bg-slate-100 dark:bg-slate-800" />
       <div className="p-6 space-y-4">
         <div className="space-y-2">

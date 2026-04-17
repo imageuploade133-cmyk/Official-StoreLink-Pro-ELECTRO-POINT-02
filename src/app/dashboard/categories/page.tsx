@@ -307,7 +307,7 @@ export default function CategoriesPage() {
                                                 <span className="font-bold text-primary">{category.name}</span>
                                                 <Badge variant="secondary" className="text-[10px] h-5 px-1.5">{category.products.length}</Badge>
                                                 {isPromoActive && (
-                                                    <Badge className="bg-rose-500 text-white font-black h-5 px-1.5 border-none shadow-sm animate-pulse flex items-center gap-1">
+                                                    <Badge className="bg-rose-500 text-white font-black h-5 px-1.5 border-none  animate-pulse flex items-center gap-1">
                                                         <Zap className="h-2.5 w-2.5 fill-current" />
                                                         {category.flashSaleDiscountType === 'percentage' ? `${category.flashSaleDiscountValue}%` : `${currencySymbol}${category.flashSaleDiscountValue}`}
                                                     </Badge>
@@ -427,7 +427,7 @@ export default function CategoriesPage() {
                 </Card>
             </div>
             
-            <Card className="shadow-lg">
+            <Card className="">
                 <CardHeader>
                     <CardTitle className="font-headline text-xl">Category Registry</CardTitle>
                     <CardDescription>Fetched incrementally to ensure performance and cost efficiency.</CardDescription>

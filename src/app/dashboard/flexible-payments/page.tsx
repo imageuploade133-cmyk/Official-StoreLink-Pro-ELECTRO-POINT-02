@@ -265,7 +265,7 @@ export default function FlexiblePaymentsPage() {
         </TabsList>
 
         <TabsContent value="registry" className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-          <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+          <Card className=" border-none ring-1 ring-border overflow-hidden">
             <CardHeader className="border-b bg-muted/10">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>

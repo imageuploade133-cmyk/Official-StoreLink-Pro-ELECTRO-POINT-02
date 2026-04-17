@@ -126,7 +126,7 @@ export function PageSpinner({
         />
         {/* Logo centered */}
         <div
-          className="relative z-10 flex items-center justify-center rounded-xl bg-[hsl(220,25%,10%)] shadow-lg"
+          className="relative z-10 flex items-center justify-center rounded-xl bg-[hsl(220,25%,10%)] "
           style={{ width: 36, height: 36 }}
         >
           <ElysiumLogo className="h-6 w-6" />

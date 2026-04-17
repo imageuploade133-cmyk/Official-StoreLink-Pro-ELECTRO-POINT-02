@@ -151,7 +151,7 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
                 )}
               >
                 <TableCell>
-                    <div className="relative w-12 h-12 rounded-lg overflow-hidden border-2 border-background shadow-sm bg-muted flex items-center justify-center shrink-0">
+                    <div className="relative w-12 h-12 rounded-lg overflow-hidden border-2 border-background  bg-muted flex items-center justify-center shrink-0">
                         <Image
                             src={(product.imageUrl && product.imageUrl.trim() !== "") ? product.imageUrl : defaultProductImageUrl}
                             alt={product.name}

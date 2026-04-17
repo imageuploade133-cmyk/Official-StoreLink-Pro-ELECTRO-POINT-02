@@ -55,7 +55,7 @@ export function OutOfDataDrawer({
           </DrawerHeader>
           <DrawerFooter className="pb-10 pt-6 px-6">
             <DrawerClose asChild>
-              <Button size="lg" className="w-full h-14 rounded-2xl text-base font-bold shadow-xl shadow-primary/20 active:scale-95 transition-transform">
+              <Button size="lg" className="w-full h-14 rounded-2xl text-base font-bold  shadow-primary/20 active:scale-95 transition-transform">
                 Got it, Thanks
               </Button>
             </DrawerClose>

@@ -109,7 +109,7 @@ export function RecentlyViewedView({ onClose, onSelectProduct }: RecentlyViewedV
                 <div className="flex items-center gap-4">
                     <button 
                         onClick={onClose}
-                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
+                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800  border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
                     >
                         <ArrowLeft className="h-5 w-5" strokeWidth={3} />
                     </button>
@@ -129,7 +129,7 @@ export function RecentlyViewedView({ onClose, onSelectProduct }: RecentlyViewedV
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Discovery Registry</p>
                     <p className="text-sm font-bold">{viewedProductIds.length} Items Found</p>
                 </div>
-                <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest bg-white dark:bg-slate-800 px-4 py-2 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 active:scale-95 transition-all">
+                <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest bg-white dark:bg-slate-800 px-4 py-2 rounded-xl  border border-slate-100 dark:border-slate-800 active:scale-95 transition-all">
                     <Filter className="h-3.5 w-3.5" strokeWidth={3} />
                     Filter
                 </button>
@@ -154,7 +154,7 @@ export function RecentlyViewedView({ onClose, onSelectProduct }: RecentlyViewedV
                             <h3 className="text-2xl font-black tracking-tight uppercase">Registry Empty</h3>
                             <p className="text-sm text-slate-500 font-medium max-w-[220px] mx-auto leading-relaxed">Your browsing history will be archived here for instant retrieval.</p>
                         </div>
-                        <Button onClick={onClose} size="lg" className="rounded-2xl font-black uppercase text-[10px] tracking-widest px-10 h-14 shadow-xl active:scale-95 transition-transform">Begin Exploration</Button>
+                        <Button onClick={onClose} size="lg" className="rounded-2xl font-black uppercase text-[10px] tracking-widest px-10 h-14  active:scale-95 transition-transform">Begin Exploration</Button>
                     </div>
                 ) : (
                     <div className="grid grid-cols-2 gap-4 p-2">
@@ -167,7 +167,7 @@ export function RecentlyViewedView({ onClose, onSelectProduct }: RecentlyViewedV
                                     className="group relative flex flex-col gap-3 animate-in fade-in slide-in-from-bottom-2 duration-500"
                                 >
                                     <div 
-                                        className="relative w-full aspect-[4/5] overflow-hidden rounded-[2rem] bg-white dark:bg-slate-800 shadow-lg border border-slate-100 dark:border-slate-800 active:scale-[0.98] transition-all"
+                                        className="relative w-full aspect-[4/5] overflow-hidden rounded-[2rem] bg-white dark:bg-slate-800  border border-slate-100 dark:border-slate-800 active:scale-[0.98] transition-all"
                                         onClick={() => onSelectProduct(product.id)}
                                     >
                                         <Image 
@@ -181,14 +181,14 @@ export function RecentlyViewedView({ onClose, onSelectProduct }: RecentlyViewedV
                                         
                                         <button 
                                             onClick={(e) => handleRemoveItem(e, product.id)}
-                                            className="absolute top-3 right-3 size-9 flex items-center justify-center bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl shadow-xl text-slate-400 hover:text-rose-500 hover:scale-110 transition-all active:scale-90 z-30 border border-white/50"
+                                            className="absolute top-3 right-3 size-9 flex items-center justify-center bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl  text-slate-400 hover:text-rose-500 hover:scale-110 transition-all active:scale-90 z-30 border border-white/50"
                                         >
                                             <X className="h-5 w-5" strokeWidth={3} />
                                         </button>
 
                                         {product.promo?.isActive && (
                                             <div className="absolute bottom-3 left-3">
-                                                <Badge className="bg-rose-500 text-white font-black text-2xs uppercase tracking-widest px-2 py-0.5 border-none shadow-lg">On Offer</Badge>
+                                                <Badge className="bg-rose-500 text-white font-black text-2xs uppercase tracking-widest px-2 py-0.5 border-none ">On Offer</Badge>
                                             </div>
                                         )}
                                     </div>

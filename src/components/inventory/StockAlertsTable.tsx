@@ -22,7 +22,7 @@ export function StockAlertsTable({ products, isLoading, onRestock }: StockAlerts
   const globalLowStockThreshold = settings?.lowStockThreshold ?? 10;
   
   return (
-    <Card className="shadow-lg">
+    <Card className="">
       <CardHeader>
         <CardTitle className="font-headline text-xl flex items-center gap-2">
           <AlertTriangle className="h-5 w-5 text-orange-500" />

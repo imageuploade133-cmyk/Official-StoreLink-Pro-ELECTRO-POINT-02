@@ -85,7 +85,7 @@ export function ImageUploadSettings({ settingsData, isLoading, storeId }: ImageU
   }
 
   return (
-    <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+    <Card className=" border-none ring-1 ring-border overflow-hidden">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader className="bg-muted/30 border-b">
@@ -197,7 +197,7 @@ export function ImageUploadSettings({ settingsData, isLoading, storeId }: ImageU
             </div>
           </CardContent>
           <CardFooter className="bg-muted/30 border-t p-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
-            <Button type="submit" disabled={isSaving} className="font-black uppercase tracking-widest text-xs h-12 px-8 shadow-xl shadow-primary/20">
+            <Button type="submit" disabled={isSaving} className="font-black uppercase tracking-widest text-xs h-12 px-8  shadow-primary/20">
               {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Save className="mr-2 h-4 w-4" />}
               Save Optimization Profile
             </Button>

@@ -114,7 +114,7 @@ export function CustomerSearchList({
                 key={customer.id}
                 type="button"
                 className={cn(
-                  "group w-full flex justify-between items-center p-3 sm:p-4 border-2 rounded-xl transition-all shadow-sm text-left active:scale-[0.99]",
+                  "group w-full flex justify-between items-center p-3 sm:p-4 border-2 rounded-xl transition-all  text-left active:scale-[0.99]",
                   customer.status === 'active' 
                     ? "bg-card hover:border-primary/50 hover:bg-primary/5 border-transparent" 
                     : "opacity-50 cursor-not-allowed bg-muted border-transparent"

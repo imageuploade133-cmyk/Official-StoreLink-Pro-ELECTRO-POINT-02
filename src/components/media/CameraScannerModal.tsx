@@ -125,7 +125,7 @@ export function CameraScannerModal({ isOpen, onClose, onBarcodeScanned }: Camera
               </Button>
             </div>
           ) : isScanning ? (
-            <div className="relative w-full aspect-[3/4] max-h-[60vh] md:max-h-none md:flex-1 rounded-3xl overflow-hidden shadow-2xl border-4 border-primary/20">
+            <div className="relative w-full aspect-[3/4] max-h-[60vh] md:max-h-none md:flex-1 rounded-3xl overflow-hidden  border-4 border-primary/20">
               <div id="scanner-container" className="w-full h-full" />
               <div className="absolute inset-0 border-2 border-primary/30 pointer-events-none rounded-3xl">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border-2 border-primary animate-pulse rounded-lg" />
@@ -149,7 +149,7 @@ export function CameraScannerModal({ isOpen, onClose, onBarcodeScanned }: Camera
           </Button>
           {scannedCode && (
             <Button 
-              className="flex-1 h-14 rounded-2xl gap-2 font-black text-lg shadow-lg shadow-primary/20" 
+              className="flex-1 h-14 rounded-2xl gap-2 font-black text-lg  shadow-primary/20" 
               onClick={() => {
                 onBarcodeScanned(scannedCode);
                 onClose();

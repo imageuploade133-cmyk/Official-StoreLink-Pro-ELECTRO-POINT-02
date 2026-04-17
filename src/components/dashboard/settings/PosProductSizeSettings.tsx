@@ -78,7 +78,7 @@ export function PosProductSizeSettings({ settingsData, isLoading, storeId }: Pos
   const currentSize = form.watch('posProductSize');
 
   return (
-    <Card className="shadow-lg border-none ring-1 ring-border">
+    <Card className=" border-none ring-1 ring-border">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader>
@@ -127,7 +127,7 @@ export function PosProductSizeSettings({ settingsData, isLoading, storeId }: Pos
                                         <FormLabel className="text-base font-bold">Custom Column Count</FormLabel>
                                         <FormDescription>Set precisely how many product cards fit in a row.</FormDescription>
                                     </div>
-                                    <div className="h-12 w-12 bg-primary text-primary-foreground rounded-xl flex items-center justify-center text-xl font-black shadow-lg">
+                                    <div className="h-12 w-12 bg-primary text-primary-foreground rounded-xl flex items-center justify-center text-xl font-black ">
                                         {field.value}
                                     </div>
                                 </div>

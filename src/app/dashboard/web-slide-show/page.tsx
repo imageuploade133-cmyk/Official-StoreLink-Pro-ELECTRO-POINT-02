@@ -267,7 +267,7 @@ export default function ManageSlideShowPage() {
         </div>
       </div>
 
-      <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <CardHeader className="bg-muted/10 border-b">
           <CardTitle>Carousel Registry (Homepage)</CardTitle>
           <CardDescription>Incremental fetching active. Use reorder arrows to swap positions within current view.</CardDescription>
@@ -302,7 +302,7 @@ export default function ManageSlideShowPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                          <div className="w-[80px] h-[45px] rounded-lg bg-muted overflow-hidden relative border shadow-sm">
+                          <div className="w-[80px] h-[45px] rounded-lg bg-muted overflow-hidden relative border ">
                           {slide.mediaType === 'image' && slide.imageUrl ? (
                                     <Image src={slide.imageUrl} alt="" fill className="object-cover" unoptimized />
                                 ) : slide.mediaType === 'video' && slide.videoPosterUrl ? (

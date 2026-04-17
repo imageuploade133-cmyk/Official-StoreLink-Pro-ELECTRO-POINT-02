@@ -321,7 +321,7 @@ export default function StaffManagementPage() {
         </div>
       </div>
       
-      <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <CardHeader className="bg-muted/10 border-b">
           <CardTitle>Staff Directory</CardTitle>
           <CardDescription>Incremental fetching active. Use pagination to browse all members.</CardDescription>

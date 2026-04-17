@@ -101,7 +101,6 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [isMinimized, setIsMinimized] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(100);
 
   const firestore = useFirestore();
   const pendingOrdersQuery = useMemo(() => {
@@ -114,27 +113,6 @@ export default function DashboardLayout({
   const { data: pendingOrders } = useCollection<Order>(pendingOrdersQuery);
   const pendingCount = pendingOrders?.length || 0;
 
-  // Restore zoom level from localStorage on mount
-  useEffect(() => {
-    const savedZoom = safeStorage.getItem('dashboard-zoom');
-    if (savedZoom) {
-      const parsedZoom = parseInt(savedZoom, 10);
-      if (!isNaN(parsedZoom) && parsedZoom >= 0 && parsedZoom <= 200) {
-        setZoomLevel(parsedZoom);
-      }
-    }
-  }, []);
-
-  // Apply zoom level using font-size scaling (affects all rem/em units proportionally)
-  useEffect(() => {
-    const baseFontSize = 16;
-    const newFontSize = (baseFontSize * zoomLevel) / 100;
-    document.documentElement.style.fontSize = newFontSize + 'px';
-    
-    // Persist to localStorage
-    safeStorage.setItem('dashboard-zoom', zoomLevel.toString());
-  }, [zoomLevel]);
-  
   const navItems = [
     { heading: 'Core' },
     { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', perm: 'view_dashboard' },
@@ -481,114 +459,6 @@ export default function DashboardLayout({
           )}
 
           <div className="flex-1" />
-
-          {/* Zoom Control */}
-          <Popover>
-            <TooltipProvider delayDuration={0}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <PopoverTrigger asChild>
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      className="relative"
-                    >
-                      <ZoomIn className="h-5 w-5" />
-                      <span className="sr-only">Zoom control</span>
-                    </Button>
-                  </PopoverTrigger>
-                </TooltipTrigger>
-                <TooltipContent>Adjust zoom level: {zoomLevel}%</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <PopoverContent align="end" className="w-64">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium">Zoom Level</label>
-                    <span className="text-lg font-semibold text-primary">
-                      {zoomLevel}%
-                    </span>
-                  </div>
-                  <Slider
-                    value={[zoomLevel]}
-                    onValueChange={(value) => setZoomLevel(value[0])}
-                    min={0}
-                    max={200}
-                    step={5}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>0%</span>
-                    <span>100%</span>
-                    <span>200%</span>
-                  </div>
-                </div>
-
-                {/* Quick zoom buttons */}
-                <div className="grid grid-cols-3 gap-2">
-                  <Button
-                    size="sm"
-                    variant={zoomLevel === 75 ? "default" : "outline"}
-                    onClick={() => setZoomLevel(75)}
-                    className="text-xs"
-                  >
-                    75%
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={zoomLevel === 100 ? "default" : "outline"}
-                    onClick={() => setZoomLevel(100)}
-                    className="text-xs"
-                  >
-                    100%
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={zoomLevel === 125 ? "default" : "outline"}
-                    onClick={() => setZoomLevel(125)}
-                    className="text-xs"
-                  >
-                    125%
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={zoomLevel === 150 ? "default" : "outline"}
-                    onClick={() => setZoomLevel(150)}
-                    className="text-xs"
-                  >
-                    150%
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={zoomLevel === 175 ? "default" : "outline"}
-                    onClick={() => setZoomLevel(175)}
-                    className="text-xs"
-                  >
-                    175%
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={zoomLevel === 200 ? "default" : "outline"}
-                    onClick={() => setZoomLevel(200)}
-                    className="text-xs"
-                  >
-                    200%
-                  </Button>
-                </div>
-
-                {/* Reset button */}
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => setZoomLevel(100)}
-                  className="w-full"
-                >
-                  Reset to 100%
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
 
           <ThemeToggle variant="outline" className="hidden md:inline-flex" />
 

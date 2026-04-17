@@ -269,13 +269,13 @@ export default function EditInvoicePage() {
           description={`Operational adjustment for record: ${invoiceNumber}`}
         />
         <div className="flex items-center gap-3">
-          <Button variant="outline" onClick={handleDownloadImage} disabled={isSaving} className="rounded-xl border-primary/20 text-primary h-11 px-6 font-bold shadow-sm">
+          <Button variant="outline" onClick={handleDownloadImage} disabled={isSaving} className="rounded-xl border-primary/20 text-primary h-11 px-6 font-bold ">
             <ImageIcon className="mr-2 h-4 w-4" /> Export Image
           </Button>
-          <Button variant="outline" onClick={handlePrint} disabled={isSaving} className="rounded-xl border-primary/20 text-primary h-11 px-6 font-bold shadow-sm">
+          <Button variant="outline" onClick={handlePrint} disabled={isSaving} className="rounded-xl border-primary/20 text-primary h-11 px-6 font-bold ">
             <Printer className="mr-2 h-4 w-4" /> Print / PDF
           </Button>
-          <Button onClick={handleSaveInvoice} disabled={isSaving} className="rounded-xl shadow-xl shadow-primary/20 font-black uppercase text-[10px] tracking-widest h-11 px-8">
+          <Button onClick={handleSaveInvoice} disabled={isSaving} className="rounded-xl  shadow-primary/20 font-black uppercase text-[10px] tracking-widest h-11 px-8">
             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Confirm Changes
           </Button>
@@ -285,7 +285,7 @@ export default function EditInvoicePage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Configuration Sidebar */}
         <div className="lg:col-span-4 space-y-6 no-print">
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
               <CardTitle>Identity & Protocol</CardTitle>
               <CardDescription>Adjust the lifecycle stage of this document.</CardDescription>
@@ -343,7 +343,7 @@ export default function EditInvoicePage() {
             </CardContent>
           </Card>
 
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
               <CardTitle>Recipient Metadata</CardTitle>
               <CardDescription>Verified client profile linked to this record.</CardDescription>
@@ -367,7 +367,7 @@ export default function EditInvoicePage() {
                     </div>
 
                     {filteredCustomers.length > 0 && (
-                        <div className="absolute top-full left-0 right-0 z-50 mt-2 bg-white dark:bg-slate-900 border rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95">
+                        <div className="absolute top-full left-0 right-0 z-50 mt-2 bg-white dark:bg-slate-900 border rounded-2xl  overflow-hidden animate-in zoom-in-95">
                             <ScrollArea className="max-h-64">
                                 <div className="p-2 space-y-1">
                                     {filteredCustomers.map(customer => (
@@ -411,7 +411,7 @@ export default function EditInvoicePage() {
 
         {/* Live Preview Area */}
         <div className="lg:col-span-8 space-y-8">
-          <div ref={printableRef} id="printable-area" className="relative bg-white dark:bg-slate-900 overflow-hidden min-h-[1100px] flex flex-col w-full max-w-[800px] mx-auto shadow-2xl rounded-[2.5rem] print:shadow-none print:max-w-none print:rounded-none">
+          <div ref={printableRef} id="printable-area" className="relative bg-white dark:bg-slate-900 overflow-hidden min-h-[1100px] flex flex-col w-full max-w-[800px] mx-auto  rounded-[2.5rem] print:shadow-none print:max-w-none print:rounded-none">
               
               {/* Full Document Background (Letterhead) */}
               {showBackground && (
@@ -498,19 +498,19 @@ export default function EditInvoicePage() {
                             )} style={status === 'draft' ? { color: settings?.invoiceAccentColor } : {}}>INVOICE</h1>
                             <div className="flex gap-2">
                                 {status === 'paid' && (
-                                    <Badge className="bg-green-600 text-white font-black px-4 py-1 rounded-full uppercase tracking-widest text-[10px] shadow-lg border-none">
+                                    <Badge className="bg-green-600 text-white font-black px-4 py-1 rounded-full uppercase tracking-widest text-[10px]  border-none">
                                         <CheckCircle2 className="h-3 w-3 mr-1.5" /> Fully Settled
                                     </Badge>
                                 )}
                                 {status === 'credit' && (
-                                    <Badge className="bg-orange-600 text-white font-black px-4 py-1 rounded-full uppercase tracking-widest text-[10px] shadow-lg border-none">
+                                    <Badge className="bg-orange-600 text-white font-black px-4 py-1 rounded-full uppercase tracking-widest text-[10px]  border-none">
                                         <Clock className="h-3 w-3 mr-1.5" /> Due {format(new Date(dueDate), 'MMM dd')}
                                     </Badge>
                                 )}
                             </div>
                         </div>
                         <div className={cn(
-                            "bg-slate-50 dark:bg-slate-800 p-6 rounded-[1.5rem] border shadow-sm",
+                            "bg-slate-50 dark:bg-slate-800 p-6 rounded-[1.5rem] border ",
                             settings?.invoiceHideStoreInfo ? "text-left min-w-[240px]" : "text-left inline-block min-w-[240px] mt-6"
                         )}>
                         <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-1">Serial Identifier</p>
@@ -556,7 +556,7 @@ export default function EditInvoicePage() {
                                 onChange={(e) => setProductSearch(e.target.value)}
                             />
                             {filteredProducts.length > 0 && (
-                                <div className="absolute top-full left-0 right-0 z-50 mt-2 bg-white dark:bg-slate-900 border rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95">
+                                <div className="absolute top-full left-0 right-0 z-50 mt-2 bg-white dark:bg-slate-900 border rounded-2xl  overflow-hidden animate-in zoom-in-95">
                                     <ScrollArea className="max-h-64">
                                         <div className="p-2 space-y-1">
                                             {filteredProducts.map(product => (
@@ -585,11 +585,11 @@ export default function EditInvoicePage() {
                     <div className="space-y-4">
                     <div className="flex items-center justify-between px-4 no-print">
                         <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Registry Items</h4>
-                        <button type="button" onClick={handleAddItem} className="h-8 rounded-full font-black text-[10px] uppercase gap-2 bg-primary/5 text-primary flex items-center px-4 shadow-sm">
+                        <button type="button" onClick={handleAddItem} className="h-8 rounded-full font-black text-[10px] uppercase gap-2 bg-primary/5 text-primary flex items-center px-4 ">
                         <Plus className="h-3.5 w-3.5" /> Manual Row
                         </button>
                     </div>
-                    <div className="rounded-[2rem] border overflow-hidden bg-transparent shadow-sm">
+                    <div className="rounded-[2rem] border overflow-hidden bg-transparent ">
                         <table className="w-full text-left">
                         <thead>
                             <tr className="bg-muted/50 border-b">
@@ -681,7 +681,7 @@ export default function EditInvoicePage() {
                         </div>
                         </div>
                         <div className={cn(
-                        "mt-6 p-8 rounded-[2rem] text-white flex flex-col gap-1 shadow-2xl transition-all duration-500",
+                        "mt-6 p-8 rounded-[2rem] text-white flex flex-col gap-1  transition-all duration-500",
                         status === 'paid' ? "bg-green-600 shadow-green-600/20" : status === 'credit' ? "bg-orange-600 shadow-orange-600/20" : "bg-primary shadow-primary/20"
                         )} style={status === 'draft' ? { backgroundColor: settings?.invoiceAccentColor } : {}}>
                         <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-70">

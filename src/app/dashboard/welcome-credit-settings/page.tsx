@@ -207,7 +207,7 @@ export default function WelcomeCreditSettingsPage() {
         <Button 
             onClick={form.handleSubmit(onSubmit)} 
             disabled={isSaving || isUploading}
-            className="h-12 px-8 font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all active:scale-95"
+            className="h-12 px-8 font-black uppercase tracking-widest  shadow-primary/20 transition-all active:scale-95"
         >
             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Sync Bonus Protocol
@@ -218,7 +218,7 @@ export default function WelcomeCreditSettingsPage() {
         <div className="lg:col-span-2 space-y-10">
           <Form {...form}>
             <form className="space-y-10">
-              <Card className={cn("shadow-xl border-none ring-1 ring-border overflow-hidden", !isEnabled && "opacity-60 grayscale-[0.5]")}>
+              <Card className={cn(" border-none ring-1 ring-border overflow-hidden", !isEnabled && "opacity-60 grayscale-[0.5]")}>
                 <CardHeader className="bg-muted/30 border-b flex flex-row items-center justify-between">
                   <div>
                     <CardTitle className="text-xl">Bonus Configuration</CardTitle>
@@ -228,7 +228,7 @@ export default function WelcomeCreditSettingsPage() {
                     control={form.control}
                     name="enableWelcomeCredit"
                     render={({ field }) => (
-                      <FormItem className="flex items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background shadow-lg">
+                      <FormItem className="flex items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background ">
                         <div className="flex items-center gap-2">
                             {field.value ? <Eye className="h-4 w-4 text-green-600" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
                             <FormLabel className="text-[10px] font-black uppercase tracking-widest">{field.value ? 'Active' : 'Disabled'}</FormLabel>
@@ -270,7 +270,7 @@ export default function WelcomeCreditSettingsPage() {
               </Card>
 
               {/* Congratulation Pop-up Customization */}
-              <Card className={cn("shadow-2xl border-none ring-1 ring-border overflow-hidden", !isPopupEnabled && "opacity-60")}>
+              <Card className={cn(" border-none ring-1 ring-border overflow-hidden", !isPopupEnabled && "opacity-60")}>
                 <CardHeader className="bg-muted/30 border-b flex flex-row items-center justify-between">
                     <div>
                         <CardTitle className="text-xl flex items-center gap-2">
@@ -377,9 +377,9 @@ export default function WelcomeCreditSettingsPage() {
                                 </FormLabel>
                                 <div className="flex flex-col gap-4">
                                     {field.value && (
-                                        <div className="relative w-full aspect-video max-w-sm rounded-[2rem] overflow-hidden border-2 shadow-xl group">
+                                        <div className="relative w-full aspect-video max-w-sm rounded-[2rem] overflow-hidden border-2  group">
                                             <Image src={field.value} alt="Welcome Visual" fill className="object-cover" unoptimized />
-                                            <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-xl" onClick={() => field.onChange('')}><X className="h-4 w-4" /></Button>
+                                            <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity " onClick={() => field.onChange('')}><X className="h-4 w-4" /></Button>
                                         </div>
                                     )}
                                     <div className="flex gap-3">
@@ -404,7 +404,7 @@ export default function WelcomeCreditSettingsPage() {
 
         <div className="lg:col-span-1">
           <div className="sticky top-24 space-y-6">
-            <Card className="shadow-2xl border-none ring-1 ring-border overflow-hidden rounded-[2.5rem]">
+            <Card className=" border-none ring-1 ring-border overflow-hidden rounded-[2.5rem]">
                 <CardHeader className="bg-muted/10 border-b">
                     <CardTitle className="text-sm font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
                         <Eye className="h-4 w-4" /> Live Simulation
@@ -413,7 +413,7 @@ export default function WelcomeCreditSettingsPage() {
                 <CardContent className="pt-8 pb-10 flex flex-col items-center">
                     {/* The Simulation Pop-up View */}
                     <div 
-                        className="w-full rounded-[2.5rem] overflow-hidden shadow-2xl border transition-all duration-500 scale-95 origin-top"
+                        className="w-full rounded-[2.5rem] overflow-hidden  border transition-all duration-500 scale-95 origin-top"
                         style={{ backgroundColor: form.watch('welcomePopupBgColor'), color: form.watch('welcomePopupTextColor') }}
                     >
                         {form.watch('welcomePopupImageUrl') && (

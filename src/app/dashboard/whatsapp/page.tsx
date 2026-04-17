@@ -325,7 +325,7 @@ export default function BulkWhatsAppPage() {
           <MessageSquare className="mr-3 h-8 w-8 text-green-600" /> WhatsApp Marketing
         </h1>
         <WhatsappDashboard />
-        <Card className="shadow-lg">
+        <Card className="">
           <CardHeader>
             <Skeleton className="h-7 w-2/5" />
             <Skeleton className="h-4 w-4/5 mt-1" />
@@ -364,7 +364,7 @@ export default function BulkWhatsAppPage() {
 
       <WhatsappDashboard />
 
-      <Card className="shadow-lg">
+      <Card className="">
         <CardHeader>
           <CardTitle className="font-headline text-xl">Send WhatsApp Messages</CardTitle>
           <CardDescription>

@@ -436,7 +436,7 @@ export default function MySalesHistoryPage() {
             </CardContent>
         </Card>
 
-        <Card className="shadow-lg overflow-hidden border-none ring-1 ring-border">
+        <Card className=" overflow-hidden border-none ring-1 ring-border">
             <CardContent className="p-0">
             <Table>
                 <TableHeader>

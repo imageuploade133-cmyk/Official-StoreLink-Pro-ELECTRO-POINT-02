@@ -815,7 +815,7 @@ export default function POSPage() {
         />
 
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-5 lg:grid-rows-none gap-3 sm:gap-6 min-h-0 p-3 sm:p-6">
-          <div className="lg:col-span-3 h-full flex flex-col bg-card p-2 sm:p-4 rounded-xl shadow-lg lg:overflow-hidden">
+          <div className="lg:col-span-3 h-full flex flex-col bg-card p-2 sm:p-4 rounded-xl  lg:overflow-hidden">
             <ProductArea
               onAddToCart={handleAddToCart}
                onProductsLoaded={setProducts}

@@ -217,7 +217,7 @@ export function OrderAuditTab({ storeId }: OrderAuditTabProps) {
         </CardContent>
       </Card>
 
-      <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <CardHeader className="border-b bg-muted/10">
           <div className="flex items-center gap-3">
             <ClipboardList className="h-6 w-6 text-primary" />
@@ -273,7 +273,7 @@ export function OrderAuditTab({ storeId }: OrderAuditTabProps) {
                                 {log.oldStatus}
                             </Badge>
                             <ArrowRight className="h-4 w-4 text-muted-foreground opacity-30" />
-                            <Badge variant="outline" className={cn("h-6 gap-1.5 px-3 uppercase text-[9px] font-black tracking-tighter shadow-sm", getStatusColor(log.newStatus))}>
+                            <Badge variant="outline" className={cn("h-6 gap-1.5 px-3 uppercase text-[9px] font-black tracking-tighter ", getStatusColor(log.newStatus))}>
                                 {getStatusIcon(log.newStatus)}
                                 {log.newStatus}
                             </Badge>

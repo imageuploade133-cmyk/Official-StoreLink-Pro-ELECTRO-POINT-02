@@ -296,7 +296,7 @@ export default function RestockHistoryPage() {
             currencySymbol={currencySymbol}
         />
         
-        <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+        <Card className=" border-none ring-1 ring-border overflow-hidden">
           <CardHeader className="bg-muted/10 border-b">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>

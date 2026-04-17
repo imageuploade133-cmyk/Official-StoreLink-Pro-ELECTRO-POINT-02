@@ -193,17 +193,17 @@ export function HeroCarousel() {
 
     const shadowClasses: Record<string, string> = {
       none: 'shadow-none',
-      sm: 'shadow-sm',
-      md: 'shadow-md',
-      lg: 'shadow-lg',
-      xl: 'shadow-xl',
-      '2xl': 'shadow-2xl',
+      sm: '',
+      md: '',
+      lg: '',
+      xl: '',
+      '2xl': '',
       inner: 'shadow-inner'
     };
     
     const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
     const shapeClass = shapeClasses[shape] || 'rounded-[2rem]';
-    const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-md';
+    const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || '';
 
     return `${shapeClass} ${sizeClass} ${shadowClass}`;
   }, [settings]);
@@ -301,7 +301,7 @@ export function HeroCarousel() {
                         )}
                         {slide.showActionButton && (
                           <div className="pt-2 md:pt-10 animate-in fade-in zoom-in-95 duration-1000 delay-300">
-                            <Button asChild style={buttonStyle} className={`group relative overflow-hidden font-black shadow-2xl active:scale-95 border-none transition-all duration-500 ${buttonClasses}`}>
+                            <Button asChild style={buttonStyle} className={`group relative overflow-hidden font-black  active:scale-95 border-none transition-all duration-500 ${buttonClasses}`}>
                               <Link href={getStoreUrl('/store/shop')}>
                                 <span className="relative z-10 flex items-center gap-2 md:gap-4">
                                   {heroBtnText}

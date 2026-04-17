@@ -335,7 +335,7 @@ export default function ManageCouponsPage() {
                 <RotateCcw className={cn("mr-2 h-4 w-4", isLoadingCoupons && "animate-spin")} />
                 Sync
             </Button>
-            <Button onClick={handleOpenAddModal} className="gap-2 h-11 font-bold shadow-lg shadow-primary/20">
+            <Button onClick={handleOpenAddModal} className="gap-2 h-11 font-bold  shadow-primary/20">
                 <PlusCircle className="h-4 w-4" /> Generate New Code
             </Button>
         </div>
@@ -399,7 +399,7 @@ export default function ManageCouponsPage() {
         </Card>
       </div>
 
-      <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <CardHeader className="bg-muted/10 border-b">
           <CardTitle>Catalog of Promo Codes</CardTitle>
           <CardDescription>Live promo codes currently available for use during checkout. Incremental fetching active.</CardDescription>

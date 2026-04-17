@@ -215,7 +215,7 @@ function PaymentConfirmationView({ state, remainingDue, changeDue, currencySymbo
         <div className="space-y-3 text-sm">
           <div className="flex justify-between items-center">
             <span className="text-muted-foreground font-medium">Via Method:</span>
-            <div className="flex items-center gap-2 font-bold bg-white px-3 py-1 rounded-full border shadow-sm">
+            <div className="flex items-center gap-2 font-bold bg-white px-3 py-1 rounded-full border ">
                 {getPaymentMethodIcon(state.paymentMethod)}
                 <span>{state.paymentMethod}</span>
             </div>
@@ -429,7 +429,7 @@ export function RecordPaymentDialog({
             <Button
               onClick={handleConfirmPayment}
               disabled={state.isSubmitting}
-              className="bg-green-600 hover:bg-green-700 text-white font-bold h-11 px-8 shadow-md"
+              className="bg-green-600 hover:bg-green-700 text-white font-bold h-11 px-8 "
             >
               {state.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
               Post Payment

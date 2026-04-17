@@ -96,7 +96,7 @@ export default function StoreHomePage() {
                     <div 
                       className={cn(
                         "flex flex-col items-center text-center p-8 rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 transition-all duration-500 group h-full",
-                        settings?.brandValuesEnableShadow !== false && "shadow-sm hover:shadow-2xl",
+                        settings?.brandValuesEnableShadow !== false && " hover:",
                         settings?.brandValuesEnableZoom !== false && "hover:-translate-y-1.5"
                       )}
                     >
@@ -120,11 +120,11 @@ export default function StoreHomePage() {
               {/* Premium Integrated Controls */}
               <div className="flex justify-center items-center gap-6 mt-12 animate-in fade-in slide-in-from-bottom-2 duration-700">
                 <CarouselPrevious 
-                    className="static translate-y-0 h-12 w-12 rounded-full border-[3px] border-primary/20 bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-xl" 
+                    className="static translate-y-0 h-12 w-12 rounded-full border-[3px] border-primary/20 bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 " 
                 />
                 <div className="h-1 w-12 rounded-full bg-primary/10" />
                 <CarouselNext 
-                    className="static translate-y-0 h-12 w-12 rounded-full border-[3px] border-primary/20 bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-xl" 
+                    className="static translate-y-0 h-12 w-12 rounded-full border-[3px] border-primary/20 bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 " 
                 />
               </div>
             </Carousel>

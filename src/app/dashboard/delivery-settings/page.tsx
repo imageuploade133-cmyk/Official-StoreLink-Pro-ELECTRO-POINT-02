@@ -132,7 +132,7 @@ export default function DeliverySettingsPage() {
         <Button 
             onClick={form.handleSubmit(onSubmit)} 
             disabled={isSaving}
-            className="h-12 px-8 font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all active:scale-95"
+            className="h-12 px-8 font-black uppercase tracking-widest  shadow-primary/20 transition-all active:scale-95"
         >
             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Save Delivery Settings
@@ -143,7 +143,7 @@ export default function DeliverySettingsPage() {
         <div className="lg:col-span-2 space-y-8">
           <Form {...form}>
             <form className="space-y-8">
-              <Card className="shadow-2xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b">
                   <CardTitle className="text-xl">Fulfillment Options</CardTitle>
                   <CardDescription>Enable or disable pickup and delivery services.</CardDescription>
@@ -153,7 +153,7 @@ export default function DeliverySettingsPage() {
                     control={form.control}
                     name="enablePickUp"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 ">
                         <div className="space-y-0.5">
                           <FormLabel className="text-base">Enable Pick Up</FormLabel>
                           <FormDescription>
@@ -173,7 +173,7 @@ export default function DeliverySettingsPage() {
                     control={form.control}
                     name="enableDelivery"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 ">
                         <div className="space-y-0.5">
                           <FormLabel className="text-base">Enable Delivery</FormLabel>
                           <FormDescription>
@@ -192,7 +192,7 @@ export default function DeliverySettingsPage() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-2xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b flex flex-row justify-between items-center pr-6">
                     <div>
                         <CardTitle className="text-xl">Delivery Locations & Pricing</CardTitle>

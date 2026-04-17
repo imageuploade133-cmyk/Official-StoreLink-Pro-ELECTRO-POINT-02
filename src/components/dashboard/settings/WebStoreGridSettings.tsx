@@ -121,7 +121,7 @@ export function WebStoreGridSettings({ settingsData, isLoading, storeId }: WebSt
   };
 
   return (
-    <Card className="border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
+    <Card className="border-slate-200 dark:border-slate-700  hover: transition-shadow">
       <CardHeader className="pb-4">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3 flex-1">
@@ -161,8 +161,8 @@ export function WebStoreGridSettings({ settingsData, isLoading, storeId }: WebSt
                 className={cn(
                   'p-4 rounded-lg border-2 transition-all duration-200 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-slate-950',
                   defaultColumns === cols
-                    ? 'border-primary bg-primary/10 shadow-sm'
-                    : 'border-slate-200 dark:border-slate-700 hover:border-primary/50 hover:shadow-sm'
+                    ? 'border-primary bg-primary/10 '
+                    : 'border-slate-200 dark:border-slate-700 hover:border-primary/50 hover:'
                 )}
               >
                 <div className={cn('grid gap-1', cols === 2 ? 'grid-cols-2' : 'grid-cols-3')}>

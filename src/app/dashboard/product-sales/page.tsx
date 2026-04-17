@@ -380,7 +380,7 @@ export default function ProductSalesPage() {
             <TabsTrigger value="dailySalesPerformance">Daily Trends</TabsTrigger>
         </TabsList>
         <TabsContent value="allProducts">
-            <Card className="shadow-md rounded-lg overflow-hidden border-none ring-1 ring-border">
+            <Card className=" rounded-lg overflow-hidden border-none ring-1 ring-border">
                 <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 gap-3 bg-white dark:bg-slate-900 border-b">
                     <div>
                         <CardTitle className="text-lg">Product Performance Ranking</CardTitle>

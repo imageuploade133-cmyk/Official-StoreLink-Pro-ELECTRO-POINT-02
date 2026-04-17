@@ -247,7 +247,7 @@ const startRecording = async (index: number) => {
             variant="outline" 
             size="sm" 
             onClick={handleAddTrack}
-            className="rounded-full h-10 px-6 font-black uppercase text-[10px] tracking-widest border-primary/20 text-primary hover:bg-primary hover:text-white transition-all shadow-lg"
+            className="rounded-full h-10 px-6 font-black uppercase text-[10px] tracking-widest border-primary/20 text-primary hover:bg-primary hover:text-white transition-all "
         >
             <Plus className="h-4 w-4 mr-2" /> Add Track
         </Button>
@@ -275,7 +275,7 @@ const startRecording = async (index: number) => {
                     return (
                         <div key={field.id} className={cn(
                             "p-8 border-2 rounded-[3rem] transition-all duration-700 relative group overflow-hidden",
-                            isTrackRecording ? "bg-rose-50 border-rose-500 ring-8 ring-rose-500/5" : "bg-white dark:bg-slate-950 border-slate-100 dark:border-slate-800 hover:border-primary/30 shadow-xl"
+                            isTrackRecording ? "bg-rose-50 border-rose-500 ring-8 ring-rose-500/5" : "bg-white dark:bg-slate-950 border-slate-100 dark:border-slate-800 hover:border-primary/30 "
                         )}>
                             {/* Real-time Progress Bar Overlay */}
                             {isTrackRecording && (
@@ -392,7 +392,7 @@ const startRecording = async (index: number) => {
                                                 <div className="space-y-4">
                                                     {isTrackRecording ? (
                                                         <div className="space-y-4 animate-in zoom-in-95 duration-300">
-                                                            <div className="bg-white p-6 rounded-[2rem] border-2 border-rose-200 shadow-lg space-y-4 text-center">
+                                                            <div className="bg-white p-6 rounded-[2rem] border-2 border-rose-200  space-y-4 text-center">
                                                                 <div className="flex items-center justify-center gap-3">
                                                                     <div className="h-3 w-3 rounded-full bg-rose-500 animate-pulse" />
                                                                     <span className="text-xs font-black uppercase tracking-[0.2em] text-rose-600">Mic Live</span>
@@ -409,7 +409,7 @@ const startRecording = async (index: number) => {
                                                                 type="button" 
                                                                 variant="destructive" 
                                                                 onClick={stopRecording}
-                                                                className="rounded-2xl w-full h-14 font-black uppercase text-xs tracking-widest shadow-xl shadow-rose-200 transition-all active:scale-95"
+                                                                className="rounded-2xl w-full h-14 font-black uppercase text-xs tracking-widest  shadow-rose-200 transition-all active:scale-95"
                                                             >
                                                                 <StopCircle className="h-5 w-5 mr-3" /> Finish Recording
                                                             </Button>
@@ -419,7 +419,7 @@ const startRecording = async (index: number) => {
                                                             type="button" 
                                                             variant={hasAudio ? "outline" : "default"}
                                                             onClick={() => startRecording(index)}
-                                                            className="rounded-2xl w-full h-14 font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/10 hover:shadow-primary/20 transition-all active:scale-[0.98]"
+                                                            className="rounded-2xl w-full h-14 font-black uppercase text-xs tracking-widest  shadow-primary/10 hover:shadow-primary/20 transition-all active:scale-[0.98]"
                                                             disabled={isConverting}
                                                         >
                                                             {isConverting ? (
@@ -455,7 +455,7 @@ const startRecording = async (index: number) => {
                                                     type="button" 
                                                     variant="secondary"
                                                     onClick={() => togglePlayback(field.id, track.audioDataUri)}
-                                                    className="rounded-2xl h-14 w-full flex items-center justify-center gap-3 font-black uppercase text-xs tracking-widest bg-slate-900 text-white hover:bg-slate-800 shadow-xl transition-all active:scale-95"
+                                                    className="rounded-2xl h-14 w-full flex items-center justify-center gap-3 font-black uppercase text-xs tracking-widest bg-slate-900 text-white hover:bg-slate-800  transition-all active:scale-95"
                                                 >
                                                     {isPlayingId === field.id ? (
                                                         <><Pause className="h-5 w-5 fill-current" /> Stop Preview</>
@@ -488,7 +488,7 @@ const startRecording = async (index: number) => {
       </div>
       
       <div className="p-6 bg-primary/5 rounded-[3rem] border-2 border-dashed border-primary/10 flex gap-6 items-start">
-          <div className="h-12 w-12 rounded-2xl bg-white dark:bg-slate-900 flex items-center justify-center shadow-lg shrink-0">
+          <div className="h-12 w-12 rounded-2xl bg-white dark:bg-slate-900 flex items-center justify-center  shrink-0">
             <AlertTriangle className="h-6 w-6 text-amber-500" />
           </div>
           <div className="text-xs space-y-2">

@@ -89,11 +89,11 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
             {/* Immersive Profile Header */}
             <div className="flex flex-col items-center text-center space-y-4">
                 <div className="relative">
-                    <Avatar className="h-28 w-24 rounded-[2.5rem] border-4 border-primary/20 shadow-2xl">
+                    <Avatar className="h-28 w-24 rounded-[2.5rem] border-4 border-primary/20 ">
                         <AvatarImage src={user?.photoURL || undefined} className="object-cover" />
                         <AvatarFallback className="font-black text-3xl bg-primary text-white rounded-[2.5rem]">{getInitials(user?.email)}</AvatarFallback>
                     </Avatar>
-                    <div className="absolute -bottom-2 -right-2 bg-green-500 text-white p-1.5 rounded-2xl shadow-xl border-4 border-white dark:border-slate-900">
+                    <div className="absolute -bottom-2 -right-2 bg-green-500 text-white p-1.5 rounded-2xl  border-4 border-white dark:border-slate-900">
                         <ShieldCheck className="h-4 w-4" />
                     </div>
                 </div>
@@ -106,7 +106,7 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
             </div>
 
             {user && (
-                <div className="bg-primary p-8 rounded-[3rem] shadow-2xl shadow-primary/20 relative overflow-hidden group">
+                <div className="bg-primary p-8 rounded-[3rem]  shadow-primary/20 relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-1000">
                         <Coins className="h-24 w-24 -mr-6 -mt-6" />
                     </div>
@@ -140,7 +140,7 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
                             <button 
                                 key={item.id}
                                 onClick={() => onNavigate(item.id)}
-                                className="flex items-center justify-between p-6 bg-white dark:bg-slate-800 rounded-[2.5rem] border-2 border-slate-100 dark:border-slate-800 hover:border-primary/25 shadow-xl hover:shadow-2xl hover:shadow-primary/5 group active:scale-[0.98] transition-all duration-500 text-left"
+                                className="flex items-center justify-between p-6 bg-white dark:bg-slate-800 rounded-[2.5rem] border-2 border-slate-100 dark:border-slate-800 hover:border-primary/25  hover: hover:shadow-primary/5 group active:scale-[0.98] transition-all duration-500 text-left"
                             >
                                 <div className="flex items-center gap-5">
                                     <div className={cn("h-14 w-14 rounded-[1.5rem] bg-slate-50 dark:bg-slate-900 flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner", item.color)}>
@@ -159,7 +159,7 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
                     <div className="pt-6 border-t border-dashed border-slate-200 dark:border-slate-800">
                         <Button 
                             variant="ghost" 
-                            className="w-full h-16 rounded-[1.5rem] font-black uppercase text-[10px] tracking-[0.25em] text-destructive border-2 border-destructive/25 hover:border-destructive/50 hover:bg-destructive/5 shadow-xl hover:shadow-2xl hover:shadow-destructive/5 transition-all duration-500 gap-3 active:scale-[0.98]" 
+                            className="w-full h-16 rounded-[1.5rem] font-black uppercase text-[10px] tracking-[0.25em] text-destructive border-2 border-destructive/25 hover:border-destructive/50 hover:bg-destructive/5  hover: hover:shadow-destructive/5 transition-all duration-500 gap-3 active:scale-[0.98]" 
                             onClick={() => setIsLogoutDialogOpen(true)}
                         >
                             <LogOut className="h-5 w-5" /> Sign Out of App
@@ -173,7 +173,7 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
                         <p className="text-sm font-medium text-slate-500 leading-relaxed">Sign in to access your curated registry, orders, and exclusive member benefits.</p>
                     </div>
                     <div className="flex flex-col gap-4 px-10">
-                        <Button onClick={() => onNavigate('login')} size="lg" className="rounded-2xl h-16 font-black uppercase text-xs tracking-[0.2em] shadow-2xl">
+                        <Button onClick={() => onNavigate('login')} size="lg" className="rounded-2xl h-16 font-black uppercase text-xs tracking-[0.2em] ">
                             Enter Profile
                         </Button>
                         <Button onClick={() => onNavigate('signup')} variant="outline" className="rounded-2xl h-16 font-black uppercase text-xs tracking-[0.2em] bg-white dark:bg-slate-900 border-2 border-primary/10">

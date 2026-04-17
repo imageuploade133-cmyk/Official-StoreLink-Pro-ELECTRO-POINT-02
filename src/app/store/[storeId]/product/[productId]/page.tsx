@@ -170,7 +170,7 @@ function IndividualTrackPlayer({ track, branding }: { track: any, branding: any 
 
     return (
         <div 
-            className="p-5 rounded-[2.5rem] shadow-lg flex flex-col gap-4 relative overflow-hidden group/audio transition-all hover:scale-[1.01] text-white"
+            className="p-5 rounded-[2.5rem]  flex flex-col gap-4 relative overflow-hidden group/audio transition-all hover:scale-[1.01] text-white"
             style={{ backgroundColor: branding.color }}
         >
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-5" />
@@ -189,7 +189,7 @@ function IndividualTrackPlayer({ track, branding }: { track: any, branding: any 
                     onClick={togglePlayback}
                     variant="ghost" 
                     size="icon" 
-                    className="h-14 w-14 rounded-full bg-white/20 backdrop-blur-md text-white border-2 border-white/30 shadow-xl relative z-10 flex-shrink-0 transition-transform active:scale-95"
+                    className="h-14 w-14 rounded-full bg-white/20 backdrop-blur-md text-white border-2 border-white/30  relative z-10 flex-shrink-0 transition-transform active:scale-95"
                 >
                     {isPlaying ? <Pause className="h-7 w-7 fill-current" /> : <Play className="h-7 w-7 fill-current ml-1" />}
                 </Button>
@@ -212,7 +212,7 @@ function IndividualTrackPlayer({ track, branding }: { track: any, branding: any 
                     onClick={fastForward}
                     variant="ghost" 
                     size="icon" 
-                    className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-sm flex-shrink-0 transition-all active:scale-90"
+                    className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20  flex-shrink-0 transition-all active:scale-90"
                     title="Forward 10s"
                 >
                     <FastForward className="h-5 w-5" />
@@ -704,7 +704,7 @@ export default function ProductDetailsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8 lg:gap-10">
           <div className="lg:col-span-7">
             <div className="sticky top-20 md:top-24 space-y-3 md:space-y-6">
-              <div className="aspect-square bg-white dark:bg-slate-900 rounded-xl md:rounded-2xl lg:rounded-[2.5rem] overflow-hidden shadow-lg md:shadow-2xl border-2 md:border-4 border-white dark:border-slate-800 ring-1 ring-slate-200 dark:ring-slate-700 relative">
+              <div className="aspect-square bg-white dark:bg-slate-900 rounded-xl md:rounded-2xl lg:rounded-[2.5rem] overflow-hidden  md: border-2 md:border-4 border-white dark:border-slate-800 ring-1 ring-slate-200 dark:ring-slate-700 relative">
                 {showVideo && product.videoUrl ? (
                     <div className="relative w-full h-full bg-black group">
                         <video ref={videoRef} src={product.videoUrl} autoPlay loop muted playsInline poster={product.videoPosterUrl || ''} className="w-full h-full object-cover" />
@@ -713,7 +713,7 @@ export default function ProductDetailsPage() {
                                 {isPlaying ? <Pause className="h-10 w-10 fill-current" /> : <Play className="h-10 w-10 fill-current ml-1" />}
                             </Button>
                         </div>
-                        <Button onClick={() => setShowVideo(false)} className="absolute top-6 right-6 h-10 w-10 rounded-full bg-black/40 backdrop-blur-md text-white border-none shadow-xl transition-transform hover:scale-110 active:scale-95" size="icon">
+                        <Button onClick={() => setShowVideo(false)} className="absolute top-6 right-6 h-10 w-10 rounded-full bg-black/40 backdrop-blur-md text-white border-none  transition-transform hover:scale-110 active:scale-95" size="icon">
                             <X className="h-5 w-5" />
                         </Button>
                     </div>
@@ -722,12 +722,12 @@ export default function ProductDetailsPage() {
                 )}
                 <div className="absolute top-8 left-8 flex flex-col gap-3">
                     {product.isOfficialBrand && (
-                        <Badge className="bg-blue-600 text-white font-black text-[9px] uppercase tracking-widest px-2 py-1 shadow-md border-none">
+                        <Badge className="bg-blue-600 text-white font-black text-[9px] uppercase tracking-widest px-2 py-1  border-none">
                             <CheckCircle2 className="h-3.5 w-3.5 mr-2 fill-current" /> Official Brand
                         </Badge>
                     )}
                     {isDiscounted && !isOutOfStock && today && (
-                        <Badge className="text-white font-black text-[10px] uppercase tracking-[0.2em] px-3 py-1.5 shadow-xl border-none animate-pulse" style={{ backgroundColor: settings?.flashHubColor || '#e11d48' }}>
+                        <Badge className="text-white font-black text-[10px] uppercase tracking-[0.2em] px-3 py-1.5  border-none animate-pulse" style={{ backgroundColor: settings?.flashHubColor || '#e11d48' }}>
                             <Zap className="h-3.5 w-3.5 mr-2 fill-current" style={{ color: settings?.flashHubIconColor || '#fbbf24' }}/> 
                             Flash Sale Live
                         </Badge>
@@ -736,12 +736,12 @@ export default function ProductDetailsPage() {
               </div>
               <div className="flex flex-wrap gap-2 md:gap-3 lg:gap-4 justify-center md:justify-start overflow-x-auto pb-2">
                 {galleryImages.map((url, idx) => (
-                <button key={url + idx} onClick={() => { setActiveImage(url); setShowVideo(false); }} className={cn("relative w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg md:rounded-2xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 active:scale-95", !showVideo && activeImage === url ? "border-primary shadow-lg ring-2 ring-primary/20 scale-110" : "border-slate-200 dark:border-slate-800 opacity-60 hover:opacity-100")}>
+                <button key={url + idx} onClick={() => { setActiveImage(url); setShowVideo(false); }} className={cn("relative w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg md:rounded-2xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 active:scale-95", !showVideo && activeImage === url ? "border-primary  ring-2 ring-primary/20 scale-110" : "border-slate-200 dark:border-slate-800 opacity-60 hover:opacity-100")}>
                     <Image src={url} alt={`View ${idx + 1}`} fill className="object-cover" unoptimized />
                 </button>
                 ))}
                 {product.videoEnabled && product.videoUrl && (
-                    <button onClick={() => setShowVideo(true)} className={cn("relative w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg md:rounded-2xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 active:scale-95 bg-slate-900 group", showVideo ? "border-primary shadow-lg ring-2 ring-primary/20 scale-110" : "border-slate-200 dark:border-slate-800 opacity-60 hover:opacity-100")}>
+                    <button onClick={() => setShowVideo(true)} className={cn("relative w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg md:rounded-2xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 active:scale-95 bg-slate-900 group", showVideo ? "border-primary  ring-2 ring-primary/20 scale-110" : "border-slate-200 dark:border-slate-800 opacity-60 hover:opacity-100")}>
                         {product.videoPosterUrl && <Image src={product.videoPosterUrl} alt="" fill className="object-cover opacity-40" unoptimized />}
                         <div className="absolute inset-0 flex flex-col items-center justify-center text-white"><VideoIcon className="h-5 md:h-6 w-5 md:w-6 mb-1" /><span className="text-[7px] md:text-[8px] font-black uppercase">Play</span></div>
                     </button>
@@ -776,7 +776,7 @@ export default function ProductDetailsPage() {
               <Button 
                 onClick={handleRewardClick}
                 variant="outline"
-                className="w-full h-14 rounded-2xl border-2 border-dashed border-amber-500 bg-amber-50 text-amber-700 hover:bg-amber-100 font-black uppercase tracking-widest gap-2 shadow-sm animate-pulse"
+                className="w-full h-14 rounded-2xl border-2 border-dashed border-amber-500 bg-amber-50 text-amber-700 hover:bg-amber-100 font-black uppercase tracking-widest gap-2  animate-pulse"
               >
                 <Gift className="h-5 w-5" />
                 Unlock {activeRewardAd.rewardDiscountType === 'percentage' ? activeRewardAd.rewardDiscountValue + '%' : currencySymbol + activeRewardAd.rewardDiscountValue} Discount
@@ -802,7 +802,7 @@ export default function ProductDetailsPage() {
             )}
 
             {!isOutOfStock && (
-              <div className="space-y-3 md:space-y-4 p-4 md:p-6 lg:p-8 bg-white dark:bg-slate-900/50 rounded-xl md:rounded-2xl lg:rounded-[2.5rem] border-2 border-primary/20 hover:border-primary/40 transition-all duration-500 shadow-lg md:shadow-2xl shadow-primary/5 ring-1 ring-primary/5">
+              <div className="space-y-3 md:space-y-4 p-4 md:p-6 lg:p-8 bg-white dark:bg-slate-900/50 rounded-xl md:rounded-2xl lg:rounded-[2.5rem] border-2 border-primary/20 hover:border-primary/40 transition-all duration-500  md: shadow-primary/5 ring-1 ring-primary/5">
                 {(activeSectionPromo?.endDate || (isDiscounted && product.promo?.endDate)) && (
                   <PromoCountdown endDate={activeSectionPromo?.endDate || convertToDateSafely(product.promo!.endDate)!} />
                 )}
@@ -818,7 +818,7 @@ export default function ProductDetailsPage() {
                     onClick={isOutOfStock ? () => setIsOutOfDataDrawerOpen(true) : handleAddToCart} 
                     style={isOutOfStock ? { backgroundColor: '#e2e8f0', color: '#94a3b8' } : buttonStyle}
                     className={cn(
-                        "flex-1 font-black uppercase tracking-widest shadow-xl transition-all group", 
+                        "flex-1 font-black uppercase tracking-widest  transition-all group", 
                         buttonClasses,
                         isOutOfStock && "cursor-pointer"
                     )}
@@ -862,7 +862,7 @@ export default function ProductDetailsPage() {
             <BannerAd location="product_details" className="mt-12" />
             <section className="mt-24 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">
             <div className="flex items-center gap-4"><div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary"><DescriptionIcon className="h-6 w-6" /></div><div><h2 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">{product.descriptionTitle || 'Product Story'}</h2><p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400 mt-1">Detailed narrative and insights</p></div></div>
-            <div className="bg-white dark:bg-slate-900/50 rounded-[3rem] p-8 md:p-12 border-2 border-primary/20 hover:border-primary/40 transition-all duration-500 shadow-2xl relative overflow-hidden"><div className="absolute top-0 right-0 p-8 opacity-5"><Info className="h-64 w-64 -mr-20 -mt-20" /></div><div className="prose dark:prose-invert max-w-none text-slate-600 leading-relaxed text-lg font-medium relative z-10 [&_*]:dark:!text-white dark:!text-white"><div className="rich-content"><ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{product.description}</ReactMarkdown></div></div></div>
+            <div className="bg-white dark:bg-slate-900/50 rounded-[3rem] p-8 md:p-12 border-2 border-primary/20 hover:border-primary/40 transition-all duration-500  relative overflow-hidden"><div className="absolute top-0 right-0 p-8 opacity-5"><Info className="h-64 w-64 -mr-20 -mt-20" /></div><div className="prose dark:prose-invert max-w-none text-slate-600 leading-relaxed text-lg font-medium relative z-10 [&_*]:dark:!text-white dark:!text-white"><div className="rich-content"><ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{product.description}</ReactMarkdown></div></div></div>
           </section>
           </>
         )}
@@ -884,7 +884,7 @@ export default function ProductDetailsPage() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
                 <div className="lg:col-span-7 space-y-12">
                   {(product.specifications && product.specifications.length > 0) && (
-                    <div className="p-8 rounded-[2.5rem] border-[3px] border-primary/20 bg-white dark:bg-slate-900/50 shadow-xl space-y-6 transition-all hover:border-primary/40 group/card">
+                    <div className="p-8 rounded-[2.5rem] border-[3px] border-primary/20 bg-white dark:bg-slate-900/50  space-y-6 transition-all hover:border-primary/40 group/card">
                       <h3 className="text-2xl font-black tracking-tighter flex items-center gap-4">
                         <ListChecks className="h-8 w-8 text-primary group-hover/card:scale-110 transition-transform" /> 
                         {product.specificationsTitle || 'Key Features & Specifications'}
@@ -900,14 +900,14 @@ export default function ProductDetailsPage() {
                     </div>
                   )}
                   {(product.variations && product.variations.length > 0) && (
-                    <div className="p-8 rounded-[2.5rem] border-[3px] border-primary/20 bg-white dark:bg-slate-900/50 shadow-xl space-y-6 transition-all hover:border-primary/40 group/card">
+                    <div className="p-8 rounded-[2.5rem] border-[3px] border-primary/20 bg-white dark:bg-slate-900/50  space-y-6 transition-all hover:border-primary/40 group/card">
                       <h3 className="text-2xl font-black tracking-tighter flex items-center gap-4">
                         <Layers className="h-8 w-8 text-primary group-hover/card:scale-110 transition-transform" /> 
                         {product.variationsTitle || 'Variations Available'}
                       </h3>
                       <div className="flex flex-wrap gap-3">
                         {product.variations.map((v, i) => (
-                          <Badge key={i} variant="outline" className="px-4 py-2 rounded-xl text-sm font-bold border-2 bg-white dark:bg-slate-900 shadow-sm hover:border-primary/50 transition-colors">
+                          <Badge key={i} variant="outline" className="px-4 py-2 rounded-xl text-sm font-bold border-2 bg-white dark:bg-slate-900  hover:border-primary/50 transition-colors">
                             {v.name}
                           </Badge>
                         ))}
@@ -915,7 +915,7 @@ export default function ProductDetailsPage() {
                     </div>
                   )}
                   {product.sizeGuideImageUrl && (
-                    <div className="p-8 rounded-[2.5rem] border-[3px] border-primary/20 bg-white dark:bg-slate-900/50 shadow-xl space-y-6 transition-all hover:border-primary/40 group/card">
+                    <div className="p-8 rounded-[2.5rem] border-[3px] border-primary/20 bg-white dark:bg-slate-900/50  space-y-6 transition-all hover:border-primary/40 group/card">
                       <h3 className="text-2xl font-black tracking-tighter flex items-center gap-4">
                         <Maximize className="h-8 w-8 text-primary group-hover/card:scale-110 transition-transform" /> 
                         Sizing Chart
@@ -928,7 +928,7 @@ export default function ProductDetailsPage() {
                 </div>
                 <div className="lg:col-span-5 space-y-10">
                   {product.whatsInTheBox && product.whatsInTheBox.length > 0 && (
-                    <div className="bg-slate-50 dark:bg-slate-900/50 p-8 rounded-[2.5rem] space-y-8 border-[3px] border-primary/20 shadow-xl transition-all hover:border-primary/40 group/card">
+                    <div className="bg-slate-50 dark:bg-slate-900/50 p-8 rounded-[2.5rem] space-y-8 border-[3px] border-primary/20  transition-all hover:border-primary/40 group/card">
                       <h3 className="text-2xl font-black tracking-tighter flex items-center gap-4">
                         <Package className="h-8 w-8 text-primary group-hover/card:scale-110 transition-transform" /> 
                         {product.whatsInTheBoxTitle || 'What’s In The Box'}
@@ -936,7 +936,7 @@ export default function ProductDetailsPage() {
                       <div className="space-y-4">
                         <ul className="grid grid-cols-1 gap-3">
                           {product.whatsInTheBox.map((item, i) => (
-                            <li key={i} className="flex items-center gap-3 text-sm font-bold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                            <li key={i} className="flex items-center gap-3 text-sm font-bold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 ">
                               <div className="h-2 w-2 rounded-full bg-primary" />
                               {item.name}
                             </li>
@@ -946,7 +946,7 @@ export default function ProductDetailsPage() {
                     </div>
                   )}
                   {(product.showProductInsight === true) && (
-                    <div className="bg-slate-50 dark:bg-slate-900/50 p-8 rounded-[2.5rem] border-[3px] border-primary/20 shadow-xl transition-all hover:border-primary/40 group/card">
+                    <div className="bg-slate-50 dark:bg-slate-900/50 p-8 rounded-[2.5rem] border-[3px] border-primary/20  transition-all hover:border-primary/40 group/card">
                       <h3 className="text-2xl font-black tracking-tighter mb-6 flex items-center gap-4">
                         <Info className="h-8 w-8 text-primary group-hover/card:scale-110 transition-transform" />
                         Product Insight
@@ -981,7 +981,7 @@ export default function ProductDetailsPage() {
             </TabsContent>
             )}
             {showLogisticsTab && (
-                <TabsContent value="shipping" className="mt-0"><div className="max-w-5xl space-y-12"><div className="grid grid-cols-1 md:grid-cols-2 gap-8"><div className="p-10 border-2 rounded-[2rem] space-y-4 bg-white dark:bg-slate-900"><div className="h-12 w-12 rounded-2xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center text-primary mb-4"><Truck className="h-6 w-6" /></div><h4 className="font-black text-xl tracking-tight">Standard Shipping</h4><p className="text-sm text-slate-500 leading-relaxed">{settings?.shippingPolicy || "Orders are processed within 24 hours. Domestic delivery typically arrives in 3-5 business days."}</p></div><div className="p-10 border-2 rounded-[2rem] space-y-4 bg-white dark:bg-slate-900"><div className="h-12 w-12 rounded-2xl bg-orange-50 dark:bg-orange-950 flex items-center justify-center text-orange-600 mb-4"><RotateCcw className="h-6 w-6" /></div><h4 className="font-black text-xl tracking-tight">30-Day Returns</h4><p className="text-sm text-slate-500 leading-relaxed">{settings?.returnsPolicy || "Not the perfect fit? Return any unused item within 30 days for a full refund."}</p></div></div>{settings?.logisticsImageUrl && (<div className="relative aspect-video rounded-[2.5rem] overflow-hidden shadow-2xl border-4"><Image src={settings.logisticsImageUrl} alt="" fill className="object-cover" /></div>)}</div></TabsContent>
+                <TabsContent value="shipping" className="mt-0"><div className="max-w-5xl space-y-12"><div className="grid grid-cols-1 md:grid-cols-2 gap-8"><div className="p-10 border-2 rounded-[2rem] space-y-4 bg-white dark:bg-slate-900"><div className="h-12 w-12 rounded-2xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center text-primary mb-4"><Truck className="h-6 w-6" /></div><h4 className="font-black text-xl tracking-tight">Standard Shipping</h4><p className="text-sm text-slate-500 leading-relaxed">{settings?.shippingPolicy || "Orders are processed within 24 hours. Domestic delivery typically arrives in 3-5 business days."}</p></div><div className="p-10 border-2 rounded-[2rem] space-y-4 bg-white dark:bg-slate-900"><div className="h-12 w-12 rounded-2xl bg-orange-50 dark:bg-orange-950 flex items-center justify-center text-orange-600 mb-4"><RotateCcw className="h-6 w-6" /></div><h4 className="font-black text-xl tracking-tight">30-Day Returns</h4><p className="text-sm text-slate-500 leading-relaxed">{settings?.returnsPolicy || "Not the perfect fit? Return any unused item within 30 days for a full refund."}</p></div></div>{settings?.logisticsImageUrl && (<div className="relative aspect-video rounded-[2.5rem] overflow-hidden  border-4"><Image src={settings.logisticsImageUrl} alt="" fill className="object-cover" /></div>)}</div></TabsContent>
             )}
             {showVerifiedReviews && (
             <TabsContent value="reviews" className="mt-0"><div className="grid grid-cols-1 lg:grid-cols-12 gap-16"><div className="lg:col-span-4 space-y-8"><div className="bg-slate-50 dark:bg-slate-900/50 p-10 rounded-[2rem] border text-center"><p className="text-6xl font-black text-slate-900 dark:text-white tracking-tighter">{reviewStats.avg}</p><div className="flex justify-center text-amber-400 my-4">{[...Array(5)].map((_, i) => (<Star key={i} className={cn("h-6 w-6 fill-current", i >= Math.floor(reviewStats.avg) && "text-slate-200 dark:text-slate-700")} />))}</div><p className="text-sm font-bold text-slate-500 uppercase tracking-widest">Based on {reviewStats.count} Verified Ratings</p></div><div className="space-y-4">{[5, 4, 3, 2, 1].map((stars, idx) => (<div key={stars} className="flex items-center gap-4"><span className="w-12 text-xs font-black text-slate-400 uppercase tracking-tighter">{stars} Stars</span><Progress value={reviewStats.distribution[idx]} className="h-2 flex-1" /><span className="w-10 text-right text-xs font-bold text-slate-500">{reviewStats.distribution[idx]}%</span></div>))}</div><ProductReviewForm productId={productId} /></div><div className="lg:col-span-8 space-y-10"><div className="flex justify-between items-center mb-4"><h3 className="text-2xl font-black tracking-tight">Top Feedback</h3></div>{reviews && reviews.length > 0 ? (<div className="space-y-12">{reviews.map((review) => { const reviewDate = convertToDateSafely(review.createdAt); return (<div key={review.id} className="space-y-4 group animate-in fade-in slide-in-from-bottom-2 duration-500"><div className="flex justify-between items-start"><div className="flex items-start gap-4"><Avatar className="h-10 w-10 border-2"><AvatarImage src={review.userPhotoURL || ''} alt={review.userName} /><AvatarFallback>{review.userName.substring(0, 2).toUpperCase()}</AvatarFallback></Avatar><div className="space-y-1"><div className="flex text-amber-400">{[...Array(5)].map((_, i) => (<Star key={i} className={cn("h-3 w-3 fill-current", i >= review.rating && "text-slate-200 dark:text-slate-700")} />))}</div><div className="flex items-center gap-2"><p className="font-black text-sm">{review.userName}</p><Badge variant="secondary" className="bg-green-50 text-green-700 text-[8px] h-4 font-black uppercase tracking-tighter border-green-100"><CheckCircle2 className="h-2 w-2 mr-1" /> Verified Purchase</Badge></div></div></div><span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{reviewDate ? format(reviewDate, 'PP') : 'Recently'}</span></div><p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm font-medium">"{review.comment}"</p></div>); })}</div>) : (<div className="flex flex-col items-center justify-center py-20 text-center border-2 border-dashed rounded-[3rem] bg-muted/10"><MessageSquare className="h-12 w-12 text-slate-300 mb-4" /><h4 className="text-xl font-black tracking-tight">No reviews yet</h4><p className="text-sm text-muted-foreground max-w-xs mx-auto">Be the first to share your experience with this product!</p></div>)}</div></div></TabsContent>

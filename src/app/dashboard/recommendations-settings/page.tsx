@@ -139,7 +139,7 @@ export default function RecommendationsSettingsPage() {
                         control={form.control}
                         name="showRelatedProducts"
                         render={({ field }) => (
-                        <FormItem className="flex flex-row items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background shadow-sm">
+                        <FormItem className="flex flex-row items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background ">
                             <div className="flex items-center gap-2">
                                 {field.value ? <Eye className="h-4 w-4 text-green-600" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
                                 <FormLabel className="text-xs font-bold uppercase tracking-widest">{field.value ? 'Visible' : 'Hidden'}</FormLabel>

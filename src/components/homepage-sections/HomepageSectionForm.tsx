@@ -363,7 +363,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                 key={cat.id}
                                 type="button"
                                 className={cn(
-                                    "group relative flex flex-col items-center p-3 rounded-xl border-2 transition-all duration-300 hover:shadow-lg",
+                                    "group relative flex flex-col items-center p-3 rounded-xl border-2 transition-all duration-300 hover:",
                                     currentCategoryId === cat.id 
                                         ? "border-primary bg-primary/5 ring-2 ring-primary/20" 
                                         : "border-transparent bg-background hover:border-primary/30 hover:bg-muted/50"
@@ -441,7 +441,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
         <>
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                <Card className="shadow-xl border-none ring-1 ring-border">
+                <Card className=" border-none ring-1 ring-border">
                     <CardHeader className="bg-muted/30">
                         <CardTitle>Section Configuration</CardTitle>
                         <CardDescription>Define how products are selected and displayed on the homepage.</CardDescription>
@@ -714,7 +714,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                                 {selectedProductIds.map(id => {
                                                     const product = productMap.get(id);
                                                     return (
-                                                        <Badge key={id} variant="secondary" className="pl-3 pr-1 py-1.5 gap-2 text-xs font-bold border shadow-sm">
+                                                        <Badge key={id} variant="secondary" className="pl-3 pr-1 py-1.5 gap-2 text-xs font-bold border ">
                                                             {product?.name || 'Loading...'}
                                                             <Button type="button" variant="ghost" size="icon" className="h-5 w-5 hover:bg-destructive hover:text-white rounded-full transition-colors" onClick={() => handleProductDeselect(id)}>
                                                                 <X className="h-3 w-3"/>
@@ -733,7 +733,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                 </Card>
 
                 {/* Flash Sale Card */}
-                <Card className={cn("shadow-xl border-none ring-1 ring-border transition-all", isFlashSale ? "border-rose-500 ring-rose-500/20" : "")}>
+                <Card className={cn(" border-none ring-1 ring-border transition-all", isFlashSale ? "border-rose-500 ring-rose-500/20" : "")}>
                     <CardHeader className={cn("bg-muted/30 transition-colors", isFlashSale ? "bg-rose-500/10" : "")}>
                         <div className="flex justify-between items-center">
                             <div>
@@ -917,7 +917,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                 </Card>
 
                 <div className="flex justify-end gap-4">
-                    <Button type="submit" disabled={isSaving} size="lg" className="min-w-[200px] h-14 text-lg font-black shadow-lg shadow-primary/20">
+                    <Button type="submit" disabled={isSaving} size="lg" className="min-w-[200px] h-14 text-lg font-black  shadow-primary/20">
                         {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                         {isSaving ? 'Syncing...' : 'Save Configuration'}
                     </Button>

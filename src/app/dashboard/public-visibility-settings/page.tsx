@@ -123,7 +123,7 @@ export default function GlobalVisibilitySettingsPage() {
         <Button 
             onClick={form.handleSubmit(onSubmit)} 
             disabled={isSaving}
-            className="h-12 px-8 font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all active:scale-95"
+            className="h-12 px-8 font-black uppercase tracking-widest  shadow-primary/20 transition-all active:scale-95"
         >
             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Save Global Visibility
@@ -133,7 +133,7 @@ export default function GlobalVisibilitySettingsPage() {
       <div className="max-w-4xl mx-auto space-y-8">
         <Form {...form}>
           <form className="space-y-8">
-            <Card className="shadow-2xl border-none ring-1 ring-destructive/20 overflow-hidden">
+            <Card className=" border-none ring-1 ring-destructive/20 overflow-hidden">
               <CardHeader className="bg-destructive/5 border-b border-destructive/10">
                 <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-destructive/10 flex items-center justify-center text-destructive">

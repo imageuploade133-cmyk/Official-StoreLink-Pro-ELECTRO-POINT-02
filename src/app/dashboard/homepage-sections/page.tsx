@@ -115,7 +115,7 @@ export default function ManageHomepageSectionsPage() {
                                         <TableCell><Badge variant="outline" className="capitalize">{section.layout || 'N/A'}</Badge></TableCell>
                                         <TableCell>
                                             {isPromoActive ? (
-                                                <Badge className="bg-rose-500 text-white font-black gap-1.5 h-6 px-2 border-none shadow-sm animate-pulse">
+                                                <Badge className="bg-rose-500 text-white font-black gap-1.5 h-6 px-2 border-none  animate-pulse">
                                                     <Zap className="h-3 w-3 fill-current" />
                                                     {section.flashSaleDiscountType === 'percentage' 
                                                         ? `${section.flashSaleDiscountValue}%` 

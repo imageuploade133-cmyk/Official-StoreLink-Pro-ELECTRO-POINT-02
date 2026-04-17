@@ -174,17 +174,17 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
 
     const shadowClasses: Record<string, string> = {
       none: 'shadow-none',
-      sm: 'shadow-sm',
-      md: 'shadow-md',
-      lg: 'shadow-lg',
-      xl: 'shadow-xl',
-      '2xl': 'shadow-2xl',
+      sm: '',
+      md: '',
+      lg: '',
+      xl: '',
+      '2xl': '',
       inner: 'shadow-inner'
     };
     
     const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.md;
     const shapeClass = shapeClasses[shape] || 'rounded-2xl';
-    const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
+    const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || '';
 
     return `${shapeClass} ${sizeClass} ${shadowClass}`;
   }, [settings]);
@@ -196,11 +196,11 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
   // Get card designer settings with defaults
   const cardStyle = settings?.productCardStyle || 'default';
   const borderRadius = settings?.productCardBorderRadius || 'lg';
-  const shadow = settings?.productCardShadow || 'md';
+  const shadow = settings?.productCardShadow || 'none';
   const borderWidth = settings?.productCardBorderWidth || 'thin';
   const borderColor = settings?.productCardBorderColor || '#e2e8f0';
   const bgColor = settings?.productCardBgColor || '#ffffff';
-  const hoverEffect = settings?.productCardHoverEffect || 'lift';
+  const hoverEffect = settings?.productCardHoverEffect || 'none';
   const showImage = settings?.productCardShowImage !== false;
   const showBadges = settings?.productCardShowBadges !== false;
   const showRating = settings?.productCardShowRating !== false;
@@ -222,11 +222,11 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
   // Map shadow to Tailwind class
   const shadowClass = {
     'none': 'shadow-none',
-    'sm': 'shadow-sm',
-    'md': 'shadow-md',
-    'lg': 'shadow-lg',
-    'xl': 'shadow-xl',
-  }[shadow] || 'shadow-md';
+    'sm': '',
+    'md': '',
+    'lg': '',
+    'xl': '',
+  }[shadow] || 'shadow-none';
 
   // Map border width to Tailwind class
   const borderWidthClass = {
@@ -241,9 +241,9 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
     'none': '',
     'lift': 'hover:-translate-y-2',
     'zoom': '',
-    'glow': 'hover:shadow-2xl hover:shadow-primary/20',
+    'glow': 'hover: hover:shadow-primary/20',
     'border': 'hover:border-primary',
-  }[hoverEffect] || 'hover:-translate-y-2';
+  }[hoverEffect] || '';
 
   // Custom HTML template rendering
   if (cardStyle === 'custom' && settings?.productCardCustomHtml) {
@@ -298,8 +298,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
           fill
           className={cn(
             `object-cover transition-all duration-700 ${styles.productImage}`,
-            isOutOfStock && "opacity-40 grayscale",
-            hoverEffect === 'zoom' && 'group-hover:scale-110'
+            isOutOfStock && "opacity-40 grayscale"
           )}
           unoptimized
         />
@@ -308,14 +307,14 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
         {showBadges && (
         <div className="absolute top-4 left-4 flex flex-col gap-2 z-10 pointer-events-none">
           {product.isOfficialBrand && (
-            <Badge className={`bg-gradient-to-r from-blue-600 to-blue-700 text-white font-black text-[9px] uppercase tracking-widest px-3 py-1.5 shadow-lg border-none rounded-full w-fit ${styles.badgeSlide}`}>
+            <Badge className={`bg-gradient-to-r from-blue-600 to-blue-700 text-white font-black text-[9px] uppercase tracking-widest px-3 py-1.5  border-none rounded-full w-fit ${styles.badgeSlide}`}>
               <CheckCircle2 className="h-3.5 w-3.5 mr-2 fill-current" /> Official
             </Badge>
           )}
           
           {isDiscounted && !isOutOfStock && today && (
             <Badge 
-              className={`text-white font-black text-[10px] uppercase tracking-widest px-3 py-1.5 shadow-lg border-none rounded-full w-fit ${styles.discountBadge}`}
+              className={`text-white font-black text-[10px] uppercase tracking-widest px-3 py-1.5  border-none rounded-full w-fit ${styles.discountBadge}`}
               style={{ 
                   background: `linear-gradient(135deg, ${settings?.flashHubColor || '#e11d48'}, ${settings?.flashHubColor || '#e11d48'}dd)`,
                   boxShadow: `0 8px 16px ${settings?.flashHubColor || '#e11d48'}44`
@@ -335,7 +334,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
         {showWishlist && (
         <button
           className={cn(
-            `absolute top-4 right-4 h-11 w-11 flex items-center justify-center rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-lg transition-all duration-300 z-10 border border-white/30 dark:border-slate-600 hover:scale-110 active:scale-95 dark:hover:border-rose-500`,
+            `absolute top-4 right-4 h-11 w-11 flex items-center justify-center rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl  transition-all duration-300 z-10 border border-white/30 dark:border-slate-600 hover:scale-110 active:scale-95 dark:hover:border-rose-500`,
             isInWishlist && `text-rose-500 ${styles.wishlistPulse}`
           )}
           onClick={handleWishlistToggle}
@@ -351,7 +350,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
             onClick={handleAddToCart}
             disabled={isOutOfStock}
             style={buttonStyle}
-            className={`w-full font-black text-sm uppercase tracking-wide shadow-xl transition-all active:scale-95 ${styles.cartButton} ${buttonClasses} hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed`}
+            className={`w-full font-black text-sm uppercase tracking-wide  transition-all active:scale-95 ${styles.cartButton} ${buttonClasses} hover: disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             <GridCartIcon className={`h-5 w-5 mr-2 transition-all ${styles.cartIcon}`} />
             {settings?.storeGridCartText || 'Add to Bag'}
@@ -444,7 +443,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
               <Button 
                 size="icon" 
                 style={buttonStyle}
-                className={`shadow-lg shadow-primary/30 active:scale-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${buttonClasses} ${styles.mobileCartButton}`}
+                className={` shadow-primary/30 active:scale-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${buttonClasses} ${styles.mobileCartButton}`}
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
               >

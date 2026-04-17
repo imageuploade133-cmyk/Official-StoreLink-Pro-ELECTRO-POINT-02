@@ -224,7 +224,7 @@ export default function InvoicingSettingsPage() {
         <Button 
             onClick={form.handleSubmit(onSubmit)} 
             disabled={isSaving || !!uploadingField}
-            className="h-12 px-8 font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all active:scale-95"
+            className="h-12 px-8 font-black uppercase tracking-widest  shadow-primary/20 transition-all active:scale-95"
         >
             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Sync Protocol
@@ -236,7 +236,7 @@ export default function InvoicingSettingsPage() {
           <Form {...form}>
             <form className="space-y-8">
               {/* Top Banner Section */}
-              <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b">
                     <div className="flex justify-between items-center">
                         <div>
@@ -267,7 +267,7 @@ export default function InvoicingSettingsPage() {
                                     {field.value && (
                                         <div className="relative w-full aspect-[21/4] rounded-2xl overflow-hidden border-2 bg-slate-50 flex items-center justify-center group">
                                             <Image src={field.value} alt="Top Banner" fill className="object-contain p-2" unoptimized />
-                                            <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg" onClick={() => field.onChange('')}><X className="h-4 w-4" /></Button>
+                                            <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity " onClick={() => field.onChange('')}><X className="h-4 w-4" /></Button>
                                         </div>
                                     )}
                                     <div className="flex gap-2">
@@ -288,7 +288,7 @@ export default function InvoicingSettingsPage() {
               </Card>
 
               {/* Full Background Section */}
-              <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b">
                     <div className="flex justify-between items-center">
                         <div>
@@ -317,9 +317,9 @@ export default function InvoicingSettingsPage() {
                                 <FormLabel className="font-bold">Background Asset URL</FormLabel>
                                 <div className="flex flex-col gap-4">
                                     {field.value && (
-                                        <div className="relative w-full aspect-[1/1.4] max-w-[200px] rounded-2xl overflow-hidden border-2 bg-slate-50 flex items-center justify-center group shadow-xl mx-auto">
+                                        <div className="relative w-full aspect-[1/1.4] max-w-[200px] rounded-2xl overflow-hidden border-2 bg-slate-50 flex items-center justify-center group  mx-auto">
                                             <Image src={field.value} alt="Full Background" fill className="object-cover" unoptimized />
-                                            <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg" onClick={() => field.onChange('')}><X className="h-4 w-4" /></Button>
+                                            <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity " onClick={() => field.onChange('')}><X className="h-4 w-4" /></Button>
                                         </div>
                                     )}
                                     <div className="flex gap-2">
@@ -340,7 +340,7 @@ export default function InvoicingSettingsPage() {
               </Card>
 
               {/* Branding Section */}
-              <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b">
                     <CardTitle className="text-xl flex items-center gap-3">
                         <Palette className="h-5 w-5 text-primary" /> Visual Identity & Visibility
@@ -391,7 +391,7 @@ export default function InvoicingSettingsPage() {
               </Card>
 
               {/* Settlement Section */}
-              <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b">
                     <div className="flex justify-between items-center">
                         <div>
@@ -441,7 +441,7 @@ export default function InvoicingSettingsPage() {
               </Card>
 
               {/* Stamp & Signature Section */}
-              <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b">
                     <CardTitle className="text-xl flex items-center gap-2">
                         <Stamp className="h-5 w-5 text-primary" /> Trust Assets
@@ -477,7 +477,7 @@ export default function InvoicingSettingsPage() {
                                             {field.value ? (
                                                 <div className="relative w-full aspect-square max-w-[160px] rounded-2xl overflow-hidden border-2 border-dashed bg-slate-50 flex items-center justify-center p-4 group">
                                                     <Image src={field.value} alt="Stamp" width={120} height={120} className="object-contain" unoptimized />
-                                                    <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg" onClick={() => field.onChange('')}><X className="h-4 w-4" /></Button>
+                                                    <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity " onClick={() => field.onChange('')}><X className="h-4 w-4" /></Button>
                                                 </div>
                                             ) : (
                                                 <div className="w-full aspect-square max-w-[160px] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground bg-muted/10">
@@ -527,7 +527,7 @@ export default function InvoicingSettingsPage() {
                                             {field.value ? (
                                                 <div className="relative w-full aspect-[3/1] max-w-[240px] rounded-2xl overflow-hidden border-2 border-dashed bg-slate-50 flex items-center justify-center p-4 group">
                                                     <Image src={field.value} alt="Signature" width={200} height={60} className="object-contain" unoptimized />
-                                                    <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg" onClick={() => field.onChange('')}><X className="h-4 w-4" /></Button>
+                                                    <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity " onClick={() => field.onChange('')}><X className="h-4 w-4" /></Button>
                                                 </div>
                                             ) : (
                                                 <div className="w-full aspect-[3/1] max-w-[240px] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground bg-muted/10">
@@ -569,7 +569,7 @@ export default function InvoicingSettingsPage() {
               </Card>
 
               {/* Watermark Section */}
-              <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b">
                     <div className="flex justify-between items-center">
                         <div>
@@ -750,7 +750,7 @@ min={watermarkType === 'text' ? 20 : 50}
 
         <div className="lg:col-span-1">
           <div className="sticky top-24 space-y-6">
-            <Card className="bg-primary text-primary-foreground border-none shadow-2xl rounded-[2.5rem] overflow-hidden">
+            <Card className="bg-primary text-primary-foreground border-none  rounded-[2.5rem] overflow-hidden">
                 <CardHeader className="pt-10 px-8">
                     <div className="size-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center mb-4">
                         <ShieldCheck className="h-8 w-8" />
@@ -761,7 +761,7 @@ min={watermarkType === 'text' ? 20 : 50}
                 <CardContent className="px-8 pb-10 space-y-6">
                     <div className="p-4 bg-white/10 rounded-2xl border border-white/10">
                         <p className="text-[10px] font-black uppercase tracking-widest mb-4 opacity-60">Live Simulation Hub</p>
-                        <div className="bg-white rounded-xl overflow-hidden scale-90 -mx-4 shadow-2xl">
+                        <div className="bg-white rounded-xl overflow-hidden scale-90 -mx-4 ">
                             <div className="p-4 min-h-[200px] flex flex-col justify-end relative">
                                 <InvoiceTrustAssets 
                                     settings={simulatedSettings} 
@@ -790,7 +790,7 @@ min={watermarkType === 'text' ? 20 : 50}
             </Card>
 
             <div className="p-8 border-2 border-dashed rounded-[3rem] bg-muted/10 space-y-4 group transition-all hover:bg-muted/20 hover:border-primary/20">
-                <div className="size-16 rounded-full bg-background border-2 border-muted flex items-center justify-center mx-auto transition-transform duration-500 group-hover:scale-110 shadow-lg">
+                <div className="size-16 rounded-full bg-background border-2 border-muted flex items-center justify-center mx-auto transition-transform duration-500 group-hover:scale-110 ">
                     <Info className="h-8 w-8 text-primary/40" />
                 </div>
                 <h4 className="font-black text-lg tracking-tight uppercase">Registry Tip</h4>

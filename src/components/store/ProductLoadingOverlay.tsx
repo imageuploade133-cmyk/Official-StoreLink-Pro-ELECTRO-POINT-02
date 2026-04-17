@@ -16,7 +16,7 @@ export function ProductLoadingOverlay({ isVisible, productName }: ProductLoading
       "fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md transition-opacity duration-300",
       isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
     )}>
-      <div className="bg-white/10 dark:bg-black/60 border border-white/10 rounded-3xl shadow-2xl p-10 flex flex-col items-center gap-5 max-w-xs mx-4 animate-in fade-in zoom-in-95 duration-300">
+      <div className="bg-white/10 dark:bg-black/60 border border-white/10 rounded-3xl p-10 flex flex-col items-center gap-5 max-w-xs mx-4 animate-in fade-in duration-300">
         {/* Multi-ring spinner */}
         <div className="relative flex items-center justify-center">
           {/* Outer ring */}

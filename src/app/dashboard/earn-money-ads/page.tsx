@@ -315,7 +315,7 @@ export default function EarnMoneyAdsPage() {
                 <RotateCcw className={cn("mr-2 h-4 w-4", isLoadingAds && "animate-spin")} />
                 Sync
             </Button>
-            <Button onClick={handleOpenAddModal} className="gap-2 h-11 font-bold shadow-lg shadow-primary/20">
+            <Button onClick={handleOpenAddModal} className="gap-2 h-11 font-bold  shadow-primary/20">
                 <PlusCircle className="h-4 w-4" /> Add New Ad Link
             </Button>
         </div>
@@ -402,7 +402,7 @@ export default function EarnMoneyAdsPage() {
         </Card>
       </div>
 
-      <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <CardHeader className="bg-muted/10 border-b">
           <CardTitle>Ad Configurations</CardTitle>
           <CardDescription>Manage your monetization links and how they appear to customers.</CardDescription>
@@ -799,7 +799,7 @@ export default function EarnMoneyAdsPage() {
             <Button 
               onClick={handleSaveAd} 
               disabled={isSaving || (adForm.adType === 'banner' ? !adForm.adScript : !adForm.adLink)}
-              className="px-8 font-black shadow-lg shadow-primary/20 gap-2 h-11 order-1 sm:order-2"
+              className="px-8 font-black  shadow-primary/20 gap-2 h-11 order-1 sm:order-2"
             >
               {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
               {editingAd ? 'Update Ad Configuration' : 'Activate & Save Ad'}

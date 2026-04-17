@@ -116,7 +116,7 @@ function IndividualTrackPlayer({ track, branding }: { track: any, branding: any 
 
     return (
         <div 
-            className="p-5 rounded-[2rem] shadow-lg flex flex-col gap-4 relative overflow-hidden group/audio transition-all hover:scale-[1.01] text-white"
+            className="p-5 rounded-[2rem] flex flex-col gap-4 relative overflow-hidden group/audio transition-all text-white"
             style={{ backgroundColor: branding.color }}
         >
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-5" />
@@ -125,7 +125,7 @@ function IndividualTrackPlayer({ track, branding }: { track: any, branding: any 
                     onClick={togglePlayback}
                     variant="ghost" 
                     size="icon" 
-                    className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-md text-white border-2 border-white/30 shadow-xl relative z-10 flex-shrink-0"
+                    className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-md text-white border-2 border-white/30  relative z-10 flex-shrink-0"
                 >
                     {isPlaying ? <Pause className="h-7 w-7 fill-current" /> : <Play className="h-7 w-7 fill-current ml-1" />}
                 </Button>
@@ -318,17 +318,17 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
 
         const shadowClasses: Record<string, string> = {
             none: 'shadow-none',
-            sm: 'shadow-sm',
-            md: 'shadow-md',
-            lg: 'shadow-lg',
-            xl: 'shadow-xl',
-            '2xl': 'shadow-2xl',
+            sm: '',
+            md: '',
+            lg: '',
+            xl: '',
+            '2xl': '',
             inner: 'shadow-inner'
         };
 
         const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
         const shapeClass = shapeClasses[shape] || 'rounded-2xl';
-        const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
+        const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || '';
 
         return `${sizeClass} ${shapeClass} ${shadowClass}`;
     }, [settings]);
@@ -396,8 +396,8 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                         key={url + idx} 
                         onClick={() => { setActiveImage(url); setShowVideo(false); }} 
                         className={cn(
-                            "relative w-20 h-20 rounded-[1.5rem] overflow-hidden border-2 transition-all duration-300 shadow-xl shrink-0",
-                            !showVideo && activeImage === url ? "border-primary scale-110 z-10 ring-4 ring-primary/10" : "border-white dark:border-slate-800 opacity-90 hover:opacity-100"
+                            "relative w-20 h-20 rounded-[1.5rem] overflow-hidden border-2 transition-all duration-300 shrink-0",
+                            !showVideo && activeImage === url ? "border-primary z-10 ring-4 ring-primary/10" : "border-white dark:border-slate-800 opacity-90 hover:opacity-100"
                         )}
                     >
                         <Image src={url} alt={`View ${idx + 1}`} fill className="object-cover" unoptimized />
@@ -407,8 +407,8 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                     <button 
                         onClick={() => setShowVideo(true)} 
                         className={cn(
-                            "relative w-20 h-20 rounded-[1.5rem] overflow-hidden border-2 transition-all duration-300 shadow-xl shrink-0 bg-slate-900 group",
-                            showVideo ? "border-primary scale-110 z-10 ring-4 ring-primary/10" : "border-white dark:border-slate-800 opacity-90 hover:opacity-100"
+                            "relative w-20 h-20 rounded-[1.5rem] overflow-hidden border-2 transition-all duration-300 shrink-0 bg-slate-900 group",
+                            showVideo ? "border-primary z-10 ring-4 ring-primary/10" : "border-white dark:border-slate-800 opacity-90 hover:opacity-100"
                         )}
                     >
                         {product.videoPosterUrl && <Image src={product.videoPosterUrl} alt="" fill className="object-cover opacity-40" unoptimized />}
@@ -639,9 +639,9 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             {relatedProducts.filter(p => p.id !== id).slice(0, 4).map(p => (
-                                <div key={p.id} className="bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-lg p-3 group active:scale-95 transition-all">
+                                <div key={p.id} className="bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-100 dark:border-slate-800 overflow-hidden p-3 group active:scale-95 transition-all">
                                     <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted mb-3">
-                                        <Image src={p.imageUrl || 'https://placehold.co/200x200.png'} alt={p.name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" unoptimized />
+                                        <Image src={p.imageUrl || 'https://placehold.co/200x200.png'} alt={p.name} fill className="object-cover transition-transform duration-700" unoptimized />
                                     </div>
                                     <div className="space-y-1 px-1">
                                         <p className="text-[8px] font-black uppercase text-primary/60 tracking-widest">
@@ -663,9 +663,9 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
             </div>
 
             {/* Floating Action Bar */}
-            <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+            <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md p-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 z-50">
                 <div className="flex gap-4">
-                    <button className="flex items-center justify-center w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-300 shadow-sm active:scale-90 transition-transform">
+                    <button className="flex items-center justify-center w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-300 active:scale-90 transition-transform">
                         <MessageSquare className="h-6 w-6" />
                     </button>
                     {!isOutOfStock ? (
@@ -682,7 +682,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                                 }}
                                 style={addToCartButtonStyle}
                                 className={cn(
-                                    "flex-1 rounded-2xl text-white font-black uppercase tracking-widest shadow-xl transition-all active:scale-[0.98] group",
+                                    "flex-1 rounded-2xl text-white font-black uppercase tracking-widest transition-all active:scale-[0.98] group",
                                     addToCartButtonClasses
                                 )}
                             >

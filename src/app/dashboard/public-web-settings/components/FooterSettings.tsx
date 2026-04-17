@@ -206,7 +206,7 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
   }
 
   return (
-    <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+    <Card className=" border-none ring-1 ring-border overflow-hidden">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader className="bg-muted/30 border-b">
@@ -575,7 +575,7 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
             </div>
           </CardContent>
           <CardFooter className="bg-muted/30 border-t p-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
-            <Button type="submit" disabled={isSaving} size="lg" className="px-10 h-12 font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20">
+            <Button type="submit" disabled={isSaving} size="lg" className="px-10 h-12 font-black uppercase text-xs tracking-widest  shadow-primary/20">
               {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Save className="mr-2 h-4 w-4" />}
               Apply Footer Styles
             </Button>

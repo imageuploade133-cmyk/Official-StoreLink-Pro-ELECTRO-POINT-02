@@ -113,7 +113,7 @@ export function ProductSalesDetailsModal({
                             alt={product.name}
                             width={120}
                             height={120}
-                            className="rounded-lg object-cover aspect-square border-2 shadow-sm"
+                            className="rounded-lg object-cover aspect-square border-2 "
                             data-ai-hint={product.dataAiHint || product.name.toLowerCase().split(' ').slice(0,2).join(' ')}
                         />
                         <div className="text-sm mt-4 text-center md:text-left">

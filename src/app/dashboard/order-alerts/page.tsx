@@ -204,7 +204,7 @@ export default function OrderAlertsPage() {
                       </div>
                     ) : (
                       configuredNumbers.map((num, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-4 border rounded-xl bg-background shadow-sm animate-in fade-in slide-in-from-top-1">
+                        <div key={idx} className="flex items-center justify-between p-4 border rounded-xl bg-background  animate-in fade-in slide-in-from-top-1">
                           <div className="flex items-center gap-3">
                             <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                               <Smartphone className="h-4 w-4" />

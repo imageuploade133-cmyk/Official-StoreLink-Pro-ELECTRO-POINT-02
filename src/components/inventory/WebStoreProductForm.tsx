@@ -590,7 +590,7 @@ export function WebStoreProductForm() {
           placeholder="Search categories (e.g. Shoes, Luxury...)"
           value={categorySearchTerm}
           onChange={(e) => setCategorySearchTerm(e.target.value)}
-          className="pl-12 h-14 bg-muted/40 border-primary/10 focus:border-primary/30 rounded-2xl shadow-sm text-base transition-all"
+          className="pl-12 h-14 bg-muted/40 border-primary/10 focus:border-primary/30 rounded-2xl  text-base transition-all"
         />
       </div>
       <div
@@ -624,7 +624,7 @@ export function WebStoreProductForm() {
                 key={cat.id}
                 type="button"
                 className={cn(
-                  "group relative flex flex-col items-center p-4 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl",
+                  "group relative flex flex-col items-center p-4 rounded-2xl border-2 transition-all duration-300 hover:",
                   form.watch('categoryId') === cat.id
                     ? "border-primary bg-primary/5 ring-4 ring-primary/10"
                     : "border-muted-foreground/10 bg-background hover:border-primary/30 hover:bg-primary/5"
@@ -646,7 +646,7 @@ export function WebStoreProductForm() {
                   />
                   {form.watch('categoryId') === cat.id && (
                     <div className="absolute inset-0 bg-primary/40 backdrop-blur-[2px] flex items-center justify-center animate-in fade-in duration-300">
-                      <div className="bg-white text-primary rounded-full p-2 shadow-2xl scale-110">
+                      <div className="bg-white text-primary rounded-full p-2  scale-110">
                         <Check className="h-5 w-5" strokeWidth={4} />
                       </div>
                     </div>
@@ -728,7 +728,7 @@ export function WebStoreProductForm() {
             Note: Fields marked with an asterisk (*) are mandatory for catalog integrity.
           </div>
 
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
               <CardTitle>Core Information</CardTitle>
               <CardDescription>Fundamental details for your web catalog.</CardDescription>
@@ -924,7 +924,7 @@ export function WebStoreProductForm() {
             </CardContent>
           </Card>
 
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
               <CardTitle>Visuals & Assets</CardTitle>
               <CardDescription>Control how the product appears visually across the web.</CardDescription>
@@ -956,7 +956,7 @@ export function WebStoreProductForm() {
           </Card>
 
           {/* Voice Signature Experience Card */}
-          <Card className={cn("shadow-xl border-none ring-1 ring-border transition-all", !watchVoiceEnabled && "opacity-60")}>
+          <Card className={cn(" border-none ring-1 ring-border transition-all", !watchVoiceEnabled && "opacity-60")}>
             <CardHeader className="bg-muted/30 border-b">
               <div className="flex justify-between items-center">
                 <div>
@@ -982,7 +982,7 @@ export function WebStoreProductForm() {
           </Card>
 
           {/* Video Experience Section */}
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
               <div className="flex justify-between items-center">
                 <div>
@@ -1049,7 +1049,7 @@ export function WebStoreProductForm() {
           </Card>
 
           {/* Social Media & Gallery Multi-Video Section */}
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
                 <div className="flex justify-between items-center">
                     <div className="flex-1 mr-4">
@@ -1113,7 +1113,7 @@ export function WebStoreProductForm() {
           </Card>
 
           {/* Trust Badges Section */}
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
               <CardTitle>Trust & Service Badges</CardTitle>
               <CardDescription>Customize the trust indicators shown on the product detail page.</CardDescription>
@@ -1230,7 +1230,7 @@ export function WebStoreProductForm() {
           </Card>
 
           {/* Key Features Section */}
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
               <div className="flex justify-between items-center">
                 <div className="flex-1 mr-4">
@@ -1367,7 +1367,7 @@ export function WebStoreProductForm() {
           </Card>
 
           {/* Whats In The Box Section */}
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
               <div className="flex justify-between items-center">
                 <div className="flex-1 mr-4">
@@ -1494,7 +1494,7 @@ export function WebStoreProductForm() {
           </Card>
 
           {/* Variations & Sizing Section */}
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
               <div className="flex justify-between items-center">
                 <div className="flex-1 mr-4">
@@ -1630,7 +1630,7 @@ export function WebStoreProductForm() {
                     </FormLabel>
                     <div className="flex items-start gap-4">
                         {field.value && (
-                            <div className="relative w-32 h-32 rounded-xl border overflow-hidden shrink-0 shadow-sm">
+                            <div className="relative w-32 h-32 rounded-xl border overflow-hidden shrink-0 ">
                                 <Image src={field.value} alt="Size guide" fill className="object-contain" unoptimized />
                                 <Button type="button" variant="destructive" size="icon" className="absolute top-1 right-1 h-6 w-6 rounded-full" onClick={() => form.setValue('sizeGuideImageUrl', '')}>
                                     <X className="h-3 w-3" />
@@ -1660,7 +1660,7 @@ export function WebStoreProductForm() {
         </div>
 
         <div className="lg:col-span-1 space-y-6">
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-primary/5">
               <CardTitle className="text-lg flex items-center gap-2">
                   <MonitorSmartphone className="h-5 w-5 text-primary" />
@@ -1717,7 +1717,7 @@ export function WebStoreProductForm() {
           </Card>
 
           {/* Public Store Section Visibility - Red Color */}
-          <Card className="shadow-xl border-none ring-1 ring-destructive/30">
+          <Card className=" border-none ring-1 ring-destructive/30">
             <CardHeader className="bg-destructive/10">
               <CardTitle className="text-lg flex items-center gap-2 text-destructive">
                   <Eye className="h-5 w-5" />
@@ -1777,7 +1777,7 @@ export function WebStoreProductForm() {
             </CardContent>
           </Card>
 
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
               <CardHeader className="bg-muted/30">
                   <CardTitle className="text-lg">Merchandising Settings</CardTitle>
               </CardHeader>
@@ -1785,7 +1785,7 @@ export function WebStoreProductForm() {
                   <StoreMerchandisingSettings />
               </CardContent>
               <CardFooter className="flex flex-col gap-4 border-t pt-6 bg-muted/10">
-                  <Button type="submit" disabled={isSaving || isUploadingSizeGuide || isUploadingPoster} className="w-full h-14 text-lg font-bold shadow-lg shadow-primary/20">
+                  <Button type="submit" disabled={isSaving || isUploadingSizeGuide || isUploadingPoster} className="w-full h-14 text-lg font-bold  shadow-primary/20">
                   {isSaving ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />

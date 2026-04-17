@@ -184,7 +184,7 @@ export default function ShopCollectionSettingsPage() {
       />
 
       <div className="grid grid-cols-1 gap-6">
-        <Card className="border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="border-slate-200 dark:border-slate-800  hover: transition-shadow">
           <CardHeader>
             <div className="flex items-start gap-3 flex-1">
                 <div className="p-2 rounded-lg bg-primary/10 flex-shrink-0">
@@ -261,7 +261,7 @@ export default function ShopCollectionSettingsPage() {
                                 variant="destructive"
                                 size="sm"
                                 onClick={() => field.onChange('')}
-                                className="gap-2 shadow-lg"
+                                className="gap-2 "
                               >
                                 <X className="h-4 w-4" /> Remove Banner
                               </Button>
@@ -283,7 +283,7 @@ export default function ShopCollectionSettingsPage() {
                               variant="outline"
                               size="sm"
                               disabled={isUploading}
-                              className="shadow-sm"
+                              className=""
                             >
                               <label htmlFor="banner-upload" className="cursor-pointer">
                                 {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
@@ -330,7 +330,7 @@ export default function ShopCollectionSettingsPage() {
                           className={cn(
                             "flex flex-col items-center gap-3 p-6 rounded-xl border-2 transition-all duration-200",
                             field.value === 'left'
-                              ? 'border-primary bg-primary/5 shadow-sm ring-1 ring-primary/20'
+                              ? 'border-primary bg-primary/5  ring-1 ring-primary/20'
                               : 'border-slate-200 dark:border-slate-800 hover:border-primary/30 bg-card'
                           )}
                         >
@@ -348,7 +348,7 @@ export default function ShopCollectionSettingsPage() {
                           className={cn(
                             "flex flex-col items-center gap-3 p-6 rounded-xl border-2 transition-all duration-200",
                             field.value === 'center'
-                              ? 'border-primary bg-primary/5 shadow-sm ring-1 ring-primary/20'
+                              ? 'border-primary bg-primary/5  ring-1 ring-primary/20'
                               : 'border-slate-200 dark:border-slate-800 hover:border-primary/30 bg-card'
                           )}
                         >
@@ -370,7 +370,7 @@ export default function ShopCollectionSettingsPage() {
                 />
 
                 <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800">
-                  <Button type="submit" disabled={isSaving} className="gap-2 min-w-[140px] shadow-lg">
+                  <Button type="submit" disabled={isSaving} className="gap-2 min-w-[140px] ">
                     {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                     Save Changes
                   </Button>

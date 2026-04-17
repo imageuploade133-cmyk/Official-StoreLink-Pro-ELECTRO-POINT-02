@@ -232,7 +232,7 @@ export function CustomerManagementModal({ isOpen, onOpenChange, onCustomerSelect
               <Button 
                 onClick={() => setIsRegisterOpen(true)}
                 size={isMobile ? "sm" : "default"}
-                className="gap-2 font-bold shadow-lg shadow-primary/20 shrink-0 mr-6 sm:mr-8"
+                className="gap-2 font-bold  shadow-primary/20 shrink-0 mr-6 sm:mr-8"
               >
                 <PlusCircle className="h-4 w-4" />
                 <span className="hidden sm:inline">Add New Profile</span>

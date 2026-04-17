@@ -140,7 +140,7 @@ export function GeneralSettings({ settingsData, isLoading }: GeneralSettingsProp
 
   return (
     <div className="space-y-6">
-      <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <CardHeader className="bg-muted/30 border-b">
@@ -319,7 +319,7 @@ export function GeneralSettings({ settingsData, isLoading }: GeneralSettingsProp
       </Card>
 
       {/* Public Access Hub */}
-      <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <CardHeader className="bg-primary/5 border-b">
             <CardTitle className="flex items-center gap-2 text-xl font-black uppercase tracking-tight">
                 <Globe className="h-5 w-5 text-primary" />
@@ -346,7 +346,7 @@ export function GeneralSettings({ settingsData, isLoading }: GeneralSettingsProp
                         </div>
                         <Button 
                             variant="secondary" 
-                            className="w-full h-12 rounded-xl font-black uppercase text-[10px] tracking-widest gap-2 shadow-lg active:scale-95 transition-all"
+                            className="w-full h-12 rounded-xl font-black uppercase text-[10px] tracking-widest gap-2  active:scale-95 transition-all"
                             onClick={() => copyToClipboard(`/store/${currentStoreId || 'global'}`, 'Storefront URL')}
                         >
                             <Copy className="h-3.5 w-3.5" />
@@ -372,7 +372,7 @@ export function GeneralSettings({ settingsData, isLoading }: GeneralSettingsProp
                         </div>
                         <Button 
                             variant="secondary" 
-                            className="w-full h-12 rounded-xl font-black uppercase text-[10px] tracking-widest gap-2 shadow-lg active:scale-95 transition-all"
+                            className="w-full h-12 rounded-xl font-black uppercase text-[10px] tracking-widest gap-2  active:scale-95 transition-all"
                             onClick={() => copyToClipboard(`/store-app/${currentStoreId || 'global'}`, 'Store-App URL')}
                         >
                             <Copy className="h-3.5 w-3.5" />

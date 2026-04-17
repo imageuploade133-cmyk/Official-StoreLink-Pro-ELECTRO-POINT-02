@@ -279,7 +279,7 @@ export function PublicFooter() {
         {footerBannerUrl && (
           <div 
             className={cn(
-              "mb-10 w-full overflow-hidden rounded-2xl border border-white/10 shadow-2xl transition-all duration-500",
+              "mb-10 w-full overflow-hidden rounded-2xl border border-white/10  transition-all duration-500",
               (footerBannerSize === 'small' || (typeof footerBannerSize === 'number' && footerBannerSize <= 200)) && "max-w-4xl mx-auto"
             )}
             style={typeof footerBannerSize === 'number' ? { height: `${footerBannerSize}px` } : {}}

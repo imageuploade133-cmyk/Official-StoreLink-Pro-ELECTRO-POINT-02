@@ -73,13 +73,13 @@ export function OrdersView({ onClose, onNavigate }: OrdersViewProps) {
                 <div className="flex items-center gap-4">
                     <button 
                         onClick={onClose}
-                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
+                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800  border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
                     >
                         <ArrowLeft className="h-5 w-5" strokeWidth={3} />
                     </button>
                     <h1 className="text-xl font-black leading-tight tracking-tighter uppercase">Registry</h1>
                 </div>
-                <Badge variant="secondary" className="font-black h-8 px-4 rounded-full shadow-sm">Orders</Badge>
+                <Badge variant="secondary" className="font-black h-8 px-4 rounded-full ">Orders</Badge>
             </header>
 
             <ScrollArea className="flex-1 px-6 pb-32">
@@ -105,7 +105,7 @@ export function OrdersView({ onClose, onNavigate }: OrdersViewProps) {
                             <Button 
                                 onClick={() => onNavigate?.('profile')} 
                                 size="lg" 
-                                className="rounded-2xl font-black uppercase text-[10px] tracking-widest px-10 h-14 shadow-xl active:scale-95 transition-transform"
+                                className="rounded-2xl font-black uppercase text-[10px] tracking-widest px-10 h-14  active:scale-95 transition-transform"
                             >
                                 Enter Profile
                             </Button>
@@ -118,14 +118,14 @@ export function OrdersView({ onClose, onNavigate }: OrdersViewProps) {
                                 const StatusIcon = status.icon;
 
                                 return (
-                                    <div key={order.id} className="bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl overflow-hidden group">
+                                    <div key={order.id} className="bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-100 dark:border-slate-800  overflow-hidden group">
                                         <div className="p-6 space-y-6">
                                             <div className="flex justify-between items-start">
                                                 <div className="space-y-1">
                                                     <p className="text-[10px] font-black uppercase text-primary tracking-widest">#{order.id.substring(0, 12).toUpperCase()}</p>
                                                     <p className="text-xs font-bold text-slate-400">{date ? format(date, 'EEEE, MMM do') : 'Recent'}</p>
                                                 </div>
-                                                <div className={cn("flex items-center gap-2 px-4 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest shadow-sm", status.color)}>
+                                                <div className={cn("flex items-center gap-2 px-4 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest ", status.color)}>
                                                     <StatusIcon className="h-3 w-3" />
                                                     {status.label}
                                                 </div>
@@ -175,7 +175,7 @@ export function OrdersView({ onClose, onNavigate }: OrdersViewProps) {
                                 <h3 className="text-2xl font-black tracking-tight uppercase">Registry Empty</h3>
                                 <p className="text-sm text-slate-500 font-medium max-w-[220px] mx-auto leading-relaxed">When you place an order, our fulfillment telemetry will appear here.</p>
                             </div>
-                            <Button onClick={onClose} size="lg" className="rounded-2xl font-black uppercase text-[10px] tracking-widest px-10 h-14 shadow-xl active:scale-95 transition-transform">Start Discovery</Button>
+                            <Button onClick={onClose} size="lg" className="rounded-2xl font-black uppercase text-[10px] tracking-widest px-10 h-14  active:scale-95 transition-transform">Start Discovery</Button>
                         </div>
                     )}
                 </div>

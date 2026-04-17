@@ -77,7 +77,7 @@ export function ProductReviewForm({ productId }: ProductReviewFormProps) {
   }
 
   return (
-    <div className="p-8 border-2 rounded-[2rem] bg-white dark:bg-slate-900/50 shadow-sm">
+    <div className="p-8 border-2 rounded-[2rem] bg-white dark:bg-slate-900/50 ">
       <h4 className="text-xl font-black tracking-tight mb-6 flex items-center gap-3">
         <Star className="h-6 w-6 text-primary fill-current" /> Write a Review
       </h4>
@@ -137,7 +137,7 @@ export function ProductReviewForm({ productId }: ProductReviewFormProps) {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full h-14 rounded-2xl font-black uppercase text-xs tracking-[0.2em] shadow-xl shadow-primary/20"
+            className="w-full h-14 rounded-2xl font-black uppercase text-xs tracking-[0.2em]  shadow-primary/20"
           >
             {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
             Submit My Review

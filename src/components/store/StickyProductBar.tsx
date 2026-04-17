@@ -130,17 +130,17 @@ export function StickyProductBar({
 
     const shadowClasses: Record<string, string> = {
       none: 'shadow-none',
-      sm: 'shadow-sm',
-      md: 'shadow-md',
-      lg: 'shadow-lg',
-      xl: 'shadow-xl',
-      '2xl': 'shadow-2xl',
+      sm: '',
+      md: '',
+      lg: '',
+      xl: '',
+      '2xl': '',
       inner: 'shadow-inner'
     };
     
     const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
     const shapeClass = shapeClasses[shape] || 'rounded-2xl';
-    const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
+    const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || '';
 
     return `${shapeClass} ${sizeClass} ${shadowClass}`;
   }, [settings]);
@@ -149,7 +149,7 @@ export function StickyProductBar({
     /* Overlay bar - no spacer needed, content scrolls under it */
     <div className={cn(
       "fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 transition-all duration-300 ease-out",
-      isVisible ? "translate-y-0 opacity-100 shadow-lg shadow-slate-900/10" : "translate-y-full opacity-0 pointer-events-none"
+      isVisible ? "translate-y-0 opacity-100  shadow-slate-900/10" : "translate-y-full opacity-0 pointer-events-none"
     )}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex items-center justify-between gap-3 sm:gap-4">
         {/* Product Info */}

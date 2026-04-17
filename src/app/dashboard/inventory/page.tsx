@@ -407,7 +407,7 @@ export default function InventoryPage() {
         currencySymbol={currencySymbol}
       />
 
-      <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <CardContent className="p-0">
           {isLoadingProducts && products.length === 0 ? (
             <div className="p-6">

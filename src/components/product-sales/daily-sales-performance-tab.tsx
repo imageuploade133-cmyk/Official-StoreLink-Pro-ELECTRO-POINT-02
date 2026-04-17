@@ -181,7 +181,7 @@ export function DailySalesPerformanceTab({ transactions, products, currencySymbo
   };
 
   return (
-    <Card className="shadow-md rounded-lg">
+    <Card className=" rounded-lg">
       <CardHeader>
         <CardTitle>Daily Sales Performance</CardTitle>
         <CardDescription>

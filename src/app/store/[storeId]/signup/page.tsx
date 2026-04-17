@@ -224,7 +224,7 @@ export default function StoreSignupPage() {
                 setIsCongratulationOpen(open);
                 if (!open) router.replace('/store/account');
             }}>
-                <DialogContent className="sm:max-w-md p-0 overflow-hidden border-none shadow-2xl rounded-[3rem]" style={{ backgroundColor: bgColor }}>
+                <DialogContent className="sm:max-w-md p-0 overflow-hidden border-none  rounded-[3rem]" style={{ backgroundColor: bgColor }}>
                     <DialogHeader className="sr-only">
                         <DialogTitle>Congratulations</DialogTitle>
                         <DialogDescription>Welcome to our store</DialogDescription>
@@ -267,7 +267,7 @@ export default function StoreSignupPage() {
                                     setIsCongratulationOpen(false);
                                     router.replace('/store/account');
                                 }}
-                                className="w-full h-16 rounded-[1.5rem] font-black uppercase text-[10px] tracking-[0.3em] shadow-xl transition-all active:scale-95"
+                                className="w-full h-16 rounded-[1.5rem] font-black uppercase text-[10px] tracking-[0.3em]  transition-all active:scale-95"
                             >
                                 Start Discovery <ArrowRight className="ml-3 h-4 w-4" strokeWidth={3} />
                             </Button>

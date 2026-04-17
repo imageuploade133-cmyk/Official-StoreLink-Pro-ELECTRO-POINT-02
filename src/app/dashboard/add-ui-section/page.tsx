@@ -154,7 +154,7 @@ export default function AddUISectionPage() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+            <Card className=" border-none ring-1 ring-border overflow-hidden">
               <CardHeader className="bg-muted/30 border-b">
                 <CardTitle>Creative Architecture</CardTitle>
                 <CardDescription>Configure the underlying technology and content for this section.</CardDescription>
@@ -210,7 +210,7 @@ export default function AddUISectionPage() {
                                 <FormLabel className="font-bold">Primary Design Asset <span className="text-destructive">*</span></FormLabel>
                                 <div className="flex items-start gap-6">
                                     {imageUrl ? (
-                                        <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border shadow-xl bg-white shrink-0">
+                                        <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border  bg-white shrink-0">
                                             <Image src={imageUrl} alt="Preview" fill className="object-cover" unoptimized />
                                         </div>
                                     ) : (
@@ -283,7 +283,7 @@ export default function AddUISectionPage() {
           </div>
 
           <div className="lg:col-span-1 space-y-6">
-            <Card className="shadow-xl border-none ring-1 ring-border">
+            <Card className=" border-none ring-1 ring-border">
               <CardHeader className="bg-primary/5">
                 <CardTitle className="text-lg flex items-center gap-2">
                     <Monitor className="h-5 w-5 text-primary" /> Display Strategy
@@ -308,7 +308,7 @@ export default function AddUISectionPage() {
                             <Palette className="h-3.5 w-3.5" /> Background Color
                         </FormLabel>
                         <div className="flex items-center gap-3">
-                            <FormControl><Input type="color" {...field} className="p-1 h-10 w-12 cursor-pointer border-none shadow-sm" /></FormControl>
+                            <FormControl><Input type="color" {...field} className="p-1 h-10 w-12 cursor-pointer border-none " /></FormControl>
                             <span className="text-xs font-mono font-bold text-muted-foreground">{field.value}</span>
                         </div>
                     </FormItem>
@@ -324,7 +324,7 @@ export default function AddUISectionPage() {
                 )} />
               </CardContent>
               <CardFooter className="pt-6 border-t bg-muted/10">
-                <Button type="submit" disabled={isSaving || isUploading} className="w-full h-14 text-lg font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all active:scale-[0.98]">
+                <Button type="submit" disabled={isSaving || isUploading} className="w-full h-14 text-lg font-black uppercase tracking-widest  shadow-primary/20 transition-all active:scale-[0.98]">
                     {isSaving ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                     Publish UI Section
                 </Button>
@@ -332,7 +332,7 @@ export default function AddUISectionPage() {
             </Card>
 
             <div className="p-6 border-2 border-dashed rounded-[2.5rem] bg-muted/5 space-y-4">
-                <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center shadow-md">
+                <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center ">
                     <Info className="h-6 w-6 text-primary" />
                 </div>
                 <h4 className="font-black text-sm uppercase tracking-tight">Technical Protocol</h4>

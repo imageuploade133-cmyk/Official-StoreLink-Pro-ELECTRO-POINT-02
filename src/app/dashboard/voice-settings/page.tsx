@@ -182,7 +182,7 @@ export default function VoiceSettingsPage() {
         <div className="lg:col-span-2">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b">
                     <CardTitle className="text-xl">Display Text & Branding</CardTitle>
                     <CardDescription>Adjust the labels and primary color of the audio player.</CardDescription>
@@ -259,7 +259,7 @@ export default function VoiceSettingsPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="bg-muted/30 border-t p-6">
-                  <Button type="submit" disabled={isSaving} className="font-black uppercase tracking-widest text-xs h-12 px-8 shadow-xl shadow-primary/20">
+                  <Button type="submit" disabled={isSaving} className="font-black uppercase tracking-widest text-xs h-12 px-8  shadow-primary/20">
                     {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                     Sync Voice Configuration
                   </Button>
@@ -271,7 +271,7 @@ export default function VoiceSettingsPage() {
 
         <div className="lg:col-span-1">
           <div className="sticky top-24 space-y-6">
-            <Card className="shadow-lg border-none ring-1 ring-border">
+            <Card className=" border-none ring-1 ring-border">
                 <CardHeader className="bg-muted/10">
                     <CardTitle className="text-sm font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
                         <Volume2 className="h-4 w-4" /> Real-time Insight
@@ -280,7 +280,7 @@ export default function VoiceSettingsPage() {
                 <CardContent className="pt-8">
                     {/* The Simulation */}
                     <div 
-                        className="bg-primary text-white p-6 rounded-[2rem] shadow-2xl flex items-center gap-4 relative overflow-hidden transition-colors duration-500"
+                        className="bg-primary text-white p-6 rounded-[2rem]  flex items-center gap-4 relative overflow-hidden transition-colors duration-500"
                         style={{ backgroundColor: cardColor }}
                     >
                         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
@@ -297,7 +297,7 @@ export default function VoiceSettingsPage() {
                         <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-md text-white border-2 border-white/30 shadow-xl relative z-10 flex-shrink-0"
+                            className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-md text-white border-2 border-white/30  relative z-10 flex-shrink-0"
                         >
                             <Play className="h-6 w-6 fill-current ml-1" />
                         </Button>

@@ -172,12 +172,12 @@ export function CategoryGallery() {
                   href={getStoreUrl(`/store/shop?category=${category.id}`)}
                   className="flex flex-col items-center group/item"
                 >
-                  <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-500 group-hover/item:shadow-2xl group-hover/item:border-primary/30 group-hover/item:-translate-y-2 group-hover/item:ring-4 group-hover/item:ring-primary/5">
+                  <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 transition-all duration-500 group-hover/item:border-primary/30 group-hover/item:-translate-y-2 group-hover/item:ring-4 group-hover/item:ring-primary/5">
                     <Image
                       alt={category.name}
                       src={category.imageUrl || `https://picsum.photos/seed/${category.id}/300/300`}
                       fill
-                      className="object-cover transition-transform duration-1000 ease-in-out group-hover/item:scale-110"
+                      className="object-cover transition-transform duration-1000 ease-in-out"
                       sizes="(max-width: 640px) 33vw, (max-width: 1024px) 25vw, 15vw"
                       data-ai-hint="category tile"
                       unoptimized
@@ -201,7 +201,7 @@ export function CategoryGallery() {
                         disabled={isLoadingMore}
                         className="flex flex-col items-center group/more w-full h-full"
                     >
-                        <div className="relative aspect-square w-full rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 flex flex-col items-center justify-center gap-2 transition-all duration-500 group-hover/more:border-primary group-hover/more:bg-primary/5 group-hover/more:-translate-y-2 group-hover/more:shadow-xl">
+                        <div className="relative aspect-square w-full rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 flex flex-col items-center justify-center gap-2 transition-all duration-500 group-hover/more:border-primary group-hover/more:bg-primary/5 group-hover/more:-translate-y-2">
                             {isLoadingMore ? (
                                 <Loader2 className="h-6 w-6 animate-spin text-primary" />
                             ) : (
@@ -223,8 +223,8 @@ export function CategoryGallery() {
           </CarouselContent>
           
           <div className="hidden md:block">
-            <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 h-14 w-14 rounded-full border-2 border-slate-200 bg-white/90 backdrop-blur-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all duration-500 hover:scale-110 hover:bg-white active:scale-95 disabled:hidden" />
-            <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 h-14 w-14 rounded-full border-2 border-slate-200 bg-white/90 backdrop-blur-md shadow-2xl opacity-0 group-hover:opacity-100 transition-all duration-500 hover:scale-110 hover:bg-white active:scale-95 disabled:hidden" />
+            <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 h-14 w-14 rounded-full border-2 border-slate-200 bg-white/90 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-500 hover:bg-white active:scale-95 disabled:hidden" />
+            <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 h-14 w-14 rounded-full border-2 border-slate-200 bg-white/90 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-500 hover:bg-white active:scale-95 disabled:hidden" />
           </div>
         </Carousel>
       </div>

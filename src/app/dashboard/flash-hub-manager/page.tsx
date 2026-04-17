@@ -273,7 +273,7 @@ export default function FlashHubManagerPage() {
             <Button 
                 onClick={form.handleSubmit(onSubmit)} 
                 disabled={isSaving || isUploading || isUploadingIcon}
-                className="rounded-xl h-11 px-8 font-black uppercase tracking-widest shadow-xl shadow-primary/20"
+                className="rounded-xl h-11 px-8 font-black uppercase tracking-widest  shadow-primary/20"
             >
                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                 Sync Flash Hub
@@ -285,7 +285,7 @@ export default function FlashHubManagerPage() {
         <div className="lg:col-span-2 space-y-10">
           <Form {...form}>
             <form className="space-y-10">
-              <Card className="shadow-2xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader 
                     className="text-white p-8 transition-all duration-500"
                     style={{ 
@@ -299,7 +299,7 @@ export default function FlashHubManagerPage() {
                         <CardDescription className="text-white/80 font-medium">Customize the header and landing experience.</CardDescription>
                     </div>
                     {iconUrl ? (
-                        <div className="relative h-12 w-12 rounded-xl overflow-hidden border-2 border-white shadow-xl bg-white">
+                        <div className="relative h-12 w-12 rounded-xl overflow-hidden border-2 border-white  bg-white">
                             <Image src={iconUrl} alt="Hub Icon" fill className="object-cover" unoptimized />
                         </div>
                     ) : (
@@ -454,7 +454,7 @@ export default function FlashHubManagerPage() {
                                 <FormLabel className="text-xs font-bold">Custom Icon Image (Optional)</FormLabel>
                                 <div className="flex flex-col gap-4">
                                     {iconUrl && (
-                                        <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-2 border-primary/10 shadow-lg bg-white group">
+                                        <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-2 border-primary/10  bg-white group">
                                             <Image src={iconUrl} alt="Custom Icon" fill className="object-cover" unoptimized />
                                             <Button 
                                                 type="button" 
@@ -506,7 +506,7 @@ export default function FlashHubManagerPage() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b flex flex-row items-center justify-between p-8">
                   <div>
                     <CardTitle className="text-xl">Flash Hub Slideshow</CardTitle>
@@ -517,13 +517,13 @@ export default function FlashHubManagerPage() {
                         control={form.control}
                         name="flashHubShowSlideshow"
                         render={({ field }) => (
-                        <FormItem className="flex items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background shadow-lg">
+                        <FormItem className="flex items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background ">
                             <FormLabel className="text-[10px] font-black uppercase tracking-widest">{field.value ? 'Active' : 'Off'}</FormLabel>
                             <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
                         </FormItem>
                         )}
                     />
-                    <Button asChild variant="secondary" className="rounded-xl font-bold h-10 px-6 shadow-sm">
+                    <Button asChild variant="secondary" className="rounded-xl font-bold h-10 px-6 ">
                         <Link href="/dashboard/web-slide-show/create?placement=flash-hub">
                             <PlusCircle className="h-4 w-4 mr-2" /> Add Hub Slide
                         </Link>
@@ -547,7 +547,7 @@ export default function FlashHubManagerPage() {
                                 <TableRow key={slide.id} className="group hover:bg-muted/30 transition-colors">
                                     <TableCell className="text-center font-black text-primary">{slide.order}</TableCell>
                                     <TableCell>
-                                        <div className="relative w-20 h-12 rounded-lg overflow-hidden border shadow-sm bg-slate-100 flex items-center justify-center">
+                                        <div className="relative w-20 h-12 rounded-lg overflow-hidden border  bg-slate-100 flex items-center justify-center">
                                             {slide.mediaType === 'image' && slide.imageUrl ? (
                                                 <Image src={slide.imageUrl} alt="" fill className="object-cover" unoptimized />
                                             ) : slide.mediaType === 'video' && slide.videoPosterUrl ? (
@@ -593,7 +593,7 @@ export default function FlashHubManagerPage() {
         </div>
 
         <div className="lg:col-span-1 space-y-10">
-          <Card className="bg-primary text-primary-foreground border-none shadow-2xl rounded-[3rem] overflow-hidden relative group">
+          <Card className="bg-primary text-primary-foreground border-none  rounded-[3rem] overflow-hidden relative group">
             <CardHeader className="pt-12 px-10">
                 <CardTitle className="text-3xl font-black tracking-tighter uppercase leading-tight">Sales Hub Registry</CardTitle>
                 <CardDescription className="text-primary-foreground/70 font-bold text-[10px] uppercase tracking-[0.2em] pt-2">Active Flash Sections</CardDescription>

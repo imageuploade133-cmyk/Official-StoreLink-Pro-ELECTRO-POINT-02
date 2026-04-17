@@ -351,7 +351,7 @@ export function BulkPaymentDialog({
           <Button 
             onClick={form.handleSubmit(onSubmit)} 
             disabled={isSubmitting || !form.formState.isValid}
-            className="h-11 px-8 font-black uppercase tracking-tighter shadow-lg shadow-primary/20"
+            className="h-11 px-8 font-black uppercase tracking-tighter  shadow-primary/20"
           >
             {isSubmitting ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

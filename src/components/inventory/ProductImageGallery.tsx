@@ -286,7 +286,7 @@ export function ProductImageGallery({
           <div 
             key={item.url + index} 
             className={cn(
-                "group relative aspect-square rounded-[1.5rem] overflow-hidden border-2 transition-all duration-300 shadow-lg",
+                "group relative aspect-square rounded-[1.5rem] overflow-hidden border-2 transition-all duration-300 ",
                 item.isPrimary ? "border-primary scale-105 z-10 ring-4 ring-primary/10" : "border-muted bg-muted grayscale-[0.2] hover:grayscale-0"
             )}
           >
@@ -403,7 +403,7 @@ export function ProductImageGallery({
 
       {/* Full Screen Preview Dialog */}
       <Dialog open={!!previewUrl} onOpenChange={(open) => !open && setPreviewUrl(null)}>
-        <DialogContent className="max-w-[95vw] md:max-w-4xl p-0 overflow-hidden bg-black/90 border-none shadow-2xl">
+        <DialogContent className="max-w-[95vw] md:max-w-4xl p-0 overflow-hidden bg-black/90 border-none ">
           <DialogHeader className="sr-only">
             <DialogTitle>Image Preview</DialogTitle>
             <DialogDescription>Full screen view of the selected image.</DialogDescription>

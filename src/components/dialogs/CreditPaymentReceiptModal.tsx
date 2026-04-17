@@ -297,7 +297,7 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
 
           <ScrollArea className="flex-1 overflow-y-auto p-4 md:p-6 bg-muted/30">
             <TabsContent value="small" className="m-0 p-0">
-              <div id="printable-credit-receipt-small" className="receipt-container w-full max-w-xs mx-auto text-sm bg-white text-black font-mono p-4 border rounded-md shadow-sm">
+              <div id="printable-credit-receipt-small" className="receipt-container w-full max-w-xs mx-auto text-sm bg-white text-black font-mono p-4 border rounded-md ">
                   <header className="receipt-header">
                     {storeLogoUrl && (
                       <img 
@@ -344,7 +344,7 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
             </TabsContent>
 
             <TabsContent value="a4" className="m-0 p-0">
-               <div id="printable-credit-receipt-a4" className="invoice-container bg-white text-gray-800 font-sans p-6 md:p-8 rounded-lg shadow-xl border border-gray-100 max-w-4xl mx-auto my-4">
+               <div id="printable-credit-receipt-a4" className="invoice-container bg-white text-gray-800 font-sans p-6 md:p-8 rounded-lg  border border-gray-100 max-w-4xl mx-auto my-4">
                   <header className="invoice-header">
                     <div className="invoice-header-left">
                       {invoiceLogoUrl && <img src={invoiceLogoUrl} alt={storeName} className="invoice-logo" />}

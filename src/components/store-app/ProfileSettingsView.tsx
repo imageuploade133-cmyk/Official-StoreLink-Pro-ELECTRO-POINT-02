@@ -128,7 +128,7 @@ export function ProfileSettingsView({ onClose }: ProfileSettingsViewProps) {
                 <div className="flex items-center gap-4">
                     <button 
                         onClick={onClose}
-                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
+                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800  border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
                     >
                         <ArrowLeft className="h-5 w-5" strokeWidth={3} />
                     </button>
@@ -145,7 +145,7 @@ export function ProfileSettingsView({ onClose }: ProfileSettingsViewProps) {
 
                     <Form {...profileForm}>
                         <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-8">
-                            <Card className="rounded-[2.5rem] shadow-xl border-none ring-1 ring-slate-100 dark:ring-slate-800">
+                            <Card className="rounded-[2.5rem]  border-none ring-1 ring-slate-100 dark:ring-slate-800">
                                 <CardHeader className="bg-muted/20 pb-6">
                                     <CardTitle className="text-lg uppercase font-black tracking-tight flex items-center gap-3">
                                         <UserCircle className="h-5 w-5 text-primary" /> Basic Identity
@@ -169,7 +169,7 @@ export function ProfileSettingsView({ onClose }: ProfileSettingsViewProps) {
                                 </CardContent>
                             </Card>
 
-                            <Card className="rounded-[2.5rem] shadow-xl border-none ring-1 ring-slate-100 dark:ring-slate-800">
+                            <Card className="rounded-[2.5rem]  border-none ring-1 ring-slate-100 dark:ring-slate-800">
                                 <CardHeader className="bg-muted/20 pb-6">
                                     <CardTitle className="text-lg uppercase font-black tracking-tight flex items-center gap-3">
                                         <MapPin className="h-5 w-5 text-primary" /> Delivery Logistics
@@ -192,7 +192,7 @@ export function ProfileSettingsView({ onClose }: ProfileSettingsViewProps) {
                                     )} />
                                 </CardContent>
                                 <CardFooter className="pb-8 px-8">
-                                    <Button type="submit" disabled={isSavingProfile} className="w-full h-14 rounded-[1.5rem] font-black uppercase text-xs tracking-[0.2em] shadow-2xl">
+                                    <Button type="submit" disabled={isSavingProfile} className="w-full h-14 rounded-[1.5rem] font-black uppercase text-xs tracking-[0.2em] ">
                                         {isSavingProfile ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5 mr-3" />}
                                         Synchronize Profile
                                     </Button>
@@ -205,7 +205,7 @@ export function ProfileSettingsView({ onClose }: ProfileSettingsViewProps) {
 
                     <Form {...passForm}>
                         <form onSubmit={passForm.handleSubmit(onPasswordSubmit)}>
-                            <Card className="rounded-[2.5rem] shadow-xl border-none ring-1 ring-slate-100 dark:ring-slate-800">
+                            <Card className="rounded-[2.5rem]  border-none ring-1 ring-slate-100 dark:ring-slate-800">
                                 <CardHeader className="bg-muted/20 pb-6">
                                     <CardTitle className="text-lg uppercase font-black tracking-tight flex items-center gap-3">
                                         <Lock className="h-5 w-5 text-primary" /> Security Layer
@@ -235,7 +235,7 @@ export function ProfileSettingsView({ onClose }: ProfileSettingsViewProps) {
                                     )} />
                                 </CardContent>
                                 <CardFooter className="pb-8 px-8">
-                                    <Button type="submit" disabled={isSavingPassword} variant="secondary" className="w-full h-14 rounded-[1.5rem] font-black uppercase text-xs tracking-[0.2em] shadow-xl">
+                                    <Button type="submit" disabled={isSavingPassword} variant="secondary" className="w-full h-14 rounded-[1.5rem] font-black uppercase text-xs tracking-[0.2em] ">
                                         {isSavingPassword ? <Loader2 className="h-5 w-5 animate-spin" /> : <ShieldCheck className="h-5 w-5 mr-3" />}
                                         Update Credentials
                                     </Button>

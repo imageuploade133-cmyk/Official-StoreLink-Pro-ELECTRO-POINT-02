@@ -506,7 +506,7 @@ export default function CustomersPage() {
                       </CardContent>
                   </Card>
 
-                  <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+                  <Card className=" border-none ring-1 ring-border overflow-hidden">
                       <CardHeader>
                           <CardTitle className="font-headline text-xl">Directory</CardTitle>
                           <CardDescription>
@@ -563,7 +563,7 @@ export default function CustomersPage() {
                                                               src={(customer as any).profileImageUrl || defaultProfileImageUrl}
                                                               alt={customer.name}
                                                               width={40} height={40}
-                                                              className="rounded-full object-cover aspect-square shadow-sm"
+                                                              className="rounded-full object-cover aspect-square "
                                                               data-ai-hint="person face"
                                                               onError={(e: any) => { e.target.src = defaultProfileImageUrl; }}
                                                           />

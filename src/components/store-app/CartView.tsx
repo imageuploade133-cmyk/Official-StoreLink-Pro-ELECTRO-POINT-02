@@ -193,11 +193,11 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
                 <div className="flex items-center justify-between">
                     <button 
                         onClick={onNavigateToHome} 
-                        className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-800 active:scale-90 transition-all"
+                        className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 active:scale-90 transition-all"
                     >
                         <ArrowLeft className="h-6 w-6" />
                     </button>
-                    <Badge variant="secondary" className="font-black h-8 px-4 rounded-full shadow-sm bg-primary/10 text-primary border-none">
+                    <Badge variant="secondary" className="font-black h-8 px-4 rounded-full bg-primary/10 text-primary border-none">
                         {cartCount} Premium Items
                     </Badge>
                 </div>
@@ -212,25 +212,25 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
                 <div className="pb-96">
                     {cartItems.length === 0 ? (
                         <div className="py-24 text-center space-y-8 animate-in zoom-in-95 duration-700">
-                            <div className="h-32 w-32 bg-slate-100 dark:bg-slate-800/50 rounded-[3rem] flex items-center justify-center mx-auto shadow-inner group">
-                                <ShoppingBag className="h-14 w-14 text-slate-300 group-hover:scale-110 transition-transform duration-500" />
+                            <div className="h-32 w-32 bg-slate-100 dark:bg-slate-800/50 rounded-[3rem] flex items-center justify-center mx-auto group">
+                                <ShoppingBag className="h-14 w-14 text-slate-300 transition-transform duration-500" />
                             </div>
                             <div className="space-y-2">
                                 <h3 className="text-2xl font-black tracking-tight uppercase leading-none">Bag Empty</h3>
                                 <p className="text-sm font-medium text-slate-500 max-w-[220px] mx-auto leading-relaxed">Your curated essentials will appear here for final fulfillment.</p>
                             </div>
-                            <Button onClick={onNavigateToHome} className="rounded-2xl font-black uppercase text-[10px] tracking-widest px-10 h-14 shadow-xl active:scale-95 transition-all">Explore Collections</Button>
+                            <Button onClick={onNavigateToHome} className="rounded-2xl font-black uppercase text-[10px] tracking-widest px-10 h-14 active:scale-95 transition-all">Explore Collections</Button>
                         </div>
                     ) : (
                         <div className="space-y-10">
                             <div className="space-y-4">
                                 {realTimeCartItems.map((item) => (
                                     <div key={item.id} className={cn(
-                                        "flex items-center gap-5 p-5 bg-white dark:bg-slate-800 rounded-[2rem] shadow-xl border border-slate-100 dark:border-slate-800 group relative transition-all active:scale-[0.99]",
+                                        "flex items-center gap-5 p-5 bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-100 dark:border-slate-800 group relative transition-all active:scale-[0.99]",
                                         (item.isUnavailable || item.isOutOfStock) && "opacity-60 grayscale-[0.5]"
                                     )}>
-                                        <div className="relative h-24 w-24 rounded-2xl overflow-hidden shrink-0 bg-muted border shadow-sm">
-                                            <Image src={item.imageUrl || defaultImageUrl} alt={item.name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" unoptimized />
+                                        <div className="relative h-24 w-24 rounded-2xl overflow-hidden shrink-0 bg-muted border">
+                                            <Image src={item.imageUrl || defaultImageUrl} alt={item.name} fill className="object-cover transition-transform duration-700" unoptimized />
                                         </div>
                                         <div className="flex-1 min-w-0 space-y-2">
                                             <div className="flex justify-between items-start">
@@ -249,10 +249,10 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
                                             </div>
                                             <div className="flex items-center justify-between mt-4">
                                                 <div className="flex items-center gap-4 bg-slate-50 dark:bg-slate-900 p-1 rounded-xl border border-slate-100 dark:border-slate-800">
-                                                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-all shadow-sm"><Minus className="h-4 w-4" /></button>
+                                                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-all"><Minus className="h-4 w-4" /></button>
                                                     <span className="text-sm font-black w-6 text-center">{item.quantity}</span>
-                                                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-all shadow-sm" disabled={item.quantity >= (item.stock || 0)}><Plus className="h-4 w-4" /></button>
-                                                </div>
+                                                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-all" disabled={item.quantity >= (item.stock || 0)}><Plus className="h-4 w-4" /></button>
+                                                    </div>
                                                 <p className="font-black text-base tracking-tighter text-slate-900 dark:text-white">{formatCurrency(item.salePrice * item.quantity, currencySymbol)}</p>
                                             </div>
                                         </div>
@@ -267,7 +267,7 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
                                         <Tag className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-primary transition-colors" />
                                         <Input 
                                             placeholder="ENTER PROMO CODE" 
-                                            className="h-14 pl-11 bg-white dark:bg-slate-800 border-none rounded-2xl shadow-xl uppercase font-black tracking-[0.1em] text-xs"
+                                            className="h-14 pl-11 bg-white dark:bg-slate-800 border-none rounded-2xl uppercase font-black tracking-[0.1em] text-xs"
                                             value={couponCode}
                                             onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                                             disabled={!!appliedCoupon || isValidatingCoupon}
@@ -280,7 +280,7 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
                                             disabled={!couponCode.trim()} 
                                             isLoading={isValidatingCoupon}
                                             variant="secondary" 
-                                            className="h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest px-8 shadow-lg active:scale-95 transition-all"
+                                            className="h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest px-8 active:scale-95 transition-all"
                                             loadingText="Checking..."
                                         >
                                             Apply
@@ -302,7 +302,7 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
             </ScrollArea>
 
             {cartItems.length > 0 && (
-                <footer className="fixed bottom-[96px] left-1/2 -translate-x-1/2 w-full max-w-md bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border-t border-slate-100 dark:border-slate-800 p-8 rounded-t-[3.5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.15)] z-50 pb-10 space-y-8">
+                <footer className="fixed bottom-[96px] left-1/2 -translate-x-1/2 w-full max-w-md bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border-t border-slate-100 dark:border-slate-800 p-8 rounded-t-[3.5rem] z-50 pb-10 space-y-8">
                     <div className="space-y-4">
                         <div className="flex justify-between text-xs font-black uppercase tracking-[0.2em] text-slate-400">
                             <span>Subtotal</span>
@@ -335,7 +335,7 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
                         {activeRewardAd && !rewardAdClicked && (
                             <button 
                                 onClick={handleRewardClick}
-                                className="w-full relative group overflow-hidden h-14 rounded-[1.25rem] transition-all active:scale-[0.98] shadow-xl mb-2"
+                                className="w-full relative group overflow-hidden h-14 rounded-[1.25rem] transition-all active:scale-[0.98] mb-2"
                             >
                                 <div className="absolute inset-0 bg-slate-950 dark:bg-slate-900" />
                                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(251,191,36,0.15),transparent_70%)]" />
@@ -351,7 +351,7 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
                         )}
                         <Button 
                             onClick={onStartCheckout} 
-                            className="w-full h-16 rounded-[1.5rem] bg-primary text-white font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-primary/30 group transition-all active:scale-[0.98]"
+                            className="w-full h-16 rounded-[1.5rem] bg-primary text-white font-black uppercase text-xs tracking-[0.2em] group transition-all active:scale-[0.98]"
                         >
                             Proceed to Checkout <ArrowRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={3} />
                         </Button>

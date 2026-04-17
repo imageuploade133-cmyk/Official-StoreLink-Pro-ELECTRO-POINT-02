@@ -123,7 +123,7 @@ export default function StoreAppPage() {
               {isLoadingSettings ? (
                 <PageSpinner label="Loading Store" subLabel="Preparing your shopping experience…" />
               ) : (
-                <div className="relative flex flex-col max-w-md mx-auto bg-background-light dark:bg-black shadow-2xl min-h-screen border-x dark:border-slate-800/50">
+                <div className="relative flex flex-col max-w-md mx-auto bg-background-light dark:bg-black  min-h-screen border-x dark:border-slate-800/50">
             
             {showNav && (
                 <header className="sticky top-0 z-50 bg-background-light/80 dark:bg-black/80 backdrop-blur-xl transition-all duration-500 border-b border-slate-200/50 dark:border-slate-800/50">
@@ -132,7 +132,7 @@ export default function StoreAppPage() {
                         <div className="flex items-center gap-3">
                             <button 
                                 onClick={() => setActiveTab('search')}
-                                className="flex items-center justify-center size-10 rounded-2xl bg-white dark:bg-slate-800 shadow-lg border-2 border-primary/30 animate-border-glow hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
+                                className="flex items-center justify-center size-10 rounded-2xl bg-white dark:bg-slate-800  border-2 border-primary/30 animate-border-glow hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
                             >
                                 <Search className="h-5 w-5" strokeWidth={2.5} />
                             </button>
@@ -164,7 +164,7 @@ export default function StoreAppPage() {
                                     />
                                 </div>
                             ) : (
-                                <div className="bg-primary p-1.5 rounded-xl shadow-lg shadow-primary/20 rotate-3">
+                                <div className="bg-primary p-1.5 rounded-xl  shadow-primary/20 rotate-3">
                                     <ShoppingBag className="text-white h-4 w-4" strokeWidth={3} />
                                 </div>
                             )}
@@ -178,12 +178,12 @@ export default function StoreAppPage() {
                             <ThemeToggle 
                                 variant="ghost"
                                 size="icon"
-                                className="size-10 rounded-2xl bg-white dark:bg-slate-800 shadow-lg border-2 border-primary/30 hover:bg-primary/10 hover:text-primary"
+                                className="size-10 rounded-2xl bg-white dark:bg-slate-800  border-2 border-primary/30 hover:bg-primary/10 hover:text-primary"
                             />
                             <div className="relative">
                                 <button 
                                     onClick={() => setActiveTab('notifications')}
-                                    className="flex items-center justify-center size-10 rounded-2xl bg-white dark:bg-slate-800 shadow-lg border-2 border-primary/30 animate-border-glow hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
+                                    className="flex items-center justify-center size-10 rounded-2xl bg-white dark:bg-slate-800  border-2 border-primary/30 animate-border-glow hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
                                 >
                                     <Bell className="h-5 w-5" strokeWidth={2.5} />
                                 </button>
@@ -304,7 +304,7 @@ export default function StoreAppPage() {
                         }}
                         className={cn(
                             "flex flex-col items-center justify-center transition-all duration-500 relative py-2.5 px-1 rounded-[1.75rem] min-w-[64px] group",
-                            isActive ? "bg-primary text-white shadow-xl shadow-primary/20 scale-105" : "text-slate-400 dark:text-slate-500 hover:text-slate-600"
+                            isActive ? "bg-primary text-white  shadow-primary/20 scale-105" : "text-slate-400 dark:text-slate-500 hover:text-slate-600"
                         )}
                     >
                         <div className="relative">

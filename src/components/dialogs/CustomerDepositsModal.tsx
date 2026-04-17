@@ -168,7 +168,7 @@ export function CustomerDepositsModal({
                           <div className="text-[10px] text-muted-foreground uppercase">{date ? format(date, 'h:mm a') : ''}</div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className="text-[10px] font-black uppercase px-2 h-5 bg-background shadow-sm">
+                          <Badge variant="outline" className="text-[10px] font-black uppercase px-2 h-5 bg-background ">
                             {payment.paymentMethod}
                           </Badge>
                         </TableCell>

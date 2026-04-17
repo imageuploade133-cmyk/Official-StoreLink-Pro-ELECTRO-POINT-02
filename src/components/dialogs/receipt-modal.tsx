@@ -358,7 +358,7 @@ export function ReceiptModal({ isOpen, onClose, saleTransaction, staffMap }: Rec
 
           <ScrollArea className="flex-1 p-4 md:p-8 bg-muted/30">
             <TabsContent value="small" className="m-0 p-0">
-              <div id="printable-small-receipt" className="terminal-receipt bg-white shadow-xl mx-auto rounded-sm">
+              <div id="printable-small-receipt" className="terminal-receipt bg-white  mx-auto rounded-sm">
                 <header className="terminal-header">
                   {storeLogoUrl && (
                     <img 
@@ -480,7 +480,7 @@ export function ReceiptModal({ isOpen, onClose, saleTransaction, staffMap }: Rec
             </TabsContent>
 
             <TabsContent value="a4" className="m-0 p-0">
-               <div id="printable-a4-invoice" className="invoice-container shadow-2xl rounded-xl overflow-hidden max-w-4xl mx-auto my-4">
+               <div id="printable-a4-invoice" className="invoice-container  rounded-xl overflow-hidden max-w-4xl mx-auto my-4">
                  {(isFullyPaid && transactionDetails.returnStatus !== 'fullyReturned') && <div className="paid-watermark">PAID</div>}
                  {transactionDetails.returnStatus === 'fullyReturned' && <div className="paid-watermark">CREDIT</div>}
                  
@@ -517,7 +517,7 @@ export function ReceiptModal({ isOpen, onClose, saleTransaction, staffMap }: Rec
                             {invoiceLogoUrl ? (
                                 <img src={invoiceLogoUrl} alt={storeName} style={{ maxHeight: `${invoiceLogoHeight}px`, width: 'auto', objectFit: 'contain' }} className="mb-2" />
                             ) : (
-                                <div className="brand-bg px-6 py-2 rounded-full text-white font-black text-lg tracking-widest shadow-md">
+                                <div className="brand-bg px-6 py-2 rounded-full text-white font-black text-lg tracking-widest ">
                                     {transactionDetails.returnStatus === 'fullyReturned' ? 'RETURNED' : isFullyPaid ? 'PAID' : 'CREDIT'}
                                 </div>
                             )}

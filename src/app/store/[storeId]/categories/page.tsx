@@ -35,7 +35,7 @@ function CategoryCard({ category }: { category: Category }) {
     return (
         <Link 
             href={getStoreUrl(`/store/shop?category=${category.id}`)}
-            className="group relative rounded-xl overflow-hidden border dark:border-slate-800 hover:shadow-xl transition-shadow duration-300 h-full block"
+            className="group relative rounded-xl overflow-hidden border dark:border-slate-800 hover: transition-shadow duration-300 h-full block"
         >
             <div className="aspect-w-1 aspect-h-1 h-96 relative">
                 <Image

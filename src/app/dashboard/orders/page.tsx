@@ -373,7 +373,7 @@ export default function WebsiteOrdersPage() {
                 variant="ghost" 
                 size="sm" 
                 onClick={() => setShowSecondaryStats(!showSecondaryStats)}
-                className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground gap-2 hover:bg-transparent hover:text-primary border border-muted-foreground/20 rounded-full px-6 py-4 h-auto shadow-sm"
+                className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground gap-2 hover:bg-transparent hover:text-primary border border-muted-foreground/20 rounded-full px-6 py-4 h-auto "
             >
                 {showSecondaryStats ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 {showSecondaryStats ? 'Hide Detailed Attrition' : 'See Attrition Insights'}
@@ -413,7 +413,7 @@ export default function WebsiteOrdersPage() {
         </TabsList>
 
         <TabsContent value="registry" className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-          <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+          <Card className=" border-none ring-1 ring-border overflow-hidden">
             <CardHeader className="pb-4 bg-muted/10 border-b">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <CardTitle className="text-lg flex items-center gap-2">

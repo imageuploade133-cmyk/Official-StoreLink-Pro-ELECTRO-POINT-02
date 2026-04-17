@@ -75,11 +75,11 @@ const buttonShapes = [
 
 const shadowOptions = [
   { name: 'none', label: 'None', class: 'shadow-none' },
-  { name: 'sm', label: 'Small', class: 'shadow-sm' },
-  { name: 'md', label: 'Medium', class: 'shadow-md' },
-  { name: 'lg', label: 'Large', class: 'shadow-lg' },
-  { name: 'xl', label: 'X-Large', class: 'shadow-xl' },
-  { name: '2xl', label: '2X-Large', class: 'shadow-2xl' },
+  { name: 'sm', label: 'Small', class: '' },
+  { name: 'md', label: 'Medium', class: '' },
+  { name: 'lg', label: 'Large', class: '' },
+  { name: 'xl', label: 'X-Large', class: '' },
+  { name: '2xl', label: '2X-Large', class: '' },
   { name: 'inner', label: 'Inner', class: 'shadow-inner' },
 ];
 
@@ -383,7 +383,7 @@ function ButtonPreview({
 
   const getShadowClass = (shd: string) => {
     const found = shadowOptions.find(s => s.name === shd);
-    return found ? found.class : 'shadow-sm';
+    return found ? found.class : '';
   };
 
   const getStyleProperties = () => {

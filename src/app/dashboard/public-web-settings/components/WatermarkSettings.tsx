@@ -136,7 +136,7 @@ export function WatermarkSettings({ settingsData, isLoading, storeId }: Watermar
   }
 
   return (
-    <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+    <Card className=" border-none ring-1 ring-border overflow-hidden">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader className="bg-muted/30 border-b">
@@ -152,7 +152,7 @@ export function WatermarkSettings({ settingsData, isLoading, storeId }: Watermar
                     control={form.control}
                     name="webWatermarkEnabled"
                     render={({ field }) => (
-                    <FormItem className="flex flex-row items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background shadow-lg">
+                    <FormItem className="flex flex-row items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background ">
                         <div className="flex items-center gap-2">
                             {field.value ? <Eye className="h-4 w-4 text-green-600" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
                             <FormLabel className="text-[10px] font-black uppercase tracking-widest dark:text-black">{field.value ? 'Watermark ON' : 'Watermark OFF'}</FormLabel>
@@ -333,7 +333,7 @@ export function WatermarkSettings({ settingsData, isLoading, storeId }: Watermar
             </div>
           </CardContent>
           <CardFooter className="bg-muted/30 border-t p-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
-            <Button type="submit" disabled={isSaving || isUploading} size="lg" className="px-10 h-12 font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20 transition-all active:scale-95">
+            <Button type="submit" disabled={isSaving || isUploading} size="lg" className="px-10 h-12 font-black uppercase text-xs tracking-widest  shadow-primary/20 transition-all active:scale-95">
               {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Save className="mr-2 h-4 w-4" />}
               Synchronize Watermark
             </Button>

@@ -94,7 +94,7 @@ const A4Preview = ({ products, currencySymbol, settings, generatingBarcode, gene
     const { labelWidth, labelHeight, marginTop, marginLeft, verticalGap, horizontalGap } = settings;
 
     return (
-        <div className="a4-sheet mx-auto origin-top shadow-lg print:shadow-none print:m-0">
+        <div className="a4-sheet mx-auto origin-top  print:shadow-none print:m-0">
             {products.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground p-8">
                     <Tags className="w-16 h-16 mb-4 text-gray-300" />
@@ -417,7 +417,7 @@ const PrintBarcodePage = () => {
                         onBarcodeRegenerate={generateBarcode}
                     />
 
-                    <Button onClick={handlePrint} disabled={selectedProducts.length === 0} className="w-full mt-2 h-12 text-lg font-black shadow-lg shadow-primary/20">
+                    <Button onClick={handlePrint} disabled={selectedProducts.length === 0} className="w-full mt-2 h-12 text-lg font-black  shadow-primary/20">
                         <Printer className="mr-2 h-5 w-5" /> 
                         Print ({selectedProducts.reduce((acc, p) => acc + p.quantity, 0)}) Labels
                     </Button>

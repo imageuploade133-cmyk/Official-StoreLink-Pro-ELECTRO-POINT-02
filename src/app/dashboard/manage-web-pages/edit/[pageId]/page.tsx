@@ -196,7 +196,7 @@ export default function EditWebPage() {
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className=" border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
               <CardTitle>Page Designer</CardTitle>
               <CardDescription>Make changes to your page below. Use the designer for layouts and styling.</CardDescription>
@@ -211,7 +211,7 @@ export default function EditWebPage() {
                   <FormItem>
                     <FormLabel className="font-bold">Banner Image (Optional)</FormLabel>
                     <div className="flex items-start gap-4">
-                      {bannerImage && ( <div className="w-32 h-20 rounded-xl overflow-hidden relative border shadow-sm"> <Image src={bannerImage} alt="Banner preview" fill style={{ objectFit: 'cover' }} unoptimized/> </div> )}
+                      {bannerImage && ( <div className="w-32 h-20 rounded-xl overflow-hidden relative border "> <Image src={bannerImage} alt="Banner preview" fill style={{ objectFit: 'cover' }} unoptimized/> </div> )}
                       <div className="flex-grow space-y-2">
                         <div className="flex gap-2">
                             <FormControl><Input placeholder="https://example.com/banner.png" {...field} value={field.value || ''} disabled={isSaving || isUploading} /></FormControl>
@@ -281,7 +281,7 @@ export default function EditWebPage() {
               </div>
             </CardContent>
             <CardFooter className="bg-muted/30 border-t p-6 flex justify-between">
-              <Button type="submit" disabled={isSaving || isUploading} size="lg" className="px-10 h-14 font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20">
+              <Button type="submit" disabled={isSaving || isUploading} size="lg" className="px-10 h-14 font-black uppercase text-xs tracking-widest  shadow-primary/20">
                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                 {isSaving ? 'Synchronizing...' : 'Save Changes'}
               </Button>

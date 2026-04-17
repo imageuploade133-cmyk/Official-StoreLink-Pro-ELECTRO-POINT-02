@@ -33,7 +33,7 @@ export function CustomUISection({ section }: CustomUISectionProps) {
             dangerouslySetInnerHTML={{ __html: section.htmlContent || '' }}
         />
       ) : (
-        <div className="relative group overflow-hidden rounded-[3rem] shadow-2xl">
+        <div className="relative group overflow-hidden rounded-[3rem] ">
             {section.imageUrl && (
                 <div className="relative aspect-video md:aspect-[21/9] w-full overflow-hidden">
                     <Image 
@@ -64,7 +64,7 @@ export function CustomUISection({ section }: CustomUISectionProps) {
                     )}
                     {(section.buttonText && section.linkUrl) && (
                         <div className="pt-4">
-                            <Button asChild size="lg" className="rounded-full h-14 md:h-16 px-10 md:px-14 font-black uppercase text-xs tracking-[0.25em] shadow-2xl shadow-primary/30 group/btn transition-all active:scale-95">
+                            <Button asChild size="lg" className="rounded-full h-14 md:h-16 px-10 md:px-14 font-black uppercase text-xs tracking-[0.25em]  shadow-primary/30 group/btn transition-all active:scale-95">
                                 <Link href={section.linkUrl}>
                                     {section.buttonText}
                                     <ArrowRight className="ml-3 h-5 w-5 transition-transform group-hover/btn:translate-x-2" strokeWidth={3} />

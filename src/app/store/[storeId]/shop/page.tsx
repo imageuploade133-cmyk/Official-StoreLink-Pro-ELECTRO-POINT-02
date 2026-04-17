@@ -314,7 +314,7 @@ function ShopPageContent() {
             {/* Category Auto-Switch Notification */}
             {categoryNotification.show && (
                 <div className="fixed top-24 left-1/2 -translate-x-1/2 z-40 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3">
+                    <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-lg  flex items-center gap-3">
                         <div className="h-2 w-2 bg-white rounded-full animate-pulse"></div>
                         <span className="text-sm font-semibold">{categoryNotification.message}</span>
                     </div>
@@ -334,10 +334,10 @@ function ShopPageContent() {
                             className="w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center px-4">
-                            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tighter text-white drop-shadow-lg">
+                            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tighter text-white drop-">
                                 {currentCategory ? currentCategory.name : (settings?.shopCollectionTitle || 'Shop Our Collection')}
                             </h1>
-                            <p className="mt-2 sm:mt-4 max-w-2xl mx-auto text-sm sm:text-base text-white/90 font-medium drop-shadow-md">
+                            <p className="mt-2 sm:mt-4 max-w-2xl mx-auto text-sm sm:text-base text-white/90 font-medium drop-">
                                 {currentCategory?.description ? (
                                     <span dangerouslySetInnerHTML={{ __html: currentCategory.description }} />
                                 ) : (settings?.shopCollectionDescription || 'Discover products that are crafted with quality and designed for life.')}
@@ -401,7 +401,7 @@ function ShopPageContent() {
                         
                         {/* Search Suggestions Dropdown */}
                         {(showSuggestions || isLoadingSuggestions) && searchTerm.trim() && (
-                            <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg  z-50 max-h-80 overflow-y-auto">
                                 {isLoadingSuggestions ? (
                                     <div className="p-4 text-center">
                                         <Loader2 className="h-4 w-4 animate-spin mx-auto text-primary" />

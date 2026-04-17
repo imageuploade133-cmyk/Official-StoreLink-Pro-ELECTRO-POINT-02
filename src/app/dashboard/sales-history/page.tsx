@@ -508,11 +508,11 @@ function SalesHistoryContent() {
         </CardContent>
     </Card>
 
-      <Card className="shadow-lg overflow-hidden border-none ring-1 ring-border">
+      <Card className=" overflow-hidden border-none ring-1 ring-border">
         <CardContent className="p-0">
           <ScrollArea className="h-[600px]"> 
             <Table>
-              <TableHeader className="sticky top-0 bg-background z-10 shadow-sm">
+              <TableHeader className="sticky top-0 bg-background z-10 ">
                 <TableRow>
                     <TableHead className="w-[80px]">Sale ID</TableHead>
                     <TableHead className="w-[150px]">Date & Time</TableHead>

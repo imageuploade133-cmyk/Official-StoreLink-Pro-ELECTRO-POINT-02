@@ -89,7 +89,7 @@ export function ProductVideoGallery({ videos, title, description }: ProductVideo
             <div 
               key={video.id || idx} 
               className={cn(
-                "group relative flex flex-col bg-white dark:bg-slate-900 rounded-[3rem] border-2 border-slate-100 dark:border-slate-800 overflow-hidden shadow-2xl transition-all duration-500 hover:border-primary/30 hover:shadow-primary/5 w-full",
+                "group relative flex flex-col bg-white dark:bg-slate-900 rounded-[3rem] border-2 border-slate-100 dark:border-slate-800 overflow-hidden  transition-all duration-500 hover:border-primary/30 hover:shadow-primary/5 w-full",
               )}
             >
               {video.title && (

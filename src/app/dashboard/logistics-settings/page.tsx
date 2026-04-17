@@ -174,7 +174,7 @@ export default function LogisticsSettingsPage() {
         <Button 
             onClick={form.handleSubmit(onSubmit)} 
             disabled={isSaving || isUploading}
-            className="h-12 px-8 font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all active:scale-95"
+            className="h-12 px-8 font-black uppercase tracking-widest  shadow-primary/20 transition-all active:scale-95"
         >
             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Save Fulfillment Settings
@@ -185,7 +185,7 @@ export default function LogisticsSettingsPage() {
         <div className="lg:col-span-2 space-y-8">
           <Form {...form}>
             <form className="space-y-8">
-              <Card className={cn("shadow-2xl border-none ring-1 ring-border overflow-hidden", !isLogisticsVisible && "opacity-60 grayscale-[0.5]")}>
+              <Card className={cn(" border-none ring-1 ring-border overflow-hidden", !isLogisticsVisible && "opacity-60 grayscale-[0.5]")}>
                 <CardHeader className="bg-muted/30 border-b">
                   <div className="flex justify-between items-center">
                     <div>
@@ -196,7 +196,7 @@ export default function LogisticsSettingsPage() {
                         control={form.control}
                         name="showLogisticsOnPublicSite"
                         render={({ field }) => (
-                        <FormItem className="flex flex-row items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background shadow-lg">
+                        <FormItem className="flex flex-row items-center gap-3 space-y-0 rounded-full border px-4 py-2 bg-background ">
                             <div className="flex items-center gap-2">
                                 {field.value ? <Eye className="h-4 w-4 text-green-600" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
                                 <FormLabel className="text-[10px] font-black uppercase tracking-widest">{field.value ? 'Live on Web' : 'Hidden'}</FormLabel>
@@ -223,7 +223,7 @@ export default function LogisticsSettingsPage() {
                         </FormLabel>
                         <div className="flex flex-col sm:flex-row items-start gap-6">
                             {currentImageUrl ? (
-                              <div className="relative w-full sm:w-64 aspect-video rounded-3xl overflow-hidden border-4 border-white shadow-2xl bg-white flex-shrink-0 group">
+                              <div className="relative w-full sm:w-64 aspect-video rounded-3xl overflow-hidden border-4 border-white  bg-white flex-shrink-0 group">
                                 <Image 
                                     src={currentImageUrl} 
                                     alt="Logistics preview" 
@@ -235,7 +235,7 @@ export default function LogisticsSettingsPage() {
                                     type="button" 
                                     variant="destructive" 
                                     size="icon" 
-                                    className="absolute top-2 right-2 h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-xl"
+                                    className="absolute top-2 right-2 h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity "
                                     onClick={() => form.setValue('logisticsImageUrl', '')}
                                 >
                                     <X className="h-4 w-4" />
@@ -270,7 +270,7 @@ export default function LogisticsSettingsPage() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-2xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b">
                     <CardTitle className="text-xl">Fulfillment Policies</CardTitle>
                     <CardDescription>Use the designer below to craft authoritative logistics documentation.</CardDescription>
@@ -320,7 +320,7 @@ export default function LogisticsSettingsPage() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-2xl border-none ring-1 ring-border overflow-hidden">
+              <Card className=" border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/30 border-b flex flex-row justify-between items-center pr-6">
                     <div>
                         <CardTitle className="text-xl">Question & Answer Registry</CardTitle>
@@ -426,7 +426,7 @@ export default function LogisticsSettingsPage() {
 
         <div className="lg:col-span-1">
           <div className="sticky top-24 space-y-6">
-            <Card className="bg-primary text-primary-foreground border-none shadow-2xl overflow-hidden rounded-[2.5rem]">
+            <Card className="bg-primary text-primary-foreground border-none  overflow-hidden rounded-[2.5rem]">
                 <CardHeader className="pt-10 px-8">
                     <div className="h-14 w-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center mb-4">
                         <Info className="h-8 w-8" />

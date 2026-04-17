@@ -200,7 +200,7 @@ export function DepositAuditTab({ currencySymbol }: DepositAuditTabProps) {
         </CardContent>
       </Card>
 
-      <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <CardHeader className="border-b bg-muted/10">
           <div className="flex items-center gap-3">
             <History className="h-6 w-6 text-primary" />
@@ -258,7 +258,7 @@ export function DepositAuditTab({ currencySymbol }: DepositAuditTabProps) {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className="h-5 text-[9px] font-black uppercase tracking-tighter bg-background shadow-sm border-primary/20 text-primary">
+                          <Badge variant="outline" className="h-5 text-[9px] font-black uppercase tracking-tighter bg-background  border-primary/20 text-primary">
                             {p.paymentMethod}
                           </Badge>
                         </TableCell>

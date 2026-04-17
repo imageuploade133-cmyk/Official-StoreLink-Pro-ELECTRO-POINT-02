@@ -418,7 +418,7 @@ export default function ManageWebCatalogPage() {
         </Card>
       </div>
 
-      <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
+      <Card className=" border-none ring-1 ring-border overflow-hidden">
         <CardHeader className="bg-muted/10 border-b">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
@@ -498,7 +498,7 @@ export default function ManageWebCatalogPage() {
                     return (
                       <TableRow key={product.id} className="group transition-colors hover:bg-muted/30">
                         <TableCell className="pl-6">
-                          <div className="relative w-12 h-12 rounded-xl overflow-hidden border-2 border-white shadow-md bg-white">
+                          <div className="relative w-12 h-12 rounded-xl overflow-hidden border-2 border-white  bg-white">
                               <Image 
                                   src={product.imageUrl || defaultProductImageUrl} 
                                   alt={product.name} 

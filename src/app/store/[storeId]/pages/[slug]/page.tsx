@@ -85,7 +85,7 @@ export default function DynamicPublicPage() {
         </header>
 
         <main className="max-w-5xl mx-auto px-6 sm:px-10 lg:px-12 py-20">
-            <div className="bg-white dark:bg-slate-900 rounded-[3rem] p-8 md:p-16 border-2 border-slate-50 dark:border-slate-800 shadow-2xl">
+            <div className="bg-white dark:bg-slate-900 rounded-[3rem] p-8 md:p-16 border-2 border-slate-50 dark:border-slate-800 ">
                 <article className="prose dark:prose-invert lg:prose-xl max-w-none">
                     <div className="rich-content">
                         <ReactMarkdown 
