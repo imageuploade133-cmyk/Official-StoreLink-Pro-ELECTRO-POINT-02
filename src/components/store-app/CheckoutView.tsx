@@ -30,6 +30,8 @@ import {
   Phone,
   Mail,
   Landmark,
+  Banknote,
+  Wallet,
   Copy,
   Info,
   Tag,
@@ -115,11 +117,29 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
   const bankAccounts = settings?.bankAccounts || [];
 
   const availablePaymentMethods = useMemo(() => {
+    const methods: {id: string, name: string}[] = [];
+    
+    // Add bank transfer if bank accounts are available
     if (bankAccounts.length > 0) {
-        return [{ id: 'manual-bank-transfer', name: 'Bank Transfer' }];
+        methods.push({ id: 'manual-bank-transfer', name: 'Bank Transfer' });
     }
-    return [];
-  }, [bankAccounts]);
+    
+    // Add other payment methods from settings
+    if (settings?.paymentMethods && Array.isArray(settings.paymentMethods)) {
+        settings.paymentMethods.forEach(m => {
+            if (m.name !== 'Bank Transfer' && !methods.find(prev => prev.name === m.name)) {
+                methods.push({ id: m.id, name: m.name });
+            }
+        });
+    }
+    
+    // Fallback if still empty to avoid "Channel Maintenance"
+    if (methods.length === 0) {
+        methods.push({ id: 'pay-on-delivery', name: 'Pay on Delivery' });
+    }
+    
+    return methods;
+  }, [bankAccounts, settings?.paymentMethods]);
 
   useEffect(() => {
     const saved = safeSessionStorage.getItem('appliedCoupon');
@@ -391,11 +411,17 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                             <RadioGroupItem value={method.name} id={method.id} className="peer sr-only" />
                                             <Label htmlFor={method.id} className="flex items-center gap-4 p-6 bg-white dark:bg-slate-800 rounded-[2rem] border-2 border-transparent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 shadow-lg cursor-pointer transition-all active:scale-[0.98]">
                                                 <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                                                    <Landmark className="h-7 w-7" />
+                                                    {method.name.toLowerCase().includes('transfer') ? <Landmark className="h-7 w-7" /> : 
+                                                     method.name.toLowerCase().includes('card') ? <CreditCard className="h-7 w-7" /> :
+                                                     (method.name.toLowerCase().includes('cash') || method.name.toLowerCase().includes('delivery')) ? <Banknote className="h-7 w-7" /> :
+                                                     <Wallet className="h-7 w-7" />}
                                                 </div>
                                                 <div className="flex-1">
                                                     <p className="font-black text-sm uppercase tracking-widest">{method.name}</p>
-                                                    <p className="text-[10px] font-bold text-slate-400 uppercase mt-0.5">Direct manual verification</p>
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase mt-0.5">
+                                                        {method.name === 'Bank Transfer' ? 'Direct manual verification' : 
+                                                         method.name.toLowerCase().includes('delivery') ? 'Pay upon receipt' : 'Secure payment method'}
+                                                    </p>
                                                 </div>
                                                 {paymentMethod === method.name && <CheckCircle2 className="h-7 w-7 text-primary fill-current" />}
                                             </Label>
