@@ -81,7 +81,7 @@ export function PublicFooter() {
 
   return (
     <footer 
-        className={cn("pt-20 pb-10 transition-all duration-700 relative overflow-hidden", !hasCustomBg && "bg-background-dark text-slate-400")} 
+        className={cn("pt-20 pb-10 transition-all duration-700 relative z-0 overflow-hidden", !hasCustomBg && "bg-background-dark text-slate-400")} 
         style={footerStyle}
     >
       {/* Custom Footer Background Branding */}
@@ -148,7 +148,7 @@ export function PublicFooter() {
         </div>
       )}
 
-      <div className="max-w-site-container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-site-container mx-auto px-4 sm:px-6 lg:px-8 relative z-0">
         <div className={cn(
             "grid grid-cols-1 gap-12 mb-16",
             footerDesign === 'standard' && "md:grid-cols-4",
