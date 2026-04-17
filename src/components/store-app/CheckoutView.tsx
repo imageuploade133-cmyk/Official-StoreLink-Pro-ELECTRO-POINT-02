@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
+import { useParams } from 'next/navigation';
 import { useCart } from '@/contexts/cart-context';
 import { useUser, useFirestore, useDoc } from '@/firebase';
 import { useSettings } from '@/contexts/settings-context';
@@ -43,7 +44,9 @@ import {
   Sparkles,
   Truck,
   Store,
-  Map as MapIcon
+  Map as MapIcon,
+  Upload,
+  X
 } from 'lucide-react';
 import type { UserProfile, Order, BankAccount, Coupon } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -52,6 +55,7 @@ import { formatPhoneNumberForWhatsapp } from '@/lib/phone-utils';
 import { safeSessionStorage } from '@/lib/storage-utils';
 import { useAds } from '@/contexts/ad-context';
 import { placeOrderAction } from '@/app/actions/orders';
+import { uploadImage } from '@/ai/flows/image-upload-flow';
 
 type CheckoutStep = 'details' | 'payment' | 'processing' | 'success';
 type FulfillmentType = 'delivery' | 'pickup';
@@ -76,6 +80,8 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
   const firestore = useFirestore();
   const { toast } = useToast();
   const { rewardAdClicked, activeAds, applyRewardDiscount } = useAds();
+  const params = useParams();
+  const storeId = params?.storeId as string;
 
   const [step, setStep] = useState<CheckoutStep>('details');
   const [fulfillmentType, setFulfillmentType] = useState<FulfillmentType>('delivery');
@@ -84,6 +90,8 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
   const [selectedBankId, setSelectedBankId] = useState<string>('');
   const [paymentReference] = useState(generatePaymentReference());
   const [hasConfirmedTransfer, setHasConfirmedTransfer] = useState(false);
+  const [receiptUrl, setReceiptUrl] = useState<string>('');
+  const [isUploadingReceipt, setIsUploadingReceipt] = useState(false);
   const [isSummaryExpanded, setIsSummaryExpanded] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -101,16 +109,20 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
   const subtotal = cartItems.reduce((sum, item) => sum + item.salePrice * item.quantity, 0);
 
   // Delivery settings
-  const enableDelivery = settings?.enableDelivery ?? true;
-  const enablePickUp = settings?.enablePickUp ?? false;
+  const enableDelivery = settings?.enableDelivery !== false;
+  const enablePickUp = settings?.enablePickUp !== false;
   const deliveryLocations = settings?.deliveryLocations || [];
 
   // Initialize fulfillment type based on settings
   useEffect(() => {
-    if (!enableDelivery && enablePickUp) {
-        setFulfillmentType('pickup');
+    if (settings) {
+        if (settings.enableDelivery === false && settings.enablePickUp !== false) {
+            setFulfillmentType('pickup');
+        } else if (settings.enablePickUp === false && settings.enableDelivery !== false) {
+            setFulfillmentType('delivery');
+        }
     }
-  }, [enableDelivery, enablePickUp]);
+  }, [settings]);
 
   // Initialize delivery location if available
   useEffect(() => {
@@ -149,30 +161,26 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
   const total = Math.max(0, subtotal - discountAmount - rewardDiscountAmount + shipping);
   const bankAccounts = settings?.bankAccounts || [];
 
-  const availablePaymentMethods = useMemo(() => {
-    const methods: {id: string, name: string}[] = [];
-    
-    // Add bank transfer if bank accounts are available
-    if (bankAccounts.length > 0) {
-        methods.push({ id: 'manual-bank-transfer', name: 'Bank Transfer' });
-    }
-    
-    // Add other payment methods from settings
-    if (settings?.paymentMethods && Array.isArray(settings.paymentMethods)) {
-        settings.paymentMethods.forEach(m => {
-            if (m.name !== 'Bank Transfer' && !methods.find(prev => prev.name === m.name)) {
-                methods.push({ id: m.id, name: m.name });
-            }
-        });
-    }
-    
-    // Fallback if still empty
-    if (methods.length === 0) {
-        methods.push({ id: 'pay-on-delivery', name: 'Pay on Delivery' });
-    }
-    
-    return methods;
-  }, [bankAccounts, settings?.paymentMethods]);
+  const [availablePaymentMethods, setAvailablePaymentMethods] = useState<any[]>([]);
+  const [isLoadingMethods, setIsLoadingMethods] = useState(true);
+
+  useEffect(() => {
+    if (!storeId) return;
+    const fetchMethods = async () => {
+      try {
+        const res = await fetch(`/api/payment/methods?storeId=${storeId}`);
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setAvailablePaymentMethods(data);
+        }
+      } catch (e) {
+        console.error('Failed to fetch payment methods', e);
+      } finally {
+        setIsLoadingMethods(false);
+      }
+    };
+    fetchMethods();
+  }, [storeId]);
 
   useEffect(() => {
     const saved = safeSessionStorage.getItem('appliedCoupon');
@@ -218,6 +226,32 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleReceiptUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ variant: "destructive", title: "File too large", description: "Receipt image should be smaller than 2MB." });
+      return;
+    }
+
+    setIsUploadingReceipt(true);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      try {
+        const imageDataUri = reader.result as string;
+        const result = await uploadImage({ imageDataUri });
+        setReceiptUrl(result.display_url);
+        toast({ title: "Receipt Uploaded", description: "Your payment receipt has been attached." });
+      } catch (error: any) {
+        toast({ variant: "destructive", title: "Upload Failed", description: error.message || "Could not upload receipt." });
+      } finally {
+        setIsUploadingReceipt(false);
+      }
+    };
+  };
+
   const validateDetails = () => {
     if (!formData.name || !formData.email || !formData.phone) {
         toast({ variant: 'destructive', title: 'Missing Information', description: 'Please fill in your name, email, and phone.' });
@@ -247,7 +281,10 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
 
     try {
       let finalOrderId = '';
-      const storeId = cartItems[0]?.store_id || null;
+      const selectedMethod = availablePaymentMethods.find(m => m.name === paymentMethod || m.id === paymentMethod);
+      const isOnlinePayment = selectedMethod && 
+                             selectedMethod.provider !== 'manual' && 
+                             selectedMethod.provider !== 'pay_on_delivery';
 
       const result = await placeOrderAction({
         userId: user?.uid || 'GUEST',
@@ -261,6 +298,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
         totalCost: cartItems.reduce((sum, item) => sum + (item.purchasePrice * item.quantity), 0),
         paymentMethod: paymentMethod,
         paymentReference: paymentMethod === 'Bank Transfer' ? paymentReference : null,
+        paymentReceiptUrl: paymentMethod === 'Bank Transfer' ? receiptUrl : null,
         couponCode: appliedCoupon?.code || null,
         appliedCouponId: appliedCoupon?.id || null,
         selectedBankAccount: paymentMethod === 'Bank Transfer' ? selectedBankAccount : null,
@@ -275,6 +313,30 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
       }
 
       finalOrderId = result.orderId;
+
+      if (isOnlinePayment) {
+        // Initialize payment
+        const initRes = await fetch('/api/payment/initialize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderId: finalOrderId,
+            amount: total,
+            currency: settings?.currency || 'NGN',
+            email: formData.email,
+            providerName: selectedMethod.provider,
+            userId: user?.uid || 'GUEST',
+            storeId: storeId,
+          }),
+        });
+        const initData = await initRes.json();
+        if (initData.success && initData.authorization_url) {
+          window.location.href = initData.authorization_url;
+          return;
+        } else {
+          throw new Error(initData.error || 'Failed to initialize payment');
+        }
+      }
 
       if (settings?.enableWhatsapp && formData.phone) {
           const formattedPhone = formatPhoneNumberForWhatsapp(formData.phone, settings.countryCode);
@@ -309,7 +371,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
     toast({ title: 'Copied to clipboard' });
   };
 
-  if (isAuthLoading || isLoadingSettings || isProfileLoading) {
+  if (isAuthLoading || isLoadingSettings || isProfileLoading || isLoadingMethods) {
     return (
       <div className="flex h-[60vh] items-center justify-center">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
@@ -571,10 +633,9 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                             <RadioGroupItem value={method.name} id={method.id} className="peer sr-only" />
                                             <Label htmlFor={method.id} className="flex items-center gap-4 p-6 bg-white dark:bg-slate-800 rounded-[2rem] border-2 border-transparent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 shadow-lg cursor-pointer transition-all active:scale-[0.98]">
                                                 <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                                                    {method.name.toLowerCase().includes('transfer') ? <Landmark className="h-7 w-7" /> : 
-                                                     method.name.toLowerCase().includes('card') ? <CreditCard className="h-7 w-7" /> :
-                                                     (method.name.toLowerCase().includes('cash') || method.name.toLowerCase().includes('delivery')) ? <Banknote className="h-7 w-7" /> :
-                                                     <Wallet className="h-7 w-7" />}
+                                                    {method.provider === 'manual' ? <Landmark className="h-7 w-7" /> : 
+                                                     method.provider === 'pay_on_delivery' ? <Truck className="h-7 w-7" /> :
+                                                     <CreditCard className="h-7 w-7" />}
                                                 </div>
                                                 <div className="flex-1">
                                                     <p className="font-black text-sm uppercase tracking-widest">{method.name}</p>
@@ -588,6 +649,21 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                         </div>
                                     ))}
                                 </RadioGroup>
+
+                                {paymentMethod !== 'Bank Transfer' && paymentMethod !== '' && (
+                                    <div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
+                                        <div className="p-6 border-2 border-primary/20 bg-primary/5 rounded-[2rem] space-y-4 shadow-lg">
+                                            <div className="flex items-center gap-3 text-primary">
+                                                {paymentMethod.toLowerCase().includes('delivery') ? <Truck className="h-5 w-5" /> : <CreditCard className="h-5 w-5" />}
+                                                <h3 className="font-black text-sm uppercase tracking-widest">{paymentMethod}</h3>
+                                            </div>
+                                            <p className="text-xs leading-relaxed font-medium text-slate-600 dark:text-slate-400">
+                                                {availablePaymentMethods.find(m => m.name === paymentMethod)?.instructions || 
+                                                 (paymentMethod.toLowerCase().includes('delivery') ? "You will pay for your order when it is delivered to you." : "Follow the on-screen instructions to complete your payment.")}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
 
                                 {paymentMethod === 'Bank Transfer' && (
                                     <div className="space-y-8 animate-in zoom-in-95 duration-500">
@@ -647,6 +723,34 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                                             <p className="text-[11px] text-white/70 leading-relaxed font-medium">
                                                                 You <span className="text-white font-bold underline">MUST</span> enter this code in your bank app's <strong>Remark</strong> or <strong>Narration</strong> field for automated verification.
                                                             </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="space-y-2">
+                                                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Upload Receipt (Optional)</p>
+                                                        <div className="flex flex-col gap-3">
+                                                            {receiptUrl ? (
+                                                                <div className="relative w-full h-40 rounded-2xl overflow-hidden border border-white/10 bg-white/5">
+                                                                    <Image src={receiptUrl} alt="Receipt" fill className="object-cover" />
+                                                                    <Button 
+                                                                        variant="destructive" 
+                                                                        size="icon" 
+                                                                        className="absolute top-2 right-2 h-8 w-8 rounded-full shadow-lg"
+                                                                        onClick={() => setReceiptUrl('')}
+                                                                    >
+                                                                        <X className="h-4 w-4" />
+                                                                    </Button>
+                                                                </div>
+                                                            ) : (
+                                                                <Button asChild variant="outline" className="w-full h-14 rounded-2xl bg-white/5 border-white/10 hover:bg-white/10 text-white font-bold" disabled={isUploadingReceipt}>
+                                                                    <label className="cursor-pointer">
+                                                                        {isUploadingReceipt ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                                                                        {isUploadingReceipt ? 'Uploading...' : 'Upload Payment Receipt'}
+                                                                        <input type="file" accept="image/*" className="hidden" onChange={handleReceiptUpload} disabled={isUploadingReceipt} />
+                                                                    </label>
+                                                                </Button>
+                                                            )}
+                                                            <p className="text-[9px] text-white/40 font-medium uppercase tracking-widest text-center">Attach a screenshot of your successful transfer</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -732,7 +836,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                     <LoadingButton 
                         onClick={handlePlaceOrder}
                         isLoading={step === 'processing'}
-                        disabled={paymentMethod === 'Bank Transfer' && !hasConfirmedTransfer}
+                        disabled={(paymentMethod === 'Bank Transfer' && !hasConfirmedTransfer) || availablePaymentMethods.length === 0}
                         loadingText="Processing..."
                         className="w-full h-16 rounded-[1.5rem] bg-primary text-white font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-primary/30 group transition-all active:scale-[0.98]"
                     >
