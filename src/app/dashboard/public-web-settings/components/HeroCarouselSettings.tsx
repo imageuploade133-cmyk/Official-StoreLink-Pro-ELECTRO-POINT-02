@@ -13,11 +13,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, GalleryHorizontal, Save, Clock, RotateCcw } from 'lucide-react';
+import { Loader2, GalleryHorizontal, Save, Clock, RotateCcw, Eye, EyeOff } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
 
 const heroSettingsSchema = z.object({
   slideShowDuration: z.coerce.number().min(1000, "Minimum 1 second.").max(20000, "Maximum 20 seconds."),
+  showGlobalSlideShow: z.boolean().default(true),
 });
 
 type FormValues = z.infer<typeof heroSettingsSchema>;
@@ -30,6 +32,7 @@ interface HeroCarouselSettingsProps {
 
 const defaultHeroValues: FormValues = {
   slideShowDuration: 7000,
+  showGlobalSlideShow: true,
 };
 
 export function HeroCarouselSettings({ settingsData, isLoading, storeId }: HeroCarouselSettingsProps) {
@@ -46,6 +49,7 @@ export function HeroCarouselSettings({ settingsData, isLoading, storeId }: HeroC
     if (settingsData) {
       form.reset({
         slideShowDuration: settingsData.slideShowDuration || 7000,
+        showGlobalSlideShow: settingsData.showGlobalSlideShow ?? true,
       });
     }
   }, [settingsData, form]);
@@ -88,6 +92,30 @@ export function HeroCarouselSettings({ settingsData, isLoading, storeId }: HeroC
             <CardDescription>Configure the timing and behavior of your homepage slideshow.</CardDescription>
           </CardHeader>
           <CardContent className="pt-8 space-y-10">
+            <FormField
+                control={form.control}
+                name="showGlobalSlideShow"
+                render={({ field }) => (
+                    <FormItem className="flex items-center justify-between rounded-2xl border-2 border-dashed p-6 bg-primary/5">
+                        <div className="space-y-1">
+                            <FormLabel className="text-base font-black flex items-center gap-2 uppercase tracking-tight">
+                                {field.value ? <Eye className="h-5 w-5 text-primary" /> : <EyeOff className="h-5 w-5 text-destructive" />}
+                                Global Slideshow Visibility
+                            </FormLabel>
+                            <FormDescription className="text-xs">
+                                When disabled, the hero slideshow will be hidden from both the public store and the store app.
+                            </FormDescription>
+                        </div>
+                        <FormControl>
+                            <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                            />
+                        </FormControl>
+                    </FormItem>
+                )}
+            />
+
             <FormField
                 control={form.control}
                 name="slideShowDuration"
