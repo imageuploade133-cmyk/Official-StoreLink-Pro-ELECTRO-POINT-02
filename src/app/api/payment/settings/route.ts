@@ -21,8 +21,14 @@ export async function GET(request: Request) {
     }
 
     const providersRef = adminDb.collection('payment_providers');
-    const q = providersRef.where('storeId', '==', storeId);
-    const querySnapshot = await q.get();
+    
+    // Try querying by storeId (new format)
+    let querySnapshot = await providersRef.where('storeId', '==', storeId).get();
+    
+    // If empty, try store_id (migrated/alternative format)
+    if (querySnapshot.empty) {
+      querySnapshot = await providersRef.where('store_id', '==', storeId).get();
+    }
 
     const providers: any[] = [];
     querySnapshot.forEach((doc) => {
@@ -105,6 +111,7 @@ export async function POST(request: Request) {
     
     const providerData: any = {
       storeId,
+      store_id: storeId, // Keep both for compatibility
       providerName,
       config: encryptedConfig,
       updatedAt: Timestamp.now(),

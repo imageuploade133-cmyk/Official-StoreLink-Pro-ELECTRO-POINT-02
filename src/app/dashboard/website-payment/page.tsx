@@ -508,9 +508,9 @@ export default function WebsitePaymentSettings() {
                       <div className="space-y-2 pt-4">
                         <Label className="text-sm font-medium">Webhook URL</Label>
                         <div className="flex items-center gap-2">
-                          <Input readOnly value={`${typeof window !== 'undefined' ? window.location.origin : ''}/api/payment/webhook?provider=paystack&storeId=global`} className="bg-muted" />
+                          <Input readOnly value={`${typeof window !== 'undefined' ? window.location.origin : ''}/api/payment/webhook?provider=paystack&storeId=${currentStoreId || 'global'}`} className="bg-muted" />
                           <Button variant="outline" size="sm" onClick={() => {
-                            navigator.clipboard.writeText(`${window.location.origin}/api/payment/webhook?provider=paystack&storeId=global`);
+                            navigator.clipboard.writeText(`${window.location.origin}/api/payment/webhook?provider=paystack&storeId=${currentStoreId || 'global'}`);
                             toast({ title: 'Copied', description: 'Webhook URL copied to clipboard.' });
                           }}>Copy</Button>
                         </div>
