@@ -27,13 +27,12 @@ import {
   Calendar,
   Landmark,
   CheckCircle2,
-  AlertTriangle,
   X,
-  Info,
   ArchiveX,
   Printer,
   Loader2,
-  Store
+  Store,
+  Truck
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { formatCurrency } from '@/lib/formatUtils';
