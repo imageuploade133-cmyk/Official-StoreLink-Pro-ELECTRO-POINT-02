@@ -268,8 +268,23 @@ export default function WebsiteOrdersPage() {
   };
 
   const getStatusBadge = (order: Order) => {
-    const isAwaitingPayment = order.status === 'pending' && (order.paymentMethod === 'Bank Transfer' || order.paymentMethod === 'manual-bank-transfer');
-    if (isAwaitingPayment) return <Badge variant="outline" className="bg-orange-100 text-orange-700 border-orange-200 animate-pulse"><Clock className="mr-1.5 h-3 w-3" /> Pay Waiting</Badge>;
+    const isAwaitingPayment = order.status === 'pending' && (
+        order.paymentMethod === 'Bank Transfer' || 
+        order.paymentMethod === 'manual-bank-transfer' ||
+        order.paymentMethod === 'Pay on Delivery'
+    );
+    if (isAwaitingPayment) {
+        const isPOD = order.paymentMethod === 'Pay on Delivery';
+        return (
+            <Badge variant="outline" className={cn(
+                "animate-pulse",
+                isPOD ? "bg-blue-100 text-blue-700 border-blue-200" : "bg-orange-100 text-orange-700 border-orange-200"
+            )}>
+                {isPOD ? <Truck className="mr-1.5 h-3 w-3" /> : <Clock className="mr-1.5 h-3 w-3" />}
+                {isPOD ? 'POD Waiting' : 'Pay Waiting'}
+            </Badge>
+        );
+    }
     switch (order.status) {
       case 'pending': return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200"><Clock className="mr-1 h-3 w-3" /> Pending</Badge>;
       case 'processing': return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200"><Package className="mr-1 h-3 w-3" /> Processing</Badge>;

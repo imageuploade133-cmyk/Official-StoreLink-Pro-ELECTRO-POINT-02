@@ -66,8 +66,24 @@ const flutterwaveSchema = z.object({
   mode: z.enum(['test', 'live']).default('test'),
 });
 
+const stripeSchema = z.object({
+  testPublicKey: z.string().optional(),
+  testSecretKey: z.string().optional(),
+  livePublicKey: z.string().optional(),
+  liveSecretKey: z.string().optional(),
+  isActive: z.boolean().default(false),
+  mode: z.enum(['test', 'live']).default('test'),
+});
+
+const payOnDeliverySchema = z.object({
+  instructions: z.string().optional(),
+  isActive: z.boolean().default(false),
+});
+
 type PaystackFormValues = z.infer<typeof paystackSchema>;
 type FlutterwaveFormValues = z.infer<typeof flutterwaveSchema>;
+type StripeFormValues = z.infer<typeof stripeSchema>;
+type PayOnDeliveryFormValues = z.infer<typeof payOnDeliverySchema>;
 
 export default function WebsitePaymentSettings() {
   const firestore = useFirestore();
@@ -119,7 +135,9 @@ export default function WebsitePaymentSettings() {
 
   const paystackProvider = providers.find(p => p.providerName === 'paystack');
   const flutterwaveProvider = providers.find(p => p.providerName === 'flutterwave');
+  const stripeProvider = providers.find(p => p.providerName === 'stripe');
   const manualProvider = providers.find(p => p.providerName === 'manual');
+  const payOnDeliveryProvider = providers.find(p => p.providerName === 'pay_on_delivery');
 
   const paystackForm = useForm<PaystackFormValues>({
     resolver: zodResolver(paystackSchema),
@@ -147,6 +165,26 @@ export default function WebsitePaymentSettings() {
     },
   });
 
+  const stripeForm = useForm<StripeFormValues>({
+    resolver: zodResolver(stripeSchema),
+    defaultValues: {
+      testPublicKey: stripeProvider?.config?.testPublicKey || '',
+      testSecretKey: stripeProvider?.config?.testSecretKey || '',
+      livePublicKey: stripeProvider?.config?.livePublicKey || '',
+      liveSecretKey: stripeProvider?.config?.liveSecretKey || '',
+      isActive: stripeProvider?.isActive || false,
+      mode: stripeProvider?.mode || 'test',
+    },
+  });
+
+  const payOnDeliveryForm = useForm<PayOnDeliveryFormValues>({
+    resolver: zodResolver(payOnDeliverySchema),
+    defaultValues: {
+      instructions: payOnDeliveryProvider?.config?.instructions || 'Pay with cash or card upon delivery.',
+      isActive: payOnDeliveryProvider?.isActive || false,
+    },
+  });
+
   useEffect(() => {
     if (paystackProvider) {
       paystackForm.reset({
@@ -170,7 +208,23 @@ export default function WebsitePaymentSettings() {
         mode: flutterwaveProvider.mode || 'test',
       });
     }
-  }, [paystackProvider, flutterwaveProvider, paystackForm, flutterwaveForm]);
+    if (stripeProvider) {
+      stripeForm.reset({
+        testPublicKey: stripeProvider.config?.testPublicKey || '',
+        testSecretKey: stripeProvider.config?.testSecretKey || '',
+        livePublicKey: stripeProvider.config?.livePublicKey || '',
+        liveSecretKey: stripeProvider.config?.liveSecretKey || '',
+        isActive: stripeProvider.isActive || false,
+        mode: stripeProvider.mode || 'test',
+      });
+    }
+    if (payOnDeliveryProvider) {
+      payOnDeliveryForm.reset({
+        instructions: payOnDeliveryProvider.config?.instructions || 'Pay with cash or card upon delivery.',
+        isActive: payOnDeliveryProvider.isActive || false,
+      });
+    }
+  }, [paystackProvider, flutterwaveProvider, stripeProvider, payOnDeliveryProvider, paystackForm, flutterwaveForm, stripeForm, payOnDeliveryForm]);
 
   const saveProviderSettings = async (providerName: string, values: any) => {
     if (!user) return;
@@ -426,6 +480,7 @@ export default function WebsitePaymentSettings() {
           <TabsTrigger value="flutterwave">Flutterwave</TabsTrigger>
           <TabsTrigger value="stripe">Stripe</TabsTrigger>
           <TabsTrigger value="manual">Manual Transfer</TabsTrigger>
+          <TabsTrigger value="pay_on_delivery">Pay on Delivery</TabsTrigger>
         </TabsList>
 
         <TabsContent value="paystack" className="space-y-6">
@@ -742,21 +797,206 @@ export default function WebsitePaymentSettings() {
         </TabsContent>
 
         <TabsContent value="stripe" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Stripe Settings</CardTitle>
-              <CardDescription>Accept global payments via cards and digital wallets.</CardDescription>
-            </CardHeader>
-            <CardContent className="py-12 flex flex-col items-center justify-center text-center">
-              <div className="bg-primary/10 p-4 rounded-full mb-4">
-                <PlusCircle className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="text-lg font-bold">Coming Soon</h3>
-              <p className="text-muted-foreground max-w-sm">
-                We are currently working on integrating Stripe. You will be able to accept international payments soon.
-              </p>
-            </CardContent>
-          </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <Form {...stripeForm}>
+                <form onSubmit={stripeForm.handleSubmit((values) => saveProviderSettings('stripe', values))}>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                      <div>
+                        <CardTitle>Stripe Settings</CardTitle>
+                        <CardDescription>Accept global payments via cards and digital wallets.</CardDescription>
+                      </div>
+                      <FormField
+                        control={stripeForm.control}
+                        name="isActive"
+                        render={({ field }) => (
+                          <FormItem className="flex items-center gap-2 space-y-0">
+                            <FormLabel className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Enabled</FormLabel>
+                            <FormControl>
+                              <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <FormField
+                        control={stripeForm.control}
+                        name="mode"
+                        render={({ field }) => (
+                          <FormItem className="space-y-3">
+                            <FormLabel>Transaction Mode</FormLabel>
+                            <FormControl>
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex flex-row space-x-4"
+                              >
+                                <FormItem className="flex items-center space-x-2 space-y-0">
+                                  <FormControl><RadioGroupItem value="test" /></FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">Test Mode</FormLabel>
+                                </FormItem>
+                                <FormItem className="flex items-center space-x-2 space-y-0">
+                                  <FormControl><RadioGroupItem value="live" /></FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">Live Mode</FormLabel>
+                                </FormItem>
+                              </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={stripeForm.control}
+                          name="testPublicKey"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Test Publishable Key</FormLabel>
+                              <FormControl><Input placeholder="pk_test_..." {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={stripeForm.control}
+                          name="testSecretKey"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Test Secret Key</FormLabel>
+                              <FormControl><Input type="password" placeholder="sk_test_..." {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={stripeForm.control}
+                          name="livePublicKey"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Live Publishable Key</FormLabel>
+                              <FormControl><Input placeholder="pk_live_..." {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={stripeForm.control}
+                          name="liveSecretKey"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Live Secret Key</FormLabel>
+                              <FormControl><Input type="password" placeholder="sk_live_..." {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </CardContent>
+                    <CardFooter className="border-t pt-6 flex gap-2">
+                      <Button type="submit" disabled={isSaving}>
+                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                        Save Stripe Settings
+                      </Button>
+                      <Button type="button" variant="outline" onClick={() => testConnection('stripe')} disabled={isSaving}>
+                        Test Connection
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </form>
+              </Form>
+            </div>
+            <div className="lg:col-span-1">
+              <Card className="bg-primary/5 border-primary/20 shadow-none sticky top-6">
+                <CardHeader>
+                  <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary">
+                    <Info className="h-4 w-4" /> About Stripe
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm space-y-4 text-muted-foreground leading-relaxed">
+                  <p>Stripe is a global leader in payment processing.</p>
+                  <ul className="list-disc pl-5 space-y-2">
+                    <li>Accepts Apple Pay, Google Pay, and cards.</li>
+                    <li>Supports over 135 currencies.</li>
+                    <li>Best-in-class checkout experience.</li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="pay_on_delivery" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <Form {...payOnDeliveryForm}>
+                <form onSubmit={payOnDeliveryForm.handleSubmit((values) => saveProviderSettings('pay_on_delivery', values))}>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                      <div>
+                        <CardTitle>Pay on Delivery</CardTitle>
+                        <CardDescription>Allow customers to pay when they receive their order.</CardDescription>
+                      </div>
+                      <FormField
+                        control={payOnDeliveryForm.control}
+                        name="isActive"
+                        render={({ field }) => (
+                          <FormItem className="flex items-center gap-2 space-y-0">
+                            <FormLabel className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Enabled</FormLabel>
+                            <FormControl>
+                              <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <FormField
+                        control={payOnDeliveryForm.control}
+                        name="instructions"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Instructions for Customer</FormLabel>
+                            <FormControl><Textarea rows={4} placeholder="e.g., Please have the exact amount ready..." {...field} /></FormControl>
+                            <FormDescription>Shown at checkout when this method is selected.</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </CardContent>
+                    <CardFooter className="border-t pt-6">
+                      <Button type="submit" disabled={isSaving}>
+                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                        Save Settings
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </form>
+              </Form>
+            </div>
+            <div className="lg:col-span-1">
+              <Card className="bg-primary/5 border-primary/20 shadow-none sticky top-6">
+                <CardHeader>
+                  <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary">
+                    <Info className="h-4 w-4" /> Cash on Delivery
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm space-y-4 text-muted-foreground leading-relaxed">
+                  <p>Pay on Delivery (POD) is popular for building customer trust.</p>
+                  <ul className="list-disc pl-5 space-y-2">
+                    <li>Recommended for local deliveries.</li>
+                    <li>Ensures customers are happy before they pay.</li>
+                    <li>No online transaction fees.</li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="manual" className="space-y-6">

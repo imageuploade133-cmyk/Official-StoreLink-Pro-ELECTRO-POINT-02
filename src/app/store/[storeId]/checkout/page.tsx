@@ -278,8 +278,10 @@ export default function CheckoutPage() {
       // For online payments, we initialize first, then save the order
       // But actually, we should probably save the order as 'pending' first.
       
-      const selectedMethod = availablePaymentMethods.find(m => m.name === paymentMethod);
-      const isOnlinePayment = selectedMethod && selectedMethod.provider !== 'manual';
+      const selectedMethod = availablePaymentMethods.find(m => m.name === paymentMethod || m.id === paymentMethod);
+      const isOnlinePayment = selectedMethod && 
+                             selectedMethod.provider !== 'manual' && 
+                             selectedMethod.provider !== 'pay_on_delivery';
 
       await runTransaction(firestore, async (transaction) => {
         // --- 1. GATHER ALL READS FIRST ---
@@ -617,12 +619,29 @@ export default function CheckoutPage() {
                         <div key={method.id}>
                         <RadioGroupItem value={method.name} id={method.id} className="peer sr-only" />
                         <Label htmlFor={method.id} className="flex flex-col items-center justify-center rounded-xl border-2 border-muted bg-popover p-6 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 [&:has([data-state=checked])]:border-primary cursor-pointer transition-all h-full text-center">
-                            {method.name === 'Bank Transfer' ? <Landmark className="mb-3 h-8 w-8" /> : <CreditCard className="mb-3 h-8 w-8" />}
+                            {method.provider === 'manual' ? <Landmark className="mb-3 h-8 w-8" /> : 
+                             method.provider === 'pay_on_delivery' ? <Truck className="mb-3 h-8 w-8" /> :
+                             <CreditCard className="mb-3 h-8 w-8" />}
                             <span className="text-xs font-black uppercase tracking-widest">{method.name}</span>
                         </Label>
                         </div>
                     ))}
                     </RadioGroup>
+
+                    {paymentMethod === 'Pay on Delivery' && (
+                        <div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
+                            <div className="p-6 border-2 border-primary/20 bg-primary/5 rounded-2xl space-y-4">
+                                <div className="flex items-center gap-3 text-primary"><Truck className="h-5 w-5" /><h3 className="font-bold text-lg">Pay on Delivery</h3></div>
+                                <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                                    {availablePaymentMethods.find(m => m.name === 'Pay on Delivery')?.instructions || "You will pay for your order when it is delivered to you."}
+                                </p>
+                                <div className="flex items-center gap-2 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-xl text-amber-700 dark:text-amber-400 text-xs">
+                                    <Info className="h-4 w-4 shrink-0" />
+                                    <p>Please ensure you are available at the delivery address to receive and pay for your order.</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {paymentMethod === 'Bank Transfer' && bankAccounts.length > 0 && (
                         <div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
