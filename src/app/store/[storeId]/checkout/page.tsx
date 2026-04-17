@@ -48,6 +48,7 @@ import { sendWhatsAppReceipt } from '@/lib/whatsapp';
 import { formatPhoneNumberForWhatsapp } from '@/lib/phone-utils';
 import { safeSessionStorage } from '@/lib/storage-utils';
 import { useAds } from '@/contexts/ad-context';
+import { placeOrderAction, logWhatsAppMessageAction } from '@/app/actions/orders';
 
 import { uploadImage } from '@/ai/flows/image-upload-flow';
 import { Upload } from 'lucide-react';
@@ -273,74 +274,40 @@ export default function CheckoutPage() {
 
     try {
       let finalOrderId = '';
-      const orderRef = doc(collection(firestore, 'orders'));
-      finalOrderId = orderRef.id;
-
-      // For online payments, we initialize first, then save the order
-      // But actually, we should probably save the order as 'pending' first.
       
       const selectedMethod = availablePaymentMethods.find(m => m.name === paymentMethod || m.id === paymentMethod);
       const isOnlinePayment = selectedMethod && 
                              selectedMethod.provider !== 'manual' && 
                              selectedMethod.provider !== 'pay_on_delivery';
 
-      await runTransaction(firestore, async (transaction) => {
-        // --- 1. GATHER ALL READS FIRST ---
-        const productRefs = cartItems.map(item => doc(firestore, 'products', item.id));
-        const productSnapshots = await Promise.all(productRefs.map(ref => transaction.get(ref)));
-
-        // --- 2. VALIDATIONS AND LOGIC ---
-        for (let i = 0; i < cartItems.length; i++) {
-          const item = cartItems[i];
-          const productDoc = productSnapshots[i];
-          
-          if (!productDoc.exists()) {
-            throw new Error(`Product "${item.name}" no longer exists.`);
-          }
-          
-          const currentStock = productDoc.data().stock || 0;
-          if (currentStock < item.quantity) {
-            throw new Error(`Insufficient stock for "${item.name}". Only ${currentStock} left.`);
-          }
-          
-          // --- 3. QUEUE WRITES ---
-          transaction.update(productRefs[i], { stock: currentStock - item.quantity });
-        }
-
-        const firstProduct = productSnapshots[0]?.data();
-        const orderStoreId = firstProduct?.store_id || null;
-
-        if (appliedCoupon) {
-            const couponRef = doc(firestore, 'coupons', appliedCoupon.id);
-            transaction.update(couponRef, { usageCount: increment(1) });
-        }
-
-        const orderData: any = {
-          user_id: user?.uid || 'GUEST',
-          store_id: orderStoreId,
-          items: cartItems.map(item => ({
-            productId: item.id,
-            quantity: item.quantity,
-            price: item.salePrice
-          })),
-          totalAmount: total,
-          totalCost: cartItems.reduce((sum, item) => sum + (item.purchasePrice * item.quantity), 0),
-          paymentMethod: paymentMethod,
-          paymentReference: paymentMethod === 'Bank Transfer' ? paymentReference : null,
-          paymentReceiptUrl: paymentMethod === 'Bank Transfer' ? receiptUrl : null,
-          couponCode: appliedCoupon?.code || null,
-          selectedBankAccount: paymentMethod === 'Bank Transfer' ? selectedBankAccount : null,
-          fulfillmentType,
-          deliveryLocationId: fulfillmentType === 'delivery' ? selectedLocationId : null,
-          deliveryPrice: shipping,
-          status: 'pending',
-          isPaid: false,
-          createdAt: serverTimestamp(),
-          guestInfo: user ? null : formData,
-        };
-
-        transaction.set(orderRef, orderData);
+      // Use the server action to place the order
+      const result = await placeOrderAction({
+        userId: user?.uid || 'GUEST',
+        storeId: storeId,
+        items: cartItems.map(item => ({
+          productId: item.id,
+          quantity: item.quantity,
+          price: item.salePrice
+        })),
+        totalAmount: total,
+        totalCost: cartItems.reduce((sum, item) => sum + (item.purchasePrice * item.quantity), 0),
+        paymentMethod: paymentMethod,
+        paymentReference: paymentMethod === 'Bank Transfer' ? paymentReference : null,
+        paymentReceiptUrl: paymentMethod === 'Bank Transfer' ? receiptUrl : null,
+        couponCode: appliedCoupon?.code || null,
+        appliedCouponId: appliedCoupon?.id || null,
+        selectedBankAccount: paymentMethod === 'Bank Transfer' ? selectedBankAccount : null,
+        fulfillmentType,
+        deliveryLocationId: fulfillmentType === 'delivery' ? selectedLocationId : null,
+        deliveryPrice: shipping,
+        guestInfo: user ? null : formData,
       });
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      finalOrderId = result.orderId;
 
       if (isOnlinePayment) {
         // Initialize payment
@@ -391,8 +358,7 @@ export default function CheckoutPage() {
                           message: extraMsg
                           });
 
-                      await addDoc(collection(firestore, 'whatsappMessageLogs'), {
-                          timestamp: serverTimestamp(),
+                      await logWhatsAppMessageAction({
                           store_id: storeId,
                           eventType: 'order_placed',
                           messageContent: `Order Confirmation sent to Customer for #${finalOrderId}`,
@@ -402,7 +368,7 @@ export default function CheckoutPage() {
                           unitsCharged: 3.1,
                           userId: user?.uid || 'GUEST',
                           userName: user?.email || 'Guest Checkout'
-                      } as WhatsappMessageLog);
+                      });
                   } catch (waError) {
                       console.error("Failed to send Customer WhatsApp notification:", waError);
                   }
@@ -428,8 +394,7 @@ export default function CheckoutPage() {
                           fulfillmentType: fulfillmentType,
                           });
 
-                      await addDoc(collection(firestore, 'whatsappMessageLogs'), {
-                          timestamp: serverTimestamp(),
+                      await logWhatsAppMessageAction({
                           store_id: storeId,
                           eventType: 'staff_order_alert',
                           messageContent: `Staff Order Alert sent for #${finalOrderId}`,
@@ -439,7 +404,7 @@ export default function CheckoutPage() {
                           unitsCharged: 3.1,
                           userId: 'SYSTEM',
                           userName: 'Order Alert Service'
-                      } as WhatsappMessageLog);
+                      });
                   } catch (staffWaError) {
                       console.error(`Failed to send Staff WhatsApp alert to ${alertNum}:`, staffWaError);
                   }

@@ -46,6 +46,7 @@ import {
   import { formatPhoneNumberForWhatsapp } from '@/lib/phone-utils';
   import { safeSessionStorage } from '@/lib/storage-utils';
   import { useAds } from '@/contexts/ad-context';
+  import { placeOrderAction } from '@/app/actions/orders';
 
   type CheckoutStep = 'details' | 'payment' | 'processing' | 'success';
 
@@ -175,41 +176,36 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
 
     try {
       let finalOrderId = '';
-      await runTransaction(firestore, async (transaction) => {
-        const productRefs = cartItems.map(item => doc(firestore, 'products', item.id));
-        const productSnapshots = await Promise.all(productRefs.map(ref => transaction.get(ref)));
 
-        for (let i = 0; i < cartItems.length; i++) {
-          const item = cartItems[i];
-          const productDoc = productSnapshots[i];
-          if (!productDoc.exists()) throw new Error(`Product "${item.name}" not found.`);
-          const currentStock = productDoc.data().stock || 0;
-          if (currentStock < item.quantity) throw new Error(`Insufficient stock for "${item.name}".`);
-          transaction.update(productRefs[i], { stock: currentStock - item.quantity });
-        }
+      // Find storeId from first cart item if not available otherwise
+      const storeId = cartItems[0]?.store_id || null;
 
-        if (appliedCoupon) {
-            const couponRef = doc(firestore, 'coupons', appliedCoupon.id);
-            transaction.update(couponRef, { usageCount: increment(1) });
-        }
-
-        const orderRef = doc(collection(firestore, 'orders'));
-        const orderData: Omit<Order, 'id'> = {
-          user_id: user?.uid || 'GUEST',
-          items: cartItems.map(item => ({ productId: item.id, quantity: item.quantity, price: item.salePrice })),
-          totalAmount: total,
-          totalCost: cartItems.reduce((sum, item) => sum + (item.purchasePrice * item.quantity), 0),
-          paymentMethod: paymentMethod,
-          paymentReference: paymentMethod === 'Bank Transfer' ? paymentReference : null as any,
-          couponCode: appliedCoupon?.code || null as any,
-          selectedBankAccount: paymentMethod === 'Bank Transfer' ? selectedBankAccount : null,
-          status: 'pending',
-          createdAt: serverTimestamp() as any,
-          guestInfo: user ? null : formData,
-        };
-        transaction.set(orderRef, orderData);
-        finalOrderId = orderRef.id;
+      const result = await placeOrderAction({
+        userId: user?.uid || 'GUEST',
+        storeId: storeId,
+        items: cartItems.map(item => ({
+          productId: item.id,
+          quantity: item.quantity,
+          price: item.salePrice
+        })),
+        totalAmount: total,
+        totalCost: cartItems.reduce((sum, item) => sum + (item.purchasePrice * item.quantity), 0),
+        paymentMethod: paymentMethod,
+        paymentReference: paymentMethod === 'Bank Transfer' ? paymentReference : null,
+        couponCode: appliedCoupon?.code || null,
+        appliedCouponId: appliedCoupon?.id || null,
+        selectedBankAccount: paymentMethod === 'Bank Transfer' ? selectedBankAccount : null,
+        fulfillmentType: 'delivery', // Default for this view
+        deliveryLocationId: null,
+        deliveryPrice: shipping,
+        guestInfo: user ? null : formData,
       });
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      finalOrderId = result.orderId;
 
       if (settings?.enableWhatsapp && formData.phone) {
           const formattedPhone = formatPhoneNumberForWhatsapp(formData.phone, settings.countryCode);
