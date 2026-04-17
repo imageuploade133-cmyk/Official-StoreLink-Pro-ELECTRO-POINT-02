@@ -244,21 +244,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
     const relatedQuery = useMemo(() => (firestore && storeId) ? query(collection(firestore, 'products'), where('store_id', '==', storeId), where('categoryId', '==', product?.categoryId || ''), where('isVisibleOnWeb', '==', true), limit(6)) : null, [firestore, product?.categoryId, storeId]);
     const { data: relatedProducts } = useCollection<Product>(relatedQuery);
 
-    if (isFetching) return <div className="p-10 text-center"><Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" /></div>;
-    if (!product) return null;
-
-    const isDiscounted = effectivePrice < product.sellingPrice;
-    const isLiked = isProductInWishlist(product.id);
-    const isOutOfStock = product.stock <= 0;
-    const lowStockThreshold = product.lowStockThreshold || settings?.lowStockThreshold || 10;
-    const voiceBranding = { preTitle: settings?.voiceExperiencePreTitle || 'Audio Signature', title: settings?.voiceExperienceTitle || 'Product Insights', color: settings?.voiceExperienceColor || '#5048e5', iconUrl: settings?.voiceExperienceIconUrl };
-    const visibleVoices = (distributedVoices || []).filter(v => v.isVisible !== false);
-    const DescriptionIcon = iconMap[product.descriptionIcon as keyof typeof iconMap] || BookOpen;
-
-    const addToCartText = settings?.storeAddToCartText || 'Secure Purchase';
-    const AddToCartIcon = iconMap[settings?.storeAddToCartIcon as keyof typeof iconMap] || ShoppingBag;
-
-    // Dynamic Button Style for Add to Cart
+    // Dynamic Button Style for Add to Cart - Moved up to avoid hook error
     const addToCartButtonStyle = useMemo(() => {
         const useIndividual = settings?.useIndividualBtnSettings !== false;
         const style = useIndividual
@@ -346,6 +332,20 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
 
         return `${sizeClass} ${shapeClass} ${shadowClass}`;
     }, [settings]);
+
+    if (isFetching) return <div className="p-10 text-center"><Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" /></div>;
+    if (!product) return null;
+
+    const isDiscounted = effectivePrice < product.sellingPrice;
+    const isLiked = isProductInWishlist(product.id);
+    const isOutOfStock = product.stock <= 0;
+    const lowStockThreshold = product.lowStockThreshold || settings?.lowStockThreshold || 10;
+    const voiceBranding = { preTitle: settings?.voiceExperiencePreTitle || 'Audio Signature', title: settings?.voiceExperienceTitle || 'Product Insights', color: settings?.voiceExperienceColor || '#5048e5', iconUrl: settings?.voiceExperienceIconUrl };
+    const visibleVoices = (distributedVoices || []).filter(v => v.isVisible !== false);
+    const DescriptionIcon = iconMap[product.descriptionIcon as keyof typeof iconMap] || BookOpen;
+
+    const addToCartText = settings?.storeAddToCartText || 'Secure Purchase';
+    const AddToCartIcon = iconMap[settings?.storeAddToCartIcon as keyof typeof iconMap] || ShoppingBag;
 
     const reviewStats = (() => {
         if (!reviews || reviews.length === 0) return { avg: 0, count: 0, distribution: [0, 0, 0, 0, 0] };
