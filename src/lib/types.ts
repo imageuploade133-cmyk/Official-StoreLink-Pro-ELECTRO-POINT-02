@@ -304,6 +304,7 @@ export interface Settings {
   webWatermarkImageWidth?: number;
   webWatermarkRotation?: number;
   slideShowDuration?: number;
+  showGlobalSlideShow?: boolean;
   // Stock Bar Settings
   showStockBar?: boolean;
   stockBarHealthyLabel?: string;

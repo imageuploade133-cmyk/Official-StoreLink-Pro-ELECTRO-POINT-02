@@ -13,10 +13,13 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 import { useStoreUrl } from '@/hooks/use-store-url';
+import { useSettings } from '@/contexts/settings-context';
 
 export function HeroCarousel() {
   const firestore = useFirestore();
   const { storeId, getStoreUrl } = useStoreUrl();
+  const { settings, isLoadingSettings } = useSettings();
+
   const slidesQuery = React.useMemo(() => {
     if (!firestore || !storeId) return null;
     return query(
@@ -88,12 +91,16 @@ export function HeroCarousel() {
   const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
 
-  if (isLoading) {
+  if (isLoading || isLoadingSettings) {
     return (
       <div className="w-full aspect-[21/7]">
         <Skeleton className="w-full h-full" />
       </div>
     );
+  }
+
+  if (settings?.showGlobalSlideShow === false) {
+    return null;
   }
 
   if (!slides || slides.length === 0) {

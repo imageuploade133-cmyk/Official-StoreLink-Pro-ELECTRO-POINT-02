@@ -52,6 +52,8 @@ import { useToast } from '@/hooks/use-toast';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/auth-context';
+import { useSettings } from '@/contexts/settings-context';
+import { saveStoreSettings } from '@/firebase/firestore/settings';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import Image from 'next/image';
 
@@ -82,6 +84,25 @@ export default function ManageSlideShowPage() {
   const [isReordering, setIsReordering] = useState<string | null>(null);
   const [slideToDelete, setSlideToDelete] = useState<SlideShow | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const { settings } = useSettings();
+  const [isUpdatingGlobal, setIsUpdatingGlobal] = useState(false);
+
+  const handleToggleGlobalSlideshow = async (checked: boolean) => {
+    if (!firestore || !currentStoreId) return;
+    setIsUpdatingGlobal(true);
+    try {
+      await saveStoreSettings(firestore, currentStoreId, { showGlobalSlideShow: checked });
+      toast({
+        title: 'Settings Updated',
+        description: `Global slideshow is now ${checked ? 'enabled' : 'disabled'}.`,
+      });
+    } catch (error: any) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Failed to update global slideshow status.' });
+    } finally {
+      setIsUpdatingGlobal(false);
+    }
+  };
 
   const fetchSlides = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
     if (!firestore || !currentStoreId) return;
@@ -266,6 +287,32 @@ export default function ManageSlideShowPage() {
             </Button>
         </div>
       </div>
+
+      <Card className="bg-primary/5 border-primary/20 shadow-sm">
+        <CardContent className="p-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="space-y-1">
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                <GalleryHorizontal className="h-5 w-5 text-primary" />
+                Global Slideshow Toggle
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Enable or disable the slideshow across the public store and mobile app.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 bg-background p-3 rounded-xl border shadow-sm">
+              <span className={cn("text-xs font-black uppercase transition-colors", settings?.showGlobalSlideShow === false ? "text-destructive" : "text-muted-foreground")}>Off</span>
+              <Switch 
+                checked={settings?.showGlobalSlideShow ?? true} 
+                onCheckedChange={handleToggleGlobalSlideshow}
+                disabled={isUpdatingGlobal}
+              />
+              <span className={cn("text-xs font-black uppercase transition-colors", settings?.showGlobalSlideShow !== false ? "text-green-600" : "text-muted-foreground")}>On</span>
+              {isUpdatingGlobal && <Loader2 className="h-4 w-4 animate-spin text-primary ml-1" />}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
         <CardHeader className="bg-muted/10 border-b">

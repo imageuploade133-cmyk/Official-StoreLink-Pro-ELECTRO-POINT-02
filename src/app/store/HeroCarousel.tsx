@@ -196,6 +196,10 @@ export function HeroCarousel() {
     return `${shapeClass} ${sizeClass} ${shadowClass}`;
   }, [settings]);
 
+  if (settings?.showGlobalSlideShow === false) {
+    return null;
+  }
+
   if (isLoading) {
     return (
       <div className="w-full aspect-[21/7]">
