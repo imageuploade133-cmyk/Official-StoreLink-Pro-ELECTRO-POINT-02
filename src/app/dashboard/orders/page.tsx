@@ -123,28 +123,34 @@ export default function WebsiteOrdersPage() {
         getCountFromServer(query(storeOrdersQuery, where('status', '==', 'cancelled')))
       ]);
 
-      const [todaySnap, allActiveSnap] = await Promise.all([
-        getDocs(query(storeOrdersQuery, where('createdAt', '>=', todayStart), where('createdAt', '<=', todayEnd))),
-        getDocs(query(storeOrdersQuery, where('status', '!=', 'cancelled'), limit(500)))
-      ]);
-
+      // Fetch recent orders to calculate today's stats and total income
+      // Using a simpler query to avoid complex index requirements
+      const recentOrdersSnap = await getDocs(query(storeOrdersQuery, orderBy('createdAt', 'desc'), limit(500)));
+      
       let todayInc = 0;
       let todayCanc = 0;
       let totalInc = 0;
 
-      todaySnap.docs.forEach(doc => {
+      recentOrdersSnap.docs.forEach(doc => {
         const d = doc.data();
-        if (d.status === 'cancelled') todayCanc++;
-        else todayInc += (d.totalAmount || 0);
-      });
+        const createdAt = convertToDateSafely(d.createdAt);
+        
+        if (d.status !== 'cancelled') {
+          totalInc += (d.totalAmount || 0);
+        }
 
-      allActiveSnap.docs.forEach(doc => {
-        totalInc += (doc.data().totalAmount || 0);
+        if (createdAt && createdAt >= todayStart && createdAt <= todayEnd) {
+          if (d.status === 'cancelled') todayCanc++;
+          else todayInc += (d.totalAmount || 0);
+        }
       });
 
       setAnalytics({
         totalOrders: totalCountSnap.data().count,
-        todayOrders: todaySnap.size,
+        todayOrders: recentOrdersSnap.docs.filter(doc => {
+          const createdAt = convertToDateSafely(doc.data().createdAt);
+          return createdAt && createdAt >= todayStart && createdAt <= todayEnd;
+        }).length,
         totalIncome: totalInc,
         todayIncome: todayInc,
         totalCancelled: cancelledCountSnap.data().count,
@@ -162,20 +168,27 @@ export default function WebsiteOrdersPage() {
     setIsLoadingOrders(true);
 
     try {
-      let q = query(collection(firestore, 'orders'), where('store_id', '==', currentStoreId), orderBy('createdAt', 'desc'));
-
+      const constraints: any[] = [where('store_id', '==', currentStoreId)];
+      
       if (statusFilter !== 'all') {
-        q = query(q, where('status', '==', statusFilter));
+        constraints.push(where('status', '==', statusFilter));
       }
+      
+      constraints.push(orderBy('createdAt', 'desc'));
 
       if (direction === 'next' && lastDoc) {
-        q = query(q, startAfter(lastDoc), limit(ITEMS_PER_PAGE));
+        constraints.push(startAfter(lastDoc));
       } else if (direction === 'prev' && firstDoc) {
-        q = query(q, endBefore(firstDoc), limitToLast(ITEMS_PER_PAGE));
-      } else {
-        q = query(q, limit(ITEMS_PER_PAGE));
+        constraints.push(endBefore(firstDoc));
       }
 
+      if (direction === 'prev') {
+        constraints.push(limitToLast(ITEMS_PER_PAGE));
+      } else {
+        constraints.push(limit(ITEMS_PER_PAGE));
+      }
+
+      const q = query(collection(firestore, 'orders'), ...constraints);
       const snapshot = await getDocs(q);
       const docs = snapshot.docs;
 
@@ -197,11 +210,13 @@ export default function WebsiteOrdersPage() {
         if (direction === 'initial') {
           setOrders([]);
           setIsLastPage(true);
+        } else if (direction === 'next') {
+          setIsLastPage(true);
         }
       }
     } catch (error: any) {
       console.error("Error fetching orders:", error);
-      toast({ variant: 'destructive', title: "Fetch Error", description: "Could not load orders." });
+      toast({ variant: 'destructive', title: "Fetch Error", description: "Could not load orders. Please check if Firestore indexes are created." });
     } finally {
       setIsLoadingOrders(false);
     }
@@ -212,7 +227,9 @@ export default function WebsiteOrdersPage() {
       fetchOrders('initial');
       fetchAnalytics();
     }
-  }, [isAuthLoading, permissions.manage_orders, statusFilter, currentStoreId, fetchOrders, fetchAnalytics]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthLoading, permissions.manage_orders, statusFilter, currentStoreId]);
+
 
   const productsQuery = useMemo(() => {
     if (!firestore || !currentStoreId) return null;
