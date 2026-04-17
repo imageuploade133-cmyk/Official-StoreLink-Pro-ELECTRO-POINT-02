@@ -304,8 +304,9 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
         <div className="space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-700 pb-20">
           
           {/* Full Bleed Dynamic Slide Show Hero */}
-          <div className="w-full">
-            <div className="overflow-hidden relative bg-slate-950" data-no-ad-click="true">
+          {settings?.showGlobalSlideShow !== false && (
+            <div className="w-full">
+              <div className="overflow-hidden relative bg-slate-950" data-no-ad-click="true">
                 <div className="overflow-hidden w-full" ref={emblaRef}>
                     <div className="flex embla__container">
                         {isLoadingSlides ? (
@@ -443,6 +444,7 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                 )}
             </div>
           </div>
+          )}
 
           {/* Quick Registry Access (Horizontal Categories) */}
           <div className="space-y-6">
