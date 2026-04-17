@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useCart } from '@/contexts/cart-context';
 import { useUser, useFirestore, useDoc } from '@/firebase';
 import { useSettings } from '@/contexts/settings-context';
-import { doc, collection, runTransaction, serverTimestamp, addDoc, increment } from 'firebase/firestore';
+import { doc, collection, query, where, getDocs } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { formatCurrency } from '@/lib/formatUtils';
 import { Button } from '@/components/ui/button';
@@ -13,7 +13,7 @@ import { LoadingButton } from '@/components/ui/loading-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -40,17 +40,21 @@ import {
   ChevronDown,
   ChevronUp,
   AlertTriangle,
-  Sparkles
-  } from 'lucide-react';
-  import type { UserProfile, Order, BankAccount, WhatsappMessageLog, Coupon } from '@/lib/types';
-  import { cn } from '@/lib/utils';
-  import { sendWhatsAppReceipt } from '@/lib/whatsapp';
-  import { formatPhoneNumberForWhatsapp } from '@/lib/phone-utils';
-  import { safeSessionStorage } from '@/lib/storage-utils';
-  import { useAds } from '@/contexts/ad-context';
-  import { placeOrderAction } from '@/app/actions/orders';
+  Sparkles,
+  Truck,
+  Store,
+  Map as MapIcon
+} from 'lucide-react';
+import type { UserProfile, Order, BankAccount, Coupon } from '@/lib/types';
+import { cn } from '@/lib/utils';
+import { sendWhatsAppReceipt } from '@/lib/whatsapp';
+import { formatPhoneNumberForWhatsapp } from '@/lib/phone-utils';
+import { safeSessionStorage } from '@/lib/storage-utils';
+import { useAds } from '@/contexts/ad-context';
+import { placeOrderAction } from '@/app/actions/orders';
 
-  type CheckoutStep = 'details' | 'payment' | 'processing' | 'success';
+type CheckoutStep = 'details' | 'payment' | 'processing' | 'success';
+type FulfillmentType = 'delivery' | 'pickup';
 
 const generatePaymentReference = () => {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -74,6 +78,8 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
   const { rewardAdClicked, activeAds, applyRewardDiscount } = useAds();
 
   const [step, setStep] = useState<CheckoutStep>('details');
+  const [fulfillmentType, setFulfillmentType] = useState<FulfillmentType>('delivery');
+  const [selectedLocationId, setSelectedLocationId] = useState<string>('');
   const [paymentMethod, setPaymentMethod] = useState<string>('');
   const [selectedBankId, setSelectedBankId] = useState<string>('');
   const [paymentReference] = useState(generatePaymentReference());
@@ -93,7 +99,34 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
 
   const currencySymbol = settings?.currency || '$';
   const subtotal = cartItems.reduce((sum, item) => sum + item.salePrice * item.quantity, 0);
-  const shipping = subtotal > 0 ? 10 : 0; 
+
+  // Delivery settings
+  const enableDelivery = settings?.enableDelivery ?? true;
+  const enablePickUp = settings?.enablePickUp ?? false;
+  const deliveryLocations = settings?.deliveryLocations || [];
+
+  // Initialize fulfillment type based on settings
+  useEffect(() => {
+    if (!enableDelivery && enablePickUp) {
+        setFulfillmentType('pickup');
+    }
+  }, [enableDelivery, enablePickUp]);
+
+  // Initialize delivery location if available
+  useEffect(() => {
+    if (deliveryLocations.length > 0 && !selectedLocationId) {
+        setSelectedLocationId(deliveryLocations[0].id);
+    }
+  }, [deliveryLocations, selectedLocationId]);
+
+  const selectedLocation = useMemo(() => 
+    deliveryLocations.find(loc => loc.id === selectedLocationId),
+  [deliveryLocations, selectedLocationId]);
+
+  const shipping = useMemo(() => {
+    if (fulfillmentType === 'pickup') return 0;
+    return selectedLocation?.price ?? 0;
+  }, [fulfillmentType, selectedLocation]);
 
   const discountAmount = useMemo(() => {
     if (!appliedCoupon || subtotal === 0) return 0;
@@ -133,7 +166,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
         });
     }
     
-    // Fallback if still empty to avoid "Channel Maintenance"
+    // Fallback if still empty
     if (methods.length === 0) {
         methods.push({ id: 'pay-on-delivery', name: 'Pay on Delivery' });
     }
@@ -185,6 +218,24 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const validateDetails = () => {
+    if (!formData.name || !formData.email || !formData.phone) {
+        toast({ variant: 'destructive', title: 'Missing Information', description: 'Please fill in your name, email, and phone.' });
+        return false;
+    }
+    if (fulfillmentType === 'delivery') {
+        if (deliveryLocations.length > 0 && !selectedLocationId) {
+            toast({ variant: 'destructive', title: 'Location Required', description: 'Please select a delivery location.' });
+            return false;
+        }
+        if (!formData.address) {
+            toast({ variant: 'destructive', title: 'Address Required', description: 'Please provide a delivery address.' });
+            return false;
+        }
+    }
+    return true;
+  };
+
   const handlePlaceOrder = async () => {
     if (!firestore) return;
     if (paymentMethod === 'Bank Transfer' && (!selectedBankAccount || !hasConfirmedTransfer)) {
@@ -196,8 +247,6 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
 
     try {
       let finalOrderId = '';
-
-      // Find storeId from first cart item if not available otherwise
       const storeId = cartItems[0]?.store_id || null;
 
       const result = await placeOrderAction({
@@ -215,8 +264,8 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
         couponCode: appliedCoupon?.code || null,
         appliedCouponId: appliedCoupon?.id || null,
         selectedBankAccount: paymentMethod === 'Bank Transfer' ? selectedBankAccount : null,
-        fulfillmentType: 'delivery', // Default for this view
-        deliveryLocationId: null,
+        fulfillmentType: fulfillmentType,
+        deliveryLocationId: fulfillmentType === 'delivery' ? selectedLocationId : null,
         deliveryPrice: shipping,
         guestInfo: user ? null : formData,
       });
@@ -240,7 +289,8 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                   paymentMethod: paymentMethod,
                   storeName: settings.storeName,
                   currencySymbol: settings.currency,
-                  message: paymentMethod === 'Bank Transfer' ? `Ref: ${paymentReference}` : ''
+                  message: paymentMethod === 'Bank Transfer' ? `Ref: ${paymentReference}` : '',
+                  fulfillmentType: fulfillmentType
               }).catch(console.error);
           }
       }
@@ -292,11 +342,22 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
 
   return (
     <div className="flex flex-col h-full bg-background-light dark:bg-black animate-in slide-in-from-right-4 fade-in duration-500">
-        <header className="sticky top-0 z-50 flex flex-col bg-background-light/80 dark:bg-black/80 backdrop-blur-md px-4 py-6 justify-between border-b border-slate-200 dark:border-slate-800">
+        <header className="sticky top-0 z-50 flex flex-col bg-background-light/80 dark:bg-black/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
             <div className="flex items-center justify-between px-6 py-6">
-                <button onClick={step === 'details' ? onClose : () => setStep('details')} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-800 active:scale-90 transition-transform"><ArrowLeft className="h-6 w-6" /></button>
+                <button 
+                  onClick={step === 'details' ? onClose : () => setStep('details')} 
+                  className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-800 active:scale-90 transition-transform"
+                >
+                  <ArrowLeft className="h-6 w-6" />
+                </button>
                 <h1 className="text-xl font-black tracking-tighter uppercase">Checkout</h1>
                 <Badge variant="secondary" className="font-black h-8 px-4 rounded-full shadow-sm">{cartCount} items</Badge>
+            </div>
+            
+            {/* Step Indicator */}
+            <div className="flex px-6 pb-4 gap-2">
+              <div className={cn("h-1 flex-1 rounded-full transition-all duration-500", step === 'details' ? "bg-primary" : "bg-primary/20")} />
+              <div className={cn("h-1 flex-1 rounded-full transition-all duration-500", step === 'payment' ? "bg-primary" : "bg-primary/20")} />
             </div>
         </header>
 
@@ -337,6 +398,12 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                         <span>Subtotal</span>
                                         <span>{formatCurrency(subtotal, currencySymbol)}</span>
                                     </div>
+                                    {fulfillmentType === 'delivery' && (
+                                        <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-slate-400">
+                                            <span>Shipping ({selectedLocation?.name || 'Standard'})</span>
+                                            <span>{formatCurrency(shipping, currencySymbol)}</span>
+                                        </div>
+                                    )}
                                     {discountAmount > 0 && (
                                         <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-green-600">
                                             <span>Promo Savings</span>
@@ -358,8 +425,8 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                 {step === 'details' && (
                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
                         <div className="space-y-2">
-                            <h3 className="text-2xl font-black tracking-tighter uppercase leading-none">Logistics Profile</h3>
-                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Where should we deliver your order?</p>
+                            <h3 className="text-2xl font-black tracking-tighter uppercase leading-none">Customer Identity</h3>
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Tell us who is receiving this order.</p>
                         </div>
                         <div className="space-y-6">
                             <div className="space-y-2">
@@ -385,12 +452,105 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                     </div>
                                 </div>
                             </div>
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-primary ml-1">Fulfillment Address</Label>
-                                <div className="relative">
-                                    <MapPin className="absolute left-4 top-4 h-5 w-5 text-slate-400" />
-                                    <Textarea name="address" value={formData.address} onChange={handleInputChange} placeholder="Full street address, city and postal code..." className="min-h-[120px] pl-12 pt-4 rounded-[2rem] border-none shadow-xl font-bold bg-white dark:bg-slate-800 resize-none focus-visible:ring-primary/20" />
+
+                            <Separator />
+
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <h3 className="text-2xl font-black tracking-tighter uppercase leading-none">Fulfillment Mode</h3>
+                                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Choose how you want to receive your items.</p>
                                 </div>
+
+                                <RadioGroup 
+                                    value={fulfillmentType} 
+                                    onValueChange={(val) => setFulfillmentType(val as FulfillmentType)}
+                                    className="grid grid-cols-2 gap-4"
+                                >
+                                    {enableDelivery && (
+                                        <Label className={cn(
+                                            "flex flex-col items-center justify-center p-6 rounded-[2rem] border-2 cursor-pointer transition-all active:scale-95 shadow-lg",
+                                            fulfillmentType === 'delivery' ? "bg-primary/5 border-primary" : "bg-white dark:bg-slate-800 border-transparent"
+                                        )}>
+                                            <RadioGroupItem value="delivery" className="sr-only" />
+                                            <Truck className={cn("h-8 w-8 mb-2", fulfillmentType === 'delivery' ? "text-primary" : "text-slate-400")} />
+                                            <span className="text-[10px] font-black uppercase tracking-widest">Delivery</span>
+                                        </Label>
+                                    )}
+                                    {enablePickUp && (
+                                        <Label className={cn(
+                                            "flex flex-col items-center justify-center p-6 rounded-[2rem] border-2 cursor-pointer transition-all active:scale-95 shadow-lg",
+                                            fulfillmentType === 'pickup' ? "bg-primary/5 border-primary" : "bg-white dark:bg-slate-800 border-transparent"
+                                        )}>
+                                            <RadioGroupItem value="pickup" className="sr-only" />
+                                            <Store className={cn("h-8 w-8 mb-2", fulfillmentType === 'pickup' ? "text-primary" : "text-slate-400")} />
+                                            <span className="text-[10px] font-black uppercase tracking-widest">Pick Up</span>
+                                        </Label>
+                                    )}
+                                </RadioGroup>
+
+                                {fulfillmentType === 'delivery' && (
+                                    <div className="space-y-6 animate-in slide-in-from-top-4 duration-500">
+                                        {deliveryLocations.length > 0 && (
+                                            <div className="space-y-2">
+                                                <Label className="text-[10px] font-black uppercase tracking-widest text-primary ml-1">Delivery Zone</Label>
+                                                <div className="grid grid-cols-1 gap-3">
+                                                    {deliveryLocations.map((loc) => (
+                                                        <button
+                                                            key={loc.id}
+                                                            onClick={() => setSelectedLocationId(loc.id)}
+                                                            className={cn(
+                                                                "flex items-center justify-between p-4 rounded-2xl border-2 transition-all",
+                                                                selectedLocationId === loc.id 
+                                                                    ? "bg-primary/5 border-primary shadow-md" 
+                                                                    : "bg-white dark:bg-slate-800 border-transparent"
+                                                            )}
+                                                        >
+                                                            <div className="flex items-center gap-3">
+                                                                <MapIcon className={cn("h-5 w-5", selectedLocationId === loc.id ? "text-primary" : "text-slate-400")} />
+                                                                <span className="font-bold text-sm">{loc.name}</span>
+                                                            </div>
+                                                            <span className="font-black text-sm">{formatCurrency(loc.price, currencySymbol)}</span>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-primary ml-1">Detailed Address</Label>
+                                            <div className="relative">
+                                                <MapPin className="absolute left-4 top-4 h-5 w-5 text-slate-400" />
+                                                <Textarea 
+                                                    name="address" 
+                                                    value={formData.address} 
+                                                    onChange={handleInputChange} 
+                                                    placeholder="Enter your full street address, house number, and city..." 
+                                                    className="min-h-[120px] pl-12 pt-4 rounded-[2rem] border-none shadow-xl font-bold bg-white dark:bg-slate-800 resize-none focus-visible:ring-primary/20" 
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {fulfillmentType === 'pickup' && (
+                                    <div className="p-6 bg-primary/5 rounded-[2rem] border-2 border-dashed border-primary/20 animate-in zoom-in-95 duration-500">
+                                        <div className="flex items-start gap-4">
+                                            <Info className="h-6 w-6 text-primary shrink-0" />
+                                            <div className="space-y-1">
+                                                <p className="text-xs font-black uppercase tracking-widest text-primary">Pickup Protocol</p>
+                                                <p className="text-xs font-medium text-slate-600 dark:text-slate-400 leading-relaxed">
+                                                    You can pick up your order at our store location once it's marked as ready. We'll send you a notification.
+                                                </p>
+                                                {settings?.storeAddress && (
+                                                    <div className="mt-4 p-3 bg-white dark:bg-slate-900 rounded-xl border border-primary/10">
+                                                        <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Store Location</p>
+                                                        <p className="text-xs font-bold mt-1">{settings.storeAddress}</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -399,8 +559,8 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                 {step === 'payment' && (
                     <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
                         <div className="space-y-2">
-                            <h3 className="text-2xl font-black tracking-tighter uppercase leading-none">Payment Protocol</h3>
-                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Select your preferred settlement method.</p>
+                            <h3 className="text-2xl font-black tracking-tighter uppercase leading-none">Settlement Protocol</h3>
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Select your preferred transaction method.</p>
                         </div>
 
                         {availablePaymentMethods.length > 0 ? (
@@ -419,8 +579,8 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                                 <div className="flex-1">
                                                     <p className="font-black text-sm uppercase tracking-widest">{method.name}</p>
                                                     <p className="text-[10px] font-bold text-slate-400 uppercase mt-0.5">
-                                                        {method.name === 'Bank Transfer' ? 'Direct manual verification' : 
-                                                         method.name.toLowerCase().includes('delivery') ? 'Pay upon receipt' : 'Secure payment method'}
+                                                        {method.name === 'Bank Transfer' ? 'Manual verification required' : 
+                                                         method.name.toLowerCase().includes('delivery') ? 'Pay upon receipt' : 'Instant secure payment'}
                                                     </p>
                                                 </div>
                                                 {paymentMethod === method.name && <CheckCircle2 className="h-7 w-7 text-primary fill-current" />}
@@ -485,7 +645,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                                                 <AlertTriangle className="h-3.5 w-3.5" /> CRITICAL PROTOCOL
                                                             </p>
                                                             <p className="text-[11px] text-white/70 leading-relaxed font-medium">
-                                                                You <span className="text-white font-bold underline">MUST</span> enter this code in your bank app&apos;s <strong>Remark</strong> or <strong>Narration</strong> field. This unique digital signature allows our automated verification engine to instantly clear your payment and initiate fulfillment.
+                                                                You <span className="text-white font-bold underline">MUST</span> enter this code in your bank app's <strong>Remark</strong> or <strong>Narration</strong> field for automated verification.
                                                             </p>
                                                         </div>
                                                     </div>
@@ -536,7 +696,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                         </div>
                         <div className="text-center space-y-3">
                             <h3 className="text-3xl font-black tracking-tighter uppercase leading-none">Security Check</h3>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] animate-pulse">Syncing Distributed Registry...</p>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] animate-pulse">Processing Order...</p>
                         </div>
                     </div>
                 )}
@@ -545,9 +705,24 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
 
         {step !== 'processing' && (
             <footer className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border-t border-slate-100 dark:border-slate-800 p-8 rounded-t-[3rem] shadow-[0_-20px_50px_rgba(0,0,0,0.1)] z-50 pb-10">
+                <div className="mb-6 flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Settlement</p>
+                    <p className="text-2xl font-black tracking-tighter">{formatCurrency(total, currencySymbol)}</p>
+                  </div>
+                  {step === 'details' && (
+                    <div className="text-right">
+                       <p className="text-[10px] font-black uppercase tracking-widest text-primary">Next Step</p>
+                       <p className="text-xs font-bold">Payment</p>
+                    </div>
+                  )}
+                </div>
+
                 {step === 'details' ? (
                     <Button 
-                        onClick={() => setStep('payment')}
+                        onClick={() => {
+                          if (validateDetails()) setStep('payment');
+                        }}
                         className="w-full h-16 rounded-[1.5rem] bg-primary text-white font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-primary/30 group transition-all active:scale-[0.98]"
                     >
                         Proceed to Payment
