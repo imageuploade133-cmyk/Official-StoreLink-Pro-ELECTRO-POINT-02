@@ -211,30 +211,39 @@ export function CustomerManagementModal({ isOpen, onOpenChange, onCustomerSelect
     <>
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
         <DialogContent 
-          className={isMobile ? "w-full h-full p-0 flex flex-col" : "w-full md:max-w-6xl h-full md:h-[90vh] p-0 flex flex-col"}
+          className={cn(
+            "flex flex-col p-0 overflow-hidden",
+            isMobile ? "w-[100vw] h-[100dvh] max-w-none m-0 rounded-none border-none left-0 top-0 translate-x-0 translate-y-0" : "w-[95vw] max-w-6xl h-[90vh] rounded-xl"
+          )}
           onPointerDownOutside={(e) => e.preventDefault()}
         >
-          <DialogHeader className="p-6 pb-4 border-b shrink-0 bg-background flex flex-row items-center justify-between pr-14">
-            <div className="flex items-center gap-3">
-              <Users2 className="h-7 w-7 text-primary" />
-              <div className="min-w-0">
-                  <DialogTitle className="text-2xl font-bold tracking-tight truncate">Customer Hub</DialogTitle>
-                  <DialogDescription className="truncate">Manage terminal customers and website registrations.</DialogDescription>
+          <DialogHeader className="p-4 sm:p-6 border-b shrink-0 bg-background">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                <div className="p-2 bg-primary/10 rounded-full shrink-0">
+                  <Users2 className="h-5 w-5 sm:h-7 sm:w-7 text-primary" />
+                </div>
+                <div className="min-w-0">
+                    <DialogTitle className="text-lg sm:text-2xl font-bold tracking-tight truncate">Customer Hub</DialogTitle>
+                    <DialogDescription className="text-xs sm:text-sm truncate">Manage terminal and web customers.</DialogDescription>
+                </div>
               </div>
+              
+              <Button 
+                onClick={() => setIsRegisterOpen(true)}
+                size={isMobile ? "sm" : "default"}
+                className="gap-2 font-bold shadow-lg shadow-primary/20 shrink-0 mr-6 sm:mr-8"
+              >
+                <PlusCircle className="h-4 w-4" />
+                <span className="hidden sm:inline">Add New Profile</span>
+                <span className="inline sm:hidden">Add</span>
+              </Button>
             </div>
-            
-            <Button 
-              onClick={() => setIsRegisterOpen(true)}
-              className="hidden sm:flex gap-2 font-bold shadow-lg shadow-primary/20 mr-2"
-            >
-              <PlusCircle className="h-4 w-4" />
-              Add New Profile
-            </Button>
           </DialogHeader>
 
           <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-            <ScrollArea className="flex-1">
-                <div className="p-6 pt-4">
+            <ScrollArea className="flex-1 h-full">
+                <div className="p-3 sm:p-6 pt-4">
                     <CustomerSearchList
                         customers={customers}
                         isLoading={isLoading}
