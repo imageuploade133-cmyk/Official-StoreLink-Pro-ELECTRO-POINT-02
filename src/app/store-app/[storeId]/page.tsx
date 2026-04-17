@@ -123,7 +123,10 @@ export default function StoreAppPage() {
               {isLoadingSettings ? (
                 <PageSpinner label="Loading Store" subLabel="Preparing your shopping experience…" />
               ) : (
-                <div className="relative flex flex-col max-w-md mx-auto bg-background-light dark:bg-black shadow-2xl min-h-screen border-x dark:border-slate-800/50">
+                <div className={cn(
+                    "relative flex flex-col max-w-md mx-auto bg-background-light dark:bg-black min-h-screen border-x dark:border-slate-800/50 transition-shadow duration-300",
+                    (settings?.enableBackgroundShadow ?? true) ? "shadow-2xl" : "shadow-none"
+                )}>
             
             {showNav && (
                 <header className="sticky top-0 z-50 bg-background-light/80 dark:bg-black/80 backdrop-blur-xl transition-all duration-500 border-b border-slate-200/50 dark:border-slate-800/50">

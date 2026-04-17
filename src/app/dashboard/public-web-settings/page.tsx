@@ -19,6 +19,7 @@ import { ImageUploadSettings } from './components/ImageUploadSettings';
 import { WatermarkSettings } from './components/WatermarkSettings';
 import { HeroCarouselSettings } from './components/HeroCarouselSettings';
 import { HoverZoomSettings } from './components/HoverZoomSettings';
+import { BackgroundShadowSettings } from './components/BackgroundShadowSettings';
 import { WebStoreGridSettings } from '@/components/dashboard/settings/WebStoreGridSettings';
 import { ProductCardSizeSettings } from '@/components/dashboard/settings/ProductCardSizeSettings';
 
@@ -74,6 +75,7 @@ export default function PublicWebSettingsPage() {
                 <AuthPageSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
                 <HeroCarouselSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
                 <HoverZoomSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
+                <BackgroundShadowSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
                 <ImageUploadSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
                 <WatermarkSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
                 <ColorSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />

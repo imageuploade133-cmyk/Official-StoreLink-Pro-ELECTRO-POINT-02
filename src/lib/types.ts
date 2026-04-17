@@ -418,6 +418,7 @@ export interface Settings {
   enablePickUp?: boolean;
   enableDelivery?: boolean;
   deliveryLocations?: { id: string, name: string, price: number }[];
+  enableBackgroundShadow?: boolean;
 }
 
 export type AppSettings = Settings;
