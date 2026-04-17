@@ -24,6 +24,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
+import { useStoreUrl } from '@/hooks/use-store-url';
+
 interface NotificationsViewProps {
     onClose: () => void;
     onNavigate?: (tab: string) => void;
@@ -73,16 +75,18 @@ const getNotificationConfig = (status: string) => {
 export function NotificationsView({ onClose, onNavigate }: NotificationsViewProps) {
     const { user } = useUser();
     const firestore = useFirestore();
+    const { storeId } = useStoreUrl();
 
     const ordersQuery = useMemo(() => {
-        if (!firestore || !user) return null;
+        if (!firestore || !user || !storeId) return null;
         return query(
             collection(firestore, 'orders'),
+            where('store_id', '==', storeId),
             where('user_id', '==', user.uid),
             orderBy('createdAt', 'desc'),
             limit(20)
         );
-    }, [firestore, user]);
+    }, [firestore, user, storeId]);
 
     const { data: orders, isLoading } = useCollection<Order>(ordersQuery);
 

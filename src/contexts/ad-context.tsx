@@ -6,6 +6,7 @@ import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, where, doc, updateDoc, increment } from 'firebase/firestore';
 import type { AdLink } from '@/lib/types';
 import { safeStorage, safeSessionStorage } from '@/lib/storage-utils';
+import { usePathname } from 'next/navigation';
 
 interface AdContextType {
   activeAds: AdLink[];
@@ -22,11 +23,25 @@ const AdContext = createContext<AdContextType | undefined>(undefined);
 export function AdProvider({ children }: { children: React.ReactNode }) {
   const firestore = useFirestore();
   const [rewardAdClicked, setRewardAdClicked] = useState(false);
+  const pathname = usePathname();
+
+  const storeId = useMemo(() => {
+      const parts = pathname.split('/');
+      // Check if we are in /store/[storeId] or /store-app/[storeId]
+      if ((parts[1] === 'store' || parts[1] === 'store-app') && parts[2]) {
+          return parts[2];
+      }
+      return null;
+  }, [pathname]);
 
   const adsQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'adLinks'), where('status', '==', 'active'));
-  }, [firestore]);
+    if (!firestore || !storeId) return null;
+    return query(
+        collection(firestore, 'adLinks'), 
+        where('store_id', '==', storeId),
+        where('status', '==', 'active')
+    );
+  }, [firestore, storeId]);
 
   const { data: activeAds } = useCollection<AdLink>(adsQuery);
 

@@ -40,9 +40,13 @@ export function RecentlyViewedSection({ excludeId, onViewAll }: RecentlyViewedSe
   }, [viewedProductIds, excludeId]);
 
   const productsQuery = useMemo(() => {
-    if (!firestore || targetIds.length === 0) return null;
-    return query(collection(firestore, 'products'), where(documentId(), 'in', targetIds));
-  }, [firestore, targetIds]);
+    if (!firestore || targetIds.length === 0 || !storeId) return null;
+    return query(
+      collection(firestore, 'products'), 
+      where('store_id', '==', storeId),
+      where(documentId(), 'in', targetIds)
+    );
+  }, [firestore, targetIds, storeId]);
 
   const categoriesQuery = useMemo(() => {
     if (!firestore || !storeId) return null;

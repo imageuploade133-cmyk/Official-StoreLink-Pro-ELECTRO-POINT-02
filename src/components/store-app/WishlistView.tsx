@@ -30,6 +30,8 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
+import { useStoreUrl } from '@/hooks/use-store-url';
+
 interface WishlistViewProps {
     onClose: () => void;
     onSelectProduct: (id: string) => void;
@@ -39,6 +41,7 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
     const { wishlistProductIds, removeFromWishlist, wishlistCount } = useWishlist();
     const firestore = useFirestore();
     const { settings } = useSettings();
+    const { storeId } = useStoreUrl();
     const { addToCart } = useCart();
     
     const [today, setToday] = useState<Date | null>(null);
@@ -132,14 +135,22 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
     const productIds = useMemo(() => Array.from(wishlistProductIds), [wishlistProductIds]);
 
     const productsQuery = useMemo(() => {
-        if (!firestore || productIds.length === 0) return null;
-        return query(collection(firestore, 'products'), where(documentId(), 'in', productIds.slice(0, 30)));
-    }, [firestore, productIds]);
+        if (!firestore || productIds.length === 0 || !storeId) return null;
+        return query(
+            collection(firestore, 'products'), 
+            where('store_id', '==', storeId),
+            where(documentId(), 'in', productIds.slice(0, 30))
+        );
+    }, [firestore, productIds, storeId]);
     
     const categoriesQuery = useMemo(() => {
-        if (!firestore) return null;
-        return query(collection(firestore, 'categories'), orderBy('name'));
-    }, [firestore]);
+        if (!firestore || !storeId) return null;
+        return query(
+            collection(firestore, 'categories'), 
+            where('store_id', '==', storeId),
+            orderBy('name')
+        );
+    }, [firestore, storeId]);
 
     const { data: products, isLoading } = useCollection<Product>(productsQuery);
     const { data: categories } = useCollection<Category>(categoriesQuery);

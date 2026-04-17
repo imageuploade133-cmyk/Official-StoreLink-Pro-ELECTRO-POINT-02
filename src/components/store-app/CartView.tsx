@@ -37,6 +37,8 @@ import { Input } from '@/components/ui/input';
 import { safeSessionStorage } from '@/lib/storage-utils';
 import { useAds } from '@/contexts/ad-context';
 
+import { useStoreUrl } from '@/hooks/use-store-url';
+
 interface CartViewProps {
     onNavigateToHome: () => void;
     onStartCheckout: () => void;
@@ -45,6 +47,7 @@ interface CartViewProps {
 export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
     const { cartCount, cartItems, updateQuantity, removeFromCart } = useCart();
     const { settings } = useSettings();
+    const { storeId } = useStoreUrl();
     const firestore = useFirestore();
     const { toast } = useToast();
     const { activeAds, rewardAdClicked, setRewardAdClicked, applyRewardDiscount, recordAdClick } = useAds();
@@ -73,9 +76,13 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
     // Optimized batch query for items in cart
     const productIds = useMemo(() => cartItems.map(item => item.id), [cartItems]);
     const productsQuery = useMemo(() => {
-        if (!firestore || productIds.length === 0) return null;
-        return query(collection(firestore, 'products'), where(documentId(), 'in', productIds.slice(0, 30)));
-    }, [firestore, productIds]);
+        if (!firestore || productIds.length === 0 || !storeId) return null;
+        return query(
+            collection(firestore, 'products'), 
+            where('store_id', '==', storeId),
+            where(documentId(), 'in', productIds.slice(0, 30))
+        );
+    }, [firestore, productIds, storeId]);
 
     const { data: dbProducts, isLoading: isLoadingInventory } = useCollection<Product>(productsQuery);
 
@@ -135,10 +142,15 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
 
     const handleApplyCoupon = async () => {
         const code = couponCode.toUpperCase().trim();
-        if (!code || !firestore) return;
+        if (!code || !firestore || !storeId) return;
         setIsValidatingCoupon(true);
         try {
-            const q = query(collection(firestore, 'coupons'), where('code', '==', code), limit(1));
+            const q = query(
+                collection(firestore, 'coupons'), 
+                where('store_id', '==', storeId),
+                where('code', '==', code), 
+                limit(1)
+            );
             const snapshot = await getDocs(q);
             if (snapshot.empty) {
                 toast({ variant: "destructive", title: "Invalid Protocol", description: "The provided promo code is not found in the registry." });

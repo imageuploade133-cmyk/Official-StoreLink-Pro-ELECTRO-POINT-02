@@ -48,6 +48,8 @@ import regions from '@/lib/regions.json';
 import type { AppSettings, WhatsappMessageLog } from '@/lib/types';
 import { formatCurrency } from '@/lib/formatUtils';
 
+import { useStoreUrl } from '@/hooks/use-store-url';
+
 const iconMap = {
   PartyPopper,
   Sparkles,
@@ -86,6 +88,7 @@ export function SignupView({ onClose, onNavigate }: SignupViewProps) {
     const firestore = useFirestore();
     const { toast } = useToast();
     const { settings } = useSettings();
+    const { storeId } = useStoreUrl();
     const [showPassword, setShowPassword] = useState(false);
     const [isCongratulationActive, setIsCongratulationActive] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
@@ -100,7 +103,7 @@ export function SignupView({ onClose, onNavigate }: SignupViewProps) {
     });
 
     const onSubmit = async (values: SignupValues) => {
-        if (!firestore) return;
+        if (!firestore || !storeId) return;
         setIsProcessing(true);
         try {
             const settingsRef = doc(firestore, 'settings', 'global');
@@ -127,6 +130,7 @@ export function SignupView({ onClose, onNavigate }: SignupViewProps) {
 
             batch.set(doc(firestore, 'customers', newUser.uid), {
                 uid: newUser.uid,
+                store_id: storeId,
                 name: values.name,
                 email: values.email,
                 phone: values.phone,
@@ -147,6 +151,7 @@ export function SignupView({ onClose, onNavigate }: SignupViewProps) {
                 const paymentLogRef = doc(collection(firestore, "creditPayments"));
                 batch.set(paymentLogRef, {
                     customerId: newUser.uid,
+                    store_id: storeId,
                     customerName: values.name,
                     amount: welcomeCreditAmount,
                     paymentDate: serverTimestamp(),

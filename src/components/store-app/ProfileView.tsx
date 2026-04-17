@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { useUser, useAuth, useFirestore, useDoc } from '@/firebase';
-import { doc } from 'firebase/firestore';
+import { useUser, useAuth, useFirestore, useDoc, useCollection } from '@/firebase';
+import { doc, query, collection, where, limit } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import type { UserProfile, Customer } from '@/lib/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -34,6 +34,7 @@ import {
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/formatUtils';
 import { useSettings } from '@/contexts/settings-context';
+import { useStoreUrl } from '@/hooks/use-store-url';
 
 interface ProfileViewProps {
     onNavigate: (tab: string) => void;
@@ -45,15 +46,26 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
     const firestore = useFirestore();
     const { toast } = useToast();
     const { settings } = useSettings();
+    const { storeId } = useStoreUrl();
     const currencySymbol = settings?.currency || '$';
     
     const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
 
     const userProfileRef = useMemo(() => user ? doc(firestore, 'users', user.uid) : null, [user, firestore]);
-    const customerRef = useMemo(() => user ? doc(firestore, 'customers', user.uid) : null, [user, firestore]);
-
     const { data: userProfile } = useDoc<UserProfile>(userProfileRef);
-    const { data: customer } = useDoc<Customer>(customerRef);
+
+    // Fetch customer record for bonus display - Isolated by store
+    const customersQuery = useMemo(() => {
+        if (!user || !firestore || !storeId) return null;
+        return query(
+            collection(firestore, 'customers'),
+            where('uid', '==', user.uid),
+            where('store_id', '==', storeId),
+            limit(1)
+        );
+    }, [user, firestore, storeId]);
+    const { data: customers } = useCollection<Customer>(customersQuery);
+    const customer = customers?.[0];
 
     const getInitials = (email?: string | null) => {
         if (!email) return 'U';

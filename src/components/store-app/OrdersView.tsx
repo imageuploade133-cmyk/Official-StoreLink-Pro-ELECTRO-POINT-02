@@ -29,6 +29,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 
+import { useStoreUrl } from '@/hooks/use-store-url';
+
 interface OrdersViewProps {
     onClose: () => void;
     onNavigate?: (tab: string) => void;
@@ -49,17 +51,19 @@ export function OrdersView({ onClose, onNavigate }: OrdersViewProps) {
     const { user } = useUser();
     const firestore = useFirestore();
     const { settings } = useSettings();
+    const { storeId } = useStoreUrl();
     const currencySymbol = settings?.currency || '$';
 
     const ordersQuery = useMemo(() => {
-        if (!firestore || !user) return null;
+        if (!firestore || !user || !storeId) return null;
         return query(
             collection(firestore, 'orders'),
+            where('store_id', '==', storeId),
             where('user_id', '==', user.uid),
             orderBy('createdAt', 'desc'),
             limit(50)
         );
-    }, [firestore, user]);
+    }, [firestore, user, storeId]);
 
     const { data: orders, isLoading } = useCollection<Order>(ordersQuery);
 
