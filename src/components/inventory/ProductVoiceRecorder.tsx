@@ -419,7 +419,7 @@ const startRecording = async (index: number) => {
                                                             type="button" 
                                                             variant={hasAudio ? "outline" : "default"}
                                                             onClick={() => startRecording(index)}
-                                                            className="rounded-2xl w-full h-14 font-black uppercase text-xs tracking-widest   hover: transition-all active:scale"
+                                                            className="rounded-2xl w-full h-14 font-black uppercase text-xs tracking-widest   transition-all active:scale"
                                                             disabled={isConverting}
                                                         >
                                                             {isConverting ? (

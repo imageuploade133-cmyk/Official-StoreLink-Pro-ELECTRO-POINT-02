@@ -160,7 +160,7 @@ export function HeroCarousel() {
     const size = useIndividual
       ? (settings?.storeHeroBtnSize || 'lg')
       : (settings?.storeBtnSize || 'md');
-    const  = useIndividual
+    const _shadow_removed = useIndividual
       ? (settings?.storeHeroBtnShadow || 'md')
       : 'md';
     
@@ -191,7 +191,7 @@ export function HeroCarousel() {
     
     const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
     const shapeClass = shapeClasses[shape] || 'rounded';
-    const shadowClass = shadowClasses[ as keyof typeof shadowClasses] || '';
+    const shadowClass = shadowClasses[_shadow_removed as keyof typeof shadowClasses] || '';
 
     return `${shapeClass} ${sizeClass} ${shadowClass}`;
   }, [settings]);

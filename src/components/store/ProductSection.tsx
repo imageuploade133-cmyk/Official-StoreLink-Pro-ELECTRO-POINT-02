@@ -351,7 +351,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
     const shape = useIndividual
         ? (settings?.storeExploreBtnShape || 'full')
         : (settings?.storeBtnShape || 'full');
-    const  = useIndividual
+    const _shadow_removed = useIndividual
         ? (settings?.storeExploreBtnShadow || 'sm')
         : 'sm';
 
@@ -382,7 +382,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
 
     const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
     const shapeClass = shapeClasses[shape] || 'rounded-full';
-    const shadowClass = shadowClasses[ as keyof typeof shadowClasses] || '';
+    const shadowClass = shadowClasses[_shadow_removed as keyof typeof shadowClasses] || '';
 
     return `${sizeClass} ${shapeClass} ${shadowClass}`;
   }, [settings]);

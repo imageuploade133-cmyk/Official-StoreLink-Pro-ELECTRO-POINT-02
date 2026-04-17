@@ -64,13 +64,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           // Handle Body Background and Component --background variable
           const backgroundStyle = settings.backgroundStyle || 'solid';
   
-          if (backgroundStyle === 'image' && settings.backgroundImageUrl) {
+          if (backgroundStyle === 'image' && settings.backgroundImageUrl && !isDark) {
               body.style.backgroundImage = `url('${settings.backgroundImageUrl}')`;
               body.style.backgroundSize = 'cover';
               body.style.backgroundPosition = 'center';
               body.style.backgroundAttachment = 'fixed';
               // Use a slightly more transparent background for cards when an image is active
-              if (settings.colorBackground && !isDark) {
+              if (settings.colorBackground) {
                   root.style.setProperty('--background', hexToHslString(settings.colorBackground));
               } else {
                   root.style.removeProperty('--background');

@@ -88,7 +88,7 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
         const shape = useIndividual
             ? (settings?.storeGridCartShape || 'md')
             : (settings?.storeBtnShape || 'md');
-        const  = useIndividual
+        const _shadow_removed = useIndividual
             ? (settings?.storeGridCartShadow || 'sm')
             : 'sm';
         
@@ -119,7 +119,7 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
         
         const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
         const shapeClass = shapeClasses[shape] || 'rounded-2xl';
-        const shadowClass = shadowClasses[ as keyof typeof shadowClasses] || '';
+        const shadowClass = shadowClasses[_shadow_removed as keyof typeof shadowClasses] || '';
 
         return `${sizeClass} ${shapeClass} ${shadowClass}`;
     }, [settings]);

@@ -184,7 +184,7 @@ export default function ShopCollectionSettingsPage() {
       />
 
       <div className="grid grid-cols-1 gap-6">
-        <Card className="border-slate-200 dark:border-slate-800  hover: transition-">
+        <Card className="border-slate-200 dark:border-slate-800  transition-">
           <CardHeader>
             <div className="flex items-start gap-3 flex-1">
                 <div className="p-2 rounded-lg bg-primary/10 flex-shrink-0">

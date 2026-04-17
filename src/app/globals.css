@@ -331,8 +331,8 @@
 
   /* Premium spinner ring glow */
   @keyframes ring-glow {
-    0%, 100% { filter: drop-shadow(0 0 3px hsl(217 91% 60% / 0.3)); }
-    50% { filter: drop-shadow(0 0 8px hsl(217 91% 60% / 0.7)); }
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
   }
   .animate-ring-glow {
     animation: ring-glow 2s ease-in-out infinite;
@@ -611,9 +611,6 @@
   background-color: hsl(var(--popover)) !important;
 }
 
-/* Shadow and depth for dark cards */
-.dark [class*=""] {
-}
 
 /* Header icon dark mode - Ensure icons are visible */
 .dark header {
@@ -1112,47 +1109,42 @@
   transition: color 0.2s ease, filter 0.2s ease, transform 0.2s ease;
 }
 
-/* ── Core nav section: Electric Blue ── */
+/* Core nav section: Electric Blue */
 .dark aside nav a[href="/dashboard"] svg,
 .dark aside nav a[href="/pos"] svg,
 .dark aside nav a[href="/dashboard/profile"] svg {
   color: #60a5fa;
-  filter: drop-shadow(0 0 4px rgba(96, 165, 250, 0));
   transition: all 0.25s ease;
 }
 
-/* ── Invoicing section: Violet ── */
+/* Invoicing section: Violet */
 .dark aside nav a[href^="/dashboard/invoice"] svg,
 .dark aside nav a[href="/dashboard/invoicing-settings"] svg {
   color: #a78bfa;
-  filter: drop-shadow(0 0 4px rgba(167, 139, 250, 0));
 }
 
-/* ── Reports section: Emerald Green ── */
+/* Reports section: Emerald Green */
 .dark aside nav a[href="/dashboard/my-sales"] svg,
 .dark aside nav a[href="/dashboard/sales-history"] svg,
 .dark aside nav a[href="/dashboard/returns"] svg,
 .dark aside nav a[href="/dashboard/product-sales"] svg,
 .dark aside nav a[href="/dashboard/expenses"] svg {
   color: #34d399;
-  filter: drop-shadow(0 0 4px rgba(52, 211, 153, 0));
 }
 
-/* ── Financials section: Gold ── */
+/* Financials section: Gold */
 .dark aside nav a[href="/dashboard/flexible-payments"] svg {
   color: #fbbf24;
-  filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0));
 }
 
-/* ── E-Commerce section: Rose Pink ── */
+/* E-Commerce section: Rose Pink */
 .dark aside nav a[href="/dashboard/orders"] svg,
 .dark aside nav a[href="/dashboard/order-alerts"] svg,
 .dark aside nav a[href="/dashboard/online-customers"] svg {
   color: #fb7185;
-  filter: drop-shadow(0 0 4px rgba(251, 113, 133, 0));
 }
 
-/* ── Inventory section: Amber/Orange ── */
+/* Inventory section: Amber/Orange */
 .dark aside nav a[href="/dashboard/inventory"] svg,
 .dark aside nav a[href="/dashboard/categories"] svg,
 .dark aside nav a[href="/dashboard/stock-audit"] svg,
@@ -1161,24 +1153,21 @@
 .dark aside nav a[href="/dashboard/print-barcodes"] svg,
 .dark aside nav a[href="/dashboard/bulk-add-products"] svg {
   color: #fb923c;
-  filter: drop-shadow(0 0 4px rgba(251, 146, 60, 0));
 }
 
-/* ── Management section: Sky Blue ── */
+/* Management section: Sky Blue */
 .dark aside nav a[href="/dashboard/customers"] svg,
 .dark aside nav a[href="/dashboard/staff"] svg {
   color: #38bdf8;
-  filter: drop-shadow(0 0 4px rgba(56, 189, 248, 0));
 }
 
-/* ── Marketing section: Fuchsia/Purple ── */
+/* Marketing section: Fuchsia/Purple */
 .dark aside nav a[href="/dashboard/welcome-credit-settings"] svg,
 .dark aside nav a[href="/dashboard/whatsapp"] svg {
   color: #e879f9;
-  filter: drop-shadow(0 0 4px rgba(232, 121, 249, 0));
 }
 
-/* ── Website section: Cyan ── */
+/* Website section: Cyan */
 .dark aside nav a[href^="/dashboard/flash-hub"] svg,
 .dark aside nav a[href^="/dashboard/category-gallery"] svg,
 .dark aside nav a[href^="/dashboard/voice-settings"] svg,
@@ -1196,26 +1185,17 @@
 .dark aside nav a[href^="/dashboard/homepage-sections"] svg,
 .dark aside nav a[href^="/dashboard/add-ui-section"] svg {
   color: #22d3ee;
-  filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0));
 }
 
-/* ── Administration section: Red/Slate ── */
+/* Administration section: Red/Slate */
 .dark aside nav a[href="/dashboard/settings"] svg,
 .dark aside nav a[href="/dashboard/permissions"] svg {
   color: #94a3b8;
-  filter: drop-shadow(0 0 4px rgba(148, 163, 184, 0));
 }
 
-/* ══ ICON GLOW on hover — beautiful effect ══ */
-.dark aside nav a:hover svg {
-  filter: drop-shadow(0 0 6px currentColor) !important;
-  transform: scale(1.15);
-}
-
-/* ══ Active link icon: full brightness + strong glow ══ */
+/* Active link icon: full brightness */
 .dark aside nav a.active svg,
 .dark aside nav a[aria-current="page"] svg {
-  filter: drop-shadow(0 0 8px currentColor) !important;
   transform: scale(1.1);
   opacity: 1 !important;
 }
@@ -1301,7 +1281,7 @@
 .dark [class*="rounded-lg"]:not(button):not(a):not(nav *) {
   background: hsl(220 25% 10%) !important;
   border: 1px solid hsl(217 20% 17%) !important;
-  transition: border-color 0.2s ease, box- 0.2s ease !important;
+  transition: border-color 0.2s ease !important;
 }
 
 .dark .card:hover {

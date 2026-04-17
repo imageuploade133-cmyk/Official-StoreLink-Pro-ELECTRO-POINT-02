@@ -153,9 +153,6 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
     const size = useIndividual
       ? (settings?.storeGridCartSize || 'md')
       : (settings?.storeBtnSize || 'md');
-    const  = useIndividual
-      ? (settings?.storeGridCartShadow || 'sm')
-      : 'sm';
     
     const sizeClasses: Record<string, string> = {
       sm: 'px-3 py-1.5 text-xs',
@@ -171,20 +168,10 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
       lg: 'rounded-2xl',
       full: 'rounded-full'
     };
-
-    const shadowClasses: Record<string, string> = {
-      none: '',
-      sm: '',
-      md: '',
-      lg: '',
-      xl: '',
-      '2xl': '',
-      inner: ''
-    };
     
     const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.md;
     const shapeClass = shapeClasses[shape] || 'rounded-2xl';
-    const shadowClass = shadowClasses[ as keyof typeof shadowClasses] || '';
+    const shadowClass = '';
 
     return `${shapeClass} ${sizeClass} ${shadowClass}`;
   }, [settings]);
@@ -196,7 +183,6 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
   // Get card designer settings with defaults
   const cardStyle = settings?.productCardStyle || 'default';
   const borderRadius = settings?.productCardBorderRadius || 'lg';
-  const  = settings?.productCardShadow || 'md';
   const borderWidth = settings?.productCardBorderWidth || 'thin';
   const borderColor = settings?.productCardBorderColor || '#e2e8f0';
   const bgColor = settings?.productCardBgColor || '#ffffff';
@@ -219,14 +205,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
     'full': 'rounded-3xl',
   }[borderRadius] || 'rounded-lg';
 
-  // Map  to Tailwind class
-  const shadowClass = {
-    'none': '',
-    'sm': '',
-    'md': '',
-    'lg': '',
-    'xl': '',
-  }[] || '';
+  const shadowClass = '';
 
   // Map border width to Tailwind class
   const borderWidthClass = {
@@ -241,7 +220,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
     'none': '',
     'lift': 'hover:-translate-y-2',
     'zoom': '',
-    'glow': 'hover: hover:',
+    'glow': '',
     'border': 'hover:border-primary',
   }[hoverEffect] || 'hover:-translate-y-2';
 
@@ -318,12 +297,11 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
               className={`text-white font-black text uppercase tracking-widest px-3 py-1.5  border-none rounded-full w-fit ${styles.discountBadge}`}
               style={{ 
                   background: `linear-gradient(135deg, ${settings?.flashHubColor || '#e11d48'}, ${settings?.flashHubColor || '#e11d48'}dd)`,
-                  boxShadow: `0 8px 16px ${settings?.flashHubColor || '#e11d48'}44`
               }}
             >
               <Zap 
-                  className="h-3 w-3 mr-1 fill-current" 
-                  style={{ color: settings?.flashHubIconColor || '#fbbf24' }}
+                className="h-3 w-3 mr-1 fill-current" 
+                style={{ color: settings?.flashHubIconColor || '#fbbf24' }}
               /> 
               -{discountPercentage}%
             </Badge>
@@ -351,7 +329,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
             onClick={handleAddToCart}
             disabled={isOutOfStock}
             style={buttonStyle}
-            className={`w-full font-black text-sm uppercase tracking-wide  transition-all active:scale-95 ${styles.cartButton} ${buttonClasses} hover: disabled:opacity-50 disabled:cursor-not-allowed`}
+            className={`w-full font-black text-sm uppercase tracking-wide  transition-all active:scale-95 ${styles.cartButton} ${buttonClasses} disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             <GridCartIcon className={`h-5 w-5 mr-2 transition-all ${styles.cartIcon}`} />
             {settings?.storeGridCartText || 'Add to Bag'}

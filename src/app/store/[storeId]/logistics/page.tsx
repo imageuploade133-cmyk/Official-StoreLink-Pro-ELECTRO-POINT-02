@@ -107,7 +107,7 @@ export default function LogisticsPage() {
                 { icon: Zap, title: 'Edge Routing', desc: 'Direct carrier links', color: 'text-amber-500' },
                 { icon: RotateCcw, title: 'Total Guarantee', desc: '30-day return policy', color: 'text-green-500' },
             ].map((stat, i) => (
-                <Card key={i} className="w-full border-none  bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded transition-all duration-500 hover:-translate-y-3 hover:">
+                <Card key={i} className="w-full border-none  bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded transition-all duration-500 hover:-translate-y-3">
                     <CardContent className="pt-10 pb-8 flex flex-col items-center text-center space-y-4">
                         <div className={cn("h-16 w-16 rounded bg-slate-50 dark:bg-slate-800 flex items-center justify-center ", stat.color)}>
                             <stat.icon className="h-8 w-8" strokeWidth={2.5} />

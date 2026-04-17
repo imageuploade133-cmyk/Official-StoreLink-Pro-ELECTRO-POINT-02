@@ -109,7 +109,7 @@ export function StickyProductBar({
     const size = useIndividual
       ? (settings?.storeAddToCartSize || 'lg')
       : (settings?.storeBtnSize || 'md');
-    const  = useIndividual
+    const _shadow_removed = useIndividual
       ? (settings?.storeAddToCartShadow || 'sm')
       : 'sm';
     
@@ -140,7 +140,7 @@ export function StickyProductBar({
     
     const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
     const shapeClass = shapeClasses[shape] || 'rounded-2xl';
-    const shadowClass = shadowClasses[ as keyof typeof shadowClasses] || '';
+    const shadowClass = shadowClasses[_shadow_removed as keyof typeof shadowClasses] || '';
 
     return `${shapeClass} ${sizeClass} ${shadowClass}`;
   }, [settings]);

@@ -678,7 +678,7 @@ export function PublicNavbar() {
                                                         <Link 
                                                             key={product.id}
                                                             href={getStoreUrl(`/store/product/${product.id}`)}
-                                                            className="flex items-center gap-6 p-6 bg-white dark:bg-slate-900 rounded transition-all border border-slate-100 dark:border-slate-800 hover:border-primary/30 group  hover: active:scale"
+                                                            className="flex items-center gap-6 p-6 bg-white dark:bg-slate-900 rounded transition-all border border-slate-100 dark:border-slate-800 hover:border-primary/30 group  active:scale"
                                                             onClick={() => setIsSearchFocused(false)}
                                                         >
                                                             <div className="relative h-20 w-20 md:h-24 md:w-24 rounded-2xl overflow-hidden border bg-white flex-shrink-0 ">

@@ -255,7 +255,6 @@ export default function ProductCardDesignerPage() {
   }
 
   const borderRadiusClass = borderRadiusOptions.find(o => o.value === settings.productCardBorderRadius)?.class || 'rounded-lg';
-  const shadowClass = shadowOptions.find(o => o.value === settings.productCardShadow)?.class || '';
   const borderWidthClass = borderWidthOptions.find(o => o.value === settings.productCardBorderWidth)?.class || 'border';
 
   return (
@@ -359,28 +358,7 @@ export default function ProductCardDesignerPage() {
                     </div>
                   </div>
 
-                  {/* Shadow */}
-                  <div className="space-y-3">
-                    <Label>Shadow</Label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {shadowOptions.map((option) => (
-                        <button
-                          key={option.value}
-                          onClick={() => updateSetting('productCardShadow', option.value as any)}
-                          className={cn(
-                            'px-3 py-2 text-sm rounded-md border-2 transition-all',
-                            settings.productCardShadow === option.value
-                              ? 'border-primary bg-primary/10'
-                              : 'border-slate-200 dark:border-slate-700'
-                          )}
-                        >
-                          {option.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Border */}
+                  {/* Border Width */}
                   <div className="space-y-3">
                     <Label>Border Width</Label>
                     <div className="grid grid-cols-2 gap-2">
@@ -778,7 +756,6 @@ export default function ProductCardDesignerPage() {
                       className={cn(
                         'bg-white dark:bg-slate-800 overflow-hidden transition-all duration-300',
                         borderRadiusClass,
-                        shadowClass,
                         borderWidthClass,
                         settings.productCardHoverEffect === 'lift' && 'hover:-translate-y-2',
                         settings.productCardHoverEffect === 'glow' && 'hover: hover:',
@@ -901,7 +878,6 @@ export default function ProductCardDesignerPage() {
                     className={cn(
                       'bg-white dark:bg-slate-800 overflow-hidden transition-all duration-300',
                       borderRadiusClass,
-                      shadowClass,
                       borderWidthClass,
                       settings.productCardHoverEffect === 'lift' && 'hover:-translate-y-2',
                       settings.productCardHoverEffect === 'glow' && 'hover: hover:',
@@ -1008,7 +984,7 @@ export default function ProductCardDesignerPage() {
 }
 
 // Default HTML Template
-const defaultHtmlTemplate = `<div class="group relative flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all duration-500 hover:border-primary/30 overflow-hidden h-full hover:-translate-y-1 hover:" style="height: {{cardHeight}}px;">
+const defaultHtmlTemplate = `<div class="group relative flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all duration-500 hover:border-primary/30 overflow-hidden h-full hover:-translate-y-1" style="height: {{cardHeight}}px;">
   <!-- Media Area -->
   <a href="/store/product/{{product.id}}" class="block relative overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900" style="height: 60%;">
     <img
@@ -1038,7 +1014,7 @@ const defaultHtmlTemplate = `<div class="group relative flex flex-col bg-white d
 
     <!-- Quick Add -->
     <div class="absolute inset-x-0 bottom-0 p-5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-gradient-to-t from-black/40 to-transparent">
-      <button class="w-full bg-primary text-white font-black text-sm uppercase tracking-wide  py-3 rounded-lg hover: transition-all active:scale-95">
+      <button class="w-full bg-primary text-white font-black text-sm uppercase tracking-wide  py-3 rounded-lg transition-all active:scale-95">
         🛒 Add to Bag
       </button>
     </div>
@@ -1108,7 +1084,7 @@ const defaultHtmlTemplate = `<div class="group relative flex flex-col bg-white d
 </div>`;
 
 // Minimal HTML Template
-const minimalHtmlTemplate = `<div class="group relative bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-300 hover:" style="height: {{cardHeight}}px;">
+const minimalHtmlTemplate = `<div class="group relative bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-300" style="height: {{cardHeight}}px;">
   <a href="/store/product/{{product.id}}" class="block">
     <div class="aspect-square overflow-hidden bg-slate-100">
       <img

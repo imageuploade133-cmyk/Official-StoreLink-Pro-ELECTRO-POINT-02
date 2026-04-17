@@ -25,7 +25,7 @@ const Switch = React.forwardRef<
   >
     <SwitchPrimitives.Thumb
       className={cn(
-        "pointer-events-none block h-5 w-5 rounded-full  ring-0 transition-all duration-300 data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0 hover:",
+        "pointer-events-none block h-5 w-5 rounded-full  ring-0 transition-all duration-300 data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0",
         // Light theme - thumb colors
         "bg-white data-[state=unchecked]:ring-gray-400/30",
         "data-[state=checked]:ring-emerald-400/40",

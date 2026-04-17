@@ -363,7 +363,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                 key={cat.id}
                                 type="button"
                                 className={cn(
-                                    "group relative flex flex-col items-center p-3 rounded-xl border-2 transition-all duration-300 hover:",
+                                    "group relative flex flex-col items-center p-3 rounded-xl border-2 transition-all duration-300",
                                     currentCategoryId === cat.id 
                                         ? "border-primary bg-primary/5 ring-2 ring-primary/20" 
                                         : "border-transparent bg-background hover:border-primary/30 hover:bg-muted/50"

@@ -121,7 +121,7 @@ export function WebStoreGridSettings({ settingsData, isLoading, storeId }: WebSt
   };
 
   return (
-    <Card className="border-slate-200 dark:border-slate-700  hover: transition-">
+    <Card className="border-slate-200 dark:border-slate-700  transition-">
       <CardHeader className="pb-4">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3 flex-1">

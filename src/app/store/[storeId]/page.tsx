@@ -96,7 +96,7 @@ export default function StoreHomePage() {
                     <div 
                       className={cn(
                         "flex flex-col items-center text-center p-8 rounded bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 transition-all duration-500 group h-full",
-                        settings?.brandValuesEnableShadow !== false && " hover:",
+                        settings?.brandValuesEnableShadow !== false && "",
                         settings?.brandValuesEnableZoom !== false && "hover:-translate-y-1.5"
                       )}
                     >

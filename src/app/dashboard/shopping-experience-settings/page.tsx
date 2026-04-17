@@ -73,16 +73,6 @@ const buttonShapes = [
   { name: 'full', label: 'Pill', description: 'Maximum rounding', class: 'rounded-full' },
 ];
 
-const shadowOptions = [
-  { name: 'none', label: 'None', class: '' },
-  { name: 'sm', label: 'Small', class: '' },
-  { name: 'md', label: 'Medium', class: '' },
-  { name: 'lg', label: 'Large', class: '' },
-  { name: 'xl', label: 'X-Large', class: '' },
-  { name: '2xl', label: '2X-Large', class: '' },
-  { name: 'inner', label: 'Inner', class: '' },
-];
-
 const shoppingExpSchema = z.object({
   storeAddToCartText: z.string().min(1, 'Label required').max(40, 'Label too long.'),
   storeAddToCartIcon: z.preprocess((val) => val || 'ShoppingCart', z.string()).default('ShoppingCart'),
@@ -307,46 +297,6 @@ function ButtonShapeSelector({
   );
 }
 
-// Button Shadow Selector Component
-function ButtonShadowSelector({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <FormItem className="space-y-3">
-      <FormLabel className="text-base font-bold flex items-center gap-2">
-        <MousePointerClick className="h-4 w-4" /> Button Shadow
-      </FormLabel>
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-        {shadowOptions.map(() => (
-          <button
-            key={.name}
-            type="button"
-            onClick={() => onChange(.name)}
-            className={cn(
-              "relative flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all",
-              value === .name
-                ? 'border-primary bg-primary/5'
-                : 'border-muted hover:border-primary/30 hover:bg-muted/30'
-            )}
-          >
-            <div className={cn("w-12 h-6 bg-background border border-muted", .class)} />
-            <div className="text-center">
-              <p className="text font-semibold">{.label}</p>
-            </div>
-            {value === .name && (
-              <Check className="absolute top-1 right-1 h-3 w-3 text-primary" />
-            )}
-          </button>
-        ))}
-      </div>
-    </FormItem>
-  );
-}
-
 // Button Preview Component
 function ButtonPreview({
   settings,
@@ -364,7 +314,6 @@ function ButtonPreview({
   const style = settings[`${prefix}Style`] || 'standard';
   const size = settings[`${prefix}Size`] || 'md';
   const shape = settings[`${prefix}Shape`] || 'md';
-  const  = settings[`${prefix}Shadow`] || 'sm';
 
   const getSizeClasses = (s: string) => {
     switch (s) {
@@ -379,11 +328,6 @@ function ButtonPreview({
   const getShapeClass = (sh: string) => {
     const found = buttonShapes.find(s => s.name === sh);
     return found ? found.class : 'rounded-md';
-  };
-
-  const getShadowClass = (shd: string) => {
-    const found = shadowOptions.find(s => s.name === shd);
-    return found ? found.class : '';
   };
 
   const getStyleProperties = () => {
@@ -432,7 +376,7 @@ function ButtonPreview({
       <p className="text-xs font-semibold text-muted-foreground mb-3">Preview</p>
       <Button
         type="button"
-        className={cn(getSizeClasses(size), getShapeClass(shape), getShadowClass(), "font-semibold")}
+        className={cn(getSizeClasses(size), getShapeClass(shape), "font-semibold")}
         style={getStyleProperties()}
       >
         {Icon && <Icon className="mr-2 h-4 w-4" />}
@@ -558,18 +502,6 @@ function ButtonSection({
           render={({ field }) => (
             <ButtonShapeSelector
               value={field.value || (prefix === 'storeGridCart' ? 'md' : 'lg')}
-              onChange={field.onChange}
-            />
-          )}
-        />
-
-        {/* Button Shadow Selection */}
-        <FormField
-          control={form.control}
-          name={`${prefix}Shadow` as any}
-          render={({ field }) => (
-            <ButtonShadowSelector
-              value={field.value || (prefix === 'storeHeroBtn' ? 'md' : 'sm')}
               onChange={field.onChange}
             />
           )}

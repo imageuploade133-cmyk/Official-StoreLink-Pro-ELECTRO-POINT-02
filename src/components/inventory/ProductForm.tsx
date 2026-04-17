@@ -597,7 +597,7 @@ export function ProductForm({
                 key={cat.id}
                 type="button"
                 className={cn(
-                  "group relative flex flex-col items-center p-4 rounded-2xl border-2 transition-all duration-300 hover:",
+                  "group relative flex flex-col items-center p-4 rounded-2xl border-2 transition-all duration-300",
                   form.watch('categoryId') === cat.id
                     ? "border-primary bg-primary/5 ring-4 ring-primary/10"
                     : "border-muted-foreground/10 bg-background hover:border-primary/30 hover:bg-primary/5"
@@ -820,7 +820,7 @@ export function ProductForm({
                           type="button"
                           variant="outline"
                           size="icon"
-                          className="h-10 w-10 rounded-lg  hover: transition-all border-primary/50"
+                          className="h-10 w-10 rounded-lg  transition-all border-primary/50"
                           onClick={() => setIsBarcodeScannerOpen(true)}
                           title="Scan barcode with camera"
                         >

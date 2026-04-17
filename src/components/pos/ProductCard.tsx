@@ -119,7 +119,7 @@ export const ProductCard = React.memo(({ product, onAddToCart, priority, currenc
     
     return (
         <Card className={cn(
-            "overflow-hidden  hover: transition- duration-200 flex flex-col group border-2",
+            "overflow-hidden  transition- duration-200 flex flex-col group border-2",
             isSmallMode ? "rounded-xl" : "rounded-2xl"
         )}>
         <div className={cn(

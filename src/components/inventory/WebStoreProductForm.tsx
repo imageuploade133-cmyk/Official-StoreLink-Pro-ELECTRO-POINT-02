@@ -624,7 +624,7 @@ export function WebStoreProductForm() {
                 key={cat.id}
                 type="button"
                 className={cn(
-                  "group relative flex flex-col items-center p-4 rounded-2xl border-2 transition-all duration-300 hover:",
+                  "group relative flex flex-col items-center p-4 rounded-2xl border-2 transition-all duration-300",
                   form.watch('categoryId') === cat.id
                     ? "border-primary bg-primary/5 ring-4 ring-primary/10"
                     : "border-muted-foreground/10 bg-background hover:border-primary/30 hover:bg-primary/5"

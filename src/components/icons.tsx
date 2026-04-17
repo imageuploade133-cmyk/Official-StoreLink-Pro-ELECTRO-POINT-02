@@ -9,7 +9,7 @@ export const ElysiumLogo = (props: React.SVGProps<SVGSVGElement>) => (
     viewBox="0 0 40 40"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    className={cn("drop-shadow transition-all duration-500 hover:scale-110 hover:brightness-110 group-hover:drop-", props.className)}
+    className={cn("transition-all duration-500 hover:scale-110 hover:brightness-110", props.className)}
     {...props}
   >
     <defs>

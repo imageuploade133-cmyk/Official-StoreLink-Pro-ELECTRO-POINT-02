@@ -140,7 +140,7 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
                             <button 
                                 key={item.id}
                                 onClick={() => onNavigate(item.id)}
-                                className="flex items-center justify-between p-6 bg-white dark:bg-slate-800 rounded border-2 border-slate-100 dark:border-slate-800 hover:border-primary/25  hover: hover: group active:scale transition-all duration-500 text-left"
+                                className="flex items-center justify-between p-6 bg-white dark:bg-slate-800 rounded border-2 border-slate-100 dark:border-slate-800 hover:border-primary/25  group active:scale transition-all duration-500 text-left"
                             >
                                 <div className="flex items-center gap-5">
                                     <div className={cn("h-14 w-14 rounded bg-slate-50 dark:bg-slate-900 flex items-center justify-center group-hover:scale-110 transition-transform ", item.color)}>
@@ -159,7 +159,7 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
                     <div className="pt-6 border-t border-dashed border-slate-200 dark:border-slate-800">
                         <Button 
                             variant="ghost" 
-                            className="w-full h-16 rounded font-black uppercase text tracking text-destructive border-2 border-destructive/25 hover:border-destructive/50 hover:bg-destructive/5  hover: hover: transition-all duration-500 gap-3 active:scale" 
+                            className="w-full h-16 rounded font-black uppercase text tracking text-destructive border-2 border-destructive/25 hover:border-destructive/50 hover:bg-destructive/5  transition-all duration-500 gap-3 active:scale" 
                             onClick={() => setIsLogoutDialogOpen(true)}
                         >
                             <LogOut className="h-5 w-5" /> Sign Out of App
