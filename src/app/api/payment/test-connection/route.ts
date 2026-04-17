@@ -63,6 +63,10 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Unsupported provider' }, { status: 400 });
   } catch (error: any) {
     console.error('Error testing connection:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const message = error.message || 'Unknown error';
+    if (message.includes('Could not load the default credentials')) {
+        return NextResponse.json({ error: 'Missing Google Cloud credentials. Please ensure FIREBASE_SERVICE_ACCOUNT_KEY is set.' }, { status: 500 });
+    }
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

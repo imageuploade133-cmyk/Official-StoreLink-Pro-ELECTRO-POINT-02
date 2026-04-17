@@ -3,11 +3,21 @@ import * as admin from 'firebase-admin';
 
 if (!admin.apps.length) {
   try {
-    admin.initializeApp({
-      projectId: process.env.FIREBASE_PROJECT_ID || 'valentino-ice-cream',
-      // If service account is needed, it should be provided via environment variables
-      // credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY || '{}'))
-    });
+    const projectId = process.env.FIREBASE_PROJECT_ID || 'valentino-ice-cream';
+    const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+
+    if (serviceAccountKey) {
+      // If service account is provided via environment variables
+      admin.initializeApp({
+        credential: admin.credential.cert(JSON.parse(serviceAccountKey)),
+        projectId: projectId,
+      });
+    } else {
+      // Fallback to Application Default Credentials (ADC)
+      admin.initializeApp({
+        projectId: projectId,
+      });
+    }
   } catch (error) {
     console.error('Firebase admin initialization error', error);
   }
@@ -15,3 +25,4 @@ if (!admin.apps.length) {
 
 export const adminDb = admin.firestore();
 export const adminAuth = admin.auth();
+export const adminStorage = admin.storage();
