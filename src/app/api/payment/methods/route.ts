@@ -9,8 +9,26 @@ export async function GET(request: Request) {
     const storeId = searchParams.get('storeId') || 'global';
 
     const providersRef = adminDb.collection('payment_providers');
-    const q = providersRef.where('storeId', '==', storeId).where('isActive', '==', true);
-    const querySnapshot = await q.get();
+    
+    let querySnapshot;
+    try {
+      const q = providersRef.where('storeId', '==', storeId).where('isActive', '==', true);
+      querySnapshot = await q.get();
+    } catch (dbError: any) {
+      console.error('Database error fetching payment providers:', dbError);
+      
+      // FALLBACK: If database fails (e.g. missing credentials), return Paystack if keys are in env
+      if (process.env.PAYSTACK_PUBLIC_KEY) {
+        return NextResponse.json([{
+          id: 'paystack',
+          name: 'Pay with Card (Paystack)',
+          provider: 'paystack',
+          publicKey: process.env.PAYSTACK_PUBLIC_KEY,
+          mode: process.env.PAYSTACK_PUBLIC_KEY.startsWith('pk_live') ? 'live' : 'test',
+        }]);
+      }
+      throw dbError; // Rethrow if no fallback possible
+    }
 
     const methods: any[] = [];
     querySnapshot.forEach((doc) => {

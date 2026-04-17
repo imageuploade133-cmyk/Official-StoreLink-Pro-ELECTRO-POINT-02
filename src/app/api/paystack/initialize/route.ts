@@ -57,7 +57,12 @@ export async function POST(request: Request) {
             createdAt: Timestamp.now() as any,
             updatedAt: Timestamp.now() as any,
         };
-        await adminDb.collection('transactions').doc(reference).set(transactionData);
+        try {
+            await adminDb.collection('transactions').doc(reference).set(transactionData);
+        } catch (dbError) {
+            console.error('Failed to save transaction to database:', dbError);
+            // We continue even if DB save fails, as Paystack has the metadata to recover
+        }
     }
 
     return NextResponse.json({

@@ -22,12 +22,40 @@ export async function GET(request: Request) {
 
     const providersRef = adminDb.collection('payment_providers');
     
-    // Try querying by storeId (new format)
-    let querySnapshot = await providersRef.where('storeId', '==', storeId).get();
-    
-    // If empty, try store_id (migrated/alternative format)
-    if (querySnapshot.empty) {
-      querySnapshot = await providersRef.where('store_id', '==', storeId).get();
+    let querySnapshot;
+    try {
+        // Try querying by storeId (new format)
+        querySnapshot = await providersRef.where('storeId', '==', storeId).get();
+        
+        // If empty, try store_id (migrated/alternative format)
+        if (querySnapshot.empty) {
+          querySnapshot = await providersRef.where('store_id', '==', storeId).get();
+        }
+    } catch (dbError: any) {
+        console.error('Database error fetching payment settings:', dbError);
+        
+        // If database fails due to missing credentials, provide a minimal fallback if env keys exist
+        if (dbError.message?.includes('Could not load the default credentials') || 
+            dbError.message?.includes('FIREBASE_SERVICE_ACCOUNT_KEY')) {
+            
+            const fallbackProviders = [];
+            if (process.env.PAYSTACK_PUBLIC_KEY) {
+                fallbackProviders.push({
+                    id: 'env_paystack',
+                    providerName: 'paystack',
+                    isActive: true,
+                    mode: process.env.PAYSTACK_PUBLIC_KEY.startsWith('pk_live') ? 'live' : 'test',
+                    config: {
+                        testPublicKey: process.env.PAYSTACK_PUBLIC_KEY.startsWith('pk_test') ? process.env.PAYSTACK_PUBLIC_KEY : '********',
+                        testSecretKey: '********',
+                        livePublicKey: process.env.PAYSTACK_PUBLIC_KEY.startsWith('pk_live') ? process.env.PAYSTACK_PUBLIC_KEY : '********',
+                        liveSecretKey: '********',
+                    }
+                });
+            }
+            return NextResponse.json(fallbackProviders);
+        }
+        throw dbError;
     }
 
     const providers: any[] = [];

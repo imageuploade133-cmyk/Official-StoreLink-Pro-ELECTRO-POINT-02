@@ -81,11 +81,13 @@ export default function WebsitePaymentSettings() {
   
   const [providers, setProviders] = useState<any[]>([]);
   const [isLoadingProviders, setIsLoadingProviders] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const fetchProviders = async () => {
     if (!user) return;
+    setAuthError(null);
     try {
       const token = await user.getIdToken();
       const res = await fetch(`/api/payment/settings?storeId=${currentStoreId || 'global'}`, {
@@ -94,8 +96,13 @@ export default function WebsitePaymentSettings() {
         }
       });
       const data = await res.json();
-      if (Array.isArray(data)) {
+      if (res.ok && Array.isArray(data)) {
         setProviders(data);
+      } else if (data.error) {
+        if (data.error.includes('FIREBASE_SERVICE_ACCOUNT_KEY')) {
+            setAuthError(data.error);
+        }
+        console.error('API Error:', data.error);
       }
     } catch (e) {
       console.error('Failed to fetch providers', e);
@@ -397,6 +404,21 @@ export default function WebsitePaymentSettings() {
         title="Website Payment Method"
         description="Configure how your customers pay for orders on your online store."
       />
+
+      {authError && (
+        <Alert variant="destructive" className="mb-6">
+          <Info className="h-4 w-4" />
+          <AlertTitle>Missing Server Credentials</AlertTitle>
+          <AlertDescription className="space-y-2">
+            <p>{authError}</p>
+            <p className="text-xs">
+                To fix this, you need to generate a Service Account Key in Firebase Console (Settings &gt; Service Accounts), 
+                and add it to your environment variables as <strong>FIREBASE_SERVICE_ACCOUNT_KEY</strong>. 
+                For Vercel, you can encode the JSON as Base64 to avoid formatting issues.
+            </p>
+          </AlertDescription>
+        </Alert>
+      )}
 
       <Tabs defaultValue="paystack" className="space-y-6">
         <TabsList className="bg-muted/50 p-1">

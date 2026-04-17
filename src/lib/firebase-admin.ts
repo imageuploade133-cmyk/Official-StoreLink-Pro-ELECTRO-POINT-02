@@ -7,11 +7,23 @@ if (!admin.apps.length) {
     const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
 
     if (serviceAccountKey) {
-      // If service account is provided via environment variables
-      admin.initializeApp({
-        credential: admin.credential.cert(JSON.parse(serviceAccountKey)),
-        projectId: projectId,
-      });
+      try {
+        // If service account is provided via environment variables
+        const key = serviceAccountKey.startsWith('{') 
+          ? JSON.parse(serviceAccountKey) 
+          : JSON.parse(Buffer.from(serviceAccountKey, 'base64').toString());
+
+        admin.initializeApp({
+          credential: admin.credential.cert(key),
+          projectId: projectId,
+        });
+      } catch (parseError) {
+        console.error('Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY. Ensure it is valid JSON or Base64 encoded JSON.');
+        // Fallback to ADC
+        admin.initializeApp({
+          projectId: projectId,
+        });
+      }
     } else {
       // Fallback to Application Default Credentials (ADC)
       admin.initializeApp({
