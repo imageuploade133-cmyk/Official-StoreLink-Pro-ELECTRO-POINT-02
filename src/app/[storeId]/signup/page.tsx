@@ -36,6 +36,7 @@ import { createUserWithEmailAndPassword, updateProfile, AuthError } from "fireba
 import { doc, setDoc, collection, writeBatch, serverTimestamp, getDoc } from "firebase/firestore";
 import { useSettings } from "@/contexts/settings-context";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useStoreUrl } from "@/hooks/use-store-url";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from 'zod';
@@ -88,6 +89,7 @@ export default function StoreSignupPage() {
     const router = useRouter();
     const { user, store, staffMember, isCustomer, isLoading: isAuthLoading } = useAuth();
     const { settings, isLoading: isLoadingSettings } = useSettings();
+    const { getStoreUrl } = useStoreUrl();
     
     const form = useForm<SignupFormValues>({
       resolver: zodResolver(signupSchema),
@@ -109,7 +111,7 @@ export default function StoreSignupPage() {
           if (store || staffMember) {
             router.replace('/dashboard');
           } else {
-            router.replace('/store/account');
+            router.replace(getStoreUrl('/store/account'));
           }
         }
     }, [user, isAuthLoading, store, staffMember, router, isCongratulationOpen]);
@@ -183,7 +185,7 @@ export default function StoreSignupPage() {
                 setIsCongratulationOpen(true);
             } else {
                 toast({ title: "Account Created", description: "Welcome to the collection." });
-                router.replace('/store/account');
+                router.replace(getStoreUrl('/store/account'));
             }
         } catch (error: any) {
             let description = "An unknown error occurred. Please try again.";
@@ -222,7 +224,7 @@ export default function StoreSignupPage() {
         return (
             <Dialog open={isCongratulationOpen} onOpenChange={(open) => {
                 setIsCongratulationOpen(open);
-                if (!open) router.replace('/store/account');
+                if (!open) router.replace(getStoreUrl('/store/account'));
             }}>
                 <DialogContent className="sm:max-w-md p-0 overflow-hidden border-none shadow-2xl rounded-[3rem]" style={{ backgroundColor: bgColor }}>
                     <DialogHeader className="sr-only">
@@ -265,7 +267,7 @@ export default function StoreSignupPage() {
                             <Button 
                                 onClick={() => {
                                     setIsCongratulationOpen(false);
-                                    router.replace('/store/account');
+                                    router.replace(getStoreUrl('/store/account'));
                                 }}
                                 className="w-full h-16 rounded-[1.5rem] font-black uppercase text-[10px] tracking-[0.3em] shadow-xl transition-all active:scale-95"
                             >
@@ -356,7 +358,7 @@ export default function StoreSignupPage() {
                 </Button>
                 <div className="text-center text-sm">
                     Already have an account?{" "}
-                    <Link href="/store/login" className="underline text-primary font-bold">Log in</Link>
+                    <Link href=getStoreUrl("/store/login") className="underline text-primary font-bold">Log in</Link>
                 </div>
             </form>
           </Form>

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useSettings } from '@/contexts/settings-context';
+import { useStoreUrl } from '@/hooks/use-store-url';
 import { 
   Truck, 
   RotateCcw, 
@@ -31,6 +32,7 @@ import { cn } from '@/lib/utils';
 
 export default function LogisticsPage() {
   const { settings } = useSettings();
+  const { getStoreUrl } = useStoreUrl();
   const storeName = settings?.storeName || 'StoreLink Pro';
   const isVisible = settings?.showLogisticsOnPublicSite !== false;
 
@@ -68,7 +70,7 @@ export default function LogisticsPage() {
                 </div>
                 <div className="pt-6">
                     <Button asChild size="lg" className="w-full h-14 rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20">
-                        <Link href="/store/shop">Explore Catalog <ArrowRight className="ml-3 h-4 w-4" /></Link>
+                        <Link href=getStoreUrl("/store/shop")>Explore Catalog <ArrowRight className="ml-3 h-4 w-4" /></Link>
                     </Button>
                 </div>
             </div>
@@ -241,7 +243,7 @@ export default function LogisticsPage() {
                             )}
                         </div>
                         <Button variant="outline" className="w-full bg-white text-primary hover:bg-slate-100 border-none h-14 rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl transition-all active:scale-[0.98]" asChild>
-                            <Link href="/store/shop">Return to Catalog <ArrowRight className="ml-3 h-4 w-4" /></Link>
+                            <Link href=getStoreUrl("/store/shop")>Return to Catalog <ArrowRight className="ml-3 h-4 w-4" /></Link>
                         </Button>
                     </CardContent>
                 </Card>

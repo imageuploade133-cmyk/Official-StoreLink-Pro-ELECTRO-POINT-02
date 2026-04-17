@@ -342,12 +342,12 @@ export function GeneralSettings({ settingsData, isLoading }: GeneralSettingsProp
                     </div>
                     <div className="space-y-3">
                         <div className="bg-muted/30 p-3 rounded-xl border font-mono text-[10px] truncate opacity-60">
-                            {origin}/store/{currentStoreId || 'global'}
+                            {origin}/{currentStoreId || 'global'}
                         </div>
                         <Button 
                             variant="secondary" 
                             className="w-full h-12 rounded-xl font-black uppercase text-[10px] tracking-widest gap-2 shadow-lg active:scale-95 transition-all"
-                            onClick={() => copyToClipboard(`/store/${currentStoreId || 'global'}`, 'Storefront URL')}
+                            onClick={() => copyToClipboard(`/${currentStoreId || 'global'}`, 'Storefront URL')}
                         >
                             <Copy className="h-3.5 w-3.5" />
                             Copy Store Link

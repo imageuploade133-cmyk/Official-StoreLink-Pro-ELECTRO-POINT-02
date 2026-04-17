@@ -27,6 +27,7 @@ import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword, sendPasswordResetEmail, AuthError } from "firebase/auth";
 import { useSettings } from "@/contexts/settings-context";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useStoreUrl } from "@/hooks/use-store-url";
 
 export default function StoreLoginPage() {
     const [isLoading, setIsLoading] = useState(false);
@@ -42,6 +43,7 @@ export default function StoreLoginPage() {
     const router = useRouter();
     const { user, store, staffMember, isCustomer, isLoading: isAuthLoading } = useAuth();
     const { settings, isLoading: isLoadingSettings } = useSettings();
+    const { getStoreUrl } = useStoreUrl();
 
     const storeName = settings?.storeName || 'Welcome';
     const storeLogo = settings?.invoiceLogoUrl;
@@ -53,7 +55,7 @@ export default function StoreLoginPage() {
         // Handle redirect reactively based on auth state
         if (!isAuthLoading && user) {
           if (isCustomer) {
-            router.replace('/store/account');
+            router.replace(getStoreUrl('/store/account'));
           } else if (store || staffMember) {
             router.replace('/dashboard');
           } else {
@@ -266,7 +268,7 @@ export default function StoreLoginPage() {
             </Button>
             <div className="text-center text-sm">
                 Don&apos;t have an account?{" "}
-                <Link href="/store/signup" className="underline text-primary">
+                <Link href={getStoreUrl('/store/signup')} className="underline text-primary">
                     Sign up
                 </Link>
             </div>

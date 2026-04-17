@@ -31,11 +31,22 @@ import * as z from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useAuth } from "@/contexts/auth-context";
 
+const reservedSlugs = [
+  'dashboard', 'login', 'signup', 'signup-merchant', 'pos', 'api', 'actions', 
+  'admin', 'store', 'store-app', 'public', 'static', 'favicon.ico', 's-logo.png', 
+  'icon.svg', 'globals.css', 'favicon.png', 's-logo.svg', 'providers.tsx', 'layout.tsx', 'page.tsx'
+];
+
 const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
   email: z.string().trim().email('Invalid email address.'),
   storeName: z.string().min(2, 'Store name must be at least 2 characters.'),
-  storeSlug: z.string().min(2, 'Store slug must be at least 2 characters.').regex(/^[a-z0-9-]+$/, 'Only lowercase letters, numbers, and hyphens allowed.'),
+  storeSlug: z.string()
+    .min(2, 'Store slug must be at least 2 characters.')
+    .regex(/^[a-z0-9-]+$/, 'Only lowercase letters, numbers, and hyphens allowed.')
+    .refine(slug => !reservedSlugs.includes(slug), {
+      message: 'This slug is reserved for system use.',
+    }),
   storeAddress: z.string().min(5, 'Store address must be at least 5 characters.'),
   storePhone: z.string().min(5, 'Store phone number is required.'),
   databaseId: z.string().min(1, 'Database ID is required.').regex(/^[a-z0-9-]+$/, 'Only lowercase letters, numbers, and hyphens allowed.').default('(default)'),
@@ -312,8 +323,8 @@ export default function MerchantSignupPage() {
                         <FormLabel>Store URL Slug</FormLabel>
                         <FormControl>
                             <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">/store/</span>
-                                <Input placeholder="my-awesome-store" className="pl-16" {...field} disabled={isSubmitting || isLoading} />
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">/</span>
+                                <Input placeholder="my-awesome-store" className="pl-6" {...field} disabled={isSubmitting || isLoading} />
                             </div>
                         </FormControl>
                         <FormMessage />
