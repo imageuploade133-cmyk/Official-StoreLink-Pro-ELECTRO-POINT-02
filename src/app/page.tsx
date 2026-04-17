@@ -30,14 +30,14 @@ export default function HomePage() {
         if (store || staffMember) {
           router.replace('/dashboard');
         } else if (isCustomer) {
-          router.replace('/store/account');
+          router.replace('/global/account');
         } else {
           // Logged in but no recognized role, could be a new merchant
           router.replace('/signup-merchant');
         }
       } else {
         // Default for visitors: Show the store
-        router.replace('/store/global');
+        router.replace('/global');
       }
     }
   }, [user, store, staffMember, isCustomer, isLoading, router]);

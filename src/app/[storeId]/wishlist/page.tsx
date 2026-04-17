@@ -11,11 +11,13 @@ import { HeartCrack } from 'lucide-react';
 import { ProductCard } from '@/components/store/ProductCard';
 import { useSettings } from '@/contexts/settings-context';
 import { ProductCardSkeleton } from '@/components/store/ProductCardSkeleton';
+import { useStoreUrl } from '@/hooks/use-store-url';
 
 export default function WishlistPage() {
   const { wishlistProductIds, isLoadingWishlist } = useWishlist();
   const firestore = useFirestore();
   const { settings } = useSettings();
+  const { getStoreUrl } = useStoreUrl();
   const currencySymbol = settings?.currency || '$';
   
   const productIds = useMemo(() => Array.from(wishlistProductIds), [wishlistProductIds]);
@@ -80,7 +82,7 @@ export default function WishlistPage() {
               Looks like you haven't added anything yet.
             </p>
             <Button asChild className="mt-8">
-              <Link href="/store/shop">Start Exploring</Link>
+              <Link href={getStoreUrl('/store/shop')}>Start Exploring</Link>
             </Button>
           </div>
         ) : (

@@ -21,7 +21,7 @@ export function useStoreUrl() {
     }
     if (cleanPath.startsWith('/store')) {
         const remaining = cleanPath.replace('/store', '');
-        return `/store/${storeId}${remaining}`;
+        return `/${storeId}${remaining}`;
     }
     return cleanPath;
   };

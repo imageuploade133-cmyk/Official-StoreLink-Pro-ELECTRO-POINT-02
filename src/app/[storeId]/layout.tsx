@@ -15,6 +15,7 @@ import { useFirestore } from '@/firebase';
 import { doc, runTransaction, increment } from 'firebase/firestore';
 import { format } from 'date-fns';
 import { useParams } from 'next/navigation';
+import { OfflineDetector } from "@/components/OfflineDetector";
 
 function WebsiteTracker() {
   const firestore = useFirestore();
@@ -89,7 +90,7 @@ export default function PublicLayout({
   }
 
   return (
-    <>
+    <OfflineDetector>
       <WebsiteTracker />
       <AdSystem />
       {settings?.backgroundStyle === 'video' && settings.backgroundVideoUrl && <BackgroundVideoPlayer />}
@@ -108,6 +109,6 @@ export default function PublicLayout({
       </main>
 
       <PublicFooter />
-    </>
+    </OfflineDetector>
   );
 }

@@ -474,7 +474,7 @@ export default function CheckoutPage() {
                 </CardContent>
             </Card>
         )}
-        <Button asChild size="lg"><Link href="/store/shop">Return to Shop</Link></Button>
+        <Button asChild size="lg"><Link href=getStoreUrl("/store/shop")>Return to Shop</Link></Button>
       </div>
     );
   }
@@ -487,7 +487,7 @@ export default function CheckoutPage() {
             <h1 className="text-4xl font-extrabold tracking-tight">Checkout</h1>
             <p className="text-muted-foreground mt-2">Complete your purchase securely.</p>
           </div>
-          <Button variant="ghost" asChild><Link href="/store/cart"><ArrowLeft className="mr-2 h-4 w-4" /> Back to Cart</Link></Button>
+          <Button variant="ghost" asChild><Link href=getStoreUrl("/store/cart")><ArrowLeft className="mr-2 h-4 w-4" /> Back to Cart</Link></Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
