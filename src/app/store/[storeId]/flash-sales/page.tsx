@@ -298,7 +298,7 @@ export default function AllFlashSalesPage() {
 
   return (
     <div className="bg-background min-h-screen">
-      <HubHero slides={hubSlides || []} settings={settings} getStoreUrl={getStoreUrl} />
+      <HubHero slides={settings?.flashHubShowSlideshow ? (hubSlides || []) : []} settings={settings} getStoreUrl={getStoreUrl} />
 
       <main className="pb-20">
         {isLoading && sections.length === 0 ? (
