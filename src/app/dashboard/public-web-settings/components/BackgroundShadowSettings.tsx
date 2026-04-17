@@ -81,7 +81,7 @@ export function BackgroundShadowSettings({ settingsData, isLoading, storeId }: B
                     <Label htmlFor="enable-shadow" className="flex flex-col space-y-1">
                         <span>Enable Background Shadow</span>
                         <span className="font-normal text-sm text-muted-foreground">
-                            When enabled, a subtle shadow will be applied to the main content area.
+                            When enabled, a professional shadow effect will be applied to Products, Cards, Inputs, Buttons and more across the project.
                         </span>
                     </Label>
                     <Switch

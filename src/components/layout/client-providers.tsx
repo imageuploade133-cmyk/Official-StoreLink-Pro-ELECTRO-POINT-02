@@ -12,6 +12,7 @@ import { WishlistProvider } from '@/contexts/wishlist-context';
 import { GlobalLoadingProvider } from '@/contexts/global-loading-context';
 import { RecentlyViewedProvider } from '@/contexts/recently-viewed-context';
 import { AdProvider } from '@/contexts/ad-context';
+import { UIBackgroundShadowManager } from './UIBackgroundShadowManager';
 
 export function ClientProviders({ children }: { children: React.ReactNode }) {
   return (
@@ -25,6 +26,7 @@ export function ClientProviders({ children }: { children: React.ReactNode }) {
                   <CartProvider>
                     <WishlistProvider>
                       <RecentlyViewedProvider>
+                        <UIBackgroundShadowManager />
                         <ThemeProvider>{children}</ThemeProvider>
                       </RecentlyViewedProvider>
                     </WishlistProvider>
