@@ -52,6 +52,25 @@ export async function GET(request: Request) {
       });
       const result = await res.json();
       isSuccessful = result.status === 'success' && result.data.status === 'successful';
+    } else if (providerName === 'opay') {
+      const res = await fetch('https://api.opaycheckout.com/api/v1/international/cashier/status', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${secretKey}`,
+          'Content-Type': 'application/json',
+          'MerchantId': config.merchantId,
+        },
+        body: JSON.stringify({ reference }),
+      });
+      const result = await res.json();
+      isSuccessful = result.code === '00000' && result.data.status === 'SUCCESSFUL';
+    } else if (providerName === 'palmpay') {
+      const res = await fetch(`https://api.palmpay.com/v1/checkout/query?reference=${reference}&merchantId=${config.merchantId}`, {
+        headers: { Authorization: `Bearer ${secretKey}` },
+      });
+      const result = await res.json();
+      isSuccessful = (result.code === 'SUCCESS' || result.status === 'success') && 
+                     (result.data.status === 'SUCCESSFUL' || result.data.status === 'success');
     }
 
     if (isSuccessful) {

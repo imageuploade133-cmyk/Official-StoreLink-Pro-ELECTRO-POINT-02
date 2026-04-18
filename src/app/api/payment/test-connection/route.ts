@@ -60,6 +60,34 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: true });
     }
 
+    if (providerName === 'opay') {
+        const res = await fetch('https://api.opaycheckout.com/api/v1/international/cashier/status', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${secretKey}`,
+            'Content-Type': 'application/json',
+            'MerchantId': config.merchantId,
+          },
+          body: JSON.stringify({ reference: 'test-connection' }),
+        });
+        const result = await res.json();
+        // If it returns a code other than unauthorized, we assume the keys are at least recognized
+        if (result.code === '401' || res.status === 401) {
+          return NextResponse.json({ success: false, error: 'Invalid OPay Credentials' });
+        }
+        return NextResponse.json({ success: true });
+      }
+  
+      if (providerName === 'palmpay') {
+        const res = await fetch(`https://api.palmpay.com/v1/checkout/query?reference=test&merchantId=${config.merchantId}`, {
+          headers: { Authorization: `Bearer ${secretKey}` },
+        });
+        if (res.status === 401) {
+          return NextResponse.json({ success: false, error: 'Invalid PalmPay Credentials' });
+        }
+        return NextResponse.json({ success: true });
+      }
+
     return NextResponse.json({ error: 'Unsupported provider' }, { status: 400 });
   } catch (error: any) {
     console.error('Error testing connection:', error);

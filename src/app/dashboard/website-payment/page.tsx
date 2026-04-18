@@ -75,6 +75,28 @@ const stripeSchema = z.object({
   mode: z.enum(['test', 'live']).default('test'),
 });
 
+const opaySchema = z.object({
+  merchantId: z.string().optional(),
+  testPublicKey: z.string().optional(),
+  testSecretKey: z.string().optional(),
+  livePublicKey: z.string().optional(),
+  liveSecretKey: z.string().optional(),
+  webhookSecret: z.string().optional(),
+  isActive: z.boolean().default(false),
+  mode: z.enum(['test', 'live']).default('test'),
+});
+
+const palmpaySchema = z.object({
+  merchantId: z.string().optional(),
+  testAppId: z.string().optional(),
+  testSecretKey: z.string().optional(),
+  liveAppId: z.string().optional(),
+  liveSecretKey: z.string().optional(),
+  webhookSecret: z.string().optional(),
+  isActive: z.boolean().default(false),
+  mode: z.enum(['test', 'live']).default('test'),
+});
+
 const payOnDeliverySchema = z.object({
   instructions: z.string().optional(),
   isActive: z.boolean().default(false),
@@ -83,6 +105,8 @@ const payOnDeliverySchema = z.object({
 type PaystackFormValues = z.infer<typeof paystackSchema>;
 type FlutterwaveFormValues = z.infer<typeof flutterwaveSchema>;
 type StripeFormValues = z.infer<typeof stripeSchema>;
+type OpayFormValues = z.infer<typeof opaySchema>;
+type PalmPayFormValues = z.infer<typeof palmpaySchema>;
 type PayOnDeliveryFormValues = z.infer<typeof payOnDeliverySchema>;
 
 export default function WebsitePaymentSettings() {
@@ -136,6 +160,8 @@ export default function WebsitePaymentSettings() {
   const paystackProvider = providers.find(p => p.providerName === 'paystack');
   const flutterwaveProvider = providers.find(p => p.providerName === 'flutterwave');
   const stripeProvider = providers.find(p => p.providerName === 'stripe');
+  const opayProvider = providers.find(p => p.providerName === 'opay');
+  const palmpayProvider = providers.find(p => p.providerName === 'palmpay');
   const manualProvider = providers.find(p => p.providerName === 'manual');
   const payOnDeliveryProvider = providers.find(p => p.providerName === 'pay_on_delivery');
 
@@ -174,6 +200,34 @@ export default function WebsitePaymentSettings() {
       liveSecretKey: stripeProvider?.config?.liveSecretKey || '',
       isActive: stripeProvider?.isActive || false,
       mode: stripeProvider?.mode || 'test',
+    },
+  });
+
+  const opayForm = useForm<OpayFormValues>({
+    resolver: zodResolver(opaySchema),
+    defaultValues: {
+      merchantId: opayProvider?.config?.merchantId || '',
+      testPublicKey: opayProvider?.config?.testPublicKey || '',
+      testSecretKey: opayProvider?.config?.testSecretKey || '',
+      livePublicKey: opayProvider?.config?.livePublicKey || '',
+      liveSecretKey: opayProvider?.config?.liveSecretKey || '',
+      webhookSecret: opayProvider?.config?.webhookSecret || '',
+      isActive: opayProvider?.isActive || false,
+      mode: opayProvider?.mode || 'test',
+    },
+  });
+
+  const palmpayForm = useForm<PalmPayFormValues>({
+    resolver: zodResolver(palmpaySchema),
+    defaultValues: {
+      merchantId: palmpayProvider?.config?.merchantId || '',
+      testAppId: palmpayProvider?.config?.testAppId || '',
+      testSecretKey: palmpayProvider?.config?.testSecretKey || '',
+      liveAppId: palmpayProvider?.config?.liveAppId || '',
+      liveSecretKey: palmpayProvider?.config?.liveSecretKey || '',
+      webhookSecret: palmpayProvider?.config?.webhookSecret || '',
+      isActive: palmpayProvider?.isActive || false,
+      mode: palmpayProvider?.mode || 'test',
     },
   });
 
@@ -216,6 +270,30 @@ export default function WebsitePaymentSettings() {
         liveSecretKey: stripeProvider.config?.liveSecretKey || '',
         isActive: stripeProvider.isActive || false,
         mode: stripeProvider.mode || 'test',
+      });
+    }
+    if (opayProvider) {
+      opayForm.reset({
+        merchantId: opayProvider.config?.merchantId || '',
+        testPublicKey: opayProvider.config?.testPublicKey || '',
+        testSecretKey: opayProvider.config?.testSecretKey || '',
+        livePublicKey: opayProvider.config?.livePublicKey || '',
+        liveSecretKey: opayProvider.config?.liveSecretKey || '',
+        webhookSecret: opayProvider.config?.webhookSecret || '',
+        isActive: opayProvider.isActive || false,
+        mode: opayProvider.mode || 'test',
+      });
+    }
+    if (palmpayProvider) {
+      palmpayForm.reset({
+        merchantId: palmpayProvider.config?.merchantId || '',
+        testAppId: palmpayProvider.config?.testAppId || '',
+        testSecretKey: palmpayProvider.config?.testSecretKey || '',
+        liveAppId: palmpayProvider.config?.liveAppId || '',
+        liveSecretKey: palmpayProvider.config?.liveSecretKey || '',
+        webhookSecret: palmpayProvider.config?.webhookSecret || '',
+        isActive: palmpayProvider.isActive || false,
+        mode: palmpayProvider.mode || 'test',
       });
     }
     if (payOnDeliveryProvider) {
@@ -479,6 +557,8 @@ export default function WebsitePaymentSettings() {
           <TabsTrigger value="paystack">Paystack</TabsTrigger>
           <TabsTrigger value="flutterwave">Flutterwave</TabsTrigger>
           <TabsTrigger value="stripe">Stripe</TabsTrigger>
+          <TabsTrigger value="opay">OPay</TabsTrigger>
+          <TabsTrigger value="palmpay">PalmPay</TabsTrigger>
           <TabsTrigger value="manual">Manual Transfer</TabsTrigger>
           <TabsTrigger value="pay_on_delivery">Pay on Delivery</TabsTrigger>
         </TabsList>
@@ -924,6 +1004,324 @@ export default function WebsitePaymentSettings() {
                     <li>Accepts Apple Pay, Google Pay, and cards.</li>
                     <li>Supports over 135 currencies.</li>
                     <li>Best-in-class checkout experience.</li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="opay" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <Form {...opayForm}>
+                <form onSubmit={opayForm.handleSubmit((values) => saveProviderSettings('opay', values))}>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                      <div>
+                        <CardTitle>OPay Settings</CardTitle>
+                        <CardDescription>Accept payments via OPay Checkout.</CardDescription>
+                      </div>
+                      <FormField
+                        control={opayForm.control}
+                        name="isActive"
+                        render={({ field }) => (
+                          <FormItem className="flex items-center gap-2 space-y-0">
+                            <FormLabel className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Enabled</FormLabel>
+                            <FormControl>
+                              <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <FormField
+                        control={opayForm.control}
+                        name="mode"
+                        render={({ field }) => (
+                          <FormItem className="space-y-3">
+                            <FormLabel>Transaction Mode</FormLabel>
+                            <FormControl>
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex flex-row space-x-4"
+                              >
+                                <FormItem className="flex items-center space-x-2 space-y-0">
+                                  <FormControl><RadioGroupItem value="test" /></FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">Test Mode</FormLabel>
+                                </FormItem>
+                                <FormItem className="flex items-center space-x-2 space-y-0">
+                                  <FormControl><RadioGroupItem value="live" /></FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">Live Mode</FormLabel>
+                                </FormItem>
+                              </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={opayForm.control}
+                        name="merchantId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Merchant ID</FormLabel>
+                            <FormControl><Input placeholder="256..." {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={opayForm.control}
+                          name="testPublicKey"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Test Public Key</FormLabel>
+                              <FormControl><Input placeholder="OPAYPUB..." {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={opayForm.control}
+                          name="testSecretKey"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Test Secret Key</FormLabel>
+                              <FormControl><Input type="password" placeholder="OPAYSEC..." {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={opayForm.control}
+                          name="livePublicKey"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Live Public Key</FormLabel>
+                              <FormControl><Input placeholder="OPAYPUB..." {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={opayForm.control}
+                          name="liveSecretKey"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Live Secret Key</FormLabel>
+                              <FormControl><Input type="password" placeholder="OPAYSEC..." {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <FormField
+                        control={opayForm.control}
+                        name="webhookSecret"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Webhook Secret</FormLabel>
+                            <FormControl><Input type="password" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </CardContent>
+                    <CardFooter className="border-t pt-6 flex gap-2">
+                      <Button type="submit" disabled={isSaving}>
+                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                        Save OPay Settings
+                      </Button>
+                      <Button type="button" variant="outline" onClick={() => testConnection('opay')} disabled={isSaving}>
+                        Test Connection
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </form>
+              </Form>
+            </div>
+            <div className="lg:col-span-1">
+              <Card className="bg-primary/5 border-primary/20 shadow-none sticky top-6">
+                <CardHeader>
+                  <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary">
+                    <Info className="h-4 w-4" /> About OPay
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm space-y-4 text-muted-foreground leading-relaxed">
+                  <p>OPay Checkout provides a fast and secure way for customers in Nigeria to pay.</p>
+                  <ul className="list-disc pl-5 space-y-2">
+                    <li>Supports OPay Wallet, Cards, and Bank Transfers.</li>
+                    <li>Optimized for mobile payments.</li>
+                    <li>Highly reliable for local transactions.</li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="palmpay" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <Form {...palmpayForm}>
+                <form onSubmit={palmpayForm.handleSubmit((values) => saveProviderSettings('palmpay', values))}>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                      <div>
+                        <CardTitle>PalmPay Settings</CardTitle>
+                        <CardDescription>Accept payments via PalmPay.</CardDescription>
+                      </div>
+                      <FormField
+                        control={palmpayForm.control}
+                        name="isActive"
+                        render={({ field }) => (
+                          <FormItem className="flex items-center gap-2 space-y-0">
+                            <FormLabel className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Enabled</FormLabel>
+                            <FormControl>
+                              <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <FormField
+                        control={palmpayForm.control}
+                        name="mode"
+                        render={({ field }) => (
+                          <FormItem className="space-y-3">
+                            <FormLabel>Transaction Mode</FormLabel>
+                            <FormControl>
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex flex-row space-x-4"
+                              >
+                                <FormItem className="flex items-center space-x-2 space-y-0">
+                                  <FormControl><RadioGroupItem value="test" /></FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">Test Mode</FormLabel>
+                                </FormItem>
+                                <FormItem className="flex items-center space-x-2 space-y-0">
+                                  <FormControl><RadioGroupItem value="live" /></FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">Live Mode</FormLabel>
+                                </FormItem>
+                              </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={palmpayForm.control}
+                        name="merchantId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Merchant ID</FormLabel>
+                            <FormControl><Input placeholder="Merchant ID" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={palmpayForm.control}
+                          name="testAppId"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Test App ID / Public Key</FormLabel>
+                              <FormControl><Input placeholder="App ID" {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={palmpayForm.control}
+                          name="testSecretKey"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Test Secret Key</FormLabel>
+                              <FormControl><Input type="password" placeholder="Secret Key" {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={palmpayForm.control}
+                          name="liveAppId"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Live App ID / Public Key</FormLabel>
+                              <FormControl><Input placeholder="App ID" {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={palmpayForm.control}
+                          name="liveSecretKey"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Live Secret Key</FormLabel>
+                              <FormControl><Input type="password" placeholder="Secret Key" {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <FormField
+                        control={palmpayForm.control}
+                        name="webhookSecret"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Webhook Secret</FormLabel>
+                            <FormControl><Input type="password" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </CardContent>
+                    <CardFooter className="border-t pt-6 flex gap-2">
+                      <Button type="submit" disabled={isSaving}>
+                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                        Save PalmPay Settings
+                      </Button>
+                      <Button type="button" variant="outline" onClick={() => testConnection('palmpay')} disabled={isSaving}>
+                        Test Connection
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </form>
+              </Form>
+            </div>
+            <div className="lg:col-span-1">
+              <Card className="bg-primary/5 border-primary/20 shadow-none sticky top-6">
+                <CardHeader>
+                  <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary">
+                    <Info className="h-4 w-4" /> About PalmPay
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm space-y-4 text-muted-foreground leading-relaxed">
+                  <p>PalmPay is a leading digital payment service provider in Africa.</p>
+                  <ul className="list-disc pl-5 space-y-2">
+                    <li>Secure and rapid transaction processing.</li>
+                    <li>Popular among mobile users.</li>
+                    <li>Competitive transaction rates.</li>
                   </ul>
                 </CardContent>
               </Card>
