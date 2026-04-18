@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useFirestore, useDoc } from '@/firebase';
 import { doc } from 'firebase/firestore';
-import { saveGlobalSettings } from '@/firebase/firestore/settings';
+import { saveGlobalSettings, saveStoreSettings } from '@/firebase/firestore/settings';
 import type { AppSettings } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context';
 import { useToast } from '@/hooks/use-toast';
@@ -131,7 +131,7 @@ const shoppingExpSchema = z.object({
   useIndividualBtnSettings: z.boolean().default(true),
   showProductReviews: z.boolean().default(true),
   showReviewRatingOnCard: z.boolean().default(true),
-  checkoutSuccessRedirectUrl: z.string().url().or(z.literal('')).optional(),
+  checkoutSuccessRedirectUrl: z.string().optional().or(z.literal('')),
 });
 
 type FormValues = z.infer<typeof shoppingExpSchema>;
