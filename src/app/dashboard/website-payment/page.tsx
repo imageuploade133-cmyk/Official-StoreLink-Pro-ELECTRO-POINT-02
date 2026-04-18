@@ -97,6 +97,15 @@ const palmpaySchema = z.object({
   mode: z.enum(['test', 'live']).default('test'),
 });
 
+const paypalSchema = z.object({
+  clientId: z.string().optional(),
+  secretKey: z.string().optional(),
+  liveClientId: z.string().optional(),
+  liveSecretKey: z.string().optional(),
+  isActive: z.boolean().default(false),
+  mode: z.enum(['test', 'live']).default('test'),
+});
+
 const payOnDeliverySchema = z.object({
   instructions: z.string().optional(),
   isActive: z.boolean().default(false),
@@ -107,6 +116,7 @@ type FlutterwaveFormValues = z.infer<typeof flutterwaveSchema>;
 type StripeFormValues = z.infer<typeof stripeSchema>;
 type OpayFormValues = z.infer<typeof opaySchema>;
 type PalmPayFormValues = z.infer<typeof palmpaySchema>;
+type PayPalFormValues = z.infer<typeof paypalSchema>;
 type PayOnDeliveryFormValues = z.infer<typeof payOnDeliverySchema>;
 
 export default function WebsitePaymentSettings() {
@@ -162,6 +172,7 @@ export default function WebsitePaymentSettings() {
   const stripeProvider = providers.find(p => p.providerName === 'stripe');
   const opayProvider = providers.find(p => p.providerName === 'opay');
   const palmpayProvider = providers.find(p => p.providerName === 'palmpay');
+  const paypalProvider = providers.find(p => p.providerName === 'paypal');
   const manualProvider = providers.find(p => p.providerName === 'manual');
   const payOnDeliveryProvider = providers.find(p => p.providerName === 'pay_on_delivery');
 
@@ -231,6 +242,18 @@ export default function WebsitePaymentSettings() {
     },
   });
 
+  const paypalForm = useForm<PayPalFormValues>({
+    resolver: zodResolver(paypalSchema),
+    defaultValues: {
+      clientId: paypalProvider?.config?.clientId || '',
+      secretKey: paypalProvider?.config?.secretKey || '',
+      liveClientId: paypalProvider?.config?.liveClientId || '',
+      liveSecretKey: paypalProvider?.config?.liveSecretKey || '',
+      isActive: paypalProvider?.isActive || false,
+      mode: paypalProvider?.mode || 'test',
+    },
+  });
+
   const payOnDeliveryForm = useForm<PayOnDeliveryFormValues>({
     resolver: zodResolver(payOnDeliverySchema),
     defaultValues: {
@@ -296,13 +319,23 @@ export default function WebsitePaymentSettings() {
         mode: palmpayProvider.mode || 'test',
       });
     }
+    if (paypalProvider) {
+      paypalForm.reset({
+        clientId: paypalProvider.config?.clientId || '',
+        secretKey: paypalProvider.config?.secretKey || '',
+        liveClientId: paypalProvider.config?.liveClientId || '',
+        liveSecretKey: paypalProvider.config?.liveSecretKey || '',
+        isActive: paypalProvider.isActive || false,
+        mode: paypalProvider.mode || 'test',
+      });
+    }
     if (payOnDeliveryProvider) {
       payOnDeliveryForm.reset({
         instructions: payOnDeliveryProvider.config?.instructions || 'Pay with cash or card upon delivery.',
         isActive: payOnDeliveryProvider.isActive || false,
       });
     }
-  }, [paystackProvider, flutterwaveProvider, stripeProvider, payOnDeliveryProvider, paystackForm, flutterwaveForm, stripeForm, payOnDeliveryForm]);
+  }, [paystackProvider, flutterwaveProvider, stripeProvider, opayProvider, palmpayProvider, paypalProvider, payOnDeliveryProvider, paystackForm, flutterwaveForm, stripeForm, opayForm, palmpayForm, paypalForm, payOnDeliveryForm]);
 
   const saveProviderSettings = async (providerName: string, values: any) => {
     if (!user) return;
@@ -557,6 +590,7 @@ export default function WebsitePaymentSettings() {
           <TabsTrigger value="paystack">Paystack</TabsTrigger>
           <TabsTrigger value="flutterwave">Flutterwave</TabsTrigger>
           <TabsTrigger value="stripe">Stripe</TabsTrigger>
+          <TabsTrigger value="paypal">PayPal</TabsTrigger>
           <TabsTrigger value="opay">OPay</TabsTrigger>
           <TabsTrigger value="palmpay">PalmPay</TabsTrigger>
           <TabsTrigger value="manual">Manual Transfer</TabsTrigger>
@@ -1004,6 +1038,141 @@ export default function WebsitePaymentSettings() {
                     <li>Accepts Apple Pay, Google Pay, and cards.</li>
                     <li>Supports over 135 currencies.</li>
                     <li>Best-in-class checkout experience.</li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="paypal" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <Form {...paypalForm}>
+                <form onSubmit={paypalForm.handleSubmit((values) => saveProviderSettings('paypal', values))}>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                      <div>
+                        <CardTitle>PayPal Settings</CardTitle>
+                        <CardDescription>Accept global payments via PayPal.</CardDescription>
+                      </div>
+                      <FormField
+                        control={paypalForm.control}
+                        name="isActive"
+                        render={({ field }) => (
+                          <FormItem className="flex items-center gap-2 space-y-0">
+                            <FormLabel className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Enabled</FormLabel>
+                            <FormControl>
+                              <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <FormField
+                        control={paypalForm.control}
+                        name="mode"
+                        render={({ field }) => (
+                          <FormItem className="space-y-3">
+                            <FormLabel>Transaction Mode</FormLabel>
+                            <FormControl>
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex flex-row space-x-4"
+                              >
+                                <FormItem className="flex items-center space-x-2 space-y-0">
+                                  <FormControl><RadioGroupItem value="test" /></FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">Sandbox Mode</FormLabel>
+                                </FormItem>
+                                <FormItem className="flex items-center space-x-2 space-y-0">
+                                  <FormControl><RadioGroupItem value="live" /></FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">Live Mode</FormLabel>
+                                </FormItem>
+                              </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={paypalForm.control}
+                          name="clientId"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Sandbox Client ID</FormLabel>
+                              <FormControl><Input placeholder="Client ID" {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={paypalForm.control}
+                          name="secretKey"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Sandbox Secret Key</FormLabel>
+                              <FormControl><Input type="password" placeholder="Secret Key" {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={paypalForm.control}
+                          name="liveClientId"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Live Client ID</FormLabel>
+                              <FormControl><Input placeholder="Client ID" {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={paypalForm.control}
+                          name="liveSecretKey"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Live Secret Key</FormLabel>
+                              <FormControl><Input type="password" placeholder="Secret Key" {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </CardContent>
+                    <CardFooter className="border-t pt-6 flex gap-2">
+                      <Button type="submit" disabled={isSaving}>
+                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                        Save PayPal Settings
+                      </Button>
+                      <Button type="button" variant="outline" onClick={() => testConnection('paypal')} disabled={isSaving}>
+                        Test Connection
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </form>
+              </Form>
+            </div>
+            <div className="lg:col-span-1">
+              <Card className="bg-primary/5 border-primary/20 shadow-none sticky top-6">
+                <CardHeader>
+                  <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary">
+                    <Info className="h-4 w-4" /> About PayPal
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm space-y-4 text-muted-foreground leading-relaxed">
+                  <p>PayPal is a globally recognized payment platform.</p>
+                  <ul className="list-disc pl-5 space-y-2">
+                    <li>Accept payments from over 200 countries.</li>
+                    <li>Supports multiple currencies.</li>
+                    <li>Trusted by millions of customers worldwide.</li>
                   </ul>
                 </CardContent>
               </Card>

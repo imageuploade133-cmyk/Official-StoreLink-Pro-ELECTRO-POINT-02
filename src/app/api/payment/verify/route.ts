@@ -69,8 +69,39 @@ export async function GET(request: Request) {
         headers: { Authorization: `Bearer ${secretKey}` },
       });
       const result = await res.json();
-      isSuccessful = (result.code === 'SUCCESS' || result.status === 'success') && 
+      isSuccessful = (result.code === 'SUCCESS' || result.status === 'success') &&
                      (result.data.status === 'SUCCESSFUL' || result.data.status === 'success');
+    } else if (providerName === 'paypal') {
+        const token = searchParams.get('token'); // PayPal Order ID
+        if (!token) throw new Error('Missing PayPal token');
+
+        const clientId = mode === 'live' ? config.liveClientId : config.clientId;
+        const paypalSecret = mode === 'live' ? config.liveSecretKey : config.secretKey;
+        const baseUrl = mode === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
+
+        // Get access token
+        const auth = Buffer.from(`${clientId}:${paypalSecret}`).toString('base64');
+        const tokenRes = await fetch(`${baseUrl}/v1/oauth2/token`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Basic ${auth}`,
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'grant_type=client_credentials',
+        });
+        const tokenData = await tokenRes.json();
+        const accessToken = tokenData.access_token;
+
+        // Capture order
+        const captureRes = await fetch(`${baseUrl}/v2/checkout/orders/${token}/capture`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        const captureData = await captureRes.json();
+        isSuccessful = captureRes.ok && (captureData.status === 'COMPLETED' || captureData.status === 'APPROVED');
     }
 
     if (isSuccessful) {

@@ -569,10 +569,11 @@ export default function CheckoutPage() {
                         <div key={method.id}>
                         <RadioGroupItem value={method.name} id={method.id} className="peer sr-only" />
                         <Label htmlFor={method.id} className="flex flex-col items-center justify-center rounded-xl border-2 border-muted bg-popover p-6 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 [&:has([data-state=checked])]:border-primary cursor-pointer transition-all h-full text-center">
-                            {method.provider === 'manual' ? <Landmark className="mb-3 h-8 w-8" /> : 
+                            {method.provider === 'manual' ? <Landmark className="mb-3 h-8 w-8" /> :
                              method.provider === 'pay_on_delivery' ? <Truck className="mb-3 h-8 w-8" /> :
                              method.provider === 'opay' ? <Wallet className="mb-3 h-8 w-8" /> :
                              method.provider === 'palmpay' ? <Smartphone className="mb-3 h-8 w-8" /> :
+                             method.provider === 'paypal' ? <Wallet className="mb-3 h-8 w-8 text-blue-600" /> :
                              <CreditCard className="mb-3 h-8 w-8" />}
                             <span className="text-xs font-black uppercase tracking-widest">{method.name}</span>
                         </Label>
