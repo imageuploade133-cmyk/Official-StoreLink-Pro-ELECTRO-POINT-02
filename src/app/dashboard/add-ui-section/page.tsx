@@ -24,6 +24,7 @@ import {
   Monitor, 
   Code, 
   ImageIcon, 
+  Video,
   Maximize, 
   AlignLeft,
   AlignCenter,
@@ -43,13 +44,16 @@ import Image from 'next/image';
 
 const uiSectionSchema = z.object({
   title: z.string().min(3, 'Internal title is required.'),
-  uiType: z.enum(['image', 'html']),
+  uiType: z.enum(['image', 'html', 'video']),
   order: z.coerce.number().int().min(0),
   published: z.boolean().default(true),
   fullWidth: z.boolean().default(false),
   backgroundColor: z.string().optional().or(z.literal('')),
   // Image Type Fields
   imageUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
+  // Video Type Fields
+  videoUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
+  videoPosterUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
   linkUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
   overlayTitle: z.string().optional().or(z.literal('')),
   overlaySubtitle: z.string().optional().or(z.literal('')),
@@ -60,6 +64,9 @@ const uiSectionSchema = z.object({
 }).superRefine((data, ctx) => {
     if (data.uiType === 'image' && (!data.imageUrl || data.imageUrl.trim() === '')) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Image URL is required for Image mode.', path: ['imageUrl'] });
+    }
+    if (data.uiType === 'video' && (!data.videoUrl || data.videoUrl.trim() === '')) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Video URL is required for Video mode.', path: ['videoUrl'] });
     }
     if (data.uiType === 'html' && (!data.htmlContent || data.htmlContent.trim() === '')) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'HTML content is required for Code mode.', path: ['htmlContent'] });
@@ -89,6 +96,8 @@ export default function AddUISectionPage() {
       fullWidth: false,
       backgroundColor: '#FFFFFF',
       imageUrl: '',
+      videoUrl: '',
+      videoPosterUrl: '',
       linkUrl: '',
       overlayTitle: '',
       overlaySubtitle: '',
@@ -100,6 +109,7 @@ export default function AddUISectionPage() {
 
   const uiType = form.watch('uiType');
   const imageUrl = form.watch('imageUrl');
+  const videoUrl = form.watch('videoUrl');
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -181,12 +191,19 @@ export default function AddUISectionPage() {
                     <FormItem className="space-y-4">
                         <FormLabel className="font-black text-xs uppercase tracking-widest text-primary">Design Protocol</FormLabel>
                         <FormControl>
-                            <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-2 gap-4">
+                            <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div className="relative">
                                     <RadioGroupItem value="image" id="type-image" className="peer sr-only" />
                                     <Label htmlFor="type-image" className="flex items-center gap-4 p-6 rounded-2xl border-2 bg-muted/5 cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 transition-all">
                                         <ImageIcon className="h-6 w-6" />
                                         <div><p className="font-bold">Image Visual</p><p className="text-[10px] text-muted-foreground uppercase">Overlay & Banners</p></div>
+                                    </Label>
+                                </div>
+                                <div className="relative">
+                                    <RadioGroupItem value="video" id="type-video" className="peer sr-only" />
+                                    <Label htmlFor="type-video" className="flex items-center gap-4 p-6 rounded-2xl border-2 bg-muted/5 cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 transition-all">
+                                        <Video className="h-6 w-6" />
+                                        <div><p className="font-bold">Video Motion</p><p className="text-[10px] text-muted-foreground uppercase">MP4 / Stream</p></div>
                                     </Label>
                                 </div>
                                 <div className="relative">
@@ -203,35 +220,56 @@ export default function AddUISectionPage() {
 
                 <Separator className="border-dashed" />
 
-                {uiType === 'image' ? (
+                {uiType === 'image' || uiType === 'video' ? (
                     <div className="space-y-8 animate-in fade-in slide-in-from-top-2 duration-500">
-                        <FormField control={form.control} name="imageUrl" render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="font-bold">Primary Design Asset <span className="text-destructive">*</span></FormLabel>
-                                <div className="flex items-start gap-6">
-                                    {imageUrl ? (
-                                        <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border shadow-xl bg-white shrink-0">
-                                            <Image src={imageUrl} alt="Preview" fill className="object-cover" unoptimized />
+                        {uiType === 'image' ? (
+                            <FormField control={form.control} name="imageUrl" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="font-bold">Primary Design Asset <span className="text-destructive">*</span></FormLabel>
+                                    <div className="flex items-start gap-6">
+                                        {imageUrl ? (
+                                            <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border shadow-xl bg-white shrink-0">
+                                                <Image src={imageUrl} alt="Preview" fill className="object-cover" unoptimized />
+                                            </div>
+                                        ) : (
+                                            <div className="w-48 aspect-video rounded-2xl border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground bg-muted/20 shrink-0">
+                                                <ImageIcon className="h-8 w-8 opacity-20" />
+                                            </div>
+                                        )}
+                                        <div className="flex-grow space-y-3">
+                                            <FormControl><Input placeholder="https://example.com/banner.jpg" {...field} value={field.value || ''} className="h-11" /></FormControl>
+                                            <Button asChild variant="outline" size="sm" disabled={isUploading}>
+                                                <label htmlFor="ui-image-upload" className="cursor-pointer">
+                                                    {isUploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Upload className="h-4 w-4 mr-2" />}
+                                                    Upload Background
+                                                </label>
+                                            </Button>
+                                            <input id="ui-image-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
                                         </div>
-                                    ) : (
-                                        <div className="w-48 aspect-video rounded-2xl border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground bg-muted/20 shrink-0">
-                                            <ImageIcon className="h-8 w-8 opacity-20" />
-                                        </div>
-                                    )}
-                                    <div className="flex-grow space-y-3">
-                                        <FormControl><Input placeholder="https://example.com/banner.jpg" {...field} value={field.value || ''} className="h-11" /></FormControl>
-                                        <Button asChild variant="outline" size="sm" disabled={isUploading}>
-                                            <label htmlFor="ui-image-upload" className="cursor-pointer">
-                                                {isUploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Upload className="h-4 w-4 mr-2" />}
-                                                Upload Background
-                                            </label>
-                                        </Button>
-                                        <input id="ui-image-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
                                     </div>
-                                </div>
-                                <FormMessage />
-                            </FormItem>
-                        )} />
+                                    <FormMessage />
+                                </FormItem>
+                            )} />
+                        ) : (
+                            <div className="space-y-6">
+                                <FormField control={form.control} name="videoUrl" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="font-bold">Video URL <span className="text-destructive">*</span></FormLabel>
+                                        <FormControl><Input placeholder="https://example.com/video.mp4" {...field} value={field.value || ''} className="h-11" /></FormControl>
+                                        <FormDescription>Direct link to MP4 video file.</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )} />
+                                <FormField control={form.control} name="videoPosterUrl" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="font-bold">Video Poster (Thumbnail)</FormLabel>
+                                        <FormControl><Input placeholder="https://example.com/poster.jpg" {...field} value={field.value || ''} className="h-11" /></FormControl>
+                                        <FormDescription>Image displayed before the video starts.</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )} />
+                            </div>
+                        )}
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <FormField control={form.control} name="overlayTitle" render={({ field }) => (
