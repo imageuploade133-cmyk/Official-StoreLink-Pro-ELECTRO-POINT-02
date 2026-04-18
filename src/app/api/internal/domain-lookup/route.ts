@@ -21,10 +21,25 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const domain = searchParams.get('domain');
   const subdomain = searchParams.get('subdomain');
+  const storeId = searchParams.get('storeId');
 
-  console.log('Domain lookup:', { domain, subdomain });
+  console.log('Domain lookup:', { domain, subdomain, storeId });
 
   try {
+    if (storeId) {
+      const storeDoc = await db.collection('stores').doc(storeId).get();
+      if (storeDoc.exists) {
+        const store = storeDoc.data();
+        return NextResponse.json({ 
+          storeId: storeDoc.id,
+          plan: store?.plan,
+          subdomain: store?.subdomain,
+          customDomain: store?.customDomain,
+          domainVerified: store?.domainVerified
+        });
+      }
+    }
+
     if (domain) {
       const storeQuery = await db.collection('stores')
         .where('customDomain', '==', domain)
@@ -34,19 +49,47 @@ export async function GET(request: Request) {
         .get();
 
       if (!storeQuery.empty) {
-        const store = storeQuery.docs[0].data();
-        return NextResponse.json({ storeId: store.id });
+        const doc = storeQuery.docs[0];
+        const store = doc.data();
+        return NextResponse.json({ 
+          storeId: doc.id,
+          plan: store?.plan,
+          subdomain: store?.subdomain,
+          customDomain: store?.customDomain,
+          domainVerified: store?.domainVerified
+        });
       }
     }
 
     if (subdomain) {
-      // For subdomains, we check if the store slug/id matches the subdomain
-      const storeDoc = await db.collection('stores').doc(subdomain).get();
+      // 1. Check if the store slug/id matches the subdomain
+      const storeDoc = await db.collection('stores').doc(subdomain.toLowerCase()).get();
       if (storeDoc.exists) {
         const store = storeDoc.data();
-        // Allow both Pro and Premium plans to use subdomains
         if (store?.plan === 'pro' || store?.plan === 'premium') {
-          return NextResponse.json({ storeId: store.id });
+          return NextResponse.json({ 
+            storeId: storeDoc.id,
+            plan: store?.plan,
+            subdomain: store?.subdomain
+          });
+        }
+      }
+
+      // 2. Check if any store has this as their custom subdomain field
+      const subdomainQuery = await db.collection('stores')
+        .where('subdomain', '==', subdomain.toLowerCase())
+        .limit(1)
+        .get();
+      
+      if (!subdomainQuery.empty) {
+        const doc = subdomainQuery.docs[0];
+        const store = doc.data();
+        if (store?.plan === 'pro' || store?.plan === 'premium') {
+          return NextResponse.json({ 
+            storeId: doc.id,
+            plan: store?.plan,
+            subdomain: store?.subdomain
+          });
         }
       }
     }

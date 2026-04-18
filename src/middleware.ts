@@ -24,30 +24,69 @@ export async function middleware(req: NextRequest) {
   const isLocalhost = hostname.includes('localhost') || hostname.includes('127.0.0.1') || hostname.endsWith('.vercel.app');
   
   let storeId = null;
+  let storeData = null;
 
-  // 1. Pro Plan: storeid.domain.com
+  // 1. Pro Plan: storeid.domain.com or custom-subdomain.domain.com
   if (hostname.endsWith(`.${mainDomain}`)) {
     const subdomain = hostname.replace(`.${mainDomain}`, '');
     if (!reservedSubdomains.includes(subdomain)) {
-      // We'll rewrite to the storeId path. 
-      // The application logic will handle plan validation since it already fetches store settings.
-      storeId = subdomain;
+      try {
+        const lookupUrl = new URL(`/api/internal/domain-lookup?subdomain=${subdomain}`, url.origin);
+        const res = await fetch(lookupUrl.toString());
+        if (res.ok) {
+          const data = await res.json();
+          storeId = data.storeId;
+          storeData = data;
+        }
+      } catch (error) {
+        console.error('Middleware subdomain lookup error:', error);
+      }
     }
   } 
   // 2. Premium Plan: customdomain.com
   else if (hostname !== mainDomain && !isLocalhost) {
     // For custom domains, we MUST look up which store it belongs to.
     try {
-        // We use an internal API to keep middleware light. 
-        // In a real production app, you might use Edge Config or a fast KV store here.
         const lookupUrl = new URL(`/api/internal/domain-lookup?domain=${hostname}`, url.origin);
         const res = await fetch(lookupUrl.toString());
         if (res.ok) {
           const data = await res.json();
           storeId = data.storeId;
+          storeData = data;
         }
     } catch (error) {
         console.error('Middleware domain lookup error:', error);
+    }
+  }
+  // 3. Path-based redirect for Pro stores
+  else if (hostname === mainDomain || isLocalhost) {
+    const pathParts = url.pathname.split('/');
+    if (pathParts.length >= 2) {
+      const possibleStoreId = pathParts[1];
+      if (possibleStoreId && !reservedSubdomains.includes(possibleStoreId)) {
+        try {
+          const lookupUrl = new URL(`/api/internal/domain-lookup?storeId=${possibleStoreId}`, url.origin);
+          const res = await fetch(lookupUrl.toString());
+          if (res.ok) {
+            const data = await res.json();
+            // Redirect to subdomain if on Pro/Premium plan and NOT on the subdomain already
+            if ((data.plan === 'pro' || data.plan === 'premium') && data.subdomain) {
+              // Construct the new URL on the subdomain
+              // We remove the /[storeId] from the beginning of the path
+              const newPath = url.pathname.startsWith(`/${possibleStoreId}`) 
+                ? url.pathname.substring(possibleStoreId.length + 1) || '/' 
+                : url.pathname;
+              const protocol = url.protocol || 'https:';
+              const newUrl = new URL(newPath + url.search, `${protocol}//${data.subdomain}.${mainDomain}`);
+              
+              console.log(`Redirecting from path ${url.pathname} to subdomain ${newUrl.toString()}`);
+              return NextResponse.redirect(newUrl);
+            }
+          }
+        } catch (error) {
+          console.error('Middleware path redirect lookup error:', error);
+        }
+      }
     }
   }
 

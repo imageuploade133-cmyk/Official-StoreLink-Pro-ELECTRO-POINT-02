@@ -1,5 +1,5 @@
 
-export const RESERVED_SUBDOMAINS = ['www', 'admin', 'dashboard', 'api', 'pos', 'signup', 'login', 'signup-merchant'];
+export const RESERVED_SUBDOMAINS = ['www', 'admin', 'dashboard', 'api', 'pos', 'signup', 'login', 'signup-merchant', 'shop', 'auth', 'mail', 'support', 'docs'];
 
 /**
  * Gets the main domain of the application.
@@ -72,7 +72,7 @@ export function getProtocol(): string {
 /**
  * Gets the full URL for a store based on its ID and the current plan
  */
-export function getStoreUrl(storeId: string, plan: string, customDomain?: string | null): string {
+export function getStoreUrl(storeId: string, plan: string, customDomain?: string | null, subdomain?: string | null): string {
   const mainDomain = getMainDomain();
   const protocol = getProtocol();
   
@@ -80,6 +80,10 @@ export function getStoreUrl(storeId: string, plan: string, customDomain?: string
     return `${protocol}//${customDomain}`;
   }
   
+  if ((plan === 'pro' || plan === 'premium') && subdomain) {
+    return `${protocol}//${subdomain}.${mainDomain}`;
+  }
+
   if (plan === 'pro') {
     return `${protocol}//${storeId}.${mainDomain}`;
   }
