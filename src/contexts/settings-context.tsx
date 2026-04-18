@@ -14,7 +14,7 @@ interface SettingsContextType {
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
-export function SettingsProvider({ children }: { children: React.ReactNode }) {
+export function SettingsProvider({ children, storeId: storeIdFromMiddleware }: { children: React.ReactNode, storeId?: string | null }) {
   const firestore = useFirestore();
   const { store, staffMember } = useAuth();
   const pathname = usePathname();
@@ -28,7 +28,12 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       return null;
   }, [pathname]);
 
-  const storeId = useMemo(() => staffMember?.store_id || store?.id || storeIdFromPath, [staffMember, store, storeIdFromPath]);
+  const storeId = useMemo(() => 
+    staffMember?.store_id || 
+    store?.id || 
+    storeIdFromPath || 
+    storeIdFromMiddleware
+  , [staffMember, store, storeIdFromPath, storeIdFromMiddleware]);
 
   const settingsRef = useMemo(
     () => {
