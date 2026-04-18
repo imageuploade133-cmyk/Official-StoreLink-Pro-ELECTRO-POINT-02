@@ -32,7 +32,7 @@ export async function middleware(req: NextRequest) {
     if (!reservedSubdomains.includes(subdomain)) {
       try {
         const lookupUrl = new URL(`/api/internal/domain-lookup?subdomain=${subdomain}`, url.origin);
-        const res = await fetch(lookupUrl.toString());
+        const res = await fetch(lookupUrl.toString(), { cache: 'no-store' });
         if (res.ok) {
           storeData = await res.json();
           storeId = storeData.storeId;
@@ -46,7 +46,7 @@ export async function middleware(req: NextRequest) {
   else if (hostname !== mainDomain && !isLocalhost) {
     try {
         const lookupUrl = new URL(`/api/internal/domain-lookup?domain=${hostname}`, url.origin);
-        const res = await fetch(lookupUrl.toString());
+        const res = await fetch(lookupUrl.toString(), { cache: 'no-store' });
         if (res.ok) {
           storeData = await res.json();
           storeId = storeData.storeId;
@@ -63,7 +63,7 @@ export async function middleware(req: NextRequest) {
       if (possibleStoreId && !reservedSubdomains.includes(possibleStoreId)) {
         try {
           const lookupUrl = new URL(`/api/internal/domain-lookup?storeId=${possibleStoreId}`, url.origin);
-          const res = await fetch(lookupUrl.toString());
+          const res = await fetch(lookupUrl.toString(), { cache: 'no-store' });
           if (res.ok) {
             storeData = await res.json();
             storeId = storeData.storeId;
@@ -95,16 +95,17 @@ export async function middleware(req: NextRequest) {
     // Handle optional redirect if enabled and we are not on the primary domain
     if (redirectEnabled && primaryHostname) {
       const onCorrectHostname = hostname === primaryHostname;
-      const onCorrectPath = isPathBased ? url.pathname.startsWith(`/${storeId}`) : true;
+      const onCorrectPath = isPathBased ? url.pathname.startsWith(`/${storeId}`) || url.pathname.startsWith(`/${storeData.slug}`) : true;
 
       if (!onCorrectHostname || (isPathBased && !onCorrectPath)) {
         const protocol = url.protocol || 'https:';
         let newPath = url.pathname;
         
-        if (isPathBased && !newPath.startsWith(`/${storeId}`)) {
-          newPath = `/${storeId}${newPath}`;
-        } else if (!isPathBased && newPath.startsWith(`/${storeId}`)) {
-          newPath = newPath.replace(`/${storeId}`, '') || '/';
+        const pathStoreId = storeData.slug || storeId;
+        if (isPathBased && !newPath.startsWith(`/${pathStoreId}`)) {
+          newPath = `/${pathStoreId}${newPath}`;
+        } else if (!isPathBased && (newPath.startsWith(`/${storeId}`) || (storeData.slug && newPath.startsWith(`/${storeData.slug}`)))) {
+          newPath = newPath.replace(`/${storeId}`, '').replace(`/${storeData.slug}`, '') || '/';
         }
 
         const newUrl = new URL(newPath + url.search, `${protocol}//${primaryHostname}`);
@@ -121,7 +122,9 @@ export async function middleware(req: NextRequest) {
     if (isHostnameBased || (hostname.endsWith(`.${mainDomain}`) && !reservedSubdomains.includes(hostname.replace(`.${mainDomain}`, '')))) {
        // Avoid infinite rewrites
        if (url.pathname.startsWith(`/${storeId}`)) {
-          return NextResponse.next();
+          const response = NextResponse.next();
+          response.headers.set('x-store-id', storeId);
+          return response;
        }
 
        const rewriteUrl = new URL(`/${storeId}${url.pathname}`, req.url);
@@ -131,6 +134,11 @@ export async function middleware(req: NextRequest) {
        response.headers.set('x-store-id', storeId);
        return response;
     }
+
+    // For path-based stores on main domain, also set the header
+    const response = NextResponse.next();
+    response.headers.set('x-store-id', storeId);
+    return response;
   }
 
   return NextResponse.next();

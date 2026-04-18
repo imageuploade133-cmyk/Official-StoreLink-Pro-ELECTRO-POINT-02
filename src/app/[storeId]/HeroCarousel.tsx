@@ -41,21 +41,22 @@ const iconMap = {
 
 export function HeroCarousel() {
   const firestore = useFirestore();
-  const { settings } = useSettings();
+  const { settings, store } = useSettings();
   const params = useParams();
   const storeId = params?.storeId as string;
+  const effectiveStoreId = store?.id || storeId;
   const { getStoreUrl } = useStoreUrl();
   
   const slidesQuery = React.useMemo(() => {
-    if (!firestore || !storeId) return null;
+    if (!firestore || !effectiveStoreId) return null;
     return query(
       collection(firestore, 'slideShows'), 
-      where('store_id', '==', storeId),
+      where('store_id', '==', effectiveStoreId),
       where('published', '==', true), 
       orderBy('order', 'asc'), 
       limit(20)
     );
-  }, [firestore, storeId]);
+  }, [firestore, effectiveStoreId]);
   const { data: slides, isLoading } = useCollection<SlideShow>(slidesQuery);
 
   const slideDuration = settings?.slideShowDuration || 7000;

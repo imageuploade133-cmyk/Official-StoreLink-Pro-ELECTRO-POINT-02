@@ -6,6 +6,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import type { Settings, Store } from '@/lib/types';
 import { useAuth } from './auth-context';
 import { usePathname } from 'next/navigation';
+import { RESERVED_SUBDOMAINS } from '@/lib/domain';
 
 interface SettingsContextType {
   settings: Settings | null;
@@ -26,14 +27,18 @@ export function SettingsProvider({ children, storeId: storeIdFromMiddleware }: {
       if ((parts[1] === 'store' || parts[1] === 'store-app') && parts[2]) {
           return parts[2];
       }
+      // Check if we are in /[storeId]
+      if (parts[1] && !RESERVED_SUBDOMAINS.includes(parts[1])) {
+          return parts[1];
+      }
       return null;
   }, [pathname]);
 
   const storeId = useMemo(() => 
-    staffMember?.store_id || 
-    store?.id || 
+    storeIdFromMiddleware || 
     storeIdFromPath || 
-    storeIdFromMiddleware
+    staffMember?.store_id || 
+    store?.id
   , [staffMember, store, storeIdFromPath, storeIdFromMiddleware]);
 
   const settingsRef = useMemo(
@@ -69,7 +74,7 @@ export function SettingsProvider({ children, storeId: storeIdFromMiddleware }: {
   const { data: storeData, isLoading: isLoadingStore } = useDoc<Store>(storeRef);
 
   const settingsData = newSettingsData || oldSettingsData;
-  const isLoadingSettings = isLoadingNewSettings && isLoadingOldSettings && isLoadingStore;
+  const isLoadingSettings = isLoadingNewSettings || isLoadingOldSettings || isLoadingStore;
 
   const value = { 
     settings: settingsData, 

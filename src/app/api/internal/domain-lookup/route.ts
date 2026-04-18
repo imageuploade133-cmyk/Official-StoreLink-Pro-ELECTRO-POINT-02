@@ -27,11 +27,32 @@ export async function GET(request: Request) {
 
   try {
     if (storeId) {
+      // 1. Check if the storeId is the document ID
       const storeDoc = await db.collection('stores').doc(storeId).get();
       if (storeDoc.exists) {
         const store = storeDoc.data();
         return NextResponse.json({ 
           storeId: storeDoc.id,
+          plan: store?.plan,
+          subdomain: store?.subdomain,
+          customDomain: store?.customDomain,
+          domainVerified: store?.domainVerified,
+          primaryDomainType: store?.primaryDomainType,
+          redirectEnabled: store?.redirectEnabled
+        });
+      }
+
+      // 2. Check if the storeId is a slug
+      const slugQuery = await db.collection('stores')
+        .where('slug', '==', storeId.toLowerCase())
+        .limit(1)
+        .get();
+      
+      if (!slugQuery.empty) {
+        const doc = slugQuery.docs[0];
+        const store = doc.data();
+        return NextResponse.json({ 
+          storeId: doc.id,
           plan: store?.plan,
           subdomain: store?.subdomain,
           customDomain: store?.customDomain,
