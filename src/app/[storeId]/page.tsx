@@ -28,23 +28,26 @@ const DynamicIcon = ({ name }: { name: string }) => {
 
 export default function StoreHomePage() {
   const firestore = useFirestore();
-  const { settings } = useSettings();
+  const { settings, store, isLoadingSettings } = useSettings();
   const currencySymbol = settings?.currency || '$';
   const params = useParams();
   const storeId = params?.storeId as string;
+  const effectiveStoreId = store?.id || storeId;
+
+  console.log("Store slug:", storeId, "Effective ID:", effectiveStoreId);
 
   // Fetch Categories once for name mapping across all sections
   const categoriesQuery = useMemo(() => {
-    if (!firestore || !storeId) return null;
-    return query(collection(firestore, 'categories'), where('store_id', '==', storeId), orderBy('name'));
-  }, [firestore, storeId]);
+    if (!firestore || !effectiveStoreId) return null;
+    return query(collection(firestore, 'categories'), where('store_id', '==', effectiveStoreId), orderBy('name'));
+  }, [firestore, effectiveStoreId]);
   const { data: categories } = useCollection<Category>(categoriesQuery);
 
   // Fetch Homepage Sections (Product & Custom UI)
   const sectionsQuery = useMemo(() => {
-    if (!firestore || !storeId) return null;
-    return query(collection(firestore, 'homepageSections'), where('store_id', '==', storeId), where('published', '==', true), orderBy('order', 'asc'));
-  }, [firestore, storeId]);
+    if (!firestore || !effectiveStoreId) return null;
+    return query(collection(firestore, 'homepageSections'), where('store_id', '==', effectiveStoreId), where('published', '==', true), orderBy('order', 'asc'));
+  }, [firestore, effectiveStoreId]);
   const { data: sections } = useCollection<HomepageSection>(sectionsQuery);
   
   const defaultValues: BrandValue[] = [
@@ -62,6 +65,22 @@ export default function StoreHomePage() {
   const valuesAutoplay = React.useRef(
     Autoplay({ delay: 3000, stopOnInteraction: false, stopOnMouseEnter: true })
   )
+
+  if (isLoadingSettings) {
+    return null; // Layout handles skeleton
+  }
+
+  if (!store) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
+        <h1 className="text-4xl font-bold mb-4">Store Not Found</h1>
+        <p className="text-muted-foreground mb-8">The store you are looking for does not exist or has been moved.</p>
+        <Button asChild>
+          <Link href="/">Back to Home</Link>
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <>
