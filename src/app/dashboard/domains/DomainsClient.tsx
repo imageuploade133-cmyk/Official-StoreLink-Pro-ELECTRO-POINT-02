@@ -10,11 +10,11 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { addDomainToVercel, checkDomainStatus, updateStoreDomain, updateStorePlan, verifyDomain } from '@/app/actions/domains';
+import { addDomainToVercel, checkDomainStatus, updateStoreDomain, updateStorePlan, verifyDomain, isSubdomainAvailable } from '@/app/actions/domains';
 import { Spinner } from '@/components/ui/spinner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getMainDomain, getProtocol } from '@/lib/domain';
+import { getMainDomain, getProtocol, getStoreUrl } from '@/lib/domain';
 
 interface DomainsClientProps {
   initialMainDomain: string;
@@ -26,6 +26,7 @@ export default function DomainsClient({ initialMainDomain, initialProtocol }: Do
   const { toast } = useToast();
   const [isUpdating, setIsUpdating] = useState(false);
   const [customDomain, setCustomDomain] = useState('');
+  const [subdomainInput, setSubdomainInput] = useState('');
   const [verifying, setVerifying] = useState(false);
   const [domainStatus, setDomainStatus] = useState<any>(null);
 
@@ -36,6 +37,11 @@ export default function DomainsClient({ initialMainDomain, initialProtocol }: Do
     if (store?.customDomain) {
       setCustomDomain(store.customDomain);
       checkStatus(store.customDomain);
+    }
+    if (store?.subdomain) {
+      setSubdomainInput(store.subdomain);
+    } else if (store?.id) {
+      setSubdomainInput(store.id);
     }
   }, [store]);
 
@@ -54,6 +60,30 @@ export default function DomainsClient({ initialMainDomain, initialProtocol }: Do
       toast({ title: 'Plan Updated', description: `Your plan has been updated to ${plan.toUpperCase()}.` });
     } catch (error) {
       toast({ variant: 'destructive', title: 'Update Failed', description: 'Failed to update plan.' });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleUpdateSubdomain = async () => {
+    if (!store || !subdomainInput) return;
+    
+    setIsUpdating(true);
+    try {
+      const available = await isSubdomainAvailable(subdomainInput, store.id);
+      if (!available) {
+        toast({ 
+          variant: 'destructive', 
+          title: 'Subdomain unavailable', 
+          description: 'This subdomain is already taken or reserved. Please choose another one.' 
+        });
+        return;
+      }
+
+      await updateStoreDomain(store.id, store.customDomain || null, subdomainInput);
+      toast({ title: 'Subdomain Updated', description: `Your store subdomain has been updated to ${subdomainInput}.${mainDomain}` });
+    } catch (error) {
+      toast({ variant: 'destructive', title: 'Update Failed', description: 'Failed to update subdomain.' });
     } finally {
       setIsUpdating(false);
     }
@@ -122,7 +152,8 @@ export default function DomainsClient({ initialMainDomain, initialProtocol }: Do
   }
 
   const currentPlan = store?.plan || 'free';
-  const subdomain = store?.id; // Store ID is the slug
+  const storeSlug = store?.id;
+  const activeSubdomain = store?.subdomain || storeSlug;
 
   return (
     <div className="space-y-8 max-w-5xl">
@@ -131,6 +162,33 @@ export default function DomainsClient({ initialMainDomain, initialProtocol }: Do
         title="Domain Settings"
         description="Manage how customers access your store online."
       />
+
+      <Card className="bg-primary/5 border-primary/20">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-medium">Current Primary URL</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <code className="text-lg font-bold text-primary break-all">
+              {store?.customDomain && store.domainVerified 
+                ? `${protocol}//${store.customDomain}` 
+                : (currentPlan !== 'free' 
+                   ? `${protocol}//${activeSubdomain}.${mainDomain}` 
+                   : `${protocol}//${mainDomain}/${storeSlug}`)}
+            </code>
+            <Button variant="outline" size="sm" asChild className="shrink-0">
+                <a 
+                  href={store ? getStoreUrl(store.id, currentPlan, store.customDomain, store.subdomain) : '#'} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2"
+                >
+                    Visit Store <ExternalLink className="h-4 w-4" />
+                </a>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6 md:grid-cols-3">
         <Card className={currentPlan === 'free' ? 'border-primary shadow-md' : ''}>
@@ -141,7 +199,7 @@ export default function DomainsClient({ initialMainDomain, initialProtocol }: Do
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">Your store is accessible at:</p>
             <code className="bg-muted p-2 rounded block text-xs break-all">
-              {mainDomain}/{subdomain}
+              {mainDomain}/{storeSlug}
             </code>
           </CardContent>
           <CardFooter>
@@ -164,7 +222,7 @@ export default function DomainsClient({ initialMainDomain, initialProtocol }: Do
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">Professional subdomain for your store:</p>
             <code className="bg-muted p-2 rounded block text-xs break-all">
-              {subdomain}.{mainDomain}
+              {activeSubdomain}.{mainDomain}
             </code>
           </CardContent>
           <CardFooter>
@@ -202,6 +260,46 @@ export default function DomainsClient({ initialMainDomain, initialProtocol }: Do
           </CardFooter>
         </Card>
       </div>
+
+      {(currentPlan === 'pro' || currentPlan === 'premium') && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Subdomain Settings</CardTitle>
+            <CardDescription>Activate and customize your store's subdomain.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1 flex items-center border rounded-md px-3 bg-muted/50 h-10">
+                <Input
+                  className="border-0 bg-transparent p-0 focus-visible:ring-0"
+                  placeholder="your-store-name"
+                  value={subdomainInput}
+                  onChange={(e) => setSubdomainInput(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                  disabled={isUpdating}
+                />
+                <span className="text-muted-foreground ml-2">.{mainDomain}</span>
+              </div>
+              <Button 
+                onClick={handleUpdateSubdomain} 
+                disabled={isUpdating || !subdomainInput || subdomainInput === store?.subdomain}
+              >
+                {isUpdating ? <Spinner size="sm" className="mr-2" /> : null}
+                {store?.subdomain ? 'Update Subdomain' : 'Activate Subdomain'}
+              </Button>
+            </div>
+            {!store?.subdomain ? (
+                <p className="text-xs text-muted-foreground">
+                    Activate your professional subdomain to use <strong>{subdomainInput || '...'}.{mainDomain}</strong> instead of {mainDomain}/{store?.id}
+                </p>
+            ) : (
+                <div className="flex items-center gap-2 text-xs text-green-600 font-medium">
+                    <CheckCircle className="h-3 w-3" />
+                    Subdomain is active: {store.subdomain}.{mainDomain}
+                </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {currentPlan === 'premium' && (
         <Card>
@@ -298,9 +396,9 @@ export default function DomainsClient({ initialMainDomain, initialProtocol }: Do
             <div className="flex items-center justify-between py-2 border-b">
               <span className="text-sm font-medium">Pro Subdomain</span>
               <div className="flex items-center gap-2">
-                <code className="text-xs">{subdomain}.{mainDomain}</code>
+                <code className="text-xs">{activeSubdomain}.{mainDomain}</code>
                 <Button variant="ghost" size="icon" asChild className="h-8 w-8">
-                  <a href={`${protocol}//${subdomain}.${mainDomain}`} target="_blank" rel="noopener noreferrer">
+                  <a href={`${protocol}//${activeSubdomain}.${mainDomain}`} target="_blank" rel="noopener noreferrer">
                     <ExternalLink className="h-4 w-4" />
                   </a>
                 </Button>

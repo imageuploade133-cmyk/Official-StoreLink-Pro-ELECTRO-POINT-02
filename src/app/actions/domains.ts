@@ -3,6 +3,7 @@
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { getFirestore } from 'firebase-admin/firestore';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { RESERVED_SUBDOMAINS } from '@/lib/domain';
 
 const VERCEL_TOKEN = process.env.VERCEL_TOKEN;
 const VERCEL_PROJECT_ID = process.env.VERCEL_PROJECT_ID;
@@ -75,14 +76,50 @@ export async function updateStorePlan(storeId: string, plan: 'free' | 'pro' | 'p
     return { success: true };
 }
 
+export async function isSubdomainAvailable(subdomain: string, excludeStoreId?: string) {
+    const db = getDb();
+    
+    // 1. Check reserved names
+    if (RESERVED_SUBDOMAINS.includes(subdomain.toLowerCase())) {
+        return false;
+    }
+
+    // 2. Check if another store uses this as their custom subdomain
+    const subdomainQuery = await db.collection('stores')
+        .where('subdomain', '==', subdomain.toLowerCase())
+        .get();
+    
+    if (!subdomainQuery.empty) {
+        const otherStore = subdomainQuery.docs.find(doc => doc.id !== excludeStoreId);
+        if (otherStore) return false;
+    }
+    
+    // 3. Check if another store has this as their store ID (slug)
+    const storeById = await db.collection('stores').doc(subdomain.toLowerCase()).get();
+    if (storeById.exists && storeById.id !== excludeStoreId) {
+        return false;
+    }
+
+    return true;
+}
+
 export async function updateStoreDomain(storeId: string, domain: string | null, subdomain: string | null) {
     const db = getDb();
-    await db.collection('stores').doc(storeId).update({
+    const storeDoc = await db.collection('stores').doc(storeId).get();
+    const currentData = storeDoc.data();
+
+    const updateData: any = {
         customDomain: domain,
         subdomain: subdomain,
-        domainVerified: false,
         updatedAt: new Date()
-    });
+    };
+
+    // Only reset verification if the custom domain changed
+    if (currentData?.customDomain !== domain) {
+        updateData.domainVerified = false;
+    }
+
+    await db.collection('stores').doc(storeId).update(updateData);
     return { success: true };
 }
 
