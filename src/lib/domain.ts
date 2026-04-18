@@ -33,6 +33,18 @@ export function getMainDomain(host?: string | null): string {
     // Try to strip common system subdomains
     const parts = hostname.split('.');
     
+    // Special handling for Vercel domains
+    if (hostname.endsWith('.vercel.app')) {
+      // valentino-ice-creame-01-nine.vercel.app -> 3 parts
+      // test11.valentino-ice-creame-01-nine.vercel.app -> 4 parts
+      if (parts.length > 3) {
+        const baseDomain = parts.slice(-3).join('.');
+        const port = currentHost.split(':')[1];
+        return port ? `${baseDomain}:${port}` : baseDomain;
+      }
+      return hostname;
+    }
+
     if (parts.length > 2 && RESERVED_SUBDOMAINS.includes(parts[0])) {
       // If we're on dashboard.example.com, the main domain is example.com
       const port = currentHost.split(':')[1];
