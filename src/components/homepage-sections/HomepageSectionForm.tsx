@@ -527,12 +527,19 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
         <>
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                <Card className="shadow-xl border-none ring-1 ring-border">
-                    <CardHeader className="bg-muted/30">
-                        <CardTitle>Section Configuration</CardTitle>
-                        <CardDescription>Define how products are selected and displayed on the homepage.</CardDescription>
+                <Card className="shadow-2xl border-none ring-1 ring-border overflow-hidden rounded-[2.5rem]">
+                    <CardHeader className="bg-gradient-to-br from-primary/5 via-background to-background border-b border-primary/5 px-8 py-10">
+                        <div className="flex items-center gap-5">
+                            <div className="h-14 w-14 rounded-2xl bg-primary flex items-center justify-center shadow-2xl shadow-primary/40">
+                                <SlidersHorizontal className="h-7 w-7 text-white" />
+                            </div>
+                            <div>
+                                <CardTitle className="text-2xl font-black tracking-tight uppercase">Section Configuration</CardTitle>
+                                <CardDescription className="text-sm font-medium mt-1">Orchestrate how products and promotions are served to your audience.</CardDescription>
+                            </div>
+                        </div>
                     </CardHeader>
-                    <CardContent className="space-y-8 pt-6">
+                    <CardContent className="space-y-8 pt-10 px-8 pb-10">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <FormField control={form.control} name="title" render={({ field }) => ( 
                                 <FormItem> 
@@ -712,25 +719,40 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                             )}
                         />
                         
-                        <div className="space-y-6 pt-8 border-t border-dashed">
+                        <div className="space-y-6 pt-10 border-t-2 border-dashed border-primary/10">
                             <Tabs 
                                 value={activeTab}
                                 onValueChange={(val) => setActiveTab(val as 'products' | 'visual')}
                                 className="w-full"
                             >
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-                                    <div>
-                                        <h3 className="text-sm font-black uppercase tracking-[0.2em] text-primary">Section Configuration</h3>
-                                        <p className="text-xs text-muted-foreground mt-1">Configure both products and promotional banners for this section.</p>
+                                <div className="bg-muted/30 rounded-[2rem] p-6 mb-8 border border-border shadow-sm">
+                                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-12 w-12 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                                                <SlidersHorizontal className="h-6 w-6 text-primary-foreground" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-lg font-black uppercase tracking-tight text-foreground">Content Merchandising</h3>
+                                                <p className="text-xs text-muted-foreground font-medium mt-0.5">Define your section's product logic and visual style.</p>
+                                            </div>
+                                        </div>
+                                        <TabsList className="grid grid-cols-2 w-full lg:w-[450px] h-14 p-1.5 bg-background/50 backdrop-blur-sm rounded-2xl border border-border shadow-inner">
+                                            <TabsTrigger 
+                                                value="products" 
+                                                className="rounded-xl font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg gap-2"
+                                            >
+                                                <Box className="h-4 w-4" /> 
+                                                Inventory
+                                            </TabsTrigger>
+                                            <TabsTrigger 
+                                                value="visual" 
+                                                className="rounded-xl font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg gap-2"
+                                            >
+                                                <Palette className="h-4 w-4" /> 
+                                                Creative
+                                            </TabsTrigger>
+                                        </TabsList>
                                     </div>
-                                    <TabsList className="grid grid-cols-2 w-full sm:w-[400px] h-12 p-1 bg-muted/50 rounded-xl">
-                                        <TabsTrigger value="products" className="rounded-lg font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm gap-2">
-                                            <Box className="h-4 w-4" /> Products
-                                        </TabsTrigger>
-                                        <TabsTrigger value="visual" className="rounded-lg font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm gap-2">
-                                            <ImageIcon className="h-4 w-4" /> Banner Settings
-                                        </TabsTrigger>
-                                    </TabsList>
                                 </div>
 
                                 <TabsContent value="products" className="space-y-8 animate-in fade-in duration-500 focus-visible:outline-none">
@@ -741,26 +763,52 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                                 <FormLabel className="font-bold">Target Merchandising Strategy</FormLabel>
                                             </div>
                                             <FormControl>
-                                                <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                                    <div className="flex items-center space-x-2 border rounded-xl p-4 transition-all hover:bg-muted/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                                                        <RadioGroupItem value="category" id="selection-category" />
-                                                        <Label htmlFor="selection-category" className="font-bold cursor-pointer flex flex-col">
-                                                            <span>Dynamic Category</span>
-                                                            <span className="text-[10px] font-normal text-muted-foreground">Sync with catalog</span>
+                                                <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                                    <div className="relative group">
+                                                        <RadioGroupItem value="category" id="selection-category" className="peer sr-only" />
+                                                        <Label 
+                                                            htmlFor="selection-category" 
+                                                            className="flex flex-col items-center justify-center gap-3 p-6 rounded-[2rem] border-2 bg-background cursor-pointer transition-all duration-300 peer-data-[state=checked]:border-primary peer-data-[state=checked]:ring-4 peer-data-[state=checked]:ring-primary/10 hover:border-primary/50 hover:bg-primary/5 group-hover:shadow-lg"
+                                                        >
+                                                            <div className="h-12 w-12 rounded-2xl bg-muted group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                                                                <LayoutGrid className="h-6 w-6 text-muted-foreground group-hover:text-primary" />
+                                                            </div>
+                                                            <div className="text-center">
+                                                                <p className="font-black uppercase tracking-tight text-sm">Dynamic Category</p>
+                                                                <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-60">Automated Sync</p>
+                                                            </div>
                                                         </Label>
                                                     </div>
-                                                    <div className="flex items-center space-x-2 border rounded-xl p-4 transition-all hover:bg-muted/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                                                        <RadioGroupItem value="manual" id="selection-manual" />
-                                                        <Label htmlFor="selection-manual" className="font-bold cursor-pointer flex flex-col">
-                                                            <span>Hand-Picked</span>
-                                                            <span className="text-[10px] font-normal text-muted-foreground">Individual items</span>
+
+                                                    <div className="relative group">
+                                                        <RadioGroupItem value="manual" id="selection-manual" className="peer sr-only" />
+                                                        <Label 
+                                                            htmlFor="selection-manual" 
+                                                            className="flex flex-col items-center justify-center gap-3 p-6 rounded-[2rem] border-2 bg-background cursor-pointer transition-all duration-300 peer-data-[state=checked]:border-primary peer-data-[state=checked]:ring-4 peer-data-[state=checked]:ring-primary/10 hover:border-primary/50 hover:bg-primary/5 group-hover:shadow-lg"
+                                                        >
+                                                            <div className="h-12 w-12 rounded-2xl bg-muted group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                                                                <MousePointer2 className="h-6 w-6 text-muted-foreground group-hover:text-primary" />
+                                                            </div>
+                                                            <div className="text-center">
+                                                                <p className="font-black uppercase tracking-tight text-sm">Hand-Picked</p>
+                                                                <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-60">Individual Items</p>
+                                                            </div>
                                                         </Label>
                                                     </div>
-                                                    <div className="flex items-center space-x-2 border rounded-xl p-4 transition-all hover:bg-muted/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                                                        <RadioGroupItem value="custom-ui" id="selection-none" />
-                                                        <Label htmlFor="selection-none" className="font-bold cursor-pointer flex flex-col">
-                                                            <span>No Products</span>
-                                                            <span className="text-[10px] font-normal text-muted-foreground">Visual banner only</span>
+
+                                                    <div className="relative group">
+                                                        <RadioGroupItem value="custom-ui" id="selection-none" className="peer sr-only" />
+                                                        <Label 
+                                                            htmlFor="selection-none" 
+                                                            className="flex flex-col items-center justify-center gap-3 p-6 rounded-[2rem] border-2 bg-background cursor-pointer transition-all duration-300 peer-data-[state=checked]:border-primary peer-data-[state=checked]:ring-4 peer-data-[state=checked]:ring-primary/10 hover:border-primary/50 hover:bg-primary/5 group-hover:shadow-lg"
+                                                        >
+                                                            <div className="h-12 w-12 rounded-2xl bg-muted group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                                                                <ImageIcon className="h-6 w-6 text-muted-foreground group-hover:text-primary" />
+                                                            </div>
+                                                            <div className="text-center">
+                                                                <p className="font-black uppercase tracking-tight text-sm">No Products</p>
+                                                                <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-60">Visual Banner Only</p>
+                                                            </div>
                                                         </Label>
                                                     </div>
                                                 </RadioGroup>
@@ -882,26 +930,52 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                                 <FormLabel className="font-black text-xs uppercase tracking-widest text-primary">UI Design Protocol</FormLabel>
 
                                                 <FormControl>
-                                                    <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                        <div className="relative">
+                                                    <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                        <div className="relative group">
                                                             <RadioGroupItem value="image" id="f-type-image" className="peer sr-only" />
-                                                            <Label htmlFor="f-type-image" className="flex items-center gap-4 p-6 rounded-2xl border-2 bg-muted/5 cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 transition-all">
-                                                                <ImageIcon className="h-6 w-6" />
-                                                                <div><p className="font-bold">Image Visual</p><p className="text-[10px] text-muted-foreground uppercase">Banners</p></div>
+                                                            <Label 
+                                                                htmlFor="f-type-image" 
+                                                                className="flex flex-col items-center justify-center gap-3 p-6 rounded-[2rem] border-2 bg-background cursor-pointer transition-all duration-300 peer-data-[state=checked]:border-primary peer-data-[state=checked]:ring-4 peer-data-[state=checked]:ring-primary/10 hover:border-primary/50 hover:bg-primary/5 group-hover:shadow-lg"
+                                                            >
+                                                                <div className="h-12 w-12 rounded-2xl bg-muted group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                                                                    <ImageIcon className="h-6 w-6 text-muted-foreground group-hover:text-primary" />
+                                                                </div>
+                                                                <div className="text-center">
+                                                                    <p className="font-black uppercase tracking-tight text-sm">Image Visual</p>
+                                                                    <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-60">Static Banner</p>
+                                                                </div>
                                                             </Label>
                                                         </div>
-                                                        <div className="relative">
+
+                                                        <div className="relative group">
                                                             <RadioGroupItem value="video" id="f-type-video" className="peer sr-only" />
-                                                            <Label htmlFor="f-type-video" className="flex items-center gap-4 p-6 rounded-2xl border-2 bg-muted/5 cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 transition-all">
-                                                                <Video className="h-6 w-6" />
-                                                                <div><p className="font-bold">Video Motion</p><p className="text-[10px] text-muted-foreground uppercase">MP4 / Stream</p></div>
+                                                            <Label 
+                                                                htmlFor="f-type-video" 
+                                                                className="flex flex-col items-center justify-center gap-3 p-6 rounded-[2rem] border-2 bg-background cursor-pointer transition-all duration-300 peer-data-[state=checked]:border-primary peer-data-[state=checked]:ring-4 peer-data-[state=checked]:ring-primary/10 hover:border-primary/50 hover:bg-primary/5 group-hover:shadow-lg"
+                                                            >
+                                                                <div className="h-12 w-12 rounded-2xl bg-muted group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                                                                    <Video className="h-6 w-6 text-muted-foreground group-hover:text-primary" />
+                                                                </div>
+                                                                <div className="text-center">
+                                                                    <p className="font-black uppercase tracking-tight text-sm">Video Motion</p>
+                                                                    <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-60">MP4 / Stream</p>
+                                                                </div>
                                                             </Label>
                                                         </div>
-                                                        <div className="relative">
+
+                                                        <div className="relative group">
                                                             <RadioGroupItem value="html" id="f-type-html" className="peer sr-only" />
-                                                            <Label htmlFor="f-type-html" className="flex items-center gap-4 p-6 rounded-2xl border-2 bg-muted/5 cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 transition-all">
-                                                                <Code className="h-6 w-6" />
-                                                                <div><p className="font-bold">Bespoke HTML</p><p className="text-[10px] text-muted-foreground uppercase">Raw Code</p></div>
+                                                            <Label 
+                                                                htmlFor="f-type-html" 
+                                                                className="flex flex-col items-center justify-center gap-3 p-6 rounded-[2rem] border-2 bg-background cursor-pointer transition-all duration-300 peer-data-[state=checked]:border-primary peer-data-[state=checked]:ring-4 peer-data-[state=checked]:ring-primary/10 hover:border-primary/50 hover:bg-primary/5 group-hover:shadow-lg"
+                                                            >
+                                                                <div className="h-12 w-12 rounded-2xl bg-muted group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                                                                    <Code className="h-6 w-6 text-muted-foreground group-hover:text-primary" />
+                                                                </div>
+                                                                <div className="text-center">
+                                                                    <p className="font-black uppercase tracking-tight text-sm">Bespoke HTML</p>
+                                                                    <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-60">Raw Code</p>
+                                                                </div>
                                                             </Label>
                                                         </div>
                                                     </RadioGroup>
@@ -1048,28 +1122,30 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
 
                 {/* Flash Sale Card */}
                 {selectionType !== 'custom-ui' && (
-                    <Card className={cn("shadow-xl border-none ring-1 ring-border transition-all", isFlashSale ? "border-rose-500 ring-rose-500/20" : "")}>
-                        <CardHeader className={cn("bg-muted/30 transition-colors", isFlashSale ? "bg-rose-500/10" : "")}>
+                    <Card className={cn("shadow-2xl border-none ring-1 transition-all rounded-[2.5rem] overflow-hidden", isFlashSale ? "ring-rose-500/50 shadow-rose-500/10" : "ring-border")}>
+                        <CardHeader className={cn("transition-colors px-8 py-10", isFlashSale ? "bg-rose-500/5" : "bg-muted/30")}>
                             <div className="flex justify-between items-center">
-                                <div>
-                                    <CardTitle className="flex items-center gap-2">
-                                        <Zap className={cn("h-5 w-5", isFlashSale ? "text-rose-500 fill-current" : "text-muted-foreground")} />
-                                        Flash Sale Engine (Promo)
-                                    </CardTitle>
-                                    <CardDescription>Turn this section into a high-visibility, section-wide promotional event.</CardDescription>
+                                <div className="flex items-center gap-5">
+                                    <div className={cn("h-14 w-14 rounded-2xl flex items-center justify-center shadow-2xl transition-all", isFlashSale ? "bg-rose-500 text-white shadow-rose-500/40 rotate-6" : "bg-muted text-muted-foreground shadow-none")}>
+                                        <Zap className={cn("h-7 w-7", isFlashSale ? "fill-current" : "")} />
+                                    </div>
+                                    <div>
+                                        <CardTitle className="text-xl font-black tracking-tight uppercase">Flash Sale Engine</CardTitle>
+                                        <CardDescription className="font-medium">Ignite sales with a high-visibility promotional layer.</CardDescription>
+                                    </div>
                                 </div>
                                 <FormField
                                     control={form.control}
                                     name="isFlashSale"
                                     render={({ field }) => (
                                         <FormControl>
-                                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                            <Switch checked={field.value} onCheckedChange={field.onChange} className="data-[state=checked]:bg-rose-500" />
                                         </FormControl>
                                     )}
                                 />
                             </div>
                         </CardHeader>
-                        <CardContent className={cn("pt-6 space-y-6 transition-opacity", !isFlashSale && "opacity-40 pointer-events-none")}>
+                        <CardContent className={cn("px-8 py-10 space-y-6 transition-opacity", !isFlashSale && "opacity-40 pointer-events-none")}>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <FormField
                                     control={form.control}
