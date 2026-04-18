@@ -55,8 +55,8 @@ export default function CreateHomepageSectionPage() {
         <div className="space-y-6">
              <PageHeader
                 icon={Columns}
-                title="Create Homepage Section"
-                description="Build a new section to feature products on your homepage."
+                title="Create Product Feed Section"
+                description="Choose between dynamic categories or hand-picked products to feature on your homepage."
             >
              <div className="mt-4">
                     <Button variant="outline" asChild>

@@ -15,7 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
-import { Loader2, Columns, PlusCircle, Edit, Trash2, Zap, Clock, Info } from 'lucide-react';
+import { Loader2, Columns, PlusCircle, Edit, Trash2, Zap, Clock, Info, ImageIcon, LayoutGrid } from 'lucide-react';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { convertToDateSafely } from '@/lib/utils';
 
@@ -65,10 +65,13 @@ export default function ManageHomepageSectionsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
-        <PageHeader icon={Columns} title="Manage Homepage Sections" description="Organize and manage products, banners, and video sections on your storefront." />
+        <PageHeader icon={Columns} title="Manage Homepage Sections" description="Curate product feeds and design high-impact visual banners for your storefront." />
         <div className="flex items-center gap-2">
+            <Button variant="outline" asChild>
+                <Link href="/dashboard/add-ui-section"><ImageIcon className="mr-2 h-4 w-4"/> Add Banner / Video</Link>
+            </Button>
             <Button asChild>
-                <Link href="/dashboard/homepage-sections/create"><PlusCircle className="mr-2 h-4 w-4"/> Create Homepage Section</Link>
+                <Link href="/dashboard/homepage-sections/create"><LayoutGrid className="mr-2 h-4 w-4"/> Create Product Feed</Link>
             </Button>
         </div>
       </div>
@@ -135,7 +138,7 @@ export default function ManageHomepageSectionsPage() {
                                         </TableCell>
                                         <TableCell className="text-right space-x-2">
                                             <Button variant="outline" size="sm" asChild>
-                                                <Link href={`/dashboard/homepage-sections/edit/${section.id}`}>
+                                                <Link href={section.selectionType === 'custom-ui' ? `/dashboard/edit-ui-section/${section.id}` : `/dashboard/homepage-sections/edit/${section.id}`}>
                                                     <Edit className="mr-2 h-4 w-4"/>Edit
                                                 </Link>
                                             </Button>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useFirestore, useDoc } from '@/firebase';
@@ -30,6 +30,12 @@ export default function EditHomepageSectionPage() {
     
     const [isSaving, setIsSaving] = useState(false);
 
+    useEffect(() => {
+        if (sectionData?.selectionType === 'custom-ui') {
+            router.replace(`/dashboard/edit-ui-section/${sectionId}`);
+        }
+    }, [sectionData, sectionId, router]);
+
     const handleEditSubmit = async (values: any) => {
         if (!firestore || !sectionId) return;
         setIsSaving(true);
@@ -55,8 +61,8 @@ export default function EditHomepageSectionPage() {
         <div className="space-y-6">
             <PageHeader
                 icon={Columns}
-                title="Edit Homepage Section"
-                description="Modify an existing product section on your homepage."
+                title="Edit Product Feed Section"
+                description="Modify how products are selected and displayed in this section."
             />
             <Skeleton className="h-[600px] w-full" />
         </div>
@@ -81,8 +87,8 @@ export default function EditHomepageSectionPage() {
         <div className="space-y-6">
             <PageHeader
                 icon={Columns}
-                title={`Edit Section: ${sectionData?.title || '...'}`}
-                description="Modify an existing product section on your homepage."
+                title={`Edit Product Feed: ${sectionData?.title || '...'}`}
+                description="Modify how products are selected and displayed in this section."
             >
                  <div className="mt-4">
                     <Button variant="outline" asChild>
