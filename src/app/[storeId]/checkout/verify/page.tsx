@@ -6,6 +6,7 @@ import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
+import { useStoreUrl } from '@/hooks/use-store-url';
 
 export default function VerifyPaymentPage() {
   const searchParams = useSearchParams();
@@ -13,6 +14,7 @@ export default function VerifyPaymentPage() {
   const storeId = params?.storeId as string;
   const router = useRouter();
   const { toast } = useToast();
+  const { getStoreUrl } = useStoreUrl();
   const [status, setStatus] = useState<'verifying' | 'success' | 'failed'>('verifying');
   const [message, setMessage] = useState('Verifying your payment...');
 

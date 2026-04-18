@@ -27,6 +27,12 @@ function WebsiteTracker() {
     if (!firestore || !storeId) return;
 
     const trackVisit = async () => {
+      // Prevent multiple tracking calls in the same session to reduce contention
+      const sessionKey = `vst_${storeId}`;
+      if (typeof window !== 'undefined' && sessionStorage.getItem(sessionKey)) {
+        return;
+      }
+
       const todayStr = format(new Date(), 'yyyy-MM-dd');
       // Store-specific traffic tracking
       const trafficRef = doc(firestore, 'stores', storeId, 'analytics', 'websiteTraffic');
@@ -46,15 +52,27 @@ function WebsiteTracker() {
             const data = trafficDoc.data();
             const isNewDay = data.lastDailyUpdate !== todayStr;
             
-            transaction.update(trafficRef, {
-              totalViews: increment(1),
-              todayViews: isNewDay ? 1 : increment(1),
-              lastDailyUpdate: todayStr
-            });
+            if (isNewDay) {
+              transaction.update(trafficRef, {
+                totalViews: increment(1),
+                todayViews: 1,
+                lastDailyUpdate: todayStr
+              });
+            } else {
+              transaction.update(trafficRef, {
+                totalViews: increment(1),
+                todayViews: increment(1)
+              });
+            }
           }
         });
+
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem(sessionKey, 'true');
+        }
       } catch (error) {
-        console.error("Traffic tracking failed:", error);
+        // Silently fail for traffic tracking to avoid breaking the UI
+        console.warn("Traffic tracking failed:", error);
       }
     };
 
