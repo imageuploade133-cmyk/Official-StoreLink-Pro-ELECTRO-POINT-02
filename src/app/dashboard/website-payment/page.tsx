@@ -19,7 +19,7 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Loader2, Save, Landmark, Info, PlusCircle, Trash2, Edit, X, Upload, Coins, AlertTriangle, CreditCard, Globe, Wallet, Smartphone, Zap, Truck, CheckCircle2 } from 'lucide-react';
+import { Loader2, Save, Landmark, Info, PlusCircle, Trash2, Edit, Upload, Coins, AlertTriangle, CreditCard, Globe, Wallet, Smartphone, Zap, Truck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -43,7 +43,6 @@ type InstructionsFormValues = z.infer<typeof instructionsSchema>;
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
@@ -150,9 +149,7 @@ export default function WebsitePaymentSettings() {
   
   const [providers, setProviders] = useState<any[]>([]);
   const [isLoadingProviders, setIsLoadingProviders] = useState(true);
-    { id: "manual", name: "Manual Transfer", icon: Landmark, color: "text-gray-600" }, 
-    { id: "pay_on_delivery", name: "Pay on Delivery", icon: Truck, color: "text-red-500" }, 
-  ];
+  const [authError, setAuthError] = useState<string | null>(null);
   const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const fetchProviders = async () => {
