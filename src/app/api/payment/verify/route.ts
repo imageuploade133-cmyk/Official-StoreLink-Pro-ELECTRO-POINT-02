@@ -134,6 +134,37 @@ export async function GET(request: Request) {
         });
         const result = await res.json();
         isSuccessful = result.payment_status === 'finished' || result.payment_status === 'partially_paid';
+    } else if (providerName === 'monnify') {
+        const apiKey = mode === 'live' ? config.liveApiKey : config.testApiKey || config.apiKey;
+        const secretKey = mode === 'live' ? config.liveSecretKey : config.testSecretKey || config.secretKey;
+        const baseUrl = mode === 'live' ? 'https://api.monnify.com' : 'https://sandbox.monnify.com';
+
+        if (!apiKey || !secretKey) {
+          throw new Error('Monnify credentials not configured');
+        }
+
+        // Get access token
+        const auth = Buffer.from(`${apiKey}:${secretKey}`).toString('base64');
+        const tokenRes = await fetch(`${baseUrl}/api/v1/auth/login`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Basic ${auth}`,
+          },
+        });
+        const tokenData = await tokenRes.json();
+        if (!tokenData.requestSuccessful) {
+          throw new Error(tokenData.responseMessage || 'Monnify auth failed');
+        }
+        const accessToken = tokenData.responseBody.accessToken;
+
+        // Verify transaction
+        const verifyRes = await fetch(`${baseUrl}/api/v1/merchant/transactions/query?paymentReference=${reference}`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        const verifyData = await verifyRes.json();
+        isSuccessful = verifyData.requestSuccessful && verifyData.responseBody.paymentStatus === 'PAID';
     }
 
     if (isSuccessful) {

@@ -624,8 +624,9 @@ export default function CheckoutPage() {
                              method.provider === 'palmpay' ? <Smartphone className="mb-3 h-8 w-8" /> :
                              method.provider === 'paypal' ? <Wallet className="mb-3 h-8 w-8 text-blue-600" /> :
                              method.provider === 'nowpayments' ? <Coins className="mb-3 h-8 w-8 text-amber-500" /> :
+                             method.provider === 'monnify' ? <CreditCard className="mb-3 h-8 w-8 text-blue-500" /> :
                              <CreditCard className="mb-3 h-8 w-8" />}
-                            <span className="text-xs font-black uppercase tracking-widest">{method.name}</span>
+
                         </Label>
                         </div>
                     ))}

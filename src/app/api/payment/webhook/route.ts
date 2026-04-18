@@ -83,6 +83,20 @@ export async function POST(request: Request) {
                 await processSuccessfulTransaction(reference, event);
             }
         }
+    } else if (providerName === 'monnify') {
+        const signature = request.headers.get('monnify-signature') || request.headers.get('x-monnify-signature');
+        const hash = crypto.createHmac('sha512', secretKey).update(body).digest('hex');
+        if (hash !== signature) {
+            console.error('Invalid Monnify signature');
+            return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+        }
+
+        const event = JSON.parse(body);
+        // Monnify status for success is PAID
+        if (event.paymentStatus === 'PAID') {
+            const reference = event.paymentReference;
+            await processSuccessfulTransaction(reference, event);
+        }
     } else if (providerName === 'palmpay') {
         const event = JSON.parse(body);
         if (event.status === 'SUCCESS' || event.code === '0') {

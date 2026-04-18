@@ -138,6 +138,31 @@ export async function GET(request: Request) {
         }
       }
 
+      if (providerName === 'monnify') {
+        const apiKey = mode === 'live' ? config.liveApiKey : config.testApiKey || config.apiKey;
+        const secretKey = mode === 'live' ? config.liveSecretKey : config.testSecretKey || config.secretKey;
+        const baseUrl = mode === 'live' ? 'https://api.monnify.com' : 'https://sandbox.monnify.com';
+
+        if (!apiKey || !secretKey) {
+          return NextResponse.json({ success: false, error: 'Monnify credentials not configured' });
+        }
+
+        const auth = Buffer.from(`${apiKey}:${secretKey}`).toString('base64');
+        const res = await fetch(`${baseUrl}/api/v1/auth/login`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Basic ${auth}`,
+          },
+        });
+
+        const result = await res.json();
+        if (result.requestSuccessful) {
+          return NextResponse.json({ success: true });
+        } else {
+          return NextResponse.json({ success: false, error: result.responseMessage || 'Invalid Monnify Credentials' });
+        }
+      }
+
     return NextResponse.json({ error: 'Unsupported provider' }, { status: 400 });
   } catch (error: any) {
     console.error('Error testing connection:', error);

@@ -127,6 +127,17 @@ const nowpaymentsSchema = z.object({
   acceptedCoins: z.array(z.string()).default(['btc', 'usdt', 'eth']),
 });
 
+const monnifySchema = z.object({
+  testApiKey: z.string().optional(),
+  testSecretKey: z.string().optional(),
+  testContractCode: z.string().optional(),
+  liveApiKey: z.string().optional(),
+  liveSecretKey: z.string().optional(),
+  liveContractCode: z.string().optional(),
+  isActive: z.boolean().default(false),
+  mode: z.enum(['test', 'live']).default('test'),
+});
+
 type PaystackFormValues = z.infer<typeof paystackSchema>;
 type FlutterwaveFormValues = z.infer<typeof flutterwaveSchema>;
 type StripeFormValues = z.infer<typeof stripeSchema>;
@@ -136,6 +147,7 @@ type PayPalFormValues = z.infer<typeof paypalSchema>;
 type PayOnDeliveryFormValues = z.infer<typeof payOnDeliverySchema>;
 type FastCheckoutFormValues = z.infer<typeof fastCheckoutSchema>;
 type NowPaymentsFormValues = z.infer<typeof nowpaymentsSchema>;
+type MonnifyFormValues = z.infer<typeof monnifySchema>;
 
 export default function WebsitePaymentSettings() {
   const firestore = useFirestore();
@@ -194,6 +206,7 @@ export default function WebsitePaymentSettings() {
   const payOnDeliveryProvider = providers.find(p => p.providerName === 'pay_on_delivery');
   const fastCheckoutProvider = providers.find(p => p.providerName === 'fast_checkout');
   const nowpaymentsProvider = providers.find(p => p.providerName === 'nowpayments');
+  const monnifyProvider = providers.find(p => p.providerName === "monnify");
 
   const isProviderActive = (name: string) => { 
     if (name === "paystack") return paystackProvider?.isActive; 
@@ -203,6 +216,7 @@ export default function WebsitePaymentSettings() {
     if (name === "opay") return opayProvider?.isActive; 
     if (name === "palmpay") return palmpayProvider?.isActive; 
     if (name === "nowpayments") return nowpaymentsProvider?.isActive; 
+    if (name === "monnify") return monnifyProvider?.isActive;
     if (name === "fast_checkout") return fastCheckoutProvider?.isActive; 
     if (name === "manual") return manualProvider?.isActive; 
     if (name === "pay_on_delivery") return payOnDeliveryProvider?.isActive; 
@@ -217,6 +231,7 @@ export default function WebsitePaymentSettings() {
     { id: "opay", name: "OPay", icon: Smartphone, color: "text-green-600" }, 
     { id: "palmpay", name: "PalmPay", icon: Smartphone, color: "text-purple-600" }, 
     { id: "nowpayments", name: "NOWPayments", icon: Coins, color: "text-yellow-500" }, 
+    { id: "monnify", name: "Monnify", icon: CreditCard, color: "text-blue-600" },
     { id: "fast_checkout", name: "Fast Checkout", icon: Zap, color: "text-yellow-400" }, 
     { id: "manual", name: "Manual Transfer", icon: Landmark, color: "text-gray-600" }, 
     { id: "pay_on_delivery", name: "Pay on Delivery", icon: Truck, color: "text-red-500" }, 
@@ -329,6 +344,20 @@ export default function WebsitePaymentSettings() {
     },
   });
 
+  const monnifyForm = useForm<MonnifyFormValues>({
+    resolver: zodResolver(monnifySchema),
+    defaultValues: {
+      testApiKey: monnifyProvider?.config?.testApiKey || '',
+      testSecretKey: monnifyProvider?.config?.testSecretKey || '',
+      testContractCode: monnifyProvider?.config?.testContractCode || '',
+      liveApiKey: monnifyProvider?.config?.liveApiKey || '',
+      liveSecretKey: monnifyProvider?.config?.liveSecretKey || '',
+      liveContractCode: monnifyProvider?.config?.liveContractCode || '',
+      isActive: monnifyProvider?.isActive || false,
+      mode: monnifyProvider?.mode || 'test',
+    },
+  });
+
   useEffect(() => {
     if (paystackProvider) {
       paystackForm.reset({
@@ -418,8 +447,21 @@ export default function WebsitePaymentSettings() {
         mode: nowpaymentsProvider.mode || 'test',
         acceptedCoins: nowpaymentsProvider.config?.acceptedCoins || ['btc', 'usdt', 'eth'],
       });
+
+    if (monnifyProvider) {
+      monnifyForm.reset({
+        testApiKey: monnifyProvider.config?.testApiKey || '',
+        testSecretKey: monnifyProvider.config?.testSecretKey || '',
+        testContractCode: monnifyProvider.config?.testContractCode || '',
+        liveApiKey: monnifyProvider.config?.liveApiKey || '',
+        liveSecretKey: monnifyProvider.config?.liveSecretKey || '',
+        liveContractCode: monnifyProvider.config?.liveContractCode || '',
+        isActive: monnifyProvider.isActive || false,
+        mode: monnifyProvider.mode || 'test',
+      });
     }
-  }, [paystackProvider, flutterwaveProvider, stripeProvider, opayProvider, palmpayProvider, paypalProvider, payOnDeliveryProvider, fastCheckoutProvider, nowpaymentsProvider, paystackForm, flutterwaveForm, stripeForm, opayForm, palmpayForm, paypalForm, payOnDeliveryForm, fastCheckoutForm, nowpaymentsForm]);
+    }
+  }, [paystackProvider, flutterwaveProvider, stripeProvider, opayProvider, palmpayProvider, paypalProvider, payOnDeliveryProvider, fastCheckoutProvider, nowpaymentsProvider, monnifyProvider, paystackForm, flutterwaveForm, stripeForm, opayForm, palmpayForm, paypalForm, payOnDeliveryForm, fastCheckoutForm, nowpaymentsForm, monnifyForm]);
 
   const saveProviderSettings = async (providerName: string, values: any) => {
     if (!user) return;
@@ -1816,6 +1858,185 @@ export default function WebsitePaymentSettings() {
             </div>
           </div>
         </TabsContent>
+        
+        <TabsContent value="monnify" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <Form {...monnifyForm}>
+                <form onSubmit={monnifyForm.handleSubmit((values) => saveProviderSettings('monnify', values))}>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                      <div>
+                        <CardTitle className="flex items-center gap-2"><CreditCard className="h-5 w-5 text-blue-600" />Monnify Settings</CardTitle>
+                        <CardDescription>Accept payments via cards and bank transfers using Monnify.</CardDescription>
+                      </div>
+                      <FormField
+                        control={monnifyForm.control}
+                        name="isActive"
+                        render={({ field }) => (
+                          <FormItem className="flex items-center gap-2 space-y-0">
+                            <FormLabel className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Enabled</FormLabel>
+                            <FormControl>
+                              <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <FormField
+                        control={monnifyForm.control}
+                        name="mode"
+                        render={({ field }) => (
+                          <FormItem className="space-y-3">
+                            <FormLabel>Transaction Mode</FormLabel>
+                            <FormControl>
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex flex-row space-x-4"
+                              >
+                                <FormItem className="flex items-center space-x-2 space-y-0">
+                                  <FormControl><RadioGroupItem value="test" /></FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">Test Mode</FormLabel>
+                                </FormItem>
+                                <FormItem className="flex items-center space-x-2 space-y-0">
+                                  <FormControl><RadioGroupItem value="live" /></FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">Live Mode</FormLabel>
+                                </FormItem>
+                              </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={monnifyForm.control}
+                          name="testApiKey"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Test API Key</FormLabel>
+                              <FormControl><Input placeholder="MK_TEST_..." {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={monnifyForm.control}
+                          name="testSecretKey"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Test Secret Key</FormLabel>
+                              <FormControl><Input type="password" placeholder="Test Secret Key" {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <FormField
+                        control={monnifyForm.control}
+                        name="testContractCode"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Test Contract Code</FormLabel>
+                            <FormControl><Input placeholder="Test Contract Code" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4">
+                        <FormField
+                          control={monnifyForm.control}
+                          name="liveApiKey"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Live API Key</FormLabel>
+                              <FormControl><Input placeholder="MK_PROD_..." {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={monnifyForm.control}
+                          name="liveSecretKey"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Live Secret Key</FormLabel>
+                              <FormControl><Input type="password" placeholder="Live Secret Key" {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <FormField
+                        control={monnifyForm.control}
+                        name="liveContractCode"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Live Contract Code</FormLabel>
+                            <FormControl><Input placeholder="Live Contract Code" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="space-y-2 pt-4">
+                        <Label className="text-sm font-medium">Webhook URL</Label>
+                        <div className="flex items-center gap-2">
+                          <Input readOnly value={`${typeof window !== 'undefined' ? window.location.origin : ''}/api/payment/webhook?provider=monnify&storeId=${currentStoreId || 'global'}`} className="bg-muted" />
+                          <Button variant="outline" size="sm" onClick={() => {
+                            navigator.clipboard.writeText(`${window.location.origin}/api/payment/webhook?provider=monnify&storeId=${currentStoreId || 'global'}`);
+                            toast({ title: 'Copied', description: 'Webhook URL copied to clipboard.' });
+                          }}>Copy</Button>
+                        </div>
+                        <p className="text-[0.8rem] text-muted-foreground">
+                          Set this in your Monnify dashboard to receive payment notifications.
+                        </p>
+                      </div>
+                    </CardContent>
+                    <CardFooter className="border-t pt-6 flex gap-2">
+                      <Button type="submit" disabled={isSaving}>
+                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                        Save Monnify Settings
+                      </Button>
+                      <Button type="button" variant="outline" onClick={() => testConnection('monnify')} disabled={isSaving}>
+                        Test Connection
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </form>
+              </Form>
+            </div>
+            <div className="lg:col-span-1">
+              <Card className="bg-primary/5 border-primary/20 shadow-none sticky top-6">
+                <CardHeader>
+                  <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary">
+                    <Info className="h-4 w-4" /> About Monnify
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm space-y-4 text-muted-foreground leading-relaxed">
+                  <p>Monnify is a payment gateway that allows businesses to accept payments from customers via several payment channels.</p>
+                  <ul className="list-disc pl-5 space-y-2">
+                    <li>Accept payments via Bank Transfer, Card, and USSD.</li>
+                    <li>Low transaction fees.</li>
+                    <li>Trusted by thousands of businesses in Nigeria.</li>
+                  </ul>
+                  <Alert>
+                    <Info className="h-4 w-4" />
+                    <AlertTitle>Note</AlertTitle>
+                    <AlertDescription>
+                      You can find your API Key, Secret Key and Contract Code on your Monnify dashboard under Settings.
+                    </AlertDescription>
+                  </Alert>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+ 
         <TabsContent value="fast_checkout" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
