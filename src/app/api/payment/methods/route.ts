@@ -55,8 +55,9 @@ export async function GET(request: Request) {
               data.providerName === 'paypal' ? 'Pay with PayPal' :
               data.providerName === 'stripe' ? 'Pay with Card (Stripe)' :
               data.providerName === 'nowpayments' ? 'Pay with Crypto' :
+              data.providerName === 'monnify' ? 'Pay with Monnify' :
               data.providerName === 'manual' ? 'Bank Transfer' :
-              data.providerName === 'pay_on_delivery' ? 'Pay on Delivery' : data.providerName,
+
         provider: data.providerName,
         publicKey: publicKey, // Only expose correct public key
         mode: mode,

@@ -264,6 +264,56 @@ export async function POST(request: Request) {
         if (result.payment_id || result.id) {
             reference = (result.payment_id || result.id).toString();
         }
+    } else if (providerName === 'monnify') {
+        const apiKey = mode === 'live' ? config.liveApiKey : config.testApiKey || config.apiKey;
+        const secretKey = mode === 'live' ? config.liveSecretKey : config.testSecretKey || config.secretKey;
+        const contractCode = mode === 'live' ? config.liveContractCode : config.testContractCode || config.contractCode;
+        const baseUrl = mode === 'live' ? 'https://api.monnify.com' : 'https://sandbox.monnify.com';
+
+        if (!apiKey || !secretKey || !contractCode) {
+            throw new Error('Monnify credentials not fully configured');
+        }
+
+        // Get access token
+        const auth = Buffer.from(`${apiKey}:${secretKey}`).toString('base64');
+        const tokenRes = await fetch(`${baseUrl}/api/v1/auth/login`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Basic ${auth}`,
+            },
+        });
+        const tokenData = await tokenRes.json();
+        if (!tokenData.requestSuccessful) {
+            throw new Error(tokenData.responseMessage || 'Monnify auth failed');
+        }
+        const accessToken = tokenData.responseBody.accessToken;
+
+        // Initialize transaction
+        const initRes = await fetch(`${baseUrl}/api/v1/merchant/transactions/init-transaction`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                amount,
+                customerName: email.split('@')[0], // Fallback if name not provided
+                customerEmail: email,
+                paymentReference: reference,
+                paymentDescription: `Order ${orderId}`,
+                currencyCode: normalizedCurrency,
+                contractCode,
+                redirectUrl: `${request.headers.get('origin')}/store/${storeId}/checkout/verify?provider=monnify&reference=${reference}`,
+            }),
+        });
+
+        const initData = await initRes.json();
+        if (!initData.requestSuccessful) {
+            console.error('Monnify Init Error:', initData);
+            throw new Error(initData.responseMessage || 'Monnify initialization failed');
+        }
+
+        result.data = { authorization_url: initData.responseBody.checkoutUrl };
     } else {
         throw new Error('Unsupported provider');
     }
