@@ -111,6 +111,14 @@ const payOnDeliverySchema = z.object({
   isActive: z.boolean().default(false),
 });
 
+const fastCheckoutSchema = z.object({
+  enableApplePay: z.boolean().default(false),
+  enableGooglePay: z.boolean().default(false),
+  enableExpress: z.boolean().default(false),
+  enableQuickPayButtons: z.boolean().default(false),
+  isActive: z.boolean().default(false),
+});
+
 type PaystackFormValues = z.infer<typeof paystackSchema>;
 type FlutterwaveFormValues = z.infer<typeof flutterwaveSchema>;
 type StripeFormValues = z.infer<typeof stripeSchema>;
@@ -118,6 +126,7 @@ type OpayFormValues = z.infer<typeof opaySchema>;
 type PalmPayFormValues = z.infer<typeof palmpaySchema>;
 type PayPalFormValues = z.infer<typeof paypalSchema>;
 type PayOnDeliveryFormValues = z.infer<typeof payOnDeliverySchema>;
+type FastCheckoutFormValues = z.infer<typeof fastCheckoutSchema>;
 
 export default function WebsitePaymentSettings() {
   const firestore = useFirestore();
@@ -175,6 +184,7 @@ export default function WebsitePaymentSettings() {
   const paypalProvider = providers.find(p => p.providerName === 'paypal');
   const manualProvider = providers.find(p => p.providerName === 'manual');
   const payOnDeliveryProvider = providers.find(p => p.providerName === 'pay_on_delivery');
+  const fastCheckoutProvider = providers.find(p => p.providerName === 'fast_checkout');
 
   const paystackForm = useForm<PaystackFormValues>({
     resolver: zodResolver(paystackSchema),
@@ -262,6 +272,17 @@ export default function WebsitePaymentSettings() {
     },
   });
 
+  const fastCheckoutForm = useForm<FastCheckoutFormValues>({
+    resolver: zodResolver(fastCheckoutSchema),
+    defaultValues: {
+      enableApplePay: fastCheckoutProvider?.config?.enableApplePay || false,
+      enableGooglePay: fastCheckoutProvider?.config?.enableGooglePay || false,
+      enableExpress: fastCheckoutProvider?.config?.enableExpress || false,
+      enableQuickPayButtons: fastCheckoutProvider?.config?.enableQuickPayButtons || false,
+      isActive: fastCheckoutProvider?.isActive || false,
+    },
+  });
+
   useEffect(() => {
     if (paystackProvider) {
       paystackForm.reset({
@@ -335,7 +356,16 @@ export default function WebsitePaymentSettings() {
         isActive: payOnDeliveryProvider.isActive || false,
       });
     }
-  }, [paystackProvider, flutterwaveProvider, stripeProvider, opayProvider, palmpayProvider, paypalProvider, payOnDeliveryProvider, paystackForm, flutterwaveForm, stripeForm, opayForm, palmpayForm, paypalForm, payOnDeliveryForm]);
+    if (fastCheckoutProvider) {
+      fastCheckoutForm.reset({
+        enableApplePay: fastCheckoutProvider.config?.enableApplePay || false,
+        enableGooglePay: fastCheckoutProvider.config?.enableGooglePay || false,
+        enableExpress: fastCheckoutProvider.config?.enableExpress || false,
+        enableQuickPayButtons: fastCheckoutProvider.config?.enableQuickPayButtons || false,
+        isActive: fastCheckoutProvider.isActive || false,
+      });
+    }
+  }, [paystackProvider, flutterwaveProvider, stripeProvider, opayProvider, palmpayProvider, paypalProvider, payOnDeliveryProvider, fastCheckoutProvider, paystackForm, flutterwaveForm, stripeForm, opayForm, palmpayForm, paypalForm, payOnDeliveryForm, fastCheckoutForm]);
 
   const saveProviderSettings = async (providerName: string, values: any) => {
     if (!user) return;
@@ -593,6 +623,7 @@ export default function WebsitePaymentSettings() {
           <TabsTrigger value="paypal">PayPal</TabsTrigger>
           <TabsTrigger value="opay">OPay</TabsTrigger>
           <TabsTrigger value="palmpay">PalmPay</TabsTrigger>
+          <TabsTrigger value="fast_checkout">Fast Checkout</TabsTrigger>
           <TabsTrigger value="manual">Manual Transfer</TabsTrigger>
           <TabsTrigger value="pay_on_delivery">Pay on Delivery</TabsTrigger>
         </TabsList>
@@ -1560,6 +1591,131 @@ export default function WebsitePaymentSettings() {
                     <li>Ensures customers are happy before they pay.</li>
                     <li>No online transaction fees.</li>
                   </ul>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="fast_checkout" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <Form {...fastCheckoutForm}>
+                <form onSubmit={fastCheckoutForm.handleSubmit((values) => saveProviderSettings('fast_checkout', values))}>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                      <div>
+                        <CardTitle>Fast Checkout Settings</CardTitle>
+                        <CardDescription>Enable Apple Pay, Google Pay and other express options.</CardDescription>
+                      </div>
+                      <FormField
+                        control={fastCheckoutForm.control}
+                        name="isActive"
+                        render={({ field }) => (
+                          <FormItem className="flex items-center gap-2 space-y-0">
+                            <FormLabel className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Enabled</FormLabel>
+                            <FormControl>
+                              <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormField
+                          control={fastCheckoutForm.control}
+                          name="enableApplePay"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
+                              <div className="space-y-0.5">
+                                <FormLabel>Apple Pay</FormLabel>
+                                <FormDescription>Allow customers to pay with Apple Pay.</FormDescription>
+                              </div>
+                              <FormControl>
+                                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={fastCheckoutForm.control}
+                          name="enableGooglePay"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
+                              <div className="space-y-0.5">
+                                <FormLabel>Google Pay</FormLabel>
+                                <FormDescription>Allow customers to pay with Google Pay.</FormDescription>
+                              </div>
+                              <FormControl>
+                                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={fastCheckoutForm.control}
+                          name="enableExpress"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
+                              <div className="space-y-0.5">
+                                <FormLabel>Express Checkout</FormLabel>
+                                <FormDescription>Enable PayPal Express or similar one-tap flows.</FormDescription>
+                              </div>
+                              <FormControl>
+                                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={fastCheckoutForm.control}
+                          name="enableQuickPayButtons"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
+                              <div className="space-y-0.5">
+                                <FormLabel>Quick Pay Buttons</FormLabel>
+                                <FormDescription>Show payment buttons directly on product/cart pages.</FormDescription>
+                              </div>
+                              <FormControl>
+                                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </CardContent>
+                    <CardFooter className="border-t pt-6">
+                      <Button type="submit" disabled={isSaving}>
+                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                        Save Fast Checkout Settings
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </form>
+              </Form>
+            </div>
+            <div className="lg:col-span-1">
+              <Card className="bg-primary/5 border-primary/20 shadow-none sticky top-6">
+                <CardHeader>
+                  <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary">
+                    <Info className="h-4 w-4" /> About Fast Checkout
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm space-y-4 text-muted-foreground leading-relaxed">
+                  <p>Fast checkout options improve conversion rates by reducing the number of steps to complete a purchase.</p>
+                  <ul className="list-disc pl-5 space-y-2">
+                    <li><strong>Apple/Google Pay:</strong> Seamless one-tap mobile payments.</li>
+                    <li><strong>Express Checkout:</strong> Skip traditional forms using saved gateway data.</li>
+                    <li><strong>Quick Pay:</strong> Immediate purchase from product cards.</li>
+                  </ul>
+                  <Alert className="bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-950/20 dark:border-amber-900 dark:text-amber-400">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Requirement</AlertTitle>
+                    <AlertDescription className="text-xs">
+                      Stripe or PayPal must be active and configured for these options to appear during checkout.
+                    </AlertDescription>
+                  </Alert>
                 </CardContent>
               </Card>
             </div>

@@ -3,6 +3,7 @@ import { adminDb } from '@/lib/firebase-admin';
 import { Timestamp } from 'firebase-admin/firestore';
 import { decrypt } from '@/lib/encryption';
 import { PaymentProvider, Transaction } from '@/lib/types';
+import Stripe from 'stripe';
 
 export async function POST(request: Request) {
   try {
@@ -203,6 +204,31 @@ export async function POST(request: Request) {
 
         const approvalUrl = orderData.links.find((l: any) => l.rel === 'approve').href;
         result.data = { authorization_url: approvalUrl };
+    } else if (providerName === 'stripe') {
+        // Initialize Stripe
+        const stripe = new Stripe(secretKey);
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            line_items: [{
+                price_data: {
+                    currency: normalizedCurrency.toLowerCase(),
+                    product_data: {
+                        name: `Order ${orderId}`,
+                    },
+                    unit_amount: Math.round(amount * 100),
+                },
+                quantity: 1,
+            }],
+            mode: 'payment',
+            success_url: `${request.headers.get('origin')}/store/${storeId}/checkout/verify?provider=stripe&session_id={CHECKOUT_SESSION_ID}&orderId=${orderId}`,
+            cancel_url: `${request.headers.get('origin')}/store/${storeId}/checkout`,
+            customer_email: email,
+            client_reference_id: reference,
+            shipping_address_collection: {
+                allowed_countries: ['US', 'CA', 'GB', 'NG', 'GH', 'KE'], // Add more as needed
+            },
+        });
+        result.data = { authorization_url: session.url };
     } else {
         throw new Error('Unsupported provider');
     }

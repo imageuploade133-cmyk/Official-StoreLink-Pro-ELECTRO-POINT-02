@@ -3,6 +3,7 @@ import { adminDb } from '@/lib/firebase-admin';
 import { Timestamp } from 'firebase-admin/firestore';
 import { decrypt } from '@/lib/encryption';
 import { PaymentProvider, Transaction } from '@/lib/types';
+import Stripe from 'stripe';
 
 export async function GET(request: Request) {
   try {
@@ -102,6 +103,29 @@ export async function GET(request: Request) {
         });
         const captureData = await captureRes.json();
         isSuccessful = captureRes.ok && (captureData.status === 'COMPLETED' || captureData.status === 'APPROVED');
+    } else if (providerName === 'stripe') {
+        const sessionId = searchParams.get('session_id');
+        if (!sessionId) throw new Error('Missing Stripe session ID');
+        const stripe = new Stripe(secretKey);
+        const session = await stripe.checkout.sessions.retrieve(sessionId);
+        isSuccessful = session.payment_status === 'paid';
+        
+        if (isSuccessful && session.shipping_details) {
+            // Update order with shipping details from Stripe if it was collected
+            const orderId = searchParams.get('orderId');
+            if (orderId) {
+                const orderRef = adminDb.collection('orders').doc(orderId);
+                const shipping = session.shipping_details;
+                const address = `${shipping.address.line1}, ${shipping.address.line2 || ''}, ${shipping.address.city}, ${shipping.address.state}, ${shipping.address.postal_code}, ${shipping.address.country}`;
+                await orderRef.update({
+                    guestInfo: {
+                        name: shipping.name,
+                        email: session.customer_details?.email || '',
+                        address: address
+                    }
+                });
+            }
+        }
     }
 
     if (isSuccessful) {
