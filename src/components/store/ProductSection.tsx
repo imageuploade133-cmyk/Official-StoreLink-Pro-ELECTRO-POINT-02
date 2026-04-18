@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import Image from 'next/image';
 import { 
   collection, 
   query, 
@@ -268,7 +269,17 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
     return true;
   }, [section.isFlashSale, section.flashSaleStartDate, section.flashSaleEndDate]);
 
+  const isHTML = section.uiType === 'html';
+  const isVideo = section.uiType === 'video';
+  const isCenter = section.alignment === 'center';
+  const hasBanner = !!(
+    (isHTML && section.htmlContent) ||
+    (isVideo && section.videoUrl) ||
+    (!isHTML && !isVideo && section.imageUrl)
+  );
+
   const displayProducts = useMemo(() => {
+
     if (!isPromoActive || !section.flashSaleDiscountValue) return products;
     return products.map(p => ({
         ...p,
@@ -449,6 +460,77 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
 
   return (
     <section ref={sectionRef} className="py-12 md:py-24 overflow-hidden relative dark:bg-black" style={backgroundColor ? { backgroundColor } : {}}>
+      {/* Optional Section Banner */}
+      {hasBanner && (
+        <div className={cn("mb-16", section.fullWidth ? "w-full" : "max-w-site-container mx-auto px-4 sm:px-6 lg:px-8")}>
+            {isHTML ? (
+                <div 
+                    className="w-full"
+                    dangerouslySetInnerHTML={{ __html: section.htmlContent || '' }}
+                />
+            ) : (
+                <div className="relative group overflow-hidden rounded-[2rem] md:rounded-[3rem] shadow-2xl mx-auto">
+                    {isVideo ? (
+                        <div className="relative aspect-video md:aspect-[21/9] w-full overflow-hidden">
+                            <video
+                                src={section.videoUrl}
+                                poster={section.videoPosterUrl}
+                                autoPlay
+                                muted
+                                loop
+                                playsInline
+                                className="h-full w-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] transition-opacity group-hover:opacity-40" />
+                        </div>
+                    ) : section.imageUrl && (
+                        <div className="relative aspect-video md:aspect-[21/9] w-full overflow-hidden">
+                            <Image 
+                                src={section.imageUrl} 
+                                alt={section.title} 
+                                fill 
+                                className={cn(
+                                    "object-cover transition-transform duration-700",
+                                    settings?.enableHoverZoom !== false && "group-hover:scale-110"
+                                )} 
+                                unoptimized
+                            />
+                            <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] transition-opacity group-hover:opacity-40" />
+                        </div>
+                    )}
+
+                    <div className={cn(
+                        "absolute inset-0 z-10 flex items-center p-6 md:p-20",
+                        isCenter ? "justify-center text-center" : "justify-start text-left"
+                    )}>
+                        <div className="max-w-3xl space-y-3 md:space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+                            {section.overlayTitle && (
+                                <h2 className="text-2xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase whitespace-pre-line">
+                                    {section.overlayTitle}
+                                </h2>
+                            )}
+                            {section.overlaySubtitle && (
+                                <p className="text-sm md:text-2xl text-white/90 font-medium leading-relaxed max-w-xl">
+                                    {section.overlaySubtitle}
+                                </p>
+                            )}
+                            {(section.buttonText && section.linkUrl) && (
+                                <div className="pt-2 md:pt-4">
+                                    <Button asChild size="lg" className="rounded-full h-10 md:h-16 px-6 md:px-14 font-black uppercase text-[10px] md:text-xs tracking-[0.25em] shadow-2xl shadow-primary/30 group/btn transition-all active:scale-95">
+                                        <Link href={section.linkUrl}>
+                                            {section.buttonText}
+                                            <ArrowRight className="ml-2 md:ml-3 h-4 w-4 md:h-5 md:w-5 transition-transform group-hover/btn:translate-x-2" strokeWidth={3} />
+                                        </Link>
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+      )}
+
       <div className={cn("max-w-site-container mx-auto px-4 sm:px-6 lg:px-8")}>
         <Carousel 
             plugins={section.autoScroll ? [autoplay.current] : []}
@@ -499,25 +581,28 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
                     </div>
                 </div>
             ) : (
-                <div className={cn(
-                    "mb-10 md:mb-16 flex flex-col md:flex-row gap-6",
-                    alignment === 'left' ? 'items-start text-left justify-between' : 'items-center text-center justify-center'
-                )}>
-                    <div className="space-y-3">
-                        <h2 className="text-3xl md:text-5xl font-black tracking-tighter text-slate-900 dark:text-white leading-tight uppercase">
-                            {section.title}
-                        </h2>
-                        {section.description && (
-                            <p className={cn(
-                                "text-sm md:text-lg text-slate-500 dark:text-slate-300 max-w-2xl font-medium leading-relaxed opacity-90 dark:opacity-90",
-                                alignment === 'center' && "mx-auto"
-                            )}>
-                                {section.description}
-                            </p>
-                        )}
+                (!hasBanner || section.overlayTitle !== section.title) && (
+                    <div className={cn(
+                        "mb-10 md:mb-16 flex flex-col md:flex-row gap-6",
+                        alignment === 'left' ? 'items-start text-left justify-between' : 'items-center text-center justify-center'
+                    )}>
+                        <div className="space-y-3">
+                            <h2 className="text-3xl md:text-5xl font-black tracking-tighter text-slate-900 dark:text-white leading-tight uppercase">
+                                {section.title}
+                            </h2>
+                            {section.description && (
+                                <p className={cn(
+                                    "text-sm md:text-lg text-slate-500 dark:text-slate-300 max-w-2xl font-medium leading-relaxed opacity-90 dark:opacity-90",
+                                    alignment === 'center' && "mx-auto"
+                                )}>
+                                    {section.description}
+                                </p>
+                            )}
+                        </div>
                     </div>
-                </div>
+                )
             )}
+
 
             {section.layout === 'carousel' ? (
                 <>
