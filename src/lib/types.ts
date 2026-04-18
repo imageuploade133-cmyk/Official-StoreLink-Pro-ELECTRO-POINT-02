@@ -485,6 +485,7 @@ export interface HomepageSection {
   textColor?: string;
   // Carousel Extensions
   autoScroll?: boolean;
+  showOverlay?: boolean;
   slideIcon?: 'chevron' | 'arrow' | 'circle';
   slideStyle?: 'default' | 'rounded' | 'square' | 'outline' | 'ghost';
 }

@@ -104,6 +104,8 @@ const homepageSectionSchema = z.object({
   buttonText: z.string().optional().or(z.literal('')),
   htmlContent: z.string().optional().or(z.literal('')),
   fullWidth: z.boolean().default(false),
+  showOverlay: z.boolean().default(false),
+  textColor: z.string().optional().or(z.literal('')),
   // Carousel Extensions
   autoScroll: z.boolean().default(false),
   slideIcon: z.enum(['chevron', 'arrow', 'circle']).default('chevron'),
@@ -192,6 +194,8 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
             buttonText: '',
             htmlContent: '',
             fullWidth: false,
+            showOverlay: false,
+            textColor: '#FFFFFF',
             autoScroll: false,
             slideIcon: 'chevron',
             slideStyle: 'default',
@@ -250,6 +254,8 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                 buttonText: defaultValues.buttonText || '',
                 htmlContent: defaultValues.htmlContent || '',
                 fullWidth: defaultValues.fullWidth ?? false,
+                showOverlay: defaultValues.showOverlay ?? false,
+                textColor: defaultValues.textColor || '#FFFFFF',
             });
             if (defaultValues.selectionType === 'custom-ui') {
                 setActiveTab('visual');
@@ -980,6 +986,39 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                                         <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
                                                     </FormItem>
                                                 )} />
+
+                                                <FormField control={form.control} name="showOverlay" render={({ field }) => (
+                                                    <FormItem className="flex items-center justify-between p-4 border rounded-2xl bg-muted/5 transition-all hover:bg-muted/10">
+                                                        <div className="space-y-0.5">
+                                                            <FormLabel className="font-black text-[10px] uppercase tracking-wider flex items-center gap-2">
+                                                                <Palette className="h-3.5 w-3.5 text-orange-500" /> Banner Overlay
+                                                            </FormLabel>
+                                                            <p className="text-[8px] font-bold text-muted-foreground uppercase">Enable dark gradient overlay</p>
+                                                        </div>
+                                                        <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                                                    </FormItem>
+                                                )} />
+
+                                                <FormField
+                                                    control={form.control}
+                                                    name="textColor"
+                                                    render={({ field }) => (
+                                                        <FormItem className="flex items-center justify-between p-4 border rounded-2xl bg-muted/5 transition-all hover:bg-muted/10">
+                                                            <div className="space-y-0.5">
+                                                                <FormLabel className="font-black text-[10px] uppercase tracking-wider flex items-center gap-2">
+                                                                    <Type className="h-3.5 w-3.5 text-indigo-500" /> Banner Text Color
+                                                                </FormLabel>
+                                                                <p className="text-[8px] font-bold text-muted-foreground uppercase">Color for titles & subtitles</p>
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                <FormControl>
+                                                                    <Input type="color" {...field} value={field.value || '#FFFFFF'} className="p-0.5 h-8 w-8 cursor-pointer rounded border-none bg-transparent" />
+                                                                </FormControl>
+                                                                <Button type="button" variant="ghost" size="sm" className="h-8 text-[10px]" onClick={() => field.onChange('#FFFFFF')}>Reset</Button>
+                                                            </div>
+                                                        </FormItem>
+                                                    )}
+                                                />
                                             </div>
                                         ) : (
                                             <div className="space-y-6 animate-in slide-in-from-right-2 duration-300">
