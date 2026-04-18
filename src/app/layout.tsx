@@ -4,6 +4,7 @@ import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import { ClientProviders } from '@/components/layout/client-providers';
+import { headers } from 'next/headers';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -30,11 +31,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headerList = await headers();
+  const storeId = headerList.get('x-store-id');
+
   return (
     <html
       lang="en"
@@ -67,7 +71,7 @@ export default function RootLayout({
         className="bg-background text-foreground antialiased font-display h-full"
         suppressHydrationWarning={true}
       >
-        <ClientProviders>
+        <ClientProviders storeId={storeId}>
           {children}
           <Toaster />
         </ClientProviders>

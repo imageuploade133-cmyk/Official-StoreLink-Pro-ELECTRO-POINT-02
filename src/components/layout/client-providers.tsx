@@ -14,13 +14,13 @@ import { RecentlyViewedProvider } from '@/contexts/recently-viewed-context';
 import { AdProvider } from '@/contexts/ad-context';
 import { UIBackgroundShadowManager } from './UIBackgroundShadowManager';
 
-export function ClientProviders({ children }: { children: React.ReactNode }) {
+export function ClientProviders({ children, storeId }: { children: React.ReactNode, storeId?: string | null }) {
   return (
     <FirebaseClientProvider>
       <ThemeContextProvider>
         <AuthProvider>
           <StoreFirestoreProvider>
-            <SettingsProvider>
+            <SettingsProvider storeId={storeId}>
                 <GlobalLoadingProvider>
                   <AdProvider>
                   <CartProvider>

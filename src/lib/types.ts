@@ -660,6 +660,11 @@ export interface Store {
   phone?: string;
   databaseId?: string;
   createdAt: Timestamp;
+  plan?: 'free' | 'pro' | 'premium';
+  customDomain?: string;
+  subdomain?: string;
+  domainVerificationToken?: string;
+  domainVerified?: boolean;
 }
 
 export interface StaffMember {
