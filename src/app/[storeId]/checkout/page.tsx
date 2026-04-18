@@ -86,6 +86,7 @@ export default function CheckoutPage() {
 
   const [paymentMethod, setPaymentMethod] = useState<string>('');
   const [selectedBankId, setSelectedBankId] = useState<string>('');
+  const [selectedCoin, setSelectedCoin] = useState<string>('btc');
   const [paymentReference] = useState(generatePaymentReference());
   const [hasConfirmedTransfer, setHasConfirmedTransfer] = useState(false);
   const [receiptUrl, setReceiptUrl] = useState<string>('');
@@ -305,6 +306,8 @@ export default function CheckoutPage() {
         deliveryLocationId: fulfillmentType === 'delivery' ? selectedLocationId : null,
         deliveryPrice: shipping,
         guestInfo: user ? null : formData,
+        payCurrency: selectedMethod.provider === 'nowpayments' ? selectedCoin : null,
+        gateway: selectedMethod.provider === 'nowpayments' ? 'NOWPayments' : selectedMethod.provider,
       });
 
       if (!result.success) {
@@ -326,6 +329,7 @@ export default function CheckoutPage() {
             providerName: selectedMethod.provider,
             userId: user?.uid || 'GUEST',
             storeId: storeId,
+            payCurrency: selectedMethod.provider === 'nowpayments' ? selectedCoin : undefined,
           }),
         });
         const initData = await initRes.json();
@@ -619,6 +623,7 @@ export default function CheckoutPage() {
                              method.provider === 'opay' ? <Wallet className="mb-3 h-8 w-8" /> :
                              method.provider === 'palmpay' ? <Smartphone className="mb-3 h-8 w-8" /> :
                              method.provider === 'paypal' ? <Wallet className="mb-3 h-8 w-8 text-blue-600" /> :
+                             method.provider === 'nowpayments' ? <Coins className="mb-3 h-8 w-8 text-amber-500" /> :
                              <CreditCard className="mb-3 h-8 w-8" />}
                             <span className="text-xs font-black uppercase tracking-widest">{method.name}</span>
                         </Label>
@@ -717,12 +722,40 @@ export default function CheckoutPage() {
                                                 <span className="text-sm font-bold">I've successfully transferred the funds</span>
                                             </label>
                                         </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-                    </>
+                                        </div>
+                                        )}
+                                        </div>
+                                        </div>
+                                        )}
+
+                                        {availablePaymentMethods.find(m => m.name === paymentMethod || m.id === paymentMethod)?.provider === 'nowpayments' && (
+                                        <div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
+                                        <div className="p-6 border-2 border-primary/20 bg-primary/5 rounded-2xl space-y-4">
+                                        <div className="flex items-center gap-3 text-primary"><Coins className="h-5 w-5" /><h3 className="font-bold text-lg">Pay with Cryptocurrency</h3></div>
+                                        <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                                        Select your preferred cryptocurrency to pay with. You will be redirected to NOWPayments to complete the transaction.
+                                        </p>
+
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                        {(availablePaymentMethods.find(m => m.name === paymentMethod || m.id === paymentMethod)?.config?.acceptedCoins || ['btc', 'eth', 'usdttrc20']).map((coin: string) => (
+                                            <div
+                                                key={coin}
+                                                onClick={() => setSelectedCoin(coin)}
+                                                className={cn(
+                                                    "flex items-center justify-center p-3 rounded-xl border-2 transition-all cursor-pointer font-bold uppercase text-sm",
+                                                    selectedCoin === coin
+                                                        ? "border-primary bg-primary/10 text-primary"
+                                                        : "border-muted bg-background hover:border-primary/30"
+                                                )}
+                                            >
+                                                {coin}
+                                            </div>
+                                        ))}
+                                        </div>
+                                        </div>
+                                        </div>
+                                        )}
+                                        </>
                 ) : (
                     <div className="p-8 text-center border-2 border-dashed rounded-xl bg-muted/20">
                         <AlertTriangle className="mx-auto h-12 w-12 text-muted-foreground opacity-30 mb-4" />

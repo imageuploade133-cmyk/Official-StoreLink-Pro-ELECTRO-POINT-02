@@ -18,7 +18,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Loader2, Save, Landmark, Info, PlusCircle, Trash2, Edit, X, Upload } from 'lucide-react';
+import { Loader2, Save, Landmark, Info, PlusCircle, Trash2, Edit, X, Upload, Coins, AlertTriangle } from 'lucide-react';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
@@ -119,6 +119,13 @@ const fastCheckoutSchema = z.object({
   isActive: z.boolean().default(false),
 });
 
+const nowpaymentsSchema = z.object({
+  apiKey: z.string().optional(),
+  isActive: z.boolean().default(false),
+  mode: z.enum(['test', 'live']).default('test'),
+  acceptedCoins: z.array(z.string()).default(['btc', 'usdt', 'eth']),
+});
+
 type PaystackFormValues = z.infer<typeof paystackSchema>;
 type FlutterwaveFormValues = z.infer<typeof flutterwaveSchema>;
 type StripeFormValues = z.infer<typeof stripeSchema>;
@@ -127,6 +134,7 @@ type PalmPayFormValues = z.infer<typeof palmpaySchema>;
 type PayPalFormValues = z.infer<typeof paypalSchema>;
 type PayOnDeliveryFormValues = z.infer<typeof payOnDeliverySchema>;
 type FastCheckoutFormValues = z.infer<typeof fastCheckoutSchema>;
+type NowPaymentsFormValues = z.infer<typeof nowpaymentsSchema>;
 
 export default function WebsitePaymentSettings() {
   const firestore = useFirestore();
@@ -185,6 +193,7 @@ export default function WebsitePaymentSettings() {
   const manualProvider = providers.find(p => p.providerName === 'manual');
   const payOnDeliveryProvider = providers.find(p => p.providerName === 'pay_on_delivery');
   const fastCheckoutProvider = providers.find(p => p.providerName === 'fast_checkout');
+  const nowpaymentsProvider = providers.find(p => p.providerName === 'nowpayments');
 
   const paystackForm = useForm<PaystackFormValues>({
     resolver: zodResolver(paystackSchema),
@@ -283,6 +292,16 @@ export default function WebsitePaymentSettings() {
     },
   });
 
+  const nowpaymentsForm = useForm<NowPaymentsFormValues>({
+    resolver: zodResolver(nowpaymentsSchema),
+    defaultValues: {
+      apiKey: nowpaymentsProvider?.config?.apiKey || '',
+      isActive: nowpaymentsProvider?.isActive || false,
+      mode: nowpaymentsProvider?.mode || 'test',
+      acceptedCoins: nowpaymentsProvider?.config?.acceptedCoins || ['btc', 'usdt', 'eth'],
+    },
+  });
+
   useEffect(() => {
     if (paystackProvider) {
       paystackForm.reset({
@@ -365,7 +384,15 @@ export default function WebsitePaymentSettings() {
         isActive: fastCheckoutProvider.isActive || false,
       });
     }
-  }, [paystackProvider, flutterwaveProvider, stripeProvider, opayProvider, palmpayProvider, paypalProvider, payOnDeliveryProvider, fastCheckoutProvider, paystackForm, flutterwaveForm, stripeForm, opayForm, palmpayForm, paypalForm, payOnDeliveryForm, fastCheckoutForm]);
+    if (nowpaymentsProvider) {
+      nowpaymentsForm.reset({
+        apiKey: nowpaymentsProvider.config?.apiKey || '',
+        isActive: nowpaymentsProvider.isActive || false,
+        mode: nowpaymentsProvider.mode || 'test',
+        acceptedCoins: nowpaymentsProvider.config?.acceptedCoins || ['btc', 'usdt', 'eth'],
+      });
+    }
+  }, [paystackProvider, flutterwaveProvider, stripeProvider, opayProvider, palmpayProvider, paypalProvider, payOnDeliveryProvider, fastCheckoutProvider, nowpaymentsProvider, paystackForm, flutterwaveForm, stripeForm, opayForm, palmpayForm, paypalForm, payOnDeliveryForm, fastCheckoutForm, nowpaymentsForm]);
 
   const saveProviderSettings = async (providerName: string, values: any) => {
     if (!user) return;
@@ -623,6 +650,7 @@ export default function WebsitePaymentSettings() {
           <TabsTrigger value="paypal">PayPal</TabsTrigger>
           <TabsTrigger value="opay">OPay</TabsTrigger>
           <TabsTrigger value="palmpay">PalmPay</TabsTrigger>
+          <TabsTrigger value="nowpayments">NOWPayments</TabsTrigger>
           <TabsTrigger value="fast_checkout">Fast Checkout</TabsTrigger>
           <TabsTrigger value="manual">Manual Transfer</TabsTrigger>
           <TabsTrigger value="pay_on_delivery">Pay on Delivery</TabsTrigger>
@@ -1597,6 +1625,155 @@ export default function WebsitePaymentSettings() {
           </div>
         </TabsContent>
 
+        <TabsContent value="nowpayments" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <Form {...nowpaymentsForm}>
+                <form onSubmit={nowpaymentsForm.handleSubmit((values) => saveProviderSettings('nowpayments', values))}>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                      <div>
+                        <CardTitle>NOWPayments Settings</CardTitle>
+                        <CardDescription>Accept cryptocurrency payments globally.</CardDescription>
+                      </div>
+                      <FormField
+                        control={nowpaymentsForm.control}
+                        name="isActive"
+                        render={({ field }) => (
+                          <FormItem className="flex items-center gap-2 space-y-0">
+                            <FormLabel className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Enabled</FormLabel>
+                            <FormControl>
+                              <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <FormField
+                        control={nowpaymentsForm.control}
+                        name="mode"
+                        render={({ field }) => (
+                          <FormItem className="space-y-3">
+                            <FormLabel>Transaction Mode</FormLabel>
+                            <FormControl>
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex flex-row space-x-4"
+                              >
+                                <FormItem className="flex items-center space-x-2 space-y-0">
+                                  <FormControl><RadioGroupItem value="test" /></FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">Sandbox Mode</FormLabel>
+                                </FormItem>
+                                <FormItem className="flex items-center space-x-2 space-y-0">
+                                  <FormControl><RadioGroupItem value="live" /></FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">Live Mode</FormLabel>
+                                </FormItem>
+                              </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={nowpaymentsForm.control}
+                        name="apiKey"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>API Key</FormLabel>
+                            <FormControl><Input type="password" placeholder="NOWPayments API Key" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={nowpaymentsForm.control}
+                        name="acceptedCoins"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Accepted Coins</FormLabel>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                              {['btc', 'eth', 'usdttrc20', 'usdterc20', 'ltc', 'doge'].map((coin) => (
+                                <div key={coin} className="flex items-center space-x-2">
+                                  <Checkbox 
+                                    id={`coin-${coin}`} 
+                                    checked={field.value?.includes(coin)}
+                                    onCheckedChange={(checked) => {
+                                      const current = field.value || [];
+                                      if (checked) {
+                                        field.onChange([...current, coin]);
+                                      } else {
+                                        field.onChange(current.filter((c: string) => c !== coin));
+                                      }
+                                    }}
+                                  />
+                                  <Label htmlFor={`coin-${coin}`} className="text-sm uppercase">{coin}</Label>
+                                </div>
+                              ))}
+                            </div>
+                            <FormDescription>Select the coins you want to accept during checkout.</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="space-y-2 pt-4">
+                        <Label className="text-sm font-medium">IPN Callback URL</Label>
+                        <div className="flex items-center gap-2">
+                          <Input readOnly value={`${typeof window !== 'undefined' ? window.location.origin : ''}/api/payment/webhook?provider=nowpayments&storeId=${currentStoreId || 'global'}`} className="bg-muted" />
+                          <Button variant="outline" size="sm" onClick={() => {
+                            navigator.clipboard.writeText(`${window.location.origin}/api/payment/webhook?provider=nowpayments&storeId=${currentStoreId || 'global'}`);
+                            toast({ title: 'Copied', description: 'Webhook URL copied to clipboard.' });
+                          }}>Copy</Button>
+                        </div>
+                        <p className="text-[0.8rem] text-muted-foreground">
+                          Set this in your NOWPayments dashboard to receive payment notifications.
+                        </p>
+                      </div>
+                    </CardContent>
+                    <CardFooter className="border-t pt-6 flex gap-2">
+                      <Button type="submit" disabled={isSaving}>
+                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                        Save NOWPayments Settings
+                      </Button>
+                      <Button type="button" variant="outline" onClick={() => testConnection('nowpayments')} disabled={isSaving}>
+                        Test Connection
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </form>
+              </Form>
+            </div>
+            <div className="lg:col-span-1">
+              <Card className="bg-primary/5 border-primary/20 shadow-none sticky top-6">
+                <CardHeader>
+                  <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary">
+                    <Coins className="h-4 w-4" /> About NOWPayments
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm space-y-4 text-muted-foreground leading-relaxed">
+                  <p>NOWPayments is a non-custodial crypto payment gateway.</p>
+                  <ul className="list-disc pl-5 space-y-2">
+                    <li>Accept 50+ cryptocurrencies.</li>
+                    <li>Non-custodial: funds go directly to your wallet.</li>
+                    <li>Low transaction fees.</li>
+                    <li>Non-reversible transactions.</li>
+                  </ul>
+                  <Alert>
+                    <Info className="h-4 w-4" />
+                    <AlertTitle>Wallet Required</AlertTitle>
+                    <AlertDescription>
+                      Make sure you have added your outcome wallets in the NOWPayments dashboard.
+                    </AlertDescription>
+                  </Alert>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
         <TabsContent value="fast_checkout" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">

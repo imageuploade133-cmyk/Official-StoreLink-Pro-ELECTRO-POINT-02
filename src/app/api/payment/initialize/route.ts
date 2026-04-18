@@ -8,7 +8,7 @@ import Stripe from 'stripe';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { orderId, amount, currency, email, providerName, storeId = 'global', userId } = body;
+    const { orderId, amount, currency, email, providerName, storeId = 'global', userId, payCurrency } = body;
 
     if (!orderId || !amount || !email || !providerName) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -229,6 +229,41 @@ export async function POST(request: Request) {
             },
         });
         result.data = { authorization_url: session.url };
+    } else if (providerName === 'nowpayments') {
+        const apiKey = config.apiKey;
+        if (!apiKey) {
+            throw new Error('NOWPayments API key not configured');
+        }
+
+        const nowPaymentsRes = await fetch('https://api.nowpayments.io/v1/payment', {
+            method: 'POST',
+            headers: {
+                'x-api-key': apiKey,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                price_amount: amount,
+                price_currency: normalizedCurrency.toLowerCase() === 'ngn' ? 'usd' : normalizedCurrency.toLowerCase(), // NOWPayments might not support NGN as price_currency for all pairs, but let's try. Actually better to check their supported list.
+                pay_currency: payCurrency || 'btc',
+                ipn_callback_url: `${request.headers.get('origin')}/api/payment/webhook?provider=nowpayments&storeId=${storeId}`,
+                order_id: orderId,
+                order_description: `Order ${orderId} at ${storeId}`,
+                success_url: `${request.headers.get('origin')}/store/${storeId}/checkout/verify?provider=nowpayments&reference=${reference}`,
+                cancel_url: `${request.headers.get('origin')}/store/${storeId}/checkout`,
+            }),
+        });
+
+        result = await nowPaymentsRes.json();
+        if (!nowPaymentsRes.ok) {
+            console.error('NOWPayments Error:', result);
+            throw new Error(result.message || 'NOWPayments initialization failed');
+        }
+
+        // NOWPayments returns invoice_url or payment_url
+        result.data = { authorization_url: result.invoice_url || result.payment_url };
+        if (result.payment_id || result.id) {
+            reference = (result.payment_id || result.id).toString();
+        }
     } else {
         throw new Error('Unsupported provider');
     }

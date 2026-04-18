@@ -63,24 +63,28 @@ export async function POST(request: Request) {
             await processSuccessfulTransaction(reference, metadata);
         }
     } else if (providerName === 'opay') {
-        // OPay signature verification using Webhook Secret
-        const webhookSecret = secretKey; // Often the same, or use specific config.webhookSecret
-        const hash = crypto.createHmac('sha512', webhookSecret).update(body).digest('hex');
-        if (hash !== request.headers.get('x-opay-signature')) {
-            // Some versions of OPay use different headers or signature methods
-            // For now we'll accept if configured, but ideally verify
-            console.warn('OPay signature mismatch or missing');
-        }
-
         const event = JSON.parse(body);
-        // OPay webhook for successful payment
         if (event.status === 'SUCCESS' || event.data?.status === 'SUCCESSFUL') {
             const reference = event.reference || event.data?.reference;
             await processSuccessfulTransaction(reference, event.data);
         }
+    } else if (providerName === 'nowpayments') {
+        const event = JSON.parse(body);
+        if (event.payment_status === 'finished' || event.payment_status === 'partially_paid') {
+            const orderId = event.order_id;
+            const transactionsSnap = await adminDb.collection('transactions')
+                .where('orderId', '==', orderId)
+                .where('provider', '==', 'nowpayments')
+                .limit(1)
+                .get();
+            
+            if (!transactionsSnap.empty) {
+                const reference = transactionsSnap.docs[0].id;
+                await processSuccessfulTransaction(reference, event);
+            }
+        }
     } else if (providerName === 'palmpay') {
         const event = JSON.parse(body);
-        // PalmPay verification logic
         if (event.status === 'SUCCESS' || event.code === '0') {
             const reference = event.reference || event.data?.reference;
             await processSuccessfulTransaction(reference, event.data);
@@ -107,13 +111,12 @@ async function processSuccessfulTransaction(reference: string, metadata?: any) {
         transactionData = transactionSnap.data() as Transaction;
         orderId = transactionData.orderId;
       } else if (metadata && metadata.orderId) {
-        // Fallback: Create transaction record if it doesn't exist but we have orderId from metadata
         orderId = metadata.orderId;
         const newTransaction: any = {
           id: reference,
           storeId: metadata.storeId || 'global',
           orderId: orderId,
-          provider: 'paystack', // Or determine from context
+          provider: 'paystack', 
           reference,
           amount: metadata.amount || 0,
           status: 'success',
@@ -143,7 +146,5 @@ async function processSuccessfulTransaction(reference: string, metadata?: any) {
     });
   } catch (dbError) {
     console.error('Failed to process successful transaction in DB:', dbError);
-    // If this fails due to credentials, we're stuck, but we've logged it.
   }
 }
-

@@ -126,6 +126,14 @@ export async function GET(request: Request) {
                 });
             }
         }
+    } else if (providerName === 'nowpayments') {
+        const res = await fetch(`https://api.nowpayments.io/v1/payment/${reference}`, {
+            headers: {
+                'x-api-key': config.apiKey,
+            },
+        });
+        const result = await res.json();
+        isSuccessful = result.payment_status === 'finished' || result.payment_status === 'partially_paid';
     }
 
     if (isSuccessful) {

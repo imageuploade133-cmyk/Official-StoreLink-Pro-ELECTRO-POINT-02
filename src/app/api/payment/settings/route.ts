@@ -69,7 +69,7 @@ export async function GET(request: Request) {
           // Mask secret keys for frontend
           if (config) {
             Object.keys(config).forEach(key => {
-              if (key.toLowerCase().includes('secret') || key.toLowerCase().includes('encryption')) {
+              if (key.toLowerCase().includes('secret') || key.toLowerCase().includes('encryption') || key.toLowerCase().includes('apikey')) {
                 const val = (config as any)[key];
                 (config as any)[key] = val ? `********${val.slice(-4)}` : '';
               }
