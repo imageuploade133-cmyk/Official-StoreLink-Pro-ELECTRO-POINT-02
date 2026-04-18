@@ -19,7 +19,8 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Loader2, Save, Landmark, Info, PlusCircle, Trash2, Edit, X, Upload, Coins, AlertTriangle } from 'lucide-react';
+import { Loader2, Save, Landmark, Info, PlusCircle, Trash2, Edit, X, Upload, Coins, AlertTriangle, CreditCard, Globe, Wallet, Smartphone, Zap, Truck, CheckCircle2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
@@ -149,8 +150,9 @@ export default function WebsitePaymentSettings() {
   
   const [providers, setProviders] = useState<any[]>([]);
   const [isLoadingProviders, setIsLoadingProviders] = useState(true);
-  const [authError, setAuthError] = useState<string | null>(null);
-
+    { id: "manual", name: "Manual Transfer", icon: Landmark, color: "text-gray-600" }, 
+    { id: "pay_on_delivery", name: "Pay on Delivery", icon: Truck, color: "text-red-500" }, 
+  ];
   const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const fetchProviders = async () => {
@@ -195,6 +197,33 @@ export default function WebsitePaymentSettings() {
   const payOnDeliveryProvider = providers.find(p => p.providerName === 'pay_on_delivery');
   const fastCheckoutProvider = providers.find(p => p.providerName === 'fast_checkout');
   const nowpaymentsProvider = providers.find(p => p.providerName === 'nowpayments');
+
+  const isProviderActive = (name: string) => { 
+    if (name === "paystack") return paystackProvider?.isActive; 
+    if (name === "flutterwave") return flutterwaveProvider?.isActive; 
+    if (name === "stripe") return stripeProvider?.isActive; 
+    if (name === "paypal") return paypalProvider?.isActive; 
+    if (name === "opay") return opayProvider?.isActive; 
+    if (name === "palmpay") return palmpayProvider?.isActive; 
+    if (name === "nowpayments") return nowpaymentsProvider?.isActive; 
+    if (name === "fast_checkout") return fastCheckoutProvider?.isActive; 
+    if (name === "manual") return manualProvider?.isActive; 
+    if (name === "pay_on_delivery") return payOnDeliveryProvider?.isActive; 
+    return false; 
+  }; 
+
+  const paymentMethods = [ 
+    { id: "paystack", name: "Paystack", icon: CreditCard, color: "text-blue-500" }, 
+    { id: "flutterwave", name: "Flutterwave", icon: Globe, color: "text-orange-500" }, 
+    { id: "stripe", name: "Stripe", icon: CreditCard, color: "text-indigo-600" }, 
+    { id: "paypal", name: "PayPal", icon: Wallet, color: "text-blue-700" }, 
+    { id: "opay", name: "OPay", icon: Smartphone, color: "text-green-600" }, 
+    { id: "palmpay", name: "PalmPay", icon: Smartphone, color: "text-purple-600" }, 
+    { id: "nowpayments", name: "NOWPayments", icon: Coins, color: "text-yellow-500" }, 
+    { id: "fast_checkout", name: "Fast Checkout", icon: Zap, color: "text-yellow-400" }, 
+    { id: "manual", name: "Manual Transfer", icon: Landmark, color: "text-gray-600" }, 
+    { id: "pay_on_delivery", name: "Pay on Delivery", icon: Truck, color: "text-red-500" }, 
+  ];
 
   const paystackForm = useForm<PaystackFormValues>({
     resolver: zodResolver(paystackSchema),
@@ -644,17 +673,32 @@ export default function WebsitePaymentSettings() {
       )}
 
       <Tabs defaultValue="paystack" className="space-y-6">
-        <TabsList className="bg-muted/50 p-1">
-          <TabsTrigger value="paystack">Paystack</TabsTrigger>
-          <TabsTrigger value="flutterwave">Flutterwave</TabsTrigger>
-          <TabsTrigger value="stripe">Stripe</TabsTrigger>
-          <TabsTrigger value="paypal">PayPal</TabsTrigger>
-          <TabsTrigger value="opay">OPay</TabsTrigger>
-          <TabsTrigger value="palmpay">PalmPay</TabsTrigger>
-          <TabsTrigger value="nowpayments">NOWPayments</TabsTrigger>
-          <TabsTrigger value="fast_checkout">Fast Checkout</TabsTrigger>
-          <TabsTrigger value="manual">Manual Transfer</TabsTrigger>
-          <TabsTrigger value="pay_on_delivery">Pay on Delivery</TabsTrigger>
+        <TabsList className="bg-muted/50 p-1.5 h-auto flex-wrap justify-start gap-1.5 shadow-sm border border-border/50"> 
+          {paymentMethods.map((method) => { 
+            const active = isProviderActive(method.id); 
+            return ( 
+              <TabsTrigger  
+                key={method.id}  
+                value={method.id}  
+                className={cn( 
+                  "flex items-center gap-2.5 px-4 py-2.5 transition-all duration-200", 
+                  "data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-primary/20", 
+                  "hover:bg-background/60" 
+                )} 
+              > 
+                <div className={cn( 
+                  "p-1 rounded-md transition-colors", 
+                  active ? "bg-primary/10" : "bg-muted" 
+                )}> 
+                  <method.icon className={cn("h-4 w-4", active ? method.color : "text-muted-foreground")} /> 
+                </div> 
+                <span className="font-medium text-xs md:text-sm">{method.name}</span> 
+                {active && ( 
+                  <div className="ml-1 h-2 w-2 rounded-full bg-green-500 animate-pulse" /> 
+                )} 
+              </TabsTrigger> 
+            ); 
+          })} 
         </TabsList>
 
         <TabsContent value="paystack" className="space-y-6">
@@ -665,7 +709,7 @@ export default function WebsitePaymentSettings() {
                   <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                       <div>
-                        <CardTitle>Paystack Settings</CardTitle>
+                        <CardTitle className="flex items-center gap-2"><CreditCard className="h-5 w-5 text-blue-500" />Paystack Settings</CardTitle>
                         <CardDescription>Accept payments via cards, bank transfers, and USSD.</CardDescription>
                       </div>
                       <FormField
@@ -821,7 +865,7 @@ export default function WebsitePaymentSettings() {
                   <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                       <div>
-                        <CardTitle>Flutterwave Settings</CardTitle>
+                        <CardTitle className="flex items-center gap-2"><Globe className="h-5 w-5 text-orange-500" />Flutterwave Settings</CardTitle>
                         <CardDescription>Global payment gateway for businesses.</CardDescription>
                       </div>
                       <FormField
@@ -978,7 +1022,7 @@ export default function WebsitePaymentSettings() {
                   <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                       <div>
-                        <CardTitle>Stripe Settings</CardTitle>
+                        <CardTitle className="flex items-center gap-2"><CreditCard className="h-5 w-5 text-indigo-600" />Stripe Settings</CardTitle>
                         <CardDescription>Accept global payments via cards and digital wallets.</CardDescription>
                       </div>
                       <FormField
@@ -1113,7 +1157,7 @@ export default function WebsitePaymentSettings() {
                   <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                       <div>
-                        <CardTitle>PayPal Settings</CardTitle>
+                        <CardTitle className="flex items-center gap-2"><Wallet className="h-5 w-5 text-blue-700" />PayPal Settings</CardTitle>
                         <CardDescription>Accept global payments via PayPal.</CardDescription>
                       </div>
                       <FormField
@@ -1248,7 +1292,7 @@ export default function WebsitePaymentSettings() {
                   <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                       <div>
-                        <CardTitle>OPay Settings</CardTitle>
+                        <CardTitle className="flex items-center gap-2"><Smartphone className="h-5 w-5 text-green-600" />OPay Settings</CardTitle>
                         <CardDescription>Accept payments via OPay Checkout.</CardDescription>
                       </div>
                       <FormField
@@ -1407,7 +1451,7 @@ export default function WebsitePaymentSettings() {
                   <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                       <div>
-                        <CardTitle>PalmPay Settings</CardTitle>
+                        <CardTitle className="flex items-center gap-2"><Smartphone className="h-5 w-5 text-purple-600" />PalmPay Settings</CardTitle>
                         <CardDescription>Accept payments via PalmPay.</CardDescription>
                       </div>
                       <FormField
@@ -1566,7 +1610,7 @@ export default function WebsitePaymentSettings() {
                   <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                       <div>
-                        <CardTitle>Pay on Delivery</CardTitle>
+                        <CardTitle className="flex items-center gap-2"><Truck className="h-5 w-5 text-red-500" />Pay on Delivery</CardTitle>
                         <CardDescription>Allow customers to pay when they receive their order.</CardDescription>
                       </div>
                       <FormField
@@ -1634,7 +1678,7 @@ export default function WebsitePaymentSettings() {
                   <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                       <div>
-                        <CardTitle>NOWPayments Settings</CardTitle>
+                        <CardTitle className="flex items-center gap-2"><Coins className="h-5 w-5 text-yellow-500" />NOWPayments Settings</CardTitle>
                         <CardDescription>Accept cryptocurrency payments globally.</CardDescription>
                       </div>
                       <FormField
@@ -1783,7 +1827,7 @@ export default function WebsitePaymentSettings() {
                   <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
                       <div>
-                        <CardTitle>Fast Checkout Settings</CardTitle>
+                        <CardTitle className="flex items-center gap-2"><Zap className="h-5 w-5 text-yellow-400" />Fast Checkout Settings</CardTitle>
                         <CardDescription>Enable Apple Pay, Google Pay and other express options.</CardDescription>
                       </div>
                       <FormField
@@ -1906,7 +1950,7 @@ export default function WebsitePaymentSettings() {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
                   <div>
-                    <CardTitle>Manual Payment</CardTitle>
+                    <CardTitle className="flex items-center gap-2"><Landmark className="h-5 w-5 text-gray-600" />Manual Payment</CardTitle>
                     <CardDescription>Enable or disable manual bank transfers.</CardDescription>
                   </div>
                   <Switch 
@@ -1922,7 +1966,7 @@ export default function WebsitePaymentSettings() {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
                   <div>
-                    <CardTitle>Bank Accounts</CardTitle>
+                    <CardTitle className="flex items-center gap-2"><Landmark className="h-5 w-5" />Bank Accounts</CardTitle>
                     <CardDescription>Add the accounts where customers should send payments.</CardDescription>
                   </div>
                   <Button onClick={handleAddAccount} size="sm">
@@ -1970,7 +2014,7 @@ export default function WebsitePaymentSettings() {
                 <form onSubmit={instructionsForm.handleSubmit(onSaveInstructions)}>
                   <Card>
                     <CardHeader>
-                      <CardTitle>Customer Instructions</CardTitle>
+                      <CardTitle className="flex items-center gap-2"><Info className="h-5 w-5" />Customer Instructions</CardTitle>
                       <CardDescription>Tell customers what to do after choosing bank transfer.</CardDescription>
                     </CardHeader>
                     <CardContent>
