@@ -669,6 +669,8 @@ export interface Store {
   subdomainActive?: boolean;
   domainStatus?: 'pending' | 'active' | 'failed' | 'none';
   domainActivatedAt?: Timestamp;
+  primaryDomainType?: 'free' | 'subdomain' | 'custom';
+  redirectEnabled?: boolean;
 }
 
 export interface StaffMember {

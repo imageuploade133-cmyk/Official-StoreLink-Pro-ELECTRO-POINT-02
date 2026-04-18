@@ -16,12 +16,23 @@ import {
   verifyDomain, 
   updateStoreDomain,
   checkDomainStatus,
-  isSubdomainAvailable
+  isSubdomainAvailable,
+  updateStorePrimaryDomain,
+  toggleDomainRedirect
 } from '@/app/actions/domains';
 import { getMainDomain } from '@/lib/domain';
 import { cn } from '@/lib/utils';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
 
 export default function DomainSettingsPage() {
   const { store, permissions, isLoading: isAuthLoading } = useAuth();
@@ -174,6 +185,12 @@ export default function DomainSettingsPage() {
       
       // 2. Update Firestore
       await updateStoreDomain(store!.id, null, store?.subdomain || null);
+      
+      // If primary domain was custom, reset it to free
+      if (store?.primaryDomainType === 'custom') {
+        await updateStorePrimaryDomain(store!.id, 'free');
+      }
+
       setDomainInput('');
 
       toast({
@@ -188,6 +205,42 @@ export default function DomainSettingsPage() {
       });
     } finally {
       setIsRemoving(false);
+    }
+  };
+
+  const handlePrimaryDomainChange = async (value: 'free' | 'subdomain' | 'custom') => {
+    if (!store) return;
+    try {
+        await updateStorePrimaryDomain(store.id, value);
+        toast({
+            title: "Primary Domain Updated",
+            description: `Your primary domain is now set to ${value === 'free' ? 'Free URL' : value === 'subdomain' ? 'Pro URL' : 'Custom Domain'}.`,
+        });
+    } catch (error: any) {
+        toast({
+            title: "Update Failed",
+            description: error.message || "Failed to update primary domain.",
+            variant: "destructive"
+        });
+    }
+  };
+
+  const handleToggleRedirect = async (enabled: boolean) => {
+    if (!store) return;
+    try {
+        await toggleDomainRedirect(store.id, enabled);
+        toast({
+            title: enabled ? "Redirects Enabled" : "Redirects Disabled",
+            description: enabled 
+                ? "Secondary domains will now redirect to your primary domain."
+                : "All active domains will work independently.",
+        });
+    } catch (error: any) {
+        toast({
+            title: "Update Failed",
+            description: error.message || "Failed to update redirect settings.",
+            variant: "destructive"
+        });
     }
   };
 
@@ -220,6 +273,59 @@ export default function DomainSettingsPage() {
         title="Domain Settings"
         description="Connect and manage your store's custom domain and URLs."
       />
+
+      {/* Primary Domain Configuration */}
+      <Card className="border-primary/20 bg-primary/5">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Globe className="h-5 w-5 text-primary" />
+            Primary Domain Configuration
+          </CardTitle>
+          <CardDescription>
+            Choose your primary domain for generated links and SEO.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="primary-domain">Primary Domain</Label>
+              <Select 
+                value={store?.primaryDomainType || 'free'} 
+                onValueChange={(value) => handlePrimaryDomainChange(value as any)}
+              >
+                <SelectTrigger id="primary-domain">
+                  <SelectValue placeholder="Select primary domain" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="free">Free URL ({freeUrl})</SelectItem>
+                  <SelectItem value="subdomain">Pro URL ({proUrl})</SelectItem>
+                  {domainStatus === 'active' && (
+                    <SelectItem value="custom">Custom Domain ({customDomain})</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                This domain will be used for all shared links and search engine optimization.
+              </p>
+            </div>
+
+            <div className="flex flex-col justify-end space-y-4">
+              <div className="flex items-center justify-between p-4 border rounded-lg bg-background">
+                <div className="space-y-0.5">
+                  <Label className="text-base">Automatic Redirects</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Redirect all secondary domains to your primary domain.
+                  </p>
+                </div>
+                <Switch 
+                  checked={!!store?.redirectEnabled} 
+                  onCheckedChange={handleToggleRedirect}
+                />
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Current URLs */}
       <Card>

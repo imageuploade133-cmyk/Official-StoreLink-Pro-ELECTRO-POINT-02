@@ -10,12 +10,13 @@ import { BackgroundVideoPlayer } from '@/components/store/BackgroundVideoPlayer'
 import { cn } from "@/lib/utils";
 import { AdSystem } from '@/components/store/AdSystem';
 import { BannerAd } from '@/components/ads/BannerAd';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useFirestore } from '@/firebase';
 import { doc, runTransaction, increment } from 'firebase/firestore';
 import { format } from 'date-fns';
-import { useParams } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 import { OfflineDetector } from "@/components/OfflineDetector";
+import { getStoreUrl } from "@/lib/domain";
 
 function WebsiteTracker() {
   const firestore = useFirestore();
@@ -63,6 +64,52 @@ function WebsiteTracker() {
   return null;
 }
 
+function CanonicalLink() {
+    const { store } = useSettings();
+    const pathname = usePathname();
+    const params = useParams();
+    const storeId = params?.storeId as string;
+
+    const canonicalUrl = useMemo(() => {
+        if (!store || !storeId) return null;
+        
+        const baseUrl = getStoreUrl(
+            store.id, 
+            store.plan || 'free', 
+            store.customDomain, 
+            store.subdomain, 
+            store.primaryDomainType
+        );
+        
+        let path = pathname;
+        if (path.startsWith(`/${storeId}`)) {
+            path = path.replace(`/${storeId}`, '');
+        }
+        
+        // Ensure path starts with / if not empty, but if it is empty, make it empty string
+        // so we don't end up with trailing slash if not needed, or we can ensure it has one.
+        if (path === '/') path = '';
+        
+        return `${baseUrl}${path}`;
+    }, [store, storeId, pathname]);
+
+    useEffect(() => {
+        if (!canonicalUrl) return;
+        
+        let link: HTMLLinkElement | null = document.querySelector('link[rel="canonical"]');
+        if (link) {
+            link.setAttribute('href', canonicalUrl);
+        } else {
+            link = document.createElement('link');
+            link.setAttribute('rel', 'canonical');
+            link.setAttribute('href', canonicalUrl);
+            document.head.appendChild(link);
+        }
+    }, [canonicalUrl]);
+
+    return null;
+}
+
 export default function PublicLayout({
   children,
 }: Readonly<{
@@ -92,6 +139,7 @@ export default function PublicLayout({
   return (
     <OfflineDetector>
       <WebsiteTracker />
+      <CanonicalLink />
       <AdSystem />
       {settings?.backgroundStyle === 'video' && settings.backgroundVideoUrl && <BackgroundVideoPlayer />}
       <PublicNavbar />
