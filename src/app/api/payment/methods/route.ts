@@ -54,6 +54,7 @@ export async function GET(request: Request) {
               data.providerName === 'palmpay' ? 'Pay with PalmPay' :
               data.providerName === 'paypal' ? 'Pay with PayPal' :
               data.providerName === 'stripe' ? 'Pay with Card (Stripe)' :
+              data.providerName === 'nowpayments' ? 'Pay with Crypto' :
               data.providerName === 'manual' ? 'Bank Transfer' :
               data.providerName === 'pay_on_delivery' ? 'Pay on Delivery' : data.providerName,
         provider: data.providerName,

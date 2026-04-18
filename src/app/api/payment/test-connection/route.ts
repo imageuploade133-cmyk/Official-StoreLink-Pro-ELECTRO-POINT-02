@@ -113,6 +113,31 @@ export async function GET(request: Request) {
         return NextResponse.json({ success: true });
       }
 
+      if (providerName === 'nowpayments') {
+        const apiKey = config.apiKey;
+        if (!apiKey) {
+            return NextResponse.json({ success: false, error: 'NOWPayments API key not configured' });
+        }
+
+        const res = await fetch('https://api.nowpayments.io/v1/status', {
+          headers: {
+            'x-api-key': apiKey,
+          },
+        });
+        
+        if (!res.ok) {
+          const result = await res.json();
+          return NextResponse.json({ success: false, error: result.message || 'Invalid NOWPayments API Key' });
+        }
+        
+        const result = await res.json();
+        if (result.message === 'OK') {
+            return NextResponse.json({ success: true });
+        } else {
+            return NextResponse.json({ success: false, error: result.message || 'Unexpected response from NOWPayments' });
+        }
+      }
+
     return NextResponse.json({ error: 'Unsupported provider' }, { status: 400 });
   } catch (error: any) {
     console.error('Error testing connection:', error);

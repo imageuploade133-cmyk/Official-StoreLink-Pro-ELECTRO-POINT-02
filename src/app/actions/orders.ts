@@ -18,7 +18,9 @@ export async function placeOrderAction({
   fulfillmentType,
   deliveryLocationId,
   deliveryPrice,
-  guestInfo
+  guestInfo,
+  payCurrency,
+  gateway
 }: {
   userId: string;
   storeId: string | null;
@@ -35,6 +37,8 @@ export async function placeOrderAction({
   deliveryLocationId?: string | null;
   deliveryPrice?: number;
   guestInfo?: any;
+  payCurrency?: string;
+  gateway?: string;
 }) {
   try {
     const result = await adminDb.runTransaction(async (transaction) => {
@@ -82,6 +86,8 @@ export async function placeOrderAction({
         isPaid: false,
         createdAt: FieldValue.serverTimestamp(),
         guestInfo: guestInfo || null,
+        payCurrency: payCurrency || null,
+        gateway: gateway || null,
       };
       
       transaction.set(orderRef, orderData);
