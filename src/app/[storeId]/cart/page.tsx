@@ -26,9 +26,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { safeSessionStorage } from '@/lib/storage-utils';
 import { useAds } from '@/contexts/ad-context';
 
-import { useStoreUrl } from '@/hooks/use-store-url';
+import { FastCheckoutButtons } from '@/components/store/FastCheckoutButtons';
+
+import { useParams } from 'next/navigation';
 
 export default function CartPage() {
+  const params = useParams();
   const { cartItems, updateQuantity, removeFromCart, cartCount } = useCart();
   const { settings } = useSettings();
   const firestore = useFirestore();
@@ -41,6 +44,26 @@ export default function CartPage() {
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
   const [itemToRemove, setItemToRemove] = useState<StoreCartItem | null>(null);
   const [today, setToday] = useState<Date | null>(null);
+  const [availablePaymentMethods, setAvailablePaymentMethods] = useState<any[]>([]);
+  const [isLoadingMethods, setIsLoadingMethods] = useState(true);
+
+  useEffect(() => {
+    if (!params?.storeId) return;
+    const fetchMethods = async () => {
+      try {
+        const res = await fetch(`/api/payment/methods?storeId=${params.storeId}`);
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setAvailablePaymentMethods(data);
+        }
+      } catch (e) {
+        console.error('Failed to fetch payment methods', e);
+      } finally {
+        setIsLoadingMethods(false);
+      }
+    };
+    fetchMethods();
+  }, [params?.storeId]);
 
   useEffect(() => {
     setToday(new Date());
@@ -408,6 +431,43 @@ export default function CartPage() {
                                     <Sparkles className="h-4 w-4 text-amber-400 group-hover:-rotate-12 transition-transform" />
                                 </div>
                             </button>
+                          )}
+                          
+                          {availablePaymentMethods.find(m => m.id === 'fast_checkout')?.config?.enableQuickPayButtons && (
+                            <FastCheckoutButtons 
+                              storeId={params?.storeId as string}
+                              amount={total}
+                              currency={settings?.currency || 'NGN'}
+                              availableMethods={availablePaymentMethods}
+                              onSuccess={(orderId) => {}}
+                              onBeforeCheckout={async () => {
+                                // For cart page, we might not have user info if not logged in
+                                // Redirect to checkout is safer if we want full info, 
+                                // but we can create a skeleton order
+                                try {
+                                  const result = await fetch('/api/internal/create-express-order', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                      storeId: params?.storeId,
+                                      items: realTimeCartItems.map(item => ({
+                                        productId: item.id,
+                                        quantity: item.quantity,
+                                        price: item.salePrice
+                                      })),
+                                      totalAmount: total,
+                                      totalCost: realTimeCartItems.reduce((sum, item) => sum + ((item.purchasePrice || 0) * item.quantity), 0),
+                                    })
+                                  }).then(r => r.json());
+                                  
+                                  if (result.success) return result.orderId;
+                                  throw new Error(result.error);
+                                } catch (e: any) {
+                                  toast({ variant: 'destructive', title: 'Order Failed', description: e.message });
+                                  return null;
+                                }
+                              }}
+                            />
                           )}
 
                           <Button asChild size="lg" style={buttonStyle} className="w-full h-14 text-lg font-bold shadow-lg shadow-primary/20 border-none" disabled={hasIssues || subtotal === 0}>

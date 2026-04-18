@@ -54,7 +54,7 @@ import { placeOrderAction, logWhatsAppMessageAction } from '@/app/actions/orders
 import { useStoreUrl } from '@/hooks/use-store-url';
 
 import { uploadImage } from '@/ai/flows/image-upload-flow';
-import { Upload } from 'lucide-react';
+import { FastCheckoutButtons } from '@/components/store/FastCheckoutButtons';
 
 type CheckoutStep = 'details' | 'payment' | 'processing';
 
@@ -481,6 +481,51 @@ export default function CheckoutPage() {
                 <CardDescription>{user ? "Confirm your account delivery information." : "Provide your details for guest checkout."}</CardDescription>
               </CardHeader>
               <CardContent>
+                {step === 'details' && (
+                  <FastCheckoutButtons 
+                    storeId={storeId}
+                    amount={total}
+                    currency={settings?.currency || 'NGN'}
+                    availableMethods={availablePaymentMethods}
+                    onSuccess={(orderId) => {
+                      // Handle success
+                    }}
+                    onBeforeCheckout={async () => {
+                      // Validate basic info
+                      if (!formData.email) {
+                          toast({ variant: 'destructive', title: 'Email Required', description: 'Please enter your email.' });
+                          return null;
+                      }
+
+                      // Create order using placeOrderAction
+                      try {
+                        const result = await placeOrderAction({
+                            userId: user?.uid || 'GUEST',
+                            storeId: storeId,
+                            items: cartItems.map(item => ({
+                                productId: item.id,
+                                quantity: item.quantity,
+                                price: item.salePrice
+                            })),
+                            totalAmount: total,
+                            totalCost: cartItems.reduce((sum, item) => sum + (item.purchasePrice * item.quantity), 0),
+                            paymentMethod: 'Express Checkout',
+                            fulfillmentType,
+                            deliveryLocationId: fulfillmentType === 'delivery' ? selectedLocationId : null,
+                            deliveryPrice: shipping,
+                            guestInfo: user ? null : formData,
+                        });
+                        
+                        if (result.success) return result.orderId;
+                        throw new Error(result.error);
+                      } catch (e: any) {
+                        toast({ variant: 'destructive', title: 'Order Failed', description: e.message });
+                        return null;
+                      }
+                    }}
+                    customerEmail={formData.email}
+                  />
+                )}
                 <form onSubmit={handleProceedToPayment} className="space-y-6">
                   <div className="space-y-4">
                     <Label>Fulfillment Method</Label>

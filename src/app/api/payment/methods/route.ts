@@ -53,12 +53,14 @@ export async function GET(request: Request) {
               data.providerName === 'opay' ? 'Pay with OPay' :
               data.providerName === 'palmpay' ? 'Pay with PalmPay' :
               data.providerName === 'paypal' ? 'Pay with PayPal' :
+              data.providerName === 'stripe' ? 'Pay with Card (Stripe)' :
               data.providerName === 'manual' ? 'Bank Transfer' :
               data.providerName === 'pay_on_delivery' ? 'Pay on Delivery' : data.providerName,
         provider: data.providerName,
         publicKey: publicKey, // Only expose correct public key
         mode: mode,
         instructions: config.instructions || '',
+        config: data.providerName === 'fast_checkout' ? config : undefined,
       });
     });
 

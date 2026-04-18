@@ -83,7 +83,7 @@ import { StickyProductBar } from '@/components/store/StickyProductBar';
 import { BannerAd } from '@/components/ads/BannerAd';
 import { useAds } from '@/contexts/ad-context';
 import { useStoreUrl } from '@/hooks/use-store-url';
-import { getStoreUrl as getAbsoluteStoreUrl } from '@/lib/domain';
+import { FastCheckoutButtons } from '@/components/store/FastCheckoutButtons';
 
 const iconMap = {
   Truck,
@@ -266,11 +266,26 @@ export default function ProductDetailsPage() {
   
   const [quantity, setQuantity] = useState(1);
   const [today, setToday] = useState<Date | null>(null);
-  const [activeImage, setActiveImage] = useState<string | null>(null);
-  const [showVideo, setShowVideo] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isOutOfDataDrawerOpen, setIsOutOfDataDrawerOpen] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [availablePaymentMethods, setAvailablePaymentMethods] = useState<any[]>([]);
+  const [isLoadingMethods, setIsLoadingMethods] = useState(true);
+
+  useEffect(() => {
+    if (!storeId) return;
+    const fetchMethods = async () => {
+      try {
+        const res = await fetch(`/api/payment/methods?storeId=${storeId}`);
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setAvailablePaymentMethods(data);
+        }
+      } catch (e) {
+        console.error('Failed to fetch payment methods', e);
+      } finally {
+        setIsLoadingMethods(false);
+      }
+    };
+    fetchMethods();
+  }, [storeId]);
 
   useEffect(() => {
     setToday(new Date());
@@ -844,6 +859,42 @@ export default function ProductDetailsPage() {
                     <AddToCartIcon className="mr-2 md:mr-3 h-4 md:h-5 w-4 md:w-5 group-hover:animate-bounce" /> {isOutOfStock ? "Out of Stock" : addToCartText}
                   </Button>
                 </div>
+
+                {availablePaymentMethods.find(m => m.id === 'fast_checkout')?.config?.enableQuickPayButtons && !isOutOfStock && (
+                  <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <FastCheckoutButtons 
+                      storeId={storeId}
+                      amount={effectivePrice * quantity}
+                      currency={settings?.currency || 'NGN'}
+                      availableMethods={availablePaymentMethods}
+                      onSuccess={(orderId) => {}}
+                      onBeforeCheckout={async () => {
+                        try {
+                          const result = await fetch('/api/internal/create-express-order', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              storeId,
+                              items: [{
+                                productId: product.id,
+                                quantity,
+                                price: effectivePrice
+                              }],
+                              totalAmount: effectivePrice * quantity,
+                              totalCost: (product.purchasePrice || 0) * quantity,
+                            })
+                          }).then(r => r.json());
+                          
+                          if (result.success) return result.orderId;
+                          throw new Error(result.error);
+                        } catch (e: any) {
+                          toast({ variant: 'destructive', title: 'Order Failed', description: e.message });
+                          return null;
+                        }
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             )}
 
