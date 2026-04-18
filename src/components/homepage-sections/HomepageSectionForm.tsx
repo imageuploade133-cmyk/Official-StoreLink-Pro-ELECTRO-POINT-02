@@ -206,8 +206,10 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
     
     const [openProductSearch, setOpenProductSearch] = useState(false);
     const [productSearchTerm, setProductSearchTerm] = useState('');
+    const [activeTab, setActiveTab] = useState<'products' | 'visual'>('products');
 
     // Paginated category loading state
+
     const CATEGORY_BATCH_SIZE = 20;
     const [paginatedCategories, setPaginatedCategories] = useState<Category[]>([]);
     const [isLoadingPaginatedCategories, setIsLoadingPaginatedCategories] = useState(false);
@@ -249,6 +251,9 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                 htmlContent: defaultValues.htmlContent || '',
                 fullWidth: defaultValues.fullWidth ?? false,
             });
+            if (defaultValues.selectionType === 'custom-ui') {
+                setActiveTab('visual');
+            }
         }
     }, [defaultValues, categories, form]);
 
@@ -703,29 +708,21 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                         
                         <div className="space-y-6 pt-8 border-t border-dashed">
                             <Tabs 
-                                value={selectionType === 'custom-ui' ? 'visual' : 'products'} 
-                                onValueChange={(val) => {
-                                    if (val === 'visual') {
-                                        form.setValue('selectionType', 'custom-ui', { shouldValidate: true });
-                                    } else {
-                                        if (selectionType === 'custom-ui') {
-                                            form.setValue('selectionType', 'category', { shouldValidate: true });
-                                        }
-                                    }
-                                }}
+                                value={activeTab}
+                                onValueChange={(val) => setActiveTab(val as 'products' | 'visual')}
                                 className="w-full"
                             >
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                                     <div>
-                                        <h3 className="text-sm font-black uppercase tracking-[0.2em] text-primary">Section Content Mode</h3>
-                                        <p className="text-xs text-muted-foreground mt-1">Choose between displaying products or a custom visual banner.</p>
+                                        <h3 className="text-sm font-black uppercase tracking-[0.2em] text-primary">Section Configuration</h3>
+                                        <p className="text-xs text-muted-foreground mt-1">Configure both products and promotional banners for this section.</p>
                                     </div>
                                     <TabsList className="grid grid-cols-2 w-full sm:w-[400px] h-12 p-1 bg-muted/50 rounded-xl">
                                         <TabsTrigger value="products" className="rounded-lg font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm gap-2">
                                             <Box className="h-4 w-4" /> Products
                                         </TabsTrigger>
                                         <TabsTrigger value="visual" className="rounded-lg font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm gap-2">
-                                            <ImageIcon className="h-4 w-4" /> Visual UI
+                                            <ImageIcon className="h-4 w-4" /> Banner Settings
                                         </TabsTrigger>
                                     </TabsList>
                                 </div>
@@ -738,7 +735,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                                 <FormLabel className="font-bold">Target Merchandising Strategy</FormLabel>
                                             </div>
                                             <FormControl>
-                                                <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                                     <div className="flex items-center space-x-2 border rounded-xl p-4 transition-all hover:bg-muted/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
                                                         <RadioGroupItem value="category" id="selection-category" />
                                                         <Label htmlFor="selection-category" className="font-bold cursor-pointer flex flex-col">
@@ -751,6 +748,13 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                                         <Label htmlFor="selection-manual" className="font-bold cursor-pointer flex flex-col">
                                                             <span>Hand-Picked</span>
                                                             <span className="text-[10px] font-normal text-muted-foreground">Individual items</span>
+                                                        </Label>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2 border rounded-xl p-4 transition-all hover:bg-muted/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                                                        <RadioGroupItem value="custom-ui" id="selection-none" />
+                                                        <Label htmlFor="selection-none" className="font-bold cursor-pointer flex flex-col">
+                                                            <span>No Products</span>
+                                                            <span className="text-[10px] font-normal text-muted-foreground">Visual banner only</span>
                                                         </Label>
                                                     </div>
                                                 </RadioGroup>
@@ -840,13 +844,37 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                             <FormField control={form.control} name="productIds" render={() => <FormMessage />} />
                                         </div>
                                     )}
+
+                                    {selectionType === 'custom-ui' && (
+                                        <div className="flex flex-col items-center justify-center py-10 bg-muted/20 rounded-2xl border-2 border-dashed gap-4 animate-in fade-in duration-500">
+                                            <ImageIcon className="h-10 w-10 text-muted-foreground opacity-50" />
+                                            <div className="text-center">
+                                                <p className="font-bold text-slate-600">No products will be displayed</p>
+                                                <p className="text-xs text-muted-foreground">Switch to Banner Settings tab to configure your visual content.</p>
+                                            </div>
+                                        </div>
+                                    )}
                                 </TabsContent>
 
                                 <TabsContent value="visual" className="space-y-8 animate-in fade-in duration-500 focus-visible:outline-none">
                                     <div className="space-y-8">
+                                        {selectionType !== 'custom-ui' && (
+                                            <div className="p-4 bg-blue-50 border border-blue-100 rounded-2xl flex gap-4 items-start animate-in slide-in-from-top-2 duration-500">
+                                                <div className="bg-blue-500 p-2 rounded-full text-white">
+                                                    <Info className="h-4 w-4" />
+                                                </div>
+                                                <div className="text-xs space-y-1">
+                                                    <p className="font-black text-blue-700 uppercase tracking-wider">Optional Section Banner</p>
+                                                    <p className="text-blue-600/80 leading-relaxed font-medium">
+                                                        You can add a promotional banner that will appear above your products. If you don't provide an image or video, only the products will be displayed.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
                                         <FormField control={form.control} name="uiType" render={({ field }) => (
                                             <FormItem className="space-y-4">
                                                 <FormLabel className="font-black text-xs uppercase tracking-widest text-primary">UI Design Protocol</FormLabel>
+
                                                 <FormControl>
                                                     <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                         <div className="relative">
