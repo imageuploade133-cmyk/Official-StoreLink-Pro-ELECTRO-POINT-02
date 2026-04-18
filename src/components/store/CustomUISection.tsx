@@ -47,24 +47,24 @@ export function CustomUISection({ section }: CustomUISectionProps) {
                         loop
                         playsInline
                         className="h-full w-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] transition-opacity group-hover:opacity-40" />
-                </div>
-            ) : section.imageUrl && (
-                <div className="relative aspect-video md:aspect-[21/9] w-full overflow-hidden">
-                    <Image 
-                        src={section.imageUrl} 
-                        alt={section.title} 
-                        fill 
+                        />
+                        {(section.showOverlay ?? false) && <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] transition-opacity group-hover:opacity-40" />}
+                        </div>
+                        ) : section.imageUrl && (
+                        <div className="relative aspect-video md:aspect-[21/9] w-full overflow-hidden">
+                        <Image
+                        src={section.imageUrl}
+                        alt={section.title}
+                        fill
                         className={cn(
                             "object-cover transition-transform duration-700",
                             settings?.enableHoverZoom !== false && "group-hover:scale-110"
-                        )} 
+                        )}
                         unoptimized
-                    />
-                    <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] transition-opacity group-hover:opacity-40" />
-                </div>
-            )}
+                        />
+                        {(section.showOverlay ?? false) && <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] transition-opacity group-hover:opacity-40" />}
+                        </div>
+                        )}
 
             <div className={cn(
                 "absolute inset-0 z-10 flex items-center p-8 md:p-20",
@@ -72,12 +72,12 @@ export function CustomUISection({ section }: CustomUISectionProps) {
             )}>
                 <div className="max-w-3xl space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
                     {section.overlayTitle && (
-                        <h2 className="text-3xl md:text-7xl font-black text-white leading-none tracking-tighter uppercase whitespace-pre-line">
+                        <h2 className="text-3xl md:text-7xl font-black leading-none tracking-tighter uppercase whitespace-pre-line" style={{ color: section.textColor || '#FFFFFF' }}>
                             {section.overlayTitle}
                         </h2>
                     )}
                     {section.overlaySubtitle && (
-                        <p className="text-lg md:text-2xl text-white/90 font-medium leading-relaxed max-w-xl mx-auto">
+                        <p className="text-lg md:text-2xl font-medium leading-relaxed max-w-xl mx-auto" style={{ color: `${section.textColor || '#FFFFFF'}E6` }}>
                             {section.overlaySubtitle}
                         </p>
                     )}
