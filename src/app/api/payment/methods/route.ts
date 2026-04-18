@@ -52,6 +52,7 @@ export async function GET(request: Request) {
               data.providerName === 'flutterwave' ? 'Pay with Card (Flutterwave)' :
               data.providerName === 'opay' ? 'Pay with OPay' :
               data.providerName === 'palmpay' ? 'Pay with PalmPay' :
+              data.providerName === 'paypal' ? 'Pay with PayPal' :
               data.providerName === 'manual' ? 'Bank Transfer' :
               data.providerName === 'pay_on_delivery' ? 'Pay on Delivery' : data.providerName,
         provider: data.providerName,

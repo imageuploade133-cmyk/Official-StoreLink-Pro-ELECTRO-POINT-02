@@ -146,6 +146,63 @@ export async function POST(request: Request) {
           }
           // Assume PalmPay returns payment url in result.data.url or result.data.paymentUrl
           result.data = { authorization_url: result.data.url || result.data.paymentUrl || result.data.checkoutUrl };
+    } else if (providerName === 'paypal') {
+        const clientId = mode === 'live' ? config.liveClientId : config.clientId;
+        const paypalSecret = mode === 'live' ? config.liveSecretKey : config.secretKey;
+        const baseUrl = mode === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
+
+        if (!clientId || !paypalSecret) {
+            throw new Error('PayPal credentials not configured');
+        }
+
+        // Get access token
+        const auth = Buffer.from(`${clientId}:${paypalSecret}`).toString('base64');
+        const tokenRes = await fetch(`${baseUrl}/v1/oauth2/token`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Basic ${auth}`,
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'grant_type=client_credentials',
+        });
+        const tokenData = await tokenRes.json();
+        if (!tokenRes.ok) {
+            console.error('PayPal Auth Error:', tokenData);
+            throw new Error(tokenData.error_description || 'PayPal auth failed');
+        }
+
+        const accessToken = tokenData.access_token;
+
+        // Create order
+        const orderRes = await fetch(`${baseUrl}/v2/checkout/orders`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                intent: 'CAPTURE',
+                purchase_units: [{
+                    amount: {
+                        currency_code: normalizedCurrency,
+                        value: amount.toFixed(2),
+                    },
+                    reference_id: reference,
+                }],
+                application_context: {
+                    return_url: `${request.headers.get('origin')}/store/${storeId}/checkout/verify?provider=paypal&reference=${reference}`,
+                    cancel_url: `${request.headers.get('origin')}/store/${storeId}/checkout`,
+                }
+            }),
+        });
+        const orderData = await orderRes.json();
+        if (!orderRes.ok) {
+            console.error('PayPal Order Error:', orderData);
+            throw new Error(orderData.message || 'PayPal order creation failed');
+        }
+
+        const approvalUrl = orderData.links.find((l: any) => l.rel === 'approve').href;
+        result.data = { authorization_url: approvalUrl };
     } else {
         throw new Error('Unsupported provider');
     }

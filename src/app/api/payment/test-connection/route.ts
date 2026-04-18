@@ -88,6 +88,31 @@ export async function GET(request: Request) {
         return NextResponse.json({ success: true });
       }
 
+      if (providerName === 'paypal') {
+        const clientId = mode === 'live' ? config.liveClientId : config.clientId;
+        const paypalSecret = mode === 'live' ? config.liveSecretKey : config.secretKey;
+        const baseUrl = mode === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
+
+        if (!clientId || !paypalSecret) {
+            return NextResponse.json({ success: false, error: 'PayPal credentials not configured' });
+        }
+
+        const auth = Buffer.from(`${clientId}:${paypalSecret}`).toString('base64');
+        const res = await fetch(`${baseUrl}/v1/oauth2/token`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Basic ${auth}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: 'grant_type=client_credentials',
+        });
+        if (!res.ok) {
+          const result = await res.json();
+          return NextResponse.json({ success: false, error: result.error_description || 'Invalid PayPal Credentials' });
+        }
+        return NextResponse.json({ success: true });
+      }
+
     return NextResponse.json({ error: 'Unsupported provider' }, { status: 400 });
   } catch (error: any) {
     console.error('Error testing connection:', error);
