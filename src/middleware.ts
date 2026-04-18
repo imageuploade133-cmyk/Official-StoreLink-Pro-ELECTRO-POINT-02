@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { getMainDomain, RESERVED_SUBDOMAINS } from '@/lib/domain';
 
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl;
   const hostname = req.headers.get('host') || '';
 
   // Define main domain and reserved subdomains
-  const mainDomain = process.env.NEXT_PUBLIC_MAIN_DOMAIN || 'storelinkpro.com';
-  const reservedSubdomains = ['www', 'admin', 'dashboard', 'api', 'pos', 'signup', 'login', 'signup-merchant'];
+  const mainDomain = getMainDomain(hostname);
+  const reservedSubdomains = RESERVED_SUBDOMAINS;
 
   // Exclude internal paths and static files
   if (
