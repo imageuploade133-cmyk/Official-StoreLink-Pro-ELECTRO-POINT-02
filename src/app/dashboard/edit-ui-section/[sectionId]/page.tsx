@@ -105,6 +105,12 @@ export default function EditUISectionPage() {
 
   const { data: section, isLoading: isLoadingSection } = useDoc<HomepageSection>(sectionRef);
 
+  useEffect(() => {
+    if (section && section.selectionType !== 'custom-ui') {
+      router.replace(`/dashboard/homepage-sections/edit/${sectionId}`);
+    }
+  }, [section, sectionId, router]);
+
   const form = useForm<FormValues>({
     resolver: zodResolver(uiSectionSchema),
     shouldUnregister: false,

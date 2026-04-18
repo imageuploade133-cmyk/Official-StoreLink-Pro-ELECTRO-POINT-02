@@ -47,14 +47,7 @@ import {
   Type,
   MousePointer2,
   CircleDashed,
-  Box,
-  ImageIcon,
-  Video,
-  Code,
-  Upload,
-  Monitor,
-  Palette,
-  Maximize
+  Box
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
@@ -83,7 +76,7 @@ const homepageSectionSchema = z.object({
   layout: z.enum(['carousel', 'grid']).default('carousel'),
   alignment: z.enum(['left', 'center']).default('left'),
   backgroundColor: z.string().optional().or(z.literal('')),
-  selectionType: z.enum(['manual', 'category', 'custom-ui']),
+  selectionType: z.enum(['manual', 'category']),
   categoryId: z.string().optional().or(z.literal('')),
   productIds: z.array(z.string()).optional().default([]),
   // Flash Sale Fields
@@ -93,7 +86,7 @@ const homepageSectionSchema = z.object({
   flashSaleStartDate: z.date().optional().nullable(),
   flashSaleEndDate: z.date().optional().nullable(),
   // Custom UI Fields
-  uiType: z.enum(['image', 'html', 'video']).default('image'),
+  uiType: z.enum(['image', 'html', 'video']).optional().default('image'),
   imageUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
   videoUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
   videoPosterUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
@@ -102,7 +95,7 @@ const homepageSectionSchema = z.object({
   overlaySubtitle: z.string().optional().or(z.literal('')),
   buttonText: z.string().optional().or(z.literal('')),
   htmlContent: z.string().optional().or(z.literal('')),
-  fullWidth: z.boolean().default(false),
+  fullWidth: z.boolean().optional().default(false),
   // Carousel Extensions
   autoScroll: z.boolean().default(false),
   slideIcon: z.enum(['chevron', 'arrow', 'circle']).default('chevron'),
@@ -113,17 +106,6 @@ const homepageSectionSchema = z.object({
     }
     if (data.selectionType === 'manual' && (!data.productIds || data.productIds.length === 0)) {
        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'At least one product must be selected for manual mode.', path: ['productIds'] });
-    }
-    if (data.selectionType === 'custom-ui') {
-        if (data.uiType === 'image' && (!data.imageUrl || data.imageUrl.trim() === '')) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Image URL is required for Image mode.', path: ['imageUrl'] });
-        }
-        if (data.uiType === 'video' && (!data.videoUrl || data.videoUrl.trim() === '')) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Video URL is required for Video mode.', path: ['videoUrl'] });
-        }
-        if (data.uiType === 'html' && (!data.htmlContent || data.htmlContent.trim() === '')) {
-            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'HTML content is required for Code mode.', path: ['htmlContent'] });
-        }
     }
     if (data.isFlashSale && (!data.flashSaleDiscountValue || data.flashSaleDiscountValue <= 0)) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Flash sale requires a discount value greater than zero.', path: ['flashSaleDiscountValue'] });
@@ -200,7 +182,6 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
     const [isChangeCategoryModalOpen, setIsChangeCategoryModalOpen] = useState(false);
     const [isNewCategoryFormOpen, setIsNewCategoryFormOpen] = useState(false);
     const [isSubmittingNewCategory, setIsSubmittingNewCategory] = useState(false);
-    const [isUploading, setIsUploading] = useState(false);
     const [categorySearchTerm, setCategorySearchTerm] = useState('');
     
     const [openProductSearch, setOpenProductSearch] = useState(false);
@@ -356,24 +337,6 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
         form.setValue('productIds', selectedProductIds.filter(id => id !== productId), { shouldValidate: true });
     };
 
-    const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-        setIsUploading(true);
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = async () => {
-          try {
-            const result = await uploadImage({ imageDataUri: reader.result as string });
-            form.setValue('imageUrl', result.display_url, { shouldValidate: true });
-            toast({ title: "Asset Uploaded", description: "Design image is ready." });
-          } catch (error: any) {
-            toast({ variant: "destructive", title: "Upload Failed", description: error.message });
-          } finally {
-            setIsUploading(false);
-          }
-        };
-    };
 
     const handleNewCategorySubmit = async (categoryValues: CategoryFormValues) => {
         if (!firestore || !currentStoreId) return;
@@ -706,7 +669,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                 <FormItem className="space-y-3">
                                     <FormLabel className="font-bold">Selection Strategy</FormLabel>
                                     <FormControl>
-                                        <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                        <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div className="flex items-center space-x-2 border rounded-xl p-4 transition-all hover:bg-muted/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
                                                 <RadioGroupItem value="category" id="selection-category" />
                                                 <Label htmlFor="selection-category" className="font-bold cursor-pointer flex flex-col">
@@ -719,13 +682,6 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                                 <Label htmlFor="selection-manual" className="font-bold cursor-pointer flex flex-col">
                                                     <span>Hand-Picked</span>
                                                     <span className="text-[10px] font-normal text-muted-foreground">Individual items</span>
-                                                </Label>
-                                            </div>
-                                            <div className="flex items-center space-x-2 border rounded-xl p-4 transition-all hover:bg-muted/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                                                <RadioGroupItem value="custom-ui" id="selection-custom-ui" />
-                                                <Label htmlFor="selection-custom-ui" className="font-bold cursor-pointer flex flex-col">
-                                                    <span>Banner / Video</span>
-                                                    <span className="text-[10px] font-normal text-muted-foreground">Custom visual UI</span>
                                                 </Label>
                                             </div>
                                         </RadioGroup>
@@ -815,146 +771,12 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                     <FormField control={form.control} name="productIds" render={() => <FormMessage />} />
                                 </div>
                             )}
-
-                            {selectionType === 'custom-ui' && (
-                                <div className="space-y-8 animate-in fade-in slide-in-from-top-2 duration-500">
-                                    <FormField control={form.control} name="uiType" render={({ field }) => (
-                                        <FormItem className="space-y-4">
-                                            <FormLabel className="font-black text-xs uppercase tracking-widest text-primary">UI Design Protocol</FormLabel>
-                                            <FormControl>
-                                                <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                    <div className="relative">
-                                                        <RadioGroupItem value="image" id="f-type-image" className="peer sr-only" />
-                                                        <Label htmlFor="f-type-image" className="flex items-center gap-4 p-6 rounded-2xl border-2 bg-muted/5 cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 transition-all">
-                                                            <ImageIcon className="h-6 w-6" />
-                                                            <div><p className="font-bold">Image Visual</p><p className="text-[10px] text-muted-foreground uppercase">Banners</p></div>
-                                                        </Label>
-                                                    </div>
-                                                    <div className="relative">
-                                                        <RadioGroupItem value="video" id="f-type-video" className="peer sr-only" />
-                                                        <Label htmlFor="f-type-video" className="flex items-center gap-4 p-6 rounded-2xl border-2 bg-muted/5 cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 transition-all">
-                                                            <Video className="h-6 w-6" />
-                                                            <div><p className="font-bold">Video Motion</p><p className="text-[10px] text-muted-foreground uppercase">MP4 / Stream</p></div>
-                                                        </Label>
-                                                    </div>
-                                                    <div className="relative">
-                                                        <RadioGroupItem value="html" id="f-type-html" className="peer sr-only" />
-                                                        <Label htmlFor="f-type-html" className="flex items-center gap-4 p-6 rounded-2xl border-2 bg-muted/5 cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 transition-all">
-                                                            <Code className="h-6 w-6" />
-                                                            <div><p className="font-bold">Bespoke HTML</p><p className="text-[10px] text-muted-foreground uppercase">Raw Code</p></div>
-                                                        </Label>
-                                                    </div>
-                                                </RadioGroup>
-                                            </FormControl>
-                                        </FormItem>
-                                    )} />
-
-                                    <Separator className="border-dashed" />
-
-                                    {uiType === 'image' || uiType === 'video' ? (
-                                        <div className="space-y-8">
-                                            {uiType === 'image' ? (
-                                                <FormField control={form.control} name="imageUrl" render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel className="font-bold">Primary Design Asset <span className="text-destructive">*</span></FormLabel>
-                                                        <div className="flex items-start gap-6">
-                                                            {imageUrl ? (
-                                                                <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border shadow-xl bg-white shrink-0">
-                                                                    <Image src={imageUrl} alt="Preview" fill className="object-cover" unoptimized />
-                                                                </div>
-                                                            ) : (
-                                                                <div className="w-48 aspect-video rounded-2xl border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground bg-muted/20 shrink-0">
-                                                                    <ImageIcon className="h-8 w-8 opacity-20" />
-                                                                </div>
-                                                            )}
-                                                            <div className="flex-grow space-y-3">
-                                                                <FormControl><Input placeholder="https://example.com/banner.jpg" {...field} value={field.value || ''} className="h-11" /></FormControl>
-                                                                <Button asChild variant="outline" size="sm" disabled={isUploading}>
-                                                                    <label htmlFor="f-ui-image-upload" className="cursor-pointer">
-                                                                        {isUploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Upload className="h-4 w-4 mr-2" />}
-                                                                        Upload Background
-                                                                    </label>
-                                                                </Button>
-                                                                <input id="f-ui-image-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-                                                            </div>
-                                                        </div>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )} />
-                                            ) : (
-                                                <div className="space-y-6">
-                                                    <FormField control={form.control} name="videoUrl" render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel className="font-bold">Video URL <span className="text-destructive">*</span></FormLabel>
-                                                            <FormControl><Input placeholder="https://example.com/video.mp4" {...field} value={field.value || ''} className="h-11" /></FormControl>
-                                                            <FormDescription>Direct link to MP4 video file.</FormDescription>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )} />
-                                                    <FormField control={form.control} name="videoPosterUrl" render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel className="font-bold">Video Poster (Thumbnail)</FormLabel>
-                                                            <FormControl><Input placeholder="https://example.com/poster.jpg" {...field} value={field.value || ''} className="h-11" /></FormControl>
-                                                            <FormDescription>Image displayed before the video starts.</FormDescription>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )} />
-                                                </div>
-                                            )}
-
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                                <FormField control={form.control} name="overlayTitle" render={({ field }) => (
-                                                    <FormItem><FormLabel className="font-bold">Display Heading</FormLabel><FormControl><Input placeholder="e.g., NEW ARRIVALS" {...field} value={field.value || ''} /></FormControl></FormItem>
-                                                )} />
-                                                <FormField control={form.control} name="buttonText" render={({ field }) => (
-                                                    <FormItem><FormLabel className="font-bold">Action Button Label</FormLabel><FormControl><Input placeholder="Explore Now" {...field} value={field.value || ''} /></FormControl></FormItem>
-                                                )} />
-                                            </div>
-
-                                            <FormField control={form.control} name="linkUrl" render={({ field }) => (
-                                                <FormItem><FormLabel className="font-bold">Destination URL</FormLabel><FormControl><Input placeholder="https://..." {...field} value={field.value || ''} /></FormControl></FormItem>
-                                            )} />
-
-                                            <FormField control={form.control} name="fullWidth" render={({ field }) => (
-                                                <FormItem className="flex items-center justify-between p-4 border rounded-2xl bg-muted/5 transition-all hover:bg-muted/10">
-                                                    <div className="space-y-0.5">
-                                                        <FormLabel className="font-black text-[10px] uppercase tracking-wider flex items-center gap-2">
-                                                            <Maximize className="h-3.5 w-3.5 text-blue-500" /> Edge-to-Edge
-                                                        </FormLabel>
-                                                        <p className="text-[8px] font-bold text-muted-foreground uppercase">Disable container padding</p>
-                                                    </div>
-                                                    <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                                                </FormItem>
-                                            )} />
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-6">
-                                            <FormField control={form.control} name="htmlContent" render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="font-black text-xs uppercase tracking-widest text-primary">Custom HTML Logic <span className="text-destructive">*</span></FormLabel>
-                                                    <FormControl>
-                                                        <Textarea 
-                                                            {...field} 
-                                                            value={field.value || ''} 
-                                                            placeholder="<div class='custom-banner'>...</div>"
-                                                            className="min-h-[300px] font-mono text-sm leading-relaxed bg-slate-950 text-emerald-400 p-6 rounded-2xl"
-                                                        />
-                                                    </FormControl>
-                                                    <FormDescription>Note: Use standard Tailwind utility classes for consistent styling.</FormDescription>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )} />
-                                        </div>
-                                    )}
-                                </div>
-                            )}
                         </div>
                     </CardContent>
                 </Card>
 
                 {/* Flash Sale Card */}
-                {selectionType !== 'custom-ui' && (
-                    <Card className={cn("shadow-xl border-none ring-1 ring-border transition-all", isFlashSale ? "border-rose-500 ring-rose-500/20" : "")}>
+                <Card className={cn("shadow-xl border-none ring-1 ring-border transition-all", isFlashSale ? "border-rose-500 ring-rose-500/20" : "")}>
                         <CardHeader className={cn("bg-muted/30 transition-colors", isFlashSale ? "bg-rose-500/10" : "")}>
                             <div className="flex justify-between items-center">
                                 <div>
@@ -1136,7 +958,6 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                             </div>
                         </CardContent>
                     </Card>
-                )}
 
                 <div className="flex justify-end gap-4">
                     <Button type="submit" disabled={isSaving} size="lg" className="min-w-[200px] h-14 text-lg font-black shadow-lg shadow-primary/20">
