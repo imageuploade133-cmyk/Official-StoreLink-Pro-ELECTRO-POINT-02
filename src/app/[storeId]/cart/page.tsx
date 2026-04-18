@@ -29,6 +29,7 @@ import { useAds } from '@/contexts/ad-context';
 import { FastCheckoutButtons } from '@/components/store/FastCheckoutButtons';
 
 import { useParams } from 'next/navigation';
+import { useStoreUrl } from '@/hooks/use-store-url';
 
 export default function CartPage() {
   const params = useParams();
