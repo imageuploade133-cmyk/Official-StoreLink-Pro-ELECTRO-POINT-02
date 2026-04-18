@@ -62,6 +62,7 @@ export async function GET(request: Request) {
         publicKey: publicKey, // Only expose correct public key
         mode: mode,
         instructions: config.instructions || '',
+        visibilityLocations: data.visibilityLocations || [],
         config: data.providerName === 'fast_checkout' ? config : undefined,
       });
     });

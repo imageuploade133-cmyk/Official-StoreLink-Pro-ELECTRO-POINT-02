@@ -98,6 +98,7 @@ export interface PaymentProvider {
   config: string; // JSON string, encrypted
   isActive: boolean;
   mode: 'test' | 'live';
+  visibilityLocations?: string[];
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }

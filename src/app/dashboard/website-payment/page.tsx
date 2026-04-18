@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -26,6 +25,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { uploadImage } from '@/ai/flows/image-upload-flow';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 
 const bankAccountSchema = z.object({
   bankName: z.string().min(2, 'Bank name is required.'),
@@ -41,12 +45,6 @@ const instructionsSchema = z.object({
 type AccountFormValues = z.infer<typeof bankAccountSchema>;
 type InstructionsFormValues = z.infer<typeof instructionsSchema>;
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Switch } from '@/components/ui/switch';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-
 const paystackSchema = z.object({
   testPublicKey: z.string().optional(),
   testSecretKey: z.string().optional(),
@@ -54,6 +52,7 @@ const paystackSchema = z.object({
   liveSecretKey: z.string().optional(),
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
+  visibilityLocations: z.array(z.string()).default([]),
 });
 
 const flutterwaveSchema = z.object({
@@ -65,6 +64,7 @@ const flutterwaveSchema = z.object({
   liveEncryptionKey: z.string().optional(),
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
+  visibilityLocations: z.array(z.string()).default([]),
 });
 
 const stripeSchema = z.object({
@@ -74,6 +74,7 @@ const stripeSchema = z.object({
   liveSecretKey: z.string().optional(),
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
+  visibilityLocations: z.array(z.string()).default([]),
 });
 
 const opaySchema = z.object({
@@ -85,6 +86,7 @@ const opaySchema = z.object({
   webhookSecret: z.string().optional(),
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
+  visibilityLocations: z.array(z.string()).default([]),
 });
 
 const palmpaySchema = z.object({
@@ -96,6 +98,7 @@ const palmpaySchema = z.object({
   webhookSecret: z.string().optional(),
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
+  visibilityLocations: z.array(z.string()).default([]),
 });
 
 const paypalSchema = z.object({
@@ -105,11 +108,13 @@ const paypalSchema = z.object({
   liveSecretKey: z.string().optional(),
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
+  visibilityLocations: z.array(z.string()).default([]),
 });
 
 const payOnDeliverySchema = z.object({
   instructions: z.string().optional(),
   isActive: z.boolean().default(false),
+  visibilityLocations: z.array(z.string()).default([]),
 });
 
 const fastCheckoutSchema = z.object({
@@ -118,6 +123,7 @@ const fastCheckoutSchema = z.object({
   enableExpress: z.boolean().default(false),
   enableQuickPayButtons: z.boolean().default(false),
   isActive: z.boolean().default(false),
+  visibilityLocations: z.array(z.string()).default([]),
 });
 
 const nowpaymentsSchema = z.object({
@@ -125,6 +131,7 @@ const nowpaymentsSchema = z.object({
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
   acceptedCoins: z.array(z.string()).default(['btc', 'usdt', 'eth']),
+  visibilityLocations: z.array(z.string()).default([]),
 });
 
 const monnifySchema = z.object({
@@ -136,6 +143,12 @@ const monnifySchema = z.object({
   liveContractCode: z.string().optional(),
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
+  visibilityLocations: z.array(z.string()).default([]),
+});
+
+const manualSchema = z.object({
+  isActive: z.boolean().default(false),
+  visibilityLocations: z.array(z.string()).default([]),
 });
 
 type PaystackFormValues = z.infer<typeof paystackSchema>;
@@ -148,6 +161,48 @@ type PayOnDeliveryFormValues = z.infer<typeof payOnDeliverySchema>;
 type FastCheckoutFormValues = z.infer<typeof fastCheckoutSchema>;
 type NowPaymentsFormValues = z.infer<typeof nowpaymentsSchema>;
 type MonnifyFormValues = z.infer<typeof monnifySchema>;
+type ManualFormValues = z.infer<typeof manualSchema>;
+
+const LocationVisibility = ({ control, locations, name }: { control: any, locations: {id: string, name: string}[], name: string }) => {
+  if (!locations || locations.length === 0) return null;
+  
+  return (
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <FormItem className="space-y-3 pt-4 border-t">
+          <div>
+            <FormLabel className="text-base">Location Visibility</FormLabel>
+            <FormDescription>
+              Select which delivery locations this payment method should be visible for. 
+              If none selected, it will be visible for all locations.
+            </FormDescription>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+            {locations.map((loc) => (
+              <div key={loc.id} className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50 transition-colors">
+                <Checkbox 
+                  id={`${name}-${loc.id}`} 
+                  checked={field.value?.includes(loc.id)}
+                  onCheckedChange={(checked) => {
+                    const current = field.value || [];
+                    if (checked) {
+                      field.onChange([...current, loc.id]);
+                    } else {
+                      field.onChange(current.filter((id: string) => id !== loc.id));
+                    }
+                  }}
+                />
+                <Label htmlFor={`${name}-${loc.id}`} className="text-sm font-medium cursor-pointer flex-1">{loc.name}</Label>
+              </div>
+            ))}
+          </div>
+        </FormItem>
+      )}
+    />
+  );
+};
 
 export default function WebsitePaymentSettings() {
   const firestore = useFirestore();
@@ -246,6 +301,7 @@ export default function WebsitePaymentSettings() {
       liveSecretKey: paystackProvider?.config?.liveSecretKey || '',
       isActive: paystackProvider?.isActive || false,
       mode: paystackProvider?.mode || 'test',
+      visibilityLocations: paystackProvider?.visibilityLocations || [],
     },
   });
 
@@ -260,6 +316,7 @@ export default function WebsitePaymentSettings() {
       liveEncryptionKey: flutterwaveProvider?.config?.liveEncryptionKey || '',
       isActive: flutterwaveProvider?.isActive || false,
       mode: flutterwaveProvider?.mode || 'test',
+      visibilityLocations: flutterwaveProvider?.visibilityLocations || [],
     },
   });
 
@@ -272,6 +329,7 @@ export default function WebsitePaymentSettings() {
       liveSecretKey: stripeProvider?.config?.liveSecretKey || '',
       isActive: stripeProvider?.isActive || false,
       mode: stripeProvider?.mode || 'test',
+      visibilityLocations: stripeProvider?.visibilityLocations || [],
     },
   });
 
@@ -286,6 +344,7 @@ export default function WebsitePaymentSettings() {
       webhookSecret: opayProvider?.config?.webhookSecret || '',
       isActive: opayProvider?.isActive || false,
       mode: opayProvider?.mode || 'test',
+      visibilityLocations: opayProvider?.visibilityLocations || [],
     },
   });
 
@@ -300,6 +359,7 @@ export default function WebsitePaymentSettings() {
       webhookSecret: palmpayProvider?.config?.webhookSecret || '',
       isActive: palmpayProvider?.isActive || false,
       mode: palmpayProvider?.mode || 'test',
+      visibilityLocations: palmpayProvider?.visibilityLocations || [],
     },
   });
 
@@ -312,6 +372,7 @@ export default function WebsitePaymentSettings() {
       liveSecretKey: paypalProvider?.config?.liveSecretKey || '',
       isActive: paypalProvider?.isActive || false,
       mode: paypalProvider?.mode || 'test',
+      visibilityLocations: paypalProvider?.visibilityLocations || [],
     },
   });
 
@@ -320,6 +381,7 @@ export default function WebsitePaymentSettings() {
     defaultValues: {
       instructions: payOnDeliveryProvider?.config?.instructions || 'Pay with cash or card upon delivery.',
       isActive: payOnDeliveryProvider?.isActive || false,
+      visibilityLocations: payOnDeliveryProvider?.visibilityLocations || [],
     },
   });
 
@@ -331,6 +393,7 @@ export default function WebsitePaymentSettings() {
       enableExpress: fastCheckoutProvider?.config?.enableExpress || false,
       enableQuickPayButtons: fastCheckoutProvider?.config?.enableQuickPayButtons || false,
       isActive: fastCheckoutProvider?.isActive || false,
+      visibilityLocations: fastCheckoutProvider?.visibilityLocations || [],
     },
   });
 
@@ -341,6 +404,7 @@ export default function WebsitePaymentSettings() {
       isActive: nowpaymentsProvider?.isActive || false,
       mode: nowpaymentsProvider?.mode || 'test',
       acceptedCoins: nowpaymentsProvider?.config?.acceptedCoins || ['btc', 'usdt', 'eth'],
+      visibilityLocations: nowpaymentsProvider?.visibilityLocations || [],
     },
   });
 
@@ -355,7 +419,16 @@ export default function WebsitePaymentSettings() {
       liveContractCode: monnifyProvider?.config?.liveContractCode || '',
       isActive: monnifyProvider?.isActive || false,
       mode: monnifyProvider?.mode || 'test',
+      visibilityLocations: monnifyProvider?.visibilityLocations || [],
     },
+  });
+
+  const manualForm = useForm<ManualFormValues>({
+    resolver: zodResolver(manualSchema),
+    defaultValues: {
+      isActive: manualProvider?.isActive ?? true,
+      visibilityLocations: manualProvider?.visibilityLocations || [],
+    }
   });
 
   useEffect(() => {
@@ -367,6 +440,7 @@ export default function WebsitePaymentSettings() {
         liveSecretKey: paystackProvider.config?.liveSecretKey || '',
         isActive: paystackProvider.isActive || false,
         mode: paystackProvider.mode || 'test',
+        visibilityLocations: paystackProvider.visibilityLocations || [],
       });
     }
     if (flutterwaveProvider) {
@@ -379,6 +453,7 @@ export default function WebsitePaymentSettings() {
         liveEncryptionKey: flutterwaveProvider.config?.liveEncryptionKey || '',
         isActive: flutterwaveProvider.isActive || false,
         mode: flutterwaveProvider.mode || 'test',
+        visibilityLocations: flutterwaveProvider.visibilityLocations || [],
       });
     }
     if (stripeProvider) {
@@ -389,6 +464,7 @@ export default function WebsitePaymentSettings() {
         liveSecretKey: stripeProvider.config?.liveSecretKey || '',
         isActive: stripeProvider.isActive || false,
         mode: stripeProvider.mode || 'test',
+        visibilityLocations: stripeProvider.visibilityLocations || [],
       });
     }
     if (opayProvider) {
@@ -401,6 +477,7 @@ export default function WebsitePaymentSettings() {
         webhookSecret: opayProvider.config?.webhookSecret || '',
         isActive: opayProvider.isActive || false,
         mode: opayProvider.mode || 'test',
+        visibilityLocations: opayProvider.visibilityLocations || [],
       });
     }
     if (palmpayProvider) {
@@ -413,6 +490,7 @@ export default function WebsitePaymentSettings() {
         webhookSecret: palmpayProvider.config?.webhookSecret || '',
         isActive: palmpayProvider.isActive || false,
         mode: palmpayProvider.mode || 'test',
+        visibilityLocations: palmpayProvider.visibilityLocations || [],
       });
     }
     if (paypalProvider) {
@@ -423,12 +501,14 @@ export default function WebsitePaymentSettings() {
         liveSecretKey: paypalProvider.config?.liveSecretKey || '',
         isActive: paypalProvider.isActive || false,
         mode: paypalProvider.mode || 'test',
+        visibilityLocations: paypalProvider.visibilityLocations || [],
       });
     }
     if (payOnDeliveryProvider) {
       payOnDeliveryForm.reset({
         instructions: payOnDeliveryProvider.config?.instructions || 'Pay with cash or card upon delivery.',
         isActive: payOnDeliveryProvider.isActive || false,
+        visibilityLocations: payOnDeliveryProvider.visibilityLocations || [],
       });
     }
     if (fastCheckoutProvider) {
@@ -438,6 +518,7 @@ export default function WebsitePaymentSettings() {
         enableExpress: fastCheckoutProvider.config?.enableExpress || false,
         enableQuickPayButtons: fastCheckoutProvider.config?.enableQuickPayButtons || false,
         isActive: fastCheckoutProvider.isActive || false,
+        visibilityLocations: fastCheckoutProvider.visibilityLocations || [],
       });
     }
     if (nowpaymentsProvider) {
@@ -446,8 +527,9 @@ export default function WebsitePaymentSettings() {
         isActive: nowpaymentsProvider.isActive || false,
         mode: nowpaymentsProvider.mode || 'test',
         acceptedCoins: nowpaymentsProvider.config?.acceptedCoins || ['btc', 'usdt', 'eth'],
+        visibilityLocations: nowpaymentsProvider.visibilityLocations || [],
       });
-
+    }
     if (monnifyProvider) {
       monnifyForm.reset({
         testApiKey: monnifyProvider.config?.testApiKey || '',
@@ -458,16 +540,22 @@ export default function WebsitePaymentSettings() {
         liveContractCode: monnifyProvider.config?.liveContractCode || '',
         isActive: monnifyProvider.isActive || false,
         mode: monnifyProvider.mode || 'test',
+        visibilityLocations: monnifyProvider.visibilityLocations || [],
       });
     }
+    if (manualProvider) {
+      manualForm.reset({
+        isActive: manualProvider.isActive,
+        visibilityLocations: manualProvider.visibilityLocations || [],
+      });
     }
-  }, [paystackProvider, flutterwaveProvider, stripeProvider, opayProvider, palmpayProvider, paypalProvider, payOnDeliveryProvider, fastCheckoutProvider, nowpaymentsProvider, monnifyProvider, paystackForm, flutterwaveForm, stripeForm, opayForm, palmpayForm, paypalForm, payOnDeliveryForm, fastCheckoutForm, nowpaymentsForm, monnifyForm]);
+  }, [paystackProvider, flutterwaveProvider, stripeProvider, opayProvider, palmpayProvider, paypalProvider, payOnDeliveryProvider, fastCheckoutProvider, nowpaymentsProvider, monnifyProvider, manualProvider, paystackForm, flutterwaveForm, stripeForm, opayForm, palmpayForm, paypalForm, payOnDeliveryForm, fastCheckoutForm, nowpaymentsForm, monnifyForm, manualForm]);
 
   const saveProviderSettings = async (providerName: string, values: any) => {
     if (!user) return;
     setIsSaving(true);
     try {
-      const { isActive, mode, ...config } = values;
+      const { isActive, mode, visibilityLocations, ...config } = values;
       
       // Filter out masked keys before saving if they haven't been changed
       Object.keys(config).forEach(key => {
@@ -487,6 +575,7 @@ export default function WebsitePaymentSettings() {
           providerName,
           isActive,
           mode,
+          visibilityLocations,
           config,
           storeId: currentStoreId || 'global',
         }),
@@ -553,6 +642,7 @@ export default function WebsitePaymentSettings() {
   const isLoadingSettings = isLoadingMainSettings && (currentStoreId ? isLoadingOldSettings : true);
 
   const bankAccounts = settingsData?.bankAccounts || [];
+  const deliveryLocations = settingsData?.deliveryLocations || [];
 
   const instructionsForm = useForm<InstructionsFormValues>({
     resolver: zodResolver(instructionsSchema),
@@ -568,20 +658,6 @@ export default function WebsitePaymentSettings() {
       });
     }
   }, [settingsData, instructionsForm]);
-
-  const manualForm = useForm({
-    defaultValues: {
-      isActive: manualProvider?.isActive ?? true,
-    }
-  });
-
-  useEffect(() => {
-    if (manualProvider) {
-      manualForm.reset({
-        isActive: manualProvider.isActive,
-      });
-    }
-  }, [manualProvider, manualForm]);
 
   const onSaveInstructions = async (data: InstructionsFormValues) => {
     if (!firestore) return;
@@ -855,6 +931,8 @@ export default function WebsitePaymentSettings() {
                           Set this in your Paystack dashboard to receive payment notifications.
                         </p>
                       </div>
+
+                      <LocationVisibility control={paystackForm.control} locations={deliveryLocations} name="visibilityLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -1019,6 +1097,8 @@ export default function WebsitePaymentSettings() {
                           </FormItem>
                         )}
                       />
+                      
+                      <LocationVisibility control={flutterwaveForm.control} locations={deliveryLocations} name="visibilityLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -1154,6 +1234,8 @@ export default function WebsitePaymentSettings() {
                           )}
                         />
                       </div>
+                      
+                      <LocationVisibility control={stripeForm.control} locations={deliveryLocations} name="visibilityLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -1289,6 +1371,8 @@ export default function WebsitePaymentSettings() {
                           )}
                         />
                       </div>
+                      
+                      <LocationVisibility control={paypalForm.control} locations={deliveryLocations} name="visibilityLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -1448,6 +1532,8 @@ export default function WebsitePaymentSettings() {
                           </FormItem>
                         )}
                       />
+                      
+                      <LocationVisibility control={opayForm.control} locations={deliveryLocations} name="visibilityLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -1607,6 +1693,8 @@ export default function WebsitePaymentSettings() {
                           </FormItem>
                         )}
                       />
+                      
+                      <LocationVisibility control={palmpayForm.control} locations={deliveryLocations} name="visibilityLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -1678,6 +1766,8 @@ export default function WebsitePaymentSettings() {
                           </FormItem>
                         )}
                       />
+                      
+                      <LocationVisibility control={payOnDeliveryForm.control} locations={deliveryLocations} name="visibilityLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6">
                       <Button type="submit" disabled={isSaving}>
@@ -1817,6 +1907,8 @@ export default function WebsitePaymentSettings() {
                           Set this in your NOWPayments dashboard to receive payment notifications.
                         </p>
                       </div>
+                      
+                      <LocationVisibility control={nowpaymentsForm.control} locations={deliveryLocations} name="visibilityLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -1835,7 +1927,7 @@ export default function WebsitePaymentSettings() {
               <Card className="bg-primary/5 border-primary/20 shadow-none sticky top-6">
                 <CardHeader>
                   <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary">
-                    <Coins className="h-4 w-4" /> About NOWPayments
+                    <Info className="h-4 w-4" /> About NOWPayments
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="text-sm space-y-4 text-muted-foreground leading-relaxed">
@@ -1996,6 +2088,8 @@ export default function WebsitePaymentSettings() {
                           Set this in your Monnify dashboard to receive payment notifications.
                         </p>
                       </div>
+                      
+                      <LocationVisibility control={monnifyForm.control} locations={deliveryLocations} name="visibilityLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -2124,6 +2218,8 @@ export default function WebsitePaymentSettings() {
                           )}
                         />
                       </div>
+                      
+                      <LocationVisibility control={fastCheckoutForm.control} locations={deliveryLocations} name="visibilityLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6">
                       <Button type="submit" disabled={isSaving}>
@@ -2165,21 +2261,38 @@ export default function WebsitePaymentSettings() {
         <TabsContent value="manual" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2"><Landmark className="h-5 w-5 text-gray-600" />Manual Payment</CardTitle>
-                    <CardDescription>Enable or disable manual bank transfers.</CardDescription>
-                  </div>
-                  <Switch 
-                    checked={manualForm.watch('isActive')} 
-                    onCheckedChange={(checked) => {
-                      manualForm.setValue('isActive', checked);
-                      saveProviderSettings('manual', { isActive: checked });
-                    }} 
-                  />
-                </CardHeader>
-              </Card>
+              <Form {...manualForm}>
+                <form onSubmit={manualForm.handleSubmit((values) => saveProviderSettings('manual', values))}>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                      <div>
+                        <CardTitle className="flex items-center gap-2"><Landmark className="h-5 w-5 text-gray-600" />Manual Payment</CardTitle>
+                        <CardDescription>Enable or disable manual bank transfers.</CardDescription>
+                      </div>
+                      <FormField
+                        control={manualForm.control}
+                        name="isActive"
+                        render={({ field }) => (
+                          <FormItem className="flex items-center gap-2 space-y-0">
+                            <FormControl>
+                              <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </CardHeader>
+                    <CardContent>
+                      <LocationVisibility control={manualForm.control} locations={deliveryLocations} name="visibilityLocations" />
+                    </CardContent>
+                    <CardFooter className="border-t pt-6">
+                      <Button type="submit" disabled={isSaving}>
+                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                        Save Manual Payment Settings
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </form>
+              </Form>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
