@@ -628,7 +628,14 @@ export default function CheckoutPage() {
                              method.provider === 'nowpayments' ? <Coins className="mb-3 h-8 w-8 text-amber-500" /> :
                              method.provider === 'monnify' ? <CreditCard className="mb-3 h-8 w-8 text-blue-500" /> :
                              <CreditCard className="mb-3 h-8 w-8" />}
-
+                            
+                            <span className="font-bold text-sm mb-1">{method.name}</span>
+                            <p className="text-[10px] text-muted-foreground line-clamp-2">
+                                {method.instructions || 
+                                 (method.provider === 'pay_on_delivery' ? 'Pay when you receive your order' : 
+                                  method.provider === 'manual' ? 'Transfer to our bank account' : 
+                                  'Secure online payment')}
+                            </p>
                         </Label>
                         </div>
                     ))}
