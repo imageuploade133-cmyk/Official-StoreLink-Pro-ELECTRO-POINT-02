@@ -67,6 +67,7 @@ import {
   DrawerFooter,
   DrawerClose,
 } from '@/components/ui/drawer';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CategoryForm, type CategoryFormValues } from '../inventory/CategoryForm';
 import { cn, convertToDateSafely } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -701,253 +702,279 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                         />
                         
                         <div className="space-y-6 pt-8 border-t border-dashed">
-                            <h3 className="text-sm font-black uppercase tracking-[0.2em] text-primary">Target Merchandising</h3>
-                            <FormField control={form.control} name="selectionType" render={({ field }) => (
-                                <FormItem className="space-y-3">
-                                    <FormLabel className="font-bold">Selection Strategy</FormLabel>
-                                    <FormControl>
-                                        <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                            <div className="flex items-center space-x-2 border rounded-xl p-4 transition-all hover:bg-muted/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                                                <RadioGroupItem value="category" id="selection-category" />
-                                                <Label htmlFor="selection-category" className="font-bold cursor-pointer flex flex-col">
-                                                    <span>Dynamic Category</span>
-                                                    <span className="text-[10px] font-normal text-muted-foreground">Sync with catalog</span>
-                                                </Label>
-                                            </div>
-                                            <div className="flex items-center space-x-2 border rounded-xl p-4 transition-all hover:bg-muted/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                                                <RadioGroupItem value="manual" id="selection-manual" />
-                                                <Label htmlFor="selection-manual" className="font-bold cursor-pointer flex flex-col">
-                                                    <span>Hand-Picked</span>
-                                                    <span className="text-[10px] font-normal text-muted-foreground">Individual items</span>
-                                                </Label>
-                                            </div>
-                                            <div className="flex items-center space-x-2 border rounded-xl p-4 transition-all hover:bg-muted/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                                                <RadioGroupItem value="custom-ui" id="selection-custom-ui" />
-                                                <Label htmlFor="selection-custom-ui" className="font-bold cursor-pointer flex flex-col">
-                                                    <span>Banner / Video</span>
-                                                    <span className="text-[10px] font-normal text-muted-foreground">Custom visual UI</span>
-                                                </Label>
-                                            </div>
-                                        </RadioGroup>
-                                    </FormControl>
-                                </FormItem>
-                            )}/>
-
-                            {selectionType === 'category' && (
-                                <div className="space-y-2 max-w-md">
-                                    <FormLabel className="font-bold">Target Category <span className="text-destructive">*</span></FormLabel>
-                                    <div className="flex gap-2">
-                                        <FormField
-                                            control={form.control}
-                                            name="categoryId"
-                                            render={({ field }) => (
-                                                <FormControl>
-                                                    <div className="flex gap-2 w-full">
-                                                        <Input 
-                                                            value={categories?.find(c => c.id === field.value)?.name || 'No Category Selected'} 
-                                                            readOnly 
-                                                            className="bg-muted font-bold cursor-default" 
-                                                        />
-                                                        <Button 
-                                                            type="button" 
-                                                            variant="outline" 
-                                                            onClick={() => setIsChangeCategoryModalOpen(true)}
-                                                            className="shrink-0"
-                                                        >
-                                                            {field.value ? 'Change' : 'Select'}
-                                                        </Button>
-                                                    </div>
-                                                </FormControl>
-                                            )}
-                                        />
+                            <Tabs 
+                                value={selectionType === 'custom-ui' ? 'visual' : 'products'} 
+                                onValueChange={(val) => {
+                                    if (val === 'visual') {
+                                        form.setValue('selectionType', 'custom-ui', { shouldValidate: true });
+                                    } else {
+                                        if (selectionType === 'custom-ui') {
+                                            form.setValue('selectionType', 'category', { shouldValidate: true });
+                                        }
+                                    }
+                                }}
+                                className="w-full"
+                            >
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                                    <div>
+                                        <h3 className="text-sm font-black uppercase tracking-[0.2em] text-primary">Section Content Mode</h3>
+                                        <p className="text-xs text-muted-foreground mt-1">Choose between displaying products or a custom visual banner.</p>
                                     </div>
-                                    <p className="text-[10px] text-muted-foreground italic">Automatically pulls all visible products from this category.</p>
-                                    <FormField control={form.control} name="categoryId" render={() => <FormMessage />} />
+                                    <TabsList className="grid grid-cols-2 w-full sm:w-[400px] h-12 p-1 bg-muted/50 rounded-xl">
+                                        <TabsTrigger value="products" className="rounded-lg font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm gap-2">
+                                            <Box className="h-4 w-4" /> Products
+                                        </TabsTrigger>
+                                        <TabsTrigger value="visual" className="rounded-lg font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm gap-2">
+                                            <ImageIcon className="h-4 w-4" /> Visual UI
+                                        </TabsTrigger>
+                                    </TabsList>
                                 </div>
-                            )}
 
-                            {selectionType === 'manual' && (
-                                <div className="space-y-4">
-                                    <FormLabel className="font-bold">Hand-Picked Products ({selectedProductIds.length}) <span className="text-destructive">*</span></FormLabel>
-                                    <Popover open={openProductSearch} onOpenChange={setOpenProductSearch}>
-                                        <PopoverTrigger asChild>
-                                            <Button variant="outline" className="w-full justify-start font-normal text-muted-foreground h-11 border-dashed">
-                                                <SearchIcon className="mr-2 h-4 w-4"/>
-                                                Search the master catalog to add items...
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
-                                            <Command shouldFilter={false}>
-                                                <CommandInput placeholder="Type product name..." value={productSearchTerm} onValueChange={setProductSearchTerm}/>
-                                                <CommandList>
-                                                    {isLoadingProducts && <div className="p-4 text-sm text-center"><Loader2 className="h-4 w-4 animate-spin mx-auto"/></div>}
-                                                    <CommandEmpty>No matching products found.</CommandEmpty>
-                                                    <CommandGroup>
-                                                        {filteredProductsForSearch.slice(0, 50).map(p => (
-                                                            <CommandItem key={p.id} value={p.name} onSelect={() => handleProductSelect(p.id)} className="cursor-pointer">
-                                                                {p.name} {p.sku ? `(${p.sku})` : ''}
-                                                            </CommandItem>
-                                                        ))}
-                                                    </CommandGroup>
-                                                </CommandList>
-                                            </Command>
-                                        </PopoverContent>
-                                    </Popover>
-                                    <div className="bg-muted/10 p-4 rounded-2xl border-2 border-dashed min-h-[120px]">
-                                        {selectedProductIds.length === 0 ? (
-                                            <p className="text-sm text-center text-muted-foreground pt-8">No products curated yet. Search above to begin.</p>
-                                        ) : (
-                                            <div className="flex wrap gap-2">
-                                                {selectedProductIds.map(id => {
-                                                    const product = productMap.get(id);
-                                                    return (
-                                                        <Badge key={id} variant="secondary" className="pl-3 pr-1 py-1.5 gap-2 text-xs font-bold border shadow-sm">
-                                                            {product?.name || 'Loading...'}
-                                                            <Button type="button" variant="ghost" size="icon" className="h-5 w-5 hover:bg-destructive hover:text-white rounded-full transition-colors" onClick={() => handleProductDeselect(id)}>
-                                                                <X className="h-3 w-3"/>
-                                                            </Button>
-                                                        </Badge>
-                                                    )
-                                                })}
+                                <TabsContent value="products" className="space-y-8 animate-in fade-in duration-500 focus-visible:outline-none">
+                                    <FormField control={form.control} name="selectionType" render={({ field }) => (
+                                        <FormItem className="space-y-3">
+                                            <div className="flex items-center gap-2">
+                                                <SlidersHorizontal className="h-4 w-4 text-primary" />
+                                                <FormLabel className="font-bold">Target Merchandising Strategy</FormLabel>
                                             </div>
-                                        )}
-                                    </div>
-                                    <FormField control={form.control} name="productIds" render={() => <FormMessage />} />
-                                </div>
-                            )}
-
-                            {selectionType === 'custom-ui' && (
-                                <div className="space-y-8 animate-in fade-in slide-in-from-top-2 duration-500">
-                                    <FormField control={form.control} name="uiType" render={({ field }) => (
-                                        <FormItem className="space-y-4">
-                                            <FormLabel className="font-black text-xs uppercase tracking-widest text-primary">UI Design Protocol</FormLabel>
                                             <FormControl>
-                                                <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                    <div className="relative">
-                                                        <RadioGroupItem value="image" id="f-type-image" className="peer sr-only" />
-                                                        <Label htmlFor="f-type-image" className="flex items-center gap-4 p-6 rounded-2xl border-2 bg-muted/5 cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 transition-all">
-                                                            <ImageIcon className="h-6 w-6" />
-                                                            <div><p className="font-bold">Image Visual</p><p className="text-[10px] text-muted-foreground uppercase">Banners</p></div>
+                                                <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                    <div className="flex items-center space-x-2 border rounded-xl p-4 transition-all hover:bg-muted/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                                                        <RadioGroupItem value="category" id="selection-category" />
+                                                        <Label htmlFor="selection-category" className="font-bold cursor-pointer flex flex-col">
+                                                            <span>Dynamic Category</span>
+                                                            <span className="text-[10px] font-normal text-muted-foreground">Sync with catalog</span>
                                                         </Label>
                                                     </div>
-                                                    <div className="relative">
-                                                        <RadioGroupItem value="video" id="f-type-video" className="peer sr-only" />
-                                                        <Label htmlFor="f-type-video" className="flex items-center gap-4 p-6 rounded-2xl border-2 bg-muted/5 cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 transition-all">
-                                                            <Video className="h-6 w-6" />
-                                                            <div><p className="font-bold">Video Motion</p><p className="text-[10px] text-muted-foreground uppercase">MP4 / Stream</p></div>
-                                                        </Label>
-                                                    </div>
-                                                    <div className="relative">
-                                                        <RadioGroupItem value="html" id="f-type-html" className="peer sr-only" />
-                                                        <Label htmlFor="f-type-html" className="flex items-center gap-4 p-6 rounded-2xl border-2 bg-muted/5 cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 transition-all">
-                                                            <Code className="h-6 w-6" />
-                                                            <div><p className="font-bold">Bespoke HTML</p><p className="text-[10px] text-muted-foreground uppercase">Raw Code</p></div>
+                                                    <div className="flex items-center space-x-2 border rounded-xl p-4 transition-all hover:bg-muted/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                                                        <RadioGroupItem value="manual" id="selection-manual" />
+                                                        <Label htmlFor="selection-manual" className="font-bold cursor-pointer flex flex-col">
+                                                            <span>Hand-Picked</span>
+                                                            <span className="text-[10px] font-normal text-muted-foreground">Individual items</span>
                                                         </Label>
                                                     </div>
                                                 </RadioGroup>
                                             </FormControl>
                                         </FormItem>
-                                    )} />
+                                    )}/>
 
-                                    <Separator className="border-dashed" />
-
-                                    {uiType === 'image' || uiType === 'video' ? (
-                                        <div className="space-y-8">
-                                            {uiType === 'image' ? (
-                                                <FormField control={form.control} name="imageUrl" render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel className="font-bold">Primary Design Asset <span className="text-destructive">*</span></FormLabel>
-                                                        <div className="flex items-start gap-6">
-                                                            {imageUrl ? (
-                                                                <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border shadow-xl bg-white shrink-0">
-                                                                    <Image src={imageUrl} alt="Preview" fill className="object-cover" unoptimized />
-                                                                </div>
-                                                            ) : (
-                                                                <div className="w-48 aspect-video rounded-2xl border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground bg-muted/20 shrink-0">
-                                                                    <ImageIcon className="h-8 w-8 opacity-20" />
-                                                                </div>
-                                                            )}
-                                                            <div className="flex-grow space-y-3">
-                                                                <FormControl><Input placeholder="https://example.com/banner.jpg" {...field} value={field.value || ''} className="h-11" /></FormControl>
-                                                                <Button asChild variant="outline" size="sm" disabled={isUploading}>
-                                                                    <label htmlFor="f-ui-image-upload" className="cursor-pointer">
-                                                                        {isUploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Upload className="h-4 w-4 mr-2" />}
-                                                                        Upload Background
-                                                                    </label>
+                                    {selectionType === 'category' && (
+                                        <div className="space-y-2 max-w-md animate-in slide-in-from-left-2 duration-300">
+                                            <FormLabel className="font-bold">Target Category <span className="text-destructive">*</span></FormLabel>
+                                            <div className="flex gap-2">
+                                                <FormField
+                                                    control={form.control}
+                                                    name="categoryId"
+                                                    render={({ field }) => (
+                                                        <FormControl>
+                                                            <div className="flex gap-2 w-full">
+                                                                <Input 
+                                                                    value={categories?.find(c => c.id === field.value)?.name || 'No Category Selected'} 
+                                                                    readOnly 
+                                                                    className="bg-muted font-bold cursor-default" 
+                                                                />
+                                                                <Button 
+                                                                    type="button" 
+                                                                    variant="outline" 
+                                                                    onClick={() => setIsChangeCategoryModalOpen(true)}
+                                                                    className="shrink-0"
+                                                                >
+                                                                    {field.value ? 'Change' : 'Select'}
                                                                 </Button>
-                                                                <input id="f-ui-image-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
                                                             </div>
+                                                        </FormControl>
+                                                    )}
+                                                />
+                                            </div>
+                                            <p className="text-[10px] text-muted-foreground italic">Automatically pulls all visible products from this category.</p>
+                                            <FormField control={form.control} name="categoryId" render={() => <FormMessage />} />
+                                        </div>
+                                    )}
+
+                                    {selectionType === 'manual' && (
+                                        <div className="space-y-4 animate-in slide-in-from-left-2 duration-300">
+                                            <FormLabel className="font-bold">Hand-Picked Products ({selectedProductIds.length}) <span className="text-destructive">*</span></FormLabel>
+                                            <Popover open={openProductSearch} onOpenChange={setOpenProductSearch}>
+                                                <PopoverTrigger asChild>
+                                                    <Button variant="outline" className="w-full justify-start font-normal text-muted-foreground h-11 border-dashed">
+                                                        <SearchIcon className="mr-2 h-4 w-4"/>
+                                                        Search the master catalog to add items...
+                                                    </Button>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                                                    <Command shouldFilter={false}>
+                                                        <CommandInput placeholder="Type product name..." value={productSearchTerm} onValueChange={setProductSearchTerm}/>
+                                                        <CommandList>
+                                                            {isLoadingProducts && <div className="p-4 text-sm text-center"><Loader2 className="h-4 w-4 animate-spin mx-auto"/></div>}
+                                                            <CommandEmpty>No matching products found.</CommandEmpty>
+                                                            <CommandGroup>
+                                                                {filteredProductsForSearch.slice(0, 50).map(p => (
+                                                                    <CommandItem key={p.id} value={p.name} onSelect={() => handleProductSelect(p.id)} className="cursor-pointer">
+                                                                        {p.name} {p.sku ? `(${p.sku})` : ''}
+                                                                    </CommandItem>
+                                                                ))}
+                                                            </CommandGroup>
+                                                        </CommandList>
+                                                    </Command>
+                                                </PopoverContent>
+                                            </Popover>
+                                            <div className="bg-muted/10 p-4 rounded-2xl border-2 border-dashed min-h-[120px]">
+                                                {selectedProductIds.length === 0 ? (
+                                                    <p className="text-sm text-center text-muted-foreground pt-8">No products curated yet. Search above to begin.</p>
+                                                ) : (
+                                                    <div className="flex wrap gap-2">
+                                                        {selectedProductIds.map(id => {
+                                                            const product = productMap.get(id);
+                                                            return (
+                                                                <Badge key={id} variant="secondary" className="pl-3 pr-1 py-1.5 gap-2 text-xs font-bold border shadow-sm">
+                                                                    {product?.name || 'Loading...'}
+                                                                    <Button type="button" variant="ghost" size="icon" className="h-5 w-5 hover:bg-destructive hover:text-white rounded-full transition-colors" onClick={() => handleProductDeselect(id)}>
+                                                                        <X className="h-3 w-3"/>
+                                                                    </Button>
+                                                                </Badge>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <FormField control={form.control} name="productIds" render={() => <FormMessage />} />
+                                        </div>
+                                    )}
+                                </TabsContent>
+
+                                <TabsContent value="visual" className="space-y-8 animate-in fade-in duration-500 focus-visible:outline-none">
+                                    <div className="space-y-8">
+                                        <FormField control={form.control} name="uiType" render={({ field }) => (
+                                            <FormItem className="space-y-4">
+                                                <FormLabel className="font-black text-xs uppercase tracking-widest text-primary">UI Design Protocol</FormLabel>
+                                                <FormControl>
+                                                    <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                        <div className="relative">
+                                                            <RadioGroupItem value="image" id="f-type-image" className="peer sr-only" />
+                                                            <Label htmlFor="f-type-image" className="flex items-center gap-4 p-6 rounded-2xl border-2 bg-muted/5 cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 transition-all">
+                                                                <ImageIcon className="h-6 w-6" />
+                                                                <div><p className="font-bold">Image Visual</p><p className="text-[10px] text-muted-foreground uppercase">Banners</p></div>
+                                                            </Label>
                                                         </div>
+                                                        <div className="relative">
+                                                            <RadioGroupItem value="video" id="f-type-video" className="peer sr-only" />
+                                                            <Label htmlFor="f-type-video" className="flex items-center gap-4 p-6 rounded-2xl border-2 bg-muted/5 cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 transition-all">
+                                                                <Video className="h-6 w-6" />
+                                                                <div><p className="font-bold">Video Motion</p><p className="text-[10px] text-muted-foreground uppercase">MP4 / Stream</p></div>
+                                                            </Label>
+                                                        </div>
+                                                        <div className="relative">
+                                                            <RadioGroupItem value="html" id="f-type-html" className="peer sr-only" />
+                                                            <Label htmlFor="f-type-html" className="flex items-center gap-4 p-6 rounded-2xl border-2 bg-muted/5 cursor-pointer peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 transition-all">
+                                                                <Code className="h-6 w-6" />
+                                                                <div><p className="font-bold">Bespoke HTML</p><p className="text-[10px] text-muted-foreground uppercase">Raw Code</p></div>
+                                                            </Label>
+                                                        </div>
+                                                    </RadioGroup>
+                                                </FormControl>
+                                            </FormItem>
+                                        )} />
+
+                                        <Separator className="border-dashed" />
+
+                                        {uiType === 'image' || uiType === 'video' ? (
+                                            <div className="space-y-8 animate-in slide-in-from-right-2 duration-300">
+                                                {uiType === 'image' ? (
+                                                    <FormField control={form.control} name="imageUrl" render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel className="font-bold">Primary Design Asset <span className="text-destructive">*</span></FormLabel>
+                                                            <div className="flex items-start gap-6">
+                                                                {imageUrl ? (
+                                                                    <div className="relative w-48 aspect-video rounded-2xl overflow-hidden border shadow-xl bg-white shrink-0">
+                                                                        <Image src={imageUrl} alt="Preview" fill className="object-cover" unoptimized />
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="w-48 aspect-video rounded-2xl border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground bg-muted/20 shrink-0">
+                                                                        <ImageIcon className="h-8 w-8 opacity-20" />
+                                                                    </div>
+                                                                )}
+                                                                <div className="flex-grow space-y-3">
+                                                                    <FormControl><Input placeholder="https://example.com/banner.jpg" {...field} value={field.value || ''} className="h-11" /></FormControl>
+                                                                    <Button asChild variant="outline" size="sm" disabled={isUploading}>
+                                                                        <label htmlFor="f-ui-image-upload" className="cursor-pointer">
+                                                                            {isUploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Upload className="h-4 w-4 mr-2" />}
+                                                                            Upload Background
+                                                                        </label>
+                                                                    </Button>
+                                                                    <input id="f-ui-image-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                                                                </div>
+                                                            </div>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )} />
+                                                ) : (
+                                                    <div className="space-y-6">
+                                                        <FormField control={form.control} name="videoUrl" render={({ field }) => (
+                                                            <FormItem>
+                                                                <FormLabel className="font-bold">Video URL <span className="text-destructive">*</span></FormLabel>
+                                                                <FormControl><Input placeholder="https://example.com/video.mp4" {...field} value={field.value || ''} className="h-11" /></FormControl>
+                                                                <FormDescription>Direct link to MP4 video file.</FormDescription>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )} />
+                                                        <FormField control={form.control} name="videoPosterUrl" render={({ field }) => (
+                                                            <FormItem>
+                                                                <FormLabel className="font-bold">Video Poster (Thumbnail)</FormLabel>
+                                                                <FormControl><Input placeholder="https://example.com/poster.jpg" {...field} value={field.value || ''} className="h-11" /></FormControl>
+                                                                <FormDescription>Image displayed before the video starts.</FormDescription>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )} />
+                                                    </div>
+                                                )}
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                                    <FormField control={form.control} name="overlayTitle" render={({ field }) => (
+                                                        <FormItem><FormLabel className="font-bold">Display Heading</FormLabel><FormControl><Input placeholder="e.g., NEW ARRIVALS" {...field} value={field.value || ''} /></FormControl></FormItem>
+                                                    )} />
+                                                    <FormField control={form.control} name="buttonText" render={({ field }) => (
+                                                        <FormItem><FormLabel className="font-bold">Action Button Label</FormLabel><FormControl><Input placeholder="Explore Now" {...field} value={field.value || ''} /></FormControl></FormItem>
+                                                    )} />
+                                                </div>
+
+                                                <FormField control={form.control} name="linkUrl" render={({ field }) => (
+                                                    <FormItem><FormLabel className="font-bold">Destination URL</FormLabel><FormControl><Input placeholder="https://..." {...field} value={field.value || ''} /></FormControl></FormItem>
+                                                )} />
+
+                                                <FormField control={form.control} name="fullWidth" render={({ field }) => (
+                                                    <FormItem className="flex items-center justify-between p-4 border rounded-2xl bg-muted/5 transition-all hover:bg-muted/10">
+                                                        <div className="space-y-0.5">
+                                                            <FormLabel className="font-black text-[10px] uppercase tracking-wider flex items-center gap-2">
+                                                                <Maximize className="h-3.5 w-3.5 text-blue-500" /> Edge-to-Edge
+                                                            </FormLabel>
+                                                            <p className="text-[8px] font-bold text-muted-foreground uppercase">Disable container padding</p>
+                                                        </div>
+                                                        <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
+                                                    </FormItem>
+                                                )} />
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-6 animate-in slide-in-from-right-2 duration-300">
+                                                <FormField control={form.control} name="htmlContent" render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel className="font-black text-xs uppercase tracking-widest text-primary">Custom HTML Logic <span className="text-destructive">*</span></FormLabel>
+                                                        <FormControl>
+                                                            <Textarea 
+                                                                {...field} 
+                                                                value={field.value || ''} 
+                                                                placeholder="<div class='custom-banner'>...</div>"
+                                                                className="min-h-[300px] font-mono text-sm leading-relaxed bg-slate-950 text-emerald-400 p-6 rounded-2xl"
+                                                            />
+                                                        </FormControl>
+                                                        <FormDescription>Note: Use standard Tailwind utility classes for consistent styling.</FormDescription>
                                                         <FormMessage />
                                                     </FormItem>
                                                 )} />
-                                            ) : (
-                                                <div className="space-y-6">
-                                                    <FormField control={form.control} name="videoUrl" render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel className="font-bold">Video URL <span className="text-destructive">*</span></FormLabel>
-                                                            <FormControl><Input placeholder="https://example.com/video.mp4" {...field} value={field.value || ''} className="h-11" /></FormControl>
-                                                            <FormDescription>Direct link to MP4 video file.</FormDescription>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )} />
-                                                    <FormField control={form.control} name="videoPosterUrl" render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel className="font-bold">Video Poster (Thumbnail)</FormLabel>
-                                                            <FormControl><Input placeholder="https://example.com/poster.jpg" {...field} value={field.value || ''} className="h-11" /></FormControl>
-                                                            <FormDescription>Image displayed before the video starts.</FormDescription>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )} />
-                                                </div>
-                                            )}
-
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                                <FormField control={form.control} name="overlayTitle" render={({ field }) => (
-                                                    <FormItem><FormLabel className="font-bold">Display Heading</FormLabel><FormControl><Input placeholder="e.g., NEW ARRIVALS" {...field} value={field.value || ''} /></FormControl></FormItem>
-                                                )} />
-                                                <FormField control={form.control} name="buttonText" render={({ field }) => (
-                                                    <FormItem><FormLabel className="font-bold">Action Button Label</FormLabel><FormControl><Input placeholder="Explore Now" {...field} value={field.value || ''} /></FormControl></FormItem>
-                                                )} />
                                             </div>
-
-                                            <FormField control={form.control} name="linkUrl" render={({ field }) => (
-                                                <FormItem><FormLabel className="font-bold">Destination URL</FormLabel><FormControl><Input placeholder="https://..." {...field} value={field.value || ''} /></FormControl></FormItem>
-                                            )} />
-
-                                            <FormField control={form.control} name="fullWidth" render={({ field }) => (
-                                                <FormItem className="flex items-center justify-between p-4 border rounded-2xl bg-muted/5 transition-all hover:bg-muted/10">
-                                                    <div className="space-y-0.5">
-                                                        <FormLabel className="font-black text-[10px] uppercase tracking-wider flex items-center gap-2">
-                                                            <Maximize className="h-3.5 w-3.5 text-blue-500" /> Edge-to-Edge
-                                                        </FormLabel>
-                                                        <p className="text-[8px] font-bold text-muted-foreground uppercase">Disable container padding</p>
-                                                    </div>
-                                                    <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                                                </FormItem>
-                                            )} />
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-6">
-                                            <FormField control={form.control} name="htmlContent" render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="font-black text-xs uppercase tracking-widest text-primary">Custom HTML Logic <span className="text-destructive">*</span></FormLabel>
-                                                    <FormControl>
-                                                        <Textarea 
-                                                            {...field} 
-                                                            value={field.value || ''} 
-                                                            placeholder="<div class='custom-banner'>...</div>"
-                                                            className="min-h-[300px] font-mono text-sm leading-relaxed bg-slate-950 text-emerald-400 p-6 rounded-2xl"
-                                                        />
-                                                    </FormControl>
-                                                    <FormDescription>Note: Use standard Tailwind utility classes for consistent styling.</FormDescription>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )} />
-                                        </div>
-                                    )}
-                                </div>
-                            )}
+                                        )}
+                                    </div>
+                                </TabsContent>
+                            </Tabs>
                         </div>
                     </CardContent>
                 </Card>
