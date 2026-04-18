@@ -34,9 +34,8 @@ export default function VerifyPaymentPage() {
         const data = await res.json();
 
         if (data.success) {
-          setStatus('success');
-          setMessage('Payment successful! Your order is being processed.');
           toast({ title: 'Payment Successful', description: 'Your order has been confirmed.' });
+          router.push(getStoreUrl(`/store/checkout/success?orderId=${data.orderId}`));
         } else {
           setStatus('failed');
           setMessage(data.error || 'Payment verification failed.');

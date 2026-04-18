@@ -25,7 +25,7 @@ export async function GET(request: Request) {
     
     const transactionData = transactionSnap.data() as Transaction;
     if (transactionData.status === 'success') {
-        return NextResponse.json({ success: true, status: 'success' });
+        return NextResponse.json({ success: true, status: 'success', orderId: transactionData.orderId });
     }
 
     const providerId = `${storeId}_${providerName}`;
@@ -75,7 +75,7 @@ export async function GET(request: Request) {
         });
       });
 
-      return NextResponse.json({ success: true, status: 'success' });
+      return NextResponse.json({ success: true, status: 'success', orderId: transactionData.orderId });
     } else {
       await transactionRef.update({
         status: 'failed',
