@@ -358,7 +358,7 @@ export default function StoreSignupPage() {
                 </Button>
                 <div className="text-center text-sm">
                     Already have an account?{" "}
-                    <Link href=getStoreUrl("/store/login") className="underline text-primary font-bold">Log in</Link>
+                    <Link href={getStoreUrl("/store/login")} className="underline text-primary font-bold">Log in</Link>
                 </div>
             </form>
           </Form>

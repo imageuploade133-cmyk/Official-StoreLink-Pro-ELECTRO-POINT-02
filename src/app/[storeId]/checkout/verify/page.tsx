@@ -65,7 +65,7 @@ export default function VerifyPaymentPage() {
         <h1 className="text-3xl font-bold">Payment Confirmed!</h1>
         <p className="text-muted-foreground max-w-md">{message}</p>
         <Button asChild size="lg">
-          <Link href=getStoreUrl("/store/account?tab=orders")>View My Orders</Link>
+          <Link href={getStoreUrl("/store/account?tab=orders")}>View My Orders</Link>
         </Button>
       </div>
     );
@@ -78,10 +78,10 @@ export default function VerifyPaymentPage() {
       <p className="text-muted-foreground max-w-md">{message}</p>
       <div className="flex gap-4">
         <Button asChild variant="outline">
-          <Link href=getStoreUrl("/store/checkout")>Try Again</Link>
+          <Link href={getStoreUrl("/store/checkout")}>Try Again</Link>
         </Button>
         <Button asChild>
-          <Link href=getStoreUrl("/store/shop")>Return to Shop</Link>
+          <Link href={getStoreUrl("/store/shop")}>Return to Shop</Link>
         </Button>
       </div>
     </div>
