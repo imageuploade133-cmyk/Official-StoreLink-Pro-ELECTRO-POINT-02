@@ -54,7 +54,7 @@ import { useStoreUrl } from '@/hooks/use-store-url';
 import { uploadImage } from '@/ai/flows/image-upload-flow';
 import { Upload } from 'lucide-react';
 
-type CheckoutStep = 'details' | 'payment' | 'processing' | 'success';
+type CheckoutStep = 'details' | 'payment' | 'processing';
 
 const generatePaymentReference = () => {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -417,9 +417,9 @@ export default function CheckoutPage() {
       }
 
       toast({ title: 'Order Placed!', description: 'Your order has been received successfully.' });
-      setStep('success');
       clearCart();
       safeSessionStorage.removeItem('appliedCoupon');
+      router.push(getStoreUrl(`/store/checkout/success?orderId=${finalOrderId}`));
     } catch (error: any) {
       console.error('Order error:', error);
       toast({ 
@@ -456,27 +456,6 @@ export default function CheckoutPage() {
     return (
       <div className="flex h-[60vh] items-center justify-center">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (step === 'success') {
-    return (
-      <div className="max-w-2xl mx-auto py-24 px-4 text-center">
-        <div className="bg-green-100 dark:bg-green-900/30 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-8 text-green-600">
-          <CheckCircle2 className="h-12 w-12" />
-        </div>
-        <h1 className="text-4xl font-extrabold mb-4">Order Received!</h1>
-        <p className="text-xl text-muted-foreground mb-4">Your purchase has been placed successfully.</p>
-        {paymentMethod === 'Bank Transfer' && (
-            <Card className="bg-orange-50 dark:bg-orange-950/20 border-orange-200 mb-8 max-w-md mx-auto">
-                <CardContent className="pt-6 space-y-3">
-                    <p className="font-bold text-orange-700 dark:text-orange-400">Payment Pending Verification</p>
-                    <p className="text-sm">Please ensure you used reference <strong>{paymentReference}</strong> in your transfer. We will process your order once funds are confirmed.</p>
-                </CardContent>
-            </Card>
-        )}
-        <Button asChild size="lg"><Link href={getStoreUrl("/store/shop")}>Return to Shop</Link></Button>
       </div>
     );
   }

@@ -536,6 +536,12 @@ export function PublicNavbar() {
                                                     Flash Hub
                                                 </Link>
                                             )}
+                                            <Link className="text-lg font-bold tracking-tight hover:text-primary transition-colors flex items-center gap-3 group" href={getStoreUrl("/store/account")} onClick={() => setIsMenuOpen(false)}>
+                                                <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-900 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                                                    <History className="h-5 w-5 text-slate-600 dark:text-slate-400 group-hover:text-primary" />
+                                                </div>
+                                                My Orders
+                                            </Link>
                                             {navbarShowCollectionsLink && (
                                                 <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
                                                     <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-4">Collections</p>
