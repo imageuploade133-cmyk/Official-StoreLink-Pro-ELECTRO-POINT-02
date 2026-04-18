@@ -72,10 +72,28 @@ export function getProtocol(): string {
 /**
  * Gets the full URL for a store based on its ID and the current plan
  */
-export function getStoreUrl(storeId: string, plan: string, customDomain?: string | null, subdomain?: string | null): string {
+export function getStoreUrl(
+  storeId: string, 
+  plan: string, 
+  customDomain?: string | null, 
+  subdomain?: string | null,
+  primaryDomainType?: 'free' | 'subdomain' | 'custom'
+): string {
   const mainDomain = getMainDomain();
   const protocol = getProtocol();
   
+  // If primary domain type is explicitly set, use it
+  if (primaryDomainType === 'custom' && customDomain) {
+    return `${protocol}//${customDomain}`;
+  }
+  if (primaryDomainType === 'subdomain' && subdomain) {
+    return `${protocol}//${subdomain}.${mainDomain}`;
+  }
+  if (primaryDomainType === 'free') {
+    return `${protocol}//${mainDomain}/${storeId}`;
+  }
+
+  // Fallback to legacy logic if primaryDomainType is not set
   if (plan === 'premium' && customDomain) {
     return `${protocol}//${customDomain}`;
   }

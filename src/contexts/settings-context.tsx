@@ -2,13 +2,14 @@
 
 import React, { createContext, useContext, useMemo } from 'react';
 import { useFirestore, useDoc } from '@/firebase';
-import { doc } from 'firebase/firestore';
-import type { Settings } from '@/lib/types';
+import { doc, onSnapshot } from 'firebase/firestore';
+import type { Settings, Store } from '@/lib/types';
 import { useAuth } from './auth-context';
 import { usePathname } from 'next/navigation';
 
 interface SettingsContextType {
   settings: Settings | null;
+  store: Store | null;
   isLoadingSettings: boolean;
 }
 
@@ -61,10 +62,20 @@ export function SettingsProvider({ children, storeId: storeIdFromMiddleware }: {
   const { data: newSettingsData, isLoading: isLoadingNewSettings } = useDoc<Settings>(settingsRef);
   const { data: oldSettingsData, isLoading: isLoadingOldSettings } = useDoc<Settings>(oldSettingsRef);
 
-  const settingsData = newSettingsData || oldSettingsData;
-  const isLoadingSettings = isLoadingNewSettings && isLoadingOldSettings;
+  const storeRef = useMemo(
+    () => (firestore && storeId) ? doc(firestore, 'stores', storeId) : null,
+    [firestore, storeId]
+  );
+  const { data: storeData, isLoading: isLoadingStore } = useDoc<Store>(storeRef);
 
-  const value = { settings: settingsData, isLoadingSettings };
+  const settingsData = newSettingsData || oldSettingsData;
+  const isLoadingSettings = isLoadingNewSettings && isLoadingOldSettings && isLoadingStore;
+
+  const value = { 
+    settings: settingsData, 
+    store: storeData,
+    isLoadingSettings 
+  };
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
 }

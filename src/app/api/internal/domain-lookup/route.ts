@@ -35,7 +35,9 @@ export async function GET(request: Request) {
           plan: store?.plan,
           subdomain: store?.subdomain,
           customDomain: store?.customDomain,
-          domainVerified: store?.domainVerified
+          domainVerified: store?.domainVerified,
+          primaryDomainType: store?.primaryDomainType,
+          redirectEnabled: store?.redirectEnabled
         });
       }
     }
@@ -62,7 +64,9 @@ export async function GET(request: Request) {
           plan: store?.plan,
           subdomain: store?.subdomain,
           customDomain: store?.customDomain,
-          domainVerified: store?.domainVerified
+          domainVerified: store?.domainVerified,
+          primaryDomainType: store?.primaryDomainType,
+          redirectEnabled: store?.redirectEnabled
         });
       }
     }
@@ -78,7 +82,9 @@ export async function GET(request: Request) {
             return NextResponse.json({ 
               storeId: storeDoc.id,
               plan: store?.plan,
-              subdomain: store?.subdomain
+              subdomain: store?.subdomain,
+              primaryDomainType: store?.primaryDomainType,
+              redirectEnabled: store?.redirectEnabled
             });
           }
         }
@@ -99,7 +105,9 @@ export async function GET(request: Request) {
             return NextResponse.json({ 
               storeId: doc.id,
               plan: store?.plan,
-              subdomain: store?.subdomain
+              subdomain: store?.subdomain,
+              primaryDomainType: store?.primaryDomainType,
+              redirectEnabled: store?.redirectEnabled
             });
           }
         }

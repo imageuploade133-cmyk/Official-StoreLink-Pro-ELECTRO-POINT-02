@@ -24,9 +24,9 @@ export async function middleware(req: NextRequest) {
   const isLocalhost = hostname.includes('localhost') || hostname.includes('127.0.0.1') || hostname.endsWith('.vercel.app');
   
   let storeId = null;
-  let storeData = null;
+  let storeData: any = null;
 
-  // 1. Pro Plan: storeid.domain.com or custom-subdomain.domain.com
+  // 1. Check if we are on a subdomain (storeid.domain.com or custom-subdomain.domain.com)
   if (hostname.endsWith(`.${mainDomain}`)) {
     const subdomain = hostname.replace(`.${mainDomain}`, '');
     if (!reservedSubdomains.includes(subdomain)) {
@@ -34,31 +34,28 @@ export async function middleware(req: NextRequest) {
         const lookupUrl = new URL(`/api/internal/domain-lookup?subdomain=${subdomain}`, url.origin);
         const res = await fetch(lookupUrl.toString());
         if (res.ok) {
-          const data = await res.json();
-          storeId = data.storeId;
-          storeData = data;
+          storeData = await res.json();
+          storeId = storeData.storeId;
         }
       } catch (error) {
         console.error('Middleware subdomain lookup error:', error);
       }
     }
   } 
-  // 2. Premium Plan: customdomain.com
+  // 2. Check if we are on a custom domain (customdomain.com)
   else if (hostname !== mainDomain && !isLocalhost) {
-    // For custom domains, we MUST look up which store it belongs to.
     try {
         const lookupUrl = new URL(`/api/internal/domain-lookup?domain=${hostname}`, url.origin);
         const res = await fetch(lookupUrl.toString());
         if (res.ok) {
-          const data = await res.json();
-          storeId = data.storeId;
-          storeData = data;
+          storeData = await res.json();
+          storeId = storeData.storeId;
         }
     } catch (error) {
         console.error('Middleware domain lookup error:', error);
     }
   }
-  // 3. Path-based redirect for Pro stores
+  // 3. Check if we are on the main domain with a path-based storeId (domain.com/storeId)
   else if (hostname === mainDomain || isLocalhost) {
     const pathParts = url.pathname.split('/');
     if (pathParts.length >= 2) {
@@ -68,44 +65,72 @@ export async function middleware(req: NextRequest) {
           const lookupUrl = new URL(`/api/internal/domain-lookup?storeId=${possibleStoreId}`, url.origin);
           const res = await fetch(lookupUrl.toString());
           if (res.ok) {
-            const data = await res.json();
-            // Redirect to subdomain if on Pro/Premium plan and NOT on the subdomain already
-            if ((data.plan === 'pro' || data.plan === 'premium') && data.subdomain) {
-              // Construct the new URL on the subdomain
-              // We remove the /[storeId] from the beginning of the path
-              const newPath = url.pathname.startsWith(`/${possibleStoreId}`) 
-                ? url.pathname.substring(possibleStoreId.length + 1) || '/' 
-                : url.pathname;
-              const protocol = url.protocol || 'https:';
-              const newUrl = new URL(newPath + url.search, `${protocol}//${data.subdomain}.${mainDomain}`);
-              
-              console.log(`Redirecting from path ${url.pathname} to subdomain ${newUrl.toString()}`);
-              return NextResponse.redirect(newUrl);
-            }
+            storeData = await res.json();
+            storeId = storeData.storeId;
           }
         } catch (error) {
-          console.error('Middleware path redirect lookup error:', error);
+          console.error('Middleware path lookup error:', error);
         }
       }
     }
   }
 
-  if (storeId) {
-    // If we have a storeId from hostname, rewrite the URL
-    // e.g., store1.storelinkpro.com/shop -> storelinkpro.com/store1/shop
+  // If we found a store, handle optional redirects and rewrites
+  if (storeId && storeData) {
+    const { primaryDomainType, redirectEnabled, subdomain, customDomain, plan } = storeData;
     
-    // Avoid infinite rewrites
-    if (url.pathname.startsWith(`/${storeId}`)) {
-        return NextResponse.next();
+    // Determine the desired primary domain URL
+    let primaryHostname = null;
+    let isPathBased = false;
+
+    if (primaryDomainType === 'custom' && customDomain) {
+      primaryHostname = customDomain;
+    } else if (primaryDomainType === 'subdomain' && subdomain) {
+      primaryHostname = `${subdomain}.${mainDomain}`;
+    } else if (primaryDomainType === 'free') {
+      primaryHostname = mainDomain;
+      isPathBased = true;
     }
 
-    const rewriteUrl = new URL(`/${storeId}${url.pathname}`, req.url);
-    console.log(`Rewriting ${hostname}${url.pathname} to ${rewriteUrl.pathname}`);
+    // Handle optional redirect if enabled and we are not on the primary domain
+    if (redirectEnabled && primaryHostname) {
+      const onCorrectHostname = hostname === primaryHostname;
+      const onCorrectPath = isPathBased ? url.pathname.startsWith(`/${storeId}`) : true;
+
+      if (!onCorrectHostname || (isPathBased && !onCorrectPath)) {
+        const protocol = url.protocol || 'https:';
+        let newPath = url.pathname;
+        
+        if (isPathBased && !newPath.startsWith(`/${storeId}`)) {
+          newPath = `/${storeId}${newPath}`;
+        } else if (!isPathBased && newPath.startsWith(`/${storeId}`)) {
+          newPath = newPath.replace(`/${storeId}`, '') || '/';
+        }
+
+        const newUrl = new URL(newPath + url.search, `${protocol}//${primaryHostname}`);
+        console.log(`Redirecting to primary domain: ${newUrl.toString()}`);
+        return NextResponse.redirect(newUrl);
+      }
+    }
+
+    // Rewrite the URL for internal routing if we are on a domain/subdomain that's NOT the main domain
+    // Or if we are on the main domain but the store is NOT using path-based access (wait, no)
+    // Actually, if we have a storeId from hostname, we must rewrite.
     
-    const response = NextResponse.rewrite(rewriteUrl);
-    // Add storeId to headers so server components can access it
-    response.headers.set('x-store-id', storeId);
-    return response;
+    const isHostnameBased = hostname !== mainDomain && !isLocalhost;
+    if (isHostnameBased || (hostname.endsWith(`.${mainDomain}`) && !reservedSubdomains.includes(hostname.replace(`.${mainDomain}`, '')))) {
+       // Avoid infinite rewrites
+       if (url.pathname.startsWith(`/${storeId}`)) {
+          return NextResponse.next();
+       }
+
+       const rewriteUrl = new URL(`/${storeId}${url.pathname}`, req.url);
+       console.log(`Rewriting ${hostname}${url.pathname} to ${rewriteUrl.pathname}`);
+       
+       const response = NextResponse.rewrite(rewriteUrl);
+       response.headers.set('x-store-id', storeId);
+       return response;
+    }
   }
 
   return NextResponse.next();

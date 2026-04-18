@@ -83,6 +83,7 @@ import { StickyProductBar } from '@/components/store/StickyProductBar';
 import { BannerAd } from '@/components/ads/BannerAd';
 import { useAds } from '@/contexts/ad-context';
 import { useStoreUrl } from '@/hooks/use-store-url';
+import { getStoreUrl as getAbsoluteStoreUrl } from '@/lib/domain';
 
 const iconMap = {
   Truck,
@@ -525,16 +526,33 @@ export default function ProductDetailsPage() {
   };
 
   const handleShare = async () => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !product) return;
+
+    const baseUrl = getAbsoluteStoreUrl(
+        storeId, 
+        settings?.plan || 'free', 
+        settings?.customDomain, 
+        settings?.subdomain, 
+        settings?.primaryDomainType
+    );
+    
+    let path = `/product/${productId}`;
+    // If we're on the free domain, we need to include /store in the path if that's how it's structured
+    // Wait, the public pages are under [storeId]/product/[productId]
+    // The relative URL for shop is /store/shop ? 
+    // Let's check useStoreUrl hook again.
+    
+    const fullUrl = `${baseUrl}${path}`;
+
     const shareData = {
-      title: product?.name || 'Check this out!',
-      text: product?.description?.replace(/<[^>]*>?/gm, '').substring(0, 100) || 'Amazing product found on StoreLink Pro.',
-      url: window.location.href,
+      title: product.name || 'Check this out!',
+      text: product.description?.replace(/<[^>]*>?/gm, '').substring(0, 100) || 'Amazing product found on StoreLink Pro.',
+      url: fullUrl,
     };
     if (navigator.share) {
       try { await navigator.share(shareData); } catch (err) {}
     } else {
-      navigator.clipboard.writeText(window.location.href);
+      navigator.clipboard.writeText(fullUrl);
       toast({ title: "Link Copied!" });
     }
   };

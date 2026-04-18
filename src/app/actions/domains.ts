@@ -177,6 +177,24 @@ export async function toggleSubdomainActive(storeId: string, isActive: boolean) 
     return { success: true };
 }
 
+export async function updateStorePrimaryDomain(storeId: string, type: 'free' | 'subdomain' | 'custom') {
+    const db = getDb();
+    await db.collection('stores').doc(storeId).update({
+        primaryDomainType: type,
+        updatedAt: new Date()
+    });
+    return { success: true };
+}
+
+export async function toggleDomainRedirect(storeId: string, enabled: boolean) {
+    const db = getDb();
+    await db.collection('stores').doc(storeId).update({
+        redirectEnabled: enabled,
+        updatedAt: new Date()
+    });
+    return { success: true };
+}
+
 export async function verifyDomain(storeId: string, domain: string) {
     const status = await checkDomainStatus(domain);
     if (status.success && (status.data?.configured || status.mock)) {

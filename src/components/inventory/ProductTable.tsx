@@ -31,6 +31,8 @@ import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useSettings } from '@/contexts/settings-context';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/auth-context';
+import { getStoreUrl as getAbsoluteStoreUrl } from '@/lib/domain';
 
 const shareIcons: Record<string, any> = {
   Share2,
@@ -51,25 +53,41 @@ interface ProductTableProps {
 export function ProductTable({ products, categories, onOpenActions, currencySymbol, globalLowStockThreshold }: ProductTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const { settings } = useSettings();
+  const { store } = useAuth();
   const { toast } = useToast();
   const defaultProductImageUrl = settings?.defaultProductImageUrl || 'https://placehold.co/400x300.png';
 
   const ShareIcon = shareIcons[settings?.productSharingIcon || 'Share2'] || Share2;
 
   const handleShare = (product: Product) => {
-    const origin = window.location.origin;
-    const url = `${origin}/store/product/${product.id}`;
+    if (!store) {
+        const origin = window.location.origin;
+        const url = `${origin}/store/product/${product.id}`;
+        copyToClipboard(url);
+        return;
+    }
+
+    const baseUrl = getAbsoluteStoreUrl(
+        store.id, 
+        store.plan || 'free', 
+        store.customDomain, 
+        store.subdomain, 
+        store.primaryDomainType
+    );
+    
+    let path = `/product/${product.id}`;
+    const fullUrl = `${baseUrl}${path}`;
     
     if (navigator.share) {
       navigator.share({
         title: product.name,
         text: `Check out ${product.name} on our store!`,
-        url: url,
+        url: fullUrl,
       }).catch(() => {
-        copyToClipboard(url);
+        copyToClipboard(fullUrl);
       });
     } else {
-      copyToClipboard(url);
+      copyToClipboard(fullUrl);
     }
   };
 
