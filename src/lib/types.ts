@@ -665,6 +665,8 @@ export interface Store {
   subdomain?: string;
   domainVerificationToken?: string;
   domainVerified?: boolean;
+  customDomainActive?: boolean;
+  subdomainActive?: boolean;
 }
 
 export interface StaffMember {

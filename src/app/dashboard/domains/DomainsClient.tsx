@@ -10,11 +10,22 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { addDomainToVercel, checkDomainStatus, updateStoreDomain, updateStorePlan, verifyDomain, isSubdomainAvailable } from '@/app/actions/domains';
+import { 
+  addDomainToVercel, 
+  checkDomainStatus, 
+  updateStoreDomain, 
+  updateStorePlan, 
+  verifyDomain, 
+  isSubdomainAvailable,
+  removeDomainFromVercel,
+  toggleDomainActive,
+  toggleSubdomainActive
+} from '@/app/actions/domains';
 import { Spinner } from '@/components/ui/spinner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getMainDomain, getProtocol, getStoreUrl } from '@/lib/domain';
+import { Trash2, Power, PowerOff } from 'lucide-react';
 
 interface DomainsClientProps {
   initialMainDomain: string;
@@ -128,6 +139,64 @@ export default function DomainsClient({ initialMainDomain, initialProtocol }: Do
       toast({ variant: 'destructive', title: 'Error', description: 'Failed to verify domain.' });
     } finally {
       setVerifying(false);
+    }
+  };
+
+  const handleDeleteDomain = async () => {
+    if (!store || !store.customDomain) return;
+    if (!confirm(`Are you sure you want to delete the domain ${store.customDomain}? This will remove it from our system and Vercel.`)) return;
+
+    setIsUpdating(true);
+    try {
+      const res = await removeDomainFromVercel(store.customDomain);
+      if (res.success || res.mock) {
+        await updateStoreDomain(store.id, null, store.subdomain || null);
+        setCustomDomain('');
+        setDomainStatus(null);
+        toast({ title: 'Domain Deleted', description: 'Custom domain has been removed.' });
+      } else {
+        toast({ variant: 'destructive', title: 'Deletion Failed', description: res.error?.message || 'Failed to remove domain from Vercel.' });
+      }
+    } catch (error) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Failed to delete domain.' });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleToggleDomainActive = async () => {
+    if (!store || !store.customDomain) return;
+    const newActiveState = store.customDomainActive === false;
+    
+    setIsUpdating(true);
+    try {
+      await toggleDomainActive(store.id, newActiveState);
+      toast({ 
+        title: newActiveState ? 'Domain Activated' : 'Domain Deactivated', 
+        description: `Your custom domain has been ${newActiveState ? 'activated' : 'deactivated'}.` 
+      });
+    } catch (error) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Failed to toggle domain status.' });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleToggleSubdomainActive = async () => {
+    if (!store || !store.subdomain) return;
+    const newActiveState = store.subdomainActive === false;
+
+    setIsUpdating(true);
+    try {
+      await toggleSubdomainActive(store.id, newActiveState);
+      toast({ 
+        title: newActiveState ? 'Subdomain Activated' : 'Subdomain Deactivated', 
+        description: `Your subdomain has been ${newActiveState ? 'activated' : 'deactivated'}.` 
+      });
+    } catch (error) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Failed to toggle subdomain status.' });
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -279,22 +348,42 @@ export default function DomainsClient({ initialMainDomain, initialProtocol }: Do
                 />
                 <span className="text-muted-foreground ml-2">.{mainDomain}</span>
               </div>
-              <Button 
-                onClick={handleUpdateSubdomain} 
-                disabled={isUpdating || !subdomainInput || subdomainInput === store?.subdomain}
-              >
-                {isUpdating ? <Spinner size="sm" className="mr-2" /> : null}
-                {store?.subdomain ? 'Update Subdomain' : 'Activate Subdomain'}
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button 
+                  onClick={handleUpdateSubdomain} 
+                  disabled={isUpdating || !subdomainInput || subdomainInput === store?.subdomain}
+                  className="flex-1 sm:flex-none"
+                >
+                  {isUpdating ? <Spinner size="sm" className="mr-2" /> : null}
+                  {store?.subdomain ? 'Update Subdomain' : 'Activate Subdomain'}
+                </Button>
+                {store?.subdomain && (
+                  <Button
+                    variant="outline"
+                    onClick={handleToggleSubdomainActive}
+                    disabled={isUpdating}
+                    className={store.subdomainActive === false ? "text-green-600 border-green-200 hover:bg-green-50" : "text-amber-600 border-amber-200 hover:bg-amber-50"}
+                  >
+                    {store.subdomainActive === false ? (
+                      <><Power className="h-4 w-4 mr-2" /> Activate</>
+                    ) : (
+                      <><PowerOff className="h-4 w-4 mr-2" /> Deactivate</>
+                    )}
+                  </Button>
+                )}
+              </div>
             </div>
             {!store?.subdomain ? (
                 <p className="text-xs text-muted-foreground">
                     Activate your professional subdomain to use <strong>{subdomainInput || '...'}.{mainDomain}</strong> instead of {mainDomain}/{store?.id}
                 </p>
             ) : (
-                <div className="flex items-center gap-2 text-xs text-green-600 font-medium">
-                    <CheckCircle className="h-3 w-3" />
-                    Subdomain is active: {store.subdomain}.{mainDomain}
+                <div className={`flex items-center gap-2 text-xs font-medium ${store.subdomainActive === false ? 'text-amber-600' : 'text-green-600'}`}>
+                    {store.subdomainActive === false ? (
+                      <><AlertTriangle className="h-3 w-3" /> Subdomain is deactivated: {store.subdomain}.{mainDomain}</>
+                    ) : (
+                      <><CheckCircle className="h-3 w-3" /> Subdomain is active: {store.subdomain}.{mainDomain}</>
+                    )}
                 </div>
             )}
           </CardContent>
@@ -329,7 +418,11 @@ export default function DomainsClient({ initialMainDomain, initialProtocol }: Do
                     <div>
                       <p className="font-medium">{store.customDomain}</p>
                       <p className="text-xs text-muted-foreground">
-                        Status: {store.domainVerified ? (
+                        Status: {store.customDomainActive === false ? (
+                          <span className="text-amber-600 flex items-center gap-1 inline-flex">
+                            <PowerOff className="h-3 w-3" /> Deactivated
+                          </span>
+                        ) : store.domainVerified ? (
                           <span className="text-green-500 flex items-center gap-1 inline-flex">
                             <CheckCircle className="h-3 w-3" /> Verified
                           </span>
@@ -341,10 +434,32 @@ export default function DomainsClient({ initialMainDomain, initialProtocol }: Do
                       </p>
                     </div>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={handleVerify} disabled={verifying}>
-                    {verifying ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <RefreshCw className="h-4 w-4 mr-2" />}
-                    Refresh Status
-                  </Button>
+                  <div className="flex flex-wrap gap-2">
+                    <Button variant="ghost" size="sm" onClick={handleVerify} disabled={verifying}>
+                      {verifying ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <RefreshCw className="h-4 w-4 mr-2" />}
+                      Refresh
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={handleToggleDomainActive} 
+                      disabled={isUpdating}
+                      className={store.customDomainActive === false ? "text-green-600 hover:text-green-700 hover:bg-green-50" : "text-amber-600 hover:text-amber-700 hover:bg-amber-50"}
+                    >
+                      {store.customDomainActive === false ? <Power className="h-4 w-4 mr-2" /> : <PowerOff className="h-4 w-4 mr-2" />}
+                      {store.customDomainActive === false ? 'Activate' : 'Deactivate'}
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={handleDeleteDomain} 
+                      disabled={isUpdating}
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete
+                    </Button>
+                  </div>
                 </div>
 
                 {!store.domainVerified && (
@@ -394,26 +509,34 @@ export default function DomainsClient({ initialMainDomain, initialProtocol }: Do
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="flex items-center justify-between py-2 border-b">
-              <span className="text-sm font-medium">Pro Subdomain</span>
+              <span className={`text-sm font-medium ${store?.subdomainActive === false ? 'text-muted-foreground' : ''}`}>Pro Subdomain</span>
               <div className="flex items-center gap-2">
-                <code className="text-xs">{activeSubdomain}.{mainDomain}</code>
-                <Button variant="ghost" size="icon" asChild className="h-8 w-8">
-                  <a href={`${protocol}//${activeSubdomain}.${mainDomain}`} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                </Button>
+                <code className={`text-xs ${store?.subdomainActive === false ? 'line-through text-muted-foreground' : ''}`}>{activeSubdomain}.{mainDomain}</code>
+                {store?.subdomainActive === false ? (
+                  <Badge variant="outline" className="text-[10px] h-5">Deactivated</Badge>
+                ) : (
+                  <Button variant="ghost" size="icon" asChild className="h-8 w-8">
+                    <a href={`${protocol}//${activeSubdomain}.${mainDomain}`} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  </Button>
+                )}
               </div>
             </div>
             {store?.customDomain && store.domainVerified && (
               <div className="flex items-center justify-between py-2">
-                <span className="text-sm font-medium">Custom Domain</span>
+                <span className={`text-sm font-medium ${store.customDomainActive === false ? 'text-muted-foreground' : ''}`}>Custom Domain</span>
                 <div className="flex items-center gap-2">
-                  <code className="text-xs">{store.customDomain}</code>
-                  <Button variant="ghost" size="icon" asChild className="h-8 w-8">
-                    <a href={`${protocol}//${store.customDomain}`} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="h-4 w-4" />
-                    </a>
-                  </Button>
+                  <code className={`text-xs ${store.customDomainActive === false ? 'line-through text-muted-foreground' : ''}`}>{store.customDomain}</code>
+                  {store.customDomainActive === false ? (
+                    <Badge variant="outline" className="text-[10px] h-5">Deactivated</Badge>
+                  ) : (
+                    <Button variant="ghost" size="icon" asChild className="h-8 w-8">
+                      <a href={`${protocol}//${store.customDomain}`} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </Button>
+                  )}
                 </div>
               </div>
             )}

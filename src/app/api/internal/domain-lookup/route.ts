@@ -47,10 +47,16 @@ export async function GET(request: Request) {
         .where('domainVerified', '==', true)
         .limit(1)
         .get();
-
+      
       if (!storeQuery.empty) {
         const doc = storeQuery.docs[0];
         const store = doc.data();
+        
+        // Check if domain is active (default to true)
+        if (store?.customDomainActive === false) {
+          return NextResponse.json({ error: 'Domain deactivated' }, { status: 403 });
+        }
+
         return NextResponse.json({ 
           storeId: doc.id,
           plan: store?.plan,
@@ -67,11 +73,14 @@ export async function GET(request: Request) {
       if (storeDoc.exists) {
         const store = storeDoc.data();
         if (store?.plan === 'pro' || store?.plan === 'premium') {
-          return NextResponse.json({ 
-            storeId: storeDoc.id,
-            plan: store?.plan,
-            subdomain: store?.subdomain
-          });
+          // Check if subdomain is active (default to true)
+          if (store?.subdomainActive !== false) {
+            return NextResponse.json({ 
+              storeId: storeDoc.id,
+              plan: store?.plan,
+              subdomain: store?.subdomain
+            });
+          }
         }
       }
 
@@ -85,11 +94,14 @@ export async function GET(request: Request) {
         const doc = subdomainQuery.docs[0];
         const store = doc.data();
         if (store?.plan === 'pro' || store?.plan === 'premium') {
-          return NextResponse.json({ 
-            storeId: doc.id,
-            plan: store?.plan,
-            subdomain: store?.subdomain
-          });
+          // Check if subdomain is active (default to true)
+          if (store?.subdomainActive !== false) {
+            return NextResponse.json({ 
+              storeId: doc.id,
+              plan: store?.plan,
+              subdomain: store?.subdomain
+            });
+          }
         }
       }
     }

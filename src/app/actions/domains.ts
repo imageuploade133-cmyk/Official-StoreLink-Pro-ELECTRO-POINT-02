@@ -47,6 +47,31 @@ export async function addDomainToVercel(domain: string) {
   return { success: true, data };
 }
 
+export async function removeDomainFromVercel(domain: string) {
+  if (!VERCEL_TOKEN || !VERCEL_PROJECT_ID) {
+    console.warn('Vercel tokens not configured');
+    return { success: true, mock: true };
+  }
+
+  const teamParam = VERCEL_TEAM_ID ? `?teamId=${VERCEL_TEAM_ID}` : '';
+  const response = await fetch(
+    `https://api.vercel.com/v9/projects/${VERCEL_PROJECT_ID}/domains/${domain}${teamParam}`,
+    {
+      headers: {
+        Authorization: `Bearer ${VERCEL_TOKEN}`,
+      },
+      method: 'DELETE',
+    }
+  );
+
+  const data = await response.json();
+  if (!response.ok) {
+    return { success: false, error: data.error };
+  }
+
+  return { success: true, data };
+}
+
 export async function checkDomainStatus(domain: string) {
   if (!VERCEL_TOKEN || !VERCEL_PROJECT_ID) {
     return { success: true, status: 'valid', mock: true };
@@ -114,12 +139,37 @@ export async function updateStoreDomain(storeId: string, domain: string | null, 
         updatedAt: new Date()
     };
 
+    if (domain) {
+        updateData.customDomainActive = true;
+    }
+    if (subdomain) {
+        updateData.subdomainActive = true;
+    }
+
     // Only reset verification if the custom domain changed
     if (currentData?.customDomain !== domain) {
         updateData.domainVerified = false;
     }
 
     await db.collection('stores').doc(storeId).update(updateData);
+    return { success: true };
+}
+
+export async function toggleDomainActive(storeId: string, isActive: boolean) {
+    const db = getDb();
+    await db.collection('stores').doc(storeId).update({
+        customDomainActive: isActive,
+        updatedAt: new Date()
+    });
+    return { success: true };
+}
+
+export async function toggleSubdomainActive(storeId: string, isActive: boolean) {
+    const db = getDb();
+    await db.collection('stores').doc(storeId).update({
+        subdomainActive: isActive,
+        updatedAt: new Date()
+    });
     return { success: true };
 }
 
