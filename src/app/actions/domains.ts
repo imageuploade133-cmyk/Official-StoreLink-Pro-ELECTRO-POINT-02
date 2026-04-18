@@ -136,7 +136,8 @@ export async function updateStoreDomain(storeId: string, domain: string | null, 
     const updateData: any = {
         customDomain: domain,
         subdomain: subdomain,
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        domainStatus: domain ? 'pending' : 'none'
     };
 
     if (domain) {
@@ -149,6 +150,9 @@ export async function updateStoreDomain(storeId: string, domain: string | null, 
     // Only reset verification if the custom domain changed
     if (currentData?.customDomain !== domain) {
         updateData.domainVerified = false;
+        if (!domain) {
+            updateData.domainActivatedAt = null;
+        }
     }
 
     await db.collection('stores').doc(storeId).update(updateData);
@@ -179,9 +183,21 @@ export async function verifyDomain(storeId: string, domain: string) {
         const db = getDb();
         await db.collection('stores').doc(storeId).update({
             domainVerified: true,
+            domainStatus: 'active',
+            domainActivatedAt: new Date(),
             updatedAt: new Date()
         });
         return { success: true };
     }
+    
+    // If check was successful but not configured, we could mark as pending or failed
+    if (status.success && !status.data?.configured && !status.mock) {
+         const db = getDb();
+         await db.collection('stores').doc(storeId).update({
+            domainStatus: 'failed', // or keep as pending
+            updatedAt: new Date()
+        });
+    }
+
     return { success: false, error: 'Domain not yet configured or verified in DNS' };
 }

@@ -181,7 +181,7 @@ export default function DashboardLayout({
     { href: '/dashboard/stock-bar-settings', icon: Activity, label: 'Stock Bar Settings', perm: 'manage_settings' },
     { href: '/dashboard/product-card-designer', icon: Palette, label: 'Product Card Designer', perm: 'manage_settings' },
     { href: '/dashboard/public-web-settings', icon: Globe, label: 'General Web Settings', perm: 'manage_settings' },
-    { href: '/dashboard/domains', icon: Globe, label: 'Domain Settings', perm: 'manage_settings' },
+    { href: '/dashboard/settings/domain', icon: Globe, label: 'Domain Settings', perm: 'manage_settings' },
     { href: '/dashboard/shop-collection-settings', icon: ShoppingBag, label: 'Shop Our Collection', perm: 'manage_settings' },
     { href: '/dashboard/public-visibility-settings', icon: EyeOff, label: 'Global Section Visibility', perm: 'manage_settings' },
     { href: '/dashboard/store-navigation-settings', icon: List, label: 'Navigation Bar Settings', perm: 'manage_settings' },

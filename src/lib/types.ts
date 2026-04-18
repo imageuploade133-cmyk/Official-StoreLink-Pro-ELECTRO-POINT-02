@@ -667,6 +667,8 @@ export interface Store {
   domainVerified?: boolean;
   customDomainActive?: boolean;
   subdomainActive?: boolean;
+  domainStatus?: 'pending' | 'active' | 'failed' | 'none';
+  domainActivatedAt?: Timestamp;
 }
 
 export interface StaffMember {
