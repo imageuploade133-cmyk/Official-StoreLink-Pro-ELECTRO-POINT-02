@@ -65,13 +65,10 @@ export default function ManageHomepageSectionsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
-        <PageHeader icon={Columns} title="Product Section Manage Homepage" description="Organize and manage the product sections on your public homepage." />
+        <PageHeader icon={Columns} title="Manage Homepage Sections" description="Organize and manage products, banners, and video sections on your storefront." />
         <div className="flex items-center gap-2">
-            <Button variant="outline" asChild>
-                <Link href="/dashboard/add-ui-section"><PlusCircle className="mr-2 h-4 w-4"/> Add Custom UI</Link>
-            </Button>
             <Button asChild>
-                <Link href="/dashboard/homepage-sections/create"><PlusCircle className="mr-2 h-4 w-4"/> Create Product Section</Link>
+                <Link href="/dashboard/homepage-sections/create"><PlusCircle className="mr-2 h-4 w-4"/> Create Homepage Section</Link>
             </Button>
         </div>
       </div>
@@ -111,8 +108,8 @@ export default function ManageHomepageSectionsPage() {
                                     <TableRow key={section.id}>
                                         <TableCell className="font-medium">{section.order}</TableCell>
                                         <TableCell className="font-bold">{section.title}</TableCell>
-                                        <TableCell><Badge variant="secondary" className="capitalize">{section.selectionType}</Badge></TableCell>
-                                        <TableCell><Badge variant="outline" className="capitalize">{section.layout || 'N/A'}</Badge></TableCell>
+                                        <TableCell><Badge variant="secondary" className="capitalize">{section.selectionType === 'custom-ui' ? section.uiType : section.selectionType}</Badge></TableCell>
+                                        <TableCell><Badge variant="outline" className="capitalize">{section.selectionType === 'custom-ui' ? 'Full Width' : (section.layout || 'N/A')}</Badge></TableCell>
                                         <TableCell>
                                             {isPromoActive ? (
                                                 <Badge className="bg-rose-500 text-white font-black gap-1.5 h-6 px-2 border-none shadow-sm animate-pulse">
@@ -138,7 +135,7 @@ export default function ManageHomepageSectionsPage() {
                                         </TableCell>
                                         <TableCell className="text-right space-x-2">
                                             <Button variant="outline" size="sm" asChild>
-                                                <Link href={section.selectionType === 'custom-ui' ? `/dashboard/edit-ui-section/${section.id}` : `/dashboard/homepage-sections/edit/${section.id}`}>
+                                                <Link href={`/dashboard/homepage-sections/edit/${section.id}`}>
                                                     <Edit className="mr-2 h-4 w-4"/>Edit
                                                 </Link>
                                             </Button>

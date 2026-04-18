@@ -19,6 +19,7 @@ export function CustomUISection({ section }: CustomUISectionProps) {
   if (!section.published) return null;
 
   const isHTML = section.uiType === 'html';
+  const isVideo = section.uiType === 'video';
   const isCenter = section.alignment === 'center';
 
   return (
@@ -36,7 +37,20 @@ export function CustomUISection({ section }: CustomUISectionProps) {
         />
       ) : (
         <div className="relative group overflow-hidden rounded-[3rem] shadow-2xl">
-            {section.imageUrl && (
+            {isVideo ? (
+                <div className="relative aspect-video md:aspect-[21/9] w-full overflow-hidden">
+                    <video
+                        src={section.videoUrl}
+                        poster={section.videoPosterUrl}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        className="h-full w-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] transition-opacity group-hover:opacity-40" />
+                </div>
+            ) : section.imageUrl && (
                 <div className="relative aspect-video md:aspect-[21/9] w-full overflow-hidden">
                     <Image 
                         src={section.imageUrl} 

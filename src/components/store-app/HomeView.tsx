@@ -4,7 +4,7 @@ import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, where, orderBy, limit } from 'firebase/firestore';
-import type { Category, Product, SlideShow } from '@/lib/types';
+import type { Category, Product, SlideShow, HomepageSection } from '@/lib/types';
 import { useSettings } from '@/contexts/settings-context';
 import { useWishlist } from '@/contexts/wishlist-context';
 import { useCart } from '@/contexts/cart-context';
@@ -24,7 +24,8 @@ import {
     ArrowRight,
     ShoppingCart,
     ShoppingBag,
-    Plus
+    Plus,
+    Monitor
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -33,6 +34,8 @@ import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 
 import { useStoreUrl } from '@/hooks/use-store-url';
+import { CustomUISection } from '@/components/store/CustomUISection';
+import { ProductSection } from '@/components/store/ProductSection';
 
 interface HomeViewProps {
     onSelectProduct: (id: string) => void;
@@ -266,6 +269,18 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
     }, [firestore, storeId]);
     const { data: products, isLoading: isLoadingProducts } = useCollection<Product>(productsQuery);
 
+    // 4. Fetch Dynamic Homepage Sections
+    const sectionsQuery = useMemo(() => {
+        if (!firestore || !storeId) return null;
+        return query(
+            collection(firestore, 'homepageSections'), 
+            where('store_id', '==', storeId),
+            where('published', '==', true),
+            orderBy('order', 'asc')
+        );
+    }, [firestore, storeId]);
+    const { data: sections } = useCollection<HomepageSection>(sectionsQuery);
+
     const categoryMap = useMemo(() => {
         if (!categories) return new Map();
         return new Map(categories.map(c => [c.id, c.name]));
@@ -445,6 +460,20 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
             </div>
           </div>
           )}
+
+          {/* Dynamic Homepage Sections */}
+          {sections?.map(section => (
+            <div key={section.id} className="px-0">
+                {section.selectionType === 'custom-ui' ? (
+                    <CustomUISection section={section} />
+                ) : (
+                    <ProductSection 
+                        section={section}
+                        categories={categories || []}
+                    />
+                )}
+            </div>
+          ))}
 
           {/* Quick Registry Access (Horizontal Categories) */}
           <div className="space-y-6">

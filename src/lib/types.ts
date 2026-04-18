@@ -470,9 +470,11 @@ export interface HomepageSection {
   flashSaleStartDate?: Timestamp | null;
   flashSaleEndDate?: Timestamp | null;
   // Custom UI Extensions
-  uiType?: 'image' | 'html';
+  uiType?: 'image' | 'html' | 'video';
   htmlContent?: string;
   imageUrl?: string;
+  videoUrl?: string;
+  videoPosterUrl?: string;
   overlayTitle?: string;
   overlaySubtitle?: string;
   linkUrl?: string;
