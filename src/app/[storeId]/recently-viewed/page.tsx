@@ -67,7 +67,7 @@ export default function RecentlyViewedPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="text-center md:text-left">
-                <Link href=getStoreUrl("/store/shop") className="text-xs font-black uppercase text-primary tracking-widest flex items-center justify-center md:justify-start gap-2 mb-4 hover:underline">
+                <Link href={getStoreUrl("/store/shop")} className="text-xs font-black uppercase text-primary tracking-widest flex items-center justify-center md:justify-start gap-2 mb-4 hover:underline">
                     <ArrowLeft className="h-3 w-3" /> Back to Shop
                 </Link>
                 <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white flex items-center justify-center md:justify-start gap-4">
@@ -103,7 +103,7 @@ export default function RecentlyViewedPage() {
             <h3 className="text-2xl font-black tracking-tight">Your history is empty</h3>
             <p className="mt-2 text-muted-foreground max-w-sm mx-auto">Start exploring our collection to keep track of items you love.</p>
             <Button asChild size="lg" className="mt-8 px-10 rounded-2xl font-bold">
-              <Link href=getStoreUrl("/store/shop")>Start Shopping</Link>
+              <Link href={getStoreUrl("/store/shop")}>Start Shopping</Link>
             </Button>
           </div>
         ) : (
