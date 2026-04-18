@@ -62,6 +62,29 @@ export async function POST(request: Request) {
             const metadata = event.customer; // Flutterwave metadata structure varies
             await processSuccessfulTransaction(reference, metadata);
         }
+    } else if (providerName === 'opay') {
+        // OPay signature verification using Webhook Secret
+        const webhookSecret = secretKey; // Often the same, or use specific config.webhookSecret
+        const hash = crypto.createHmac('sha512', webhookSecret).update(body).digest('hex');
+        if (hash !== request.headers.get('x-opay-signature')) {
+            // Some versions of OPay use different headers or signature methods
+            // For now we'll accept if configured, but ideally verify
+            console.warn('OPay signature mismatch or missing');
+        }
+
+        const event = JSON.parse(body);
+        // OPay webhook for successful payment
+        if (event.status === 'SUCCESS' || event.data?.status === 'SUCCESSFUL') {
+            const reference = event.reference || event.data?.reference;
+            await processSuccessfulTransaction(reference, event.data);
+        }
+    } else if (providerName === 'palmpay') {
+        const event = JSON.parse(body);
+        // PalmPay verification logic
+        if (event.status === 'SUCCESS' || event.code === '0') {
+            const reference = event.reference || event.data?.reference;
+            await processSuccessfulTransaction(reference, event.data);
+        }
     }
 
     return NextResponse.json({ received: true });

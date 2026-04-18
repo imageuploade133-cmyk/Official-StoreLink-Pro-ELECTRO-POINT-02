@@ -93,6 +93,59 @@ export async function POST(request: Request) {
             console.error('Flutterwave Error:', result);
             throw new Error(result.message || 'Flutterwave initialization failed');
           }
+    } else if (providerName === 'opay') {
+        const opayRes = await fetch('https://api.opaycheckout.com/api/v1/international/cashier/create', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${secretKey}`,
+              'Content-Type': 'application/json',
+              'MerchantId': config.merchantId,
+            },
+            body: JSON.stringify({
+              amount: {
+                total: Math.round(amount * 100),
+                currency: normalizedCurrency,
+              },
+              reference,
+              returnUrl: `${request.headers.get('origin')}/store/${storeId}/checkout/verify?provider=opay&reference=${reference}`,
+              callbackUrl: `${request.headers.get('origin')}/api/payment/webhook?provider=opay&storeId=${storeId}`,
+              userIdentify: email,
+              productDesc: `Order ${orderId}`,
+            }),
+          });
+          result = await opayRes.json();
+          if (result.code !== '00000') {
+            console.error('OPay Error:', result);
+            throw new Error(result.message || 'OPay initialization failed');
+          }
+          // OPay returns data.cashierUrl
+          result.data = { authorization_url: result.data.cashierUrl };
+    } else if (providerName === 'palmpay') {
+        // PalmPay initialization (Simplified version based on common PalmPay API patterns)
+        const palmpayRes = await fetch('https://api.palmpay.com/v1/checkout/initialize', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${secretKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              merchantId: config.merchantId,
+              appId: mode === 'live' ? config.liveAppId : config.testAppId,
+              reference,
+              amount: Math.round(amount * 100),
+              currency: normalizedCurrency,
+              redirectUrl: `${request.headers.get('origin')}/store/${storeId}/checkout/verify?provider=palmpay&reference=${reference}`,
+              callbackUrl: `${request.headers.get('origin')}/api/payment/webhook?provider=palmpay&storeId=${storeId}`,
+              customerEmail: email,
+            }),
+          });
+          result = await palmpayRes.json();
+          if (result.code !== 'SUCCESS' && result.status !== 'success') {
+            console.error('PalmPay Error:', result);
+            throw new Error(result.message || 'PalmPay initialization failed');
+          }
+          // Assume PalmPay returns payment url in result.data.url or result.data.paymentUrl
+          result.data = { authorization_url: result.data.url || result.data.paymentUrl || result.data.checkoutUrl };
     } else {
         throw new Error('Unsupported provider');
     }

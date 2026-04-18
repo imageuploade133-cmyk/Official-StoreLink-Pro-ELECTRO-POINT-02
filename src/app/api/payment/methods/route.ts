@@ -50,6 +50,8 @@ export async function GET(request: Request) {
         id: data.providerName,
         name: data.providerName === 'paystack' ? 'Pay with Card (Paystack)' : 
               data.providerName === 'flutterwave' ? 'Pay with Card (Flutterwave)' :
+              data.providerName === 'opay' ? 'Pay with OPay' :
+              data.providerName === 'palmpay' ? 'Pay with PalmPay' :
               data.providerName === 'manual' ? 'Bank Transfer' :
               data.providerName === 'pay_on_delivery' ? 'Pay on Delivery' : data.providerName,
         provider: data.providerName,
