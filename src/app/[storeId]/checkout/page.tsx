@@ -43,6 +43,8 @@ import {
   X,
   Wallet,
   Smartphone,
+  Coins,
+  Upload,
 } from 'lucide-react';
 import type { UserProfile, Order, BankAccount, WhatsappMessageLog, Coupon } from '@/lib/types';
 import { cn } from '@/lib/utils';
