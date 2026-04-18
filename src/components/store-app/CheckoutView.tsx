@@ -637,11 +637,11 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                                      method.provider === 'pay_on_delivery' ? <Truck className="h-7 w-7" /> :
                                                      <CreditCard className="h-7 w-7" />}
                                                 </div>
-                                                <div className="flex-1">
+                                                <div className="flex-1 text-left">
                                                     <p className="font-black text-sm uppercase tracking-widest">{method.name}</p>
-                                                    <p className="text-[10px] font-bold text-slate-400 uppercase mt-0.5">
-                                                        {method.name === 'Bank Transfer' ? 'Manual verification required' : 
-                                                         method.name.toLowerCase().includes('delivery') ? 'Pay upon receipt' : 'Instant secure payment'}
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase mt-0.5 line-clamp-2">
+                                                        {method.instructions || (method.name === 'Bank Transfer' ? 'Manual verification required' : 
+                                                         method.name.toLowerCase().includes('delivery') ? 'Pay upon receipt' : 'Instant secure payment')}
                                                     </p>
                                                 </div>
                                                 {paymentMethod === method.name && <CheckCircle2 className="h-7 w-7 text-primary fill-current" />}
