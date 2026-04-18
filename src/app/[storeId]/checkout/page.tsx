@@ -49,6 +49,7 @@ import { formatPhoneNumberForWhatsapp } from '@/lib/phone-utils';
 import { safeSessionStorage } from '@/lib/storage-utils';
 import { useAds } from '@/contexts/ad-context';
 import { placeOrderAction, logWhatsAppMessageAction } from '@/app/actions/orders';
+import { useStoreUrl } from '@/hooks/use-store-url';
 
 import { uploadImage } from '@/ai/flows/image-upload-flow';
 import { Upload } from 'lucide-react';
@@ -70,6 +71,7 @@ export default function CheckoutPage() {
   const { cartItems, clearCart } = useCart();
   const { user, isLoading: isAuthLoading } = useUser();
   const { settings, isLoadingSettings } = useSettings();
+  const { getStoreUrl } = useStoreUrl();
   const firestore = useFirestore();
   const { toast } = useToast();
   const { triggerAd, rewardAdClicked, activeAds, applyRewardDiscount } = useAds();
