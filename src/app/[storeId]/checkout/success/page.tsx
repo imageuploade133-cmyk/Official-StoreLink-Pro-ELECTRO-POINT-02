@@ -135,6 +135,11 @@ export default function OrderSuccessPage() {
         )}
 
         <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
+          {settings?.checkoutSuccessRedirectUrl && (
+            <Button asChild size="lg" variant="default" className="rounded-full px-10 h-14 font-bold shadow-lg bg-green-600 hover:bg-green-700">
+              <a href={settings.checkoutSuccessRedirectUrl}>Return to Merchant</a>
+            </Button>
+          )}
           <Button asChild size="lg" className="rounded-full px-10 h-14 font-bold shadow-lg shadow-primary/20">
             <Link href={getStoreUrl("/store/shop")}>Continue Shopping</Link>
           </Button>

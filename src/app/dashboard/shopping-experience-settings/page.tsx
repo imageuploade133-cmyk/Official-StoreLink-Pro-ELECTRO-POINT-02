@@ -131,6 +131,7 @@ const shoppingExpSchema = z.object({
   useIndividualBtnSettings: z.boolean().default(true),
   showProductReviews: z.boolean().default(true),
   showReviewRatingOnCard: z.boolean().default(true),
+  checkoutSuccessRedirectUrl: z.string().url().or(z.literal('')).optional(),
 });
 
 type FormValues = z.infer<typeof shoppingExpSchema>;
@@ -821,6 +822,7 @@ export default function ShoppingExperienceSettingsPage() {
       useIndividualBtnSettings: true,
       showProductReviews: true,
       showReviewRatingOnCard: true,
+      checkoutSuccessRedirectUrl: '',
     }
   });
 
@@ -874,6 +876,7 @@ export default function ShoppingExperienceSettingsPage() {
         useIndividualBtnSettings: settingsData.useIndividualBtnSettings !== false,
         showProductReviews: settingsData.showProductReviews ?? true,
         showReviewRatingOnCard: settingsData.showReviewRatingOnCard ?? true,
+        checkoutSuccessRedirectUrl: settingsData.checkoutSuccessRedirectUrl || '',
       });
     }
   }, [settingsData, form]);
@@ -991,11 +994,12 @@ export default function ShoppingExperienceSettingsPage() {
 
           {/* Button Sections */}
           <Tabs defaultValue="addToCart" className="w-full" disabled={isSaving}>
-            <TabsList className="grid w-full grid-cols-4" style={{ pointerEvents: isSaving ? 'none' : 'auto', opacity: isSaving ? 0.6 : 1 }}>
+            <TabsList className="grid w-full grid-cols-5" style={{ pointerEvents: isSaving ? 'none' : 'auto', opacity: isSaving ? 0.6 : 1 }}>
               <TabsTrigger value="addToCart">Add to Cart</TabsTrigger>
               <TabsTrigger value="gridCart">Grid Button</TabsTrigger>
               <TabsTrigger value="heroBtn">Hero Button</TabsTrigger>
               <TabsTrigger value="exploreBtn">Explore Button</TabsTrigger>
+              <TabsTrigger value="checkout">Checkout</TabsTrigger>
             </TabsList>
 
             <TabsContent value="addToCart" className="space-y-4">
@@ -1044,6 +1048,39 @@ export default function ShoppingExperienceSettingsPage() {
                 isUploading={isUploading}
                 handleImageUpload={handleImageUpload}
               />
+            </TabsContent>
+
+            <TabsContent value="checkout" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5" /> Checkout Success Redirect
+                  </CardTitle>
+                  <CardDescription>
+                    Configure a custom URL to redirect customers to after a successful purchase.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4 pt-4">
+                  <FormField
+                    control={form.control}
+                    name="checkoutSuccessRedirectUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-semibold flex items-center gap-2">
+                          <ArrowRight className="h-4 w-4" /> Redirect URL
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., https://yourwebsite.com/thank-you" {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          Leave empty to stay on the default order confirmation page.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
 

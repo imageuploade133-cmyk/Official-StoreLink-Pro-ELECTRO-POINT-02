@@ -420,6 +420,7 @@ export interface Settings {
   enableDelivery?: boolean;
   deliveryLocations?: { id: string, name: string, price: number }[];
   enableBackgroundShadow?: boolean;
+  checkoutSuccessRedirectUrl?: string;
 }
 
 export type AppSettings = Settings;
