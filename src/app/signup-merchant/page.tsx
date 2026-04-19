@@ -30,7 +30,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useAuth } from "@/contexts/auth-context";
-import "../auth-custom.css";
 
 const reservedSlugs = [
   'dashboard', 'login', 'signup', 'signup-merchant', 'pos', 'api', 'actions', 
@@ -73,8 +72,6 @@ export default function MerchantSignupPage() {
     const { store, stores, setSelectedStoreId, staffMember, isLoading: isAuthContextLoading } = useAuth();
     const [isSuccessfullySubmitted, setIsSuccessfullySubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [mascotIndex, setMascotIndex] = useState(0);
-    const mascotMessages = ['👋', '✨', '🎉', '💪', '🌟'];
     
     const form = useForm<SignupFormValues>({
       resolver: zodResolver(signupSchema),
@@ -298,165 +295,94 @@ export default function MerchantSignupPage() {
     }
 
   return (
-    <div className="login-body">
-      <div className="bg-shapes">
-        <div className="shape shape-1"></div>
-        <div className="shape shape-2"></div>
-        <div className="shape shape-3"></div>
-      </div>
-
-      <div className="signup-container-custom">
-        <div className="login-card-custom">
-          <div 
-            className="mascot-custom" 
-            title="Hi there! 👋"
-            onClick={() => setMascotIndex((mascotIndex + 1) % mascotMessages.length)}
-          >
-            {mascotMessages[mascotIndex]}
-          </div>
-
-          <div className="brand-custom text-center">
-            <div className="logo-container-custom">
-              <div className="logo-custom">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="white"/>
-                </svg>
-              </div>
-              <span className="sparkle sparkle-1">✨</span>
-              <span className="sparkle sparkle-2">⭐</span>
+    <div className="w-full min-h-screen grid lg:grid-cols-2">
+      <div className="flex items-center justify-center py-12">
+        <div className="mx-auto grid w-[400px] gap-6 px-4">
+          <div className="grid gap-2 text-center">
+             <div className="flex justify-center mb-4 h-10">
+                <ElysiumLogo className="h-10 w-10 text-primary" />
             </div>
-            <h1 className="text-3xl font-bold">Create a Store</h1>
-            <p>Start managing your business with StoreLink Pro.</p>
+            <h1 className="text-4xl font-bold font-headline">Create a Store</h1>
+            <p className="text-balance text-muted-foreground">
+              Start managing your business with StoreLink Pro.
+            </p>
           </div>
-
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
                 <FormField control={form.control} name="name" render={({ field }) => (
-                  <div className="form-group-custom">
-                    <label>Full Name</label>
-                    <div className="input-wrapper-custom">
-                      <UserIcon className="input-icon-custom" size={20} />
-                      <input {...field} placeholder="John Doe" className="w-full" disabled={isSubmitting || isLoading} />
-                    </div>
-                    <FormMessage className="text-xs mt-1" />
-                  </div>
+                    <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="John Doe" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
                 )}/>
                 <FormField control={form.control} name="email" render={({ field }) => (
-                  <div className="form-group-custom">
-                    <label>Email Address</label>
-                    <div className="input-wrapper-custom">
-                      <Mail className="input-icon-custom" size={20} />
-                      <input {...field} type="email" placeholder="m@example.com" className="w-full" disabled={isSubmitting || isLoading} />
-                    </div>
-                    <FormMessage className="text-xs mt-1" />
-                  </div>
+                    <FormItem><FormLabel>Email Address</FormLabel><FormControl><Input type="email" placeholder="m@example.com" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
                 )}/>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField control={form.control} name="storeName" render={({ field }) => (
-                  <div className="form-group-custom">
-                    <label>Store Name</label>
-                    <div className="input-wrapper-custom">
-                      <StoreIcon className="input-icon-custom" size={20} />
-                      <input {...field} placeholder="My Awesome Store" className="w-full" disabled={isSubmitting || isLoading} />
-                    </div>
-                    <FormMessage className="text-xs mt-1" />
-                  </div>
+                    <FormItem><FormLabel>Store Name</FormLabel><FormControl><Input placeholder="My Awesome Store" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
                 )}/>
                 <FormField control={form.control} name="storeSlug" render={({ field }) => (
-                  <div className="form-group-custom">
-                    <label>Store URL Slug</label>
-                    <div className="input-wrapper-custom">
-                      <span className="absolute left-10 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">/</span>
-                      <input {...field} placeholder="my-awesome-store" className="w-full pl-12" disabled={isSubmitting || isLoading} />
-                    </div>
-                    <FormMessage className="text-xs mt-1" />
-                  </div>
+                    <FormItem>
+                        <FormLabel>Store URL Slug</FormLabel>
+                        <FormControl>
+                            <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">/</span>
+                                <Input placeholder="my-awesome-store" className="pl-6" {...field} disabled={isSubmitting || isLoading} />
+                            </div>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
                 )}/>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField control={form.control} name="storePhone" render={({ field }) => (
-                  <div className="form-group-custom">
-                    <label>Store Phone Number</label>
-                    <div className="input-wrapper-custom">
-                      <Phone className="input-icon-custom" size={20} />
-                      <input {...field} placeholder="+234..." className="w-full" disabled={isSubmitting || isLoading} />
-                    </div>
-                    <FormMessage className="text-xs mt-1" />
-                  </div>
-                )}/>
-                <FormField control={form.control} name="storeAddress" render={({ field }) => (
-                  <div className="form-group-custom">
-                    <label>Store Address</label>
-                    <div className="input-wrapper-custom">
-                      <Home className="input-icon-custom" size={20} />
-                      <input {...field} placeholder="123 Business St, Lagos" className="w-full" disabled={isSubmitting || isLoading} />
-                    </div>
-                    <FormMessage className="text-xs mt-1" />
-                  </div>
-                )}/>
-              </div>
-
-              <FormField control={form.control} name="databaseId" render={({ field }) => (
-                <div className="form-group-custom">
-                  <label>Database ID (Optional)</label>
-                  <div className="input-wrapper-custom">
-                    <input {...field} placeholder="(default)" className="w-full" disabled={isSubmitting || isLoading} />
-                  </div>
-                  <p className="text-[10px] text-muted-foreground italic mt-1">Leave as <strong>(default)</strong> unless you have specifically created a separate Firestore database for this project.</p>
-                  <FormMessage className="text-xs mt-1" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormField control={form.control} name="storePhone" render={({ field }) => (
+                        <FormItem><FormLabel>Store Phone Number</FormLabel><FormControl><Input placeholder="+234..." {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
+                    )}/>
+                    <FormField control={form.control} name="storeAddress" render={({ field }) => (
+                        <FormItem><FormLabel>Store Address</FormLabel><FormControl><Input placeholder="123 Business St, Lagos" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
+                    )}/>
                 </div>
-              )}/>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField control={form.control} name="password" render={({ field }) => (
-                  <div className="form-group-custom">
-                    <label>Password</label>
-                    <div className="input-wrapper-custom">
-                      <Lock className="input-icon-custom" size={20} />
-                      <input {...field} type={showPassword ? 'text' : 'password'} placeholder="Min. 6 chars" className="w-full" disabled={isSubmitting || isLoading} />
-                      <button 
-                        type="button" 
-                        className="password-toggle-custom" 
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                      </button>
-                    </div>
-                    <FormMessage className="text-xs mt-1" />
-                  </div>
+                <FormField control={form.control} name="databaseId" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Database ID (Optional)</FormLabel>
+                        <FormControl><Input placeholder="(default)" {...field} disabled={isSubmitting || isLoading} /></FormControl>
+                        <p className="text-[10px] text-muted-foreground italic">Leave as <strong>(default)</strong> unless you have specifically created a separate Firestore database for this project.</p>
+                        <FormMessage />
+                    </FormItem>
                 )}/>
-                <FormField control={form.control} name="confirmPassword" render={({ field }) => (
-                  <div className="form-group-custom">
-                    <label>Confirm Password</label>
-                    <div className="input-wrapper-custom">
-                      <Lock className="input-icon-custom" size={20} />
-                      <input {...field} type={showPassword ? 'text' : 'password'} placeholder="Repeat password" className="w-full" disabled={isSubmitting || isLoading} />
-                    </div>
-                    <FormMessage className="text-xs mt-1" />
-                  </div>
-                )}/>
-              </div>
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormField control={form.control} name="password" render={({ field }) => (
+                        <FormItem><FormLabel>Password</FormLabel>
+                          <div className="relative">
+                            <FormControl><Input type={showPassword ? 'text' : 'password'} placeholder="Min. 6 chars" {...field} disabled={isSubmitting || isLoading} /></FormControl>
+                             <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7" onClick={() => setShowPassword(!showPassword)}><Eye className="h-4 w-4" /></Button>
+                          </div>
+                        <FormMessage /></FormItem>
+                    )}/>
+                    <FormField control={form.control} name="confirmPassword" render={({ field }) => (
+                        <FormItem><FormLabel>Confirm Password</FormLabel><FormControl><Input type={showPassword ? 'text' : 'password'} placeholder="Repeat password" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
+                    )}/>
+                </div>
 
-              <button 
-                type="submit" 
-                className={`btn-login-custom mt-4 ${(isSubmitting || isLoading) ? 'loading' : ''}`} 
-                disabled={isSubmitting || isLoading}
-              >
-                {(isSubmitting || isLoading) ? 'Creating Store…' : 'Create Store Account'}
-              </button>
-
-              <div className="signup-link-custom">
-                Already have an account? <Link href="/login">Log in</Link>
-              </div>
-              <div className="mt-8 text-center text-xs text-muted-foreground font-bold">
-                Powered By Ads Developments Inc.
-              </div>
+                <Button type="submit" className="w-full mt-2 h-12 font-bold" disabled={isSubmitting || isLoading}>
+                    {(isSubmitting || isLoading) ? <><Spinner size="sm" className="mr-2" />Creating Store…</> : 'Create Store Account'}
+                </Button>
+                <div className="text-center text-sm">
+                    Already have an account?{" "}
+                    <Link href="/login" className="underline text-primary font-bold">Log in</Link>
+                </div>
             </form>
           </Form>
+        </div>
+      </div>
+       <div className="hidden bg-muted lg:block relative">
+        <Image
+          src={loginImage.src}
+          alt="Storefront"
+          fill
+          className="object-cover"
+          unoptimized
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+        <div className="absolute bottom-10 left-10 text-white max-w-lg">
+            <h2 className="text-4xl font-black tracking-tighter uppercase">StoreLink Pro</h2>
+            <p className="text-white/80 mt-2 font-medium">The ultimate all-in-one solution for managing your e-commerce business with unparalleled efficiency and insight.</p>
         </div>
       </div>
     </div>
