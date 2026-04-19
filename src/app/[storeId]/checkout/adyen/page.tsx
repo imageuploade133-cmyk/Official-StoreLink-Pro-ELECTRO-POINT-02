@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useRouter, useParams } from 'next/navigation';
 import AdyenCheckout from '@adyen/adyen-web';
-import '@adyen/adyen-web/dist/adyen.css';
+import '@adyen/adyen-web/styles/adyen.css';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 

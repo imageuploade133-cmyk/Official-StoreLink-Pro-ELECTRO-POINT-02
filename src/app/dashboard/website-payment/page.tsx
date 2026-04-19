@@ -2288,7 +2288,7 @@ export default function WebsitePaymentSettings() {
                     <Info className="h-4 w-4" />
                     <AlertTitle>Adyen Portal</AlertTitle>
                     <AlertDescription>
-                      Find your credentials in the Adyen Customer Area under Developers > API credentials.
+                      Find your credentials in the Adyen Customer Area under Developers &gt; API credentials.
                     </AlertDescription>
                   </Alert>
                 </CardContent>
