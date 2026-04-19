@@ -148,6 +148,14 @@ export default function CheckoutPage() {
 
   const filteredPaymentMethods = useMemo(() => {
     return availablePaymentMethods.filter(method => {
+      // Filter by Region if store has a payment region set
+      if (settings?.paymentRegion) {
+        const isNigeriaSpecific = ['paystack', 'flutterwave', 'opay', 'palmpay', 'monnify'].includes(method.provider);
+        if (settings.paymentRegion !== 'Nigeria' && isNigeriaSpecific) {
+          return false;
+        }
+      }
+
       // If fulfillment is pickup, we show all methods
       if (fulfillmentType === 'pickup') return true;
       
@@ -157,7 +165,7 @@ export default function CheckoutPage() {
       // If there are specified locations, check if the selected location is in the list
       return method.allowedLocations.includes(selectedLocationId);
     });
-  }, [availablePaymentMethods, fulfillmentType, selectedLocationId]);
+  }, [availablePaymentMethods, fulfillmentType, selectedLocationId, settings?.paymentRegion]);
 
   useEffect(() => {
     if (!storeId) return;

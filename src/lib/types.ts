@@ -136,6 +136,7 @@ export interface Settings {
   theme?: 'light' | 'dark' | 'system';
   currency: string;
   country?: string;
+  paymentRegion?: string;
   countryCode?: string;
   colorPrimary?: string;
   colorBackground?: string;

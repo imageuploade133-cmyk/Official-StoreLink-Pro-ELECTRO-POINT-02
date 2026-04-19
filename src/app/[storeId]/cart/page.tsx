@@ -48,6 +48,19 @@ export default function CartPage() {
   const [availablePaymentMethods, setAvailablePaymentMethods] = useState<any[]>([]);
   const [isLoadingMethods, setIsLoadingMethods] = useState(true);
 
+  const filteredPaymentMethods = useMemo(() => {
+    return availablePaymentMethods.filter(method => {
+      // Filter by Region if store has a payment region set
+      if (settings?.paymentRegion) {
+        const isNigeriaSpecific = ['paystack', 'flutterwave', 'opay', 'palmpay', 'monnify'].includes(method.provider);
+        if (settings.paymentRegion !== 'Nigeria' && isNigeriaSpecific) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [availablePaymentMethods, settings?.paymentRegion]);
+
   useEffect(() => {
     if (!params?.storeId) return;
     const fetchMethods = async () => {
@@ -434,12 +447,12 @@ export default function CartPage() {
                             </button>
                           )}
                           
-                          {availablePaymentMethods.find(m => m.id === 'fast_checkout')?.config?.enableQuickPayButtons && (
+                          {filteredPaymentMethods.find(m => m.id === 'fast_checkout')?.config?.enableQuickPayButtons && (
                             <FastCheckoutButtons 
                               storeId={params?.storeId as string}
                               amount={total}
                               currency={settings?.currency || 'NGN'}
-                              availableMethods={availablePaymentMethods}
+                              availableMethods={filteredPaymentMethods}
                               onSuccess={(orderId) => {}}
                               onBeforeCheckout={async () => {
                                 // For cart page, we might not have user info if not logged in
