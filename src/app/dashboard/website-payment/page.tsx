@@ -2478,7 +2478,7 @@ function LocationVisibilitySelector({
             {deliveryLocations.map((loc) => (
               <div key={loc.id} className="flex items-center space-x-2 p-3 rounded-xl border bg-background/50 transition-colors hover:bg-muted/50">
                 <Checkbox
-                  id=`${name}-${loc.id}`
+                  id={`${name}-${loc.id}`}
                   checked={field.value?.includes(loc.id)}
                   onCheckedChange={(checked) => {
                     const current = field.value || [];
@@ -2490,7 +2490,7 @@ function LocationVisibilitySelector({
                   }}
                 />
                 <label
-                  htmlFor=`${name}-${loc.id}`
+                  htmlFor={`${name}-${loc.id}`}
                   className="text-sm font-medium leading-none cursor-pointer flex-grow"
                 >
                   {loc.name}
