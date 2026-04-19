@@ -103,6 +103,19 @@ export async function POST(request: Request) {
             const reference = event.reference || event.data?.reference;
             await processSuccessfulTransaction(reference, event.data);
         }
+    } else if (providerName === 'adyen') {
+        const event = JSON.parse(body);
+        // Adyen sends an array of notificationItems
+        if (event.notificationItems && event.notificationItems.length > 0) {
+            for (const item of event.notificationItems) {
+                const notification = item.notificationRequestItem;
+                // Check eventCode and success
+                if (notification.eventCode === 'AUTHORISATION' && notification.success === 'true') {
+                    const reference = notification.merchantReference;
+                    await processSuccessfulTransaction(reference, notification);
+                }
+            }
+        }
     }
 
     return NextResponse.json({ received: true });
