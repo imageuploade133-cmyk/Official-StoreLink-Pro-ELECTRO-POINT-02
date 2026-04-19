@@ -269,6 +269,19 @@ export default function ProductDetailsPage() {
   const [availablePaymentMethods, setAvailablePaymentMethods] = useState<any[]>([]);
   const [isLoadingMethods, setIsLoadingMethods] = useState(true);
 
+  const filteredPaymentMethods = useMemo(() => {
+    return availablePaymentMethods.filter(method => {
+      // Filter by Region if store has a payment region set
+      if (settings?.paymentRegion) {
+        const isNigeriaSpecific = ['paystack', 'flutterwave', 'opay', 'palmpay', 'monnify'].includes(method.provider);
+        if (settings.paymentRegion !== 'Nigeria' && isNigeriaSpecific) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [availablePaymentMethods, settings?.paymentRegion]);
+
   useEffect(() => {
     if (!storeId) return;
     const fetchMethods = async () => {
@@ -860,13 +873,13 @@ export default function ProductDetailsPage() {
                   </Button>
                 </div>
 
-                {availablePaymentMethods.find(m => m.id === 'fast_checkout')?.config?.enableQuickPayButtons && !isOutOfStock && (
+                {filteredPaymentMethods.find(m => m.id === 'fast_checkout')?.config?.enableQuickPayButtons && !isOutOfStock && (
                   <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
                     <FastCheckoutButtons 
                       storeId={storeId}
                       amount={effectivePrice * quantity}
                       currency={settings?.currency || 'NGN'}
-                      availableMethods={availablePaymentMethods}
+                      availableMethods={filteredPaymentMethods}
                       onSuccess={(orderId) => {}}
                       onBeforeCheckout={async () => {
                         try {

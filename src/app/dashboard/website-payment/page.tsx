@@ -46,6 +46,8 @@ import { Switch } from '@/components/ui/switch';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import regions from '@/lib/regions.json';
 
 const paystackSchema = z.object({
   testPublicKey: z.string().optional(),
@@ -186,14 +188,32 @@ export default function WebsitePaymentSettings() {
   const { toast } = useToast();
   
   const [isSaving, setIsSaving] = useState(false);
+  const [isSavingRegion, setIsSavingRegion] = useState(false);
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
+
+  const handleRegionChange = async (value: string) => {
+    if (!firestore || !currentStoreId) return;
+    setIsSavingRegion(true);
+    try {
+      if (currentStoreId) {
+        await saveStoreSettings(firestore, currentStoreId, { paymentRegion: value });
+      } else {
+        await saveGlobalSettings(firestore, { paymentRegion: value });
+      }
+      toast({ title: "Success", description: `Payment region updated to ${value}.` });
+    } catch (e) {
+      toast({ variant: "destructive", title: "Error", description: "Failed to update payment region." });
+    } finally {
+      setIsSavingRegion(false);
+    }
+  };
   const [editingAccount, setEditingAccount] = useState<BankAccount | null>(null);
   const [accountToDelete, setAccountToDelete] = useState<BankAccount | null>(null);
   
   const [providers, setProviders] = useState<any[]>([]);
   const [isLoadingProviders, setIsLoadingProviders] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
-  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const fetchProviders = async () => {
     if (!user) return;
@@ -813,6 +833,42 @@ export default function WebsitePaymentSettings() {
         </Alert>
       )}
 
+      <Card className="border-none shadow-md bg-muted/20">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg font-bold flex items-center gap-2">
+            <Globe className="h-5 w-5 text-primary" /> Payment Region
+          </CardTitle>
+          <CardDescription>
+            Select your primary country/region for payments. This helps customize the payment experience.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <Select 
+              value={settingsData?.paymentRegion || settingsData?.country || ""} 
+              onValueChange={handleRegionChange}
+              disabled={isSavingRegion}
+            >
+              <SelectTrigger className="w-full sm:w-[300px] h-11 bg-background">
+                <SelectValue placeholder="Select Region" />
+              </SelectTrigger>
+              <SelectContent>
+                {regions.map((region) => (
+                  <SelectItem key={region.code} value={region.name}>
+                    {region.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {isSavingRegion && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground animate-in fade-in">
+                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                Saving region...
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
       <Tabs defaultValue="paystack" className="space-y-6">
         <TabsList className="bg-muted/50 p-1.5 h-auto flex-wrap justify-start gap-1.5 shadow-sm border border-border/50"> 
           {paymentMethods.map((method) => { 

@@ -164,6 +164,27 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
   const [availablePaymentMethods, setAvailablePaymentMethods] = useState<any[]>([]);
   const [isLoadingMethods, setIsLoadingMethods] = useState(true);
 
+  const filteredPaymentMethods = useMemo(() => {
+    return availablePaymentMethods.filter(method => {
+      // Filter by Region if store has a payment region set
+      if (settings?.paymentRegion) {
+        const isNigeriaSpecific = ['paystack', 'flutterwave', 'opay', 'palmpay', 'monnify'].includes(method.provider);
+        if (settings.paymentRegion !== 'Nigeria' && isNigeriaSpecific) {
+          return false;
+        }
+      }
+
+      // If fulfillment is pickup, we show all methods
+      if (fulfillmentType === 'pickup') return true;
+      
+      // If no locations are specified for the method, it's visible for all locations
+      if (!method.allowedLocations || method.allowedLocations.length === 0) return true;
+      
+      // If there are specified locations, check if the selected location is in the list
+      return method.allowedLocations.includes(selectedLocationId);
+    });
+  }, [availablePaymentMethods, fulfillmentType, selectedLocationId, settings?.paymentRegion]);
+
   useEffect(() => {
     if (!storeId) return;
     const fetchMethods = async () => {
@@ -206,10 +227,10 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
   }, [userProfile, user]);
 
   useEffect(() => {
-    if (availablePaymentMethods.length > 0 && !paymentMethod) {
-      setPaymentMethod(availablePaymentMethods[0].name);
+    if (filteredPaymentMethods.length > 0 && !paymentMethod) {
+      setPaymentMethod(filteredPaymentMethods[0].name);
     }
-  }, [availablePaymentMethods, paymentMethod]);
+  }, [filteredPaymentMethods, paymentMethod]);
 
   useEffect(() => {
     if (paymentMethod === 'Bank Transfer' && bankAccounts.length > 0 && !selectedBankId) {
@@ -281,7 +302,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
 
     try {
       let finalOrderId = '';
-      const selectedMethod = availablePaymentMethods.find(m => m.name === paymentMethod || m.id === paymentMethod);
+      const selectedMethod = filteredPaymentMethods.find(m => m.name === paymentMethod || m.id === paymentMethod);
       const isOnlinePayment = selectedMethod && 
                              selectedMethod.provider !== 'manual' && 
                              selectedMethod.provider !== 'pay_on_delivery';
@@ -625,10 +646,10 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                             <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Select your preferred transaction method.</p>
                         </div>
 
-                        {availablePaymentMethods.length > 0 ? (
+                        {filteredPaymentMethods.length > 0 ? (
                             <div className="space-y-8">
                                 <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="grid grid-cols-1 gap-4">
-                                    {availablePaymentMethods.map((method) => (
+                                    {filteredPaymentMethods.map((method) => (
                                         <div key={method.id} className="relative">
                                             <RadioGroupItem value={method.name} id={method.id} className="peer sr-only" />
                                             <Label htmlFor={method.id} className="flex items-center gap-4 p-6 bg-white dark:bg-slate-800 rounded-[2rem] border-2 border-transparent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 shadow-lg cursor-pointer transition-all active:scale-[0.98]">
@@ -664,7 +685,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                                 <h3 className="font-black text-sm uppercase tracking-widest">{paymentMethod}</h3>
                                             </div>
                                             <p className="text-xs leading-relaxed font-medium text-slate-600 dark:text-slate-400">
-                                                {availablePaymentMethods.find(m => m.name === paymentMethod)?.instructions || 
+                                                {filteredPaymentMethods.find(m => m.name === paymentMethod)?.instructions || 
                                                  (paymentMethod.toLowerCase().includes('delivery') ? "You will pay for your order when it is delivered to you." : "Follow the on-screen instructions to complete your payment.")}
                                             </p>
                                         </div>
@@ -842,7 +863,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                     <LoadingButton 
                         onClick={handlePlaceOrder}
                         isLoading={step === 'processing'}
-                        disabled={(paymentMethod === 'Bank Transfer' && !hasConfirmedTransfer) || availablePaymentMethods.length === 0}
+                        disabled={(paymentMethod === 'Bank Transfer' && !hasConfirmedTransfer) || filteredPaymentMethods.length === 0}
                         loadingText="Processing..."
                         className="w-full h-16 rounded-[1.5rem] bg-primary text-white font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-primary/30 group transition-all active:scale-[0.98]"
                     >
