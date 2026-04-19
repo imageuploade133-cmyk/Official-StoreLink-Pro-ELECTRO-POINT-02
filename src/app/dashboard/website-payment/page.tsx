@@ -55,6 +55,7 @@ const paystackSchema = z.object({
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
   allowedLocations: z.array(z.string()).default([]),
+  logoUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
 });
 
 const flutterwaveSchema = z.object({
@@ -67,6 +68,7 @@ const flutterwaveSchema = z.object({
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
   allowedLocations: z.array(z.string()).default([]),
+  logoUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
 });
 
 const stripeSchema = z.object({
@@ -77,6 +79,7 @@ const stripeSchema = z.object({
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
   allowedLocations: z.array(z.string()).default([]),
+  logoUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
 });
 
 const opaySchema = z.object({
@@ -89,6 +92,7 @@ const opaySchema = z.object({
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
   allowedLocations: z.array(z.string()).default([]),
+  logoUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
 });
 
 const palmpaySchema = z.object({
@@ -101,6 +105,7 @@ const palmpaySchema = z.object({
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
   allowedLocations: z.array(z.string()).default([]),
+  logoUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
 });
 
 const paypalSchema = z.object({
@@ -111,12 +116,14 @@ const paypalSchema = z.object({
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
   allowedLocations: z.array(z.string()).default([]),
+  logoUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
 });
 
 const payOnDeliverySchema = z.object({
   instructions: z.string().optional(),
   isActive: z.boolean().default(false),
   allowedLocations: z.array(z.string()).default([]),
+  logoUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
 });
 
 const fastCheckoutSchema = z.object({
@@ -126,6 +133,7 @@ const fastCheckoutSchema = z.object({
   enableQuickPayButtons: z.boolean().default(false),
   isActive: z.boolean().default(false),
   allowedLocations: z.array(z.string()).default([]),
+  logoUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
 });
 
 const nowpaymentsSchema = z.object({
@@ -133,6 +141,7 @@ const nowpaymentsSchema = z.object({
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
   allowedLocations: z.array(z.string()).default([]),
+  logoUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
   acceptedCoins: z.array(z.string()).default(['btc', 'usdt', 'eth']),
 });
 
@@ -146,6 +155,7 @@ const monnifySchema = z.object({
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
   allowedLocations: z.array(z.string()).default([]),
+  logoUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
 });
 
 const adyenSchema = z.object({
@@ -155,6 +165,7 @@ const adyenSchema = z.object({
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
   allowedLocations: z.array(z.string()).default([]),
+  logoUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
 });
 
 type PaystackFormValues = z.infer<typeof paystackSchema>;
@@ -270,6 +281,7 @@ export default function WebsitePaymentSettings() {
       isActive: paystackProvider?.isActive || false,
       allowedLocations: paystackProvider?.allowedLocations || [],
       mode: paystackProvider?.mode || 'test',
+      logoUrl: paystackProvider?.config?.logoUrl || '',
     },
   });
 
@@ -285,6 +297,7 @@ export default function WebsitePaymentSettings() {
       isActive: flutterwaveProvider?.isActive || false,
       allowedLocations: flutterwaveProvider?.allowedLocations || [],
       mode: flutterwaveProvider?.mode || 'test',
+      logoUrl: flutterwaveProvider?.config?.logoUrl || '',
     },
   });
 
@@ -298,6 +311,7 @@ export default function WebsitePaymentSettings() {
       isActive: stripeProvider?.isActive || false,
       allowedLocations: stripeProvider?.allowedLocations || [],
       mode: stripeProvider?.mode || 'test',
+      logoUrl: stripeProvider?.config?.logoUrl || '',
     },
   });
 
@@ -313,6 +327,7 @@ export default function WebsitePaymentSettings() {
       isActive: opayProvider?.isActive || false,
       allowedLocations: opayProvider?.allowedLocations || [],
       mode: opayProvider?.mode || 'test',
+      logoUrl: opayProvider?.config?.logoUrl || '',
     },
   });
 
@@ -328,6 +343,7 @@ export default function WebsitePaymentSettings() {
       isActive: palmpayProvider?.isActive || false,
       allowedLocations: palmpayProvider?.allowedLocations || [],
       mode: palmpayProvider?.mode || 'test',
+      logoUrl: palmpayProvider?.config?.logoUrl || '',
     },
   });
 
@@ -341,6 +357,7 @@ export default function WebsitePaymentSettings() {
       isActive: paypalProvider?.isActive || false,
       allowedLocations: paypalProvider?.allowedLocations || [],
       mode: paypalProvider?.mode || 'test',
+      logoUrl: paypalProvider?.config?.logoUrl || '',
     },
   });
 
@@ -350,6 +367,7 @@ export default function WebsitePaymentSettings() {
       instructions: payOnDeliveryProvider?.config?.instructions || 'Pay with cash or card upon delivery.',
       isActive: payOnDeliveryProvider?.isActive || false,
       allowedLocations: payOnDeliveryProvider?.allowedLocations || [],
+      logoUrl: payOnDeliveryProvider?.config?.logoUrl || '',
     },
   });
 
@@ -362,6 +380,7 @@ export default function WebsitePaymentSettings() {
       enableQuickPayButtons: fastCheckoutProvider?.config?.enableQuickPayButtons || false,
       isActive: fastCheckoutProvider?.isActive || false,
       allowedLocations: fastCheckoutProvider?.allowedLocations || [],
+      logoUrl: fastCheckoutProvider?.config?.logoUrl || '',
     },
   });
 
@@ -372,6 +391,7 @@ export default function WebsitePaymentSettings() {
       isActive: nowpaymentsProvider?.isActive || false,
       allowedLocations: nowpaymentsProvider?.allowedLocations || [],
       mode: nowpaymentsProvider?.mode || 'test',
+      logoUrl: nowpaymentsProvider?.config?.logoUrl || '',
       acceptedCoins: nowpaymentsProvider?.config?.acceptedCoins || ['btc', 'usdt', 'eth'],
     },
   });
@@ -388,6 +408,7 @@ export default function WebsitePaymentSettings() {
       isActive: monnifyProvider?.isActive || false,
       allowedLocations: monnifyProvider?.allowedLocations || [],
       mode: monnifyProvider?.mode || 'test',
+      logoUrl: monnifyProvider?.config?.logoUrl || '',
     },
   });
   const adyenForm = useForm<AdyenFormValues>({
@@ -412,6 +433,7 @@ export default function WebsitePaymentSettings() {
         isActive: paystackProvider.isActive || false,
         allowedLocations: paystackProvider.allowedLocations || [],
         mode: paystackProvider.mode || 'test',
+        logoUrl: paystackProvider.config?.logoUrl || '',
       });
     }
     if (flutterwaveProvider) {
@@ -425,6 +447,7 @@ export default function WebsitePaymentSettings() {
         isActive: flutterwaveProvider.isActive || false,
         allowedLocations: flutterwaveProvider.allowedLocations || [],
         mode: flutterwaveProvider.mode || 'test',
+        logoUrl: flutterwaveProvider.config?.logoUrl || '',
       });
     }
     if (stripeProvider) {
@@ -436,6 +459,7 @@ export default function WebsitePaymentSettings() {
         isActive: stripeProvider.isActive || false,
         allowedLocations: stripeProvider.allowedLocations || [],
         mode: stripeProvider.mode || 'test',
+        logoUrl: stripeProvider.config?.logoUrl || '',
       });
     }
     if (opayProvider) {
@@ -449,6 +473,7 @@ export default function WebsitePaymentSettings() {
         isActive: opayProvider.isActive || false,
         allowedLocations: opayProvider.allowedLocations || [],
         mode: opayProvider.mode || 'test',
+        logoUrl: opayProvider.config?.logoUrl || '',
       });
     }
     if (palmpayProvider) {
@@ -462,6 +487,7 @@ export default function WebsitePaymentSettings() {
         isActive: palmpayProvider.isActive || false,
         allowedLocations: palmpayProvider.allowedLocations || [],
         mode: palmpayProvider.mode || 'test',
+        logoUrl: palmpayProvider.config?.logoUrl || '',
       });
     }
     if (paypalProvider) {
@@ -473,6 +499,7 @@ export default function WebsitePaymentSettings() {
         isActive: paypalProvider.isActive || false,
         allowedLocations: paypalProvider.allowedLocations || [],
         mode: paypalProvider.mode || 'test',
+        logoUrl: paypalProvider.config?.logoUrl || '',
       });
     }
     if (payOnDeliveryProvider) {
@@ -480,6 +507,7 @@ export default function WebsitePaymentSettings() {
         instructions: payOnDeliveryProvider.config?.instructions || 'Pay with cash or card upon delivery.',
         isActive: payOnDeliveryProvider.isActive || false,
         allowedLocations: payOnDeliveryProvider.allowedLocations || [],
+        logoUrl: payOnDeliveryProvider.config?.logoUrl || '',
       });
     }
     if (fastCheckoutProvider) {
@@ -490,6 +518,7 @@ export default function WebsitePaymentSettings() {
         enableQuickPayButtons: fastCheckoutProvider.config?.enableQuickPayButtons || false,
         isActive: fastCheckoutProvider.isActive || false,
         allowedLocations: fastCheckoutProvider.allowedLocations || [],
+        logoUrl: fastCheckoutProvider.config?.logoUrl || '',
       });
     }
     if (nowpaymentsProvider) {
@@ -498,6 +527,7 @@ export default function WebsitePaymentSettings() {
         isActive: nowpaymentsProvider.isActive || false,
         allowedLocations: nowpaymentsProvider.allowedLocations || [],
         mode: nowpaymentsProvider.mode || 'test',
+        logoUrl: nowpaymentsProvider.config?.logoUrl || '',
         acceptedCoins: nowpaymentsProvider.config?.acceptedCoins || ['btc', 'usdt', 'eth'],
       });
 
@@ -512,6 +542,7 @@ export default function WebsitePaymentSettings() {
         isActive: monnifyProvider.isActive || false,
         allowedLocations: monnifyProvider.allowedLocations || [],
         mode: monnifyProvider.mode || 'test',
+        logoUrl: monnifyProvider.config?.logoUrl || '',
       });
     if (adyenProvider) {
       adyenForm.reset({
@@ -521,6 +552,7 @@ export default function WebsitePaymentSettings() {
         isActive: adyenProvider.isActive || false,
         allowedLocations: adyenProvider.allowedLocations || [],
         mode: adyenProvider.mode || "test",
+        logoUrl: adyenProvider.config?.logoUrl || '',
       });
     }
     }
@@ -639,6 +671,7 @@ export default function WebsitePaymentSettings() {
     defaultValues: {
       isActive: manualProvider?.isActive ?? true,
       allowedLocations: manualProvider?.allowedLocations || [],
+      logoUrl: manualProvider?.config?.logoUrl || '',
     }
   });
 
@@ -647,6 +680,7 @@ export default function WebsitePaymentSettings() {
       manualForm.reset({
         isActive: manualProvider.isActive,
         allowedLocations: manualProvider.allowedLocations || [],
+        logoUrl: manualProvider.config?.logoUrl || '',
       });
     }
   }, [manualProvider, manualForm]);
@@ -923,6 +957,7 @@ export default function WebsitePaymentSettings() {
                           Set this in your Paystack dashboard to receive payment notifications.
                         </p>
                       </div>
+                      <PaymentMethodLogoUpload form={paystackForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={paystackForm.control} name="allowedLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
@@ -1088,6 +1123,7 @@ export default function WebsitePaymentSettings() {
                           </FormItem>
                         )}
                       />
+                      <PaymentMethodLogoUpload form={flutterwaveForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={flutterwaveForm.control} name="allowedLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
@@ -1224,6 +1260,7 @@ export default function WebsitePaymentSettings() {
                           )}
                         />
                       </div>
+                      <PaymentMethodLogoUpload form={stripeForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={stripeForm.control} name="allowedLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
@@ -1360,6 +1397,7 @@ export default function WebsitePaymentSettings() {
                           )}
                         />
                       </div>
+                      <PaymentMethodLogoUpload form={paypalForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={paypalForm.control} name="allowedLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
@@ -1520,6 +1558,7 @@ export default function WebsitePaymentSettings() {
                           </FormItem>
                         )}
                       />
+                      <PaymentMethodLogoUpload form={opayForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={opayForm.control} name="allowedLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
@@ -1680,6 +1719,7 @@ export default function WebsitePaymentSettings() {
                           </FormItem>
                         )}
                       />
+                      <PaymentMethodLogoUpload form={palmpayForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={palmpayForm.control} name="allowedLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
@@ -1752,6 +1792,7 @@ export default function WebsitePaymentSettings() {
                           </FormItem>
                         )}
                       />
+                      <PaymentMethodLogoUpload form={payOnDeliveryForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={payOnDeliveryForm.control} name="allowedLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6">
@@ -1892,6 +1933,7 @@ export default function WebsitePaymentSettings() {
                           Set this in your NOWPayments dashboard to receive payment notifications.
                         </p>
                       </div>
+                      <PaymentMethodLogoUpload form={nowpaymentsForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={nowpaymentsForm.control} name="allowedLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
@@ -2072,6 +2114,7 @@ export default function WebsitePaymentSettings() {
                           Set this in your Monnify dashboard to receive payment notifications.
                         </p>
                       </div>
+                      <PaymentMethodLogoUpload form={monnifyForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={monnifyForm.control} name="allowedLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
@@ -2216,6 +2259,7 @@ export default function WebsitePaymentSettings() {
                             </FormControl>
                             <FormDescription>
                               Your Adyen API Key for checkout service.
+                      <PaymentMethodLogoUpload form={adyenForm} isSaving={isSaving} />
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -2384,6 +2428,7 @@ export default function WebsitePaymentSettings() {
                           )}
                         />
                       </div>
+                      <PaymentMethodLogoUpload form={fastCheckoutForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={fastCheckoutForm.control} name="allowedLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6">
@@ -2448,6 +2493,7 @@ export default function WebsitePaymentSettings() {
                       />
                     </CardHeader>
                     <CardContent>
+                      <PaymentMethodLogoUpload form={manualForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={manualForm.control} name="allowedLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6">
@@ -2723,5 +2769,67 @@ function LocationVisibilitySelector({
         )}
       />
     </div>
+  );
+}
+
+function PaymentMethodLogoUpload({ form, isSaving, label = "Payment Method Logo" }: { form: any, isSaving: boolean, label?: string }) {
+  const [isUploading, setIsUploading] = useState(false);
+  const { toast } = useToast();
+  const logoUrl = form.watch('logoUrl');
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 1 * 1024 * 1024) {
+      toast({ variant: "destructive", title: "File too large", description: "Logo image should be smaller than 1MB." });
+      return;
+    }
+
+    setIsUploading(true);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      try {
+        const imageDataUri = reader.result as string;
+        const result = await uploadImage({ imageDataUri });
+        form.setValue('logoUrl', result.display_url, { shouldValidate: true });
+        toast({ title: "Logo Uploaded", description: "Logo has been updated." });
+      } catch (error: any) {
+        toast({ variant: "destructive", title: "Upload Failed", description: error.message || "Could not upload logo." });
+      } finally {
+        setIsUploading(false);
+      }
+    };
+    reader.onerror = () => {
+        toast({ variant: "destructive", title: "File Error", description: "Could not read the selected file."});
+        setIsUploading(false);
+    };
+  };
+
+  return (
+    <FormField control={form.control} name="logoUrl" render={({ field }) => (
+      <FormItem className="pt-4 border-t mt-4">
+        <FormLabel>{label} (Optional)</FormLabel>
+        <div className="flex items-center gap-4">
+          <div className="relative w-16 h-16 rounded-lg border bg-muted flex items-center justify-center overflow-hidden">
+            {logoUrl ? <Image src={logoUrl} alt="Logo" fill className=\"object-contain p-1\" /> : <Upload className=\"h-8 w-8 text-muted-foreground\" />}
+          </div>
+          <div className="flex-grow space-y-2">
+            <div className="flex items-center gap-2">
+              <FormControl><Input placeholder=\"https://example.com/logo.png\" {...field} value={field.value || ''} disabled={isSaving || isUploading} /></FormControl>
+              <Button asChild variant=\"outline\" size=\"icon\" disabled={isSaving || isUploading}>
+                <label className=\"cursor-pointer\">
+                  {isUploading ? <Loader2 className=\"h-4 w-4 animate-spin\"/> : <Upload className=\"h-4 w-4\" />}
+                  <input type=\"file\" accept=\"image/*\" className=\"hidden\" onChange={handleImageUpload} disabled={isSaving || isUploading} />
+                </label>
+              </Button>
+            </div>
+            <FormDescription>Shown at checkout instead of the default icon.</FormDescription>
+          </div>
+        </div>
+        <FormMessage />
+      </FormItem>
+    )} />
   );
 }
