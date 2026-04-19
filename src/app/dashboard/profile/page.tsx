@@ -11,9 +11,10 @@ import { PermissionsCard } from './components/PermissionsCard';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Loader2 } from 'lucide-react';
 import { LogoutCard } from './components/LogoutCard';
+import { QuickLinksCard } from './components/QuickLinksCard';
 
 export default function ProfilePage() {
-  const { user, staffMember, isLoading, permissions } = useAuth();
+  const { user, staffMember, isLoading, permissions, isAdmin } = useAuth();
   
   if (isLoading) {
     return (
@@ -42,6 +43,7 @@ export default function ProfilePage() {
         <div className="lg:col-span-2 space-y-6">
           <ProfileUpdateForm user={user} staffMember={staffMember}/>
           <PasswordChangeForm user={user} />
+          {isAdmin && <QuickLinksCard />}
           <PermissionsCard userPermissions={permissions} />
           <LogoutCard />
         </div>
