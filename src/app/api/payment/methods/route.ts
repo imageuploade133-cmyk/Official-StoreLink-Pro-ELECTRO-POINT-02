@@ -65,6 +65,7 @@ export async function GET(request: Request) {
         instructions: config.instructions || '',
         config: data.providerName === 'fast_checkout' ? config : undefined,
         allowedLocations: data.allowedLocations || [],
+        paymentRegion: data.paymentRegion || '',
         logoUrl: config.logoUrl || '',
       });
     });

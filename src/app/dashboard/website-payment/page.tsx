@@ -50,6 +50,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import regions from '@/lib/regions.json';
 
 const paystackSchema = z.object({
+  paymentRegion: z.string().optional(),
   testPublicKey: z.string().optional(),
   testSecretKey: z.string().optional(),
   livePublicKey: z.string().optional(),
@@ -61,6 +62,7 @@ const paystackSchema = z.object({
 });
 
 const flutterwaveSchema = z.object({
+  paymentRegion: z.string().optional(),
   testPublicKey: z.string().optional(),
   testSecretKey: z.string().optional(),
   testEncryptionKey: z.string().optional(),
@@ -74,6 +76,7 @@ const flutterwaveSchema = z.object({
 });
 
 const stripeSchema = z.object({
+  paymentRegion: z.string().optional(),
   testPublicKey: z.string().optional(),
   testSecretKey: z.string().optional(),
   livePublicKey: z.string().optional(),
@@ -85,6 +88,7 @@ const stripeSchema = z.object({
 });
 
 const opaySchema = z.object({
+  paymentRegion: z.string().optional(),
   merchantId: z.string().optional(),
   testPublicKey: z.string().optional(),
   testSecretKey: z.string().optional(),
@@ -98,6 +102,7 @@ const opaySchema = z.object({
 });
 
 const palmpaySchema = z.object({
+  paymentRegion: z.string().optional(),
   merchantId: z.string().optional(),
   testAppId: z.string().optional(),
   testSecretKey: z.string().optional(),
@@ -111,6 +116,7 @@ const palmpaySchema = z.object({
 });
 
 const paypalSchema = z.object({
+  paymentRegion: z.string().optional(),
   clientId: z.string().optional(),
   secretKey: z.string().optional(),
   liveClientId: z.string().optional(),
@@ -122,6 +128,7 @@ const paypalSchema = z.object({
 });
 
 const payOnDeliverySchema = z.object({
+  paymentRegion: z.string().optional(),
   instructions: z.string().optional(),
   isActive: z.boolean().default(false),
   allowedLocations: z.array(z.string()).default([]),
@@ -129,6 +136,7 @@ const payOnDeliverySchema = z.object({
 });
 
 const fastCheckoutSchema = z.object({
+  paymentRegion: z.string().optional(),
   enableApplePay: z.boolean().default(false),
   enableGooglePay: z.boolean().default(false),
   enableExpress: z.boolean().default(false),
@@ -139,6 +147,7 @@ const fastCheckoutSchema = z.object({
 });
 
 const nowpaymentsSchema = z.object({
+  paymentRegion: z.string().optional(),
   apiKey: z.string().optional(),
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
@@ -148,6 +157,7 @@ const nowpaymentsSchema = z.object({
 });
 
 const monnifySchema = z.object({
+  paymentRegion: z.string().optional(),
   testApiKey: z.string().optional(),
   testSecretKey: z.string().optional(),
   testContractCode: z.string().optional(),
@@ -161,6 +171,7 @@ const monnifySchema = z.object({
 });
 
 const adyenSchema = z.object({
+  paymentRegion: z.string().optional(),
   apiKey: z.string().optional(),
   merchantAccount: z.string().optional(),
   clientKey: z.string().optional(),
@@ -294,6 +305,7 @@ export default function WebsitePaymentSettings() {
   const paystackForm = useForm<PaystackFormValues>({
     resolver: zodResolver(paystackSchema),
     defaultValues: {
+      paymentRegion: paystackProvider?.paymentRegion || '',
       testPublicKey: paystackProvider?.config?.testPublicKey || '',
       testSecretKey: paystackProvider?.config?.testSecretKey || '',
       livePublicKey: paystackProvider?.config?.livePublicKey || '',
@@ -308,6 +320,7 @@ export default function WebsitePaymentSettings() {
   const flutterwaveForm = useForm<FlutterwaveFormValues>({
     resolver: zodResolver(flutterwaveSchema),
     defaultValues: {
+      paymentRegion: flutterwaveProvider?.paymentRegion || '',
       testPublicKey: flutterwaveProvider?.config?.testPublicKey || '',
       testSecretKey: flutterwaveProvider?.config?.testSecretKey || '',
       testEncryptionKey: flutterwaveProvider?.config?.testEncryptionKey || '',
@@ -324,6 +337,7 @@ export default function WebsitePaymentSettings() {
   const stripeForm = useForm<StripeFormValues>({
     resolver: zodResolver(stripeSchema),
     defaultValues: {
+      paymentRegion: stripeProvider?.paymentRegion || '',
       testPublicKey: stripeProvider?.config?.testPublicKey || '',
       testSecretKey: stripeProvider?.config?.testSecretKey || '',
       livePublicKey: stripeProvider?.config?.livePublicKey || '',
@@ -338,6 +352,7 @@ export default function WebsitePaymentSettings() {
   const opayForm = useForm<OpayFormValues>({
     resolver: zodResolver(opaySchema),
     defaultValues: {
+      paymentRegion: opayProvider?.paymentRegion || '',
       merchantId: opayProvider?.config?.merchantId || '',
       testPublicKey: opayProvider?.config?.testPublicKey || '',
       testSecretKey: opayProvider?.config?.testSecretKey || '',
@@ -354,6 +369,7 @@ export default function WebsitePaymentSettings() {
   const palmpayForm = useForm<PalmPayFormValues>({
     resolver: zodResolver(palmpaySchema),
     defaultValues: {
+      paymentRegion: palmpayProvider?.paymentRegion || '',
       merchantId: palmpayProvider?.config?.merchantId || '',
       testAppId: palmpayProvider?.config?.testAppId || '',
       testSecretKey: palmpayProvider?.config?.testSecretKey || '',
@@ -370,6 +386,7 @@ export default function WebsitePaymentSettings() {
   const paypalForm = useForm<PayPalFormValues>({
     resolver: zodResolver(paypalSchema),
     defaultValues: {
+      paymentRegion: paypalProvider?.paymentRegion || '',
       clientId: paypalProvider?.config?.clientId || '',
       secretKey: paypalProvider?.config?.secretKey || '',
       liveClientId: paypalProvider?.config?.liveClientId || '',
@@ -384,6 +401,7 @@ export default function WebsitePaymentSettings() {
   const payOnDeliveryForm = useForm<PayOnDeliveryFormValues>({
     resolver: zodResolver(payOnDeliverySchema),
     defaultValues: {
+      paymentRegion: payOnDeliveryProvider?.paymentRegion || '',
       instructions: payOnDeliveryProvider?.config?.instructions || 'Pay with cash or card upon delivery.',
       isActive: payOnDeliveryProvider?.isActive || false,
       allowedLocations: payOnDeliveryProvider?.allowedLocations || [],
@@ -394,6 +412,7 @@ export default function WebsitePaymentSettings() {
   const fastCheckoutForm = useForm<FastCheckoutFormValues>({
     resolver: zodResolver(fastCheckoutSchema),
     defaultValues: {
+      paymentRegion: fastCheckoutProvider?.paymentRegion || '',
       enableApplePay: fastCheckoutProvider?.config?.enableApplePay || false,
       enableGooglePay: fastCheckoutProvider?.config?.enableGooglePay || false,
       enableExpress: fastCheckoutProvider?.config?.enableExpress || false,
@@ -407,6 +426,7 @@ export default function WebsitePaymentSettings() {
   const nowpaymentsForm = useForm<NowPaymentsFormValues>({
     resolver: zodResolver(nowpaymentsSchema),
     defaultValues: {
+      paymentRegion: nowpaymentsProvider?.paymentRegion || '',
       apiKey: nowpaymentsProvider?.config?.apiKey || '',
       isActive: nowpaymentsProvider?.isActive || false,
       allowedLocations: nowpaymentsProvider?.allowedLocations || [],
@@ -419,6 +439,7 @@ export default function WebsitePaymentSettings() {
   const monnifyForm = useForm<MonnifyFormValues>({
     resolver: zodResolver(monnifySchema),
     defaultValues: {
+      paymentRegion: monnifyProvider?.paymentRegion || '',
       testApiKey: monnifyProvider?.config?.testApiKey || '',
       testSecretKey: monnifyProvider?.config?.testSecretKey || '',
       testContractCode: monnifyProvider?.config?.testContractCode || '',
@@ -434,6 +455,7 @@ export default function WebsitePaymentSettings() {
   const adyenForm = useForm<AdyenFormValues>({
     resolver: zodResolver(adyenSchema),
     defaultValues: {
+      paymentRegion: adyenProvider?.paymentRegion || '',
       apiKey: adyenProvider?.config?.apiKey || "",
       merchantAccount: adyenProvider?.config?.merchantAccount || "",
       clientKey: adyenProvider?.config?.clientKey || "",
@@ -446,6 +468,7 @@ export default function WebsitePaymentSettings() {
   useEffect(() => {
     if (paystackProvider) {
       paystackForm.reset({
+        paymentRegion: paystackProvider.paymentRegion || '',
         testPublicKey: paystackProvider.config?.testPublicKey || '',
         testSecretKey: paystackProvider.config?.testSecretKey || '',
         livePublicKey: paystackProvider.config?.livePublicKey || '',
@@ -458,6 +481,7 @@ export default function WebsitePaymentSettings() {
     }
     if (flutterwaveProvider) {
       flutterwaveForm.reset({
+        paymentRegion: flutterwaveProvider.paymentRegion || '',
         testPublicKey: flutterwaveProvider.config?.testPublicKey || '',
         testSecretKey: flutterwaveProvider.config?.testSecretKey || '',
         testEncryptionKey: flutterwaveProvider.config?.testEncryptionKey || '',
@@ -472,6 +496,7 @@ export default function WebsitePaymentSettings() {
     }
     if (stripeProvider) {
       stripeForm.reset({
+        paymentRegion: stripeProvider.paymentRegion || '',
         testPublicKey: stripeProvider.config?.testPublicKey || '',
         testSecretKey: stripeProvider.config?.testSecretKey || '',
         livePublicKey: stripeProvider.config?.livePublicKey || '',
@@ -484,6 +509,7 @@ export default function WebsitePaymentSettings() {
     }
     if (opayProvider) {
       opayForm.reset({
+        paymentRegion: opayProvider.paymentRegion || '',
         merchantId: opayProvider.config?.merchantId || '',
         testPublicKey: opayProvider.config?.testPublicKey || '',
         testSecretKey: opayProvider.config?.testSecretKey || '',
@@ -498,6 +524,7 @@ export default function WebsitePaymentSettings() {
     }
     if (palmpayProvider) {
       palmpayForm.reset({
+        paymentRegion: palmpayProvider.paymentRegion || '',
         merchantId: palmpayProvider.config?.merchantId || '',
         testAppId: palmpayProvider.config?.testAppId || '',
         testSecretKey: palmpayProvider.config?.testSecretKey || '',
@@ -512,6 +539,7 @@ export default function WebsitePaymentSettings() {
     }
     if (paypalProvider) {
       paypalForm.reset({
+        paymentRegion: paypalProvider.paymentRegion || '',
         clientId: paypalProvider.config?.clientId || '',
         secretKey: paypalProvider.config?.secretKey || '',
         liveClientId: paypalProvider.config?.liveClientId || '',
@@ -524,6 +552,7 @@ export default function WebsitePaymentSettings() {
     }
     if (payOnDeliveryProvider) {
       payOnDeliveryForm.reset({
+        paymentRegion: payOnDeliveryProvider.paymentRegion || '',
         instructions: payOnDeliveryProvider.config?.instructions || 'Pay with cash or card upon delivery.',
         isActive: payOnDeliveryProvider.isActive || false,
         allowedLocations: payOnDeliveryProvider.allowedLocations || [],
@@ -532,6 +561,7 @@ export default function WebsitePaymentSettings() {
     }
     if (fastCheckoutProvider) {
       fastCheckoutForm.reset({
+        paymentRegion: fastCheckoutProvider.paymentRegion || '',
         enableApplePay: fastCheckoutProvider.config?.enableApplePay || false,
         enableGooglePay: fastCheckoutProvider.config?.enableGooglePay || false,
         enableExpress: fastCheckoutProvider.config?.enableExpress || false,
@@ -543,6 +573,7 @@ export default function WebsitePaymentSettings() {
     }
     if (nowpaymentsProvider) {
       nowpaymentsForm.reset({
+        paymentRegion: nowpaymentsProvider.paymentRegion || '',
         apiKey: nowpaymentsProvider.config?.apiKey || '',
         isActive: nowpaymentsProvider.isActive || false,
         allowedLocations: nowpaymentsProvider.allowedLocations || [],
@@ -553,6 +584,7 @@ export default function WebsitePaymentSettings() {
 
     if (monnifyProvider) {
       monnifyForm.reset({
+        paymentRegion: monnifyProvider.paymentRegion || '',
         testApiKey: monnifyProvider.config?.testApiKey || '',
         testSecretKey: monnifyProvider.config?.testSecretKey || '',
         testContractCode: monnifyProvider.config?.testContractCode || '',
@@ -566,6 +598,7 @@ export default function WebsitePaymentSettings() {
       });
     if (adyenProvider) {
       adyenForm.reset({
+        paymentRegion: adyenProvider.paymentRegion || '',
         apiKey: adyenProvider.config?.apiKey || "",
         merchantAccount: adyenProvider.config?.merchantAccount || "",
         clientKey: adyenProvider.config?.clientKey || "",
@@ -689,6 +722,7 @@ export default function WebsitePaymentSettings() {
 
   const manualForm = useForm({
     defaultValues: {
+      paymentRegion: manualProvider?.paymentRegion || '',
       isActive: manualProvider?.isActive ?? true,
       allowedLocations: manualProvider?.allowedLocations || [],
       logoUrl: manualProvider?.config?.logoUrl || '',
@@ -699,6 +733,7 @@ export default function WebsitePaymentSettings() {
     if (manualProvider) {
       manualForm.reset({
         isActive: manualProvider.isActive,
+        paymentRegion: manualProvider.paymentRegion || '',
         allowedLocations: manualProvider.allowedLocations || [],
         logoUrl: manualProvider.config?.logoUrl || '',
       });
@@ -1015,6 +1050,7 @@ export default function WebsitePaymentSettings() {
                       </div>
                       <PaymentMethodLogoUpload form={paystackForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={paystackForm.control} name="allowedLocations" />
+                      <PaymentRegionSelector control={paystackForm.control} name="paymentRegion" disabled={isSaving} />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -1181,6 +1217,7 @@ export default function WebsitePaymentSettings() {
                       />
                       <PaymentMethodLogoUpload form={flutterwaveForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={flutterwaveForm.control} name="allowedLocations" />
+                      <PaymentRegionSelector control={flutterwaveForm.control} name="paymentRegion" disabled={isSaving} />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -1318,6 +1355,7 @@ export default function WebsitePaymentSettings() {
                       </div>
                       <PaymentMethodLogoUpload form={stripeForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={stripeForm.control} name="allowedLocations" />
+                      <PaymentRegionSelector control={stripeForm.control} name="paymentRegion" disabled={isSaving} />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -1455,6 +1493,7 @@ export default function WebsitePaymentSettings() {
                       </div>
                       <PaymentMethodLogoUpload form={paypalForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={paypalForm.control} name="allowedLocations" />
+                      <PaymentRegionSelector control={paypalForm.control} name="paymentRegion" disabled={isSaving} />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -1616,6 +1655,7 @@ export default function WebsitePaymentSettings() {
                       />
                       <PaymentMethodLogoUpload form={opayForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={opayForm.control} name="allowedLocations" />
+                      <PaymentRegionSelector control={opayForm.control} name="paymentRegion" disabled={isSaving} />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -1777,6 +1817,7 @@ export default function WebsitePaymentSettings() {
                       />
                       <PaymentMethodLogoUpload form={palmpayForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={palmpayForm.control} name="allowedLocations" />
+                      <PaymentRegionSelector control={palmpayForm.control} name="paymentRegion" disabled={isSaving} />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -1850,6 +1891,7 @@ export default function WebsitePaymentSettings() {
                       />
                       <PaymentMethodLogoUpload form={payOnDeliveryForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={payOnDeliveryForm.control} name="allowedLocations" />
+                      <PaymentRegionSelector control={payOnDeliveryForm.control} name="paymentRegion" disabled={isSaving} />
                     </CardContent>
                     <CardFooter className="border-t pt-6">
                       <Button type="submit" disabled={isSaving}>
@@ -1991,6 +2033,7 @@ export default function WebsitePaymentSettings() {
                       </div>
                       <PaymentMethodLogoUpload form={nowpaymentsForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={nowpaymentsForm.control} name="allowedLocations" />
+                      <PaymentRegionSelector control={nowpaymentsForm.control} name="paymentRegion" disabled={isSaving} />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -2172,6 +2215,7 @@ export default function WebsitePaymentSettings() {
                       </div>
                       <PaymentMethodLogoUpload form={monnifyForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={monnifyForm.control} name="allowedLocations" />
+                      <PaymentRegionSelector control={monnifyForm.control} name="paymentRegion" disabled={isSaving} />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -2316,6 +2360,7 @@ export default function WebsitePaymentSettings() {
                             <FormDescription>
                               Your Adyen API Key for checkout service.
                       <PaymentMethodLogoUpload form={adyenForm} isSaving={isSaving} />
+                      <PaymentRegionSelector control={adyenForm.control} name="paymentRegion" disabled={isSaving} />
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -2486,6 +2531,7 @@ export default function WebsitePaymentSettings() {
                       </div>
                       <PaymentMethodLogoUpload form={fastCheckoutForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={fastCheckoutForm.control} name="allowedLocations" />
+                      <PaymentRegionSelector control={fastCheckoutForm.control} name="paymentRegion" disabled={isSaving} />
                     </CardContent>
                     <CardFooter className="border-t pt-6">
                       <Button type="submit" disabled={isSaving}>
@@ -2551,6 +2597,7 @@ export default function WebsitePaymentSettings() {
                     <CardContent>
                       <PaymentMethodLogoUpload form={manualForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={manualForm.control} name="allowedLocations" />
+                      <PaymentRegionSelector control={manualForm.control} name="paymentRegion" disabled={isSaving} />
                     </CardContent>
                     <CardFooter className="border-t pt-6">
                       <Button type="submit" disabled={isSaving}>
@@ -2887,5 +2934,67 @@ function PaymentMethodLogoUpload({ form, isSaving, label = "Payment Method Logo"
         <FormMessage />
       </FormItem>
     )} />
+  );
+}
+
+function PaymentRegionSelector({ 
+  control, 
+  name,
+  disabled
+}: { 
+  control: any, 
+  name: string,
+  disabled?: boolean
+}) {
+  const { toast } = useToast();
+  
+  return (
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <FormItem className="pt-4 border-t mt-4">
+          <div className="flex items-center justify-between">
+            <FormLabel>Payment Region (Optional)</FormLabel>
+            {field.value && (
+              <Button 
+                type="button" 
+                variant="ghost" 
+                size="sm" 
+                className="h-8 text-xs text-muted-foreground hover:text-destructive"
+                onClick={() => {
+                  field.onChange("");
+                  toast({ title: "Region Reset", description: "Payment region has been unselected." });
+                }}
+              >
+                <Trash2 className="h-3 w-3 mr-1" /> Reset to Default
+              </Button>
+            )}
+          </div>
+          <Select 
+            onValueChange={field.onChange} 
+            value={field.value || ""} 
+            disabled={disabled}
+          >
+            <FormControl>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a region for this method" />
+              </SelectTrigger>
+            </FormControl>
+            <SelectContent>
+              {regions.map((region: any) => (
+                <SelectItem key={region.code} value={region.name}>
+                  {region.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <FormDescription>
+            Specify a region for this payment method. Leave unselected to use default store region.
+          </FormDescription>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
   );
 }
