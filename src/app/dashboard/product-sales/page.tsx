@@ -26,6 +26,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ProductSalesTable } from "@/components/product-sales/product-sales-table";
 import { ProductSalesDetailsModal } from "@/components/product-sales/product-sales-details-modal";
 import { DailySalesPerformanceTab } from "@/components/product-sales/daily-sales-performance-tab";
+import { BarcodeScanner } from "@/components/inventory/BarcodeScanner";
+import { useBarcodeScanner } from "@/hooks/use-barcode-scanner";
 import type { AggregatedProductSale, SaleTransaction, StaffMember, Product } from "@/lib/types";
 import {
   TrendingUp,
@@ -39,7 +41,8 @@ import {
   ChevronRight,
   RotateCcw,
   BarChart3,
-  AlertTriangle
+  AlertTriangle,
+  Barcode
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSettings } from "@/contexts/settings-context";
@@ -71,6 +74,8 @@ export default function ProductSalesPage() {
   const [staffMap, setStaffMap] = React.useState<Map<string, StaffMember>>(new Map());
 
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [isBarcodeSearch, setIsBarcodeSearch] = React.useState(false);
+  const [isScannerOpen, setIsScannerOpen] = React.useState(false);
   
   // Pagination State
   const [currentPage, setCurrentPage] = React.useState(1);
@@ -87,8 +92,9 @@ export default function ProductSalesPage() {
 
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>(undefined);
   const [activePreset, setActivePreset] = React.useState<'last7' | 'last30' | 'custom'>('last30');
-  
+
   React.useEffect(() => {
+
     // Set initial date range on client-side to avoid hydration mismatch
     setDateRange({
       from: subDays(new Date(), 29),
@@ -146,17 +152,27 @@ export default function ProductSalesPage() {
   }, [firestore, toast, currentStoreId]);
 
   // 2. Fetch paginated products and merge with sales data
-  const fetchProductBatch = React.useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
+  const fetchProductBatch = React.useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial', overrideSearch?: string, isBarcode?: boolean) => {
     if (!firestore || !currentStoreId) return;
     setLoading(true);
 
     try {
       const productsCol = collection(firestore, "products");
-      let q = query(productsCol, where('store_id', '==', currentStoreId), where('isVisibleOnWeb', '==', true), orderBy("name", "asc"));
+      const currentSearch = overrideSearch !== undefined ? overrideSearch : searchTerm;
+      const currentIsBarcode = isBarcode !== undefined ? isBarcode : isBarcodeSearch;
+      
+      let q = query(productsCol, where('store_id', '==', currentStoreId), where('isVisibleOnWeb', '==', true));
 
-      if (searchTerm.trim()) {
-        const term = searchTerm.toLowerCase().trim();
-        q = query(q, where("name", ">=", term), where("name", "<=", term + '\uf8ff'));
+      if (currentSearch.trim()) {
+        const term = currentSearch.trim();
+        if (currentIsBarcode) {
+          q = query(q, where("barcode", "==", term));
+        } else {
+          const lowerTerm = term.toLowerCase();
+          q = query(q, where("name", ">=", lowerTerm), where("name", "<=", lowerTerm + '\uf8ff'), orderBy("name", "asc"));
+        }
+      } else {
+        q = query(q, orderBy("name", "asc"));
       }
 
       if (direction === 'initial') {
@@ -242,7 +258,18 @@ export default function ProductSalesPage() {
     } finally {
       setLoading(false);
     }
-  }, [firestore, searchTerm, toast, currentStoreId]);
+  }, [firestore, searchTerm, isBarcodeSearch, toast, currentStoreId]);
+
+  const handleScan = React.useCallback((barcode: string) => {
+    setSearchTerm(barcode);
+    setIsBarcodeSearch(true);
+    fetchProductBatch('initial', barcode, true);
+  }, [fetchProductBatch]);
+
+  useBarcodeScanner({
+    onScan: handleScan,
+    enabled: !isDetailsModalOpen && !isScannerOpen
+  });
 
   // Initial Data Load
   React.useEffect(() => {
@@ -393,13 +420,23 @@ export default function ProductSalesPage() {
                                 type="search"
                                 placeholder="Search by name or SKU..."
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                onChange={(e) => {
+                                    setSearchTerm(e.target.value);
+                                    setIsBarcodeSearch(false);
+                                }}
                                 onKeyDown={(e) => e.key === 'Enter' && fetchProductBatch('initial')}
                                 className="pl-8 h-10"
                             />
                         </div>
+                        <Button size="icon" variant="outline" onClick={() => setIsScannerOpen(true)} className="h-10 w-10 sm:hidden">
+                            <Barcode className="h-4 w-4" />
+                        </Button>
                         <Button size="icon" variant="secondary" onClick={() => fetchProductBatch('initial')} className="h-10 w-10">
                             <SearchIcon className="h-4 w-4" />
+                        </Button>
+                        <Button variant="outline" onClick={() => setIsScannerOpen(true)} className="hidden sm:flex h-10 gap-2">
+                            <Barcode className="h-4 w-4" />
+                            <span>Scan</span>
                         </Button>
                     </div>
                 </CardHeader>
@@ -447,6 +484,12 @@ export default function ProductSalesPage() {
         allSalesTransactions={allTransactions}
         staffMap={staffMap}
         currencySymbol={currencySymbol}
+      />
+
+      <BarcodeScanner
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+        onScan={handleScan}
       />
     </main>
   );
