@@ -16,6 +16,7 @@ import {
   PackageSearch, 
   AlertTriangle, 
   Truck, 
+  Clock,
   Image as LucideImageIcon,
   Share2,
   Share,
@@ -25,6 +26,7 @@ import {
   Copy
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { format } from 'date-fns';
 import type { Product, Category } from '@/lib/types';
 import { formatCurrency } from '@/lib/formatUtils';
 import { cn } from '@/lib/utils';
@@ -158,14 +160,20 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
             const threshold = product.lowStockThreshold ?? globalLowStockThreshold;
             const isLowStock = product.stock > 0 && product.stock <= threshold;
             const isOutOfStock = product.stock <= 0;
+            
+            const expiryDate = product.expiryDate instanceof Date 
+              ? product.expiryDate 
+              : (product.expiryDate as any)?.toDate?.();
+            const isExpired = expiryDate ? expiryDate < new Date() : false;
 
             return (
               <TableRow
                 key={product.id}
                 className={cn(
                     "transition-colors group",
-                    isOutOfStock && "bg-red-50/50 hover:bg-red-50 dark:bg-red-950/10 dark:hover:bg-red-950/20",
-                    isLowStock && "bg-orange-50/50 hover:bg-orange-50 dark:bg-orange-950/10 dark:hover:bg-orange-950/20"
+                    isExpired && "bg-destructive/5 hover:bg-destructive/10 dark:bg-destructive/10 dark:hover:bg-destructive/20",
+                    !isExpired && isOutOfStock && "bg-red-50/50 hover:bg-red-50 dark:bg-red-950/10 dark:hover:bg-red-950/20",
+                    !isExpired && isLowStock && "bg-orange-50/50 hover:bg-orange-50 dark:bg-orange-950/10 dark:hover:bg-orange-950/20"
                 )}
               >
                 <TableCell>
@@ -180,15 +188,33 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
                     </div>
                 </TableCell>
                 <TableCell className="font-medium">
-                    <div className="flex items-center gap-2">
-                        {product.name}
-                        {isLowStock && (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <AlertTriangle className="h-3.5 w-3.5 text-orange-500 cursor-help" />
-                                </TooltipTrigger>
-                                <TooltipContent>Low Stock (Threshold: {threshold})</TooltipContent>
-                            </Tooltip>
+                    <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                            {product.name}
+                            {isExpired && (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Clock className="h-3.5 w-3.5 text-destructive cursor-help" />
+                                    </TooltipTrigger>
+                                    <TooltipContent>Product Expired!</TooltipContent>
+                                </Tooltip>
+                            )}
+                            {isLowStock && !isExpired && (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <AlertTriangle className="h-3.5 w-3.5 text-orange-500 cursor-help" />
+                                    </TooltipTrigger>
+                                    <TooltipContent>Low Stock (Threshold: {threshold})</TooltipContent>
+                                </Tooltip>
+                            )}
+                        </div>
+                        {expiryDate && (
+                            <span className={cn(
+                                "text-[10px] font-medium",
+                                isExpired ? "text-destructive" : "text-muted-foreground"
+                            )}>
+                                {isExpired ? 'Expired: ' : 'Expires: '}{format(expiryDate, "PP")}
+                            </span>
                         )}
                     </div>
                 </TableCell>
