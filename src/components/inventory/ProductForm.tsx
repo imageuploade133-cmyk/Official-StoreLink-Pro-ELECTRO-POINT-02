@@ -95,7 +95,8 @@ import { PromoSettings } from './PromoSettings';
 import { AdvancedVideoManager } from './AdvancedVideoManager';
 import { ProductVoiceRecorder } from './ProductVoiceRecorder';
 import { CameraCaptureModal } from '@/components/media/CameraCaptureModal';
-import { CameraScannerModal } from '@/components/media/CameraScannerModal';
+import { BarcodeScanner } from '@/components/inventory/BarcodeScanner';
+import { useBarcodeScanner } from '@/hooks/use-barcode-scanner';
 import { StoreMerchandisingSettings } from './StoreMerchandisingSettings';
 
 const badgeIcons = [
@@ -258,6 +259,14 @@ export function ProductForm({
   const [isVideosTitleLocked, setIsVideosTitleLocked] = useState(true);
   const [isBarcodeScannerOpen, setIsBarcodeScannerOpen] = useState(false);
   const [isPhotoCaptureOpen, setIsPhotoCaptureOpen] = useState(false);
+
+  const { playSuccessSound, vibrate } = useBarcodeScanner({
+    onScan: (barcode) => {
+        form.setValue("barcode", barcode);
+        toast({ title: "Barcode Scanned!", description: `Set to: ${barcode}` });
+    },
+    enabled: !isBarcodeScannerOpen && !isCategoryModalOpen && !isChangeCategoryModalOpen && !isPhotoCaptureOpen
+  });
 
   const handleBarcodeScanned = (barcode: string) => {
     form.setValue('barcode', barcode);
@@ -830,10 +839,10 @@ export function ProductForm({
                       <FormDescription className="text-xs">
                           Enter manually or use the camera icon above (works on mobile/desktop).
                       </FormDescription>
-                      <CameraScannerModal 
+                      <BarcodeScanner 
                         isOpen={isBarcodeScannerOpen} 
                         onClose={() => setIsBarcodeScannerOpen(false)} 
-                        onBarcodeScanned={handleBarcodeScanned} 
+                        onScan={handleBarcodeScanned} 
                       />
                       <FormMessage />
                     </FormItem>

@@ -51,8 +51,12 @@ import {
   Truck,
   Phone,
   MapPin,
-  ExternalLink
+  ExternalLink,
+  Scan
 } from 'lucide-react';
+import { BarcodeScannerField } from '@/components/inventory/BarcodeScannerField';
+import { BarcodeScanner } from '@/components/inventory/BarcodeScanner';
+import { useBarcodeScanner } from '@/hooks/use-barcode-scanner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -111,6 +115,16 @@ export default function RestockHistoryPage() {
   const currencySymbol = settings?.currency || '$';
   
   const canModify = isAdmin;
+
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+
+  const { playSuccessSound, vibrate } = useBarcodeScanner({
+    onScan: (barcode) => {
+        setSearchTerm(barcode);
+        fetchRestockHistory('initial');
+    },
+    enabled: !isScannerOpen && !isActionModalOpen && !isDetailsDialogOpen && !isAuthDialogOpen
+  });
 
   const fetchRestockHistory = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
     if (!firestore || !currentStoreId) return;
@@ -306,10 +320,19 @@ export default function RestockHistoryPage() {
                 </CardDescription>
               </div>
               <div className="flex items-center gap-2 w-full sm:w-auto">
-                <div className="relative flex-grow">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                    <Input placeholder="Search view..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10 h-10 w-full sm:w-64" />
-                </div>
+                <BarcodeScannerField 
+                    onScan={(barcode) => setSearchTerm(barcode)}
+                    placeholder="Search view..."
+                    className="flex-grow sm:w-64"
+                />
+                <Button 
+                    variant="outline" 
+                    size="icon" 
+                    className="h-10 w-10 rounded-xl border-dashed"
+                    onClick={() => setIsScannerOpen(true)}
+                >
+                    <Scan className="h-4 w-4" />
+                </Button>
                 <Popover>
                     <PopoverTrigger asChild>
                         <Button variant={"outline"} className={cn("justify-start text-left font-normal h-10", !dateRange && "text-muted-foreground")}>
@@ -422,6 +445,12 @@ export default function RestockHistoryPage() {
             title="Authorize Reversal"
             description={`This will reverse the selected stock entry for "${entryPendingDeletion?.productName}". The quantity will be subtracted from the current stock. This action is permanent.`}
             confirmButtonText="Confirm & Reverse"
+        />
+
+        <BarcodeScanner 
+            isOpen={isScannerOpen}
+            onClose={() => setIsScannerOpen(false)}
+            onScan={(barcode) => setSearchTerm(barcode)}
         />
         </>
       );

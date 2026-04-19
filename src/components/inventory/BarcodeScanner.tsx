@@ -34,9 +34,41 @@ export function BarcodeScanner({ isOpen, onClose, onScan }: BarcodeScannerProps)
   const [isFlashOn, setIsFlashOn] = useState(false);
   const [cameras, setCameras] = useState<{id: string, label: string}[]>([]);
   const [selectedCameraId, setSelectedCameraId] = useState<string | null>(null);
+  const [isRepeatMode, setIsRepeatMode] = useState(false);
   
   const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
   const { toast } = useToast();
+
+  const playSuccessSound = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+
+      const audioCtx = new AudioContextClass();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+      gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.1);
+    } catch (e) {
+      console.warn('Failed to play success sound:', e);
+    }
+  }, []);
+
+  const vibrate = useCallback(() => {
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(100);
+    }
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -85,8 +117,18 @@ export function BarcodeScanner({ isOpen, onClose, onScan }: BarcodeScannerProps)
             ]
           },
           (decodedText) => {
+            playSuccessSound();
+            vibrate();
             onScan(decodedText);
-            onClose();
+            if (!isRepeatMode) {
+              onClose();
+            } else {
+              toast({
+                title: "Scanned",
+                description: `Code: ${decodedText}`,
+                duration: 1000,
+              });
+            }
           },
           () => {
             // Error callback - ignore to avoid spamming
@@ -175,8 +217,18 @@ export function BarcodeScanner({ isOpen, onClose, onScan }: BarcodeScannerProps)
               ]
           },
           (decodedText) => {
+            playSuccessSound();
+            vibrate();
             onScan(decodedText);
-            onClose();
+            if (!isRepeatMode) {
+              onClose();
+            } else {
+              toast({
+                title: "Scanned",
+                description: `Code: ${decodedText}`,
+                duration: 1000,
+              });
+            }
           },
           () => {}
         );
@@ -278,6 +330,19 @@ export function BarcodeScanner({ isOpen, onClose, onScan }: BarcodeScannerProps)
                 <RefreshCw className="h-6 w-6" />
               </Button>
             )}
+
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={() => setIsRepeatMode(!isRepeatMode)}
+              className={cn(
+                "h-14 w-14 rounded-full border-2 transition-all duration-300",
+                isRepeatMode ? "bg-orange-500 border-orange-500 text-white shadow-lg shadow-orange-500/40" : "bg-black/40 border-white/20 text-white hover:bg-black/60"
+              )}
+              title="Fast Repeated Scanning"
+            >
+              <RefreshCw className={cn("h-6 w-6", isRepeatMode && "animate-spin-slow")} />
+            </Button>
 
             <Button 
               variant="outline" 

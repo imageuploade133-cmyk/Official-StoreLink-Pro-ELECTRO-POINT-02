@@ -94,6 +94,8 @@ interface SaleDataForDialog {
   initialPaymentMethod?: string;
 }
 
+import { useBarcodeScanner } from '@/hooks/use-barcode-scanner';
+
 export default function POSPage() {
   const { settings } = useSettings();
   const currencySymbol = settings?.currency || '$';
@@ -121,10 +123,6 @@ export default function POSPage() {
 
   const [discount, setDiscount] = useState<{ type: 'percentage' | 'fixed' | null, value: number }>({ type: null, value: 0 });
   
-  const barcodeBuffer = useRef('');
-  const lastKeystrokeTimeRef = useRef<number>(0);
-  const barcodeScanInputRef = useRef<HTMLInputElement>(null);
-
   // Modal States
   const [isClearCartDialogOpen, setIsClearCartDialogOpen] = useState(false);
   const [isHeldSalesModalOpen, setIsHeldSalesModalOpen] = useState(false);
@@ -148,6 +146,19 @@ export default function POSPage() {
   const [manualCustomerName, setManualCustomerName] = useState('');
   const [manualCustomerPhone, setManualCustomerPhone] = useState('');
   const [saleDataForDialog, setSaleDataForDialog] = useState<SaleDataForDialog | null>(null);
+
+  const { playSuccessSound, vibrate } = useBarcodeScanner({
+    onScan: (barcode) => handleBarcodeScan(barcode),
+    enabled: !isClearCartDialogOpen && 
+             !isHeldSalesModalOpen && 
+             !isCustomerModalOpen && 
+             !isDeleteHeldSaleDialogOpen && 
+             !isConfirmPaymentDialogOpen && 
+             !isCreditSaleDialogOpen && 
+             !isConfirmHoldSaleDialogOpen && 
+             !isReceiptModalOpen && 
+             !isCalculatorOpen
+  });
 
   const subtotal = useMemo(() => cartItems.reduce((sum, item) => sum + item.salePrice * item.quantity, 0), [cartItems]);
 
@@ -280,77 +291,6 @@ export default function POSPage() {
     },
     [products, handleAddToCart, toast, today]
   );
-
-  useEffect(() => {
-    const handleGlobalKeyDown = (event: KeyboardEvent) => {
-      const activeElement = document.activeElement;
-      const isAnyModalOpen =
-        isClearCartDialogOpen ||
-        isHeldSalesModalOpen ||
-        isCustomerModalOpen ||
-        isDeleteHeldSaleDialogOpen ||
-        isConfirmPaymentDialogOpen ||
-        isCreditSaleDialogOpen ||
-        isConfirmHoldSaleDialogOpen ||
-        isReceiptModalOpen ||
-        isCalculatorOpen;
-
-      if (
-        isAnyModalOpen ||
-        (activeElement &&
-          (activeElement.tagName === 'INPUT' ||
-            activeElement.tagName === 'TEXTAREA') &&
-          activeElement !== barcodeScanInputRef.current)
-      ) {
-        return;
-      }
-
-      if (event.key === 'Enter') {
-        if (barcodeBuffer.current.trim()) {
-          handleBarcodeScan(barcodeBuffer.current.trim());
-          event.preventDefault();
-        }
-      } else if (event.key.length === 1) {
-        const currentTime = Date.now();
-        if (currentTime - lastKeystrokeTimeRef.current > SCAN_TIMEOUT_MS) {
-          barcodeBuffer.current = event.key;
-        } else {
-          barcodeBuffer.current += event.key;
-        }
-        lastKeystrokeTimeRef.current = currentTime;
-        if (barcodeScanInputRef.current) {
-          barcodeScanInputRef.current.value = barcodeBuffer.current;
-        }
-      } else if (event.key === 'Backspace') {
-        barcodeBuffer.current = barcodeBuffer.current.slice(0, -1);
-        if (barcodeScanInputRef.current) {
-          barcodeScanInputRef.current.value = barcodeBuffer.current;
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleGlobalKeyDown);
-    if (
-      barcodeScanInputRef.current &&
-      !document.querySelector('input:focus, textarea:focus')
-    ) {
-      barcodeScanInputRef.current.focus();
-    }
-    return () => {
-      document.removeEventListener('keydown', handleGlobalKeyDown);
-    };
-  }, [
-    handleBarcodeScan,
-    isClearCartDialogOpen,
-    isHeldSalesModalOpen,
-    isCustomerModalOpen,
-    isDeleteHeldSaleDialogOpen,
-    isConfirmPaymentDialogOpen,
-    isCreditSaleDialogOpen,
-    isConfirmHoldSaleDialogOpen,
-    isReceiptModalOpen,
-    isCalculatorOpen,
-  ]);
 
   const handleRemoveFromCart = (productId: string) => {
     setCartItems((prevItems) =>
@@ -806,13 +746,6 @@ export default function POSPage() {
             </div>
             <UserNav />
         </header>
-
-        <input
-          ref={barcodeScanInputRef}
-          type="text"
-          aria-label="Barcode scanner input"
-          className="absolute -left-full"
-        />
 
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-5 lg:grid-rows-none gap-3 sm:gap-6 min-h-0 p-3 sm:p-6">
           <div className="lg:col-span-3 h-full flex flex-col bg-card p-2 sm:p-4 rounded-xl shadow-lg lg:overflow-hidden">
