@@ -163,6 +163,35 @@ export async function GET(request: Request) {
         }
       }
 
+      if (providerName === 'adyen') {
+        const apiKey = config.apiKey;
+        const merchantAccount = config.merchantAccount;
+        if (!apiKey || !merchantAccount) {
+          return NextResponse.json({ success: false, error: 'Adyen credentials not configured' });
+        }
+
+        const baseUrl = mode === 'live' 
+          ? `https://checkout-live.adyen.com/v71` 
+          : `https://checkout-test.adyen.com/v71`;
+
+        const res = await fetch(`${baseUrl}/paymentMethods`, {
+          method: 'POST',
+          headers: {
+            'X-API-Key': apiKey,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            merchantAccount,
+          }),
+        });
+
+        if (!res.ok) {
+          const result = await res.json();
+          return NextResponse.json({ success: false, error: result.message || 'Invalid Adyen Credentials' });
+        }
+        return NextResponse.json({ success: true });
+      }
+
     return NextResponse.json({ error: 'Unsupported provider' }, { status: 400 });
   } catch (error: any) {
     console.error('Error testing connection:', error);

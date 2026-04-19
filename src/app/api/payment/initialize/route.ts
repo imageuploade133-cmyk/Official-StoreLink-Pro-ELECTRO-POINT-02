@@ -314,6 +314,45 @@ export async function POST(request: Request) {
         }
 
         result.data = { authorization_url: initData.responseBody.checkoutUrl };
+    } else if (providerName === 'adyen') {
+        const apiKey = config.apiKey;
+        const merchantAccount = config.merchantAccount;
+        if (!apiKey || !merchantAccount) {
+            throw new Error('Adyen credentials not configured');
+        }
+
+        const baseUrl = mode === 'live' 
+            ? `https://checkout-live.adyen.com/v71` 
+            : `https://checkout-test.adyen.com/v71`;
+
+        const sessionRes = await fetch(`${baseUrl}/sessions`, {
+            method: 'POST',
+            headers: {
+                'X-API-Key': apiKey,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                merchantAccount,
+                amount: {
+                    value: Math.round(amount * 100),
+                    currency: normalizedCurrency,
+                },
+                reference,
+                returnUrl: `${request.headers.get('origin')}/store/${storeId}/checkout/verify?provider=adyen&reference=${reference}`,
+                countryCode: config.countryCode || 'US', // Adyen often needs a country code
+            }),
+        });
+
+        const sessionData = await sessionRes.json();
+        if (!sessionRes.ok) {
+            console.error('Adyen Session Error:', sessionData);
+            throw new Error(sessionData.message || 'Adyen session creation failed');
+        }
+
+        // We redirect to a custom page that will handle the Adyen session
+        result.data = { 
+            authorization_url: `/${storeId}/checkout/adyen?orderId=${orderId}&reference=${reference}&sessionId=${sessionData.id}&sessionData=${sessionData.sessionData}`
+        };
     } else {
         throw new Error('Unsupported provider');
     }

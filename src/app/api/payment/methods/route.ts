@@ -56,6 +56,7 @@ export async function GET(request: Request) {
               data.providerName === 'stripe' ? 'Pay with Card (Stripe)' :
               data.providerName === 'nowpayments' ? 'Pay with Crypto' :
               data.providerName === 'monnify' ? 'Pay with Monnify' :
+              data.providerName === 'adyen' ? 'Pay with Adyen' :
               data.providerName === 'manual' ? 'Bank Transfer' : data.providerName,
 
         provider: data.providerName,

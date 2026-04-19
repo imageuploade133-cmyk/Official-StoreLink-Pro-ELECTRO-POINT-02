@@ -19,7 +19,7 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Loader2, Save, Landmark, Info, PlusCircle, Trash2, Edit, Upload, Coins, AlertTriangle, CreditCard, Globe, Wallet, Smartphone, Zap, Truck } from 'lucide-react';
+import { Loader2, Save, Landmark, Info, PlusCircle, Trash2, Edit, Upload, Coins, AlertTriangle, CreditCard, Globe, Wallet, Smartphone, Zap, Truck, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -148,6 +148,15 @@ const monnifySchema = z.object({
   allowedLocations: z.array(z.string()).default([]),
 });
 
+const adyenSchema = z.object({
+  apiKey: z.string().optional(),
+  merchantAccount: z.string().optional(),
+  clientKey: z.string().optional(),
+  isActive: z.boolean().default(false),
+  mode: z.enum(['test', 'live']).default('test'),
+  allowedLocations: z.array(z.string()).default([]),
+});
+
 type PaystackFormValues = z.infer<typeof paystackSchema>;
 type FlutterwaveFormValues = z.infer<typeof flutterwaveSchema>;
 type StripeFormValues = z.infer<typeof stripeSchema>;
@@ -158,6 +167,7 @@ type PayOnDeliveryFormValues = z.infer<typeof payOnDeliverySchema>;
 type FastCheckoutFormValues = z.infer<typeof fastCheckoutSchema>;
 type NowPaymentsFormValues = z.infer<typeof nowpaymentsSchema>;
 type MonnifyFormValues = z.infer<typeof monnifySchema>;
+type AdyenFormValues = z.infer<typeof adyenSchema>;
 
 export default function WebsitePaymentSettings() {
   const firestore = useFirestore();
@@ -217,6 +227,7 @@ export default function WebsitePaymentSettings() {
   const fastCheckoutProvider = providers.find(p => p.providerName === 'fast_checkout');
   const nowpaymentsProvider = providers.find(p => p.providerName === 'nowpayments');
   const monnifyProvider = providers.find(p => p.providerName === "monnify");
+  const adyenProvider = providers.find(p => p.providerName === "adyen");
 
   const isProviderActive = (name: string) => { 
     if (name === "paystack") return paystackProvider?.isActive; 
@@ -227,6 +238,7 @@ export default function WebsitePaymentSettings() {
     if (name === "palmpay") return palmpayProvider?.isActive; 
     if (name === "nowpayments") return nowpaymentsProvider?.isActive; 
     if (name === "monnify") return monnifyProvider?.isActive;
+    if (name === "adyen") return adyenProvider?.isActive;
     if (name === "fast_checkout") return fastCheckoutProvider?.isActive; 
     if (name === "manual") return manualProvider?.isActive; 
     if (name === "pay_on_delivery") return payOnDeliveryProvider?.isActive; 
@@ -242,6 +254,7 @@ export default function WebsitePaymentSettings() {
     { id: "palmpay", name: "PalmPay", icon: Smartphone, color: "text-purple-600" }, 
     { id: "nowpayments", name: "NOWPayments", icon: Coins, color: "text-yellow-500" }, 
     { id: "monnify", name: "Monnify", icon: CreditCard, color: "text-blue-600" },
+    { id: "adyen", name: "Adyen", icon: ShieldCheck, color: "text-green-600" },
     { id: "fast_checkout", name: "Fast Checkout", icon: Zap, color: "text-yellow-400" }, 
     { id: "manual", name: "Manual Transfer", icon: Landmark, color: "text-gray-600" }, 
     { id: "pay_on_delivery", name: "Pay on Delivery", icon: Truck, color: "text-red-500" }, 
@@ -377,6 +390,17 @@ export default function WebsitePaymentSettings() {
       mode: monnifyProvider?.mode || 'test',
     },
   });
+  const adyenForm = useForm<AdyenFormValues>({
+    resolver: zodResolver(adyenSchema),
+    defaultValues: {
+      apiKey: adyenProvider?.config?.apiKey || "",
+      merchantAccount: adyenProvider?.config?.merchantAccount || "",
+      clientKey: adyenProvider?.config?.clientKey || "",
+      isActive: adyenProvider?.isActive || false,
+      allowedLocations: adyenProvider?.allowedLocations || [],
+      mode: adyenProvider?.mode || "test",
+    },
+  });
 
   useEffect(() => {
     if (paystackProvider) {
@@ -489,9 +513,19 @@ export default function WebsitePaymentSettings() {
         allowedLocations: monnifyProvider.allowedLocations || [],
         mode: monnifyProvider.mode || 'test',
       });
+    if (adyenProvider) {
+      adyenForm.reset({
+        apiKey: adyenProvider.config?.apiKey || "",
+        merchantAccount: adyenProvider.config?.merchantAccount || "",
+        clientKey: adyenProvider.config?.clientKey || "",
+        isActive: adyenProvider.isActive || false,
+        allowedLocations: adyenProvider.allowedLocations || [],
+        mode: adyenProvider.mode || "test",
+      });
     }
     }
-  }, [paystackProvider, flutterwaveProvider, stripeProvider, opayProvider, palmpayProvider, paypalProvider, payOnDeliveryProvider, fastCheckoutProvider, nowpaymentsProvider, monnifyProvider, paystackForm, flutterwaveForm, stripeForm, opayForm, palmpayForm, paypalForm, payOnDeliveryForm, fastCheckoutForm, nowpaymentsForm, monnifyForm]);
+    }
+  }, [paystackProvider, flutterwaveProvider, stripeProvider, opayProvider, palmpayProvider, paypalProvider, payOnDeliveryProvider, fastCheckoutProvider, nowpaymentsProvider, monnifyProvider, paystackForm, flutterwaveForm, stripeForm, opayForm, palmpayForm, paypalForm, payOnDeliveryForm, fastCheckoutForm, nowpaymentsForm, monnifyForm, adyenProvider, adyenForm]);
 
   const saveProviderSettings = async (providerName: string, values: any) => {
     if (!user) return;
@@ -2072,6 +2106,189 @@ export default function WebsitePaymentSettings() {
                     <AlertTitle>Note</AlertTitle>
                     <AlertDescription>
                       You can find your API Key, Secret Key and Contract Code on your Monnify dashboard under Settings.
+                    </AlertDescription>
+                  </Alert>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+        <TabsContent value="adyen" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <Form {...adyenForm}>
+                <form onSubmit={adyenForm.handleSubmit((values) => saveProviderSettings('adyen', values))}>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                      <div>
+                        <CardTitle className="flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-green-600" />Adyen Settings</CardTitle>
+                        <CardDescription>Accept global payments securely using Adyen.</CardDescription>
+                      </div>
+                      <FormField
+                        control={adyenForm.control}
+                        name="isActive"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                            <FormLabel>Active</FormLabel>
+                          </FormItem>
+                        )}
+                      />
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <FormField
+                        control={adyenForm.control}
+                        name="mode"
+                        render={({ field }) => (
+                          <FormItem className="space-y-3">
+                            <FormLabel>Gateway Mode</FormLabel>
+                            <FormControl>
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex flex-row space-x-4"
+                              >
+                                <FormItem className="flex items-center space-x-2 space-y-0">
+                                  <FormControl>
+                                    <RadioGroupItem value="test" />
+                                  </FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">
+                                    Test
+                                  </FormLabel>
+                                </FormItem>
+                                <FormItem className="flex items-center space-x-2 space-y-0">
+                                  <FormControl>
+                                    <RadioGroupItem value="live" />
+                                  </FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">
+                                    Live
+                                  </FormLabel>
+                                </FormItem>
+                              </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={adyenForm.control}
+                          name="merchantAccount"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Merchant Account</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="Your Adyen Merchant Account" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={adyenForm.control}
+                          name="clientKey"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Client Key</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="test_..." />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <FormField
+                        control={adyenForm.control}
+                        name="apiKey"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>API Key</FormLabel>
+                            <FormControl>
+                              <Input {...field} type="password" placeholder="AQEy..." />
+                            </FormControl>
+                            <FormDescription>
+                              Your Adyen API Key for checkout service.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={adyenForm.control}
+                        name="allowedLocations"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Allowed Delivery Locations</FormLabel>
+                            <FormDescription>
+                              If selected, this method will only be available for these locations. Leave empty for all locations.
+                            </FormDescription>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                              {deliveryLocations.map((loc) => (
+                                <div key={loc.id} className="flex items-center space-x-2 p-2 rounded border">
+                                  <Checkbox
+                                    id={`adyen-loc-${loc.id}`}
+                                    checked={field.value?.includes(loc.id)}
+                                    onCheckedChange={(checked) => {
+                                      const current = field.value || [];
+                                      const next = checked
+                                        ? [...current, loc.id]
+                                        : current.filter((id) => id !== loc.id);
+                                      field.onChange(next);
+                                    }}
+                                  />
+                                  <label htmlFor={`adyen-loc-${loc.id}`} className="text-sm cursor-pointer truncate">
+                                    {loc.name}
+                                  </label>
+                                </div>
+                              ))}
+                            </div>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </CardContent>
+                    <CardFooter className="flex gap-2 border-t pt-6">
+                      <Button type="submit" disabled={isSaving}>
+                        {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Save Adyen Settings
+                      </Button>
+                      <Button type="button" variant="outline" onClick={() => testConnection('adyen')} disabled={isSaving}>
+                        Test Connection
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </form>
+              </Form>
+            </div>
+            <div className="lg:col-span-1">
+              <Card className="bg-primary/5 border-primary/20 shadow-none sticky top-6">
+                <CardHeader>
+                  <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary">
+                    <ShieldCheck className="h-4 w-4" /> About Adyen
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm space-y-4 text-muted-foreground leading-relaxed">
+                  <p>Adyen is a leading global payment platform providing end-to-end infrastructure.</p>
+                  <ul className="list-disc pl-5 space-y-2">
+                    <li>Accept payments globally with all major methods.</li>
+                    <li>Unified commerce across all channels.</li>
+                    <li>Advanced fraud protection.</li>
+                    <li>Direct access to card networks.</li>
+                  </ul>
+                  <Alert>
+                    <Info className="h-4 w-4" />
+                    <AlertTitle>Adyen Portal</AlertTitle>
+                    <AlertDescription>
+                      Find your credentials in the Adyen Customer Area under Developers > API credentials.
                     </AlertDescription>
                   </Alert>
                 </CardContent>
