@@ -54,6 +54,7 @@ const paystackSchema = z.object({
   liveSecretKey: z.string().optional(),
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
+  allowedLocations: z.array(z.string()).default([]),
 });
 
 const flutterwaveSchema = z.object({
@@ -65,6 +66,7 @@ const flutterwaveSchema = z.object({
   liveEncryptionKey: z.string().optional(),
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
+  allowedLocations: z.array(z.string()).default([]),
 });
 
 const stripeSchema = z.object({
@@ -74,6 +76,7 @@ const stripeSchema = z.object({
   liveSecretKey: z.string().optional(),
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
+  allowedLocations: z.array(z.string()).default([]),
 });
 
 const opaySchema = z.object({
@@ -85,6 +88,7 @@ const opaySchema = z.object({
   webhookSecret: z.string().optional(),
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
+  allowedLocations: z.array(z.string()).default([]),
 });
 
 const palmpaySchema = z.object({
@@ -96,6 +100,7 @@ const palmpaySchema = z.object({
   webhookSecret: z.string().optional(),
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
+  allowedLocations: z.array(z.string()).default([]),
 });
 
 const paypalSchema = z.object({
@@ -105,11 +110,13 @@ const paypalSchema = z.object({
   liveSecretKey: z.string().optional(),
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
+  allowedLocations: z.array(z.string()).default([]),
 });
 
 const payOnDeliverySchema = z.object({
   instructions: z.string().optional(),
   isActive: z.boolean().default(false),
+  allowedLocations: z.array(z.string()).default([]),
 });
 
 const fastCheckoutSchema = z.object({
@@ -118,12 +125,14 @@ const fastCheckoutSchema = z.object({
   enableExpress: z.boolean().default(false),
   enableQuickPayButtons: z.boolean().default(false),
   isActive: z.boolean().default(false),
+  allowedLocations: z.array(z.string()).default([]),
 });
 
 const nowpaymentsSchema = z.object({
   apiKey: z.string().optional(),
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
+  allowedLocations: z.array(z.string()).default([]),
   acceptedCoins: z.array(z.string()).default(['btc', 'usdt', 'eth']),
 });
 
@@ -136,6 +145,7 @@ const monnifySchema = z.object({
   liveContractCode: z.string().optional(),
   isActive: z.boolean().default(false),
   mode: z.enum(['test', 'live']).default('test'),
+  allowedLocations: z.array(z.string()).default([]),
 });
 
 type PaystackFormValues = z.infer<typeof paystackSchema>;
@@ -245,6 +255,7 @@ export default function WebsitePaymentSettings() {
       livePublicKey: paystackProvider?.config?.livePublicKey || '',
       liveSecretKey: paystackProvider?.config?.liveSecretKey || '',
       isActive: paystackProvider?.isActive || false,
+      allowedLocations: paystackProvider?.allowedLocations || [],
       mode: paystackProvider?.mode || 'test',
     },
   });
@@ -259,6 +270,7 @@ export default function WebsitePaymentSettings() {
       liveSecretKey: flutterwaveProvider?.config?.liveSecretKey || '',
       liveEncryptionKey: flutterwaveProvider?.config?.liveEncryptionKey || '',
       isActive: flutterwaveProvider?.isActive || false,
+      allowedLocations: flutterwaveProvider?.allowedLocations || [],
       mode: flutterwaveProvider?.mode || 'test',
     },
   });
@@ -271,6 +283,7 @@ export default function WebsitePaymentSettings() {
       livePublicKey: stripeProvider?.config?.livePublicKey || '',
       liveSecretKey: stripeProvider?.config?.liveSecretKey || '',
       isActive: stripeProvider?.isActive || false,
+      allowedLocations: stripeProvider?.allowedLocations || [],
       mode: stripeProvider?.mode || 'test',
     },
   });
@@ -285,6 +298,7 @@ export default function WebsitePaymentSettings() {
       liveSecretKey: opayProvider?.config?.liveSecretKey || '',
       webhookSecret: opayProvider?.config?.webhookSecret || '',
       isActive: opayProvider?.isActive || false,
+      allowedLocations: opayProvider?.allowedLocations || [],
       mode: opayProvider?.mode || 'test',
     },
   });
@@ -299,6 +313,7 @@ export default function WebsitePaymentSettings() {
       liveSecretKey: palmpayProvider?.config?.liveSecretKey || '',
       webhookSecret: palmpayProvider?.config?.webhookSecret || '',
       isActive: palmpayProvider?.isActive || false,
+      allowedLocations: palmpayProvider?.allowedLocations || [],
       mode: palmpayProvider?.mode || 'test',
     },
   });
@@ -311,6 +326,7 @@ export default function WebsitePaymentSettings() {
       liveClientId: paypalProvider?.config?.liveClientId || '',
       liveSecretKey: paypalProvider?.config?.liveSecretKey || '',
       isActive: paypalProvider?.isActive || false,
+      allowedLocations: paypalProvider?.allowedLocations || [],
       mode: paypalProvider?.mode || 'test',
     },
   });
@@ -320,6 +336,7 @@ export default function WebsitePaymentSettings() {
     defaultValues: {
       instructions: payOnDeliveryProvider?.config?.instructions || 'Pay with cash or card upon delivery.',
       isActive: payOnDeliveryProvider?.isActive || false,
+      allowedLocations: payOnDeliveryProvider?.allowedLocations || [],
     },
   });
 
@@ -331,6 +348,7 @@ export default function WebsitePaymentSettings() {
       enableExpress: fastCheckoutProvider?.config?.enableExpress || false,
       enableQuickPayButtons: fastCheckoutProvider?.config?.enableQuickPayButtons || false,
       isActive: fastCheckoutProvider?.isActive || false,
+      allowedLocations: fastCheckoutProvider?.allowedLocations || [],
     },
   });
 
@@ -339,6 +357,7 @@ export default function WebsitePaymentSettings() {
     defaultValues: {
       apiKey: nowpaymentsProvider?.config?.apiKey || '',
       isActive: nowpaymentsProvider?.isActive || false,
+      allowedLocations: nowpaymentsProvider?.allowedLocations || [],
       mode: nowpaymentsProvider?.mode || 'test',
       acceptedCoins: nowpaymentsProvider?.config?.acceptedCoins || ['btc', 'usdt', 'eth'],
     },
@@ -354,6 +373,7 @@ export default function WebsitePaymentSettings() {
       liveSecretKey: monnifyProvider?.config?.liveSecretKey || '',
       liveContractCode: monnifyProvider?.config?.liveContractCode || '',
       isActive: monnifyProvider?.isActive || false,
+      allowedLocations: monnifyProvider?.allowedLocations || [],
       mode: monnifyProvider?.mode || 'test',
     },
   });
@@ -366,6 +386,7 @@ export default function WebsitePaymentSettings() {
         livePublicKey: paystackProvider.config?.livePublicKey || '',
         liveSecretKey: paystackProvider.config?.liveSecretKey || '',
         isActive: paystackProvider.isActive || false,
+        allowedLocations: paystackProvider.allowedLocations || [],
         mode: paystackProvider.mode || 'test',
       });
     }
@@ -378,6 +399,7 @@ export default function WebsitePaymentSettings() {
         liveSecretKey: flutterwaveProvider.config?.liveSecretKey || '',
         liveEncryptionKey: flutterwaveProvider.config?.liveEncryptionKey || '',
         isActive: flutterwaveProvider.isActive || false,
+        allowedLocations: flutterwaveProvider.allowedLocations || [],
         mode: flutterwaveProvider.mode || 'test',
       });
     }
@@ -388,6 +410,7 @@ export default function WebsitePaymentSettings() {
         livePublicKey: stripeProvider.config?.livePublicKey || '',
         liveSecretKey: stripeProvider.config?.liveSecretKey || '',
         isActive: stripeProvider.isActive || false,
+        allowedLocations: stripeProvider.allowedLocations || [],
         mode: stripeProvider.mode || 'test',
       });
     }
@@ -400,6 +423,7 @@ export default function WebsitePaymentSettings() {
         liveSecretKey: opayProvider.config?.liveSecretKey || '',
         webhookSecret: opayProvider.config?.webhookSecret || '',
         isActive: opayProvider.isActive || false,
+        allowedLocations: opayProvider.allowedLocations || [],
         mode: opayProvider.mode || 'test',
       });
     }
@@ -412,6 +436,7 @@ export default function WebsitePaymentSettings() {
         liveSecretKey: palmpayProvider.config?.liveSecretKey || '',
         webhookSecret: palmpayProvider.config?.webhookSecret || '',
         isActive: palmpayProvider.isActive || false,
+        allowedLocations: palmpayProvider.allowedLocations || [],
         mode: palmpayProvider.mode || 'test',
       });
     }
@@ -422,6 +447,7 @@ export default function WebsitePaymentSettings() {
         liveClientId: paypalProvider.config?.liveClientId || '',
         liveSecretKey: paypalProvider.config?.liveSecretKey || '',
         isActive: paypalProvider.isActive || false,
+        allowedLocations: paypalProvider.allowedLocations || [],
         mode: paypalProvider.mode || 'test',
       });
     }
@@ -429,6 +455,7 @@ export default function WebsitePaymentSettings() {
       payOnDeliveryForm.reset({
         instructions: payOnDeliveryProvider.config?.instructions || 'Pay with cash or card upon delivery.',
         isActive: payOnDeliveryProvider.isActive || false,
+        allowedLocations: payOnDeliveryProvider.allowedLocations || [],
       });
     }
     if (fastCheckoutProvider) {
@@ -438,12 +465,14 @@ export default function WebsitePaymentSettings() {
         enableExpress: fastCheckoutProvider.config?.enableExpress || false,
         enableQuickPayButtons: fastCheckoutProvider.config?.enableQuickPayButtons || false,
         isActive: fastCheckoutProvider.isActive || false,
+        allowedLocations: fastCheckoutProvider.allowedLocations || [],
       });
     }
     if (nowpaymentsProvider) {
       nowpaymentsForm.reset({
         apiKey: nowpaymentsProvider.config?.apiKey || '',
         isActive: nowpaymentsProvider.isActive || false,
+        allowedLocations: nowpaymentsProvider.allowedLocations || [],
         mode: nowpaymentsProvider.mode || 'test',
         acceptedCoins: nowpaymentsProvider.config?.acceptedCoins || ['btc', 'usdt', 'eth'],
       });
@@ -457,6 +486,7 @@ export default function WebsitePaymentSettings() {
         liveSecretKey: monnifyProvider.config?.liveSecretKey || '',
         liveContractCode: monnifyProvider.config?.liveContractCode || '',
         isActive: monnifyProvider.isActive || false,
+        allowedLocations: monnifyProvider.allowedLocations || [],
         mode: monnifyProvider.mode || 'test',
       });
     }
@@ -467,7 +497,7 @@ export default function WebsitePaymentSettings() {
     if (!user) return;
     setIsSaving(true);
     try {
-      const { isActive, mode, ...config } = values;
+      const { isActive, mode, allowedLocations, ...config } = values;
       
       // Filter out masked keys before saving if they haven't been changed
       Object.keys(config).forEach(key => {
@@ -487,6 +517,7 @@ export default function WebsitePaymentSettings() {
           providerName,
           isActive,
           mode,
+          allowedLocations,
           config,
           storeId: currentStoreId || 'global',
         }),
@@ -553,6 +584,7 @@ export default function WebsitePaymentSettings() {
   const isLoadingSettings = isLoadingMainSettings && (currentStoreId ? isLoadingOldSettings : true);
 
   const bankAccounts = settingsData?.bankAccounts || [];
+  const deliveryLocations = settingsData?.deliveryLocations || [];
 
   const instructionsForm = useForm<InstructionsFormValues>({
     resolver: zodResolver(instructionsSchema),
@@ -572,6 +604,7 @@ export default function WebsitePaymentSettings() {
   const manualForm = useForm({
     defaultValues: {
       isActive: manualProvider?.isActive ?? true,
+      allowedLocations: manualProvider?.allowedLocations || [],
     }
   });
 
@@ -579,6 +612,7 @@ export default function WebsitePaymentSettings() {
     if (manualProvider) {
       manualForm.reset({
         isActive: manualProvider.isActive,
+        allowedLocations: manualProvider.allowedLocations || [],
       });
     }
   }, [manualProvider, manualForm]);
@@ -855,6 +889,7 @@ export default function WebsitePaymentSettings() {
                           Set this in your Paystack dashboard to receive payment notifications.
                         </p>
                       </div>
+                      <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={paystackForm.control} name="allowedLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -1019,6 +1054,7 @@ export default function WebsitePaymentSettings() {
                           </FormItem>
                         )}
                       />
+                      <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={flutterwaveForm.control} name="allowedLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -1154,6 +1190,7 @@ export default function WebsitePaymentSettings() {
                           )}
                         />
                       </div>
+                      <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={stripeForm.control} name="allowedLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -1289,6 +1326,7 @@ export default function WebsitePaymentSettings() {
                           )}
                         />
                       </div>
+                      <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={paypalForm.control} name="allowedLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -1448,6 +1486,7 @@ export default function WebsitePaymentSettings() {
                           </FormItem>
                         )}
                       />
+                      <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={opayForm.control} name="allowedLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -1607,6 +1646,7 @@ export default function WebsitePaymentSettings() {
                           </FormItem>
                         )}
                       />
+                      <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={palmpayForm.control} name="allowedLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -1678,6 +1718,7 @@ export default function WebsitePaymentSettings() {
                           </FormItem>
                         )}
                       />
+                      <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={payOnDeliveryForm.control} name="allowedLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6">
                       <Button type="submit" disabled={isSaving}>
@@ -1817,6 +1858,7 @@ export default function WebsitePaymentSettings() {
                           Set this in your NOWPayments dashboard to receive payment notifications.
                         </p>
                       </div>
+                      <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={nowpaymentsForm.control} name="allowedLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -1996,6 +2038,7 @@ export default function WebsitePaymentSettings() {
                           Set this in your Monnify dashboard to receive payment notifications.
                         </p>
                       </div>
+                      <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={monnifyForm.control} name="allowedLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
                       <Button type="submit" disabled={isSaving}>
@@ -2124,6 +2167,7 @@ export default function WebsitePaymentSettings() {
                           )}
                         />
                       </div>
+                      <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={fastCheckoutForm.control} name="allowedLocations" />
                     </CardContent>
                     <CardFooter className="border-t pt-6">
                       <Button type="submit" disabled={isSaving}>
@@ -2165,21 +2209,39 @@ export default function WebsitePaymentSettings() {
         <TabsContent value="manual" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2"><Landmark className="h-5 w-5 text-gray-600" />Manual Payment</CardTitle>
-                    <CardDescription>Enable or disable manual bank transfers.</CardDescription>
-                  </div>
-                  <Switch 
-                    checked={manualForm.watch('isActive')} 
-                    onCheckedChange={(checked) => {
-                      manualForm.setValue('isActive', checked);
-                      saveProviderSettings('manual', { isActive: checked });
-                    }} 
-                  />
-                </CardHeader>
-              </Card>
+              <Form {...manualForm}>
+                <form onSubmit={manualForm.handleSubmit((values) => saveProviderSettings('manual', values))}>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                      <div>
+                        <CardTitle className="flex items-center gap-2"><Landmark className="h-5 w-5 text-gray-600" />Manual Payment</CardTitle>
+                        <CardDescription>Enable or disable manual bank transfers.</CardDescription>
+                      </div>
+                      <FormField
+                        control={manualForm.control}
+                        name="isActive"
+                        render={({ field }) => (
+                          <FormItem className="flex items-center gap-2 space-y-0">
+                            <FormLabel className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Enabled</FormLabel>
+                            <FormControl>
+                              <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </CardHeader>
+                    <CardContent>
+                      <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={manualForm.control} name="allowedLocations" />
+                    </CardContent>
+                    <CardFooter className="border-t pt-6">
+                      <Button type="submit" disabled={isSaving}>
+                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                        Save Manual Payment Settings
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </form>
+              </Form>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
@@ -2388,5 +2450,61 @@ function AccountForm({ onSubmit, isSaving, defaultValues }: { onSubmit: (values:
         </DialogFooter>
       </form>
     </Form>
+  );
+}
+
+function LocationVisibilitySelector({ 
+  deliveryLocations, 
+  control, 
+  name 
+}: { 
+  deliveryLocations: any[], 
+  control: any, 
+  name: string 
+}) {
+  return (
+    <div className="space-y-3 pt-6 border-t mt-6">
+      <div className="flex items-center justify-between">
+        <div className="space-y-0.5">
+          <FormLabel className="text-base font-semibold">Location Visibility</FormLabel>
+          <FormDescription className="text-xs">Select specific delivery locations where this payment method will be active. If none are selected, it will be visible for all locations.</FormDescription>
+        </div>
+      </div>
+      <FormField
+        control={control}
+        name={name}
+        render={({ field }) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-2">
+            {deliveryLocations.map((loc) => (
+              <div key={loc.id} className="flex items-center space-x-2 p-3 rounded-xl border bg-background/50 transition-colors hover:bg-muted/50">
+                <Checkbox
+                  id=`${name}-${loc.id}`
+                  checked={field.value?.includes(loc.id)}
+                  onCheckedChange={(checked) => {
+                    const current = field.value || [];
+                    if (checked) {
+                      field.onChange([...current, loc.id]);
+                    } else {
+                      field.onChange(current.filter((id: string) => id !== loc.id));
+                    }
+                  }}
+                />
+                <label
+                  htmlFor=`${name}-${loc.id}`
+                  className="text-sm font-medium leading-none cursor-pointer flex-grow"
+                >
+                  {loc.name}
+                </label>
+              </div>
+            ))}
+            {deliveryLocations.length === 0 && (
+              <div className="col-span-full p-4 border border-dashed rounded-xl bg-muted/20 text-center">
+                 <p className="text-xs text-muted-foreground">No delivery locations configured. Go to <strong>Delivery Settings</strong> to add locations.</p>
+              </div>
+            )}
+          </div>
+        )}
+      />
+    </div>
   );
 }

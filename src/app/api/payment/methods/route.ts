@@ -63,6 +63,7 @@ export async function GET(request: Request) {
         mode: mode,
         instructions: config.instructions || '',
         config: data.providerName === 'fast_checkout' ? config : undefined,
+        allowedLocations: data.allowedLocations || [],
       });
     });
 
