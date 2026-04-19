@@ -267,7 +267,7 @@ export default function POSPage() {
         }
       } else {
         toast({
-          variant: 'default',
+          variant: 'destructive',
           title: 'Product Not Found',
           description: `No product with barcode: ${scannedBarcode}`,
         });
