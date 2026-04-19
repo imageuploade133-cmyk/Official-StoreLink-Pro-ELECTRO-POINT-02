@@ -77,8 +77,6 @@ import { UserNav } from '@/components/UserNav';
 import { OutOfDataDrawer } from '@/components/ui/out-of-data-drawer';
 import { useRouter } from 'next/navigation';
 
-const SCAN_TIMEOUT_MS = 100;
-
 type HeldSaleDisplay = HeldSaleType & { id: string };
 
 interface SaleDataForDialog {
@@ -93,8 +91,6 @@ interface SaleDataForDialog {
   initialPaymentAtSale?: number | null;
   initialPaymentMethod?: string;
 }
-
-import { useBarcodeScanner } from '@/hooks/use-barcode-scanner';
 
 export default function POSPage() {
   const { settings } = useSettings();
@@ -147,18 +143,16 @@ export default function POSPage() {
   const [manualCustomerPhone, setManualCustomerPhone] = useState('');
   const [saleDataForDialog, setSaleDataForDialog] = useState<SaleDataForDialog | null>(null);
 
-  const { playSuccessSound, vibrate } = useBarcodeScanner({
-    onScan: (barcode) => handleBarcodeScan(barcode),
-    enabled: !isClearCartDialogOpen && 
-             !isHeldSalesModalOpen && 
-             !isCustomerModalOpen && 
-             !isDeleteHeldSaleDialogOpen && 
-             !isConfirmPaymentDialogOpen && 
-             !isCreditSaleDialogOpen && 
-             !isConfirmHoldSaleDialogOpen && 
-             !isReceiptModalOpen && 
-             !isCalculatorOpen
-  });
+  const isAnyModalOpen = 
+    isClearCartDialogOpen || 
+    isHeldSalesModalOpen || 
+    isCustomerModalOpen || 
+    isDeleteHeldSaleDialogOpen || 
+    isConfirmPaymentDialogOpen || 
+    isCreditSaleDialogOpen || 
+    isConfirmHoldSaleDialogOpen || 
+    isReceiptModalOpen || 
+    isCalculatorOpen;
 
   const subtotal = useMemo(() => cartItems.reduce((sum, item) => sum + item.salePrice * item.quantity, 0), [cartItems]);
 
@@ -261,37 +255,6 @@ export default function POSPage() {
     [cartItems, toast]
 );
   
-  const handleBarcodeScan = useCallback(
-    (scannedBarcode: string) => {
-      if (!scannedBarcode || !products) return;
-      const foundProduct = products.find((p) => p.barcode && p.barcode === scannedBarcode);
-      if (foundProduct) {
-        if (foundProduct.isVisibleInPOS === false) {
-          toast({
-            variant: 'default',
-            title: 'Product Not Available',
-            description: `${foundProduct.name} is currently hidden from POS.`,
-          });
-        } else {
-          const priceForSale = calculateEffectivePrice(foundProduct, today);
-          handleAddToCart(foundProduct, priceForSale);
-        }
-      } else {
-        toast({
-          variant: 'destructive',
-          title: 'Product Not Found',
-          description: `No product with barcode: ${scannedBarcode}`,
-        });
-      }
-      barcodeBuffer.current = '';
-      lastKeystrokeTimeRef.current = 0;
-      if (barcodeScanInputRef.current) {
-        barcodeScanInputRef.current.value = '';
-      }
-    },
-    [products, handleAddToCart, toast, today]
-  );
-
   const handleRemoveFromCart = (productId: string) => {
     setCartItems((prevItems) =>
       prevItems.filter((item) => item.id !== productId)
@@ -751,7 +714,8 @@ export default function POSPage() {
           <div className="lg:col-span-3 h-full flex flex-col bg-card p-2 sm:p-4 rounded-xl shadow-lg lg:overflow-hidden">
             <ProductArea
               onAddToCart={handleAddToCart}
-               onProductsLoaded={setProducts}
+              onProductsLoaded={setProducts}
+              isScannerEnabled={!isAnyModalOpen}
             />
           </div>
 

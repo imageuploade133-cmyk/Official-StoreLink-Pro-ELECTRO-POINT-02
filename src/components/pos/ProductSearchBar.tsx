@@ -85,6 +85,7 @@ export function ProductSearchBar({
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyDown={handleKeyDown}
+                data-barcode-input="true"
               />
               {isSearchDropdownOpen && liveSearchResults.length > 0 && (
                 <Card className="absolute top-full left-0 right-0 mt-1 z-50 max-h-80 overflow-y-auto shadow-xl border">

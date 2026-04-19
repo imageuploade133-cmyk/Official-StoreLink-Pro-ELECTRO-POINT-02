@@ -3,12 +3,16 @@ import { useEffect, useRef, useCallback } from 'react';
 interface UseBarcodeScannerOptions {
   onScan: (barcode: string) => void;
   enabled?: boolean;
+  scanTimeout?: number;
 }
 
-export function useBarcodeScanner({ onScan, enabled = true }: UseBarcodeScannerOptions) {
+export function useBarcodeScanner({ 
+  onScan, 
+  enabled = true,
+  scanTimeout = 100 
+}: UseBarcodeScannerOptions) {
   const barcodeBuffer = useRef('');
   const lastKeystrokeTimeRef = useRef<number>(0);
-  const SCAN_TIMEOUT_MS = 50; // Typical barcode scanner speed
 
   const playSuccessSound = useCallback(() => {
     if (typeof window === 'undefined') return;
@@ -44,7 +48,6 @@ export function useBarcodeScanner({ onScan, enabled = true }: UseBarcodeScannerO
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     if (!enabled) return;
 
-    // Ignore if user is typing in an input field (unless it's our designated barcode input)
     const activeElement = document.activeElement;
     const isTyping = activeElement && (
       activeElement.tagName === 'INPUT' || 
@@ -52,34 +55,55 @@ export function useBarcodeScanner({ onScan, enabled = true }: UseBarcodeScannerO
       (activeElement as HTMLElement).isContentEditable
     );
     
-    // We only want to catch global barcode scans if not typing, 
-    // OR if the active element has a specific data attribute
-    if (isTyping && !(activeElement as HTMLElement).hasAttribute('data-barcode-input')) {
-        return;
-    }
+    const currentTime = Date.now();
+    const timeSinceLastKey = currentTime - lastKeystrokeTimeRef.current;
+    const isFast = timeSinceLastKey <= scanTimeout;
 
     if (event.key === 'Enter') {
       if (barcodeBuffer.current.length > 2) {
-        onScan(barcodeBuffer.current);
+        const scannedBarcode = barcodeBuffer.current;
+        barcodeBuffer.current = '';
+        
+        onScan(scannedBarcode);
         playSuccessSound();
         vibrate();
+        
+        // Always prevent default if we handled it as a barcode scan
+        event.preventDefault();
+        event.stopPropagation();
+      } else {
         barcodeBuffer.current = '';
       }
-    } else if (event.key.length === 1) {
-      const currentTime = Date.now();
-      if (currentTime - lastKeystrokeTimeRef.current > SCAN_TIMEOUT_MS) {
-        barcodeBuffer.current = event.key;
+      return;
+    }
+
+    if (event.key.length === 1) {
+      // Logic for accumulating characters
+      if (isTyping && !(activeElement as HTMLElement).hasAttribute('data-barcode-input')) {
+        // In a regular input, only accumulate if it's fast
+        if (isFast) {
+          barcodeBuffer.current += event.key;
+        } else {
+          // Slow key in a regular input starts a new buffer, but it's likely just typing
+          barcodeBuffer.current = event.key;
+        }
       } else {
-        barcodeBuffer.current += event.key;
+        // Not in an input or in a barcode-enabled input
+        if (isFast || barcodeBuffer.current.length === 0) {
+          barcodeBuffer.current += event.key;
+        } else {
+          barcodeBuffer.current = event.key;
+        }
       }
       lastKeystrokeTimeRef.current = currentTime;
     }
-  }, [enabled, onScan, playSuccessSound, vibrate]);
+  }, [enabled, onScan, playSuccessSound, vibrate, scanTimeout]);
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
+    // Using capture phase to handle it before other listeners
+    window.addEventListener('keydown', handleKeyDown, true);
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keydown', handleKeyDown, true);
     };
   }, [handleKeyDown]);
 
