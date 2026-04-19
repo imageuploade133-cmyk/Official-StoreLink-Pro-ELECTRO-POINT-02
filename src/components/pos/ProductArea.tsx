@@ -14,6 +14,7 @@ import { ensureNumber, calculateEffectivePrice } from '@/lib/pos-utils';
 import { ProductSearchBar } from './ProductSearchBar';
 import { ProductGrid } from './ProductGrid';
 import { PaginationControls } from './PaginationControls';
+import { CameraScannerModal } from '@/components/media/CameraScannerModal';
 
 interface ProductAreaProps {
     onAddToCart: (product: DisplayProduct, priceForSale: number) => void;
@@ -60,6 +61,7 @@ export function ProductArea({ onAddToCart, onProductsLoaded }: ProductAreaProps)
 
     const [liveSearchResults, setLiveSearchResults] = useState<DisplayProduct[]>([]);
     const [isSearchDropdownOpen, setIsSearchDropdownOpen] = useState(false);
+    const [isScannerOpen, setIsScannerOpen] = useState(false);
     const searchInputContainerRef = useRef<HTMLDivElement>(null);
 
     const fetchInitialData = useCallback(async () => {
@@ -156,6 +158,21 @@ export function ProductArea({ onAddToCart, onProductsLoaded }: ProductAreaProps)
     const indexOfFirstProduct = indexOfLastProduct - PRODUCTS_PER_PAGE;
     const currentProductsOnGrid = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
     const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
+    
+    const handleScan = useCallback((barcode: string) => {
+        const foundProduct = products.find(p => p.barcode === barcode);
+        if (foundProduct) {
+            onAddToCart(foundProduct, calculateEffectivePrice(foundProduct, today));
+            setSearchTerm('');
+            setIsSearchDropdownOpen(false);
+        } else {
+            toast({
+                variant: 'destructive',
+                title: 'Product Not Found',
+                description: `No product with barcode: ${barcode}`,
+            });
+        }
+    }, [products, onAddToCart, today, toast]);
 
     return (
         <>
@@ -174,9 +191,19 @@ export function ProductArea({ onAddToCart, onProductsLoaded }: ProductAreaProps)
                     setSearchTerm('');
                     setIsSearchDropdownOpen(false);
                 }}
+                onScan={handleScan}
+                onOpenScanner={() => setIsScannerOpen(true)}
                 currencySymbol={currencySymbol}
                 globalLowStockThreshold={globalLowStockThreshold}
                 today={today}
+            />
+
+            <CameraScannerModal 
+                isOpen={isScannerOpen} 
+                onClose={() => setIsScannerOpen(false)} 
+                onBarcodeScanned={(barcode) => {
+                    handleScan(barcode);
+                }} 
             />
 
             <ProductGrid
