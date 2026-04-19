@@ -632,10 +632,16 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                         <div key={method.id} className="relative">
                                             <RadioGroupItem value={method.name} id={method.id} className="peer sr-only" />
                                             <Label htmlFor={method.id} className="flex items-center gap-4 p-6 bg-white dark:bg-slate-800 rounded-[2rem] border-2 border-transparent peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 shadow-lg cursor-pointer transition-all active:scale-[0.98]">
-                                                <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                                                    {method.provider === 'manual' ? <Landmark className="h-7 w-7" /> : 
-                                                     method.provider === 'pay_on_delivery' ? <Truck className="h-7 w-7" /> :
-                                                     <CreditCard className="h-7 w-7" />}
+                                                <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary relative overflow-hidden">
+                                                    {method.logoUrl ? (
+                                                        <Image src={method.logoUrl} alt="" fill className="object-contain p-2" />
+                                                    ) : (
+                                                        <>
+                                                            {method.provider === 'manual' ? <Landmark className="h-7 w-7" /> : 
+                                                             method.provider === 'pay_on_delivery' ? <Truck className="h-7 w-7" /> :
+                                                             <CreditCard className="h-7 w-7" />}
+                                                        </>
+                                                    )}
                                                 </div>
                                                 <div className="flex-1 text-left">
                                                     <p className="font-black text-sm uppercase tracking-widest">{method.name}</p>

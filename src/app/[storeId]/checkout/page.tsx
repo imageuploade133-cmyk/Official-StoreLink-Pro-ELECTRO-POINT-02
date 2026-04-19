@@ -638,14 +638,22 @@ export default function CheckoutPage() {
                         <div key={method.id}>
                         <RadioGroupItem value={method.name} id={method.id} className="peer sr-only" />
                         <Label htmlFor={method.id} className="flex flex-col items-center justify-center rounded-xl border-2 border-muted bg-popover p-6 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 [&:has([data-state=checked])]:border-primary cursor-pointer transition-all h-full text-center">
-                            {method.provider === 'manual' ? <Landmark className="mb-3 h-8 w-8" /> :
-                             method.provider === 'pay_on_delivery' ? <Truck className="mb-3 h-8 w-8" /> :
-                             method.provider === 'opay' ? <Wallet className="mb-3 h-8 w-8" /> :
-                             method.provider === 'palmpay' ? <Smartphone className="mb-3 h-8 w-8" /> :
-                             method.provider === 'paypal' ? <Wallet className="mb-3 h-8 w-8 text-blue-600" /> :
-                             method.provider === 'nowpayments' ? <Coins className="mb-3 h-8 w-8 text-amber-500" /> :
-                             method.provider === 'monnify' ? <CreditCard className="mb-3 h-8 w-8 text-blue-500" /> :
-                             <CreditCard className="mb-3 h-8 w-8" />}
+                            {method.logoUrl ? (
+                                <div className="relative w-12 h-12 mb-3">
+                                    <Image src={method.logoUrl} alt={method.name} fill className="object-contain" />
+                                </div>
+                            ) : (
+                                <>
+                                    {method.provider === 'manual' ? <Landmark className="mb-3 h-8 w-8" /> :
+                                     method.provider === 'pay_on_delivery' ? <Truck className="mb-3 h-8 w-8" /> :
+                                     method.provider === 'opay' ? <Wallet className="mb-3 h-8 w-8" /> :
+                                     method.provider === 'palmpay' ? <Smartphone className="mb-3 h-8 w-8" /> :
+                                     method.provider === 'paypal' ? <Wallet className="mb-3 h-8 w-8 text-blue-600" /> :
+                                     method.provider === 'nowpayments' ? <Coins className="mb-3 h-8 w-8 text-amber-500" /> :
+                                     method.provider === 'monnify' ? <CreditCard className="mb-3 h-8 w-8 text-blue-500" /> :
+                                     <CreditCard className="mb-3 h-8 w-8" />}
+                                </>
+                            )}
                             
                             <span className="font-bold text-sm mb-1">{method.name}</span>
                             <p className="text-[10px] text-muted-foreground line-clamp-2">
