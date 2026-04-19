@@ -345,6 +345,15 @@
     animation: ring-glow 2s ease-in-out infinite;
   }
 
+  /* Scanner Line Animation */
+  @keyframes scan-move {
+    0%, 100% { top: 5%; }
+    50% { top: 95%; }
+  }
+  .animate-scan-move {
+    animation: scan-move 2.5s infinite ease-in-out;
+  }
+
   /* Toast Countdown Bar Animation */
   @keyframes countdown {
     from { width: 100%; }

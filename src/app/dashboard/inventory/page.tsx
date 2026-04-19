@@ -12,11 +12,13 @@ import {
   ChevronRight, 
   RotateCcw,
   Copy,
-  Share2 
+  Share2,
+  Scan 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/PageHeader';
 import { ProductTable } from '@/components/inventory/ProductTable';
+import { BarcodeScanner } from '@/components/inventory/BarcodeScanner';
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useCollection, useFirestore } from '@/firebase';
 import { 
@@ -66,6 +68,7 @@ export default function InventoryPage() {
   const [isNavigating, setIsNavigating] = useState(false);
   const [isCloning, setIsCloning] = useState(false);
   const [isUpdatingSettings, setIsUpdatingSettings] = useState(false);
+  const [isBarcodeScannerOpen, setIsBarcodeScannerOpen] = useState(false);
 
   const firestore = useFirestore();
   const { user, store, staffMember } = useAuth();
@@ -329,6 +332,52 @@ export default function InventoryPage() {
     }
   };
 
+  const handleBarcodeScan = async (barcode: string) => {
+    if (!firestore || !currentStoreId) return;
+    
+    setIsLoadingProducts(true);
+    try {
+      const q = query(
+        collection(firestore, 'products'), 
+        where('store_id', '==', currentStoreId), 
+        where('barcode', '==', barcode),
+        limit(1)
+      );
+      const snapshot = await getDocs(q);
+      
+      if (!snapshot.empty) {
+        const product = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() } as Product;
+        setProducts([product]);
+        setIsLastPage(true);
+        setTotalProductCount(1);
+        setCurrentPage(1);
+        toast({
+          title: "Product Found",
+          description: `Located "${product.name}" via barcode scan.`,
+        });
+      } else {
+        toast({
+          title: "Product Not Found",
+          description: `No product with barcode "${barcode}" exists in your registry.`,
+          action: (
+            <Button 
+                variant="default" 
+                size="sm" 
+                onClick={() => router.push(`/dashboard/inventory/add?barcode=${barcode}`)}
+            >
+              Add New Product
+            </Button>
+          ),
+        });
+      }
+    } catch (error: any) {
+      console.error("Barcode search error:", error);
+      toast({ variant: 'destructive', title: "Search Failed", description: "Error searching for product barcode." });
+    } finally {
+      setIsLoadingProducts(false);
+    }
+  };
+
   const isLoading = isLoadingProducts || isLoadingCategories || isLoadingSettings;
   
   const { totalStock, totalStockValue, totalStockProfit } = useMemo(() => {
@@ -380,6 +429,10 @@ export default function InventoryPage() {
                 />
             </div>
             <div className="flex items-center gap-2">
+                <Button variant="outline" onClick={() => setIsBarcodeScannerOpen(true)} disabled={isLoading}>
+                    <Scan className="mr-2 h-4 w-4" />
+                    Scan Barcode
+                </Button>
                 <Button variant="outline" onClick={() => fetchProducts('initial')} disabled={isLoading}>
                     <RotateCcw className={cn("mr-2 h-4 w-4", isLoading && "animate-spin")} />
                     Sync Registry
@@ -476,6 +529,12 @@ export default function InventoryPage() {
         itemName={selectedProductForActions?.name || ''}
         itemType="product"
         isDeleting={isDeleting}
+    />
+
+    <BarcodeScanner 
+        isOpen={isBarcodeScannerOpen}
+        onClose={() => setIsBarcodeScannerOpen(false)}
+        onScan={handleBarcodeScan}
     />
 
     </div>

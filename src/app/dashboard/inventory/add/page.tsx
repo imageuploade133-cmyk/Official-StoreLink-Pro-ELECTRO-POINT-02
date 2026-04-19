@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useFirestore, useCollection } from '@/firebase';
 import { collection, addDoc, Timestamp, query, orderBy, doc, writeBatch, serverTimestamp, where } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
@@ -19,6 +19,8 @@ import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/e
 
 export default function AddProductPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialBarcode = searchParams.get('barcode') || '';
   const firestore = useFirestore();
   const { toast } = useToast();
   const { permissions, user, staffMember, store, isLoading: isAuthLoading } = useAuth();
@@ -149,6 +151,7 @@ export default function AddProductPage() {
         categories={categories || []}
         isSubmitting={isSaving}
         onCategoriesNeedRefresh={refetchCategories}
+        defaultValues={{ barcode: initialBarcode }}
       />
     </div>
   );
