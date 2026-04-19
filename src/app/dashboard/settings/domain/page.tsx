@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Globe, CheckCircle2, AlertCircle, Clock, Trash2, ExternalLink, Copy, RefreshCw } from 'lucide-react';
+import { Globe, CheckCircle2, AlertCircle, Clock, Trash2, ExternalLink, Copy, RefreshCw, Info } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { useAuth } from '@/contexts/auth-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -273,6 +273,55 @@ export default function DomainSettingsPage() {
         title="Domain Settings"
         description="Connect and manage your store's custom domain and URLs."
       />
+
+      {/* Connection Guide */}
+      <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950/20 dark:border-blue-900/30">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-blue-800 dark:text-blue-300 text-lg">
+            <Info className="h-5 w-5" />
+            Getting Started with Custom Domains
+          </CardTitle>
+          <CardDescription className="text-blue-700/80 dark:text-blue-400/80">
+            Follow these steps to connect your own domain name (like www.yourbrand.com) to your store.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-3">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 font-bold text-blue-900 dark:text-blue-200">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-[12px] text-white">1</span>
+                Add Your Domain
+              </div>
+              <p className="text-sm text-blue-800/70 dark:text-blue-300/70 leading-relaxed">
+                Enter your domain name in the <strong>Add Custom Domain</strong> form below. We support both root domains and subdomains.
+              </p>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 font-bold text-blue-900 dark:text-blue-200">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-[12px] text-white">2</span>
+                Update DNS Records
+              </div>
+              <p className="text-sm text-blue-800/70 dark:text-blue-300/70 leading-relaxed">
+                Log in to your domain provider (GoDaddy, Namecheap, etc.) and add the <strong>A</strong> and <strong>CNAME</strong> records provided in the instructions.
+              </p>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 font-bold text-blue-900 dark:text-blue-200">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-[12px] text-white">3</span>
+                Verify & Launch
+              </div>
+              <p className="text-sm text-blue-800/70 dark:text-blue-300/70 leading-relaxed">
+                Wait for DNS propagation, then click <strong>Verify</strong>. Once active, set it as your <strong>Primary Domain</strong> to start loading your store.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+        <CardFooter className="border-t bg-blue-50/50 dark:bg-blue-900/10 py-3">
+          <p className="text-xs text-blue-700/80 dark:text-blue-400/80">
+            <strong>Note:</strong> A custom domain makes your store look more professional and helps customers remember your website easily.
+          </p>
+        </CardFooter>
+      </Card>
 
       {/* Primary Domain Configuration */}
       <Card className="border-primary/20 bg-primary/5">
