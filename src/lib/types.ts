@@ -99,6 +99,7 @@ export interface PaymentProvider {
   isActive: boolean;
   mode: 'test' | 'live';
   allowedLocations?: string[];
+  paymentRegion?: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }

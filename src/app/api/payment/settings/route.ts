@@ -106,7 +106,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { providerName, config, isActive, mode, allowedLocations, storeId = 'global' } = body;
+    const { providerName, config, isActive, mode, allowedLocations, paymentRegion, storeId = 'global' } = body;
 
     if (!providerName) {
       return NextResponse.json({ error: 'Provider name is required' }, { status: 400 });
@@ -153,6 +153,7 @@ export async function POST(request: Request) {
     if (isActive !== undefined) providerData.isActive = isActive;
     if (mode !== undefined) providerData.mode = mode;
     if (allowedLocations !== undefined) providerData.allowedLocations = allowedLocations;
+    if (paymentRegion !== undefined) providerData.paymentRegion = paymentRegion;
 
     if (!existingSnap.exists) {
       providerData.createdAt = Timestamp.now();

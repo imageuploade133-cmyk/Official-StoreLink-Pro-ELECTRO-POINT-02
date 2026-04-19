@@ -148,10 +148,17 @@ export default function CheckoutPage() {
 
   const filteredPaymentMethods = useMemo(() => {
     return availablePaymentMethods.filter(method => {
-      // Filter by Region if store has a payment region set
+      // 1. Filter by Method-specific Region
+      if (method.paymentRegion && settings?.paymentRegion) {
+        if (method.paymentRegion !== settings.paymentRegion) {
+          return false;
+        }
+      }
+
+      // 2. Legacy/Automatic Nigeria-specific filtering
       if (settings?.paymentRegion) {
         const isNigeriaSpecific = ['paystack', 'flutterwave', 'opay', 'palmpay', 'monnify'].includes(method.provider);
-        if (settings.paymentRegion !== 'Nigeria' && isNigeriaSpecific) {
+        if (settings.paymentRegion !== 'Nigeria' && isNigeriaSpecific && !method.paymentRegion) {
           return false;
         }
       }
