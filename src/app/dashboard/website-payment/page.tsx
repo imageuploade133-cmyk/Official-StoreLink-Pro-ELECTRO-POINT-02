@@ -2813,15 +2813,15 @@ function PaymentMethodLogoUpload({ form, isSaving, label = "Payment Method Logo"
         <FormLabel>{label} (Optional)</FormLabel>
         <div className="flex items-center gap-4">
           <div className="relative w-16 h-16 rounded-lg border bg-muted flex items-center justify-center overflow-hidden">
-            {logoUrl ? <Image src={logoUrl} alt="Logo" fill className=\"object-contain p-1\" /> : <Upload className=\"h-8 w-8 text-muted-foreground\" />}
+            {logoUrl ? <Image src={logoUrl} alt="Logo" fill className="object-contain p-1" /> : <Upload className="h-8 w-8 text-muted-foreground" />}
           </div>
           <div className="flex-grow space-y-2">
             <div className="flex items-center gap-2">
-              <FormControl><Input placeholder=\"https://example.com/logo.png\" {...field} value={field.value || ''} disabled={isSaving || isUploading} /></FormControl>
-              <Button asChild variant=\"outline\" size=\"icon\" disabled={isSaving || isUploading}>
-                <label className=\"cursor-pointer\">
-                  {isUploading ? <Loader2 className=\"h-4 w-4 animate-spin\"/> : <Upload className=\"h-4 w-4\" />}
-                  <input type=\"file\" accept=\"image/*\" className=\"hidden\" onChange={handleImageUpload} disabled={isSaving || isUploading} />
+              <FormControl><Input placeholder="https://example.com/logo.png" {...field} value={field.value || ''} disabled={isSaving || isUploading} /></FormControl>
+              <Button asChild variant="outline" size="icon" disabled={isSaving || isUploading}>
+                <label className="cursor-pointer">
+                  {isUploading ? <Loader2 className="h-4 w-4 animate-spin"/> : <Upload className="h-4 w-4" />}
+                  <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isSaving || isUploading} />
                 </label>
               </Button>
             </div>
