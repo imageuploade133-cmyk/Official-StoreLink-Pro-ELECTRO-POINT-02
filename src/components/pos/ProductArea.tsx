@@ -15,10 +15,12 @@ import { ProductSearchBar } from './ProductSearchBar';
 import { ProductGrid } from './ProductGrid';
 import { PaginationControls } from './PaginationControls';
 import { BarcodeScanner } from '@/components/inventory/BarcodeScanner';
+import { useBarcodeScanner } from '@/hooks/use-barcode-scanner';
 
 interface ProductAreaProps {
     onAddToCart: (product: DisplayProduct, priceForSale: number) => void;
     onProductsLoaded: (products: DisplayProduct[]) => void;
+    isScannerEnabled?: boolean;
 }
 
 const PRODUCTS_PER_PAGE = 20;
@@ -33,7 +35,7 @@ const useDebouncedValue = <T,>(value: T, delay: number): T => {
 };
 
 
-export function ProductArea({ onAddToCart, onProductsLoaded }: ProductAreaProps) {
+export function ProductArea({ onAddToCart, onProductsLoaded, isScannerEnabled = true }: ProductAreaProps) {
     const firestore = useFirestore();
     const { settings } = useSettings();
     const { toast } = useToast();
@@ -63,6 +65,26 @@ export function ProductArea({ onAddToCart, onProductsLoaded }: ProductAreaProps)
     const [isSearchDropdownOpen, setIsSearchDropdownOpen] = useState(false);
     const [isScannerOpen, setIsScannerOpen] = useState(false);
     const searchInputContainerRef = useRef<HTMLDivElement>(null);
+
+    const handleScan = useCallback((barcode: string) => {
+        const foundProduct = products.find(p => p.barcode === barcode);
+        if (foundProduct) {
+            onAddToCart(foundProduct, calculateEffectivePrice(foundProduct, today));
+            setSearchTerm('');
+            setIsSearchDropdownOpen(false);
+        } else {
+            toast({
+                variant: 'destructive',
+                title: 'Product Not Found',
+                description: `No product with barcode: ${barcode}`,
+            });
+        }
+    }, [products, onAddToCart, today, toast]);
+
+    useBarcodeScanner({
+        onScan: handleScan,
+        enabled: isScannerEnabled
+    });
 
     const fetchInitialData = useCallback(async () => {
         const currentStoreId = staffMember?.store_id || store?.id;
@@ -159,21 +181,6 @@ export function ProductArea({ onAddToCart, onProductsLoaded }: ProductAreaProps)
     const currentProductsOnGrid = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
     const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
     
-    const handleScan = useCallback((barcode: string) => {
-        const foundProduct = products.find(p => p.barcode === barcode);
-        if (foundProduct) {
-            onAddToCart(foundProduct, calculateEffectivePrice(foundProduct, today));
-            setSearchTerm('');
-            setIsSearchDropdownOpen(false);
-        } else {
-            toast({
-                variant: 'destructive',
-                title: 'Product Not Found',
-                description: `No product with barcode: ${barcode}`,
-            });
-        }
-    }, [products, onAddToCart, today, toast]);
-
     return (
         <>
             <ProductSearchBar
