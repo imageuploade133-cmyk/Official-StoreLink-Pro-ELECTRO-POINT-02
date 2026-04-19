@@ -19,7 +19,7 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Loader2, Save, Landmark, Info, PlusCircle, Trash2, Edit, Upload, Coins, AlertTriangle, CreditCard, Globe, Wallet, Smartphone, Zap, Truck, ShieldCheck } from 'lucide-react';
+import { Loader2, Save, Landmark, Info, PlusCircle, Trash2, Edit, Upload, Coins, AlertTriangle, CreditCard, Globe, Wallet, Smartphone, Zap, Truck, ShieldCheck, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -212,7 +212,7 @@ export default function WebsitePaymentSettings() {
       } else {
         await saveGlobalSettings(firestore, { paymentRegion: value });
       }
-      toast({ title: "Success", description: `Payment region updated to ${value}.` });
+      toast({ title: "Success", description: value ? `Payment region updated to ${value}.` : "Payment region unselected." });
     } catch (e) {
       toast({ variant: "destructive", title: "Error", description: "Failed to update payment region." });
     } finally {
@@ -880,7 +880,7 @@ export default function WebsitePaymentSettings() {
         <CardContent>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <Select 
-              value={settingsData?.paymentRegion || settingsData?.country || ""} 
+              value={settingsData?.paymentRegion ?? settingsData?.country ?? ""} 
               onValueChange={handleRegionChange}
               disabled={isSavingRegion}
             >
@@ -895,10 +895,22 @@ export default function WebsitePaymentSettings() {
                 ))}
               </SelectContent>
             </Select>
+            {(settingsData?.paymentRegion || settingsData?.country) && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => handleRegionChange("")}
+                disabled={isSavingRegion}
+                className="h-11 px-4 border-dashed hover:bg-destructive/5 hover:text-destructive hover:border-destructive transition-colors"
+              >
+                <RotateCcw className={cn("h-4 w-4 mr-2", isSavingRegion && "animate-spin")} />
+                Reset Selection
+              </Button>
+            )}
             {isSavingRegion && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground animate-in fade-in">
                 <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                Saving region...
+                {settingsData?.paymentRegion || settingsData?.country ? "Saving region..." : "Resetting region..."}
               </div>
             )}
           </div>
