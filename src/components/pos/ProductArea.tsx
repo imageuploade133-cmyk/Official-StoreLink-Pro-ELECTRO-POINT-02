@@ -14,7 +14,7 @@ import { ensureNumber, calculateEffectivePrice } from '@/lib/pos-utils';
 import { ProductSearchBar } from './ProductSearchBar';
 import { ProductGrid } from './ProductGrid';
 import { PaginationControls } from './PaginationControls';
-import { CameraScannerModal } from '@/components/media/CameraScannerModal';
+import { BarcodeScanner } from '@/components/inventory/BarcodeScanner';
 
 interface ProductAreaProps {
     onAddToCart: (product: DisplayProduct, priceForSale: number) => void;
@@ -198,10 +198,10 @@ export function ProductArea({ onAddToCart, onProductsLoaded }: ProductAreaProps)
                 today={today}
             />
 
-            <CameraScannerModal 
+            <BarcodeScanner 
                 isOpen={isScannerOpen} 
                 onClose={() => setIsScannerOpen(false)} 
-                onBarcodeScanned={(barcode) => {
+                onScan={(barcode) => {
                     handleScan(barcode);
                 }} 
             />

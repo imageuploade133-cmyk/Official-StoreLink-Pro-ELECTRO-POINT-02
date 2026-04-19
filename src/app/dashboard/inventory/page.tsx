@@ -13,13 +13,16 @@ import {
   RotateCcw,
   Copy,
   Share2,
-  Scan 
+  Scan,
+  PackageSearch 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/PageHeader';
 import { ProductTable } from '@/components/inventory/ProductTable';
 import { BarcodeScanner } from '@/components/inventory/BarcodeScanner';
+import { BarcodeScannerField } from '@/components/inventory/BarcodeScannerField';
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useBarcodeScanner } from '@/hooks/use-barcode-scanner';
 import { useCollection, useFirestore } from '@/firebase';
 import { 
   collection, 
@@ -332,11 +335,20 @@ export default function InventoryPage() {
     }
   };
 
+  const { playSuccessSound, vibrate } = useBarcodeScanner({
+    onScan: (barcode) => handleBarcodeScan(barcode),
+    enabled: !isBarcodeScannerOpen && !isActionModalOpen && !isDeleteDialogOpen
+  });
+
   const handleBarcodeScan = async (barcode: string) => {
     if (!firestore || !currentStoreId) return;
     
     setIsLoadingProducts(true);
     try {
+      // playSuccessSound and vibrate are already called by useBarcodeScanner 
+      // but if called from handleBarcodeScan (e.g. from BarcodeScanner component), we should play them if they haven't been.
+      // Actually, BarcodeScanner component now has its own sound logic.
+
       const q = query(
         collection(firestore, 'products'), 
         where('store_id', '==', currentStoreId), 
@@ -355,6 +367,9 @@ export default function InventoryPage() {
           title: "Product Found",
           description: `Located "${product.name}" via barcode scan.`,
         });
+        
+        // Auto-open product details/edit if found
+        handleEditProduct(product.id);
       } else {
         toast({
           title: "Product Not Found",
@@ -428,27 +443,46 @@ export default function InventoryPage() {
                     disabled={isUpdatingSettings}
                 />
             </div>
-            <div className="flex items-center gap-2">
-                <Button variant="outline" onClick={() => setIsBarcodeScannerOpen(true)} disabled={isLoading}>
-                    <Scan className="mr-2 h-4 w-4" />
-                    Scan Barcode
-                </Button>
-                <Button variant="outline" onClick={() => fetchProducts('initial')} disabled={isLoading}>
-                    <RotateCcw className={cn("mr-2 h-4 w-4", isLoading && "animate-spin")} />
-                    Sync Registry
-                </Button>
-                <Button 
-                  disabled={isLoading || isNavigating} 
-                  size="lg"
-                  onClick={() => {
-                    setIsNavigating(true);
-                    router.push('/dashboard/inventory/add');
-                  }}
-                >
-                  {isNavigating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PlusCircle className="mr-2 h-4 w-4" />}
-                  Add New Product
-                </Button>
-            </div>
+            <Button 
+                disabled={isLoading || isNavigating} 
+                size="lg"
+                className="rounded-xl h-12 px-6 shadow-lg shadow-primary/20"
+                onClick={() => {
+                setIsNavigating(true);
+                router.push('/dashboard/inventory/add');
+                }}
+            >
+                {isNavigating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <PlusCircle className="mr-2 h-4 w-4" />}
+                Add New Product
+            </Button>
+        </div>
+      </div>
+
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-card p-4 rounded-2xl shadow-sm border border-border/50">
+        <BarcodeScannerField 
+          onScan={handleBarcodeScan} 
+          placeholder="Scan product barcode..." 
+          className="max-w-md w-full"
+        />
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <Button 
+            variant="outline" 
+            onClick={() => setIsBarcodeScannerOpen(true)} 
+            disabled={isLoading}
+            className="flex-1 md:flex-none rounded-xl h-11 border-dashed"
+          >
+            <Scan className="mr-2 h-4 w-4" />
+            Camera Scan
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => fetchProducts('initial')} 
+            disabled={isLoading}
+            className="flex-1 md:flex-none rounded-xl h-11 border-dashed"
+          >
+            <RotateCcw className={cn("mr-2 h-4 w-4", isLoading && "animate-spin")} />
+            Sync Registry
+          </Button>
         </div>
       </div>
 

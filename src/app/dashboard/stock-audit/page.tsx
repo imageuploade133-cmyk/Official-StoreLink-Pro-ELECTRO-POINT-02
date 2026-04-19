@@ -38,8 +38,12 @@ import {
   Filter,
   UserCircle,
   Trash2,
-  X
+  X,
+  Scan
 } from 'lucide-react';
+import { BarcodeScannerField } from '@/components/inventory/BarcodeScannerField';
+import { BarcodeScanner } from '@/components/inventory/BarcodeScanner';
+import { useBarcodeScanner } from '@/hooks/use-barcode-scanner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
@@ -82,12 +86,26 @@ export default function StockAuditPage() {
   const firstDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
   const lastDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
 
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+
+  const { playSuccessSound, vibrate } = useBarcodeScanner({
+    onScan: (barcode) => {
+        setSearchTerm(barcode);
+        fetchAuditLogs('initial'); // This might need adjustment if it doesn't filter by barcode yet
+    },
+    enabled: !isScannerOpen
+  });
+
   const fetchAuditLogs = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
     if (!firestore || !currentStoreId) return;
     setIsLoading(true);
 
     try {
       let q = query(collection(firestore, 'stockAudit'), where('store_id', '==', currentStoreId), orderBy('timestamp', 'desc'));
+
+      // If searchTerm looks like a barcode/reference, we might want to filter by it in Firestore
+      // but the current implementation filters in memory (filteredLogs).
+      // For barcodes, it's better to search in Firestore if possible.
 
       if (typeFilter !== 'all') {
         q = query(q, where('type', '==', typeFilter));
@@ -245,20 +263,19 @@ export default function StockAuditPage() {
                 <CardDescription>Real-time inventory telemetry with personnel mapping.</CardDescription>
             </div>
             <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-                <div className="relative flex-grow lg:w-64">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                        placeholder="Search product or staff..." 
-                        value={searchTerm} 
-                        onChange={(e) => setSearchTerm(e.target.value)} 
-                        className="pl-10 h-10"
-                    />
-                    {searchTerm && (
-                        <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8" onClick={() => setSearchTerm('')}>
-                            <X className="h-4 w-4" />
-                        </Button>
-                    )}
-                </div>
+                <BarcodeScannerField 
+                    onScan={(barcode) => setSearchTerm(barcode)}
+                    placeholder="Search product, staff or barcode..."
+                    className="flex-grow lg:w-72"
+                />
+                <Button 
+                    variant="outline" 
+                    size="icon" 
+                    className="h-10 w-10 rounded-xl border-dashed"
+                    onClick={() => setIsScannerOpen(true)}
+                >
+                    <Scan className="h-4 w-4" />
+                </Button>
                 <Select value={typeFilter} onValueChange={setTypeFilter}>
                     <SelectTrigger className="w-full sm:w-[160px] h-10">
                         <Filter className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
@@ -394,6 +411,12 @@ export default function StockAuditPage() {
             </div>
         </CardFooter>
       </Card>
+
+      <BarcodeScanner 
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+        onScan={(barcode) => setSearchTerm(barcode)}
+      />
     </div>
   );
 }
