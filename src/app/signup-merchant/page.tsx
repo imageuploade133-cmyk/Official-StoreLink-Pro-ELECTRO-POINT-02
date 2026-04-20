@@ -31,6 +31,8 @@ import * as z from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useAuth } from "@/contexts/auth-context";
 
+import "./../auth.css";
+
 const reservedSlugs = [
   'dashboard', 'login', 'signup', 'signup-merchant', 'pos', 'api', 'actions', 
   'admin', 'store', 'store-app', 'public', 'static', 'favicon.ico', 's-logo.png', 
@@ -295,94 +297,139 @@ export default function MerchantSignupPage() {
     }
 
   return (
-    <div className="w-full min-h-screen grid lg:grid-cols-2">
-      <div className="flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[400px] gap-6 px-4">
-          <div className="grid gap-2 text-center">
-             <div className="flex justify-center mb-4 h-10">
-                <ElysiumLogo className="h-10 w-10 text-primary" />
-            </div>
-            <h1 className="text-4xl font-bold font-headline">Create a Store</h1>
-            <p className="text-balance text-muted-foreground">
-              Start managing your business with StoreLink Pro.
-            </p>
+    <div className="auth-page-wrapper !py-12">
+      <div className="auth-wrapper !max-w-[550px]">
+        <div className="auth-card">
+          <div className="logo">
+             <ElysiumLogo className="h-8 w-8 text-white" />
           </div>
+          <h1 className="auth-title">Create a Store</h1>
+          <p className="auth-subtitle">Start managing your business with StoreLink Pro</p>
+          
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-                <FormField control={form.control} name="name" render={({ field }) => (
-                    <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="John Doe" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
-                )}/>
-                <FormField control={form.control} name="email" render={({ field }) => (
-                    <FormItem><FormLabel>Email Address</FormLabel><FormControl><Input type="email" placeholder="m@example.com" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
-                )}/>
-                <FormField control={form.control} name="storeName" render={({ field }) => (
-                    <FormItem><FormLabel>Store Name</FormLabel><FormControl><Input placeholder="My Awesome Store" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
-                )}/>
-                <FormField control={form.control} name="storeSlug" render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Store URL Slug</FormLabel>
-                        <FormControl>
-                            <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">/</span>
-                                <Input placeholder="my-awesome-store" className="pl-6" {...field} disabled={isSubmitting || isLoading} />
-                            </div>
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}/>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <FormField control={form.control} name="storePhone" render={({ field }) => (
-                        <FormItem><FormLabel>Store Phone Number</FormLabel><FormControl><Input placeholder="+234..." {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
-                    )}/>
-                    <FormField control={form.control} name="storeAddress" render={({ field }) => (
-                        <FormItem><FormLabel>Store Address</FormLabel><FormControl><Input placeholder="123 Business St, Lagos" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+                <div className="form-group">
+                    <FormField control={form.control} name="name" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel className="!text-[13px] !text-muted-foreground !font-semibold !mb-1 !block">Full Name</FormLabel>
+                            <FormControl>
+                                <Input placeholder="John Doe" {...field} disabled={isSubmitting || isLoading} className="form-input" />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
                     )}/>
                 </div>
-                <FormField control={form.control} name="databaseId" render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Database ID (Optional)</FormLabel>
-                        <FormControl><Input placeholder="(default)" {...field} disabled={isSubmitting || isLoading} /></FormControl>
-                        <p className="text-[10px] text-muted-foreground italic">Leave as <strong>(default)</strong> unless you have specifically created a separate Firestore database for this project.</p>
-                        <FormMessage />
-                    </FormItem>
-                )}/>
+                <div className="form-group">
+                    <FormField control={form.control} name="email" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel className="!text-[13px] !text-muted-foreground !font-semibold !mb-1 !block">Email Address</FormLabel>
+                            <FormControl>
+                                <Input type="email" placeholder="m@example.com" {...field} disabled={isSubmitting || isLoading} className="form-input" />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}/>
+                </div>
+                <div className="form-group">
+                    <FormField control={form.control} name="storeName" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel className="!text-[13px] !text-muted-foreground !font-semibold !mb-1 !block">Store Name</FormLabel>
+                            <FormControl>
+                                <Input placeholder="My Awesome Store" {...field} disabled={isSubmitting || isLoading} className="form-input" />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}/>
+                </div>
+                <div className="form-group">
+                    <FormField control={form.control} name="storeSlug" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel className="!text-[13px] !text-muted-foreground !font-semibold !mb-1 !block">Store URL Slug</FormLabel>
+                            <FormControl>
+                                <div className="input-wrap">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">/</span>
+                                    <Input placeholder="my-awesome-store" className="form-input !pl-7" {...field} disabled={isSubmitting || isLoading} />
+                                </div>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}/>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="form-group">
+                        <FormField control={form.control} name="storePhone" render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="!text-[13px] !text-muted-foreground !font-semibold !mb-1 !block">Phone Number</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="+234..." {...field} disabled={isSubmitting || isLoading} className="form-input" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}/>
+                    </div>
+                    <div className="form-group">
+                        <FormField control={form.control} name="storeAddress" render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="!text-[13px] !text-muted-foreground !font-semibold !mb-1 !block">Address</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="123 Business St, Lagos" {...field} disabled={isSubmitting || isLoading} className="form-input" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}/>
+                    </div>
+                </div>
+                <div className="form-group">
+                    <FormField control={form.control} name="databaseId" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel className="!text-[13px] !text-muted-foreground !font-semibold !mb-1 !block">Database ID (Optional)</FormLabel>
+                            <FormControl>
+                                <Input placeholder="(default)" {...field} disabled={isSubmitting || isLoading} className="form-input" />
+                            </FormControl>
+                            <p className="text-[10px] text-muted-foreground italic mt-1">Leave as <strong>(default)</strong> unless you have a separate Firestore database.</p>
+                            <FormMessage />
+                        </FormItem>
+                    )}/>
+                </div>
                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <FormField control={form.control} name="password" render={({ field }) => (
-                        <FormItem><FormLabel>Password</FormLabel>
-                          <div className="relative">
-                            <FormControl><Input type={showPassword ? 'text' : 'password'} placeholder="Min. 6 chars" {...field} disabled={isSubmitting || isLoading} /></FormControl>
-                             <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7" onClick={() => setShowPassword(!showPassword)}><Eye className="h-4 w-4" /></Button>
-                          </div>
-                        <FormMessage /></FormItem>
-                    )}/>
-                    <FormField control={form.control} name="confirmPassword" render={({ field }) => (
-                        <FormItem><FormLabel>Confirm Password</FormLabel><FormControl><Input type={showPassword ? 'text' : 'password'} placeholder="Repeat password" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
-                    )}/>
+                    <div className="form-group">
+                        <FormField control={form.control} name="password" render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="!text-[13px] !text-muted-foreground !font-semibold !mb-1 !block">Password</FormLabel>
+                                <div className="input-wrap">
+                                    <FormControl>
+                                        <Input type={showPassword ? 'text' : 'password'} placeholder="Min. 6 chars" {...field} disabled={isSubmitting || isLoading} className="form-input" />
+                                    </FormControl>
+                                    <button type="button" className="eye-btn" onClick={() => setShowPassword(!showPassword)}>
+                                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                    </button>
+                                </div>
+                                <FormMessage />
+                            </FormItem>
+                        )}/>
+                    </div>
+                    <div className="form-group">
+                        <FormField control={form.control} name="confirmPassword" render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="!text-[13px] !text-muted-foreground !font-semibold !mb-1 !block">Confirm</FormLabel>
+                                <FormControl>
+                                    <Input type={showPassword ? 'text' : 'password'} placeholder="Repeat" {...field} disabled={isSubmitting || isLoading} className="form-input" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}/>
+                    </div>
                 </div>
 
-                <Button type="submit" className="w-full mt-2 h-12 font-bold" disabled={isSubmitting || isLoading}>
-                    {(isSubmitting || isLoading) ? <><Spinner size="sm" className="mr-2" />Creating Store…</> : 'Create Store Account'}
-                </Button>
-                <div className="text-center text-sm">
+                <button type="submit" className="btn-primary mt-4" disabled={isSubmitting || isLoading}>
+                    {(isSubmitting || isLoading) ? <><Spinner size="sm" className="mr-2 text-white" />Creating Store…</> : 'Create Store Account'}
+                </button>
+                <div className="footer-note">
                     Already have an account?{" "}
-                    <Link href="/login" className="underline text-primary font-bold">Log in</Link>
+                    <Link href="/login">Log in</Link>
                 </div>
             </form>
           </Form>
-        </div>
-      </div>
-       <div className="hidden bg-muted lg:block relative">
-        <Image
-          src={loginImage.src}
-          alt="Storefront"
-          fill
-          className="object-cover"
-          unoptimized
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-        <div className="absolute bottom-10 left-10 text-white max-w-lg">
-            <h2 className="text-4xl font-black tracking-tighter uppercase">StoreLink Pro</h2>
-            <p className="text-white/80 mt-2 font-medium">The ultimate all-in-one solution for managing your e-commerce business with unparalleled efficiency and insight.</p>
         </div>
       </div>
     </div>
