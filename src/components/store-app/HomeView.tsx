@@ -281,6 +281,16 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
     }, [firestore, storeId]);
     const { data: sections } = useCollection<HomepageSection>(sectionsQuery);
 
+    const coveredCategoryIds = useMemo(() => {
+        return sections
+            ?.filter(s => s.selectionType === 'category' && s.categoryId)
+            .map(s => s.categoryId as string) || [];
+    }, [sections]);
+
+    const hasAllProductsSection = useMemo(() => {
+        return sections?.some(s => s.selectionType === 'all');
+    }, [sections]);
+
     const categoryMap = useMemo(() => {
         if (!categories) return new Map();
         return new Map(categories.map(c => [c.id, c.name]));
@@ -474,6 +484,28 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                 )}
             </div>
           ))}
+
+          {/* CATCH-ALL SECTION FOR PRODUCTS NOT IN ANY SPECIFIC CATEGORY SECTION */}
+          {!hasAllProductsSection && (
+            <div className="px-0">
+                <ProductSection 
+                    section={{
+                        id: 'catch-all',
+                        title: 'Our Collection',
+                        description: 'Discover our latest additions and favorite picks',
+                        selectionType: 'all',
+                        layout: 'grid',
+                        published: true,
+                        order: 9999,
+                        createdAt: null as any,
+                        updatedAt: null as any,
+                        alignment: 'center'
+                    }}
+                    categories={categories || []}
+                    excludeCategoryIds={coveredCategoryIds}
+                />
+            </div>
+          )}
 
           {/* Quick Registry Access (Horizontal Categories) */}
           <div className="space-y-6">
