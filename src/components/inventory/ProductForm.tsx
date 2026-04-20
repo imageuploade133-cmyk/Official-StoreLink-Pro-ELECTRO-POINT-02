@@ -685,13 +685,30 @@ export function ProductForm({
   return (
     <>
     <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <form onSubmit={form.handleSubmit(onSubmit, (errors) => {
+        console.error("Form Validation Errors:", errors);
+        toast({ variant: "destructive", title: "Form Error", description: "Please check all required fields." });
+      })} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-primary/5 border border-primary/10 p-3 rounded-xl flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-primary animate-in fade-in slide-in-from-top-2">
             <Info className="h-4 w-4" />
             Note: Fields marked with an asterisk (*) are mandatory for catalog integrity.
           </div>
+
+          {Object.keys(form.formState.errors).length > 0 && (
+            <div className="bg-destructive/10 border border-destructive/20 p-4 rounded-xl space-y-2 animate-in fade-in slide-in-from-top-2">
+              <div className="flex items-center gap-2 text-destructive font-bold text-sm">
+                <AlertTriangle className="h-4 w-4" />
+                Validation Error: Please check all required fields.
+              </div>
+              <ul className="list-disc list-inside text-[10px] text-destructive/80 font-bold uppercase tracking-tighter">
+                {Object.entries(form.formState.errors).map(([name, error]) => (
+                  <li key={name}>{name}: {error?.message as string}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <Card className="shadow-xl border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
@@ -713,11 +730,11 @@ export function ProductForm({
                 />
                 <div className="space-y-2">
                   <FormLabel className="font-bold text-gray-700">Category <span className="text-destructive">*</span></FormLabel>
-                  <div className="flex gap-2">
-                    <FormField
-                      control={form.control}
-                      name="categoryId"
-                      render={({ field }) => (
+                  <FormField
+                    control={form.control}
+                    name="categoryId"
+                    render={({ field }) => (
+                      <FormItem>
                         <FormControl>
                           <div className="flex gap-2 w-full">
                             <Input 
@@ -731,14 +748,14 @@ export function ProductForm({
                                 onClick={() => setIsChangeCategoryModalOpen(true)}
                                 className="shrink-0"
                             >
-                                {field.value ? 'Change' : 'Select'}
+                                {field.value ? "Change" : "Select"}
                             </Button>
                           </div>
                         </FormControl>
-                      )}
-                    />
-                  </div>
-                  <FormField control={form.control} name="categoryId" render={() => <FormMessage />} />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
               </div>
 

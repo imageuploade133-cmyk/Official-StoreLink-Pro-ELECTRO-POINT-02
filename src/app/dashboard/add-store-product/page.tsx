@@ -35,7 +35,15 @@ export default function AddStoreProductPage() {
   const { data: categories, isLoading: isLoadingCategories, refetch: refetchCategories } = useCollection<Category>(categoriesQuery);
 
   const handleProductSubmit = async (values: ProductFormValues) => {
-    if (!user || !firestore || !currentStoreId) return;
+    if (!user || !firestore) {
+      toast({ variant: 'destructive', title: 'Session Error', description: 'User or database connection lost. Please refresh.' });
+      return;
+    }
+    
+    if (!currentStoreId) {
+      toast({ variant: 'destructive', title: 'Store ID Missing', description: 'Could not determine your store ID. Please check your account settings or refresh.' });
+      return;
+    }
     
     setIsSaving(true);
     try {
