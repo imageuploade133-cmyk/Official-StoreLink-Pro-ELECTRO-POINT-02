@@ -21,6 +21,7 @@ import type { Product, Category } from '@/lib/types';
 import { ProductCard } from '@/components/store/ProductCard';
 import { useSettings } from '@/contexts/settings-context';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, ChevronLeft, ChevronRight, RotateCcw, PackageSearch, Sparkles, Loader2 } from 'lucide-react';
