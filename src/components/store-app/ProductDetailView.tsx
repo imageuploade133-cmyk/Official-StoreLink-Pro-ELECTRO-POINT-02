@@ -226,7 +226,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
             const end = convertToDateSafely(s.flashSaleEndDate);
             if (start && now < start) return false;
             if (end && now > end) return false;
-            return (s.selectionType === 'category' && s.categoryId === product.categoryId) || (s.selectionType === 'manual' && s.productIds?.includes(product.id));
+            return (s.selectionType === 'category' && s.categoryId === product.categoryId) || (s.selectionType === 'manual' && s.productIds?.includes(product.id)) || (s.selectionType === 'all');
         });
         return s ? { type: s.flashSaleDiscountType || 'percentage', value: s.flashSaleDiscountValue || 0, endDate: convertToDateSafely(s.flashSaleEndDate) } : null;
     }, [flashSections, product]);

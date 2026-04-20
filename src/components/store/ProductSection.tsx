@@ -124,7 +124,7 @@ function FlashSaleMarquee() {
     );
 }
 
-export function ProductSection({ section, categories }: ProductSectionProps) {
+export function ProductSection({ section, categories, excludeCategoryIds }: ProductSectionProps) {
   const firestore = useFirestore();
   const { settings } = useSettings();
   const { storeId, getStoreUrl } = useStoreUrl();

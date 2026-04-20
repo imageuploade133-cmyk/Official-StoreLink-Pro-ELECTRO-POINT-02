@@ -765,6 +765,22 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                             <FormControl>
                                                 <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                                                     <div className="relative group">
+                                                        <RadioGroupItem value="all" id="selection-all" className="peer sr-only" />
+                                                        <Label 
+                                                            htmlFor="selection-all" 
+                                                            className="flex flex-col items-center justify-center gap-3 p-6 rounded-[2rem] border-2 bg-background cursor-pointer transition-all duration-300 peer-data-[state=checked]:border-primary peer-data-[state=checked]:ring-4 peer-data-[state=checked]:ring-primary/10 hover:border-primary/50 hover:bg-primary/5 group-hover:shadow-lg"
+                                                        >
+                                                            <div className="h-12 w-12 rounded-2xl bg-muted group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                                                                <LayoutGrid className="h-6 w-6 text-muted-foreground group-hover:text-primary" />
+                                                            </div>
+                                                            <div className="text-center">
+                                                                <p className="font-black uppercase tracking-tight text-sm">All Products</p>
+                                                                <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-60">Catch-all</p>
+                                                            </div>
+                                                        </Label>
+                                                    </div>
+
+                                                    <div className="relative group">
                                                         <RadioGroupItem value="category" id="selection-category" className="peer sr-only" />
                                                         <Label 
                                                             htmlFor="selection-category" 
@@ -905,6 +921,16 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                             <div className="text-center">
                                                 <p className="font-bold text-slate-600">No products will be displayed</p>
                                                 <p className="text-xs text-muted-foreground">Switch to Banner Settings tab to configure your visual content.</p>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {selectionType === 'all' && (
+                                        <div className="flex flex-col items-center justify-center py-10 bg-muted/20 rounded-2xl border-2 border-dashed gap-4 animate-in fade-in duration-500">
+                                            <LayoutGrid className="h-10 w-10 text-primary opacity-50" />
+                                            <div className="text-center">
+                                                <p className="font-bold text-slate-600">Catch-all enabled</p>
+                                                <p className="text-xs text-muted-foreground">This section will automatically display all products that are not represented in other category-specific sections.</p>
                                             </div>
                                         </div>
                                     )}

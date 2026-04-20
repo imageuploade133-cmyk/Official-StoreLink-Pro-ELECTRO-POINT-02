@@ -359,6 +359,7 @@ export default function ProductDetailsPage() {
         
         if (s.selectionType === 'category' && s.categoryId === product.categoryId) return true;
         if (s.selectionType === 'manual' && s.productIds?.includes(product.id)) return true;
+        if (s.selectionType === 'all') return true;
         
         return false;
     });
