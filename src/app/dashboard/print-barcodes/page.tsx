@@ -21,7 +21,7 @@ import {
 } from 'firebase/firestore';
 import type { BarcodeProduct, Product } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { Printer, RefreshCw, Tags, Loader2, RotateCcw } from 'lucide-react';
+import { Printer, RefreshCw, Tags, Loader2, RotateCcw, Scan, Camera } from 'lucide-react';
 import JsBarcode from 'jsbarcode';
 import { useSettings } from "@/contexts/settings-context";
 import { formatCurrency } from "@/lib/formatUtils";
@@ -33,6 +33,8 @@ import { ProductSelectionCard } from '@/components/barcode/ProductSelectionCard'
 import { Skeleton } from '@/components/ui/skeleton';
 import { PageHeader } from '@/components/PageHeader';
 import { cn } from '@/lib/utils';
+import { BarcodeScanner } from '@/components/inventory/BarcodeScanner';
+import { useBarcodeScanner } from '@/hooks/use-barcode-scanner';
 
 export type LayoutSettings = {
     labelWidth: number;
@@ -162,11 +164,67 @@ const PrintBarcodePage = () => {
     const firstDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
     const lastDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
     const [isLastPage, setIsLastPage] = useState(false);
+    const [isScannerOpen, setIsScannerOpen] = useState(false);
 
     const [selectedPreset, setSelectedPreset] = useState<string>(layoutPresets[0].value);
     const [layoutSettings, setLayoutSettings] = useState<LayoutSettings>(layoutPresets[0].settings);
     const [fontSize, setFontSize] = useState<number>(10);
     const [isBold, setIsBold] = useState<boolean>(false);
+
+    const findProductByBarcode = useCallback(async (barcode: string) => {
+        if (!firestore || !currentStoreId) return null;
+        let product = products.find(p => p.barcode === barcode);
+        if (!product) {
+            try {
+                const q = query(
+                    collection(firestore, 'products'),
+                    where('store_id', '==', currentStoreId),
+                    where('barcode', '==', barcode),
+                    limit(1)
+                );
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    const doc = querySnapshot.docs[0];
+                    product = { id: doc.id, ...doc.data() } as Product;
+                }
+            } catch (error) {
+                console.error("Error searching product by barcode:", error);
+            }
+        }
+        return product;
+    }, [firestore, currentStoreId, products]);
+
+    const handleScan = useCallback(async (barcode: string) => {
+        if (!barcode) return;
+        const product = await findProductByBarcode(barcode);
+        if (product) {
+            setSelectedMap(prev => {
+                const next = { ...prev };
+                const existing = next[product.id];
+                if (existing) {
+                    next[product.id] = { ...existing, quantity: (existing.quantity || 1) + 1 };
+                } else {
+                    next[product.id] = { product, quantity: 1 };
+                }
+                return next;
+            });
+            toast({
+                title: "Product Identified",
+                description: `${product.name} added to selection.`,
+            });
+        } else {
+            toast({
+                variant: "destructive",
+                title: "Product Not Found",
+                description: `No product found with barcode: ${barcode}`,
+            });
+        }
+    }, [findProductByBarcode, toast]);
+
+    useBarcodeScanner({
+        onScan: handleScan,
+        enabled: !isScannerOpen && !!permissions?.canPrintBarcodes
+    });
 
     const fetchProducts = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
         if (!firestore || !currentStoreId) return;
@@ -415,6 +473,7 @@ const PrintBarcodePage = () => {
                         onSelectAllVisible={handleSelectAllVisible}
                         areAllVisibleSelected={areAllVisibleSelected}
                         onBarcodeRegenerate={generateBarcode}
+                        onScanButtonClick={() => setIsScannerOpen(true)}
                     />
 
                     <Button onClick={handlePrint} disabled={selectedProducts.length === 0} className="w-full mt-2 h-12 text-lg font-black shadow-lg shadow-primary/20">
@@ -457,6 +516,12 @@ const PrintBarcodePage = () => {
                 @page { size: A4; margin: 0; } 
               }
             `}</style>
+
+            <BarcodeScanner 
+                isOpen={isScannerOpen} 
+                onClose={() => setIsScannerOpen(false)} 
+                onScan={handleScan} 
+            />
         </div>
     );
 
