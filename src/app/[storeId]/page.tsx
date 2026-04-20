@@ -50,6 +50,16 @@ export default function StoreHomePage() {
   }, [firestore, effectiveStoreId]);
   const { data: sections } = useCollection<HomepageSection>(sectionsQuery);
   
+  const coveredCategoryIds = useMemo(() => {
+    return sections
+      ?.filter(s => s.selectionType === 'category' && s.categoryId)
+      .map(s => s.categoryId as string) || [];
+  }, [sections]);
+
+  const hasAllProductsSection = useMemo(() => {
+    return sections?.some(s => s.selectionType === 'all');
+  }, [sections]);
+
   const defaultValues: BrandValue[] = [
     { icon: 'Truck', title: 'Free Shipping', description: `On all orders over ${currencySymbol}600` },
     { icon: 'ShieldCheck', title: 'Secure Payment', description: '100% secure payment' },
@@ -168,6 +178,26 @@ export default function StoreHomePage() {
             />
           )
       ))}
+
+      {/* CATCH-ALL SECTION FOR PRODUCTS NOT IN ANY SPECIFIC CATEGORY SECTION */}
+      {!hasAllProductsSection && (
+        <ProductSection 
+            section={{
+                id: 'catch-all',
+                title: 'Our Collection',
+                description: 'Discover our latest additions and favorite picks',
+                selectionType: 'all',
+                layout: 'grid',
+                published: true,
+                order: 9999,
+                createdAt: null as any,
+                updatedAt: null as any,
+                alignment: 'center'
+            }}
+            categories={categories || []}
+            excludeCategoryIds={coveredCategoryIds}
+        />
+      )}
 
       <NewsletterSection />
     </>

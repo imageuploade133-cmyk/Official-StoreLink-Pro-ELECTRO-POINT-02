@@ -84,7 +84,7 @@ const homepageSectionSchema = z.object({
   layout: z.enum(['carousel', 'grid']).default('carousel'),
   alignment: z.enum(['left', 'center']).default('left'),
   backgroundColor: z.string().optional().or(z.literal('')),
-  selectionType: z.enum(['manual', 'category', 'custom-ui']),
+  selectionType: z.enum(['manual', 'category', 'custom-ui', 'all']),
   categoryId: z.string().optional().or(z.literal('')),
   productIds: z.array(z.string()).optional().default([]),
   // Flash Sale Fields
@@ -763,7 +763,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                                 <FormLabel className="font-bold">Target Merchandising Strategy</FormLabel>
                                             </div>
                                             <FormControl>
-                                                <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                                <RadioGroup onValueChange={field.onChange} value={field.value} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                                                     <div className="relative group">
                                                         <RadioGroupItem value="category" id="selection-category" className="peer sr-only" />
                                                         <Label 

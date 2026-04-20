@@ -460,7 +460,7 @@ export interface HomepageSection {
   order: number;
   published: boolean;
   layout: 'carousel' | 'grid';
-  selectionType: 'manual' | 'category' | 'custom-ui';
+  selectionType: 'manual' | 'category' | 'custom-ui' | 'all';
   alignment?: 'left' | 'center';
   backgroundColor?: string;
   categoryId?: string | null;

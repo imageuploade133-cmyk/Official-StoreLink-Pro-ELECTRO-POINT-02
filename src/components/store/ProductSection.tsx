@@ -56,6 +56,7 @@ import { useStoreUrl } from '@/hooks/use-store-url';
 interface ProductSectionProps {
   section: HomepageSection;
   categories: Category[];
+  excludeCategoryIds?: string[];
 }
 
 const BATCH_SIZE = 12;
@@ -177,7 +178,44 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
       let productsList: Product[] = [];
       let docs: QueryDocumentSnapshot<DocumentData>[] = [];
 
-      if (section.selectionType === 'category' && section.categoryId) {
+      if (section.selectionType === 'all') {
+        let q = query(
+          collection(firestore, 'products'),
+          where('store_id', '==', storeId),
+          where('isVisibleOnWeb', '==', true),
+          orderBy('createdAt', 'desc')
+        );
+
+        if (direction === 'next' && lastDocRef.current) {
+          q = query(q, startAfter(lastDocRef.current), limit(BATCH_SIZE));
+        } else if (direction === 'prev' && firstDocRef.current) {
+          q = query(q, endBefore(firstDocRef.current), limitToLast(BATCH_SIZE));
+        } else {
+          q = query(q, limit(BATCH_SIZE));
+        }
+
+        const snapshot = await getDocs(q);
+        docs = snapshot.docs;
+        productsList = docs.map(d => ({
+          id: d.id,
+          ...d.data(),
+          categoryName: categoryMap.get(d.data().categoryId || '') || 'General'
+        } as Product));
+
+        // Filter out products that are already covered by specific category sections
+        if (excludeCategoryIds && excludeCategoryIds.length > 0) {
+            productsList = productsList.filter(p => !p.categoryId || !excludeCategoryIds.includes(p.categoryId));
+        }
+        
+        if (docs.length > 0) {
+            firstDocRef.current = docs[0];
+            lastDocRef.current = docs[docs.length - 1];
+            setIsLastPage(docs.length < BATCH_SIZE);
+        } else {
+            setIsLastPage(true);
+        }
+      }
+      else if (section.selectionType === 'category' && section.categoryId) {
         let q = query(
           collection(firestore, 'products'),
           where('store_id', '==', storeId),
@@ -251,7 +289,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [firestore, section, hasEnteredView, categoryMap, storeId]);
+  }, [firestore, section, hasEnteredView, categoryMap, storeId, excludeCategoryIds]);
 
   useEffect(() => {
     if (hasEnteredView) {
@@ -457,6 +495,10 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
 
   const handleNextPage = () => fetchProducts('next');
   const handlePrevPage = () => fetchProducts('prev');
+
+  if (hasEnteredView && !isLoading && products.length === 0) {
+    return null;
+  }
 
   return (
     <section ref={sectionRef} className="py-12 md:py-24 overflow-hidden relative dark:bg-black" style={backgroundColor ? { backgroundColor } : {}}>
@@ -704,7 +746,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
             )}
         </Carousel>
         
-        {section.selectionType === 'category' && section.categoryId && (
+        {(section.selectionType === 'category' || section.selectionType === 'all') && (
              <div className={cn("mt-12 md:mt-20", alignment === 'left' ? 'text-left' : 'text-center')}>
                 <Button
                     asChild
@@ -717,7 +759,7 @@ export function ProductSection({ section, categories }: ProductSectionProps) {
                         boxShadow: `0 20px 40px -5px ${hubColor}44`
                     } : buttonStyle}
                 >
-                    <Link href={getStoreUrl(`/store/shop?category=${section.categoryId}`)}>
+                    <Link href={section.selectionType === 'all' ? getStoreUrl('/store/shop') : getStoreUrl(`/store/shop?category=${section.categoryId}`)}>
                         {exploreText} <IconComponent className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={3} />
                     </Link>
                 </Button>
