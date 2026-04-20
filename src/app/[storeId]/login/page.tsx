@@ -29,6 +29,8 @@ import { useSettings } from "@/contexts/settings-context";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useStoreUrl } from "@/hooks/use-store-url";
 
+import "../../auth.css";
+
 export default function StoreLoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
@@ -149,110 +151,47 @@ export default function StoreLoginPage() {
     }
 
   return (
-    <div className="w-full min-h-screen grid lg:grid-cols-2">
-      <div className="hidden bg-muted lg:block relative">
-        <Image
-          src={loginImage}
-          alt="A beautiful storefront"
-          {...(loginImage === loginImagePlaceholder.src && { 'data-ai-hint': loginImagePlaceholder.hint })}
-          fill
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-        <div className="absolute bottom-10 left-10 text-white p-6">
-            <h2 className="text-4xl font-bold font-headline break-words max-w-md leading-tight">{storeName}</h2>
-            <p className="text-white/80 mt-2 max-w-lg">
-                {storeDescription}
-            </p>
-        </div>
-      </div>
-      <div className="flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[350px] gap-6">
-          <div className="grid gap-2 text-center">
-             <div className="flex justify-center mb-4 h-10">
-                {storeLogo ? (
-                    <Image src={storeLogo} alt={storeName} width={40} height={40} className="h-10 w-auto object-contain" />
-                ) : (
-                    <ElysiumLogo className="h-10 w-10 text-primary" />
-                )}
-            </div>
-            <h1 className="text-4xl font-bold font-headline">Welcome Back</h1>
-            <p className="text-balance text-muted-foreground">
-              Sign in to your account to view your orders and manage your profile.
-            </p>
+    <div className="auth-page-wrapper">
+      <div className="auth-wrapper">
+        <div className="auth-card">
+          <div className="logo overflow-hidden bg-white">
+             {storeLogo ? (
+                <Image src={storeLogo} alt={storeName} width={54} height={54} className="h-full w-full object-contain" />
+             ) : (
+                <div className="h-full w-full bg-[#111] flex items-center justify-center text-white">
+                   <ElysiumLogo className="h-8 w-8" />
+                </div>
+             )}
           </div>
-          <form onSubmit={handleLogin} className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <h1 className="auth-title">Welcome Back</h1>
+          <p className="auth-subtitle">Sign in to {storeName}</p>
+          
+          <form onSubmit={handleLogin}>
+            <div className="form-group">
+              <div className="input-wrap">
                 <Input
                   id="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder="Email"
                   required
-                  className="pl-10"
+                  className="form-input"
                 />
               </div>
             </div>
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-                <Dialog open={isForgotPassOpen} onOpenChange={setIsForgotPassOpen}>
-                  <DialogTrigger asChild>
-                    <button
-                        type="button"
-                        onClick={() => setResetError('')}
-                        className="ml-auto inline-block text-sm text-muted-foreground hover:underline"
-                    >
-                        Forgot your password?
-                    </button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <form onSubmit={handlePasswordReset}>
-                        <DialogHeader>
-                          <DialogTitle>Reset Password</DialogTitle>
-                          <DialogDescription>
-                            Enter your email and we'll send a link to get back into your account.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="reset-email">Email</Label>
-                                <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                        id="reset-email"
-                                        type="email"
-                                        placeholder="name@example.com"
-                                        required
-                                        className="pl-10"
-                                    />
-                                </div>
-                            </div>
-                            {resetError && <p className="text-sm font-medium text-destructive">{resetError}</p>}
-                        </div>
-                        <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => setIsForgotPassOpen(false)}>
-                                Cancel
-                            </Button>
-                            <Button type="submit" disabled={isResetLoading}>
-                                {isResetLoading && <Spinner size="sm" className="mr-2 text-primary-foreground" />}
-                                Send reset link
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                  </DialogContent>
-                </Dialog>
-              </div>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input id="password" type={showPassword ? "text" : "password"} required placeholder="Password" className="pl-10 pr-10" />
+            
+            <div className="form-group">
+              <div className="input-wrap">
+                <Input 
+                    id="password" 
+                    type={showPassword ? "text" : "password"} 
+                    required 
+                    placeholder="Password" 
+                    className="form-input" 
+                />
                 <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    className="eye-btn"
                 >
                     {showPassword ? (
                         <EyeOff className="h-4 w-4" />
@@ -262,17 +201,78 @@ export default function StoreLoginPage() {
                 </button>
               </div>
             </div>
-            <Button type="submit" style={buttonStyle} className="w-full border-none font-bold" disabled={isLoading}>
-                {isLoading && <Spinner size="sm" className="mr-2 text-primary-foreground" />}
-              Login
-            </Button>
-            <div className="text-center text-sm">
-                Don&apos;t have an account?{" "}
-                <Link href={getStoreUrl('/store/signup')} className="underline text-primary">
-                    Sign up
-                </Link>
+
+            <div className="row">
+              <label className="check">
+                <input type="checkbox" />
+                <span>Remember me</span>
+              </label>
+              <Dialog open={isForgotPassOpen} onOpenChange={setIsForgotPassOpen}>
+                <DialogTrigger asChild>
+                  <button
+                      type="button"
+                      onClick={() => setResetError('')}
+                      className="link"
+                  >
+                      Forgot password?
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <form onSubmit={handlePasswordReset}>
+                      <DialogHeader>
+                        <DialogTitle>Reset Password</DialogTitle>
+                        <DialogDescription>
+                          Enter your email and we'll send a link to get back into your account.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                          <div className="grid gap-2">
+                              <Label htmlFor="reset-email">Email</Label>
+                              <div className="relative">
+                                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                  <Input
+                                      id="reset-email"
+                                      type="email"
+                                      placeholder="name@example.com"
+                                      required
+                                      className="pl-10"
+                                  />
+                              </div>
+                          </div>
+                          {resetError && <p className="text-sm font-medium text-destructive">{resetError}</p>}
+                      </div>
+                      <DialogFooter>
+                          <Button type="button" variant="outline" onClick={() => setIsForgotPassOpen(false)}>
+                              Cancel
+                          </Button>
+                          <Button type="submit" disabled={isResetLoading}>
+                              {isResetLoading && <Spinner size="sm" className="mr-2 text-primary-foreground" />}
+                              Send reset link
+                          </Button>
+                      </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
             </div>
+
+            <button type="submit" className="btn-primary" style={buttonStyle} disabled={isLoading}>
+                {isLoading && <Spinner size="sm" className="mr-2 text-white" />}
+                Sign In
+            </button>
           </form>
+
+          <div className="divider">or</div>
+
+          <div className="social-grid">
+            <button className="btn-social" type="button">
+                Continue with Google
+            </button>
+          </div>
+
+          <div className="footer-note">
+            Don&apos;t have an account?{" "}
+            <Link href={getStoreUrl('/store/signup')}>Sign up</Link>
+          </div>
         </div>
       </div>
     </div>
