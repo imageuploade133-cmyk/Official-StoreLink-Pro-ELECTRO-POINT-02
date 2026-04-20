@@ -62,16 +62,13 @@ const uploadImageFlow = ai.defineFlow(
     // Generate a unique name to avoid filename collisions on the server.
     const uniqueName = `image-${Date.now()}`;
 
-    const body = new URLSearchParams();
-    body.append('image', base64Data);
-    body.append('name', uniqueName); // Add the unique name to the request
+    const formData = new FormData();
+    formData.append('image', base64Data);
+    formData.append('name', uniqueName);
 
     const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: body.toString(),
+      body: formData,
     });
 
     if (!response.ok) {
