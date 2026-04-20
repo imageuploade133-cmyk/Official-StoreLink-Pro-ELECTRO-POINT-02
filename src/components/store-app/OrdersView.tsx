@@ -43,7 +43,34 @@ const getStatusConfig = (status: string) => {
         case 'shipped': return { icon: Truck, label: 'Dispatched', color: 'text-purple-600 bg-purple-50 border-purple-100' };
         case 'delivered': return { icon: CheckCircle2, label: 'Fulfillment Complete', color: 'text-green-600 bg-green-50 border-green-100' };
         case 'cancelled': return { icon: XCircle, label: 'Order Terminated', color: 'text-rose-600 bg-rose-50 border-rose-100' };
+        case 'paid': return { icon: CreditCard, label: 'Payment Verified', color: 'text-emerald-600 bg-emerald-50 border-emerald-100' };
         default: return { icon: Clock, label: status, color: 'text-slate-600 bg-slate-50 border-slate-100' };
+    }
+};
+
+const getPaymentStatusBadge = (status: string | undefined, isPaid: boolean) => {
+    const s = status || (isPaid ? 'PAID' : 'UNPAID');
+    switch (s) {
+        case 'PAID':
+            return <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-700 border border-green-100 text-[9px] font-black uppercase tracking-widest shadow-sm">
+                <CheckCircle2 className="h-2.5 w-2.5" /> PAID
+            </div>;
+        case 'UNPAID':
+            return <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-100 text-[9px] font-black uppercase tracking-widest shadow-sm">
+                <XCircle className="h-2.5 w-2.5" /> UNPAID
+            </div>;
+        case 'PENDING':
+            return <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100 text-[9px] font-black uppercase tracking-widest shadow-sm">
+                <Clock className="h-2.5 w-2.5" /> PENDING
+            </div>;
+        case 'REFUNDED':
+            return <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 text-slate-700 border border-slate-100 text-[9px] font-black uppercase tracking-widest shadow-sm">
+                <RotateCcw className="h-2.5 w-2.5" /> REFUNDED
+            </div>;
+        default:
+            return <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 text-slate-700 border border-slate-100 text-[9px] font-black uppercase tracking-widest shadow-sm">
+                {s}
+            </div>;
     }
 };
 
@@ -124,6 +151,7 @@ export function OrdersView({ onClose, onNavigate }: OrdersViewProps) {
                                                 <div className="space-y-1">
                                                     <p className="text-[10px] font-black uppercase text-primary tracking-widest">#{order.id.substring(0, 12).toUpperCase()}</p>
                                                     <p className="text-xs font-bold text-slate-400">{date ? format(date, 'EEEE, MMM do') : 'Recent'}</p>
+                                                    <div className="pt-1">{getPaymentStatusBadge(order.paymentStatus, order.isPaid)}</div>
                                                 </div>
                                                 <div className={cn("flex items-center gap-2 px-4 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest shadow-sm", status.color)}>
                                                     <StatusIcon className="h-3 w-3" />

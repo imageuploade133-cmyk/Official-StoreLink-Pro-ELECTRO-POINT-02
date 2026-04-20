@@ -201,6 +201,7 @@ export async function GET(request: Request) {
         const orderRef = adminDb.collection('orders').doc(tData.orderId);
         dbTransaction.update(orderRef, {
           status: 'processing',
+          paymentStatus: 'PAID',
           isPaid: true,
           updatedAt: Timestamp.now(),
         });

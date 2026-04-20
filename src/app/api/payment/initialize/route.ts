@@ -376,6 +376,12 @@ export async function POST(request: Request) {
 
     await adminDb.collection('transactions').doc(transactionId).set(transactionData);
 
+    // Update order payment status to PENDING
+    await adminDb.collection('orders').doc(orderId).update({
+      paymentStatus: 'PENDING',
+      updatedAt: Timestamp.now(),
+    });
+
     return NextResponse.json({
         success: true,
         authorization_url: result.data.authorization_url || result.data.link,

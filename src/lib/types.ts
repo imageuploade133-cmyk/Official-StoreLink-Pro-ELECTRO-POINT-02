@@ -969,6 +969,7 @@ export interface WishlistItem {
 }
 
 export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'paid' | 'failed';
+export type PaymentStatus = 'PAID' | 'UNPAID' | 'PENDING' | 'REFUNDED';
 
 export interface Order {
   id: string;
@@ -982,6 +983,7 @@ export interface Order {
   totalCost: number;
   paymentMethod: string;
   paymentReference?: string;
+  paymentStatus?: PaymentStatus;
   paymentReceiptUrl?: string;
   couponCode?: string;
   status: OrderStatus;

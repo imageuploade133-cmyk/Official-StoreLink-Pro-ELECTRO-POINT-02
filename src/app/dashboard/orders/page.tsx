@@ -88,6 +88,7 @@ export default function WebsiteOrdersPage() {
   const [isLoadingOrders, setIsLoadingOrders] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>('all');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [showSecondaryStats, setShowSecondaryStats] = useState(false);
@@ -245,15 +246,26 @@ export default function WebsiteOrdersPage() {
 
   const filteredOrders = useMemo(() => {
     if (!orders) return [];
-    const term = searchTerm.toLowerCase().trim();
-    if (!term) return orders;
+    let result = orders;
     
-    return orders.filter(order => {
-      const orderId = order.id.toLowerCase();
-      const customerName = (order.guestInfo?.name || 'Registered User').toLowerCase();
-      return orderId.includes(term) || customerName.includes(term);
-    });
-  }, [orders, searchTerm]);
+    const term = searchTerm.toLowerCase().trim();
+    if (term) {
+      result = result.filter(order => {
+        const orderId = order.id.toLowerCase();
+        const customerName = (order.guestInfo?.name || 'Registered User').toLowerCase();
+        return orderId.includes(term) || customerName.includes(term);
+      });
+    }
+
+    if (paymentStatusFilter !== 'all') {
+      result = result.filter(order => {
+        const s = order.paymentStatus || (order.isPaid ? 'PAID' : 'UNPAID');
+        return s === paymentStatusFilter;
+      });
+    }
+    
+    return result;
+  }, [orders, searchTerm, paymentStatusFilter]);
 
   const handleUpdateStatus = async (orderId: string, newStatus: OrderStatus) => {
     if (!firestore || !user || !currentStoreId) return;
@@ -281,6 +293,22 @@ export default function WebsiteOrdersPage() {
       fetchAnalytics();
     } catch (error: any) {
       toast({ variant: 'destructive', title: "Update Failed", description: error.message });
+    }
+  };
+
+  const getPaymentStatusBadge = (order: Order) => {
+    const s = order.paymentStatus || (order.isPaid ? 'PAID' : 'UNPAID');
+    switch (s) {
+      case 'PAID':
+        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 uppercase text-[10px] font-bold">PAID</Badge>;
+      case 'UNPAID':
+        return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 uppercase text-[10px] font-bold">UNPAID</Badge>;
+      case 'PENDING':
+        return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 uppercase text-[10px] font-bold">PENDING</Badge>;
+      case 'REFUNDED':
+        return <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200 uppercase text-[10px] font-bold">REFUNDED</Badge>;
+      default:
+        return <Badge variant="outline" className="uppercase text-[10px] font-bold">{s}</Badge>;
     }
   };
 
@@ -430,11 +458,11 @@ export default function WebsiteOrdersPage() {
                     />
                   </div>
                   <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v as any); setCurrentPage(1); }}>
-                    <SelectTrigger className="w-[160px] h-10">
-                      <SelectValue placeholder="All Statuses" />
+                    <SelectTrigger className="w-[140px] h-10">
+                      <SelectValue placeholder="All Status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Statuses</SelectItem>
+                      <SelectItem value="all">All Order Status</SelectItem>
                       <SelectItem value="pending">Pending</SelectItem>
                       <SelectItem value="paid">Paid</SelectItem>
                       <SelectItem value="processing">Processing</SelectItem>
@@ -442,6 +470,18 @@ export default function WebsiteOrdersPage() {
                       <SelectItem value="delivered">Delivered</SelectItem>
                       <SelectItem value="failed">Failed</SelectItem>
                       <SelectItem value="cancelled">Cancelled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={paymentStatusFilter} onValueChange={(v) => { setPaymentStatusFilter(v); setCurrentPage(1); }}>
+                    <SelectTrigger className="w-[140px] h-10">
+                      <SelectValue placeholder="Payment Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Payment Status</SelectItem>
+                      <SelectItem value="PAID">Paid</SelectItem>
+                      <SelectItem value="UNPAID">Unpaid</SelectItem>
+                      <SelectItem value="PENDING">Pending</SelectItem>
+                      <SelectItem value="REFUNDED">Refunded</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -508,9 +548,12 @@ export default function WebsiteOrdersPage() {
                                 {formatCurrency(order.totalAmount, currencySymbol)}
                               </TableCell>
                               <TableCell>
-                                <div className="flex items-center gap-1.5">
-                                    <CreditCard className="h-3.5 w-3.5 text-muted-foreground" />
-                                    <span className="text-xs font-medium">{order.paymentMethod}</span>
+                                <div className="flex flex-col gap-1">
+                                    <div className="flex items-center gap-1.5">
+                                        <CreditCard className="h-3 w-3 text-muted-foreground" />
+                                        <span className="text-[10px] font-medium">{order.paymentMethod}</span>
+                                    </div>
+                                    {getPaymentStatusBadge(order)}
                                 </div>
                               </TableCell>
                               <TableCell>
