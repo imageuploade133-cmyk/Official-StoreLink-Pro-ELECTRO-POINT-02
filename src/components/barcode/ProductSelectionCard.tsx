@@ -5,7 +5,7 @@ import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, Scan, Camera } from "lucide-react";
 import { ProductListTable } from "./ProductListTable";
 import { BarcodeListPagination } from "./BarcodeListPagination";
 import type { BarcodeProduct } from "@/lib/types";
@@ -27,6 +27,7 @@ interface ProductSelectionCardProps {
   onSelectAllVisible: (checked: boolean) => void;
   areAllVisibleSelected: boolean;
   onBarcodeRegenerate: (productId: string) => void;
+  onScanButtonClick?: () => void;
 }
 
 export function ProductSelectionCard({
@@ -45,7 +46,8 @@ export function ProductSelectionCard({
   setSearchTerm,
   onSelectAllVisible,
   areAllVisibleSelected,
-  onBarcodeRegenerate
+  onBarcodeRegenerate,
+  onScanButtonClick
 }: ProductSelectionCardProps) {
 
   const totalPages = Math.ceil(totalFilteredCount / itemsPerPage);
@@ -74,17 +76,31 @@ export function ProductSelectionCard({
             With Barcodes ({withBarcodesCount})
           </Button>
         </div>
-        <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search catalog by Name (Prefix)..."
-            className="pl-8 h-9 text-xs"
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-            }}
-          />
+        <div className="flex gap-2">
+          <div className="relative flex-grow">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search catalog by Name (Prefix)..."
+              className="pl-8 h-9 text-xs"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+              }}
+            />
+          </div>
+          {onScanButtonClick && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="h-9 px-3 shrink-0 font-bold border-primary/50 text-primary hover:bg-primary/5"
+              onClick={onScanButtonClick}
+              title="Scan Barcode"
+            >
+              <Scan className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Scan</span>
+            </Button>
+          )}
         </div>
       </CardHeader>
       <CardContent className="p-0 flex-grow">
