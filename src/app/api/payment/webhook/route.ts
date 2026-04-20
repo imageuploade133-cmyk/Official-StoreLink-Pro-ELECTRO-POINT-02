@@ -165,6 +165,7 @@ async function processSuccessfulTransaction(reference: string, metadata?: any) {
           const orderRef = adminDb.collection('orders').doc(orderId);
           dbTransaction.update(orderRef, {
             status: 'processing',
+            paymentStatus: 'PAID',
             isPaid: true,
             updatedAt: Timestamp.now(),
           });

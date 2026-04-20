@@ -83,6 +83,7 @@ export async function placeOrderAction({
         deliveryLocationId: deliveryLocationId || null,
         deliveryPrice: deliveryPrice || 0,
         status: 'pending',
+        paymentStatus: 'UNPAID',
         isPaid: false,
         createdAt: FieldValue.serverTimestamp(),
         guestInfo: guestInfo || null,

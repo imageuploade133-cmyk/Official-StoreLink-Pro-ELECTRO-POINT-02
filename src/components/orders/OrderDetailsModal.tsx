@@ -171,23 +171,38 @@ export function OrderDetailsModal({
                 ID: #{order.id}
               </DialogDescription>
             </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className={cn(
-                "text-xs font-bold uppercase",
-                order.fulfillmentType === 'delivery'
-                  ? "bg-blue-50 text-blue-700 border-blue-200"
-                  : "bg-orange-50 text-orange-700 border-orange-200"
-              )}>
-                {order.fulfillmentType === 'delivery' ? <><Truck className="mr-1 h-3 w-3" /> Delivery</> : <><Store className="mr-1 h-3 w-3" /> Pickup</>}
-              </Badge>
-              <Badge className={cn(
-                  "text-sm px-3 py-1 capitalize",
-                  order.status === 'delivered' ? "bg-green-100 text-green-700" :
-                  order.status === 'cancelled' ? "bg-red-100 text-red-700" : "bg-primary/10 text-primary"
-              )}>
-                {order.status}
-              </Badge>
-            </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className={cn(
+                    "text-xs font-bold uppercase",
+                    order.fulfillmentType === 'delivery'
+                      ? "bg-blue-50 text-blue-700 border-blue-200"
+                      : "bg-orange-50 text-orange-700 border-orange-200"
+                  )}>
+                    {order.fulfillmentType === 'delivery' ? <><Truck className="mr-1 h-3 w-3" /> Delivery</> : <><Store className="mr-1 h-3 w-3" /> Pickup</>}
+                  </Badge>
+                  {(() => {
+                    const s = order.paymentStatus || (order.isPaid ? 'PAID' : 'UNPAID');
+                    switch (s) {
+                      case 'PAID':
+                        return <Badge className="bg-green-600 text-white border-transparent uppercase text-[10px] font-bold">PAID</Badge>;
+                      case 'UNPAID':
+                        return <Badge variant="destructive" className="uppercase text-[10px] font-bold">UNPAID</Badge>;
+                      case 'PENDING':
+                        return <Badge className="bg-yellow-500 text-white border-transparent uppercase text-[10px] font-bold">PENDING</Badge>;
+                      case 'REFUNDED':
+                        return <Badge className="bg-gray-500 text-white border-transparent uppercase text-[10px] font-bold">REFUNDED</Badge>;
+                      default:
+                        return <Badge variant="outline" className="uppercase text-[10px] font-bold">{s}</Badge>;
+                    }
+                  })()}
+                  <Badge className={cn(
+                      "text-sm px-3 py-1 capitalize",
+                      order.status === 'delivered' ? "bg-green-100 text-green-700" :
+                      order.status === 'cancelled' ? "bg-red-100 text-red-700" : "bg-primary/10 text-primary"
+                  )}>
+                    {order.status}
+                  </Badge>
+                </div>
           </div>
         </DialogHeader>
 
