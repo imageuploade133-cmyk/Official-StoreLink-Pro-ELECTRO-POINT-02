@@ -84,6 +84,7 @@ import { BannerAd } from '@/components/ads/BannerAd';
 import { useAds } from '@/contexts/ad-context';
 import { useStoreUrl } from '@/hooks/use-store-url';
 import { FastCheckoutButtons } from '@/components/store/FastCheckoutButtons';
+import { getStoreUrl as getAbsoluteStoreUrl } from '@/lib/domain';
 
 const iconMap = {
   Truck,
@@ -268,6 +269,11 @@ export default function ProductDetailsPage() {
   const [today, setToday] = useState<Date | null>(null);
   const [availablePaymentMethods, setAvailablePaymentMethods] = useState<any[]>([]);
   const [isLoadingMethods, setIsLoadingMethods] = useState(true);
+  const [activeImage, setActiveImage] = useState<string | null>(null);
+  const [showVideo, setShowVideo] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isOutOfDataDrawerOpen, setIsOutOfDataDrawerOpen] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const filteredPaymentMethods = useMemo(() => {
     return availablePaymentMethods.filter(method => {
