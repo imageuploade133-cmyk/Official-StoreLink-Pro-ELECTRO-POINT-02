@@ -28,6 +28,8 @@ export default function AddProductPage() {
 
   const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
+  const defaultValues = useMemo(() => ({ barcode: initialBarcode }), [initialBarcode]);
+
   // Fetch Categories
   const categoriesQuery = useMemo(() => {
     if (!firestore || !currentStoreId) return null;
@@ -151,7 +153,7 @@ export default function AddProductPage() {
         categories={categories || []}
         isSubmitting={isSaving}
         onCategoriesNeedRefresh={refetchCategories}
-        defaultValues={{ barcode: initialBarcode }}
+        defaultValues={defaultValues}
       />
     </div>
   );
