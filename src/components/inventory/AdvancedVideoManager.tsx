@@ -125,6 +125,7 @@ export function AdvancedVideoManager() {
                                                     <SelectItem value="tiktok">TikTok</SelectItem>
                                                 </SelectContent>
                                             </Select>
+                                            <FormMessage />
                                         </FormItem>
                                     )}
                                 />
@@ -139,6 +140,7 @@ export function AdvancedVideoManager() {
                                             <FormItem>
                                                 <FormLabel className="text-[10px] font-black uppercase text-primary tracking-widest">Video Title</FormLabel>
                                                 <FormControl><Input placeholder="e.g., Unboxing Experience" {...titleField} className="h-11 bg-background rounded-xl" /></FormControl>
+                                                <FormMessage />
                                             </FormItem>
                                         )}
                                     />
@@ -149,6 +151,7 @@ export function AdvancedVideoManager() {
                                             <FormItem>
                                                 <FormLabel className="text-[10px] font-black uppercase text-primary tracking-widest">Media Reference</FormLabel>
                                                 <FormControl><Input placeholder="Paste URL or <iframe> code" {...urlField} className="h-11 bg-background rounded-xl" /></FormControl>
+                                                <FormMessage />
                                             </FormItem>
                                         )}
                                     />

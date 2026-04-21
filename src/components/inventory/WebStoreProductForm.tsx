@@ -124,7 +124,7 @@ const storeProductSchema = z.object({
   name: z.string().min(3, 'Product name is required.'),
   categoryId: z.string().min(1, 'Please select a category.'),
   sellingPrice: z.coerce.number().min(0.01, 'Price must be greater than 0.'),
-  newPrice: z.coerce.number().min(0.01, 'Discount price must be greater than 0.').optional().nullable(),
+  newPrice: z.preprocess((val) => (val === '' ? null : val), z.coerce.number().min(0.01, 'Discount price must be greater than 0.').optional().nullable()),
   purchasePrice: z.coerce.number().min(0, 'Cost price cannot be negative.'),
   stock: z.coerce.number().int().min(0, 'Stock cannot be negative.'),
   sku: z.string().optional().or(z.literal('')),
@@ -155,7 +155,7 @@ const storeProductSchema = z.object({
   isVisibleOnWeb: z.boolean().default(true),
   isVisibleInPOS: z.boolean().default(true),
   isNewArrival: z.boolean().default(false),
-  isPopular: false,
+  isPopular: z.boolean().default(false),
   isOldStock: z.boolean().default(false),
   showProductInsight: z.boolean().default(false),
   isOfficialBrand: z.boolean().default(false),
@@ -502,7 +502,14 @@ export function WebStoreProductForm() {
   };
 
   const onSubmit = async (values: FormValues) => {
-    if (!firestore || !user || !currentStoreId) return;
+    if (!firestore || !user || !currentStoreId) {
+      toast({ 
+        variant: "destructive", 
+        title: "Session Error", 
+        description: "You must be logged in and associated with a store to publish products." 
+      });
+      return;
+    }
     setIsSaving(true);
     try {
       const { isPromo, promoType, promoValue, promoStartDate, promoEndDate, voiceSignatures, ...rest } = values;
@@ -746,28 +753,34 @@ export function WebStoreProductForm() {
                     </FormItem>
                   )}
                 />
-                <div className="space-y-2">
-                  <FormLabel className="font-bold text-gray-700">Categorization <span className="text-destructive">*</span></FormLabel>
-                  <FormControl>
-                      <div className="flex gap-2 w-full">
-                      <Input 
-                          value={currentCategoryName} 
-                          readOnly 
-                          className="bg-muted font-bold cursor-default border-primary/20" 
-                      />
-                      <Button 
-                          type="button" 
-                          variant="outline" 
-                          onClick={() => setIsChangeCategoryModalOpen(true)}
-                          className="shrink-0 border-primary/30 text-primary hover:bg-primary/5"
-                      >
-                          <SlidersHorizontal className="h-4 w-4 mr-2" />
-                          Select
-                      </Button>
-                      </div>
-                  </FormControl>
-                  <FormMessage />
-                </div>
+                <FormField
+                  control={form.control}
+                  name="categoryId"
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel className="font-bold text-gray-700">Categorization <span className="text-destructive">*</span></FormLabel>
+                      <FormControl>
+                        <div className="flex gap-2 w-full">
+                          <Input 
+                            value={currentCategoryName} 
+                            readOnly 
+                            className="bg-muted font-bold cursor-default border-primary/20" 
+                          />
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            onClick={() => setIsChangeCategoryModalOpen(true)}
+                            className="shrink-0 border-primary/30 text-primary hover:bg-primary/5"
+                          >
+                            <SlidersHorizontal className="h-4 w-4 mr-2" />
+                            Select
+                          </Button>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

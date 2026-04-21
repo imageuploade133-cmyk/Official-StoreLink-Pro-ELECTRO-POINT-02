@@ -126,7 +126,7 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
     stock: z.coerce.number().int().min(0, 'Stock cannot be negative.'),
     purchasePrice: z.coerce.number().min(0, 'Purchase price cannot be negative.'),
     sellingPrice: z.coerce.number().min(0.01, 'Selling price must be greater than 0.'),
-    newPrice: z.coerce.number().min(0.01, 'Discount price must be greater than 0.').optional().nullable(),
+    newPrice: z.preprocess((val) => (val === '' ? null : val), z.coerce.number().min(0.01, 'Discount price must be greater than 0.').optional().nullable()),
     lowStockThreshold: z.coerce.number().int().min(0, 'Low stock threshold cannot be negative.').optional().nullable(),
     supplierName: z.string().optional().or(z.literal('')),
     supplierContactName: z.string().optional().or(z.literal('')),
