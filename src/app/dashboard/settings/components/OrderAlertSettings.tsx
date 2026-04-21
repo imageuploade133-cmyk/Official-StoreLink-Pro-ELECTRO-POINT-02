@@ -14,41 +14,21 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, Mail, Send, CheckCircle2, XCircle, Eye, EyeOff, Info, AlertTriangle } from 'lucide-react';
+import { Loader2, Mail, Send, CheckCircle2, XCircle, Eye, EyeOff, Info, Key } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Badge } from '@/components/ui/badge';
-import { sendTestOrderEmailAction, getResendUsageAction } from '@/app/actions/orders';
+import { sendTestOrderEmailAction, validateGmailSmtpAction } from '@/app/actions/orders';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const emailAlertSettingsSchema = z.object({
   enabled: z.boolean().default(false),
-  resendApiKey: z.string().optional().or(z.literal('')),
-  senderEmail: z.string().optional().or(z.literal('')),
+  gmailEmail: z.string().email({ message: "Please enter a valid Gmail address." }).refine(email => email.toLowerCase().endsWith('@gmail.com'), {
+    message: "Must be a @gmail.com address."
+  }),
+  gmailAppPassword: z.string().min(8, { message: "App Password is required." }),
   notificationEmail: z.string().email({ message: "Please enter a valid notification email address." }),
+  senderName: z.string().min(1, { message: "Sender name is required." }),
   customerConfirmation: z.boolean().default(false),
-}).superRefine((data, ctx) => {
-    if (data.resendApiKey && data.resendApiKey.trim() !== '') {
-        if (!/^re_[a-zA-Z0-9]+$/.test(data.resendApiKey)) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: "Invalid Resend API Key format. Should start with 're_'",
-                path: ['resendApiKey'],
-            });
-        }
-        if (!data.senderEmail || data.senderEmail.trim() === '') {
-             ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: "Sender Email is required when using a custom API Key",
-                path: ['senderEmail'],
-            });
-        } else if (!z.string().email().safeParse(data.senderEmail).success) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: "Please enter a valid sender email address",
-                path: ['senderEmail'],
-            });
-        }
-    }
 });
 
 type FormValues = z.infer<typeof emailAlertSettingsSchema>;
@@ -62,9 +42,9 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
   const firestore = useFirestore();
   const [isSaving, setIsSaving] = useState(false);
   const [isSendingTest, setIsSendingTest] = useState(false);
-  const [showApiKey, setShowApiKey] = useState(false);
+  const [showAppPassword, setShowAppPassword] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
-  const [keyStatus, setKeyStatus] = useState<'idle' | 'valid' | 'invalid'>('idle');
+  const [connectionStatus, setConnectionStatus] = useState<'idle' | 'connected' | 'failed'>('idle');
 
   const emailAlertsRef = React.useMemo(() => {
     if (!firestore) return null;
@@ -80,9 +60,10 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
     resolver: zodResolver(emailAlertSettingsSchema),
     defaultValues: {
       enabled: false,
-      resendApiKey: '',
-      senderEmail: '',
+      gmailEmail: '',
+      gmailAppPassword: '',
       notificationEmail: '',
+      senderName: '',
       customerConfirmation: false,
     },
   });
@@ -91,13 +72,14 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
     if (settingsData) {
       form.reset({
         enabled: settingsData.enabled || false,
-        resendApiKey: settingsData.resendApiKey || '',
-        senderEmail: settingsData.senderEmail || '',
+        gmailEmail: settingsData.gmailEmail || '',
+        gmailAppPassword: settingsData.gmailAppPassword || '',
         notificationEmail: settingsData.notificationEmail || '',
+        senderName: settingsData.senderName || '',
         customerConfirmation: settingsData.customerConfirmation || false,
       });
-      if (settingsData.resendApiKey) {
-          setKeyStatus('valid'); // Assume valid if already saved and connected
+      if (settingsData.connected) {
+          setConnectionStatus('connected');
       }
     }
   }, [settingsData, form]);
@@ -108,7 +90,8 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
     try {
       const dataToSave = {
         ...values,
-        connected: !!values.resendApiKey,
+        provider: 'gmail',
+        connected: connectionStatus === 'connected',
         updatedAt: serverTimestamp(),
       };
 
@@ -122,25 +105,25 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
     }
   };
 
-  const handleValidateKey = async () => {
-      const apiKey = form.getValues('resendApiKey');
-      if (!apiKey || !apiKey.startsWith('re_')) {
-          toast({ variant: 'destructive', title: 'Invalid Key', description: 'Please enter a valid Resend API key.' });
+  const handleValidateConnection = async () => {
+      const values = form.getValues();
+      if (!values.gmailEmail || !values.gmailAppPassword) {
+          toast({ variant: 'destructive', title: 'Missing Credentials', description: 'Please enter your Gmail address and App Password.' });
           return;
       }
 
       setIsValidating(true);
       try {
-          const result = await getResendUsageAction(apiKey);
+          const result = await validateGmailSmtpAction(values.gmailEmail, values.gmailAppPassword);
           if (result.success) {
-              setKeyStatus('valid');
-              toast({ title: 'Key Valid', description: 'Your Resend API key is working correctly.' });
+              setConnectionStatus('connected');
+              toast({ title: 'Connected', description: 'Successfully authenticated with Gmail SMTP.' });
           } else {
-              setKeyStatus('invalid');
-              toast({ variant: 'destructive', title: 'Invalid Key', description: result.error || 'Failed to validate API key.' });
+              setConnectionStatus('failed');
+              toast({ variant: 'destructive', title: 'Connection Failed', description: result.error || 'Failed to authenticate with Gmail.' });
           }
       } catch (error) {
-          setKeyStatus('invalid');
+          setConnectionStatus('failed');
       } finally {
           setIsValidating(false);
       }
@@ -168,8 +151,7 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
             '$', // Default currency for test
             {
                 ...values,
-                resendApiKey: values.resendApiKey,
-                senderEmail: values.senderEmail,
+                provider: 'gmail',
             }
         );
         
@@ -185,47 +167,46 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
         toast({
             variant: 'destructive',
             title: 'Test Failed',
-            description: error.message || 'Failed to send test email. Check your API key and sender email.',
+            description: error.message || 'Failed to send test email. Check your Gmail credentials.',
         });
     } finally {
         setIsSendingTest(false);
     }
   };
 
-  const maskedApiKey = (key: string) => {
-    if (!key || key.length < 8) return key;
-    return `re_••••••••${key.slice(-4)}`;
+  const maskedPassword = (pass: string) => {
+    if (!pass) return '';
+    return '•'.repeat(Math.min(pass.length, 12));
   };
 
   if (isLoading) {
     return <Skeleton className="h-64 w-full" />;
   }
 
-  const isUsingCustom = !!form.watch('resendApiKey');
-  const isConnected = isUsingCustom ? keyStatus === 'valid' : settingsData?.enabled;
+  const isConnected = connectionStatus === 'connected';
 
   return (
-    <Card className="border-primary/20 shadow-md overflow-hidden">
+    <Card className="border-none shadow-lg rounded-2xl overflow-hidden bg-white">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardHeader className="bg-primary/5 pb-8">
+          <CardHeader className="pb-8 border-b border-gray-50">
             <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                    <CardTitle className="flex items-center gap-2 text-xl font-bold">
-                        <Mail className="h-5 w-5 text-primary"/> Email Alerts
+                    <CardTitle className="flex items-center gap-2 text-2xl font-bold text-gray-900">
+                        <Mail className="h-6 w-6 text-primary"/> Email Alerts
                     </CardTitle>
-                    <CardDescription>
-                        Configure how you receive order notifications
+                    <CardDescription className="text-gray-500">
+                        Configure Gmail SMTP order notifications
                     </CardDescription>
                 </div>
                 <div className="flex items-center gap-4">
                     {isConnected ? (
-                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 gap-1 px-3 py-1">
-                            <CheckCircle2 className="h-3 w-3" /> {isUsingCustom ? 'Custom Connected' : 'System Ready'}
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 gap-1 px-3 py-1 rounded-full text-xs font-medium">
+                            <CheckCircle2 className="h-3 w-3" /> Connected
                         </Badge>
                     ) : (
-                        <Badge variant="outline" className="bg-gray-50 text-gray-500 border-gray-200 gap-1 px-3 py-1">
-                            <XCircle className="h-3 w-3" /> {form.watch('enabled') ? 'Not Configured' : 'Disabled'}
+                        <Badge variant="outline" className="bg-gray-50 text-gray-500 border-gray-200 gap-1 px-3 py-1 rounded-full text-xs font-medium">
+                            <XCircle className="h-3 w-3" /> {form.watch('enabled') ? 'Not Connected' : 'Disabled'}
                         </Badge>
                     )}
                     <FormField
@@ -237,6 +218,7 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
                                     <Switch 
                                         checked={field.value} 
                                         onCheckedChange={field.onChange} 
+                                        className="data-[state=checked]:bg-primary"
                                     />
                                 </FormControl>
                             </FormItem>
@@ -245,48 +227,63 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
                 </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-6 pt-6">
-            {!isUsingCustom && (
-                <Alert className="bg-blue-50 border-blue-200 text-blue-800">
-                    <Info className="h-4 w-4 text-blue-600" />
-                    <AlertTitle>Using System Default</AlertTitle>
-                    <AlertDescription className="text-xs">
-                        You are currently using the platform's default email service. Notifications will be sent from <strong>notifications@storelink-pro.com</strong>. Enter your own Resend API key below to use your own domain and branding.
-                    </AlertDescription>
-                </Alert>
-            )}
+          <CardContent className="space-y-6 pt-8 px-8">
+            <Alert className="bg-blue-50/50 border-blue-100 text-blue-900 rounded-xl">
+                <Info className="h-4 w-4 text-blue-600" />
+                <AlertTitle className="font-semibold">Setup Tip</AlertTitle>
+                <AlertDescription className="text-xs text-blue-700 mt-1">
+                    To use Gmail SMTP, you must use an <strong>App Password</strong>, not your regular Gmail password. Enable 2FA in your Google Account settings, then search for "App Passwords".
+                </AlertDescription>
+            </Alert>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <FormField
                     control={form.control}
-                    name="resendApiKey"
+                    name="gmailEmail"
                     render={({ field }) => (
-                        <FormItem className="col-span-1 md:col-span-2">
-                            <FormLabel className="flex items-center justify-between">
-                                <span>Resend API Key (Optional)</span>
-                                {field.value && (
-                                    <Button 
-                                        type="button" 
-                                        variant="link" 
-                                        className="h-auto p-0 text-xs"
-                                        onClick={handleValidateKey}
-                                        disabled={isValidating}
-                                    >
-                                        {isValidating ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
-                                        Validate Key
-                                    </Button>
-                                )}
+                        <FormItem>
+                            <FormLabel className="text-gray-700 font-medium">Gmail Address</FormLabel>
+                            <FormControl>
+                                <Input 
+                                    {...field} 
+                                    placeholder="yourname@gmail.com" 
+                                    className="bg-gray-50 border-gray-200 focus:bg-white focus:ring-primary/20 rounded-xl transition-all"
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="gmailAppPassword"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel className="flex items-center justify-between text-gray-700 font-medium">
+                                <span>Gmail App Password</span>
+                                <Button 
+                                    type="button" 
+                                    variant="link" 
+                                    className="h-auto p-0 text-xs text-primary font-semibold"
+                                    onClick={handleValidateConnection}
+                                    disabled={isValidating}
+                                >
+                                    {isValidating ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Key className="h-3 w-3 mr-1" />}
+                                    Test Connection
+                                </Button>
                             </FormLabel>
                             <div className="relative">
                                 <FormControl>
                                     <Input 
                                         {...field} 
-                                        type={showApiKey ? "text" : "password"}
-                                        placeholder="re_123456789... (Leave empty to use global default)" 
+                                        type={showAppPassword ? "text" : "password"}
+                                        placeholder="abcd efgh ijkl mnop" 
                                         autoComplete="off"
+                                        className="bg-gray-50 border-gray-200 focus:bg-white focus:ring-primary/20 rounded-xl transition-all pr-10"
                                         onChange={(e) => {
                                             field.onChange(e);
-                                            setKeyStatus('idle');
+                                            setConnectionStatus('idle');
                                         }}
                                     />
                                 </FormControl>
@@ -294,14 +291,14 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
                                     type="button"
                                     variant="ghost"
                                     size="icon"
-                                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
-                                    onClick={() => setShowApiKey(!showApiKey)}
+                                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-400 hover:text-gray-600"
+                                    onClick={() => setShowAppPassword(!showAppPassword)}
                                 >
-                                    {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    {showAppPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                 </Button>
                             </div>
-                            <FormDescription className="text-[11px]">
-                                {field.value && !showApiKey ? `Current key: ${maskedApiKey(field.value)}` : "Get your API key from resend.com"}
+                            <FormDescription className="text-[11px] text-gray-400">
+                                {field.value && !showAppPassword ? `Current: ${maskedPassword(field.value)}` : "16-character code from Google account"}
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
@@ -310,15 +307,19 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
 
                 <FormField
                     control={form.control}
-                    name="senderEmail"
+                    name="senderName"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Sender Email {isUsingCustom && <span className="text-destructive">*</span>}</FormLabel>
+                            <FormLabel className="text-gray-700 font-medium">Sender Name (Store Name)</FormLabel>
                             <FormControl>
-                                <Input {...field} placeholder={isUsingCustom ? "orders@yourdomain.com" : "Using system default"} disabled={!isUsingCustom} />
+                                <Input 
+                                    {...field} 
+                                    placeholder="My Awesome Store" 
+                                    className="bg-gray-50 border-gray-200 focus:bg-white focus:ring-primary/20 rounded-xl transition-all"
+                                />
                             </FormControl>
-                            <FormDescription className="text-[11px]">
-                                {isUsingCustom ? "Must be verified in your Resend account. Use 'onboarding@resend.dev' for testing." : "Managed by platform."}
+                            <FormDescription className="text-[11px] text-gray-400">
+                                This will appear as the sender in your customers' inboxes.
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
@@ -330,12 +331,16 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
                     name="notificationEmail"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Notification Recipient Email</FormLabel>
+                            <FormLabel className="text-gray-700 font-medium">Notification Email</FormLabel>
                             <FormControl>
-                                <Input {...field} placeholder="admin@example.com" />
+                                <Input 
+                                    {...field} 
+                                    placeholder="admin@example.com" 
+                                    className="bg-gray-50 border-gray-200 focus:bg-white focus:ring-primary/20 rounded-xl transition-all"
+                                />
                             </FormControl>
-                            <FormDescription className="text-[11px]">
-                                Where you want to receive new order alerts.
+                            <FormDescription className="text-[11px] text-gray-400">
+                                Where you'll receive new order alerts.
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
@@ -346,48 +351,43 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
                     control={form.control}
                     name="customerConfirmation"
                     render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 col-span-1 md:col-span-2 bg-muted/20">
-                            <div className="space-y-0.5">
-                                <FormLabel className="text-base">Send Customer Confirmation</FormLabel>
-                                <FormDescription className="text-xs">
-                                    Automatically send a receipt to customers.
+                        <FormItem className="flex flex-row items-center justify-between rounded-2xl border border-gray-100 p-6 col-span-1 md:col-span-2 bg-gray-50/30">
+                            <div className="space-y-1">
+                                <FormLabel className="text-base font-semibold text-gray-900">Send Customer Confirmation Email</FormLabel>
+                                <FormDescription className="text-xs text-gray-500">
+                                    Automatically send a receipt to customers after they place an order.
                                 </FormDescription>
                             </div>
                             <FormControl>
                                 <Switch
                                     checked={field.value}
                                     onCheckedChange={field.onChange}
+                                    className="data-[state=checked]:bg-primary"
                                 />
                             </FormControl>
                         </FormItem>
                     )}
                 />
             </div>
-
-            {isUsingCustom && !form.watch('senderEmail')?.includes('@') && form.watch('senderEmail') !== 'onboarding@resend.dev' && (
-                <Alert variant="destructive" className="bg-yellow-50 border-yellow-200 text-yellow-800">
-                    <AlertTriangle className="h-4 w-4 text-yellow-600" />
-                    <AlertTitle>Action Required</AlertTitle>
-                    <AlertDescription className="text-xs">
-                        When using a custom API Key, you must provide a sender email that you've verified in Resend. If you're just starting, use <strong>onboarding@resend.dev</strong>.
-                    </AlertDescription>
-                </Alert>
-            )}
           </CardContent>
-          <CardFooter className="bg-muted/50 border-t px-6 py-4 flex items-center justify-between">
+          <CardFooter className="px-8 py-6 flex items-center justify-between mt-4">
             <Button 
                 type="button" 
                 variant="outline" 
-                size="sm"
+                className="rounded-xl border-gray-200 text-gray-600 hover:bg-gray-50 transition-all font-medium"
                 onClick={handleSendTest}
                 disabled={isSendingTest || !form.watch('enabled')}
             >
                 {isSendingTest ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Send className="mr-2 h-4 w-4"/>}
-                Send Test Email
+                Test Email
             </Button>
-            <Button type="submit" disabled={isSaving} size="sm">
+            <Button 
+                type="submit" 
+                disabled={isSaving} 
+                className="rounded-xl px-8 font-semibold shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
               {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
-              Save Email Settings
+              Save Settings
             </Button>
           </CardFooter>
         </form>

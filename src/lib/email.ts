@@ -1,8 +1,6 @@
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import { adminDb } from './firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
-
-const globalResend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendOrderNotifications(order: any, settings: any, storeName: string, emailAlertSettings?: any) {
     const { id: orderId, guestInfo, user_id, totalAmount, paymentStatus, items, deliveryPrice } = order;
@@ -52,17 +50,34 @@ export async function sendOrderNotifications(order: any, settings: any, storeNam
 
     const promises = [];
 
-    // Use store-specific Resend if available
-    const storeResend = emailAlertSettings?.resendApiKey ? new Resend(emailAlertSettings.resendApiKey) : globalResend;
-    const senderEmail = emailAlertSettings?.senderEmail || 'StoreLink Pro <notifications@storelink-pro.com>';
+    // Use Gmail SMTP if available
+    const useGmail = emailAlertSettings && emailAlertSettings.provider === 'gmail' && emailAlertSettings.gmailEmail && emailAlertSettings.gmailAppPassword;
+    
+    if (!useGmail) {
+        console.log('Gmail SMTP not configured for store', settings.id);
+        return;
+    }
+
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        auth: {
+            user: emailAlertSettings.gmailEmail,
+            pass: emailAlertSettings.gmailAppPassword,
+        },
+    });
+
+    const senderName = emailAlertSettings.senderName || storeName || 'StoreLink Pro';
+    const from = `"${senderName}" <${emailAlertSettings.gmailEmail}>`;
 
     // Send to customer
-    const sendToCustomer = emailAlertSettings ? (emailAlertSettings.enabled && emailAlertSettings.customerConfirmation) : true; 
+    const sendToCustomer = emailAlertSettings.enabled && emailAlertSettings.customerConfirmation; 
     if (customerEmail && sendToCustomer) {
         const customerHtml = generateTemplate(commonData, 'confirmation');
         promises.push(sendWithRetry({
-            resendInstance: storeResend,
-            from: senderEmail,
+            transporter,
+            from,
             to: customerEmail,
             subject: `Order Confirmation - #${orderId} - ${commonData.storeName}`,
             html: customerHtml,
@@ -73,17 +88,17 @@ export async function sendOrderNotifications(order: any, settings: any, storeNam
     }
 
     // Send to store owner(s)
-    const ownerEmails = emailAlertSettings?.notificationEmail 
+    const ownerEmails = emailAlertSettings.notificationEmail 
         ? [emailAlertSettings.notificationEmail] 
-        : (settings.orderNotificationEmails || []);
+        : [];
     
-    const enableEmailAlerts = emailAlertSettings ? emailAlertSettings.enabled : settings.enableEmailAlerts;
+    const enableEmailAlerts = emailAlertSettings.enabled;
 
     if (enableEmailAlerts && ownerEmails.length > 0) {
         const ownerHtml = generateTemplate(commonData, 'notification');
         promises.push(sendWithRetry({
-            resendInstance: storeResend,
-            from: senderEmail,
+            transporter,
+            from,
             to: ownerEmails,
             subject: `New Order Received - #${orderId} - ${commonData.storeName}`,
             html: ownerHtml,
@@ -96,7 +111,7 @@ export async function sendOrderNotifications(order: any, settings: any, storeNam
     await Promise.all(promises);
 }
 
-async function sendWithRetry({ resendInstance, from, to, subject, html, orderId, storeId, type }: any) {
+async function sendWithRetry({ transporter, from, to, subject, html, orderId, storeId, type }: any) {
     let attempts = 0;
     const maxAttempts = 3;
     let status: 'sent' | 'failed' = 'failed';
@@ -104,18 +119,18 @@ async function sendWithRetry({ resendInstance, from, to, subject, html, orderId,
 
     while (attempts < maxAttempts) {
         try {
-            const { data, error } = await resendInstance.emails.send({
-                from: from,
-                to: Array.isArray(to) ? to : [to],
+            await transporter.sendMail({
+                from,
+                to: Array.isArray(to) ? to.join(', ') : to,
                 subject,
                 html,
             });
-            if (error) throw error;
             status = 'sent';
             break;
         } catch (error: any) {
             attempts++;
             lastError = error.message || 'Unknown error';
+            console.error(`Email attempt ${attempts} failed:`, lastError);
             if (attempts < maxAttempts) {
                 await new Promise(resolve => setTimeout(resolve, 1000 * attempts));
             }
