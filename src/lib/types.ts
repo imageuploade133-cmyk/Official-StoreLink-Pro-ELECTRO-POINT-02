@@ -134,9 +134,11 @@ export interface Coupon {
 
 export interface EmailAlertSettings {
   enabled: boolean;
-  resendApiKey: string;
-  senderEmail: string;
+  provider: "gmail";
+  gmailEmail: string;
+  gmailAppPassword: string;
   notificationEmail: string;
+  senderName: string;
   customerConfirmation: boolean;
   connected: boolean;
   updatedAt: Timestamp;

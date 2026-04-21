@@ -258,7 +258,7 @@ export default function OrderAlertsPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Email Alerts</CardTitle>
-                  <CardDescription>Configure Email notifications for new orders (Powered by Resend).</CardDescription>
+                  <CardDescription>Configure Email notifications for new orders (Powered by Gmail SMTP).</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <FormField
@@ -360,7 +360,7 @@ export default function OrderAlertsPage() {
               </ul>
               <Separator className="bg-primary/10" />
               <p className="text-xs italic">
-                Note: Emails are sent via Resend. Customers also receive an automatic confirmation email if their address is provided.
+                Note: Emails are sent via Gmail SMTP. Customers also receive an automatic confirmation email if enabled in settings.
               </p>
             </CardContent>
           </Card>

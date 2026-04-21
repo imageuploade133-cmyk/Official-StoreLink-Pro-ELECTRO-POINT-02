@@ -254,20 +254,24 @@ export async function sendTestOrderEmailAction(emails: string[], storeId: string
     }
 }
 
-export async function getResendUsageAction(apiKey: string) {
+export async function validateGmailSmtpAction(gmailEmail: string, gmailAppPassword: string) {
     try {
-        const response = await fetch('https://api.resend.com/emails', {
-            headers: {
-                'Authorization': `Bearer ${apiKey}`,
-            }
+        const nodemailer = require('nodemailer');
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
+            auth: {
+                user: gmailEmail,
+                pass: gmailAppPassword,
+            },
         });
-        if (response.ok) {
-            return { success: true };
-        } else {
-            return { success: false, error: 'Invalid API Key or unauthorized' };
-        }
+
+        await transporter.verify();
+        return { success: true };
     } catch (error: any) {
-        return { success: false, error: error.message };
+        console.error('SMTP Validation Error:', error);
+        return { success: false, error: error.message || 'Failed to authenticate with Gmail SMTP' };
     }
 }
 
