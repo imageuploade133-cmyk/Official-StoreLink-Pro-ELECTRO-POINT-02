@@ -376,7 +376,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
         reader.readAsDataURL(file);
         reader.onload = async () => {
           try {
-            const result = await uploadImage({ imageDataUri: reader.result as string });
+            const result = await uploadImage({ imageDataUri: reader.result as string, storeId: store?.id });
             form.setValue('imageUrl', result.display_url, { shouldValidate: true });
             toast({ title: "Asset Uploaded", description: "Design image is ready." });
           } catch (error: any) {

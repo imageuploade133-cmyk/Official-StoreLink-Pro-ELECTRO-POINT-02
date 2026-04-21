@@ -54,7 +54,7 @@ export function ProductImageGallery({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isPhotoCaptureOpen, setIsPhotoCaptureOpen] = useState(false);
   const { toast } = useToast();
-  const { settings } = useSettings();
+  const { settings, store } = useSettings();
 
   const allImages = React.useMemo(() => {
     const list = [];
@@ -107,7 +107,7 @@ export function ProductImageGallery({
             console.error("Optimization failed:", optError);
         }
 
-        const result = await uploadImage({ imageDataUri });
+        const result = await uploadImage({ imageDataUri, storeId: store?.id });
         
         if (!newPrimary) {
           newPrimary = result.display_url;
@@ -184,7 +184,7 @@ export function ProductImageGallery({
       const result = await removeBackground({ imageDataUri });
 
       // Upload the background-removed image
-      const uploadResult = await uploadImage({ imageDataUri: result.display_url });
+      const uploadResult = await uploadImage({ imageDataUri: result.display_url, storeId: store?.id });
 
       // Update the image in the correct position
       if (allImages[index].isPrimary) {

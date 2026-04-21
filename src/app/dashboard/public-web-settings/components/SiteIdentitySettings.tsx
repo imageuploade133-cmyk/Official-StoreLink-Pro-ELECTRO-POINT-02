@@ -136,7 +136,7 @@ export function SiteIdentitySettings({ settingsData, isLoading, storeId }: SiteI
     reader.onload = async () => {
       try {
         const imageDataUri = reader.result as string;
-        const result = await uploadImage({ imageDataUri });
+        const result = await uploadImage({ imageDataUri, storeId });
         form.setValue(fieldName, result.display_url, { shouldValidate: true });
         toast({ title: "Image Uploaded", description: `Your new logo has been set.` });
       } catch (error: any) {

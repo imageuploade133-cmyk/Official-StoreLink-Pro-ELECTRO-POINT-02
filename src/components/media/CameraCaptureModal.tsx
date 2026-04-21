@@ -26,7 +26,7 @@ export function CameraCaptureModal({ isOpen, onClose, onImageCaptured }: CameraC
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const { toast } = useToast();
-  const { settings } = useSettings();
+  const { settings, store } = useSettings();
 
   const startCamera = useCallback(async () => {
     try {
@@ -96,7 +96,7 @@ export function CameraCaptureModal({ isOpen, onClose, onImageCaptured }: CameraC
 
     setIsUploading(true);
     try {
-      const result = await uploadImage({ imageDataUri: capturedImage });
+      const result = await uploadImage({ imageDataUri: capturedImage, storeId: store?.id });
       onImageCaptured(result.display_url);
       toast({ title: 'Product Photo Added', description: 'Image uploaded and optimized successfully.' });
       onClose();
@@ -116,7 +116,7 @@ export function CameraCaptureModal({ isOpen, onClose, onImageCaptured }: CameraC
       const result = await removeBackground({ imageDataUri: capturedImage });
 
       // Upload the background-removed image
-      const uploadResult = await uploadImage({ imageDataUri: result.display_url });
+      const uploadResult = await uploadImage({ imageDataUri: result.display_url, storeId: store?.id });
       onImageCaptured(uploadResult.display_url);
       toast({ 
         title: 'Background Removed!', 

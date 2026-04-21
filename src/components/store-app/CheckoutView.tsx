@@ -269,7 +269,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
     reader.onload = async () => {
       try {
         const imageDataUri = reader.result as string;
-        const result = await uploadImage({ imageDataUri });
+        const result = await uploadImage({ imageDataUri, storeId });
         setReceiptUrl(result.display_url);
         toast({ title: "Receipt Uploaded", description: "Your payment receipt has been attached." });
       } catch (error: any) {

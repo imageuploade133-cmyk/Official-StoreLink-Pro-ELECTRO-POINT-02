@@ -440,7 +440,7 @@ export function WebStoreProductForm() {
     reader.onload = async () => {
       try {
         const imageDataUri = reader.result as string;
-        const result = await uploadImage({ imageDataUri });
+        const result = await uploadImage({ imageDataUri, storeId: store?.id });
         form.setValue(field, result.display_url, { shouldValidate: true });
         toast({ title: "Asset Uploaded", description: "Product video poster updated." });
       } catch (error: any) {
@@ -464,7 +464,7 @@ export function WebStoreProductForm() {
     reader.onload = async () => {
       try {
         const imageDataUri = reader.result as string;
-        const result = await uploadImage({ imageDataUri });
+        const result = await uploadImage({ imageDataUri, storeId: store?.id });
         form.setValue('sizeGuideImageUrl', result.display_url, { shouldValidate: true });
         toast({ title: "Size Guide Uploaded", description: "Your sizing chart has been saved." });
       } catch (error: any) {
@@ -910,7 +910,7 @@ export function WebStoreProductForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <RichTextEditor 
+                        <RichTextEditor storeId={store?.id} 
                           value={field.value || ''} 
                           onChange={field.onChange} 
                           placeholder="Describe your product elegantly with bold text, colors, and more..."

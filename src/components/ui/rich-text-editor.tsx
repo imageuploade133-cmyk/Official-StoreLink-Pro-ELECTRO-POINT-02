@@ -35,6 +35,7 @@ interface RichTextEditorProps {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  storeId?: string | null;
 }
 
 const COLORS = [
@@ -57,7 +58,7 @@ const FONT_SIZES = [
   { label: 'Huge', value: '7', size: '48px' },
 ];
 
-export function RichTextEditor({ value, onChange, placeholder, className }: RichTextEditorProps) {
+export function RichTextEditor({ value, onChange, placeholder, className, storeId }: RichTextEditorProps) {
   const editorRef = React.useRef<HTMLDivElement>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = React.useState<'visual' | 'code'>('visual');
@@ -172,7 +173,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     reader.onload = async () => {
       try {
         const imageDataUri = reader.result as string;
-        const result = await uploadImage({ imageDataUri });
+        const result = await uploadImage({ imageDataUri, storeId });
         const imgHtml = `<img src="${result.display_url}" class="rich-editor-media" style="max-width: 100%; height: auto; border-radius: 12px; margin: 12px auto; display: block;" />`;
         
         ensureFocus();

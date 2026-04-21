@@ -28,6 +28,7 @@ import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useToast } from '@/hooks/use-toast';
 import { uploadImage } from '@/ai/flows/image-upload-flow';
+import { useAuth } from '@/contexts/auth-context';
 import type { Product, ProductForRestockForm } from '@/lib/types';
 import Image from 'next/image';
 
@@ -72,6 +73,8 @@ export function RestockForm({
   const [isUploadingStockDoc, setIsUploadingStockDoc] = useState(false);
   const isMobile = useIsMobile();
   const { toast } = useToast();
+  const { store, staffMember } = useAuth();
+  const currentStoreId = store?.id || staffMember?.store_id;
   
   const restockFormSchema = createRestockFormSchema(allowStockDeduction);
 
@@ -123,7 +126,7 @@ export function RestockForm({
     reader.onload = async () => {
       try {
         const imageDataUri = reader.result as string;
-        const result = await uploadImage({ imageDataUri });
+        const result = await uploadImage({ imageDataUri, storeId: currentStoreId });
         form.setValue('receiptUrl', result.display_url, { shouldValidate: true });
         toast({ title: "Document Uploaded", description: "Stock document/receipt has been saved." });
       } catch (error: any) {

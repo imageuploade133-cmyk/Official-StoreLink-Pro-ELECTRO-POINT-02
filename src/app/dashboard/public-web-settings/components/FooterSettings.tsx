@@ -134,7 +134,7 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
     reader.onload = async () => {
       try {
         const imageDataUri = reader.result as string;
-        const result = await uploadImage({ imageDataUri });
+        const result = await uploadImage({ imageDataUri, storeId });
         form.setValue('footerBannerUrl', result.display_url, { shouldValidate: true });
         toast({ title: "Banner Uploaded", description: "Footer banner image has been updated." });
       } catch (error: any) {
@@ -164,7 +164,7 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
     reader.onload = async () => {
       try {
         const imageDataUri = reader.result as string;
-        const result = await uploadImage({ imageDataUri });
+        const result = await uploadImage({ imageDataUri, storeId });
         form.setValue('footerBgImageUrl', result.display_url, { shouldValidate: true });
         toast({ title: "Background Image Uploaded", description: "Footer background image has been updated." });
       } catch (error: any) {
