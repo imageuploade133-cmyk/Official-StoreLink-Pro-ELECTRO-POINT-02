@@ -14,17 +14,41 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, Mail, Send, CheckCircle2, XCircle, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Mail, Send, CheckCircle2, XCircle, Eye, EyeOff, Info, AlertTriangle } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Badge } from '@/components/ui/badge';
-import { sendTestOrderEmailAction } from '@/app/actions/orders';
+import { sendTestOrderEmailAction, getResendUsageAction } from '@/app/actions/orders';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const emailAlertSettingsSchema = z.object({
   enabled: z.boolean().default(false),
-  resendApiKey: z.string().min(1, { message: "Resend API Key is required" }).regex(/^re_[a-zA-Z0-9]+$/, { message: "Invalid Resend API Key format. Should start with 're_'" }),
-  senderEmail: z.string().email({ message: "Please enter a valid sender email address." }),
+  resendApiKey: z.string().optional().or(z.literal('')),
+  senderEmail: z.string().optional().or(z.literal('')),
   notificationEmail: z.string().email({ message: "Please enter a valid notification email address." }),
   customerConfirmation: z.boolean().default(false),
+}).superRefine((data, ctx) => {
+    if (data.resendApiKey && data.resendApiKey.trim() !== '') {
+        if (!/^re_[a-zA-Z0-9]+$/.test(data.resendApiKey)) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Invalid Resend API Key format. Should start with 're_'",
+                path: ['resendApiKey'],
+            });
+        }
+        if (!data.senderEmail || data.senderEmail.trim() === '') {
+             ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Sender Email is required when using a custom API Key",
+                path: ['senderEmail'],
+            });
+        } else if (!z.string().email().safeParse(data.senderEmail).success) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Please enter a valid sender email address",
+                path: ['senderEmail'],
+            });
+        }
+    }
 });
 
 type FormValues = z.infer<typeof emailAlertSettingsSchema>;
@@ -39,10 +63,15 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [isSendingTest, setIsSendingTest] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
+  const [keyStatus, setKeyStatus] = useState<'idle' | 'valid' | 'invalid'>('idle');
 
   const emailAlertsRef = React.useMemo(() => {
-    if (!firestore || !storeId) return null;
-    return doc(firestore, 'stores', storeId, 'settings', 'emailAlerts');
+    if (!firestore) return null;
+    if (storeId) {
+        return doc(firestore, 'stores', storeId, 'settings', 'emailAlerts');
+    }
+    return doc(firestore, 'settings', 'emailAlerts');
   }, [firestore, storeId]);
 
   const { data: settingsData, isLoading } = useDoc<EmailAlertSettingsType>(emailAlertsRef);
@@ -67,17 +96,19 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
         notificationEmail: settingsData.notificationEmail || '',
         customerConfirmation: settingsData.customerConfirmation || false,
       });
+      if (settingsData.resendApiKey) {
+          setKeyStatus('valid'); // Assume valid if already saved and connected
+      }
     }
   }, [settingsData, form]);
 
   const onSubmit = async (values: FormValues) => {
-    if (!firestore || !storeId || !emailAlertsRef) return;
+    if (!firestore || !emailAlertsRef) return;
     setIsSaving(true);
     try {
       const dataToSave = {
         ...values,
-        connected: true, // Assuming if they save a valid-looking key, we mark as connected. 
-        // Real validation happens on test email or we could do a verify call here.
+        connected: !!values.resendApiKey,
         updatedAt: serverTimestamp(),
       };
 
@@ -89,6 +120,30 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleValidateKey = async () => {
+      const apiKey = form.getValues('resendApiKey');
+      if (!apiKey || !apiKey.startsWith('re_')) {
+          toast({ variant: 'destructive', title: 'Invalid Key', description: 'Please enter a valid Resend API key.' });
+          return;
+      }
+
+      setIsValidating(true);
+      try {
+          const result = await getResendUsageAction(apiKey);
+          if (result.success) {
+              setKeyStatus('valid');
+              toast({ title: 'Key Valid', description: 'Your Resend API key is working correctly.' });
+          } else {
+              setKeyStatus('invalid');
+              toast({ variant: 'destructive', title: 'Invalid Key', description: result.error || 'Failed to validate API key.' });
+          }
+      } catch (error) {
+          setKeyStatus('invalid');
+      } finally {
+          setIsValidating(false);
+      }
   };
 
   const handleSendTest = async () => {
@@ -146,34 +201,31 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
     return <Skeleton className="h-64 w-full" />;
   }
 
-  if (!storeId) {
-      return null; // Email alerts are store-specific in this implementation
-  }
-
-  const isConnected = settingsData?.connected && settingsData?.resendApiKey;
+  const isUsingCustom = !!form.watch('resendApiKey');
+  const isConnected = isUsingCustom ? keyStatus === 'valid' : settingsData?.enabled;
 
   return (
-    <Card className="border-primary/20 shadow-md">
+    <Card className="border-primary/20 shadow-md overflow-hidden">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardHeader>
+          <CardHeader className="bg-primary/5 pb-8">
             <div className="flex items-center justify-between">
                 <div className="space-y-1">
                     <CardTitle className="flex items-center gap-2 text-xl font-bold">
                         <Mail className="h-5 w-5 text-primary"/> Email Alerts
                     </CardTitle>
                     <CardDescription>
-                        Configure order email notifications with Resend
+                        Configure how you receive order notifications
                     </CardDescription>
                 </div>
                 <div className="flex items-center gap-4">
                     {isConnected ? (
                         <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 gap-1 px-3 py-1">
-                            <CheckCircle2 className="h-3 w-3" /> Connected
+                            <CheckCircle2 className="h-3 w-3" /> {isUsingCustom ? 'Custom Connected' : 'System Ready'}
                         </Badge>
                     ) : (
                         <Badge variant="outline" className="bg-gray-50 text-gray-500 border-gray-200 gap-1 px-3 py-1">
-                            <XCircle className="h-3 w-3" /> Not Connected
+                            <XCircle className="h-3 w-3" /> {form.watch('enabled') ? 'Not Configured' : 'Disabled'}
                         </Badge>
                     )}
                     <FormField
@@ -193,21 +245,49 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
                 </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-6 pt-6">
+            {!isUsingCustom && (
+                <Alert className="bg-blue-50 border-blue-200 text-blue-800">
+                    <Info className="h-4 w-4 text-blue-600" />
+                    <AlertTitle>Using System Default</AlertTitle>
+                    <AlertDescription className="text-xs">
+                        You are currently using the platform's default email service. Notifications will be sent from <strong>notifications@storelink-pro.com</strong>. Enter your own Resend API key below to use your own domain and branding.
+                    </AlertDescription>
+                </Alert>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                     control={form.control}
                     name="resendApiKey"
                     render={({ field }) => (
                         <FormItem className="col-span-1 md:col-span-2">
-                            <FormLabel>Resend API Key</FormLabel>
+                            <FormLabel className="flex items-center justify-between">
+                                <span>Resend API Key (Optional)</span>
+                                {field.value && (
+                                    <Button 
+                                        type="button" 
+                                        variant="link" 
+                                        className="h-auto p-0 text-xs"
+                                        onClick={handleValidateKey}
+                                        disabled={isValidating}
+                                    >
+                                        {isValidating ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
+                                        Validate Key
+                                    </Button>
+                                )}
+                            </FormLabel>
                             <div className="relative">
                                 <FormControl>
                                     <Input 
                                         {...field} 
                                         type={showApiKey ? "text" : "password"}
-                                        placeholder="re_123456789..." 
+                                        placeholder="re_123456789... (Leave empty to use global default)" 
                                         autoComplete="off"
+                                        onChange={(e) => {
+                                            field.onChange(e);
+                                            setKeyStatus('idle');
+                                        }}
                                     />
                                 </FormControl>
                                 <Button
@@ -220,8 +300,8 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
                                     {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                 </Button>
                             </div>
-                            <FormDescription>
-                                {field.value && !showApiKey ? `Current key: ${maskedApiKey(field.value)}` : "Enter your Resend API key starting with 're_'"}
+                            <FormDescription className="text-[11px]">
+                                {field.value && !showApiKey ? `Current key: ${maskedApiKey(field.value)}` : "Get your API key from resend.com"}
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
@@ -233,12 +313,12 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
                     name="senderEmail"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Sender Email</FormLabel>
+                            <FormLabel>Sender Email {isUsingCustom && <span className="text-destructive">*</span>}</FormLabel>
                             <FormControl>
-                                <Input {...field} placeholder="orders@yourdomain.com" />
+                                <Input {...field} placeholder={isUsingCustom ? "orders@yourdomain.com" : "Using system default"} disabled={!isUsingCustom} />
                             </FormControl>
-                            <FormDescription>
-                                This email must be verified in your Resend account.
+                            <FormDescription className="text-[11px]">
+                                {isUsingCustom ? "Must be verified in your Resend account. Use 'onboarding@resend.dev' for testing." : "Managed by platform."}
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
@@ -250,11 +330,11 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
                     name="notificationEmail"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Notification Email</FormLabel>
+                            <FormLabel>Notification Recipient Email</FormLabel>
                             <FormControl>
                                 <Input {...field} placeholder="admin@example.com" />
                             </FormControl>
-                            <FormDescription>
+                            <FormDescription className="text-[11px]">
                                 Where you want to receive new order alerts.
                             </FormDescription>
                             <FormMessage />
@@ -266,11 +346,11 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
                     control={form.control}
                     name="customerConfirmation"
                     render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 col-span-1 md:col-span-2">
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 col-span-1 md:col-span-2 bg-muted/20">
                             <div className="space-y-0.5">
-                                <FormLabel className="text-base">Send Customer Confirmation Email</FormLabel>
-                                <FormDescription>
-                                    Automatically send a confirmation email to customers after they place an order.
+                                <FormLabel className="text-base">Send Customer Confirmation</FormLabel>
+                                <FormDescription className="text-xs">
+                                    Automatically send a receipt to customers.
                                 </FormDescription>
                             </div>
                             <FormControl>
@@ -283,20 +363,31 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
                     )}
                 />
             </div>
+
+            {isUsingCustom && !form.watch('senderEmail')?.includes('@') && form.watch('senderEmail') !== 'onboarding@resend.dev' && (
+                <Alert variant="destructive" className="bg-yellow-50 border-yellow-200 text-yellow-800">
+                    <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                    <AlertTitle>Action Required</AlertTitle>
+                    <AlertDescription className="text-xs">
+                        When using a custom API Key, you must provide a sender email that you've verified in Resend. If you're just starting, use <strong>onboarding@resend.dev</strong>.
+                    </AlertDescription>
+                </Alert>
+            )}
           </CardContent>
           <CardFooter className="bg-muted/50 border-t px-6 py-4 flex items-center justify-between">
             <Button 
                 type="button" 
                 variant="outline" 
+                size="sm"
                 onClick={handleSendTest}
-                disabled={isSendingTest}
+                disabled={isSendingTest || !form.watch('enabled')}
             >
                 {isSendingTest ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Send className="mr-2 h-4 w-4"/>}
-                Test Email
+                Send Test Email
             </Button>
-            <Button type="submit" disabled={isSaving}>
+            <Button type="submit" disabled={isSaving} size="sm">
               {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
-              Save Settings
+              Save Email Settings
             </Button>
           </CardFooter>
         </form>

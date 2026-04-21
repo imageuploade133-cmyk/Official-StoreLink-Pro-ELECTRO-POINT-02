@@ -59,7 +59,7 @@ export async function placeOrderAction({
             }
         }
 
-        // Fetch new email alert settings
+        // Fetch store-specific email alert settings
         const emailAlertsDoc = await transaction.get(adminDb.collection('stores').doc(storeId).collection('settings').doc('emailAlerts'));
         if (emailAlertsDoc.exists) {
             emailAlertSettings = emailAlertsDoc.data();
@@ -68,6 +68,12 @@ export async function placeOrderAction({
         const globalSettingsDoc = await transaction.get(adminDb.collection('settings').doc('global'));
         if (globalSettingsDoc.exists) {
           settings = { id: 'global', ...globalSettingsDoc.data() };
+        }
+        
+        // Fetch global email alert settings
+        const globalEmailAlertsDoc = await transaction.get(adminDb.collection('settings').doc('emailAlerts'));
+        if (globalEmailAlertsDoc.exists) {
+            emailAlertSettings = globalEmailAlertsDoc.data();
         }
       }
 
@@ -180,6 +186,11 @@ export async function sendOrderEmailsAction(orderId: string, storeId: string) {
             if (globalSettingsDoc.exists) {
                 settings = { id: 'global', ...globalSettingsDoc.data() };
             }
+
+            const globalEmailAlertsDoc = await adminDb.collection('settings').doc('emailAlerts').get();
+            if (globalEmailAlertsDoc.exists) {
+                emailAlertSettings = globalEmailAlertsDoc.data();
+            }
         }
         
         await sendOrderNotifications(
@@ -250,10 +261,6 @@ export async function getResendUsageAction(apiKey: string) {
                 'Authorization': `Bearer ${apiKey}`,
             }
         });
-        // Note: Resend doesn't have a direct "usage" endpoint that returns a simple number easily in the free tier
-        // But we can check the limit headers or similar.
-        // Actually, let's just return a success for now or try to find a better way.
-        // For now, let's just return success if the key works.
         if (response.ok) {
             return { success: true };
         } else {
