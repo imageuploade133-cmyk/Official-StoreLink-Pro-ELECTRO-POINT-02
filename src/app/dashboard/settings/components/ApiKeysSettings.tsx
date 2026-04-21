@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, KeyRound, Eye, EyeOff } from 'lucide-react';
+import { Loader2, KeyRound, Eye, EyeOff, RotateCcw } from 'lucide-react';
 
 const apiKeysSchema = z.object({
   imgbbApiKey: z.string().optional(),
@@ -97,9 +97,23 @@ export function ApiKeysSettings({ settingsData, isLoading, storeId }: ApiKeysSet
               name="imgbbApiKey"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    ImgBB API Key
-                    {storeId && <span className="text-[10px] font-normal px-2 py-0.5 bg-muted rounded-full">Optional</span>}
+                  <FormLabel className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      ImgBB API Key
+                      {storeId && <span className="text-[10px] font-normal px-2 py-0.5 bg-muted rounded-full">Optional</span>}
+                    </div>
+                    {storeId && field.value && (
+                      <Button 
+                        type="button"
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-6 px-2 text-[10px] gap-1 text-muted-foreground hover:text-primary"
+                        onClick={() => form.setValue('imgbbApiKey', '')}
+                      >
+                        <RotateCcw className="h-3 w-3" />
+                        Reset to default
+                      </Button>
+                    )}
                   </FormLabel>
                   <div className="relative">
                     <FormControl>
