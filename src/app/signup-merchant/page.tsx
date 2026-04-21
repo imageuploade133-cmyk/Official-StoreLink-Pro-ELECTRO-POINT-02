@@ -184,6 +184,7 @@ export default function MerchantSignupPage() {
                 storePhone: values.storePhone,
                 storeEmail: values.email,
                 currency: '₦',
+                imgbbApiKey: '',
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp(),
             };

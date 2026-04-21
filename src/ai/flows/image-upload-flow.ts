@@ -20,6 +20,7 @@ const UploadImageInputSchema = z.object({
     .describe(
       "An image file as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
+  storeId: z.string().optional().describe("Optional store ID to use store-specific ImgBB API key."),
 });
 export type UploadImageInput = z.infer<typeof UploadImageInputSchema>;
 
@@ -42,15 +43,38 @@ const uploadImageFlow = ai.defineFlow(
     
     // Initialize firebase to get firestore instance
     const { firestore } = initializeFirebase();
-    const settingsRef = doc(firestore, 'settings', 'global');
-    const settingsSnap = await getDoc(settingsRef);
-
-    if (!settingsSnap.exists()) {
-        throw new Error('Global settings document not found in Firestore.');
-    }
     
-    const settings = settingsSnap.data() as AppSettings;
-    const apiKey = settings.imgbbApiKey;
+    let apiKey = null;
+
+    // 1. Try to get store-specific API key if storeId is provided
+    if (input.storeId) {
+      // Try new location
+      const storeSettingsRef = doc(firestore, 'stores', input.storeId, 'settings', 'config');
+      const storeSettingsSnap = await getDoc(storeSettingsRef);
+      if (storeSettingsSnap.exists()) {
+        apiKey = storeSettingsSnap.data().imgbbApiKey;
+      }
+
+      // If not found in new location, try old location
+      if (!apiKey) {
+        const oldStoreSettingsRef = doc(firestore, 'settings', input.storeId);
+        const oldStoreSettingsSnap = await getDoc(oldStoreSettingsRef);
+        if (oldStoreSettingsSnap.exists()) {
+          apiKey = oldStoreSettingsSnap.data().imgbbApiKey;
+        }
+      }
+    }
+
+    // 2. Fallback to global API key if no store-specific key was found
+    if (!apiKey) {
+      const settingsRef = doc(firestore, 'settings', 'global');
+      const settingsSnap = await getDoc(settingsRef);
+
+      if (settingsSnap.exists()) {
+        const settings = settingsSnap.data() as AppSettings;
+        apiKey = settings.imgbbApiKey;
+      }
+    }
 
     if (!apiKey) {
       throw new Error('ImgBB API Key is not configured. Please set it in the application settings.');

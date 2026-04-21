@@ -117,7 +117,7 @@ export function WatermarkSettings({ settingsData, isLoading, storeId }: Watermar
     reader.onload = async () => {
       try {
         const imageDataUri = reader.result as string;
-        const result = await uploadImage({ imageDataUri });
+        const result = await uploadImage({ imageDataUri, storeId });
         form.setValue('webWatermarkImageUrl', result.display_url, { shouldValidate: true });
         toast({ title: "Image Uploaded", description: "New watermark logo has been set." });
       } catch (error: any) {

@@ -113,7 +113,7 @@ export function InventoryStockSettings({ settingsData, isLoading, storeId }: Inv
     reader.onload = async () => {
       try {
         const imageDataUri = reader.result as string;
-        const result = await uploadImage({ imageDataUri });
+        const result = await uploadImage({ imageDataUri, storeId });
         form.setValue('defaultProductImageUrl', result.display_url, { shouldValidate: true });
         toast({
           title: "Image Uploaded",

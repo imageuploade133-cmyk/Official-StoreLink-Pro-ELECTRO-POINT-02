@@ -79,7 +79,7 @@ export function CategoryForm({
   isModal = false,
 }: CategoryFormProps) {
   const { toast } = useToast();
-  const { settings } = useSettings();
+  const { settings, store } = useSettings();
   const [isUploading, setIsUploading] = useState(false);
   const currencySymbol = settings?.currency || '$';
 
@@ -150,7 +150,7 @@ export function CategoryForm({
             console.error("Optimization failed:", optError);
         }
 
-        const result = await uploadImage({ imageDataUri });
+        const result = await uploadImage({ imageDataUri, storeId: store?.id });
         setValue('imageUrl', result.display_url, { shouldValidate: true });
         toast({ title: "Image Uploaded", description: "Category icon optimized and saved." });
       } catch (error: any) {
@@ -211,7 +211,7 @@ export function CategoryForm({
                     <FormItem>
                       <FormLabel className="font-bold text-gray-700">Description</FormLabel>
                       <FormControl>
-                        <RichTextEditor 
+                        <RichTextEditor storeId={store?.id} 
                           value={field.value || ''} 
                           onChange={field.onChange} 
                           placeholder="Brief summary of this collection for your customers..."
@@ -337,7 +337,7 @@ export function CategoryForm({
                     <FormItem>
                       <FormLabel className="font-bold text-gray-700">Description (Rich Text)</FormLabel>
                       <FormControl>
-                        <RichTextEditor 
+                        <RichTextEditor storeId={store?.id} 
                           value={field.value || ''} 
                           onChange={field.onChange} 
                           placeholder="Brief summary of this collection for the public storefront..."

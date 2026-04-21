@@ -144,7 +144,7 @@ export function ColorSettings({ settingsData, isLoading, storeId }: ColorSetting
     reader.onload = async () => {
       try {
         const imageDataUri = reader.result as string;
-        const result = await uploadImage({ imageDataUri });
+        const result = await uploadImage({ imageDataUri, storeId });
         form.setValue('backgroundImageUrl', result.display_url, { shouldValidate: true });
         toast({
           title: "Image Uploaded",

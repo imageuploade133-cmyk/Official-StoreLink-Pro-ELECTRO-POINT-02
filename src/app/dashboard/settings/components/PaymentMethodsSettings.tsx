@@ -214,7 +214,7 @@ function PaymentMethodFormDialog({ isOpen, onOpenChange, onSubmit, isSaving, def
     reader.onload = async () => {
       try {
         const imageDataUri = reader.result as string;
-        const result = await uploadImage({ imageDataUri });
+        const result = await uploadImage({ imageDataUri, storeId });
         form.setValue('iconUrl', result.display_url, { shouldValidate: true });
         toast({ title: "Icon Uploaded", description: "New icon is set. Remember to save changes." });
       } catch (error: any) {

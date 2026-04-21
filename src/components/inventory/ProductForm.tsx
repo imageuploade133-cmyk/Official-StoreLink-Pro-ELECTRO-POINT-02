@@ -480,7 +480,7 @@ export function ProductForm({
     reader.onload = async () => {
       try {
         const imageDataUri = reader.result as string;
-        const result = await uploadImage({ imageDataUri });
+        const result = await uploadImage({ imageDataUri, storeId: currentStoreId });
         form.setValue(field, result.display_url, { shouldValidate: true });
         toast({ title: "Asset Uploaded", description: "Product video poster updated." });
       } catch (error: any) {
@@ -504,7 +504,7 @@ export function ProductForm({
     reader.onload = async () => {
       try {
         const imageDataUri = reader.result as string;
-        const result = await uploadImage({ imageDataUri });
+        const result = await uploadImage({ imageDataUri, storeId: currentStoreId });
         form.setValue('sizeGuideImageUrl', result.display_url, { shouldValidate: true });
         toast({ title: "Size Guide Uploaded", description: "Your sizing chart has been saved." });
       } catch (error: any) {
@@ -532,7 +532,7 @@ export function ProductForm({
     reader.onload = async () => {
       try {
         const imageDataUri = reader.result as string;
-        const result = await uploadImage({ imageDataUri });
+        const result = await uploadImage({ imageDataUri, storeId: currentStoreId });
         form.setValue('stockDocumentUrl', result.display_url, { shouldValidate: true });
         toast({ title: "Document Uploaded", description: "Stock document/receipt has been saved." });
       } catch (error: any) {
@@ -1111,7 +1111,7 @@ export function ProductForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <RichTextEditor 
+                      <RichTextEditor storeId={currentStoreId} 
                         value={field.value || ''} 
                         onChange={field.onChange} 
                         placeholder="Describe your product elegantly..."
