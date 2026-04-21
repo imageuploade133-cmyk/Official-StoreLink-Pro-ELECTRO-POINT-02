@@ -230,6 +230,8 @@ export interface Settings {
   whatsappWebhookUrl?: string;
   whatsappMarketingGreeting?: string;
   whatsappMarketingFooter?: string;
+  enableEmailAlerts?: boolean;
+  orderNotificationEmails?: string[];
   imgbbApiKey?: string;
   eBulkUsername?: string;
   eBulkApiKey?: string;

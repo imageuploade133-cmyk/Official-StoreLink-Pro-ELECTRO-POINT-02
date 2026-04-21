@@ -2,6 +2,7 @@
 
 import { adminDb } from '@/lib/firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
+import { sendOrderNotifications } from '@/lib/email';
 
 export async function placeOrderAction({
   userId,
@@ -41,10 +42,32 @@ export async function placeOrderAction({
   gateway?: string;
 }) {
   try {
-    const result = await adminDb.runTransaction(async (transaction) => {
-      // 1. Check stock for all items
+    const { orderId, orderData, settings } = await adminDb.runTransaction(async (transaction) => {
+      // 0. Get store settings
+      let settings = {};
+      if (storeId) {
+        const settingsDoc = await transaction.get(adminDb.collection('stores').doc(storeId).collection('settings').doc('config'));
+        if (settingsDoc.exists) {
+          settings = { id: storeId, ...settingsDoc.data() };
+        } else {
+            // Fallback to legacy
+            const legacySettingsDoc = await transaction.get(adminDb.collection('settings').doc(storeId));
+            if (legacySettingsDoc.exists) {
+                settings = { id: storeId, ...legacySettingsDoc.data() };
+            }
+        }
+      } else {
+        const globalSettingsDoc = await transaction.get(adminDb.collection('settings').doc('global'));
+        if (globalSettingsDoc.exists) {
+          settings = { id: 'global', ...globalSettingsDoc.data() };
+        }
+      }
+
+      // 1. Check stock for all items and get names
       const productRefs = items.map(item => adminDb.collection('products').doc(item.productId));
       const productSnaps = await Promise.all(productRefs.map(ref => transaction.get(ref)));
+
+      const enrichedItems = [];
 
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
@@ -58,6 +81,11 @@ export async function placeOrderAction({
         }
         
         transaction.update(productRefs[i], { stock: currentStock - item.quantity });
+        
+        enrichedItems.push({
+          ...item,
+          productName: data?.name || 'Product'
+        });
       }
 
       // 2. Update coupon if applicable
@@ -71,7 +99,7 @@ export async function placeOrderAction({
       const orderData = {
         user_id: userId,
         store_id: storeId,
-        items,
+        items: enrichedItems,
         totalAmount,
         totalCost,
         paymentMethod,
@@ -93,14 +121,62 @@ export async function placeOrderAction({
       
       transaction.set(orderRef, orderData);
 
-      return { orderId: orderRef.id };
+      return { orderId: orderRef.id, orderData, settings };
     });
 
-    return { success: true, orderId: result.orderId };
+    // Send Email Notifications (non-blocking)
+    if (orderId && orderData) {
+        // We use a separate async call to not block the response
+        sendOrderNotifications(
+            { id: orderId, ...orderData }, 
+            settings, 
+            (settings as any).storeName || 'Our Store'
+        ).catch(err => console.error('Error sending order emails:', err));
+    }
+
+    return { success: true, orderId };
   } catch (error: any) {
     console.error('Error placing order:', error);
     return { success: false, error: error.message };
   }
+}
+
+export async function sendOrderEmailsAction(orderId: string, storeId: string) {
+    try {
+        const orderDoc = await adminDb.collection('orders').doc(orderId).get();
+        if (!orderDoc.exists) throw new Error('Order not found');
+        
+        const orderData = orderDoc.data();
+        
+        let settings = {};
+        if (storeId && storeId !== 'global') {
+            const settingsDoc = await adminDb.collection('stores').doc(storeId).collection('settings').doc('config').get();
+            if (settingsDoc.exists) {
+                settings = { id: storeId, ...settingsDoc.data() };
+            } else {
+                const legacySettingsDoc = await adminDb.collection('settings').doc(storeId).get();
+                if (legacySettingsDoc.exists) {
+                    settings = { id: storeId, ...legacySettingsDoc.data() };
+                }
+            }
+        } else {
+            const globalSettingsDoc = await adminDb.collection('settings').doc('global').get();
+            if (globalSettingsDoc.exists) {
+                settings = { id: 'global', ...globalSettingsDoc.data() };
+            }
+        }
+        
+        await sendOrderNotifications(
+            { id: orderId, ...orderData }, 
+            settings, 
+            (settings as any).storeName || 'Our Store'
+        );
+        
+        return { success: true };
+    } catch (error: any) {
+        console.error('Error in sendOrderEmailsAction:', error);
+        return { success: false, error: error.message };
+    }
 }
 
 export async function logWhatsAppMessageAction(logData: any) {
