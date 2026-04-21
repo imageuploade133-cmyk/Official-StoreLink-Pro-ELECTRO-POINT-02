@@ -179,6 +179,53 @@ export async function sendOrderEmailsAction(orderId: string, storeId: string) {
     }
 }
 
+export async function sendTestOrderEmailAction(emails: string[], storeId: string, currency: string = '$') {
+    try {
+        let storeName = 'Test Store';
+        if (storeId && storeId !== 'global') {
+            const storeDoc = await adminDb.collection('stores').doc(storeId).get();
+            if (storeDoc.exists) {
+                storeName = storeDoc.data()?.name || 'Test Store';
+            }
+        } else {
+            const globalSettingsDoc = await adminDb.collection('settings').doc('global').get();
+            if (globalSettingsDoc.exists) {
+                storeName = globalSettingsDoc.data()?.storeName || 'Test Store';
+            }
+        }
+
+        const dummyOrder = {
+            id: 'TEST-12345',
+            guestInfo: {
+                name: 'Test Customer',
+                email: emails[0] || 'customer@example.com',
+                address: '123 Test Street, Demo City',
+            },
+            user_id: 'GUEST',
+            totalAmount: 150.00,
+            deliveryPrice: 10.00,
+            paymentStatus: 'PAID',
+            items: [
+                { productName: 'Sample Product 1', quantity: 2, price: 50.00 },
+                { productName: 'Sample Product 2', quantity: 1, price: 40.00 },
+            ],
+        };
+
+        const testSettings = {
+            id: storeId || 'global',
+            enableEmailAlerts: true,
+            orderNotificationEmails: emails,
+            currency: currency,
+        };
+
+        await sendOrderNotifications(dummyOrder, testSettings, storeName);
+        return { success: true };
+    } catch (error: any) {
+        console.error('Error in sendTestOrderEmailAction:', error);
+        return { success: false, error: error.message };
+    }
+}
+
 export async function logWhatsAppMessageAction(logData: any) {
   try {
     await adminDb.collection('whatsappMessageLogs').add({

@@ -11,6 +11,7 @@ import { GeneralSettings } from './components/GeneralSettings';
 import { PosReceiptSettings } from './components/PosReceiptSettings';
 import { InventoryStockSettings } from './components/InventoryStockSettings';
 import { MessagingSettings } from './components/MessagingSettings';
+import { OrderAlertSettings } from './components/OrderAlertSettings';
 import { useAuth } from '@/contexts/auth-context';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -30,6 +31,7 @@ const settingsKeywords = {
   pos: ['pos', 'receipt', 'printer', 'invoice', 'price modification', 'logo size', 'product size', 'columns', 'grid', 'layout'],
   inventory: ['inventory', 'stock', 'alert', 'product image', 'deduction', 'threshold', 'wastage'],
   messaging: ['messaging', 'sms', 'whatsapp', 'webhook', 'notifications', 'messages'],
+  orderAlerts: ['order alerts', 'email alerts', 'email notifications', 'order notifications'],
   payment: ['payment methods', 'cash', 'card', 'transfer', 'payment options', 'gateways'],
   social: ['social media', 'links', 'facebook', 'twitter', 'instagram'],
   shop: ['shop', 'collection', 'banner', 'alignment', 'products', 'title', 'description', 'heading'],
@@ -70,10 +72,10 @@ export default function SettingsPage() {
   const visibleSections = useMemo(() => {
     const lowercasedTerm = searchTerm.toLowerCase().trim();
     if (!lowercasedTerm) {
-        return { general: true, api: true, pos: true, inventory: true, messaging: true, payment: true, social: true, shop: true };
+        return { general: true, api: true, pos: true, inventory: true, messaging: true, orderAlerts: true, payment: true, social: true, shop: true };
     }
     
-    const visible: Record<string, boolean> = { general: false, api: false, pos: false, inventory: false, messaging: false, payment: false, social: false, shop: false };
+    const visible: Record<string, boolean> = { general: false, api: false, pos: false, inventory: false, messaging: false, orderAlerts: false, payment: false, social: false, shop: false };
     
     // Check card titles and descriptions
     if ('business & regional settings'.includes(lowercasedTerm)) visible.general = true;
@@ -81,6 +83,7 @@ export default function SettingsPage() {
     if ('pos & receipt settings'.includes(lowercasedTerm)) visible.pos = true;
     if ('inventory & stock alerts'.includes(lowercasedTerm)) visible.inventory = true;
     if ('messaging & webhooks'.includes(lowercasedTerm)) visible.messaging = true;
+    if ('order alerts'.includes(lowercasedTerm) || 'email notifications'.includes(lowercasedTerm)) visible.orderAlerts = true;
     if ('payment methods'.includes(lowercasedTerm)) visible.payment = true;
     if ('social media links'.includes(lowercasedTerm)) visible.social = true;
     if ('shop our collection settings'.includes(lowercasedTerm)) visible.shop = true;
@@ -153,6 +156,7 @@ export default function SettingsPage() {
         )}
         {visibleSections.inventory && <InventoryStockSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />}
         {visibleSections.messaging && <MessagingSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />}
+        {visibleSections.orderAlerts && <OrderAlertSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />}
         
         {noResultsFound && (
           <Card>
