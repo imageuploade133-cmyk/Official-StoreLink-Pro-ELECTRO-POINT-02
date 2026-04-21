@@ -44,7 +44,8 @@ const uploadImageFlow = ai.defineFlow(
   async (input) => {
     
     // Initialize firebase to get firestore instance
-    const { firestore } = initializeFirebase();
+    const { firestore, firebaseApp } = initializeFirebase();
+    let targetFirestore = firestore;
     
     // Start with the hardcoded global API key
     let apiKey = GLOBAL_IMGBB_API_KEY;
@@ -88,10 +89,22 @@ const uploadImageFlow = ai.defineFlow(
         const storeRef = doc(firestore, 'stores', input.storeId);
         const storeSnap = await getDoc(storeRef);
         if (storeSnap.exists()) {
-          storeName = storeSnap.data().name || 'Unnamed Store';
+          const storeData = storeSnap.data();
+          storeName = storeData.name || 'Unnamed Store';
+          
+          // If the store uses a separate database, we should save the metadata there
+          const databaseId = storeData.databaseId;
+          if (databaseId && databaseId !== '(default)') {
+            try {
+              const { getFirestore } = await import('firebase/firestore');
+              targetFirestore = getFirestore(firebaseApp, databaseId);
+            } catch (dbError) {
+              console.warn('Failed to initialize separate database firestore, falling back to default:', dbError);
+            }
+          }
         }
       } catch (error) {
-        console.warn('Failed to fetch store name:', error);
+        console.warn('Failed to fetch store info:', error);
       }
     }
 
@@ -140,7 +153,7 @@ const uploadImageFlow = ai.defineFlow(
       };
 
       // Each store manages its own uploaded images
-      const uploadsRef = collection(firestore, 'stores', storeId, 'uploads');
+      const uploadsRef = collection(targetFirestore, 'stores', storeId, 'uploads');
       await addDoc(uploadsRef, uploadMetadata);
       
       // Also save to a global collection for universal tracking if needed, 

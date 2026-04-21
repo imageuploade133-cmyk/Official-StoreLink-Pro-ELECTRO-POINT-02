@@ -99,7 +99,7 @@ export default function CreateWebPage() {
             console.error("Optimization failed:", optError);
         }
 
-        const result = await uploadImage({ imageDataUri });
+        const result = await uploadImage({ imageDataUri, storeId: currentStoreId });
         form.setValue('bannerImageUrl', result.display_url, { shouldValidate: true });
         toast({ title: "Image Uploaded", description: "Banner image optimized and set." });
       } catch (error: any) {

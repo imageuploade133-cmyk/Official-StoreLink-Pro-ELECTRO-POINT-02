@@ -35,10 +35,48 @@ export default function MediaLibraryPage() {
         if (!firestore || !currentStoreId) return;
         setIsLoading(true);
         try {
+            // 1. Fetch from current firestore (might be store-specific)
             const uploadsRef = collection(firestore, 'stores', currentStoreId, 'uploads');
             const q = query(uploadsRef, orderBy('uploadedAt', 'desc'), limit(100));
             const snapshot = await getDocs(q);
-            setUploads(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+            let results = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+
+            // 2. Also fetch from default firestore if it's different
+            const { initializeFirebase } = await import('@/firebase/init');
+            const { firestore: defaultFirestore } = initializeFirebase();
+            
+            if (firestore !== defaultFirestore) {
+                try {
+                    const defaultUploadsRef = collection(defaultFirestore, 'stores', currentStoreId, 'uploads');
+                    const qDefault = query(defaultUploadsRef, orderBy('uploadedAt', 'desc'), limit(100));
+                    const snapshotDefault = await getDocs(qDefault);
+                    const defaultResults = snapshotDefault.docs.map(d => ({ id: d.id, ...d.data() }));
+                    
+                    // Merge results
+                    const mergedResults = [...results];
+                    const existingIds = new Set(results.map(r => r.id));
+                    
+                    for (const item of defaultResults) {
+                        if (!existingIds.has(item.id)) {
+                            mergedResults.push(item);
+                            existingIds.add(item.id);
+                        }
+                    }
+                    
+                    // Sort by uploadedAt
+                    mergedResults.sort((a: any, b: any) => {
+                        const timeA = a.uploadedAt?.seconds || 0;
+                        const timeB = b.uploadedAt?.seconds || 0;
+                        return timeB - timeA;
+                    });
+                    
+                    results = mergedResults.slice(0, 100);
+                } catch (defaultError) {
+                    console.warn("Failed to fetch uploads from default database:", defaultError);
+                }
+            }
+
+            setUploads(results);
         } catch (e) {
             console.error("Error fetching uploads:", e);
             toast({ variant: 'destructive', title: "Error", description: "Could not load media library." });
