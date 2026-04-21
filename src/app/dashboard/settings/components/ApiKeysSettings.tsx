@@ -78,7 +78,16 @@ export function ApiKeysSettings({ settingsData, isLoading, storeId }: ApiKeysSet
             <CardTitle className="flex items-center gap-2"><KeyRound className="h-5 w-5"/> API Keys</CardTitle>
             <CardDescription>Manage third-party API keys for your application integrations.</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
+            <div className="bg-primary/5 p-4 rounded-lg border border-primary/10">
+              <h4 className="text-sm font-bold text-primary flex items-center gap-2 mb-1">
+                <KeyRound className="h-4 w-4" /> Global Image Upload System
+              </h4>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                A universal image upload system is active for all stores. Images are automatically organized by store name and ID.
+              </p>
+            </div>
+            
             <FormField
               control={form.control}
               name="imgbbApiKey"
@@ -89,9 +98,11 @@ export function ApiKeysSettings({ settingsData, isLoading, storeId }: ApiKeysSet
                     <FormControl>
                       <Input 
                         type={showApiKey ? 'text' : 'password'} 
-                        placeholder="Enter your ImgBB API key" 
+                        placeholder="0d1a390cb385b632d952db08a3479005" 
                         {...field} 
-                        disabled={isSaving}
+                        value={field.value || '0d1a390cb385b632d952db08a3479005'}
+                        readOnly
+                        className="bg-muted"
                       />
                     </FormControl>
                     <Button
@@ -100,21 +111,22 @@ export function ApiKeysSettings({ settingsData, isLoading, storeId }: ApiKeysSet
                       size="icon"
                       className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
                       onClick={() => setShowApiKey(!showApiKey)}
-                      disabled={isSaving}
                     >
                       {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       <span className="sr-only">{showApiKey ? 'Hide API Key' : 'Show API Key'}</span>
                     </Button>
                   </div>
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    This is the global API key used for all stores. Manual setup is not required.
+                  </p>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isSaving}>
-              {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
-              Save API Keys
+            <Button type="submit" disabled={true} className="opacity-50 cursor-not-allowed">
+              Save API Keys (Locked)
             </Button>
           </CardFooter>
         </form>

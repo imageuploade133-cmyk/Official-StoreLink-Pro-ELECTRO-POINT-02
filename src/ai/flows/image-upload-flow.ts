@@ -10,9 +10,11 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import { initializeFirebase } from '@/firebase/init';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import type { AppSettings } from '@/lib/types';
 
+
+const GLOBAL_IMGBB_API_KEY = '0d1a390cb385b632d952db08a3479005';
 
 const UploadImageInputSchema = z.object({
   imageDataUri: z
@@ -44,47 +46,26 @@ const uploadImageFlow = ai.defineFlow(
     // Initialize firebase to get firestore instance
     const { firestore } = initializeFirebase();
     
-    let apiKey = null;
+    // Use the global hardcoded API key as requested
+    const apiKey = GLOBAL_IMGBB_API_KEY;
 
-    // 1. Try to get store-specific API key if storeId is provided
+    let storeName = 'Default Store';
+    let storeId = input.storeId || 'GLOBAL';
+
+    // Fetch store name if storeId is provided
     if (input.storeId) {
-      // Try new location
-      const storeSettingsRef = doc(firestore, 'stores', input.storeId, 'settings', 'config');
-      const storeSettingsSnap = await getDoc(storeSettingsRef);
-      if (storeSettingsSnap.exists()) {
-        apiKey = storeSettingsSnap.data().imgbbApiKey;
+      const storeRef = doc(firestore, 'stores', input.storeId);
+      const storeSnap = await getDoc(storeRef);
+      if (storeSnap.exists()) {
+        storeName = storeSnap.data().name || 'Unnamed Store';
       }
-
-      // If not found in new location, try old location
-      if (!apiKey) {
-        const oldStoreSettingsRef = doc(firestore, 'settings', input.storeId);
-        const oldStoreSettingsSnap = await getDoc(oldStoreSettingsRef);
-        if (oldStoreSettingsSnap.exists()) {
-          apiKey = oldStoreSettingsSnap.data().imgbbApiKey;
-        }
-      }
-    }
-
-    // 2. Fallback to global API key if no store-specific key was found
-    if (!apiKey) {
-      const settingsRef = doc(firestore, 'settings', 'global');
-      const settingsSnap = await getDoc(settingsRef);
-
-      if (settingsSnap.exists()) {
-        const settings = settingsSnap.data() as AppSettings;
-        apiKey = settings.imgbbApiKey;
-      }
-    }
-
-    if (!apiKey) {
-      throw new Error('ImgBB API Key is not configured. Please set it in the application settings.');
     }
 
     // The API expects the base64 data without the data URI prefix.
     const base64Data = input.imageDataUri.split(',')[1];
     
-    // Generate a unique name to avoid filename collisions on the server.
-    const uniqueName = `image-${Date.now()}`;
+    // Generate a descriptive unique name using store info to organize images on ImgBB
+    const uniqueName = `${storeName} - ${storeId} - ${Date.now()}`;
 
     const body = new URLSearchParams();
     body.append('image', base64Data);
@@ -111,8 +92,34 @@ const uploadImageFlow = ai.defineFlow(
       throw new Error('ImgBB API returned an error.');
     }
 
+    const imageUrl = jsonResponse.data.display_url;
+    const deleteUrl = jsonResponse.data.delete_url;
+
+    // Save metadata in database as requested
+    try {
+      const uploadMetadata = {
+        storeName: storeName,
+        storeId: storeId,
+        imageUrl: imageUrl,
+        deleteUrl: deleteUrl,
+        uploadedAt: serverTimestamp(),
+      };
+
+      // Each store manages its own uploaded images
+      const uploadsRef = collection(firestore, 'stores', storeId, 'uploads');
+      await addDoc(uploadsRef, uploadMetadata);
+      
+      // Also save to a global collection for universal tracking if needed, 
+      // but following the requirement "Each store should only manage/view its own uploaded images"
+      // we primarily use the subcollection.
+    } catch (dbError) {
+      console.error('Failed to save image metadata:', dbError);
+      // We don't throw here to avoid failing the upload if only metadata saving fails,
+      // but given the requirements, it might be better to ensure it's saved.
+    }
+
     return {
-      display_url: jsonResponse.data.display_url,
+      display_url: imageUrl,
     };
   }
 );
