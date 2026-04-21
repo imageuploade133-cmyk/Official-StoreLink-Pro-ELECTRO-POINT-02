@@ -28,6 +28,8 @@ interface ApiKeysSettingsProps {
   storeId?: string | null;
 }
 
+const GLOBAL_DEFAULT_KEY = '0d1a390cb385b632d952db08a3479005';
+
 export function ApiKeysSettings({ settingsData, isLoading, storeId }: ApiKeysSettingsProps) {
   const { toast } = useToast();
   const firestore = useFirestore();
@@ -81,10 +83,12 @@ export function ApiKeysSettings({ settingsData, isLoading, storeId }: ApiKeysSet
           <CardContent className="space-y-4">
             <div className="bg-primary/5 p-4 rounded-lg border border-primary/10">
               <h4 className="text-sm font-bold text-primary flex items-center gap-2 mb-1">
-                <KeyRound className="h-4 w-4" /> Global Image Upload System
+                <KeyRound className="h-4 w-4" /> {storeId ? "Image Upload System" : "Global Image Upload System"}
               </h4>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                A universal image upload system is active for all stores. Images are automatically organized by store name and ID.
+                {storeId 
+                  ? "You can use your own ImgBB API key for image uploads. If not provided, the system will use the global default."
+                  : "A universal image upload system is active for all stores. Images are automatically organized by store name and ID."}
               </p>
             </div>
             
@@ -93,16 +97,16 @@ export function ApiKeysSettings({ settingsData, isLoading, storeId }: ApiKeysSet
               name="imgbbApiKey"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>ImgBB API Key</FormLabel>
+                  <FormLabel className="flex items-center gap-2">
+                    ImgBB API Key
+                    {storeId && <span className="text-[10px] font-normal px-2 py-0.5 bg-muted rounded-full">Optional</span>}
+                  </FormLabel>
                   <div className="relative">
                     <FormControl>
                       <Input 
                         type={showApiKey ? 'text' : 'password'} 
-                        placeholder="0d1a390cb385b632d952db08a3479005" 
+                        placeholder={storeId ? "Leave empty to use global default" : GLOBAL_DEFAULT_KEY} 
                         {...field} 
-                        value={field.value || '0d1a390cb385b632d952db08a3479005'}
-                        readOnly
-                        className="bg-muted"
                       />
                     </FormControl>
                     <Button
@@ -117,7 +121,9 @@ export function ApiKeysSettings({ settingsData, isLoading, storeId }: ApiKeysSet
                     </Button>
                   </div>
                   <p className="text-[10px] text-muted-foreground mt-1">
-                    This is the global API key used for all stores. Manual setup is not required.
+                    {storeId 
+                      ? "Your images will be uploaded to your own ImgBB account if you provide a key."
+                      : `Default global key: ${GLOBAL_DEFAULT_KEY}. This is used when a store doesn't provide its own.`}
                   </p>
                   <FormMessage />
                 </FormItem>
@@ -125,8 +131,15 @@ export function ApiKeysSettings({ settingsData, isLoading, storeId }: ApiKeysSet
             />
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={true} className="opacity-50 cursor-not-allowed">
-              Save API Keys (Locked)
+            <Button type="submit" disabled={isSaving}>
+              {isSaving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                'Save API Keys'
+              )}
             </Button>
           </CardFooter>
         </form>
