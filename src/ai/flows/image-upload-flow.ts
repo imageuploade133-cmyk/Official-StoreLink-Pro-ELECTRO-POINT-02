@@ -46,18 +46,52 @@ const uploadImageFlow = ai.defineFlow(
     // Initialize firebase to get firestore instance
     const { firestore } = initializeFirebase();
     
-    // Use the global hardcoded API key as requested
-    const apiKey = GLOBAL_IMGBB_API_KEY;
+    // Start with the hardcoded global API key
+    let apiKey = GLOBAL_IMGBB_API_KEY;
+
+    // Try to get the global API key from Firestore if it exists
+    try {
+      const globalSettingsRef = doc(firestore, 'settings', 'global');
+      const globalSettingsSnap = await getDoc(globalSettingsRef);
+      if (globalSettingsSnap.exists() && globalSettingsSnap.data().imgbbApiKey) {
+        apiKey = globalSettingsSnap.data().imgbbApiKey;
+      }
+    } catch (error) {
+      console.warn('Failed to fetch global API key from Firestore, using hardcoded default:', error);
+    }
 
     let storeName = 'Default Store';
     let storeId = input.storeId || 'GLOBAL';
 
-    // Fetch store name if storeId is provided
+    // Fetch store name and check for store-specific API key if storeId is provided
     if (input.storeId) {
-      const storeRef = doc(firestore, 'stores', input.storeId);
-      const storeSnap = await getDoc(storeRef);
-      if (storeSnap.exists()) {
-        storeName = storeSnap.data().name || 'Unnamed Store';
+      try {
+        // 1. Check current store settings path
+        const settingsRef = doc(firestore, 'stores', input.storeId, 'settings', 'config');
+        const settingsSnap = await getDoc(settingsRef);
+        
+        if (settingsSnap.exists() && settingsSnap.data().imgbbApiKey) {
+          apiKey = settingsSnap.data().imgbbApiKey;
+        } else {
+          // 2. Check old store settings path for backward compatibility
+          const oldSettingsRef = doc(firestore, 'settings', input.storeId);
+          const oldSettingsSnap = await getDoc(oldSettingsRef);
+          if (oldSettingsSnap.exists() && oldSettingsSnap.data().imgbbApiKey) {
+            apiKey = oldSettingsSnap.data().imgbbApiKey;
+          }
+        }
+      } catch (error) {
+        console.warn('Failed to fetch store-specific API key, falling back to global:', error);
+      }
+
+      try {
+        const storeRef = doc(firestore, 'stores', input.storeId);
+        const storeSnap = await getDoc(storeRef);
+        if (storeSnap.exists()) {
+          storeName = storeSnap.data().name || 'Unnamed Store';
+        }
+      } catch (error) {
+        console.warn('Failed to fetch store name:', error);
       }
     }
 
