@@ -18,13 +18,15 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { BellRing, Loader2, Save, Plus, Trash2, Smartphone, Info } from 'lucide-react';
+import { BellRing, Loader2, Save, Plus, Trash2, Smartphone, Info, Mail } from 'lucide-react';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const orderAlertsSchema = z.object({
   enableOrderAlerts: z.boolean().default(false),
   orderNotificationNumbers: z.array(z.string().min(5, 'Invalid phone number.')).default([]),
+  enableEmailAlerts: z.boolean().default(false),
+  orderNotificationEmails: z.array(z.string().email('Invalid email address.')).default([]),
 });
 
 type FormValues = z.infer<typeof orderAlertsSchema>;
@@ -36,6 +38,7 @@ export default function OrderAlertsPage() {
   
   const [isSaving, setIsSaving] = useState(false);
   const [newNumber, setNewNumber] = useState('');
+  const [newEmail, setNewEmail] = useState('');
 
   const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
@@ -67,6 +70,8 @@ export default function OrderAlertsPage() {
     defaultValues: {
       enableOrderAlerts: false,
       orderNotificationNumbers: [],
+      enableEmailAlerts: false,
+      orderNotificationEmails: [],
     }
   });
 
@@ -75,6 +80,8 @@ export default function OrderAlertsPage() {
       form.reset({
         enableOrderAlerts: settingsData.enableOrderAlerts || false,
         orderNotificationNumbers: settingsData.orderNotificationNumbers || [],
+        enableEmailAlerts: settingsData.enableEmailAlerts || false,
+        orderNotificationEmails: settingsData.orderNotificationEmails || [],
       });
     }
   }, [settingsData, form]);
@@ -83,7 +90,11 @@ export default function OrderAlertsPage() {
     if (!firestore) return;
     setIsSaving(true);
     try {
-      await saveGlobalSettings(firestore, data);
+      if (currentStoreId) {
+        await saveStoreSettings(firestore, currentStoreId, data);
+      } else {
+        await saveGlobalSettings(firestore, data);
+      }
       toast({ title: 'Settings Saved', description: 'Your order alert preferences have been updated.' });
     } catch (e) {
       toast({ variant: 'destructive', title: 'Error', description: 'Failed to update alert settings.' });
@@ -112,12 +123,38 @@ export default function OrderAlertsPage() {
     form.setValue('orderNotificationNumbers', updated, { shouldValidate: true });
   };
 
+  const handleAddEmail = () => {
+    const trimmed = newEmail.trim().toLowerCase();
+    if (!trimmed) return;
+
+    // Basic email validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+        toast({ variant: 'destructive', title: 'Invalid Email', description: 'Please enter a valid email address.' });
+        return;
+    }
+    
+    const currentEmails = form.getValues('orderNotificationEmails') || [];
+    if (currentEmails.includes(trimmed)) {
+        toast({ variant: 'destructive', title: 'Duplicate Email', description: 'This email is already in the alert list.' });
+        return;
+    }
+
+    form.setValue('orderNotificationEmails', [...currentEmails, trimmed], { shouldValidate: true });
+    setNewEmail('');
+  };
+
+  const handleRemoveEmail = (index: number) => {
+    const currentEmails = form.getValues('orderNotificationEmails') || [];
+    const updated = currentEmails.filter((_, i) => i !== index);
+    form.setValue('orderNotificationEmails', updated, { shouldValidate: true });
+  };
+
   const isLoading = isAuthLoading || isLoadingSettings;
 
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <PageHeader icon={BellRing} title="Order Alerts" description="Configure WhatsApp notifications for new website orders." />
+        <PageHeader icon={BellRing} title="Order Alerts" description="Configure notifications for new website orders." />
         <Skeleton className="h-[400px] w-full" />
       </div>
     );
@@ -128,13 +165,14 @@ export default function OrderAlertsPage() {
   }
 
   const configuredNumbers = form.watch('orderNotificationNumbers') || [];
+  const configuredEmails = form.watch('orderNotificationEmails') || [];
 
   return (
     <div className="space-y-6">
       <PageHeader
         icon={BellRing}
         title="Order Alerts"
-        description="Stay notified. Set up multiple WhatsApp numbers to receive alerts whenever a customer places an order."
+        description="Stay notified. Set up multiple WhatsApp numbers and Email addresses to receive alerts whenever a customer places an order."
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -143,19 +181,19 @@ export default function OrderAlertsPage() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Alert Preferences</CardTitle>
-                  <CardDescription>Toggle the global order alert system.</CardDescription>
+                  <CardTitle>WhatsApp Alerts</CardTitle>
+                  <CardDescription>Configure WhatsApp notifications for new orders.</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-6">
                   <FormField
                     control={form.control}
                     name="enableOrderAlerts"
                     render={({ field }) => (
                       <FormItem className="flex flex-row items-center justify-between rounded-xl border p-4 bg-muted/30">
                         <div className="space-y-0.5">
-                          <FormLabel className="text-base">Enable Order Alerts</FormLabel>
+                          <FormLabel className="text-base">Enable WhatsApp Alerts</FormLabel>
                           <FormDescription>
-                            If on, WhatsApp messages will be sent to the numbers below for every new order.
+                            If on, WhatsApp messages will be sent to the numbers below.
                           </FormDescription>
                         </div>
                         <FormControl>
@@ -167,71 +205,138 @@ export default function OrderAlertsPage() {
                       </FormItem>
                     )}
                   />
+
+                  <div className="space-y-4">
+                    <Label>Notification Numbers</Label>
+                    <div className="flex gap-2">
+                      <div className="flex-grow">
+                        <div className="relative">
+                          <Smartphone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Input 
+                            placeholder="e.g., +2348012345678" 
+                            className="pl-10" 
+                            value={newNumber} 
+                            onChange={(e) => setNewNumber(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddNumber())}
+                          />
+                        </div>
+                      </div>
+                      <Button type="button" onClick={handleAddNumber} variant="secondary">
+                        <Plus className="mr-2 h-4 w-4" /> Add
+                      </Button>
+                    </div>
+
+                    <div className="space-y-3">
+                      {configuredNumbers.length === 0 ? (
+                        <div className="text-center py-6 border-2 border-dashed rounded-xl text-muted-foreground bg-muted/5">
+                          <p className="text-sm">No phone numbers configured.</p>
+                        </div>
+                      ) : (
+                        configuredNumbers.map((num, idx) => (
+                          <div key={idx} className="flex items-center justify-between p-3 border rounded-xl bg-background">
+                            <div className="flex items-center gap-3">
+                              <Smartphone className="h-4 w-4 text-primary" />
+                              <span className="font-medium text-sm">{num}</span>
+                            </div>
+                            <Button 
+                              type="button" 
+                              variant="ghost" 
+                              size="icon" 
+                              className="text-destructive h-8 w-8" 
+                              onClick={() => handleRemoveNumber(idx)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Notification Numbers</CardTitle>
-                  <CardDescription>Staff numbers that will receive the order details.</CardDescription>
+                  <CardTitle>Email Alerts</CardTitle>
+                  <CardDescription>Configure Email notifications for new orders (Powered by Resend).</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="flex gap-2">
-                    <div className="flex-grow">
-                      <Label htmlFor="new-phone" className="sr-only">New Phone Number</Label>
-                      <div className="relative">
-                        <Smartphone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input 
-                          id="new-phone"
-                          placeholder="e.g., +2348012345678" 
-                          className="pl-10" 
-                          value={newNumber} 
-                          onChange={(e) => setNewNumber(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddNumber())}
-                        />
-                      </div>
-                    </div>
-                    <Button type="button" onClick={handleAddNumber} variant="secondary">
-                      <Plus className="mr-2 h-4 w-4" /> Add
-                    </Button>
-                  </div>
-
-                  <div className="space-y-3">
-                    {configuredNumbers.length === 0 ? (
-                      <div className="text-center py-12 border-2 border-dashed rounded-xl text-muted-foreground bg-muted/10">
-                        <Smartphone className="mx-auto h-12 w-12 mb-4 opacity-20" />
-                        <p>No alert numbers configured yet.</p>
-                      </div>
-                    ) : (
-                      configuredNumbers.map((num, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-4 border rounded-xl bg-background shadow-sm animate-in fade-in slide-in-from-top-1">
-                          <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                              <Smartphone className="h-4 w-4" />
-                            </div>
-                            <span className="font-black tracking-wider text-sm">{num}</span>
-                          </div>
-                          <Button 
-                            type="button" 
-                            variant="ghost" 
-                            size="icon" 
-                            className="text-destructive hover:bg-destructive/10" 
-                            onClick={() => handleRemoveNumber(idx)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                  <FormField
+                    control={form.control}
+                    name="enableEmailAlerts"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-xl border p-4 bg-muted/30">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base">Enable Email Alerts</FormLabel>
+                          <FormDescription>
+                            If on, branded email notifications will be sent to the addresses below.
+                          </FormDescription>
                         </div>
-                      ))
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
                     )}
+                  />
+
+                  <div className="space-y-4">
+                    <Label>Notification Emails</Label>
+                    <div className="flex gap-2">
+                      <div className="flex-grow">
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Input 
+                            placeholder="e.g., admin@store.com" 
+                            className="pl-10" 
+                            value={newEmail} 
+                            onChange={(e) => setNewEmail(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddEmail())}
+                          />
+                        </div>
+                      </div>
+                      <Button type="button" onClick={handleAddEmail} variant="secondary">
+                        <Plus className="mr-2 h-4 w-4" /> Add
+                      </Button>
+                    </div>
+
+                    <div className="space-y-3">
+                      {configuredEmails.length === 0 ? (
+                        <div className="text-center py-6 border-2 border-dashed rounded-xl text-muted-foreground bg-muted/5">
+                          <p className="text-sm">No email addresses configured.</p>
+                        </div>
+                      ) : (
+                        configuredEmails.map((email, idx) => (
+                          <div key={idx} className="flex items-center justify-between p-3 border rounded-xl bg-background">
+                            <div className="flex items-center gap-3">
+                              <Mail className="h-4 w-4 text-primary" />
+                              <span className="font-medium text-sm">{email}</span>
+                            </div>
+                            <Button 
+                              type="button" 
+                              variant="ghost" 
+                              size="icon" 
+                              className="text-destructive h-8 w-8" 
+                              onClick={() => handleRemoveEmail(idx)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))
+                      )}
+                    </div>
                   </div>
                 </CardContent>
-                <CardFooter className="border-t pt-6">
-                  <Button type="submit" disabled={isSaving} size="lg" className="min-w-[200px] font-bold">
-                    {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                    Save Alert Settings
-                  </Button>
-                </CardFooter>
               </Card>
+
+              <div className="flex justify-end">
+                <Button type="submit" disabled={isSaving} size="lg" className="min-w-[200px] font-bold">
+                  {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                  Save All Alert Settings
+                </Button>
+              </div>
             </form>
           </Form>
         </div>
@@ -240,21 +345,22 @@ export default function OrderAlertsPage() {
           <Card className="bg-primary/5 border-primary/20 shadow-none sticky top-6">
             <CardHeader>
               <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary uppercase tracking-widest">
-                <Info className="h-4 w-4" /> Pro Tips
+                <Info className="h-4 w-4" /> How it works
               </CardTitle>
             </CardHeader>
             <CardContent className="text-sm space-y-4 text-muted-foreground leading-relaxed">
-              <p>When an order is placed, everyone on this list will receive a WhatsApp message containing:</p>
+              <p>When an order is placed, everyone on these lists will receive notifications containing:</p>
               <ul className="list-disc pl-5 space-y-2 font-medium">
                 <li>Order ID Reference</li>
                 <li>Customer Name</li>
-                <li>Fulfillment Type (Delivery/Pickup)</li>
+                <li>Items & Quantities</li>
                 <li>Total Order Value</li>
-                <li>Payment Method used</li>
+                <li>Payment Status</li>
+                <li>Delivery Address</li>
               </ul>
               <Separator className="bg-primary/10" />
               <p className="text-xs italic">
-                Note: Ensure you include the full international country code (e.g., +234...) for all numbers to ensure message delivery.
+                Note: Emails are sent via Resend. Customers also receive an automatic confirmation email if their address is provided.
               </p>
             </CardContent>
           </Card>
