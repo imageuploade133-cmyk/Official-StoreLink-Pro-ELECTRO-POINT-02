@@ -53,6 +53,7 @@ export function ProductImageGallery({
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isPhotoCaptureOpen, setIsPhotoCaptureOpen] = useState(false);
+  const [pendingImages, setPendingImages] = useState<{ id: string; url: string }[]>([]);
   const { toast } = useToast();
   const { settings, store } = useSettings();
 
@@ -71,58 +72,88 @@ export function ProductImageGallery({
     const maxSizeBytes = maxFileSizeMb * 1024 * 1024;
 
     setIsUploading(true);
-    let newPrimary = primaryUrl;
-    const newAdditional = [...additionalUrls];
+    
+    // Create local previews for immediate feedback
+    const newPending = Array.from(files).map((file, idx) => ({
+      id: `pending-${Date.now()}-${idx}`,
+      url: URL.createObjectURL(file),
+      file
+    }));
+    
+    setPendingImages(newPending.map(p => ({ id: p.id, url: p.url })));
+
+    let currentPrimary = primaryUrl;
+    let currentAdditional = [...additionalUrls];
 
     try {
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        
-        if (file.size > maxSizeBytes) {
-            toast({
-                variant: "destructive",
-                title: "File too large",
-                description: `"${file.name}" exceeds the ${maxFileSizeMb}MB limit.`,
-            });
-            continue;
-        }
-
-        const reader = new FileReader();
-        const promise = new Promise<string>((resolve, reject) => {
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
-
-        let imageDataUri = await promise;
-
-        // Perform Client-Side Optimization
+      for (const pending of newPending) {
         try {
-            imageDataUri = await compressAndResizeImage(
-                imageDataUri, 
-                settings?.imageUploadQuality || 80, 
-                settings?.imageMaxWidth || 1920
-            );
-        } catch (optError) {
-            console.error("Optimization failed:", optError);
-        }
+          const file = pending.file;
+          
+          if (file.size > maxSizeBytes) {
+              toast({
+                  variant: "destructive",
+                  title: "File too large",
+                  description: `"${file.name}" exceeds the ${maxFileSizeMb}MB limit.`,
+              });
+              setPendingImages(prev => prev.filter(p => p.id !== pending.id));
+              URL.revokeObjectURL(pending.url);
+              continue;
+          }
 
-        const result = await uploadImage({ imageDataUri, storeId: store?.id });
-        
-        if (!newPrimary) {
-          newPrimary = result.display_url;
-        } else {
-          newAdditional.push(result.display_url);
+          const reader = new FileReader();
+          const promise = new Promise<string>((resolve, reject) => {
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+
+          let imageDataUri = await promise;
+
+          // Perform Client-Side Optimization
+          try {
+              imageDataUri = await compressAndResizeImage(
+                  imageDataUri, 
+                  settings?.imageUploadQuality || 80, 
+                  settings?.imageMaxWidth || 1920
+              );
+          } catch (optError) {
+              console.error("Optimization failed:", optError);
+          }
+
+          const result = await uploadImage({ imageDataUri, storeId: store?.id });
+          
+          if (!currentPrimary) {
+            currentPrimary = result.display_url;
+            onPrimaryChange(currentPrimary);
+          } else {
+            currentAdditional = [...currentAdditional, result.display_url];
+            onAdditionalChange(currentAdditional);
+          }
+        } catch (singleError: any) {
+          console.error("Individual upload failed:", singleError);
+          toast({ 
+            variant: "destructive", 
+            title: "Upload Failed", 
+            description: `Could not upload one of your images. ${singleError.message || ""}` 
+          });
+        } finally {
+          // Always remove from pending and revoke URL
+          setPendingImages(prev => prev.filter(p => p.id !== pending.id));
+          URL.revokeObjectURL(pending.url);
         }
       }
 
-      onPrimaryChange(newPrimary);
-      onAdditionalChange(newAdditional);
-      toast({ title: "Gallery Updated", description: "Images optimized and added successfully." });
+      toast({ title: "Gallery Updated", description: "Media assets processed successfully." });
     } catch (error: any) {
-      toast({ variant: "destructive", title: "Upload Failed", description: error.message || "An error occurred during upload." });
+      toast({ variant: "destructive", title: "Upload Process Error", description: error.message || "An error occurred during upload." });
     } finally {
       setIsUploading(false);
+      // Clean up any remaining URLs
+      newPending.forEach(p => {
+        try { URL.revokeObjectURL(p.url); } catch (e) {}
+      });
+      setPendingImages([]);
       event.target.value = ''; // Reset input
     }
   };
@@ -383,14 +414,24 @@ export function ProductImageGallery({
           </div>
         ))}
 
-        {isUploading && (
-          <div className="aspect-square rounded-[1.5rem] border-2 border-dashed border-primary/30 flex flex-col items-center justify-center bg-primary/5 animate-pulse gap-2">
-            <Loader2 className="h-8 w-8 text-primary animate-spin" />
-            <span className="text-[10px] font-black uppercase text-primary">Optimizing...</span>
+        {pendingImages.map((item) => (
+          <div 
+            key={item.id} 
+            className="group relative aspect-square rounded-[1.5rem] overflow-hidden border-2 border-dashed border-primary/30 bg-primary/5 animate-pulse"
+          >
+            <img 
+              src={item.url} 
+              alt="Uploading..." 
+              className="w-full h-full object-cover opacity-40 grayscale" 
+            />
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                <Loader2 className="h-6 w-6 text-primary animate-spin" />
+                <span className="text-[8px] font-black uppercase text-primary tracking-tighter">Processing...</span>
+            </div>
           </div>
-        )}
+        ))}
 
-        {allImages.length === 0 && !isUploading && (
+        {allImages.length === 0 && !isUploading && pendingImages.length === 0 && (
           <div className="col-span-full py-16 border-2 border-dashed rounded-[2rem] flex flex-col items-center justify-center text-muted-foreground bg-muted/10">
             <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
                 <Upload className="h-8 w-8 opacity-20" />
