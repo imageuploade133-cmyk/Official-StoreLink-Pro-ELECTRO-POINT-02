@@ -132,6 +132,16 @@ export interface Coupon {
   createdAt?: Timestamp;
 }
 
+export interface EmailAlertSettings {
+  enabled: boolean;
+  resendApiKey: string;
+  senderEmail: string;
+  notificationEmail: string;
+  customerConfirmation: boolean;
+  connected: boolean;
+  updatedAt: Timestamp;
+}
+
 export interface Settings {
   id: string; // 'global'
   theme?: 'light' | 'dark' | 'system';

@@ -42,9 +42,11 @@ export async function placeOrderAction({
   gateway?: string;
 }) {
   try {
-    const { orderId, orderData, settings } = await adminDb.runTransaction(async (transaction) => {
+    const { orderId, orderData, settings, emailAlertSettings } = await adminDb.runTransaction(async (transaction) => {
       // 0. Get store settings
       let settings = {};
+      let emailAlertSettings = null;
+
       if (storeId) {
         const settingsDoc = await transaction.get(adminDb.collection('stores').doc(storeId).collection('settings').doc('config'));
         if (settingsDoc.exists) {
@@ -56,10 +58,22 @@ export async function placeOrderAction({
                 settings = { id: storeId, ...legacySettingsDoc.data() };
             }
         }
+
+        // Fetch store-specific email alert settings
+        const emailAlertsDoc = await transaction.get(adminDb.collection('stores').doc(storeId).collection('settings').doc('emailAlerts'));
+        if (emailAlertsDoc.exists) {
+            emailAlertSettings = emailAlertsDoc.data();
+        }
       } else {
         const globalSettingsDoc = await transaction.get(adminDb.collection('settings').doc('global'));
         if (globalSettingsDoc.exists) {
           settings = { id: 'global', ...globalSettingsDoc.data() };
+        }
+        
+        // Fetch global email alert settings
+        const globalEmailAlertsDoc = await transaction.get(adminDb.collection('settings').doc('emailAlerts'));
+        if (globalEmailAlertsDoc.exists) {
+            emailAlertSettings = globalEmailAlertsDoc.data();
         }
       }
 
@@ -121,7 +135,7 @@ export async function placeOrderAction({
       
       transaction.set(orderRef, orderData);
 
-      return { orderId: orderRef.id, orderData, settings };
+      return { orderId: orderRef.id, orderData, settings, emailAlertSettings };
     });
 
     // Send Email Notifications (non-blocking)
@@ -130,7 +144,8 @@ export async function placeOrderAction({
         sendOrderNotifications(
             { id: orderId, ...orderData }, 
             settings, 
-            (settings as any).storeName || 'Our Store'
+            (settings as any).storeName || 'Our Store',
+            emailAlertSettings
         ).catch(err => console.error('Error sending order emails:', err));
     }
 
@@ -149,6 +164,8 @@ export async function sendOrderEmailsAction(orderId: string, storeId: string) {
         const orderData = orderDoc.data();
         
         let settings = {};
+        let emailAlertSettings = null;
+
         if (storeId && storeId !== 'global') {
             const settingsDoc = await adminDb.collection('stores').doc(storeId).collection('settings').doc('config').get();
             if (settingsDoc.exists) {
@@ -159,17 +176,28 @@ export async function sendOrderEmailsAction(orderId: string, storeId: string) {
                     settings = { id: storeId, ...legacySettingsDoc.data() };
                 }
             }
+
+            const emailAlertsDoc = await adminDb.collection('stores').doc(storeId).collection('settings').doc('emailAlerts').get();
+            if (emailAlertsDoc.exists) {
+                emailAlertSettings = emailAlertsDoc.data();
+            }
         } else {
             const globalSettingsDoc = await adminDb.collection('settings').doc('global').get();
             if (globalSettingsDoc.exists) {
                 settings = { id: 'global', ...globalSettingsDoc.data() };
+            }
+
+            const globalEmailAlertsDoc = await adminDb.collection('settings').doc('emailAlerts').get();
+            if (globalEmailAlertsDoc.exists) {
+                emailAlertSettings = globalEmailAlertsDoc.data();
             }
         }
         
         await sendOrderNotifications(
             { id: orderId, ...orderData }, 
             settings, 
-            (settings as any).storeName || 'Our Store'
+            (settings as any).storeName || 'Our Store',
+            emailAlertSettings
         );
         
         return { success: true };
@@ -179,7 +207,7 @@ export async function sendOrderEmailsAction(orderId: string, storeId: string) {
     }
 }
 
-export async function sendTestOrderEmailAction(emails: string[], storeId: string, currency: string = '$') {
+export async function sendTestOrderEmailAction(emails: string[], storeId: string, currency: string = '$', emailAlertSettings?: any) {
     try {
         let storeName = 'Test Store';
         if (storeId && storeId !== 'global') {
@@ -218,10 +246,27 @@ export async function sendTestOrderEmailAction(emails: string[], storeId: string
             currency: currency,
         };
 
-        await sendOrderNotifications(dummyOrder, testSettings, storeName);
+        await sendOrderNotifications(dummyOrder, testSettings, storeName, emailAlertSettings);
         return { success: true };
     } catch (error: any) {
         console.error('Error in sendTestOrderEmailAction:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+export async function getResendUsageAction(apiKey: string) {
+    try {
+        const response = await fetch('https://api.resend.com/emails', {
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+            }
+        });
+        if (response.ok) {
+            return { success: true };
+        } else {
+            return { success: false, error: 'Invalid API Key or unauthorized' };
+        }
+    } catch (error: any) {
         return { success: false, error: error.message };
     }
 }
