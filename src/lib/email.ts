@@ -2,9 +2,9 @@ import { Resend } from 'resend';
 import { adminDb } from './firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const globalResend = new Resend(process.env.RESEND_API_KEY);
 
-export async function sendOrderNotifications(order: any, settings: any, storeName: string) {
+export async function sendOrderNotifications(order: any, settings: any, storeName: string, emailAlertSettings?: any) {
     const { id: orderId, guestInfo, user_id, totalAmount, paymentStatus, items, deliveryPrice } = order;
     
     const customerEmail = guestInfo?.email || (await getCustomerEmail(user_id));
@@ -12,7 +12,6 @@ export async function sendOrderNotifications(order: any, settings: any, storeNam
     
     if (!customerEmail) {
         console.error('No customer email found for order', orderId);
-        // We still might want to notify the owner even if customer email is missing
     }
 
     // 1. Prepare items HTML
@@ -51,15 +50,19 @@ export async function sendOrderNotifications(order: any, settings: any, storeNam
         storeName: storeName || 'Our Store',
     };
 
-    const ownerEmails = settings.orderNotificationEmails || [];
-    const enableEmailAlerts = settings.enableEmailAlerts;
-
     const promises = [];
 
+    // Use store-specific Resend if available
+    const storeResend = emailAlertSettings?.resendApiKey ? new Resend(emailAlertSettings.resendApiKey) : globalResend;
+    const senderEmail = emailAlertSettings?.senderEmail || 'StoreLink Pro <notifications@storelink-pro.com>';
+
     // Send to customer
-    if (customerEmail) {
+    const sendToCustomer = emailAlertSettings ? (emailAlertSettings.enabled && emailAlertSettings.customerConfirmation) : true; 
+    if (customerEmail && sendToCustomer) {
         const customerHtml = generateTemplate(commonData, 'confirmation');
         promises.push(sendWithRetry({
+            resendInstance: storeResend,
+            from: senderEmail,
             to: customerEmail,
             subject: `Order Confirmation - #${orderId} - ${commonData.storeName}`,
             html: customerHtml,
@@ -70,9 +73,17 @@ export async function sendOrderNotifications(order: any, settings: any, storeNam
     }
 
     // Send to store owner(s)
+    const ownerEmails = emailAlertSettings?.notificationEmail 
+        ? [emailAlertSettings.notificationEmail] 
+        : (settings.orderNotificationEmails || []);
+    
+    const enableEmailAlerts = emailAlertSettings ? emailAlertSettings.enabled : settings.enableEmailAlerts;
+
     if (enableEmailAlerts && ownerEmails.length > 0) {
         const ownerHtml = generateTemplate(commonData, 'notification');
         promises.push(sendWithRetry({
+            resendInstance: storeResend,
+            from: senderEmail,
             to: ownerEmails,
             subject: `New Order Received - #${orderId} - ${commonData.storeName}`,
             html: ownerHtml,
@@ -85,7 +96,7 @@ export async function sendOrderNotifications(order: any, settings: any, storeNam
     await Promise.all(promises);
 }
 
-async function sendWithRetry({ to, subject, html, orderId, storeId, type }: any) {
+async function sendWithRetry({ resendInstance, from, to, subject, html, orderId, storeId, type }: any) {
     let attempts = 0;
     const maxAttempts = 3;
     let status: 'sent' | 'failed' = 'failed';
@@ -93,8 +104,8 @@ async function sendWithRetry({ to, subject, html, orderId, storeId, type }: any)
 
     while (attempts < maxAttempts) {
         try {
-            const { data, error } = await resend.emails.send({
-                from: 'StoreLink Pro <notifications@storelink-pro.com>',
+            const { data, error } = await resendInstance.emails.send({
+                from: from,
                 to: Array.isArray(to) ? to : [to],
                 subject,
                 html,
