@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useFieldArray, FormProvider } from 'react-hook-form';
@@ -244,6 +244,8 @@ export function ProductForm({
   const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
   
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [hasInitialReset, setHasInitialReset] = useState(false);
+  const lastResetId = useRef<string | undefined>(undefined);
   const [isSubmittingCategory, setIsSubmittingCategory] = useState(false);
   const [isAiGenerating, setIsAiGenerating] = useState(false);
   const [isUploadingSizeGuide, setIsUploadingSizeGuide] = useState(false);
@@ -364,73 +366,78 @@ export function ProductForm({
   });
 
   useEffect(() => {
-    if (defaultValues && categories.length > 0) {
-      form.reset({
-        name: defaultValues.name || '',
-        sku: defaultValues.sku || '',
-        barcode: defaultValues.barcode || '',
-        categoryId: defaultValues.categoryId ?? '',
-        stock: defaultValues.stock ?? 0,
-        purchasePrice: defaultValues.purchasePrice ?? 0,
-        sellingPrice: defaultValues.sellingPrice ?? 0,
-        newPrice: defaultValues.newPrice ?? null,
-        lowStockThreshold: defaultValues.lowStockThreshold ?? null,
-        supplierName: defaultValues.supplierName ?? '',
-        supplierContactName: defaultValues.supplierContactName ?? '',
-        supplierPhone: defaultValues.supplierPhone ?? '',
-        supplierLocation: defaultValues.supplierLocation ?? '',
-        stockDocumentUrl: defaultValues.stockDocumentUrl ?? '',
-        imageUrl: defaultValues.imageUrl ?? '',
-        additionalImageUrls: defaultValues.additionalImageUrls || [],
-        dataAiHint: defaultValues.dataAiHint ?? '',
-        audioDataUri: defaultValues.audioDataUri || '',
-        voiceEnabled: defaultValues.voiceEnabled ?? false,
-        voiceSignatures: defaultValues.voiceSignatures || [],
-        videoUrl: defaultValues.videoUrl || '',
-        videoPosterUrl: defaultValues.videoPosterUrl || '',
-        videoEnabled: defaultValues.videoEnabled ?? false,
-        videos: defaultValues.videos || [],
-        videosTitle: defaultValues.videosTitle || 'Multimedia Showcase',
-        videosDescription: defaultValues.videosDescription || 'Cinematic product insights & social proof',
-        descriptionTitle: defaultValues.descriptionTitle || 'Product Story',
-        descriptionIcon: defaultValues.descriptionIcon || 'BookOpen',
-        description: defaultValues.description ?? '',
-        expiryDate: convertToDateSafely(defaultValues.expiryDate),
-        isVisibleInPOS: defaultValues.isVisibleInPOS ?? true,
-        isVisibleOnWeb: defaultValues.isVisibleOnWeb ?? true,
-        isNewArrival: defaultValues.isNewArrival ?? false,
-        isPopular: defaultValues.isPopular ?? false,
-        isOldStock: defaultValues.isOldStock ?? false,
-        showProductInsight: defaultValues.showProductInsight ?? false,
-        isOfficialBrand: defaultValues.isOfficialBrand ?? false,
-        allowPriceModification: defaultValues.allowPriceModification ?? true,
-        isPromo: !!defaultValues.promo,
-        promoType: defaultValues.promo?.type ?? 'percentage',
-        promoValue: defaultValues.promo?.value ?? 0,
-        promoStartDate: convertToDateSafely(defaultValues.promo?.startDate),
-        promoEndDate: convertToDateSafely(defaultValues.promo?.endDate),
-        specificationsTitle: defaultValues.specificationsTitle || 'Key Features & Specifications',
-        specifications: defaultValues.specifications || [],
-        whatsInTheBoxTitle: defaultValues.whatsInTheBoxTitle || 'What’s In The Box',
-        whatsInTheBox: defaultValues.whatsInTheBox || [],
-        variationsTitle: defaultValues.variationsTitle || 'Variations Available',
-        variations: defaultValues.variations || [],
-        sizeGuideImageUrl: defaultValues.sizeGuideImageUrl || '',
-        badge1Enabled: defaultValues.badge1Enabled ?? true,
-        badge1Icon: defaultValues.badge1Icon || 'Truck',
-        badge1Title: defaultValues.badge1Title || 'Free Express',
-        badge1Sub: defaultValues.badge1Sub || 'Fulfillment',
-        badge2Enabled: defaultValues.badge2Enabled ?? true,
-        badge2Icon: defaultValues.badge2Icon || 'ShieldCheck',
-        badge2Title: defaultValues.badge2Title || '2-Year Warranty',
-        badge2Sub: defaultValues.badge2Sub || 'Protection',
-        showTechnicalSpecs: defaultValues.showTechnicalSpecs ?? true,
-        showLogisticsInfo: defaultValues.showLogisticsInfo ?? true,
-        showVerifiedReviews: defaultValues.showVerifiedReviews ?? true,
-        rewardAdsEnabled: defaultValues.rewardAdsEnabled ?? false,
-      });
+    if (categories.length > 0) {
+      const currentId = (defaultValues as any)?.id;
+      if (!hasInitialReset || (currentId && currentId !== lastResetId.current)) {
+        form.reset({
+          name: defaultValues?.name || '',
+          sku: defaultValues?.sku || '',
+          barcode: defaultValues?.barcode || '',
+          categoryId: defaultValues?.categoryId ?? '',
+          stock: defaultValues?.stock ?? 0,
+          purchasePrice: defaultValues?.purchasePrice ?? 0,
+          sellingPrice: defaultValues?.sellingPrice ?? 0,
+          newPrice: defaultValues?.newPrice ?? null,
+          lowStockThreshold: defaultValues?.lowStockThreshold ?? null,
+          supplierName: defaultValues?.supplierName ?? '',
+          supplierContactName: defaultValues?.supplierContactName ?? '',
+          supplierPhone: defaultValues?.supplierPhone ?? '',
+          supplierLocation: defaultValues?.supplierLocation ?? '',
+          stockDocumentUrl: defaultValues?.stockDocumentUrl ?? '',
+          imageUrl: defaultValues?.imageUrl ?? '',
+          additionalImageUrls: defaultValues?.additionalImageUrls || [],
+          dataAiHint: defaultValues?.dataAiHint ?? '',
+          audioDataUri: defaultValues?.audioDataUri || '',
+          voiceEnabled: defaultValues?.voiceEnabled ?? false,
+          voiceSignatures: defaultValues?.voiceSignatures || [],
+          videoUrl: defaultValues?.videoUrl || '',
+          videoPosterUrl: defaultValues?.videoPosterUrl || '',
+          videoEnabled: defaultValues?.videoEnabled ?? false,
+          videos: defaultValues?.videos || [],
+          videosTitle: defaultValues?.videosTitle || 'Multimedia Showcase',
+          videosDescription: defaultValues?.videosDescription || 'Cinematic product insights & social proof',
+          descriptionTitle: defaultValues?.descriptionTitle || 'Product Story',
+          descriptionIcon: defaultValues?.descriptionIcon || 'BookOpen',
+          description: defaultValues?.description ?? '',
+          expiryDate: convertToDateSafely(defaultValues?.expiryDate),
+          isVisibleInPOS: defaultValues?.isVisibleInPOS ?? true,
+          isVisibleOnWeb: defaultValues?.isVisibleOnWeb ?? true,
+          isNewArrival: defaultValues?.isNewArrival ?? false,
+          isPopular: defaultValues?.isPopular ?? false,
+          isOldStock: defaultValues?.isOldStock ?? false,
+          showProductInsight: defaultValues?.showProductInsight ?? false,
+          isOfficialBrand: defaultValues?.isOfficialBrand ?? false,
+          allowPriceModification: defaultValues?.allowPriceModification ?? true,
+          isPromo: !!defaultValues?.promo,
+          promoType: defaultValues?.promo?.type ?? 'percentage',
+          promoValue: defaultValues?.promo?.value ?? 0,
+          promoStartDate: convertToDateSafely(defaultValues?.promo?.startDate),
+          promoEndDate: convertToDateSafely(defaultValues?.promo?.endDate),
+          specificationsTitle: defaultValues?.specificationsTitle || 'Key Features & Specifications',
+          specifications: defaultValues?.specifications || [],
+          whatsInTheBoxTitle: defaultValues?.whatsInTheBoxTitle || 'What’s In The Box',
+          whatsInTheBox: defaultValues?.whatsInTheBox || [],
+          variationsTitle: defaultValues?.variationsTitle || 'Variations Available',
+          variations: defaultValues?.variations || [],
+          sizeGuideImageUrl: defaultValues?.sizeGuideImageUrl || '',
+          badge1Enabled: defaultValues?.badge1Enabled ?? true,
+          badge1Icon: defaultValues?.badge1Icon || 'Truck',
+          badge1Title: defaultValues?.badge1Title || 'Free Express',
+          badge1Sub: defaultValues?.badge1Sub || 'Fulfillment',
+          badge2Enabled: defaultValues?.badge2Enabled ?? true,
+          badge2Icon: defaultValues?.badge2Icon || 'ShieldCheck',
+          badge2Title: defaultValues?.badge2Title || '2-Year Warranty',
+          badge2Sub: defaultValues?.badge2Sub || 'Protection',
+          showTechnicalSpecs: defaultValues?.showTechnicalSpecs ?? true,
+          showLogisticsInfo: defaultValues?.showLogisticsInfo ?? true,
+          showVerifiedReviews: defaultValues?.showVerifiedReviews ?? true,
+          rewardAdsEnabled: defaultValues?.rewardAdsEnabled ?? false,
+        });
+        setHasInitialReset(true);
+        lastResetId.current = currentId;
+      }
     }
-  }, [defaultValues, categories, form]);
+  }, [defaultValues, categories, form, hasInitialReset]);
 
   const filteredCategories = useMemo(() => {
     return (categories || []).filter(c => c.name.toLowerCase().includes(categorySearchTerm.toLowerCase()));
