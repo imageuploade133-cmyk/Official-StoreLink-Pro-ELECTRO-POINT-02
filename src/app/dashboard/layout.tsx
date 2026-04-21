@@ -53,7 +53,8 @@ import {
   FileCog,
   Coins,
   ZoomIn,
-  Palette
+  Palette,
+  Image as ImageIcon
 } from 'lucide-react';
 import { PageSpinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
@@ -160,6 +161,7 @@ export default function DashboardLayout({
     { href: '/dashboard/shopping-experience-settings', icon: CreditCard, label: 'Checkout & Redirection', perm: 'manage_settings' },
     { heading: 'Inventory' },
     { href: '/dashboard/inventory', icon: Package, label: 'Inventory', perm: 'view_inventory' },
+    { href: '/dashboard/media-library', icon: ImageIcon, label: 'Media Library', perm: 'view_inventory' },
     { href: '/dashboard/categories', icon: FolderTree, label: 'Categories', perm: 'view_categories' },
     { href: '/dashboard/stock-audit', icon: ClipboardList, label: 'Stock Audit Log', perm: 'view_stock_audit' },
     { href: '/dashboard/stock-alerts', icon: AlertTriangle, label: 'View Stock Alerts', perm: 'view_stock_alerts' },
