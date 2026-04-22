@@ -144,6 +144,15 @@ export interface EmailAlertSettings {
   updatedAt: Timestamp;
 }
 
+export interface WhatsAppAlertSettings {
+  enabled: boolean;
+  username: string;
+  apiKey: string;
+  senderNumber?: string;
+  connected: boolean;
+  updatedAt: Timestamp;
+}
+
 export interface Settings {
   id: string; // 'global'
   theme?: 'light' | 'dark' | 'system';

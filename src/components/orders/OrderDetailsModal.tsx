@@ -24,6 +24,7 @@ import {
   Package, 
   Mail, 
   Phone, 
+  MessageSquare,
   Calendar,
   Landmark,
   CheckCircle2,
@@ -39,6 +40,8 @@ import { formatCurrency } from '@/lib/formatUtils';
 import { convertToDateSafely, cn } from '@/lib/utils';
 import type { Order, Product, OrderStatus } from '@/lib/types';
 import { useSettings } from '@/contexts/settings-context';
+import { updateOrderStatusAction, sendOrderEmailsAction, sendWhatsAppOrderAlertAction } from '@/app/actions/orders';
+import { useToast } from '@/hooks/use-toast';
 
 interface OrderDetailsModalProps {
   isOpen: boolean;
@@ -57,6 +60,7 @@ export function OrderDetailsModal({
   productMap,
   onUpdateStatus
 }: OrderDetailsModalProps) {
+  const { toast } = useToast();
   const { settings } = useSettings();
   const [isPrinting, setIsPrinting] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState<OrderStatus | null>(null);
@@ -160,6 +164,19 @@ export function OrderDetailsModal({
     };
   };
 
+    const handleResendWhatsApp = async () => {
+      try {
+        const result = await sendWhatsAppOrderAlertAction(order.id, order.store_id || 'global');
+        if (result.success) {
+          toast({ title: "WhatsApp Sent", description: "Order alert has been resent successfully." });
+        } else {
+          throw new Error(result.error);
+        }
+      } catch (error: any) {
+        toast({ variant: 'destructive', title: "Failed to send WhatsApp", description: error.message });
+      }
+    };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl h-[90vh] flex flex-col p-0 overflow-hidden">
@@ -255,8 +272,21 @@ export function OrderDetailsModal({
                         <Mail className="h-3 w-3" /> {order.guestInfo?.email || 'Account-based'}
                       </div>
                       {order.guestInfo?.phone && (
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                          <Phone className="h-3 w-3" /> {order.guestInfo.phone}
+                        <div className="flex items-center justify-between mt-1">
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <Phone className="h-3 w-3" /> {order.guestInfo.phone}
+                          </div>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-6 px-2 text-[10px] text-[#25D366] hover:text-[#128C7E] hover:bg-[#25D366]/10 gap-1 font-bold"
+                            onClick={() => {
+                              const phone = order.guestInfo.phone.replace(/\D/g, '');
+                              window.open(`https://wa.me/${phone.startsWith('0') ? '234' + phone.substring(1) : phone}`, '_blank');
+                            }}
+                          >
+                            <MessageSquare className="h-3 w-3" /> Chat on WhatsApp
+                          </Button>
                         </div>
                       )}
                     </div>
@@ -490,6 +520,15 @@ export function OrderDetailsModal({
             }
           </div>
           <div className="flex items-center gap-2">
+            <Button 
+                variant="outline" 
+                onClick={handleResendWhatsApp} 
+                disabled={isPrinting || !!updatingStatus}
+                className="h-9 px-4 font-bold border-[#25D366] text-[#25D366] hover:bg-[#25D366]/5"
+            >
+                <MessageSquare className="mr-2 h-4 w-4" />
+                Resend Alert
+            </Button>
             <Button 
                 variant="outline" 
                 onClick={handlePrint} 

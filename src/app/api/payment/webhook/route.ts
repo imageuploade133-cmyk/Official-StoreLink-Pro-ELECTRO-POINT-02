@@ -4,6 +4,11 @@ import { Timestamp } from 'firebase-admin/firestore';
 import { decrypt } from '@/lib/encryption';
 import crypto from 'crypto';
 import { Transaction } from '@/lib/types';
+import { 
+  getWhatsAppSettings, 
+  sendWhatsAppViaEBulkSMS, 
+  logWhatsAppMessage 
+} from '@/lib/whatsapp-ebulk';
 
 export async function POST(request: Request) {
   try {
@@ -169,6 +174,34 @@ async function processSuccessfulTransaction(reference: string, metadata?: any) {
             isPaid: true,
             updatedAt: Timestamp.now(),
           });
+
+          // Trigger WhatsApp notification for payment confirmed
+          getWhatsAppSettings(transactionData?.storeId || metadata?.storeId || 'global').then(async (settings) => {
+            if (settings && settings.enabled && settings.senderNumber) {
+              const orderSnap = await orderRef.get();
+              const orderData = orderSnap.data();
+              const customerName = orderData?.guestInfo?.name || 'Customer';
+              const shortOrderId = orderId.substring(0, 8).toUpperCase();
+              const amount = orderData?.totalAmount || 0;
+              
+              const message = `Hello Admin,\nPayment CONFIRMED for Order #${shortOrderId}.\n\nCustomer: ${customerName}\nAmount: ₦${amount.toLocaleString()}\nStatus: processing\n\nYou can now begin processing this order.`;
+              
+              const result = await sendWhatsAppViaEBulkSMS(settings.username, settings.apiKey, [settings.senderNumber], 'Payment Confirmed Alert', message);
+              
+              await logWhatsAppMessage({
+                eventType: 'staff_order_alert',
+                messageContent: message,
+                recipientPhone: settings.senderNumber,
+                customerName: customerName,
+                status: result?.response?.status === 'SUCCESS' ? 'sent' : 'failed',
+                unitsCharged: 1,
+                userId: 'system-webhook',
+                userName: 'Payment Webhook',
+                storeId: transactionData?.storeId || metadata?.storeId || 'global',
+                errorDetails: result?.response?.status !== 'SUCCESS' ? result?.response?.statusdetail : null
+              });
+            }
+          }).catch(err => console.error('Error sending WhatsApp payment alert:', err));
         }
       }
     });

@@ -1,83 +1,57 @@
 import { NextResponse } from 'next/server';
-import { initializeFirebase } from '@/firebase/init';
-import { doc, getDoc } from 'firebase/firestore';
-import type { AppSettings } from '@/lib/types';
-
+import { adminDb } from '@/lib/firebase-admin';
+import { getWhatsAppSettings, sendWhatsAppViaEBulkSMS } from '@/lib/whatsapp-ebulk';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { recipients, message } = body;
+    const { recipients, message, storeId } = body;
 
     // Input validation
     if (!Array.isArray(recipients) || recipients.length === 0) {
-      return new NextResponse(
-        JSON.stringify({ error: 'Recipients must be a non-empty array' }),
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Recipients must be a non-empty array' }, { status: 400 });
     }
     if (typeof message !== 'string' || message.trim() === '') {
-      return new NextResponse(
-        JSON.stringify({ error: 'Message must be a non-empty string' }),
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Message must be a non-empty string' }, { status: 400 });
     }
 
-    // Fetch credentials from Firestore
-    const { firestore } = initializeFirebase();
-    const settingsRef = doc(firestore, 'settings', 'global');
-    const settingsSnap = await getDoc(settingsRef);
-
-    if (!settingsSnap.exists()) {
-        return new NextResponse(JSON.stringify({ error: 'Global settings not found.' }), { status: 500 });
-    }
-    const settings = settingsSnap.data() as AppSettings;
-    const { eBulkUsername, eBulkApiKey } = settings;
+    // Fetch credentials
+    let settings = await getWhatsAppSettings(storeId || 'global') as any;
     
-    if (!eBulkUsername || !eBulkApiKey) {
-      return new NextResponse(
-        JSON.stringify({ error: 'eBulkSMS credentials are not configured in settings.' }),
-        { status: 500 }
-      );
+    if (!settings || !settings.username || !settings.apiKey) {
+      // Fallback to legacy AppSettings if not found in whatsappAlerts
+      const settingsRef = storeId && storeId !== 'global' 
+        ? adminDb.collection('stores').doc(storeId).collection('settings').doc('config')
+        : adminDb.collection('settings').doc('global');
+      
+      const settingsSnap = await settingsRef.get();
+      const legacyData = settingsSnap.data();
+      
+      if (!legacyData?.eBulkUsername || !legacyData?.eBulkApiKey) {
+        return NextResponse.json({ error: 'WhatsApp credentials are not configured.' }, { status: 500 });
+      }
+
+      if (!settings) settings = {};
+      settings.username = legacyData.eBulkUsername;
+      settings.apiKey = legacyData.eBulkApiKey;
     }
 
-    const payload = {
-      WA: {
-        auth: {
-          username: eBulkUsername,
-          apikey: eBulkApiKey,
-        },
-        message: {
-          subject: "POS Notification",
-          messagetext: message,
-        },
-        recipients: {
-            msisdn: recipients,
-        },
-      },
-    };
+    const responseData = await sendWhatsAppViaEBulkSMS(
+        settings.username,
+        settings.apiKey,
+        recipients,
+        "POS Notification",
+        message
+    );
 
-    const apiResponse = await fetch('https://api.ebulksms.com/sendwhatsapp.json', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
-    
-    const responseData = await apiResponse.json();
-
-    if (!apiResponse.ok || responseData?.response?.status !== 'SUCCESS') {
-        return new NextResponse(
-            JSON.stringify({ 
-                error: 'Failed to send WhatsApp message',
-                details: responseData?.response?.statusdetail || 'Unknown API error'
-            }),
-            { status: apiResponse.status || 500 }
-        );
+    if (responseData?.response?.status !== 'SUCCESS') {
+        return NextResponse.json({ 
+            error: 'Failed to send WhatsApp message',
+            details: responseData?.response?.statusdetail || 'Unknown API error'
+        }, { status: 500 });
     }
     
-    return new NextResponse(JSON.stringify(responseData), { status: 200 });
+    return NextResponse.json(responseData, { status: 200 });
 
   } catch (error: any) {
     console.error('Error in /api/send-whatsapp:', error);

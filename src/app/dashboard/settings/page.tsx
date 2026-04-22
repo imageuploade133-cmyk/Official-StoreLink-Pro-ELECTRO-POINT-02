@@ -12,6 +12,7 @@ import { PosReceiptSettings } from './components/PosReceiptSettings';
 import { InventoryStockSettings } from './components/InventoryStockSettings';
 import { MessagingSettings } from './components/MessagingSettings';
 import { OrderAlertSettings } from './components/OrderAlertSettings';
+import { WhatsAppAlertSettings } from './components/WhatsAppAlertSettings';
 import { useAuth } from '@/contexts/auth-context';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -156,7 +157,12 @@ export default function SettingsPage() {
         )}
         {visibleSections.inventory && <InventoryStockSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />}
         {visibleSections.messaging && <MessagingSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />}
-        {visibleSections.orderAlerts && <OrderAlertSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />}
+        {visibleSections.orderAlerts && (
+          <div className="space-y-6">
+            <OrderAlertSettings storeId={currentStoreId} />
+            <WhatsAppAlertSettings storeId={currentStoreId} />
+          </div>
+        )}
         
         {noResultsFound && (
           <Card>
