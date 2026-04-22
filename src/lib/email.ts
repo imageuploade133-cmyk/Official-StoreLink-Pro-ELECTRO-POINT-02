@@ -3,7 +3,7 @@ import { adminDb } from './firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 
 export async function sendOrderNotifications(order: any, settings: any, storeName: string, emailAlertSettings?: any) {
-    const { id: orderId, guestInfo, user_id, totalAmount, paymentStatus, items, deliveryPrice } = order;
+    const { id: orderId, guestInfo, user_id, totalAmount, paymentStatus, items, deliveryPrice, paymentMethod } = order;
     
     const customerEmail = guestInfo?.email || (await getCustomerEmail(user_id));
     const customerName = guestInfo?.name || (await getCustomerName(user_id));
@@ -37,6 +37,7 @@ export async function sendOrderNotifications(order: any, settings: any, storeNam
         orderId,
         customerName: customerName || 'Valued Customer',
         paymentStatus: paymentStatus || 'UNPAID',
+        paymentMethod: paymentMethod || 'N/A',
         paymentStatusLower: (paymentStatus || 'UNPAID').toLowerCase(),
         date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
         itemsHtml,
@@ -203,6 +204,10 @@ function generateTemplate(data: any, type: 'confirmation' | 'notification') {
                     <tr>
                         <td style="padding: 4px 0; color: #64748b; font-size: 14px;">Date</td>
                         <td style="padding: 4px 0; text-align: right; font-weight: 600;">${data.date}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 4px 0; color: #64748b; font-size: 14px;">Payment Method</td>
+                        <td style="padding: 4px 0; text-align: right; font-weight: 600;">${data.paymentMethod}</td>
                     </tr>
                     <tr>
                         <td style="padding: 4px 0; color: #64748b; font-size: 14px;">Payment Status</td>

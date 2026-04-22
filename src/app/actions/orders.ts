@@ -237,7 +237,8 @@ export async function updateOrderStatusAction(orderId: string, storeId: string, 
                 customerName,
                 amount,
                 currency,
-                status: newStatus
+                status: newStatus,
+                paymentMethod: orderData?.paymentMethod || 'N/A'
             };
             
             if (newStatus === 'processing') {
@@ -395,6 +396,7 @@ export async function sendTestOrderEmailAction(emails: string[], storeId: string
             totalAmount: 150.00,
             deliveryPrice: 10.00,
             paymentStatus: 'PAID',
+            paymentMethod: 'Test Payment',
             items: [
                 { productName: 'Sample Product 1', quantity: 2, price: 50.00 },
                 { productName: 'Sample Product 2', quantity: 1, price: 40.00 },
@@ -491,14 +493,15 @@ export async function validateEBulkSMSAction(username: string, apiKey: string) {
     }
 }
 
-function formatWhatsAppMessage(template: string, data: { orderId: string, customerName: string, amount: string, currency: string, status: string, itemsDetails: string }) {
+function formatWhatsAppMessage(template: string, data: { orderId: string, customerName: string, amount: string, currency: string, status: string, itemsDetails?: string, paymentMethod?: string }) {
     return template
         .replace(/{orderId}/g, data.orderId)
         .replace(/{customerName}/g, data.customerName)
         .replace(/{amount}/g, data.amount)
         .replace(/{currency}/g, data.currency)
         .replace(/{status}/g, data.status)
-        .replace(/{itemsDetails}/g, data.itemsDetails);
+        .replace(/{itemsDetails}/g, data.itemsDetails || '')
+        .replace(/{paymentMethod}/g, data.paymentMethod || '');
 }
 
 function formatOrderItemsForWhatsApp(items: any[], currency: string) {
@@ -521,6 +524,7 @@ export async function sendWhatsAppOrderAlert(order: any, settings: WhatsAppAlert
     const amount = order.totalAmount.toLocaleString();
     const orderId = order.id.substring(0, 8).toUpperCase();
     const itemsDetails = formatOrderItemsForWhatsApp(order.items, currency);
+    const paymentMethod = order.paymentMethod || 'N/A';
     
     // 1. Send to Admin
     if (settings.senderNumber) {
@@ -532,10 +536,11 @@ export async function sendWhatsAppOrderAlert(order: any, settings: WhatsAppAlert
                 amount,
                 currency,
                 status: order.status,
-                itemsDetails
+                itemsDetails,
+                paymentMethod
             });
         } else {
-            adminMessage = `Hello Admin,\nYou received a new order.\n\nOrder ID: #${orderId}\nCustomer: ${customerName}\nAmount: ${currency}${amount}\nStatus: ${order.status}\n\nItems:\n${itemsDetails}\n\nLogin to dashboard now.`;
+            adminMessage = `Hello Admin,\nYou received a new order.\n\nOrder ID: #${orderId}\nCustomer: ${customerName}\nAmount: ${currency}${amount}\nPayment Method: ${paymentMethod}\nStatus: ${order.status}\n\nItems:\n${itemsDetails}\n\nLogin to dashboard now.`;
         }
 
         try {
@@ -575,7 +580,7 @@ export async function sendWhatsAppOrderAlert(order: any, settings: WhatsAppAlert
             extraMsg = `\n\n*Payment Instructions:*\nPlease transfer ${currency}${amount} to:\nBank: ${order.selectedBankAccount.bankName}\nAccount: ${order.selectedBankAccount.accountNumber}\nName: ${order.selectedBankAccount.accountName}\nRef: ${order.paymentReference}\n`;
         }
 
-        const customerMessage = `Hello ${customerName},\nYour order #${orderId} at ${order.storeName || 'our store'} has been placed successfully!\n\nOrder Details:\n${itemsDetails}\n\nTotal: ${currency}${amount}\nStatus: ${order.status}${extraMsg}\n\nThank you for shopping with us!`;
+        const customerMessage = `Hello ${customerName},\nYour order #${orderId} at ${order.storeName || 'our store'} has been placed successfully!\n\nOrder Details:\n${itemsDetails}\n\nTotal: ${currency}${amount}\nPayment Method: ${paymentMethod}\nStatus: ${order.status}${extraMsg}\n\nThank you for shopping with us!`;
 
         try {
             const result = await sendWhatsAppViaEBulkSMS(
