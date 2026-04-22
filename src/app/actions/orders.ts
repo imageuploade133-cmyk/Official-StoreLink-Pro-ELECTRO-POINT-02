@@ -237,17 +237,20 @@ export async function updateOrderStatusAction(orderId: string, storeId: string, 
                     `Order Status Updated: ${newStatus}`,
                     message
                 ).then(result => {
+                    const status = result?.response?.status || result?.status;
+                    const statusdetail = result?.response?.statusdetail || result?.statusdetail;
+                    
                     logWhatsAppMessage({
                         eventType: 'staff_order_alert',
                         messageContent: message,
                         recipientPhone: whatsappAlertSettings.senderNumber,
                         customerName: customerName,
-                        status: result?.response?.status === 'SUCCESS' ? 'sent' : 'failed',
+                        status: status === 'SUCCESS' ? 'sent' : 'failed',
                         unitsCharged: 1,
                         userId: staffId,
                         userName: staffName,
                         storeId: storeId,
-                        errorDetails: result?.response?.status !== 'SUCCESS' ? result?.response?.statusdetail : null
+                        errorDetails: status !== 'SUCCESS' ? statusdetail : null
                     });
                 }).catch(err => console.error('Error sending status WhatsApp:', err));
             }
@@ -435,12 +438,14 @@ export async function saveWhatsAppAlertSettingsAction(storeId: string, settings:
 export async function validateEBulkSMSAction(username: string, apiKey: string) {
     try {
         const result = await sendWhatsAppViaEBulkSMS(username, apiKey, ['2348000000000'], 'Validation', 'Connection Test');
+        const status = result?.response?.status || result?.status;
+        const statusdetail = result?.response?.statusdetail || result?.statusdetail;
         
-        if (result?.response?.status === 'SUCCESS' || result?.response?.statusdetail?.includes('INSUFFICIENT_CREDIT')) {
+        if (status === 'SUCCESS' || statusdetail?.includes('INSUFFICIENT_CREDIT')) {
             return { success: true };
         }
         
-        return { success: false, error: result?.response?.statusdetail || 'Authentication failed' };
+        return { success: false, error: statusdetail || 'Authentication failed' };
     } catch (error: any) {
         return { success: false, error: error.message };
     }
@@ -457,11 +462,16 @@ export async function sendTestWhatsAppAction(storeId: string, settings: any) {
         }
         
         const message = `Test Message from ${storeName}.\n\nYour WhatsApp Alert system is now fully functional!`;
-        const recipient = settings.senderNumber || '2348000000000';
+        const recipient = settings.senderNumber;
+        if (!recipient) {
+            throw new Error('Please enter a "Sender WhatsApp Number" to receive the test message.');
+        }
         
         const result = await sendWhatsAppViaEBulkSMS(settings.username, settings.apiKey, [recipient], 'Test Alert', message);
+        const status = result?.response?.status || result?.status;
+        const statusdetail = result?.response?.statusdetail || result?.statusdetail;
         
-        if (result?.response?.status === 'SUCCESS') {
+        if (status === 'SUCCESS') {
             await logWhatsAppMessage({
                 eventType: 'custom_message',
                 messageContent: message,
@@ -475,7 +485,7 @@ export async function sendTestWhatsAppAction(storeId: string, settings: any) {
             return { success: true };
         }
         
-        throw new Error(result?.response?.statusdetail || 'Failed to send WhatsApp');
+        throw new Error(statusdetail || 'Failed to send WhatsApp');
     } catch (error: any) {
         return { success: false, error: error.message };
     }
@@ -495,18 +505,20 @@ export async function sendWhatsAppOrderAlert(order: any, settings: WhatsAppAlert
 
     try {
         const result = await sendWhatsAppViaEBulkSMS(settings.username, settings.apiKey, recipients, 'New Order Alert', message);
+        const status = result?.response?.status || result?.status;
+        const statusdetail = result?.response?.statusdetail || result?.statusdetail;
         
         await logWhatsAppMessage({
             eventType: 'order_placed',
             messageContent: message,
             recipientPhone: recipients.join(', '),
             customerName: customerName,
-            status: result?.response?.status === 'SUCCESS' ? 'sent' : 'failed',
+            status: status === 'SUCCESS' ? 'sent' : 'failed',
             unitsCharged: 1,
             userId: 'system',
             userName: 'Order System',
             storeId: order.store_id || 'global',
-            errorDetails: result?.response?.status !== 'SUCCESS' ? result?.response?.statusdetail : null,
+            errorDetails: status !== 'SUCCESS' ? statusdetail : null,
             apiResponse: JSON.stringify(result)
         });
     } catch (error: any) {

@@ -27,19 +27,29 @@ export async function logWhatsAppMessage(logData: any) {
 }
 
 export async function sendWhatsAppViaEBulkSMS(username: string, apiKey: string, recipients: string[], subject: string, message: string, retries = 2) {
+    // Decrypt API Key if it's encrypted
+    let clearApiKey = apiKey;
+    if (apiKey && apiKey.includes(':')) {
+        try {
+            clearApiKey = decrypt(apiKey);
+        } catch (e) {
+            console.error('Failed to decrypt API key in sendWhatsAppViaEBulkSMS:', e);
+        }
+    }
+
     const payload = {
         WA: {
             auth: {
                 username,
-                apikey: apiKey,
+                apikey: clearApiKey,
             },
             message: {
                 subject,
                 messagetext: message,
             },
-            recipients: {
-                msisdn: recipients.map(formatNigerianPhoneNumber),
-            },
+            recipients: recipients.map(r => ({
+                msisdn: formatNigerianPhoneNumber(r)
+            })),
         },
     };
 
@@ -51,17 +61,19 @@ export async function sendWhatsAppViaEBulkSMS(username: string, apiKey: string, 
         });
 
         const data = await response.json();
+        const status = data?.response?.status || data?.status;
+        const statusdetail = data?.response?.statusdetail || data?.statusdetail;
         
-        if (data?.response?.status !== 'SUCCESS' && retries > 0) {
-            console.log(`WhatsApp send failed, retrying... (${retries} left)`);
-            return await sendWhatsAppViaEBulkSMS(username, apiKey, recipients, subject, message, retries - 1);
+        if (status !== 'SUCCESS' && retries > 0) {
+            console.log(`WhatsApp send failed (${statusdetail}), retrying... (${retries} left)`);
+            return await sendWhatsAppViaEBulkSMS(username, clearApiKey, recipients, subject, message, retries - 1);
         }
         
         return data;
     } catch (error) {
         if (retries > 0) {
             console.log(`WhatsApp send error, retrying... (${retries} left)`);
-            return await sendWhatsAppViaEBulkSMS(username, apiKey, recipients, subject, message, retries - 1);
+            return await sendWhatsAppViaEBulkSMS(username, clearApiKey, recipients, subject, message, retries - 1);
         }
         throw error;
     }
