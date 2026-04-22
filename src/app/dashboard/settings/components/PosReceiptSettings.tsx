@@ -16,7 +16,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { ReceiptModal } from "@/components/dialogs/receipt-modal";
 import { Skeleton } from '@/components/ui/skeleton';
 import { Loader2, Receipt, Palette } from 'lucide-react';
@@ -175,10 +174,16 @@ export function PosReceiptSettings({ settingsData, isLoading, storeId }: PosRece
               {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
               Save POS Settings
             </Button>
-            <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-              <DialogTrigger asChild><Button variant="outline">Preview Thermal Receipt</Button></DialogTrigger>
-              {isPreviewOpen && mockSaleTransaction && <ReceiptModal isOpen={isPreviewOpen} onClose={() => setIsPreviewOpen(false)} saleTransaction={mockSaleTransaction} />}
-            </Dialog>
+            <Button variant="outline" type="button" onClick={() => setIsPreviewOpen(true)}>
+              Preview Thermal Receipt
+            </Button>
+            {isPreviewOpen && mockSaleTransaction && (
+              <ReceiptModal 
+                isOpen={isPreviewOpen} 
+                onClose={() => setIsPreviewOpen(false)} 
+                saleTransaction={mockSaleTransaction} 
+              />
+            )}
           </CardFooter>
         </form>
       </Form>
