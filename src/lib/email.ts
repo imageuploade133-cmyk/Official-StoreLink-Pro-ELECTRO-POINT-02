@@ -18,17 +18,17 @@ export async function sendOrderNotifications(order: any, settings: any, storeNam
     for (const item of items) {
         itemsHtml += `
             <tr>
-                <td style="padding: 12px; border-bottom: 1px solid #f1f5f9;">${item.productName || 'Product'}</td>
-                <td style="padding: 12px; border-bottom: 1px solid #f1f5f9;">${item.quantity}</td>
-                <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; text-align: right;">${settings.currency || '$'}${item.price.toFixed(2)}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; font-weight: bold;">${item.productName || 'Product'}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; font-weight: bold;">${item.quantity}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; text-align: right; font-weight: bold;">${settings.currency || '$'}${item.price.toFixed(2)}</td>
             </tr>
         `;
     }
 
     const shippingHtml = (deliveryPrice && deliveryPrice > 0) ? `
         <tr>
-            <td colspan="2" style="padding: 10px; text-align: right; color: #64748b;">Shipping</td>
-            <td style="padding: 10px; text-align: right;">${settings.currency || '$'}${deliveryPrice.toFixed(2)}</td>
+            <td colspan="2" style="padding: 10px; text-align: right; color: #0f172a; font-weight: bold;">Delivery Fee</td>
+            <td style="padding: 10px; text-align: right; font-weight: bold;">${settings.currency || '$'}${deliveryPrice.toFixed(2)}</td>
         </tr>
     ` : '';
 
@@ -49,7 +49,7 @@ export async function sendOrderNotifications(order: any, settings: any, storeNam
         paymentStatusLower: (paymentStatus || 'UNPAID').toLowerCase(),
         date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
         itemsHtml,
-        subtotal: `${settings.currency || '$'}${subtotal}`,
+        productFee: `${settings.currency || '$'}${subtotal}`,
         shippingHtml,
         total: `${settings.currency || '$'}${totalAmount.toFixed(2)}`,
         deliveryAddress: deliveryDetails,
@@ -194,7 +194,7 @@ function generateTemplate(data: any, type: 'confirmation' | 'notification') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title}</title>
 </head>
-<body style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1e293b; margin: 0; padding: 0; background-color: #f8fafc;">
+<body style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1e293b; margin: 0; padding: 0; background-color: #f8fafc; font-weight: bold;">
     <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);">
         <div style="background-color: #2563eb; padding: 40px 20px; text-align: center;">
             <div style="font-size: 28px; font-weight: 800; color: #ffffff; letter-spacing: -0.025em;">StoreLink Pro</div>
@@ -206,21 +206,21 @@ function generateTemplate(data: any, type: 'confirmation' | 'notification') {
             <div style="background-color: #f1f5f9; padding: 25px; border-radius: 16px; margin: 30px 0; border: 1px solid #e2e8f0;">
                 <table style="width: 100%; border-collapse: collapse;">
                     <tr>
-                        <td style="padding: 4px 0; color: #64748b; font-size: 14px;">Order ID</td>
-                        <td style="padding: 4px 0; text-align: right; font-weight: 600;">#${data.orderId}</td>
+                        <td style="padding: 4px 0; color: #64748b; font-size: 14px; font-weight: bold;">Order ID</td>
+                        <td style="padding: 4px 0; text-align: right; font-weight: bold;">#${data.orderId}</td>
                     </tr>
                     <tr>
-                        <td style="padding: 4px 0; color: #64748b; font-size: 14px;">Date</td>
-                        <td style="padding: 4px 0; text-align: right; font-weight: 600;">${data.date}</td>
+                        <td style="padding: 4px 0; color: #64748b; font-size: 14px; font-weight: bold;">Date</td>
+                        <td style="padding: 4px 0; text-align: right; font-weight: bold;">${data.date}</td>
                     </tr>
                     <tr>
-                        <td style="padding: 4px 0; color: #64748b; font-size: 14px;">Payment Method</td>
-                        <td style="padding: 4px 0; text-align: right; font-weight: 600;">${data.paymentMethod}</td>
+                        <td style="padding: 4px 0; color: #64748b; font-size: 14px; font-weight: bold;">Payment Method</td>
+                        <td style="padding: 4px 0; text-align: right; font-weight: bold;">${data.paymentMethod}</td>
                     </tr>
                     <tr>
-                        <td style="padding: 4px 0; color: #64748b; font-size: 14px;">Payment Status</td>
+                        <td style="padding: 4px 0; color: #64748b; font-size: 14px; font-weight: bold;">Payment Status</td>
                         <td style="padding: 4px 0; text-align: right;">
-                            <span style="display: inline-block; padding: 4px 12px; border-radius: 9999px; font-weight: 700; text-transform: uppercase; font-size: 11px; background-color: ${statusColor}; color: ${statusTextColor};">
+                            <span style="display: inline-block; padding: 4px 12px; border-radius: 9999px; font-weight: 800; text-transform: uppercase; font-size: 11px; background-color: ${statusColor}; color: ${statusTextColor};">
                                 ${data.paymentStatus}
                             </span>
                         </td>
@@ -228,13 +228,13 @@ function generateTemplate(data: any, type: 'confirmation' | 'notification') {
                 </table>
             </div>
             
-            <h3 style="color: #0f172a; font-size: 18px; font-weight: 600; margin-bottom: 16px;">Order Items</h3>
+            <h3 style="color: #0f172a; font-size: 18px; font-weight: 800; margin-bottom: 16px;">Order Items</h3>
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
                     <tr>
-                        <th style="text-align: left; padding: 12px; border-bottom: 2px solid #e2e8f0; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Item</th>
-                        <th style="text-align: left; padding: 12px; border-bottom: 2px solid #e2e8f0; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Qty</th>
-                        <th style="text-align: right; padding: 12px; border-bottom: 2px solid #e2e8f0; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Price</th>
+                        <th style="text-align: left; padding: 12px; border-bottom: 2px solid #e2e8f0; color: #0f172a; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: bold;">Item</th>
+                        <th style="text-align: left; padding: 12px; border-bottom: 2px solid #e2e8f0; color: #0f172a; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: bold;">Qty</th>
+                        <th style="text-align: right; padding: 12px; border-bottom: 2px solid #e2e8f0; color: #0f172a; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: bold;">Price</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -242,24 +242,24 @@ function generateTemplate(data: any, type: 'confirmation' | 'notification') {
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="2" style="padding: 20px 10px 5px; text-align: right; color: #64748b; font-size: 14px;">Subtotal</td>
-                        <td style="padding: 20px 10px 5px; text-align: right; font-weight: 600;">${data.subtotal}</td>
+                        <td colspan="2" style="padding: 20px 10px 5px; text-align: right; color: #0f172a; font-size: 14px; font-weight: bold;">Product Fee</td>
+                        <td style="padding: 20px 10px 5px; text-align: right; font-weight: 800;">${data.productFee}</td>
                     </tr>
                     ${data.shippingHtml}
                     <tr>
-                        <td colspan="2" style="padding: 10px; text-align: right; color: #0f172a; font-size: 18px; font-weight: 700;">Total</td>
+                        <td colspan="2" style="padding: 10px; text-align: right; color: #0f172a; font-size: 18px; font-weight: 800;">Total</td>
                         <td style="padding: 10px; text-align: right; color: #2563eb; font-size: 20px; font-weight: 800;">${data.total}</td>
                     </tr>
                 </tfoot>
             </table>
             
-            <h3 style="color: #0f172a; font-size: 18px; font-weight: 600; margin: 40px 0 16px;">Delivery Details</h3>
+            <h3 style="color: #0f172a; font-size: 18px; font-weight: 800; margin: 40px 0 16px;">Delivery Details</h3>
             <div style="background-color: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; border-left: 4px solid #2563eb;">
-                <p style="margin: 0; color: #475569; font-size: 15px; white-space: pre-line;">${data.deliveryAddress}</p>
+                <p style="margin: 0; color: #0f172a; font-size: 15px; white-space: pre-line; font-weight: bold;">${data.deliveryAddress}</p>
             </div>
         </div>
         <div style="background-color: #f1f5f9; padding: 30px; text-align: center;">
-            <p style="margin: 0; color: #94a3b8; font-size: 12px; font-weight: 500;">
+            <p style="margin: 0; color: #94a3b8; font-size: 12px; font-weight: bold;">
                 &copy; ${data.year} StoreLink Pro. Empowering businesses with smart E-Commerce & POS solutions.
             </p>
         </div>

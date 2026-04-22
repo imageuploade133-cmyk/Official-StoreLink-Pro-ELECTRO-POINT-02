@@ -220,7 +220,7 @@ export async function GET(request: Request) {
             const shortOrderId = tData.orderId.substring(0, 8).toUpperCase();
             const amount = orderData?.totalAmount || 0;
             
-            const message = `Hello Admin,\nPayment CONFIRMED for Order #${shortOrderId}.\n\nCustomer: ${customerName}\nAmount: ₦${amount.toLocaleString()}\nStatus: processing\n\nYou can now begin processing this order.`;
+            const message = `*Hello ${orderData?.storeName || 'Admin'},*\n*Payment CONFIRMED for Order #${shortOrderId}.*\n\n*Customer: ${customerName}*\n*Amount: ₦${amount.toLocaleString()}*\n*Status: processing*\n\n*You can now begin processing this order.*`;
             
             const result = await sendWhatsAppViaEBulkSMS(
                 settings.username, 
