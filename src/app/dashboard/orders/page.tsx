@@ -9,6 +9,7 @@ import {
   orderBy, 
   doc, 
   updateDoc, 
+  onSnapshot,
   getDocs, 
   limit, 
   startAfter, 
@@ -110,6 +111,14 @@ export default function WebsiteOrdersPage() {
   const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLastPage, setIsLastPage] = useState(false);
+  const unsubscribeRef = React.useRef<(() => void) | null>(null);
+
+  // Cleanup subscription on unmount
+  useEffect(() => {
+    return () => {
+      if (unsubscribeRef.current) unsubscribeRef.current();
+    };
+  }, []);
 
   const fetchAnalytics = useCallback(async () => {
     if (!firestore || !currentStoreId) return;
@@ -165,8 +174,15 @@ export default function WebsiteOrdersPage() {
     }
   }, [firestore, currentStoreId]);
 
-  const fetchOrders = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
+  const fetchOrders = useCallback((direction: 'initial' | 'next' | 'prev' = 'initial') => {
     if (!firestore || !currentStoreId) return;
+
+    // Clear previous listener if any
+    if (unsubscribeRef.current) {
+      unsubscribeRef.current();
+      unsubscribeRef.current = null;
+    }
+
     setIsLoadingOrders(true);
 
     try {
@@ -191,35 +207,43 @@ export default function WebsiteOrdersPage() {
       }
 
       const q = query(collection(firestore, 'orders'), ...constraints);
-      const snapshot = await getDocs(q);
-      const docs = snapshot.docs;
+      
+      const unsub = onSnapshot(q, (snapshot) => {
+        const docs = snapshot.docs;
 
-      if (docs.length > 0) {
-        setFirstDoc(docs[0]);
-        setLastDoc(docs[docs.length - 1]);
-        setIsLastPage(docs.length < ITEMS_PER_PAGE);
+        if (docs.length > 0) {
+          setFirstDoc(docs[0]);
+          setLastDoc(docs[docs.length - 1]);
+          setIsLastPage(docs.length < ITEMS_PER_PAGE);
 
-        const ordersData = docs.map(d => ({
-          id: d.id,
-          ...d.data()
-        } as Order));
+          const ordersData = docs.map(d => ({
+            id: d.id,
+            ...d.data()
+          } as Order));
 
-        setOrders(ordersData);
-        if (direction === 'next') setCurrentPage(p => p + 1);
-        else if (direction === 'prev') setCurrentPage(p => Math.max(1, p - 1));
-        else setCurrentPage(1);
-      } else {
-        if (direction === 'initial') {
-          setOrders([]);
-          setIsLastPage(true);
-        } else if (direction === 'next') {
-          setIsLastPage(true);
+          setOrders(ordersData);
+        } else {
+          if (direction === 'initial') {
+            setOrders([]);
+            setIsLastPage(true);
+          } else if (direction === 'next') {
+            setIsLastPage(true);
+          }
         }
-      }
+        setIsLoadingOrders(false);
+      }, (error: any) => {
+        console.error("Error fetching orders:", error);
+        toast({ variant: 'destructive', title: "Fetch Error", description: "Could not load orders." });
+        setIsLoadingOrders(false);
+      });
+
+      unsubscribeRef.current = unsub;
+
+      if (direction === 'next') setCurrentPage(p => p + 1);
+      else if (direction === 'prev') setCurrentPage(p => Math.max(1, p - 1));
+      else setCurrentPage(1);
     } catch (error: any) {
-      console.error("Error fetching orders:", error);
-      toast({ variant: 'destructive', title: "Fetch Error", description: "Could not load orders. Please check if Firestore indexes are created." });
-    } finally {
+      console.error("Error setting up orders listener:", error);
       setIsLoadingOrders(false);
     }
   }, [firestore, currentStoreId, statusFilter, firstDoc, lastDoc, toast]);
@@ -231,6 +255,20 @@ export default function WebsiteOrdersPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthLoading, permissions.manage_orders, statusFilter, currentStoreId]);
+
+  // Sync selectedOrder with orders list for real-time updates in modal
+  useEffect(() => {
+    if (selectedOrder && isDetailsModalOpen) {
+      const updated = orders.find(o => o.id === selectedOrder.id);
+      if (updated && (
+        updated.status !== selectedOrder.status || 
+        updated.paymentStatus !== selectedOrder.paymentStatus ||
+        updated.paymentMethod !== selectedOrder.paymentMethod
+      )) {
+        setSelectedOrder(updated);
+      }
+    }
+  }, [orders, selectedOrder, isDetailsModalOpen]);
 
 
   const productsQuery = useMemo(() => {
@@ -284,6 +322,7 @@ export default function WebsiteOrdersPage() {
 
       toast({ title: "Status Updated", description: `Order #${orderId.substring(0, 8)} is now ${newStatus}.` });
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+      setSelectedOrder(prev => prev?.id === orderId ? { ...prev, status: newStatus } : prev);
       fetchAnalytics();
     } catch (error: any) {
       toast({ variant: 'destructive', title: "Update Failed", description: error.message });
@@ -482,9 +521,9 @@ export default function WebsiteOrdersPage() {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="border-t">
+              <div className="border-t overflow-x-auto">
                 <TooltipProvider>
-                  <Table>
+                  <Table className="min-w-[1000px] xl:min-w-0">
                     <TableHeader>
                       <TableRow className="bg-muted/50">
                         <TableHead className="w-[140px] pl-6">Order ID</TableHead>

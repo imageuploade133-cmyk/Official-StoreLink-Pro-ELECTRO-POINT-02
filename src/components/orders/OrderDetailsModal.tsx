@@ -179,52 +179,52 @@ export function OrderDetailsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl h-[90vh] flex flex-col p-0 overflow-hidden">
-        <DialogHeader className="p-6 pb-4 border-b bg-background sticky top-0 z-10">
-          <div className="flex justify-between items-start">
+      <DialogContent className="max-w-4xl w-[98vw] sm:w-[95vw] md:w-full h-[95vh] sm:h-[90vh] flex flex-col p-0 overflow-hidden rounded-t-2xl sm:rounded-xl">
+        <DialogHeader className="p-4 sm:p-6 pb-4 border-b bg-background sticky top-0 z-50">
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
             <div className="space-y-1 text-left">
-              <DialogTitle className="text-2xl font-bold tracking-tight">Order Details</DialogTitle>
-              <DialogDescription className="font-mono text-xs text-primary uppercase">
+              <DialogTitle className="text-xl sm:text-2xl font-bold tracking-tight">Order Details</DialogTitle>
+              <DialogDescription className="font-mono text-[10px] sm:text-xs text-primary uppercase">
                 ID: #{order.id}
               </DialogDescription>
             </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className={cn(
-                    "text-xs font-bold uppercase",
-                    order.fulfillmentType === 'delivery'
-                      ? "bg-blue-50 text-blue-700 border-blue-200"
-                      : "bg-orange-50 text-orange-700 border-orange-200"
-                  )}>
-                    {order.fulfillmentType === 'delivery' ? <><Truck className="mr-1 h-3 w-3" /> Delivery</> : <><Store className="mr-1 h-3 w-3" /> Pickup</>}
-                  </Badge>
-                  {(() => {
-                    const s = order.paymentStatus || (order.isPaid ? 'PAID' : 'UNPAID');
-                    switch (s) {
-                      case 'PAID':
-                        return <Badge className="bg-green-600 text-white border-transparent uppercase text-[10px] font-bold">PAID</Badge>;
-                      case 'UNPAID':
-                        return <Badge variant="destructive" className="uppercase text-[10px] font-bold">UNPAID</Badge>;
-                      case 'PENDING':
-                        return <Badge className="bg-yellow-500 text-white border-transparent uppercase text-[10px] font-bold">PENDING</Badge>;
-                      case 'REFUNDED':
-                        return <Badge className="bg-gray-500 text-white border-transparent uppercase text-[10px] font-bold">REFUNDED</Badge>;
-                      default:
-                        return <Badge variant="outline" className="uppercase text-[10px] font-bold">{s}</Badge>;
-                    }
-                  })()}
-                  <Badge className={cn(
-                      "text-sm px-3 py-1 capitalize",
-                      order.status === 'delivered' ? "bg-green-100 text-green-700" :
-                      order.status === 'cancelled' ? "bg-red-100 text-red-700" : "bg-primary/10 text-primary"
-                  )}>
-                    {order.status}
-                  </Badge>
-                </div>
+            <div className="flex flex-wrap items-center gap-2 sm:justify-end w-full sm:w-auto">
+              <Badge variant="outline" className={cn(
+                "text-[10px] sm:text-xs font-bold uppercase",
+                order.fulfillmentType === 'delivery'
+                  ? "bg-blue-50 text-blue-700 border-blue-200"
+                  : "bg-orange-50 text-orange-700 border-orange-200"
+              )}>
+                {order.fulfillmentType === 'delivery' ? <><Truck className="mr-1 h-3 w-3" /> Delivery</> : <><Store className="mr-1 h-3 w-3" /> Pickup</>}
+              </Badge>
+              {(() => {
+                const s = order.paymentStatus || (order.isPaid ? 'PAID' : 'UNPAID');
+                switch (s) {
+                  case 'PAID':
+                    return <Badge className="bg-green-600 text-white border-transparent uppercase text-[10px] font-bold">PAID</Badge>;
+                  case 'UNPAID':
+                    return <Badge variant="destructive" className="uppercase text-[10px] font-bold">UNPAID</Badge>;
+                  case 'PENDING':
+                    return <Badge className="bg-yellow-500 text-white border-transparent uppercase text-[10px] font-bold">PENDING</Badge>;
+                  case 'REFUNDED':
+                    return <Badge className="bg-gray-500 text-white border-transparent uppercase text-[10px] font-bold">REFUNDED</Badge>;
+                  default:
+                    return <Badge variant="outline" className="uppercase text-[10px] font-bold">{s}</Badge>;
+                }
+              })()}
+              <Badge className={cn(
+                  "text-xs sm:text-sm px-2 sm:px-3 py-0.5 sm:py-1 capitalize",
+                  order.status === 'delivered' ? "bg-green-100 text-green-700" :
+                  order.status === 'cancelled' ? "bg-red-100 text-red-700" : "bg-primary/10 text-primary"
+              )}>
+                {order.status}
+              </Badge>
+            </div>
           </div>
         </DialogHeader>
 
         <ScrollArea className="flex-1">
-          <div className="p-6 space-y-6">
+          <div className="p-4 sm:p-6 space-y-6">
             
             {/* Urgent Banners */}
             {isAwaitingPayment && (
@@ -357,8 +357,8 @@ export function OrderDetailsModal({
               <h3 className="text-[10px] font-black uppercase text-muted-foreground tracking-[0.2em] flex items-center gap-2">
                 <Package className="h-4 w-4" /> Fulfillment List
               </h3>
-              <div className="border rounded-xl overflow-hidden bg-white shadow-sm">
-                <table className="w-full text-sm">
+              <div className="border rounded-xl overflow-x-auto bg-white shadow-sm min-w-full">
+                <table className="w-full text-sm min-w-[600px] sm:min-w-0">
                   <thead className="bg-muted/50 border-b">
                     <tr>
                       <th className="px-4 py-3 text-left font-black uppercase text-[10px] text-slate-500 tracking-widest">Product</th>
@@ -500,8 +500,8 @@ export function OrderDetailsModal({
             </div>
         </div>
 
-        <DialogFooter className="p-6 border-t flex flex-col sm:flex-row justify-between items-center gap-4 bg-background shadow-lg">
-          <div className="flex flex-wrap items-center gap-2">
+        <DialogFooter className="p-4 sm:p-6 border-t flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 bg-background shadow-lg">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
             {statusActions
               .filter(action => action.status !== order.status)
               .map((action) => (
@@ -511,7 +511,7 @@ export function OrderDetailsModal({
                   size="sm"
                   onClick={() => handleUpdateStatusInternal(action.status)}
                   disabled={!!updatingStatus || isPrinting}
-                  className="text-xs h-9 px-4 font-bold"
+                  className="text-[10px] sm:text-xs h-9 px-3 sm:px-4 font-bold flex-1 sm:flex-none"
                 >
                   {updatingStatus === action.status && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
                   {action.label}
@@ -519,27 +519,27 @@ export function OrderDetailsModal({
               ))
             }
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2">
             <Button 
                 variant="outline" 
                 onClick={handleResendWhatsApp} 
                 disabled={isPrinting || !!updatingStatus}
-                className="h-9 px-4 font-bold border-[#25D366] text-[#25D366] hover:bg-[#25D366]/5"
+                className="h-9 px-3 sm:px-4 font-bold border-[#25D366] text-[#25D366] hover:bg-[#25D366]/5 text-[10px] sm:text-xs flex-1 sm:flex-none"
             >
-                <MessageSquare className="mr-2 h-4 w-4" />
+                <MessageSquare className="mr-1.5 sm:mr-2 h-3.5 sm:h-4 w-3.5 sm:w-4" />
                 Resend Alert
             </Button>
             <Button 
                 variant="outline" 
                 onClick={handlePrint} 
                 disabled={isPrinting || !!updatingStatus}
-                className="h-9 px-4 font-bold border-primary text-primary hover:bg-primary/5"
+                className="h-9 px-3 sm:px-4 font-bold border-primary text-primary hover:bg-primary/5 text-[10px] sm:text-xs flex-1 sm:flex-none"
             >
-                {isPrinting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Printer className="mr-2 h-4 w-4" />}
+                {isPrinting ? <Loader2 className="mr-1.5 sm:mr-2 h-3.5 sm:h-4 w-3.5 sm:w-4 animate-spin" /> : <Printer className="mr-1.5 sm:mr-2 h-3.5 sm:h-4 w-3.5 sm:w-4" />}
                 Print Invoice
             </Button>
             <DialogClose asChild>
-                <Button variant="outline" className="h-9 px-6 font-bold" disabled={isPrinting || !!updatingStatus}>Close Window</Button>
+                <Button variant="outline" className="h-9 px-4 sm:px-6 font-bold text-[10px] sm:text-xs flex-1 sm:flex-none" disabled={isPrinting || !!updatingStatus}>Close</Button>
             </DialogClose>
           </div>
         </DialogFooter>
