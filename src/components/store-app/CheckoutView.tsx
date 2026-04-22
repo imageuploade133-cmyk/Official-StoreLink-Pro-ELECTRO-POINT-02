@@ -158,7 +158,13 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
     return subtotal - discountedPrice;
   }, [rewardAdClicked, activeRewardAd, subtotal, applyRewardDiscount]);
 
-  const total = Math.max(0, subtotal - discountAmount - rewardDiscountAmount + shipping);
+  const taxAmount = useMemo(() => {
+    if (!settings?.enableTax || !settings?.taxRate) return 0;
+    const afterDiscount = subtotal - discountAmount - rewardDiscountAmount;
+    return (afterDiscount * settings.taxRate) / 100;
+  }, [settings, subtotal, discountAmount, rewardDiscountAmount]);
+
+  const total = Math.max(0, subtotal - discountAmount - rewardDiscountAmount + shipping + taxAmount);
   const bankAccounts = settings?.bankAccounts || [];
 
   const [availablePaymentMethods, setAvailablePaymentMethods] = useState<any[]>([]);
@@ -334,6 +340,8 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
         deliveryLocationId: fulfillmentType === 'delivery' ? selectedLocationId : null,
         deliveryPrice: shipping,
         guestInfo: formData,
+        taxRate: settings?.taxRate || 0,
+        taxAmountCalculated: taxAmount,
       });
 
       if (!result.success) {
@@ -487,6 +495,12 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                         <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-amber-600">
                                             <span className="flex items-center gap-1"><Sparkles className="h-3 w-3" /> Reward Savings</span>
                                             <span>-{formatCurrency(rewardDiscountAmount, currencySymbol)}</span>
+                                        </div>
+                                    )}
+                                    {taxAmount > 0 && (
+                                        <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-slate-400">
+                                            <span>{settings?.taxName || 'Tax'} ({settings?.taxRate}%)</span>
+                                            <span>{formatCurrency(taxAmount, currencySymbol)}</span>
                                         </div>
                                     )}
                                 </div>

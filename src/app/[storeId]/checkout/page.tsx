@@ -348,8 +348,8 @@ export default function CheckoutPage() {
         deliveryLocationId: fulfillmentType === 'delivery' ? selectedLocationId : null,
         deliveryPrice: shipping,
         guestInfo: formData,
-        payCurrency: selectedMethod.provider === 'nowpayments' ? selectedCoin : null,
-        gateway: selectedMethod.provider === 'nowpayments' ? 'NOWPayments' : selectedMethod.provider,
+        payCurrency: selectedMethod?.provider === 'nowpayments' ? selectedCoin : null,
+        gateway: selectedMethod?.provider === 'nowpayments' ? 'NOWPayments' : selectedMethod?.provider,
         taxRate: settings?.taxRate || 0,
         taxAmountCalculated: taxAmount,
       });
@@ -483,6 +483,8 @@ export default function CheckoutPage() {
                             deliveryLocationId: fulfillmentType === 'delivery' ? selectedLocationId : null,
                             deliveryPrice: shipping,
                             guestInfo: formData,
+                            taxRate: settings?.taxRate || 0,
+                            taxAmountCalculated: taxAmount,
                         });
                         
                         if (result.success) return result.orderId;
