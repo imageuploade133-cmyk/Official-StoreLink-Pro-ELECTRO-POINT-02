@@ -10,6 +10,7 @@ import { useState, useEffect, useMemo } from "react";
 import { 
     Mail, 
     Lock, 
+    Unlock,
     Eye, 
     EyeOff, 
     User as UserIcon, 
@@ -51,7 +52,7 @@ const signupSchema = z.object({
     }),
   storeAddress: z.string().min(5, 'Store address must be at least 5 characters.'),
   storePhone: z.string().min(5, 'Store phone number is required.'),
-  databaseId: z.string().min(1, 'Database ID is required.').regex(/^[a-z0-9-]+$/, 'Only lowercase letters, numbers, and hyphens allowed.').default('(default)'),
+  databaseId: z.string().regex(/^(\(default\)|[a-z0-9-]+)$/, 'Only lowercase letters, numbers, and hyphens allowed.').optional().default('(default)'),
   password: z.string().min(6, 'Password must be at least 6 characters long.'),
   confirmPassword: z.string(),
 }).refine(data => data.password === data.confirmPassword, {
@@ -74,6 +75,7 @@ export default function MerchantSignupPage() {
     const { store, stores, setSelectedStoreId, staffMember, isLoading: isAuthContextLoading } = useAuth();
     const [isSuccessfullySubmitted, setIsSuccessfullySubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isDbIdUnlocked, setIsDbIdUnlocked] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);
     const totalSteps = 3;
 
@@ -187,7 +189,7 @@ export default function MerchantSignupPage() {
         console.log("onSubmit started with values:", { ...values, password: '[REDACTED]', confirmPassword: '[REDACTED]' });
         if (!firestore) {
             console.error("Firestore instance not found");
-            toast({ variant: "destructive", title: "Configuration Error", description: "Firestore is not initialized. Please refresh the page." });
+            toast({ variant: "destructive", title: "Configuration Error", description: "Database is not initialized. Please refresh the page." });
             return;
         }
 
@@ -311,7 +313,7 @@ export default function MerchantSignupPage() {
                     ]);
 
                     const timeoutPromise = new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error('Timeout: Separate database write took too long. Check if the database ID is correct and provisioned in Firebase.')), 10000)
+                        setTimeout(() => reject(new Error('Timeout: Separate database write took too long. Check if the database ID is correct and provisioned correctly.')), 10000)
                     );
 
                     await Promise.race([
@@ -522,9 +524,43 @@ export default function MerchantSignupPage() {
                   <div className="grid gap-4 animate-in fade-in slide-in-from-right-4 duration-300">
                     <FormField control={form.control} name="databaseId" render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Database ID (Optional)</FormLabel>
-                            <FormControl><Input placeholder="(default)" {...field} disabled={isSubmitting || isLoading} /></FormControl>
-                            <p className="text-[10px] text-muted-foreground italic">Leave as <strong>(default)</strong> unless you have specifically created a separate Firestore database for this project.</p>
+                            <div className="flex items-center justify-between">
+                                <FormLabel>Database ID (Optional)</FormLabel>
+                                {!isDbIdUnlocked && (
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-6 px-2 text-[10px] text-muted-foreground hover:text-primary"
+                                        onClick={() => {
+                                            const key = prompt("Enter unlock key:");
+                                            if (key === "8888") {
+                                                setIsDbIdUnlocked(true);
+                                                toast({ title: "Unlocked", description: "You can now edit the Database ID." });
+                                            } else if (key !== null) {
+                                                toast({ variant: "destructive", title: "Invalid Key", description: "The unlock key is incorrect." });
+                                            }
+                                        }}
+                                    >
+                                        <Lock className="h-3 w-3 mr-1" /> Unlock
+                                    </Button>
+                                )}
+                                {isDbIdUnlocked && (
+                                    <div className="flex items-center text-[10px] text-green-500 font-bold">
+                                        <Unlock className="h-3 w-3 mr-1" /> Unlocked
+                                    </div>
+                                )}
+                            </div>
+                            <FormControl>
+                                <Input
+                                    placeholder="(default)"
+                                    {...field}
+                                    disabled={!isDbIdUnlocked || isSubmitting || isLoading}
+                                />
+                            </FormControl>
+                            <p className="text-[10px] text-muted-foreground italic">
+                                Leave as <strong>(default)</strong> unless you have specifically created a separate database for this project.
+                            </p>
                             <FormMessage />
                         </FormItem>
                     )}/>
