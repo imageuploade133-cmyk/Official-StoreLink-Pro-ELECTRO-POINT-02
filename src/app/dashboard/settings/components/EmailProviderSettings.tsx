@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useFirestore, useDoc } from '@/firebase';
+import { useUser } from '@/firebase/auth/use-user';
 import { doc } from 'firebase/firestore';
 import type { EmailProviderSettings as EmailProviderSettingsType } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
@@ -35,6 +36,7 @@ interface EmailProviderSettingsProps {
 }
 
 export function EmailProviderSettings({ storeId }: EmailProviderSettingsProps) {
+  const { user } = useUser();
   const { toast } = useToast();
   const firestore = useFirestore();
   const [isSaving, setIsSaving] = useState(false);
@@ -77,12 +79,21 @@ export function EmailProviderSettings({ storeId }: EmailProviderSettingsProps) {
   }, [settingsData, form]);
 
   const onSubmit = async (values: FormValues) => {
+    if (!user) {
+      toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in to save settings.' });
+      return;
+    }
+
     const targetStoreId = storeId || 'global';
     setIsSaving(true);
     try {
+      const idToken = await user.getIdToken();
       const response = await fetch('/api/settings/email/save', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+        },
         body: JSON.stringify({ ...values, storeId: targetStoreId }),
       });
       const result = await response.json();
@@ -99,6 +110,11 @@ export function EmailProviderSettings({ storeId }: EmailProviderSettingsProps) {
   };
 
   const handleSendTest = async () => {
+    if (!user) {
+      toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in to send a test email.' });
+      return;
+    }
+
     const values = form.getValues();
     if (!values.testEmail) {
       toast({ variant: 'destructive', title: 'Error', description: 'Please enter a test email address.' });
@@ -108,9 +124,13 @@ export function EmailProviderSettings({ storeId }: EmailProviderSettingsProps) {
     const targetStoreId = storeId || 'global';
     setIsSendingTest(true);
     try {
+      const idToken = await user.getIdToken();
       const response = await fetch('/api/settings/email/test', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+        },
         body: JSON.stringify({ ...values, storeId: targetStoreId }),
       });
       const result = await response.json();
