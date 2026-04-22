@@ -286,7 +286,7 @@ export default function CheckoutPage() {
 
   const handleProceedToPayment = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || (fulfillmentType === 'delivery' && !formData.address)) {
+    if (!formData.name || !formData.email || !formData.phone || (fulfillmentType === 'delivery' && !formData.address)) {
       toast({ variant: 'destructive', title: 'Missing Information', description: 'Please fill in all required delivery details.' });
       return;
     }
@@ -340,7 +340,7 @@ export default function CheckoutPage() {
         fulfillmentType,
         deliveryLocationId: fulfillmentType === 'delivery' ? selectedLocationId : null,
         deliveryPrice: shipping,
-        guestInfo: user ? null : formData,
+        guestInfo: formData,
         payCurrency: selectedMethod.provider === 'nowpayments' ? selectedCoin : null,
         gateway: selectedMethod.provider === 'nowpayments' ? 'NOWPayments' : selectedMethod.provider,
       });
@@ -452,8 +452,8 @@ export default function CheckoutPage() {
                     }}
                     onBeforeCheckout={async () => {
                       // Validate basic info
-                      if (!formData.email) {
-                          toast({ variant: 'destructive', title: 'Email Required', description: 'Please enter your email.' });
+                      if (!formData.email || !formData.phone) {
+                          toast({ variant: 'destructive', title: 'Information Required', description: 'Please enter your email and phone number.' });
                           return null;
                       }
 
@@ -473,7 +473,7 @@ export default function CheckoutPage() {
                             fulfillmentType,
                             deliveryLocationId: fulfillmentType === 'delivery' ? selectedLocationId : null,
                             deliveryPrice: shipping,
-                            guestInfo: user ? null : formData,
+                            guestInfo: formData,
                         });
                         
                         if (result.success) return result.orderId;
