@@ -170,17 +170,20 @@ export async function sendOrderNotifications(order: any, settings: any, storeNam
     await Promise.all(promises);
 }
 
-export async function sendViaProvider(provider: string, apiKey: string, from: string, to: string, subject: string, html: string, meta: any) {
+export async function sendViaProvider(provider: string, apiKey: string, from: string, to: string, subject: string, html: string, meta: any): Promise<{success: boolean; error?: string}> {
     let success = false;
     let error = '';
 
     try {
+        // Trim API key if it's not a JSON config (SMTP)
+        const cleanApiKey = provider === 'smtp' ? apiKey.trim() : apiKey.trim();
+        
         if (provider === 'brevo') {
             const response = await fetch('https://api.brevo.com/v3/smtp/email', {
                 method: 'POST',
                 headers: {
                     'accept': 'application/json',
-                    'api-key': apiKey,
+                    'api-key': cleanApiKey,
                     'content-type': 'application/json'
                 },
                 body: JSON.stringify({
@@ -190,14 +193,17 @@ export async function sendViaProvider(provider: string, apiKey: string, from: st
                     htmlContent: html
                 })
             });
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.message || 'Brevo API error');
+
+            if (!response.ok) {
+                const result = await response.json().catch(() => ({ message: `Error ${response.status}: ${response.statusText}` }));
+                throw new Error(result.message || result.error || 'Brevo API error');
+            }
             success = true;
         } else if (provider === 'resend') {
             const response = await fetch('https://api.resend.com/emails', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${apiKey}`,
+                    'Authorization': `Bearer ${cleanApiKey}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
@@ -207,23 +213,38 @@ export async function sendViaProvider(provider: string, apiKey: string, from: st
                     html: html
                 })
             });
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.message || 'Resend API error');
+
+            if (!response.ok) {
+                const result = await response.json().catch(() => ({ message: `Error ${response.status}: ${response.statusText}` }));
+                throw new Error(result.message || result.error?.message || 'Resend API error');
+            }
             success = true;
         } else if (provider === 'smtp') {
             // apiKey for SMTP should be a JSON string with host, port, user, pass
-            const config = JSON.parse(apiKey);
+            let config;
+            try {
+                config = JSON.parse(cleanApiKey);
+            } catch (e) {
+                throw new Error('Invalid SMTP config JSON. Please check the format.');
+            }
+
             const transporter = nodemailer.createTransport({
-                host: config.host,
-                port: parseInt(config.port),
-                secure: config.port === '465' || config.secure,
+                host: config.host?.trim(),
+                port: parseInt(String(config.port)),
+                secure: String(config.port) === '465' || !!config.secure,
                 auth: {
-                    user: config.user,
-                    pass: config.pass,
+                    user: config.user?.trim(),
+                    pass: config.pass?.trim(),
                 },
+                // Add a timeout
+                connectTimeout: 10000,
             });
+
+            await transporter.verify(); // Verify connection before sending
             await transporter.sendMail({ from, to, subject, html });
             success = true;
+        } else {
+            throw new Error(`Unsupported email provider: ${provider}`);
         }
     } catch (e: any) {
         error = e.message;
@@ -246,7 +267,7 @@ export async function sendViaProvider(provider: string, apiKey: string, from: st
         console.error('Failed to log email to Firestore:', logError);
     }
 
-    return success;
+    return { success, error };
 }
 
 function parseFrom(from: string) {

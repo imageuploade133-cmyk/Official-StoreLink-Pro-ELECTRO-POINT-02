@@ -137,7 +137,11 @@ export function EmailProviderSettings({ storeId }: EmailProviderSettingsProps) {
       if (response.ok) {
         toast({ title: 'Test Email Sent', description: `A test email has been sent to ${values.testEmail}.` });
       } else {
-        toast({ variant: 'destructive', title: 'Invalid API Key', description: result.error || 'Failed to send test email.' });
+        toast({ 
+          variant: 'destructive', 
+          title: 'Email Delivery Failed', 
+          description: result.error || 'Failed to send test email. Please check your settings.' 
+        });
       }
     } catch (error: any) {
       toast({ variant: 'destructive', title: 'Error', description: error.message });
