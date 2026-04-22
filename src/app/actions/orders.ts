@@ -133,6 +133,7 @@ export async function placeOrderAction({
       const orderData = {
         user_id: userId,
         store_id: storeId,
+        storeName: (settings as any).storeName || 'Our Store',
         items: enrichedItems,
         totalAmount,
         totalCost,
@@ -168,10 +169,17 @@ export async function placeOrderAction({
         ).catch(err => console.error('Error sending order emails:', err));
 
         // Send WhatsApp Notifications (non-blocking)
-        if (whatsappAlertSettings && (whatsappAlertSettings as any).enabled) {
+        const waSettings = whatsappAlertSettings || {
+            enabled: (settings as any).enableWhatsapp,
+            username: (settings as any).eBulkUsername,
+            apiKey: (settings as any).eBulkApiKey,
+            senderNumber: (settings as any).orderNotificationNumbers?.[0],
+        };
+
+        if (waSettings && (waSettings as any).enabled) {
             sendWhatsAppOrderAlert(
                 { id: orderId, ...orderData },
-                whatsappAlertSettings as any,
+                waSettings as any,
                 (settings as any).currency || '₦'
             ).catch(err => console.error('Error sending WhatsApp alert:', err));
         }
@@ -483,77 +491,128 @@ export async function validateEBulkSMSAction(username: string, apiKey: string) {
     }
 }
 
-function formatWhatsAppMessage(template: string, data: { orderId: string, customerName: string, amount: string, currency: string, status: string }) {
+function formatWhatsAppMessage(template: string, data: { orderId: string, customerName: string, amount: string, currency: string, status: string, itemsDetails: string }) {
     return template
         .replace(/{orderId}/g, data.orderId)
         .replace(/{customerName}/g, data.customerName)
         .replace(/{amount}/g, data.amount)
         .replace(/{currency}/g, data.currency)
-        .replace(/{status}/g, data.status);
+        .replace(/{status}/g, data.status)
+        .replace(/{itemsDetails}/g, data.itemsDetails);
+}
+
+function formatOrderItemsForWhatsApp(items: any[], currency: string) {
+    return items.map(item => `• ${item.productName} x ${item.quantity} - ${currency}${item.price.toLocaleString()}`).join('\n');
+}
+
+async function getCustomerPhone(userId: string) {
+    if (!userId || userId === 'GUEST') return null;
+    try {
+        const doc = await adminDb.collection('users').doc(userId).get();
+        const data = doc.data();
+        return data?.alternativePhoneNumber || data?.phone || null;
+    } catch (e) {
+        return null;
+    }
 }
 
 export async function sendWhatsAppOrderAlert(order: any, settings: WhatsAppAlertSettings, currency: string) {
-    const customerName = order.guestInfo?.name || 'Customer';
+    const customerName = order.guestInfo?.name || (order.user_id !== 'GUEST' ? await getCustomerName(order.user_id) : 'Customer');
     const amount = order.totalAmount.toLocaleString();
     const orderId = order.id.substring(0, 8).toUpperCase();
+    const itemsDetails = formatOrderItemsForWhatsApp(order.items, currency);
     
-    let message = '';
-    if (settings.orderPlacedTemplate) {
-        message = formatWhatsAppMessage(settings.orderPlacedTemplate, {
-            orderId,
-            customerName,
-            amount,
-            currency,
-            status: order.status
-        });
-    } else {
-        message = `Hello Admin,\nYou received a new order.\n\nOrder ID: #${orderId}\nCustomer: ${customerName}\nAmount: ${currency}${amount}\nStatus: ${order.status}\n\nLogin to dashboard now.`;
-    }
-    
-    const recipients = [];
-    if (settings.senderNumber) recipients.push(settings.senderNumber);
-    
-    if (recipients.length === 0) return;
+    // 1. Send to Admin
+    if (settings.senderNumber) {
+        let adminMessage = '';
+        if (settings.orderPlacedTemplate) {
+            adminMessage = formatWhatsAppMessage(settings.orderPlacedTemplate, {
+                orderId,
+                customerName,
+                amount,
+                currency,
+                status: order.status,
+                itemsDetails
+            });
+        } else {
+            adminMessage = `Hello Admin,\nYou received a new order.\n\nOrder ID: #${orderId}\nCustomer: ${customerName}\nAmount: ${currency}${amount}\nStatus: ${order.status}\n\nItems:\n${itemsDetails}\n\nLogin to dashboard now.`;
+        }
 
+        try {
+            const result = await sendWhatsAppViaEBulkSMS(
+                settings.username, 
+                settings.apiKey, 
+                [settings.senderNumber], 
+                'New Order Alert (Admin)', 
+                adminMessage,
+                2,
+                settings.senderNumber
+            );
+            const status = result?.response?.status || result?.status;
+            
+            await logWhatsAppMessage({
+                eventType: 'staff_order_alert',
+                messageContent: adminMessage,
+                recipientPhone: settings.senderNumber,
+                customerName: customerName,
+                status: status === 'SUCCESS' ? 'sent' : 'failed',
+                unitsCharged: 1,
+                userId: 'system',
+                userName: 'Order System',
+                storeId: order.store_id || 'global',
+                errorDetails: status !== 'SUCCESS' ? (result?.response?.statusdetail || result?.statusdetail) : null
+            });
+        } catch (err) {
+            console.error('Error sending admin WhatsApp alert:', err);
+        }
+    }
+
+    // 2. Send to Customer
+    const customerPhone = order.guestInfo?.phone || order.guestInfo?.whatsapp || (order.user_id !== 'GUEST' ? await getCustomerPhone(order.user_id) : null);
+    if (customerPhone) {
+        let extraMsg = '';
+        if (order.paymentMethod === 'Bank Transfer' && order.selectedBankAccount) {
+            extraMsg = `\n\n*Payment Instructions:*\nPlease transfer ${currency}${amount} to:\nBank: ${order.selectedBankAccount.bankName}\nAccount: ${order.selectedBankAccount.accountNumber}\nName: ${order.selectedBankAccount.accountName}\nRef: ${order.paymentReference}\n`;
+        }
+
+        const customerMessage = `Hello ${customerName},\nYour order #${orderId} at ${order.storeName || 'our store'} has been placed successfully!\n\nOrder Details:\n${itemsDetails}\n\nTotal: ${currency}${amount}\nStatus: ${order.status}${extraMsg}\n\nThank you for shopping with us!`;
+
+        try {
+            const result = await sendWhatsAppViaEBulkSMS(
+                settings.username, 
+                settings.apiKey, 
+                [customerPhone], 
+                'Order Confirmation', 
+                customerMessage,
+                2,
+                settings.senderNumber
+            );
+            const status = result?.response?.status || result?.status;
+            
+            await logWhatsAppMessage({
+                eventType: 'order_placed',
+                messageContent: customerMessage,
+                recipientPhone: customerPhone,
+                customerName: customerName,
+                status: status === 'SUCCESS' ? 'sent' : 'failed',
+                unitsCharged: 1,
+                userId: 'system',
+                userName: 'Order System',
+                storeId: order.store_id || 'global',
+                errorDetails: status !== 'SUCCESS' ? (result?.response?.statusdetail || result?.statusdetail) : null
+            });
+        } catch (err) {
+            console.error('Error sending customer WhatsApp confirmation:', err);
+        }
+    }
+}
+
+async function getCustomerName(userId: string) {
+    if (!userId || userId === 'GUEST') return 'Customer';
     try {
-        const result = await sendWhatsAppViaEBulkSMS(
-            settings.username, 
-            settings.apiKey, 
-            recipients, 
-            'New Order Alert', 
-            message,
-            2,
-            settings.senderNumber
-        );
-        const status = result?.response?.status || result?.status;
-        const statusdetail = result?.response?.statusdetail || result?.statusdetail;
-        
-        await logWhatsAppMessage({
-            eventType: 'order_placed',
-            messageContent: message,
-            recipientPhone: recipients.join(', '),
-            customerName: customerName,
-            status: status === 'SUCCESS' ? 'sent' : 'failed',
-            unitsCharged: 1,
-            userId: 'system',
-            userName: 'Order System',
-            storeId: order.store_id || 'global',
-            errorDetails: status !== 'SUCCESS' ? statusdetail : null,
-            apiResponse: JSON.stringify(result)
-        });
-    } catch (error: any) {
-        console.error('WhatsApp Order Alert Error:', error);
-        await logWhatsAppMessage({
-            eventType: 'order_placed',
-            messageContent: message,
-            recipientPhone: recipients.join(', '),
-            customerName: customerName,
-            status: 'failed',
-            unitsCharged: 0,
-            userId: 'system',
-            userName: 'Order System',
-            storeId: order.store_id || 'global',
-            errorDetails: error.message
-        });
+        const doc = await adminDb.collection('users').doc(userId).get();
+        return doc.data()?.displayName || doc.data()?.name || 'Customer';
+    } catch (e) {
+        return 'Customer';
     }
 }

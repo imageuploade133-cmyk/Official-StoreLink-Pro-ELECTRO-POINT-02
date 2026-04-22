@@ -376,87 +376,8 @@ export default function CheckoutPage() {
         }
       }
 
-      // --- WhatsApp Notifications ---
-      if (settings?.enableWhatsapp) {
-          // 1. Notification to CUSTOMER
-          if (formData.phone) {
-              const formattedPhone = formatPhoneNumberForWhatsapp(formData.phone, settings.countryCode);
-              if (formattedPhone) {
-                  try {
-                      const extraMsg = paymentMethod === 'Bank Transfer' 
-                        ? `Payment Ref: ${paymentReference}\nPlease complete your transfer to ${selectedBankAccount?.bankName}.`
-                        : '';
-
-                      await sendWhatsAppReceipt({
-                          eventType: 'order_placed',
-                          phone: formattedPhone,
-                          customerName: formData.name,
-                          orderId: finalOrderId,
-                          items: cartItems.map(i => ({ name: i.name, qty: i.quantity, price: i.salePrice })),
-                          total: total,
-                          paymentMethod: paymentMethod,
-                          storeName: settings.storeName,
-                          currencySymbol: settings.currency,
-                          fulfillmentType: fulfillmentType,
-                          message: extraMsg
-                          });
-
-                      await logWhatsAppMessageAction({
-                          store_id: storeId,
-                          eventType: 'order_placed',
-                          messageContent: `Order Confirmation sent to Customer for #${finalOrderId}`,
-                          recipientPhone: formData.phone,
-                          customerName: formData.name,
-                          status: 'sent',
-                          unitsCharged: 3.1,
-                          userId: user?.uid || 'GUEST',
-                          userName: user?.email || 'Guest Checkout'
-                      });
-                  } catch (waError) {
-                      console.error("Failed to send Customer WhatsApp notification:", waError);
-                  }
-              }
-          }
-
-          // 2. Notifications to STAFF (Order Alerts)
-          if (settings.enableOrderAlerts && settings.orderNotificationNumbers && settings.orderNotificationNumbers.length > 0) {
-              const staffAlertPromises = settings.orderNotificationNumbers.map(async (alertNum) => {
-                  const formattedAlertPhone = formatPhoneNumberForWhatsapp(alertNum, settings.countryCode);
-                  if (!formattedAlertPhone) return;
-
-                  try {
-                      await sendWhatsAppReceipt({
-                          eventType: 'staff_order_alert',
-                          phone: formattedAlertPhone,
-                          customerName: formData.name,
-                          orderId: finalOrderId,
-                          total: total,
-                          paymentMethod: paymentMethod,
-                          storeName: settings.storeName,
-                          currencySymbol: settings.currency,
-                          fulfillmentType: fulfillmentType,
-                          });
-
-                      await logWhatsAppMessageAction({
-                          store_id: storeId,
-                          eventType: 'staff_order_alert',
-                          messageContent: `Staff Order Alert sent for #${finalOrderId}`,
-                          recipientPhone: alertNum,
-                          customerName: 'Staff Member',
-                          status: 'sent',
-                          unitsCharged: 3.1,
-                          userId: 'SYSTEM',
-                          userName: 'Order Alert Service'
-                      });
-                  } catch (staffWaError) {
-                      console.error(`Failed to send Staff WhatsApp alert to ${alertNum}:`, staffWaError);
-                  }
-              });
-              
-              Promise.all(staffAlertPromises);
-          }
-      }
-
+      // --- WhatsApp Notifications are now handled server-side in placeOrderAction ---
+      
       toast({ title: 'Order Placed!', description: 'Your order has been received successfully.' });
       clearCart();
       safeSessionStorage.removeItem('appliedCoupon');

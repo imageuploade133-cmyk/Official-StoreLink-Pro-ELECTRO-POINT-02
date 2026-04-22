@@ -366,25 +366,8 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
         }
       }
 
-      if (settings?.enableWhatsapp && formData.phone) {
-          const formattedPhone = formatPhoneNumberForWhatsapp(formData.phone, settings.countryCode);
-          if (formattedPhone) {
-              await sendWhatsAppReceipt({
-                  eventType: 'order_placed',
-                  phone: formattedPhone,
-                  customerName: formData.name,
-                  orderId: finalOrderId,
-                  items: cartItems.map(i => ({ name: i.name, qty: i.quantity, price: i.salePrice })),
-                  total: total,
-                  paymentMethod: paymentMethod,
-                  storeName: settings.storeName,
-                  currencySymbol: settings.currency,
-                  message: paymentMethod === 'Bank Transfer' ? `Ref: ${paymentReference}` : '',
-                  fulfillmentType: fulfillmentType
-              }).catch(console.error);
-          }
-      }
-
+      // --- WhatsApp Notifications are now handled server-side in placeOrderAction ---
+      
       setStep('success');
       clearCart();
       safeSessionStorage.removeItem('appliedCoupon');
