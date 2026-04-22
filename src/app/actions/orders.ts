@@ -28,7 +28,9 @@ export async function placeOrderAction({
   deliveryPrice,
   guestInfo,
   payCurrency,
-  gateway
+  gateway,
+  taxRate,
+  taxAmountCalculated
 }: {
   userId: string;
   storeId: string | null;
