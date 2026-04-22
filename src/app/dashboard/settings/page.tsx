@@ -13,6 +13,7 @@ import { InventoryStockSettings } from './components/InventoryStockSettings';
 import { MessagingSettings } from './components/MessagingSettings';
 import { OrderAlertSettings } from './components/OrderAlertSettings';
 import { WhatsAppAlertSettings } from './components/WhatsAppAlertSettings';
+import { EmailProviderSettings } from './components/EmailProviderSettings';
 import { useAuth } from '@/contexts/auth-context';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -32,7 +33,7 @@ const settingsKeywords = {
   pos: ['pos', 'receipt', 'printer', 'invoice', 'price modification', 'logo size', 'product size', 'columns', 'grid', 'layout'],
   inventory: ['inventory', 'stock', 'alert', 'product image', 'deduction', 'threshold', 'wastage'],
   messaging: ['messaging', 'sms', 'whatsapp', 'webhook', 'notifications', 'messages'],
-  orderAlerts: ['order alerts', 'email alerts', 'email notifications', 'order notifications'],
+  orderAlerts: ['order alerts', 'email alerts', 'email notifications', 'order notifications', 'email provider', 'brevo', 'resend', 'smtp'],
   payment: ['payment methods', 'cash', 'card', 'transfer', 'payment options', 'gateways'],
   social: ['social media', 'links', 'facebook', 'twitter', 'instagram'],
   shop: ['shop', 'collection', 'banner', 'alignment', 'products', 'title', 'description', 'heading'],
@@ -159,6 +160,7 @@ export default function SettingsPage() {
         {visibleSections.messaging && <MessagingSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />}
         {visibleSections.orderAlerts && (
           <div className="space-y-6">
+            <EmailProviderSettings storeId={currentStoreId} />
             <OrderAlertSettings storeId={currentStoreId} />
             <WhatsAppAlertSettings storeId={currentStoreId} />
           </div>

@@ -1,10 +1,28 @@
 import nodemailer from 'nodemailer';
 import { adminDb } from './firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
+import { decrypt } from './encryption';
 
 export async function sendOrderNotifications(order: any, settings: any, storeName: string, emailAlertSettings?: any) {
     const { id: orderId, guestInfo, user_id, totalAmount, paymentStatus, items, deliveryPrice, paymentMethod, fulfillmentType } = order;
     
+    // Fetch new notification settings if not provided
+    let notificationSettings = null;
+    const storeId = settings.id || order.store_id;
+    if (storeId && storeId !== 'global') {
+        const notifDoc = await adminDb.collection('stores').doc(storeId).collection('settings').doc('notifications').get();
+        if (notifDoc.exists) {
+            notificationSettings = notifDoc.data();
+        }
+    }
+
+    if (!notificationSettings || !notificationSettings.enabled) {
+        const globalNotifDoc = await adminDb.collection('settings').doc('notifications').get();
+        if (globalNotifDoc.exists) {
+            notificationSettings = globalNotifDoc.data();
+        }
+    }
+
     const customerEmail = guestInfo?.email || (await getCustomerEmail(user_id));
     const customerName = guestInfo?.name || (await getCustomerName(user_id));
     const customerPhone = guestInfo?.phone || (await getCustomerPhone(user_id));
@@ -59,65 +77,184 @@ export async function sendOrderNotifications(order: any, settings: any, storeNam
 
     const promises = [];
 
-    // Use Gmail SMTP if available
-    const useGmail = emailAlertSettings && emailAlertSettings.provider === 'gmail' && emailAlertSettings.gmailEmail && emailAlertSettings.gmailAppPassword;
-    
-    if (!useGmail) {
-        console.log('Gmail SMTP not configured for store', settings.id);
-        return;
-    }
+    // Prioritize new notification settings
+    if (notificationSettings && notificationSettings.enabled && notificationSettings.provider) {
+        const { provider, apiKeyEncrypted, senderName, senderEmail } = notificationSettings;
+        const apiKey = apiKeyEncrypted ? decrypt(apiKeyEncrypted) : '';
 
-    const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true,
-        auth: {
-            user: emailAlertSettings.gmailEmail,
-            pass: emailAlertSettings.gmailAppPassword,
-        },
-    });
+        if (apiKey) {
+            const subjectCustomer = `Order Confirmation - #${orderId} - ${commonData.storeName}`;
+            const subjectOwner = `New Order Received - #${orderId} - ${commonData.storeName}`;
+            const htmlCustomer = generateTemplate(commonData, 'confirmation');
+            const htmlOwner = generateTemplate(commonData, 'notification');
 
-    const senderName = emailAlertSettings.senderName || storeName || 'StoreLink Pro';
-    const from = `"${senderName}" <${emailAlertSettings.gmailEmail}>`;
+            const from = `"${senderName || storeName}" <${senderEmail}>`;
 
-    // Send to customer
-    const sendToCustomer = emailAlertSettings.enabled && emailAlertSettings.customerConfirmation; 
-    if (customerEmail && sendToCustomer) {
-        const customerHtml = generateTemplate(commonData, 'confirmation');
-        promises.push(sendWithRetry({
-            transporter,
-            from,
-            to: customerEmail,
-            subject: `Order Confirmation - #${orderId} - ${commonData.storeName}`,
-            html: customerHtml,
-            orderId,
-            storeId: settings.id,
-            type: 'customer_confirmation'
-        }));
-    }
+            if (customerEmail) {
+                promises.push(sendViaProvider(provider, apiKey, from, customerEmail, subjectCustomer, htmlCustomer, {
+                    orderId,
+                    storeId,
+                    type: 'customer_confirmation'
+                }));
+            }
 
-    // Send to store owner(s)
-    const ownerEmails = emailAlertSettings.notificationEmail 
-        ? [emailAlertSettings.notificationEmail] 
-        : [];
-    
-    const enableEmailAlerts = emailAlertSettings.enabled;
+            // Also send to owner if possible
+            if (senderEmail) {
+                promises.push(sendViaProvider(provider, apiKey, from, senderEmail, subjectOwner, htmlOwner, {
+                    orderId,
+                    storeId,
+                    type: 'owner_notification'
+                }));
+            }
+        }
+    } else {
+        // Fallback to Gmail SMTP if available
+        const useGmail = emailAlertSettings && emailAlertSettings.provider === 'gmail' && emailAlertSettings.gmailEmail && emailAlertSettings.gmailAppPassword;
+        
+        if (useGmail) {
+            const transporter = nodemailer.createTransport({
+                host: 'smtp.gmail.com',
+                port: 465,
+                secure: true,
+                auth: {
+                    user: emailAlertSettings.gmailEmail,
+                    pass: emailAlertSettings.gmailAppPassword,
+                },
+            });
 
-    if (enableEmailAlerts && ownerEmails.length > 0) {
-        const ownerHtml = generateTemplate(commonData, 'notification');
-        promises.push(sendWithRetry({
-            transporter,
-            from,
-            to: ownerEmails,
-            subject: `New Order Received - #${orderId} - ${commonData.storeName}`,
-            html: ownerHtml,
-            orderId,
-            storeId: settings.id,
-            type: 'owner_notification'
-        }));
+            const senderName = emailAlertSettings.senderName || storeName || 'StoreLink Pro';
+            const from = `"${senderName}" <${emailAlertSettings.gmailEmail}>`;
+
+            // Send to customer
+            const sendToCustomer = emailAlertSettings.enabled && emailAlertSettings.customerConfirmation; 
+            if (customerEmail && sendToCustomer) {
+                const customerHtml = generateTemplate(commonData, 'confirmation');
+                promises.push(sendWithRetry({
+                    transporter,
+                    from,
+                    to: customerEmail,
+                    subject: `Order Confirmation - #${orderId} - ${commonData.storeName}`,
+                    html: customerHtml,
+                    orderId,
+                    storeId,
+                    type: 'customer_confirmation'
+                }));
+            }
+
+            // Send to store owner(s)
+            const ownerEmails = emailAlertSettings.notificationEmail 
+                ? [emailAlertSettings.notificationEmail] 
+                : [];
+            
+            const enableEmailAlerts = emailAlertSettings.enabled;
+
+            if (enableEmailAlerts && ownerEmails.length > 0) {
+                const ownerHtml = generateTemplate(commonData, 'notification');
+                promises.push(sendWithRetry({
+                    transporter,
+                    from,
+                    to: ownerEmails,
+                    subject: `New Order Received - #${orderId} - ${commonData.storeName}`,
+                    html: ownerHtml,
+                    orderId,
+                    storeId,
+                    type: 'owner_notification'
+                }));
+            }
+        } else {
+            console.log('No email provider configured for store', storeId);
+            // Optional: Platform fallback here if required
+        }
     }
 
     await Promise.all(promises);
+}
+
+export async function sendViaProvider(provider: string, apiKey: string, from: string, to: string, subject: string, html: string, meta: any) {
+    let success = false;
+    let error = '';
+
+    try {
+        if (provider === 'brevo') {
+            const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+                method: 'POST',
+                headers: {
+                    'accept': 'application/json',
+                    'api-key': apiKey,
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sender: parseFrom(from),
+                    to: [{ email: to }],
+                    subject: subject,
+                    htmlContent: html
+                })
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Brevo API error');
+            success = true;
+        } else if (provider === 'resend') {
+            const response = await fetch('https://api.resend.com/emails', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    from: from,
+                    to: [to],
+                    subject: subject,
+                    html: html
+                })
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Resend API error');
+            success = true;
+        } else if (provider === 'smtp') {
+            // apiKey for SMTP should be a JSON string with host, port, user, pass
+            const config = JSON.parse(apiKey);
+            const transporter = nodemailer.createTransport({
+                host: config.host,
+                port: parseInt(config.port),
+                secure: config.port === '465' || config.secure,
+                auth: {
+                    user: config.user,
+                    pass: config.pass,
+                },
+            });
+            await transporter.sendMail({ from, to, subject, html });
+            success = true;
+        }
+    } catch (e: any) {
+        error = e.message;
+        console.error(`Error sending email via ${provider}:`, e);
+    }
+
+    // Log to Firestore
+    try {
+        await adminDb.collection('emailLogs').add({
+            storeId: meta.storeId || 'global',
+            orderId: meta.orderId || 'N/A',
+            recipient: to,
+            type: meta.type,
+            status: success ? 'sent' : 'failed',
+            error: error || null,
+            provider,
+            createdAt: FieldValue.serverTimestamp(),
+        });
+    } catch (logError) {
+        console.error('Failed to log email to Firestore:', logError);
+    }
+
+    return success;
+}
+
+function parseFrom(from: string) {
+    const match = from.match(/"?([^"]*)"?\s*<([^>]*)>/);
+    if (match) {
+        return { name: match[1], email: match[2] };
+    }
+    return { name: 'Store', email: from };
 }
 
 async function sendWithRetry({ transporter, from, to, subject, html, orderId, storeId, type }: any) {
@@ -163,7 +300,7 @@ async function sendWithRetry({ transporter, from, to, subject, html, orderId, st
     }
 }
 
-function generateTemplate(data: any, type: 'confirmation' | 'notification') {
+export function generateTemplate(data: any, type: 'confirmation' | 'notification') {
     const title = type === 'confirmation' ? `Thank you for your order!` : `New Order Received!`;
     const intro = type === 'confirmation' 
         ? `Hi ${data.customerName}, your order at <strong>${data.storeName}</strong> has been received and is being processed.` 

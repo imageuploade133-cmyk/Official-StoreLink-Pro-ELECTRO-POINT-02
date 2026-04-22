@@ -144,6 +144,16 @@ export interface EmailAlertSettings {
   updatedAt: Timestamp;
 }
 
+export interface EmailProviderSettings {
+  provider: 'brevo' | 'resend' | 'smtp';
+  apiKeyEncrypted: string;
+  maskedKey: string;
+  senderName: string;
+  senderEmail: string;
+  enabled: boolean;
+  updatedAt: Timestamp;
+}
+
 export interface WhatsAppAlertSettings {
   enabled: boolean;
   username: string;
