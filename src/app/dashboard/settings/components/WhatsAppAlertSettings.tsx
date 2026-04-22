@@ -42,11 +42,11 @@ interface WhatsAppAlertSettingsProps {
 }
 
 const DEFAULT_TEMPLATES = {
-  orderPlaced: "Hello Admin,\nYou received a new order.\n\nOrder ID: #{orderId}\nCustomer: {customerName}\nAmount: {currency}{amount}\nPayment Method: {paymentMethod}\nStatus: {status}\n\nLogin to dashboard now.",
-  orderProcessing: "Hello Admin,\nOrder #{orderId} for {customerName} is now being processed.",
-  orderShipped: "Hello Admin,\nOrder #{orderId} for {customerName} has been shipped.",
-  orderCancelled: "Hello Admin,\nOrder #{orderId} for {customerName} has been cancelled.",
-  orderDelivered: "Hello Admin,\nOrder #{orderId} for {customerName} has been delivered successfully.",
+  orderPlaced: "*Hello {storeName},*\n*You received a new order.*\n\n*Order ID: #{orderId}*\n*Customer: {customerName}*\n*Amount: {currency}{amount}*\n*Payment Method: {paymentMethod}*\n*Status: {status}*\n\n*Items:*\n{itemsDetails}\n\n*Login to dashboard now.*",
+  orderProcessing: "*Hello {storeName},*\n*Order #{orderId} for {customerName} is now being processed.*",
+  orderShipped: "*Hello {storeName},*\n*Order #{orderId} for {customerName} has been shipped.*",
+  orderCancelled: "*Hello {storeName},*\n*Order #{orderId} for {customerName} has been cancelled.*",
+  orderDelivered: "*Hello {storeName},*\n*Order #{orderId} for {customerName} has been delivered successfully.*",
 };
 
 export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
@@ -386,7 +386,7 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
                         <Info className="h-4 w-4" /> Available Placeholders
                     </h4>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
-                        {['{orderId}', '{customerName}', '{amount}', '{currency}', '{status}', '{paymentMethod}'].map(p => (
+                        {['{orderId}', '{customerName}', '{amount}', '{currency}', '{status}', '{paymentMethod}', '{storeName}', '{itemsDetails}'].map(p => (
                             <code key={p} className="text-xs bg-white/50 border border-amber-200 rounded px-2 py-1 text-amber-800">{p}</code>
                         ))}
                     </div>
