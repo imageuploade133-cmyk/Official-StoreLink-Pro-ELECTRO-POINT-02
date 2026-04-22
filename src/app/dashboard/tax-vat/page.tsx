@@ -22,9 +22,12 @@ import {
   TrendingUp,
   ShoppingBag,
   Globe,
-  Loader2
+  Loader2,
+  Clock,
+  Filter,
+  X
 } from "lucide-react";
-import { format, startOfDay, endOfDay, startOfMonth, endOfMonth } from "date-fns";
+import { format, startOfDay, endOfDay, startOfMonth, endOfMonth, setHours, setMinutes } from "date-fns";
 import { useFirestore } from '@/firebase';
 import { useAuth } from '@/contexts/auth-context';
 import { 
@@ -33,7 +36,8 @@ import {
   query, 
   where, 
   orderBy,
-  limit
+  limit,
+  Timestamp
 } from 'firebase/firestore'; 
 import type { SaleTransaction, Order } from '@/lib/types';
 import { convertToDateSafely, cn } from '@/lib/utils';
@@ -41,6 +45,10 @@ import { formatCurrency } from '@/lib/formatUtils';
 import { Badge } from '@/components/ui/badge';
 import { useSettings } from '@/contexts/settings-context';
 import { StatCard } from '@/components/StatCard';
+import { DateRangePicker } from '@/components/DateRangePicker';
+import { DateRange } from 'react-day-picker';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
 export default function TaxVatPage() {
   const { settings } = useSettings();
@@ -53,18 +61,35 @@ export default function TaxVatPage() {
   const [posSales, setPosSales] = useState<SaleTransaction[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   
-  const fetchTaxData = useCallback(async () => {
+  // Filtering state
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [startTime, setStartTime] = useState("00:00");
+  const [endTime, setEndTime] = useState("23:59");
+  const [isFiltering, setIsFiltering] = useState(false);
+  
+  const fetchTaxData = useCallback(async (start?: Date, end?: Date) => {
     if (!firestore || !currentStoreId) return;
     setIsLoading(true);
 
     try {
-      // Fetch POS Sales with tax
-      const salesQuery = query(
+      // Build POS Sales query
+      let salesQuery = query(
         collection(firestore, "saleTransactions"),
         where("store_id", "==", currentStoreId),
-        orderBy("createdAt", "desc"),
-        limit(1000) // Adjust limit as needed
+        orderBy("createdAt", "desc")
       );
+
+      if (start) {
+        salesQuery = query(salesQuery, where("createdAt", ">=", Timestamp.fromDate(start)));
+      }
+      if (end) {
+        salesQuery = query(salesQuery, where("createdAt", "<=", Timestamp.fromDate(end)));
+      }
+      
+      if (!start && !end) {
+        salesQuery = query(salesQuery, limit(1000));
+      }
+
       const salesSnap = await getDocs(salesQuery);
       const salesList = salesSnap.docs.map(doc => ({
         id: doc.id,
@@ -73,13 +98,24 @@ export default function TaxVatPage() {
       })) as SaleTransaction[];
       setPosSales(salesList);
 
-      // Fetch Website Orders with tax
-      const ordersQuery = query(
+      // Build Website Orders query
+      let ordersQuery = query(
         collection(firestore, "orders"),
         where("store_id", "==", currentStoreId),
-        orderBy("createdAt", "desc"),
-        limit(1000)
+        orderBy("createdAt", "desc")
       );
+
+      if (start) {
+        ordersQuery = query(ordersQuery, where("createdAt", ">=", Timestamp.fromDate(start)));
+      }
+      if (end) {
+        ordersQuery = query(ordersQuery, where("createdAt", "<=", Timestamp.fromDate(end)));
+      }
+
+      if (!start && !end) {
+        ordersQuery = query(ordersQuery, limit(1000));
+      }
+
       const ordersSnap = await getDocs(ordersQuery);
       const ordersList = ordersSnap.docs.map(doc => ({
         id: doc.id,
@@ -94,6 +130,29 @@ export default function TaxVatPage() {
       setIsLoading(false);
     }
   }, [firestore, currentStoreId]);
+
+  const handleApplyFilter = () => {
+    if (dateRange?.from) {
+      const start = new Date(dateRange.from);
+      const [startH, startM] = startTime.split(':').map(Number);
+      start.setHours(startH, startM, 0, 0);
+
+      const end = dateRange.to ? new Date(dateRange.to) : new Date(dateRange.from);
+      const [endH, endM] = endTime.split(':').map(Number);
+      end.setHours(endH, endM, 59, 999);
+
+      setIsFiltering(true);
+      fetchTaxData(start, end);
+    }
+  };
+
+  const handleResetFilter = () => {
+    setDateRange(undefined);
+    setStartTime("00:00");
+    setEndTime("23:59");
+    setIsFiltering(false);
+    fetchTaxData();
+  };
 
   useEffect(() => {
     if (currentStoreId && firestore) {
@@ -169,34 +228,90 @@ export default function TaxVatPage() {
             title="Tax & VAT Report"
             description="Overview of taxes collected from POS and Online Store."
         />
-        <Button variant="outline" onClick={fetchTaxData} disabled={isLoading}>
+        <Button variant="outline" onClick={() => isFiltering ? handleApplyFilter() : fetchTaxData()} disabled={isLoading}>
             <RotateCcw className={cn("mr-2 h-4 w-4", isLoading && "animate-spin")} />
             Refresh Data
         </Button>
       </div>
 
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-medium flex items-center gap-2">
+            <Filter className="h-4 w-4" /> Filter by Date & Time
+          </CardTitle>
+          <CardDescription>Select a date and time range to filter the tax report.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col md:flex-row items-end gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="date-range">Date Range</Label>
+              <DateRangePicker 
+                date={dateRange} 
+                onDateChange={setDateRange} 
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="start-time">Start Time</Label>
+              <div className="relative">
+                <Clock className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="start-time"
+                  type="time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  className="pl-8 w-[130px]"
+                />
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="end-time">End Time</Label>
+              <div className="relative">
+                <Clock className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="end-time"
+                  type="time"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  className="pl-8 w-[130px]"
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button onClick={handleApplyFilter} disabled={isLoading || !dateRange?.from}>
+                Apply Filter
+              </Button>
+              {isFiltering && (
+                <Button variant="ghost" onClick={handleResetFilter} disabled={isLoading}>
+                  <X className="mr-2 h-4 w-4" /> Reset
+                </Button>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <StatCard
-            title="Today's Tax"
-            value={isLoading ? '...' : formatCurrency(stats.today, currencySymbol)}
-            icon={CalendarIcon}
-            description={format(new Date(), "MMMM dd, yyyy")}
+            title={isFiltering ? "Range Total Tax" : "Today's Tax"}
+            value={isLoading ? '...' : formatCurrency(isFiltering ? stats.total : stats.today, currencySymbol)}
+            icon={isFiltering ? TrendingUp : CalendarIcon}
+            description={isFiltering ? "Total tax in selected period" : format(new Date(), "MMMM dd, yyyy")}
             className="bg-blue-50 dark:bg-blue-950/20 border-blue-100"
             valueClassName="text-blue-600 font-black"
         />
         <StatCard
-            title="This Month's Tax"
-            value={isLoading ? '...' : formatCurrency(stats.month, currencySymbol)}
-            icon={TrendingUp}
-            description={format(new Date(), "MMMM yyyy")}
+            title={isFiltering ? "POS Tax (Range)" : "This Month's Tax"}
+            value={isLoading ? '...' : formatCurrency(isFiltering ? stats.posTotal : stats.month, currencySymbol)}
+            icon={isFiltering ? ShoppingBag : TrendingUp}
+            description={isFiltering ? "POS contribution in range" : format(new Date(), "MMMM yyyy")}
             className="bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100"
             valueClassName="text-emerald-600 font-black"
         />
         <StatCard
-            title="Total Tax Collected"
-            value={isLoading ? '...' : formatCurrency(stats.total, currencySymbol)}
-            icon={BadgePercent}
-            description="Lifetime collected tax"
+            title={isFiltering ? "Web Tax (Range)" : "Total Tax Collected"}
+            value={isLoading ? '...' : formatCurrency(isFiltering ? stats.webTotal : stats.total, currencySymbol)}
+            icon={isFiltering ? Globe : BadgePercent}
+            description={isFiltering ? "Web contribution in range" : "Lifetime collected tax"}
             className="bg-indigo-50 dark:bg-indigo-950/20 border-indigo-100"
             valueClassName="text-indigo-600 font-black"
         />
@@ -229,10 +344,22 @@ export default function TaxVatPage() {
 
       <Card className="shadow-lg overflow-hidden border-none ring-1 ring-border">
         <CardHeader>
-            <CardTitle className="font-headline text-xl flex items-center">
-                <History className="mr-2 h-5 w-5 text-primary"/> Recent Tax Transactions
+            <CardTitle className="font-headline text-xl flex items-center justify-between">
+                <span className="flex items-center">
+                  <History className="mr-2 h-5 w-5 text-primary"/> 
+                  {isFiltering ? 'Filtered Tax Transactions' : 'Recent Tax Transactions'}
+                </span>
+                {isFiltering && (
+                  <Badge variant="secondary" className="ml-2 font-mono text-[10px]">
+                    {allTransactions.length} results
+                  </Badge>
+                )}
             </CardTitle>
-            <CardDescription>Recent transactions that included tax calculations.</CardDescription>
+            <CardDescription>
+              {isFiltering 
+                ? `Showing transactions from ${format(new Date(dateRange?.from || 0), 'PPP')} to ${format(new Date(dateRange?.to || dateRange?.from || 0), 'PPP')}.`
+                : 'Recent transactions that included tax calculations.'}
+            </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           <ScrollArea className="h-[500px]"> 
