@@ -50,50 +50,48 @@ export async function placeOrderAction({
 }) {
   try {
     const { orderId, orderData, settings, emailAlertSettings, whatsappAlertSettings } = await adminDb.runTransaction(async (transaction) => {
-      // 0. Get store settings
-      let settings = {};
-      let emailAlertSettings = null;
-      let whatsappAlertSettings = null;
+      // 0. Baseline settings from global
+      let settings: any = { id: 'global' };
+      let emailAlertSettings: any = null;
+      let whatsappAlertSettings: any = null;
+
+      const globalSettingsDoc = await transaction.get(adminDb.collection('settings').doc('global'));
+      if (globalSettingsDoc.exists) {
+        settings = { ...settings, ...globalSettingsDoc.data() };
+      }
+      
+      const globalEmailAlertsDoc = await transaction.get(adminDb.collection('settings').doc('emailAlerts'));
+      if (globalEmailAlertsDoc.exists) {
+        emailAlertSettings = globalEmailAlertsDoc.data();
+      }
+
+      const globalWhatsAppAlertsDoc = await transaction.get(adminDb.collection('settings').doc('whatsappAlerts'));
+      if (globalWhatsAppAlertsDoc.exists) {
+        whatsappAlertSettings = globalWhatsAppAlertsDoc.data();
+      }
 
       if (storeId) {
         const settingsDoc = await transaction.get(adminDb.collection('stores').doc(storeId).collection('settings').doc('config'));
         if (settingsDoc.exists) {
-          settings = { id: storeId, ...settingsDoc.data() };
+          settings = { ...settings, id: storeId, ...settingsDoc.data() };
         } else {
             // Fallback to legacy
             const legacySettingsDoc = await transaction.get(adminDb.collection('settings').doc(storeId));
             if (legacySettingsDoc.exists) {
-                settings = { id: storeId, ...legacySettingsDoc.data() };
+                settings = { ...settings, id: storeId, ...legacySettingsDoc.data() };
             }
         }
 
         // Fetch store-specific email alert settings
         const emailAlertsDoc = await transaction.get(adminDb.collection('stores').doc(storeId).collection('settings').doc('emailAlerts'));
         if (emailAlertsDoc.exists) {
-            emailAlertSettings = emailAlertsDoc.data();
+            emailAlertSettings = { ...emailAlertSettings, ...emailAlertsDoc.data() };
         }
 
         // Fetch store-specific whatsapp alert settings
         const whatsappAlertsDoc = await transaction.get(adminDb.collection('stores').doc(storeId).collection('settings').doc('whatsappAlerts'));
         if (whatsappAlertsDoc.exists) {
-            whatsappAlertSettings = whatsappAlertsDoc.data();
-        }
-      } else {
-        const globalSettingsDoc = await transaction.get(adminDb.collection('settings').doc('global'));
-        if (globalSettingsDoc.exists) {
-          settings = { id: 'global', ...globalSettingsDoc.data() };
-        }
-        
-        // Fetch global email alert settings
-        const globalEmailAlertsDoc = await transaction.get(adminDb.collection('settings').doc('emailAlerts'));
-        if (globalEmailAlertsDoc.exists) {
-            emailAlertSettings = globalEmailAlertsDoc.data();
-        }
-
-        // Fetch global whatsapp alert settings
-        const globalWhatsAppAlertsDoc = await transaction.get(adminDb.collection('settings').doc('whatsappAlerts'));
-        if (globalWhatsAppAlertsDoc.exists) {
-            whatsappAlertSettings = globalWhatsAppAlertsDoc.data();
+            whatsappAlertSettings = { ...whatsappAlertSettings, ...whatsappAlertsDoc.data() };
         }
       }
 
