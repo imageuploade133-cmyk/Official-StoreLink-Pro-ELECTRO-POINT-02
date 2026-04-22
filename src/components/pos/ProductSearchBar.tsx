@@ -4,7 +4,7 @@ import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Camera } from 'lucide-react';
+import { Search, Barcode } from 'lucide-react';
 import type { Category, DisplayProduct } from '@/lib/types';
 import Image from 'next/image';
 import { formatCurrency } from '@/lib/formatUtils';
@@ -67,7 +67,7 @@ export function ProductSearchBar({
               onClick={onOpenScanner}
               className="h-7 gap-1.5 text-[10px] sm:text-xs font-bold bg-primary/5 hover:bg-primary/10 border-primary/20 text-primary"
             >
-              <Camera className="h-3.5 w-3.5" />
+              <Barcode className="h-3.5 w-3.5" />
               Scan Barcode
             </Button>
           )}

@@ -22,7 +22,7 @@ import Image from 'next/image';
 import { 
   PackagePlus, 
   Search, 
-  Scan, 
+  Barcode, 
   Loader2, 
   History, 
   TrendingUp, 
@@ -286,7 +286,7 @@ export default function RestockNowPage() {
                   className="flex-1"
                 />
                 <Button variant="outline" size="icon" className="h-11 w-11 rounded-xl border-dashed" onClick={() => setIsScannerOpen(true)}>
-                  <Scan className="h-4 w-4" />
+                  <Barcode className="h-4 w-4" />
                 </Button>
               </div>
 

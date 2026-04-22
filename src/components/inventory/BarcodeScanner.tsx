@@ -11,7 +11,8 @@ import {
   DialogDescription
 } from '@/components/ui/dialog';
 import { 
-  Camera, 
+  Camera,
+  Barcode, 
   Zap, 
   ZapOff, 
   X, 
@@ -251,7 +252,7 @@ export function BarcodeScanner({ isOpen, onClose, onScan }: BarcodeScannerProps)
       <DialogContent className="sm:max-w-md p-0 overflow-hidden border-none bg-black rounded-3xl">
         <DialogHeader className="p-6 pb-2 absolute top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/80 to-transparent text-white">
           <DialogTitle className="flex items-center gap-2 text-xl font-black uppercase tracking-tight">
-            <Camera className="h-6 w-6 text-primary" />
+            <Barcode className="h-6 w-6 text-primary" />
             Barcode Scanner
           </DialogTitle>
           <DialogDescription className="text-gray-300 font-medium">

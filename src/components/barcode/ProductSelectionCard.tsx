@@ -5,7 +5,7 @@ import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Scan, Camera } from "lucide-react";
+import { Search, Barcode, Camera } from "lucide-react";
 import { ProductListTable } from "./ProductListTable";
 import { BarcodeListPagination } from "./BarcodeListPagination";
 import type { BarcodeProduct } from "@/lib/types";
@@ -97,7 +97,7 @@ export function ProductSelectionCard({
               onClick={onScanButtonClick}
               title="Scan Barcode"
             >
-              <Scan className="h-4 w-4 sm:mr-2" />
+              <Barcode className="h-4 w-4 sm:mr-2" />
               <span className="hidden sm:inline">Scan</span>
             </Button>
           )}
