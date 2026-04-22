@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useFirestore, useDoc } from '@/firebase';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc } from 'firebase/firestore';
 import type { WhatsAppAlertSettings as WhatsAppAlertSettingsType } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
@@ -14,18 +14,25 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, MessageSquare, Send, CheckCircle2, XCircle, Eye, EyeOff, Info, Key, Smartphone } from 'lucide-react';
+import { Loader2, MessageSquare, Send, CheckCircle2, XCircle, Eye, EyeOff, Info, Key, RotateCcw } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Badge } from '@/components/ui/badge';
 import { validateEBulkSMSAction, saveWhatsAppAlertSettingsAction, getDecryptedWhatsAppApiKeyAction } from '@/app/actions/orders';
 import { useUser } from '@/firebase/auth/use-user';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const whatsappAlertSettingsSchema = z.object({
   enabled: z.boolean().default(false),
   username: z.string().min(1, { message: "Username is required." }),
   apiKey: z.string().min(1, { message: "API Key is required." }),
   senderNumber: z.string().optional(),
+  orderPlacedTemplate: z.string().optional(),
+  orderProcessingTemplate: z.string().optional(),
+  orderShippedTemplate: z.string().optional(),
+  orderCancelledTemplate: z.string().optional(),
+  orderDeliveredTemplate: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof whatsappAlertSettingsSchema>;
@@ -33,6 +40,14 @@ type FormValues = z.infer<typeof whatsappAlertSettingsSchema>;
 interface WhatsAppAlertSettingsProps {
   storeId?: string | null;
 }
+
+const DEFAULT_TEMPLATES = {
+  orderPlaced: "Hello Admin,\nYou received a new order.\n\nOrder ID: #{orderId}\nCustomer: {customerName}\nAmount: {currency}{amount}\nStatus: {status}\n\nLogin to dashboard now.",
+  orderProcessing: "Hello Admin,\nOrder #{orderId} for {customerName} is now being processed.",
+  orderShipped: "Hello Admin,\nOrder #{orderId} for {customerName} has been shipped.",
+  orderCancelled: "Hello Admin,\nOrder #{orderId} for {customerName} has been cancelled.",
+  orderDelivered: "Hello Admin,\nOrder #{orderId} for {customerName} has been delivered successfully.",
+};
 
 export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
   const { user } = useUser();
@@ -61,6 +76,11 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
       username: '',
       apiKey: '',
       senderNumber: '',
+      orderPlacedTemplate: '',
+      orderProcessingTemplate: '',
+      orderShippedTemplate: '',
+      orderCancelledTemplate: '',
+      orderDeliveredTemplate: '',
     },
   });
 
@@ -86,6 +106,11 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
           username: settingsData.username || '',
           apiKey: apiKey,
           senderNumber: settingsData.senderNumber || '',
+          orderPlacedTemplate: settingsData.orderPlacedTemplate || '',
+          orderProcessingTemplate: settingsData.orderProcessingTemplate || '',
+          orderShippedTemplate: settingsData.orderShippedTemplate || '',
+          orderCancelledTemplate: settingsData.orderCancelledTemplate || '',
+          orderDeliveredTemplate: settingsData.orderDeliveredTemplate || '',
         });
         
         if (settingsData.connected) {
@@ -192,6 +217,14 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
   const maskedApiKey = (key: string) => {
     if (!key) return '';
     return '•'.repeat(Math.min(key.length, 12));
+  };
+
+  const resetTemplate = (field: keyof FormValues) => {
+    if (field.endsWith('Template')) {
+        const templateKey = field.replace('Template', '') as keyof typeof DEFAULT_TEMPLATES;
+        form.setValue(field, DEFAULT_TEMPLATES[templateKey] as any);
+        toast({ title: 'Template Reset', description: 'Template has been reset to default.' });
+    }
   };
 
   if (isLoading) {
@@ -341,8 +374,78 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
                     )}
                 />
             </div>
+
+            <div className="pt-6 border-t border-gray-50">
+                <div className="flex items-center gap-2 mb-4">
+                    <h3 className="text-lg font-bold text-gray-900">Notification Templates</h3>
+                    <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-100">Customizable</Badge>
+                </div>
+                
+                <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 mb-6">
+                    <h4 className="text-sm font-semibold text-amber-900 flex items-center gap-2">
+                        <Info className="h-4 w-4" /> Available Placeholders
+                    </h4>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
+                        {['{orderId}', '{customerName}', '{amount}', '{currency}', '{status}'].map(p => (
+                            <code key={p} className="text-xs bg-white/50 border border-amber-200 rounded px-2 py-1 text-amber-800">{p}</code>
+                        ))}
+                    </div>
+                </div>
+
+                <Tabs defaultValue="orderPlaced" className="w-full">
+                    <TabsList className="grid grid-cols-2 md:grid-cols-5 h-auto p-1 bg-gray-100 rounded-xl">
+                        <TabsTrigger value="orderPlaced" className="py-2 text-xs rounded-lg">Placed</TabsTrigger>
+                        <TabsTrigger value="orderProcessing" className="py-2 text-xs rounded-lg">Processing</TabsTrigger>
+                        <TabsTrigger value="orderShipped" className="py-2 text-xs rounded-lg">Shipped</TabsTrigger>
+                        <TabsTrigger value="orderDelivered" className="py-2 text-xs rounded-lg">Delivered</TabsTrigger>
+                        <TabsTrigger value="orderCancelled" className="py-2 text-xs rounded-lg">Cancelled</TabsTrigger>
+                    </TabsList>
+                    
+                    {[
+                        { id: 'orderPlaced', label: 'New Order Alert', field: 'orderPlacedTemplate' },
+                        { id: 'orderProcessing', label: 'Order Processing Alert', field: 'orderProcessingTemplate' },
+                        { id: 'orderShipped', label: 'Order Shipped Alert', field: 'orderShippedTemplate' },
+                        { id: 'orderDelivered', label: 'Order Delivered Alert', field: 'orderDeliveredTemplate' },
+                        { id: 'orderCancelled', label: 'Order Cancelled Alert', field: 'orderCancelledTemplate' },
+                    ].map((tab) => (
+                        <TabsContent key={tab.id} value={tab.id} className="pt-4">
+                            <FormField
+                                control={form.control}
+                                name={tab.field as any}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <div className="flex items-center justify-between">
+                                            <FormLabel className="text-gray-700 font-medium">{tab.label}</FormLabel>
+                                            <Button 
+                                                type="button" 
+                                                variant="ghost" 
+                                                size="sm" 
+                                                className="h-8 text-xs text-gray-500 hover:text-amber-600 gap-1"
+                                                onClick={() => resetTemplate(tab.field as any)}
+                                            >
+                                                <RotateCcw className="h-3 w-3" /> Reset to Default
+                                            </Button>
+                                        </div>
+                                        <FormControl>
+                                            <Textarea 
+                                                {...field} 
+                                                placeholder={DEFAULT_TEMPLATES[tab.id as keyof typeof DEFAULT_TEMPLATES]} 
+                                                className="min-h-[120px] bg-gray-50 border-gray-200 focus:bg-white focus:ring-[#25D366]/20 rounded-xl transition-all resize-none"
+                                            />
+                                        </FormControl>
+                                        <FormDescription className="text-xs">
+                                            Leave blank to use the default message.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </TabsContent>
+                    ))}
+                </Tabs>
+            </div>
           </CardContent>
-          <CardFooter className="px-8 py-6 flex items-center justify-between mt-4">
+          <CardFooter className="px-8 py-6 flex items-center justify-between mt-4 border-t border-gray-50">
             <Button 
                 type="button" 
                 variant="outline" 
