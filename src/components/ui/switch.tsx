@@ -15,9 +15,9 @@ const Switch = React.forwardRef<
       // Light theme - OFF state (gray), ON state (emerald green)
       "data-[state=unchecked]:bg-gray-300 hover:data-[state=unchecked]:bg-gray-400",
       "data-[state=checked]:bg-emerald-500 hover:data-[state=checked]:bg-emerald-600",
-      // Dark theme - OFF state (blue), ON state (green)
-      "dark:data-[state=unchecked]:bg-blue-500 dark:hover:data-[state=unchecked]:bg-blue-600",
-      "dark:data-[state=checked]:bg-green-500 dark:hover:data-[state=checked]:bg-green-400",
+      // Dark theme - OFF state (grey), ON state (green)
+      "dark:data-[state=unchecked]:bg-[#39393d] dark:hover:data-[state=unchecked]:bg-[#48484a]",
+      "dark:data-[state=checked]:bg-[#34c759] dark:hover:data-[state=checked]:bg-[#30d158]",
       className
     )}
     {...props}
@@ -30,8 +30,7 @@ const Switch = React.forwardRef<
         "bg-white data-[state=unchecked]:ring-gray-400/30",
         "data-[state=checked]:ring-emerald-400/40",
         // Dark theme - thumb colors
-        "dark:bg-white dark:data-[state=unchecked]:ring-blue-400/40",
-        "dark:data-[state=checked]:ring-green-300/50"
+        "dark:bg-white"
       )}
     />
   </SwitchPrimitives.Root>
