@@ -580,7 +580,10 @@ export async function sendWhatsAppOrderAlert(order: any, settings: WhatsAppAlert
             extraMsg = `\n\n*Payment Instructions:*\nPlease transfer ${currency}${amount} to:\nBank: ${order.selectedBankAccount.bankName}\nAccount: ${order.selectedBankAccount.accountNumber}\nName: ${order.selectedBankAccount.accountName}\nRef: ${order.paymentReference}\n`;
         }
 
-        const customerMessage = `Hello ${customerName},\nYour order #${orderId} at ${order.storeName || 'our store'} has been placed successfully!\n\nOrder Details:\n${itemsDetails}\n\nTotal: ${currency}${amount}\nPayment Method: ${paymentMethod}\nStatus: ${order.status}${extraMsg}\n\nThank you for shopping with us!`;
+        const customerEmail = order.guestInfo?.email || (order.user_id !== 'GUEST' ? await getCustomerEmail(order.user_id) : 'N/A');
+        const deliveryAddress = order.fulfillmentType === 'pickup' ? 'Method: Store Pickup' : `Address: ${order.guestInfo?.address || 'N/A'}`;
+
+        const customerMessage = `Hello ${customerName},\nYour order #${orderId} at ${order.storeName || 'our store'} has been placed successfully!\n\nOrder Details:\n${itemsDetails}\n\nTotal: ${currency}${amount}\nPayment Method: ${paymentMethod}\nStatus: ${order.status}${extraMsg}\n\n*Delivery Details:*\nName: ${customerName}\nEmail: ${customerEmail}\nPhone: ${customerPhone}\n${deliveryAddress}\n\nThank you for shopping with us!`;
 
         try {
             const result = await sendWhatsAppViaEBulkSMS(
@@ -619,5 +622,15 @@ async function getCustomerName(userId: string) {
         return doc.data()?.displayName || doc.data()?.name || 'Customer';
     } catch (e) {
         return 'Customer';
+    }
+}
+
+async function getCustomerEmail(userId: string) {
+    if (!userId || userId === 'GUEST') return 'N/A';
+    try {
+        const doc = await adminDb.collection('users').doc(userId).get();
+        return doc.data()?.email || 'N/A';
+    } catch (e) {
+        return 'N/A';
     }
 }

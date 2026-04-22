@@ -3,10 +3,11 @@ import { adminDb } from './firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 
 export async function sendOrderNotifications(order: any, settings: any, storeName: string, emailAlertSettings?: any) {
-    const { id: orderId, guestInfo, user_id, totalAmount, paymentStatus, items, deliveryPrice, paymentMethod } = order;
+    const { id: orderId, guestInfo, user_id, totalAmount, paymentStatus, items, deliveryPrice, paymentMethod, fulfillmentType } = order;
     
     const customerEmail = guestInfo?.email || (await getCustomerEmail(user_id));
     const customerName = guestInfo?.name || (await getCustomerName(user_id));
+    const customerPhone = guestInfo?.phone || (await getCustomerPhone(user_id));
     
     if (!customerEmail) {
         console.error('No customer email found for order', orderId);
@@ -33,6 +34,13 @@ export async function sendOrderNotifications(order: any, settings: any, storeNam
 
     const subtotal = (totalAmount - (deliveryPrice || 0)).toFixed(2);
 
+    const deliveryDetails = [
+        `Name: ${customerName}`,
+        `Email: ${customerEmail || 'N/A'}`,
+        `Phone: ${customerPhone || 'N/A'}`,
+        fulfillmentType === 'pickup' ? `Method: Store Pickup` : `Address: ${guestInfo?.address || 'N/A'}`
+    ].join('\n');
+
     const commonData = {
         orderId,
         customerName: customerName || 'Valued Customer',
@@ -44,7 +52,7 @@ export async function sendOrderNotifications(order: any, settings: any, storeNam
         subtotal: `${settings.currency || '$'}${subtotal}`,
         shippingHtml,
         total: `${settings.currency || '$'}${totalAmount.toFixed(2)}`,
-        deliveryAddress: guestInfo?.address || 'N/A',
+        deliveryAddress: deliveryDetails,
         year: new Date().getFullYear(),
         storeName: storeName || 'Our Store',
     };
@@ -278,5 +286,16 @@ async function getCustomerName(userId: string) {
         return doc.data()?.displayName || doc.data()?.name || 'Customer';
     } catch (e) {
         return 'Customer';
+    }
+}
+
+async function getCustomerPhone(userId: string) {
+    if (!userId || userId === 'GUEST') return null;
+    try {
+        const doc = await adminDb.collection('users').doc(userId).get();
+        const data = doc.data();
+        return data?.alternativePhoneNumber || data?.phone || null;
+    } catch (e) {
+        return null;
     }
 }
