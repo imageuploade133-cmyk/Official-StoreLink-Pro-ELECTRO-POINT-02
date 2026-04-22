@@ -15,18 +15,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useFirestore } from '@/firebase';
 import { useAuth } from '@/contexts/auth-context';
 import { runTransaction, doc, serverTimestamp, Timestamp, increment } from 'firebase/firestore';
 import type { SaleTransaction, SaleReturn } from '@/lib/types';
-import { Loader2, Undo2, Search, AlertTriangle } from 'lucide-react';
+import { Loader2, Undo2, Search, AlertTriangle, Minus, Plus } from 'lucide-react';
 import { formatCurrency } from '@/lib/formatUtils';
 import { logActivity } from '@/lib/activity-log-utils';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 const returnItemSchema = z.object({
   productId: z.string(),
@@ -48,6 +50,55 @@ const returnFormSchema = z.object({
 });
 
 type ReturnFormValues = z.infer<typeof returnFormSchema>;
+
+function QuantityAdjuster({ 
+  value, 
+  max, 
+  onChange, 
+  disabled 
+}: { 
+  value: number; 
+  max: number; 
+  onChange: (val: number) => void; 
+  disabled?: boolean 
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <Button
+        type="button"
+        variant="outline"
+        size="icon"
+        className="h-8 w-8 rounded-full shrink-0"
+        onClick={() => onChange(Math.max(0, value - 1))}
+        disabled={disabled || value <= 0}
+      >
+        <Minus className="h-4 w-4" />
+      </Button>
+      <div className="relative w-12">
+        <Input
+          type="number"
+          value={value}
+          onChange={(e) => {
+            const val = parseInt(e.target.value) || 0;
+            onChange(Math.min(max, Math.max(0, val)));
+          }}
+          className="h-8 w-12 p-0 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-xs font-bold"
+          disabled={disabled}
+        />
+      </div>
+      <Button
+        type="button"
+        variant="outline"
+        size="icon"
+        className="h-8 w-8 rounded-full shrink-0"
+        onClick={() => onChange(Math.min(max, value + 1))}
+        disabled={disabled || value >= max}
+      >
+        <Plus className="h-4 w-4" />
+      </Button>
+    </div>
+  );
+}
 
 interface SaleReturnDialogProps {
   isOpen: boolean;
@@ -244,122 +295,202 @@ export function SaleReturnDialog({ isOpen, onOpenChange, saleTransaction, curren
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Undo2 className="h-5 w-5 text-primary"/>
-            Return Items from Sale #{saleTransaction.id.substring(0, 8)}
+      <DialogContent className="max-w-2xl w-[95vw] sm:w-full max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0">
+        <DialogHeader className="p-6 pb-2">
+          <DialogTitle className="flex items-center gap-2 text-xl">
+            <Undo2 className="h-6 w-6 text-primary"/>
+            Return Items <span className="text-muted-foreground font-normal">#{saleTransaction.id.substring(0, 8).toUpperCase()}</span>
           </DialogTitle>
           <DialogDescription>
-            Select the quantity of each item to return. Stock will be automatically adjusted.
+            Select the quantity of each item to return.
           </DialogDescription>
         </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-             <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search for items in this sale..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            <ScrollArea className="h-64 border rounded-md">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                     <TableHead className="w-12 text-center">
-                        <Checkbox
-                            checked={areAllVisibleSelected}
-                            onCheckedChange={handleSelectAllVisible}
-                            aria-label="Select all visible items"
-                            disabled={filteredItemsWithIndex.every(f => f.maxReturnable === 0)}
-                        />
-                     </TableHead>
-                    <TableHead className="w-1/2">Product</TableHead>
-                    <TableHead className="text-center">Returnable</TableHead>
-                    <TableHead className="text-center w-[120px]">Qty to Return</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredItemsWithIndex.map((item) => {
-                      const originalIndex = item.originalIndex;
-                      return (
-                        <TableRow key={item.fieldId || `item-${originalIndex}`}>
-                           <TableCell className="text-center">
-                                <Checkbox
-                                    checked={item.quantity > 0}
-                                    onCheckedChange={(checked) => {
-                                        const newQuantity = checked ? 1 : 0;
-                                        if (checked && item.maxReturnable < 1) {
-                                            toast({ variant: 'destructive', title: "Cannot return", description: "No items available to return." });
-                                            return;
-                                        }
-                                        form.setValue(`items.${originalIndex}.quantity`, newQuantity, { shouldValidate: true });
-                                    }}
-                                    disabled={item.maxReturnable === 0}
-                                />
-                           </TableCell>
-                          <TableCell className="font-medium">{item.productName}</TableCell>
-                          <TableCell className="text-center">{item.maxReturnable}</TableCell>
-                          <TableCell>
-                            <FormField
-                              control={form.control}
-                              name={`items.${originalIndex}.quantity`}
-                              render={({ field: qtyField }) => (
-                                <FormItem>
-                                  <FormControl>
-                                    <Input type="number" min="0" max={item.maxReturnable} {...qtyField} disabled={item.maxReturnable === 0}/>
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                </TableBody>
-              </Table>
-            </ScrollArea>
-            
-            {form.formState.errors.items?.message && (
-                <div className="flex items-center gap-2 text-sm font-medium text-destructive bg-destructive/10 p-3 rounded-md">
-                    <AlertTriangle className="h-4 w-4" />
-                    {form.formState.errors.items.message}
-                </div>
-            )}
 
-            <FormField
-              control={form.control}
-              name="reason"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Reason for Return (Optional)</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="e.g., Damaged item, customer changed mind" {...field}/>
-                  </FormControl>
-                </FormItem>
-              )}
+        <div className="px-6 pb-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Filter items in this sale..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 h-10"
             />
-            <Card className="bg-muted/50">
-              <CardContent className="p-4">
-                  <div className="flex justify-between items-center text-lg font-bold">
-                    <span>Total Refund Amount:</span>
-                    <span className="text-destructive">{formatCurrency(totalRefundAmount, currencySymbol)}</span>
+          </div>
+        </div>
+
+        <ScrollArea className="flex-1 px-6">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pb-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between px-2">
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="select-all"
+                      checked={areAllVisibleSelected}
+                      onCheckedChange={handleSelectAllVisible}
+                      aria-label="Select all visible items"
+                      disabled={filteredItemsWithIndex.every(f => f.maxReturnable === 0)}
+                    />
+                    <Label htmlFor="select-all" className="text-sm font-medium text-muted-foreground cursor-pointer">
+                      Select All Items
+                    </Label>
                   </div>
-              </CardContent>
-            </Card>
-             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={form.formState.isSubmitting}>Cancel</Button>
-              <Button type="submit" disabled={form.formState.isSubmitting || totalRefundAmount <= 0}>
-                {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
+                  <span className="text-xs text-muted-foreground font-medium">
+                    {filteredItemsWithIndex.length} items found
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3">
+                  {filteredItemsWithIndex.map((item) => {
+                    const originalIndex = item.originalIndex;
+                    return (
+                      <Card 
+                        key={item.fieldId || `item-${originalIndex}`}
+                        className={cn(
+                          "transition-colors border-l-4",
+                          item.quantity > 0 ? "border-l-primary bg-primary/5" : "border-l-transparent"
+                        )}
+                      >
+                        <CardContent className="p-3 sm:p-4">
+                          <div className="flex gap-4 items-start">
+                            <div className="pt-1">
+                              <Checkbox
+                                id={`item-${originalIndex}`}
+                                checked={item.quantity > 0}
+                                onCheckedChange={(checked) => {
+                                  const newQuantity = checked ? 1 : 0;
+                                  if (checked && item.maxReturnable < 1) {
+                                    toast({ variant: 'destructive', title: "Cannot return", description: "No items available to return." });
+                                    return;
+                                  }
+                                  form.setValue(`items.${originalIndex}.quantity`, newQuantity, { shouldValidate: true });
+                                }}
+                                disabled={item.maxReturnable === 0}
+                              />
+                            </div>
+                            
+                            <div className="flex-1 min-w-0">
+                              <div className="flex justify-between items-start gap-2 mb-2">
+                                <div>
+                                  <Label 
+                                    htmlFor={`item-${originalIndex}`} 
+                                    className="font-bold text-sm sm:text-base leading-tight truncate block cursor-pointer"
+                                  >
+                                    {item.productName}
+                                  </Label>
+                                  <p className="text-xs text-muted-foreground">
+                                    {formatCurrency(item.unitPrice, currencySymbol)} per unit
+                                  </p>
+                                </div>
+                                <Badge variant="secondary" className="whitespace-nowrap">
+                                  {item.maxReturnable} available
+                                </Badge>
+                              </div>
+
+                              <div className="flex flex-wrap items-center justify-between gap-3 mt-4">
+                                <FormField
+                                  control={form.control}
+                                  name={`items.${originalIndex}.quantity`}
+                                  render={({ field: qtyField }) => (
+                                    <div className="flex items-center gap-3">
+                                      <QuantityAdjuster 
+                                        value={qtyField.value} 
+                                        max={item.maxReturnable} 
+                                        onChange={qtyField.onChange} 
+                                        disabled={item.maxReturnable === 0}
+                                      />
+                                      {item.maxReturnable > 1 && (
+                                        <Button
+                                          type="button"
+                                          variant="ghost"
+                                          size="sm"
+                                          className="text-xs h-7 px-2 text-primary hover:text-primary hover:bg-primary/10"
+                                          onClick={() => qtyField.onChange(item.maxReturnable)}
+                                          disabled={qtyField.value === item.maxReturnable}
+                                        >
+                                          Return All
+                                        </Button>
+                                      )}
+                                    </div>
+                                  )}
+                                />
+                                
+                                {item.quantity > 0 && (
+                                  <div className="text-sm font-bold text-primary">
+                                    Refund: {formatCurrency(item.quantity * item.unitPrice, currencySymbol)}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {form.formState.errors.items?.message && (
+                <div className="flex items-center gap-2 text-sm font-medium text-destructive bg-destructive/10 p-4 rounded-lg">
+                  <AlertTriangle className="h-5 w-5 shrink-0" />
+                  {form.formState.errors.items.message}
+                </div>
+              )}
+
+              <FormField
+                control={form.control}
+                name="reason"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-bold">Reason for Return (Optional)</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="e.g., Damaged item, customer changed mind" 
+                        className="resize-none min-h-[80px]"
+                        {...field}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </form>
+          </Form>
+        </ScrollArea>
+
+        <div className="p-6 border-t bg-muted/30">
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+            <div className="w-full sm:w-auto">
+              <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-1">Total Refund Amount</p>
+              <p className="text-2xl font-black text-primary leading-none">
+                {formatCurrency(totalRefundAmount, currencySymbol)}
+              </p>
+            </div>
+            
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="flex-1 sm:flex-none"
+                onClick={() => onOpenChange(false)} 
+                disabled={form.formState.isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={form.handleSubmit(onSubmit)}
+                className="flex-1 sm:flex-none min-w-[140px]"
+                disabled={form.formState.isSubmitting || totalRefundAmount <= 0}
+              >
+                {form.formState.isSubmitting ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                ) : (
+                  <Undo2 className="mr-2 h-4 w-4"/>
+                )}
                 Process Return
               </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+            </div>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );
