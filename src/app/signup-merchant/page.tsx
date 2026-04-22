@@ -16,7 +16,8 @@ import {
     Phone, 
     Home,
     Store as StoreIcon,
-    ArrowRight
+    ArrowRight,
+    Check
 } from "lucide-react";
 import { PageSpinner, Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/hooks/use-toast";
@@ -72,6 +73,26 @@ export default function MerchantSignupPage() {
     const { store, stores, setSelectedStoreId, staffMember, isLoading: isAuthContextLoading } = useAuth();
     const [isSuccessfullySubmitted, setIsSuccessfullySubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [currentStep, setCurrentStep] = useState(1);
+    const totalSteps = 3;
+
+    const nextStep = async () => {
+        let fieldsToValidate: (keyof SignupFormValues)[] = [];
+        if (currentStep === 1) {
+            fieldsToValidate = ['name', 'email', 'password', 'confirmPassword'];
+        } else if (currentStep === 2) {
+            fieldsToValidate = ['storeName', 'storeSlug', 'storePhone', 'storeAddress'];
+        }
+        
+        const isValid = await form.trigger(fieldsToValidate);
+        if (isValid) {
+            setCurrentStep(prev => Math.min(prev + 1, totalSteps));
+        }
+    };
+
+    const prevStep = () => {
+        setCurrentStep(prev => Math.max(prev - 1, 1));
+    };
     
     const form = useForm<SignupFormValues>({
       resolver: zodResolver(signupSchema),
@@ -299,75 +320,150 @@ export default function MerchantSignupPage() {
     <div className="w-full min-h-screen grid lg:grid-cols-2">
       <div className="flex items-center justify-center py-12">
         <div className="mx-auto grid w-[400px] gap-6 px-4">
-          <div className="grid gap-2 text-center">
+          <div className="grid gap-2 text-center mb-4">
              <div className="flex justify-center mb-4 h-10">
                 <ElysiumLogo className="h-10 w-10 text-primary" />
             </div>
             <h1 className="text-4xl font-bold font-headline">Create a Store</h1>
-            <p className="text-balance text-muted-foreground">
-              Start managing your business with StoreLink Pro.
+            <p className="text-balance text-muted-foreground text-sm">
+              {currentStep === 1 ? 'First, let’s create your administrator account.' : 
+               currentStep === 2 ? 'Tell us about your store details.' : 
+               'Final touches for your store setup.'}
             </p>
           </div>
+
+          {/* Step Indicator */}
+          <div className="flex justify-between mb-8 relative">
+            <div className="absolute top-4 left-0 w-full h-0.5 bg-muted -z-0" />
+            <div 
+              className="absolute top-4 left-0 h-0.5 bg-primary transition-all duration-500 -z-0" 
+              style={{ width: `${((currentStep - 1) / (totalSteps - 1)) * 100}%` }}
+            />
+            {[1, 2, 3].map((step) => (
+              <div key={step} className="flex flex-col items-center gap-2 z-10">
+                <div 
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
+                    currentStep > step ? 'bg-primary text-primary-foreground' : 
+                    currentStep === step ? 'bg-primary text-primary-foreground ring-4 ring-primary/20' : 
+                    'bg-muted text-muted-foreground'
+                  }`}
+                >
+                  {currentStep > step ? <Check className="h-4 w-4" /> : step}
+                </div>
+                <span className={`text-[10px] uppercase tracking-wider font-bold transition-colors duration-300 ${currentStep === step ? 'text-primary' : 'text-muted-foreground'}`}>
+                  {step === 1 ? 'Account' : step === 2 ? 'Store' : 'Finish'}
+                </span>
+              </div>
+            ))}
+          </div>
+
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-                <FormField control={form.control} name="name" render={({ field }) => (
-                    <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="John Doe" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
-                )}/>
-                <FormField control={form.control} name="email" render={({ field }) => (
-                    <FormItem><FormLabel>Email Address</FormLabel><FormControl><Input type="email" placeholder="m@example.com" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
-                )}/>
-                <FormField control={form.control} name="storeName" render={({ field }) => (
-                    <FormItem><FormLabel>Store Name</FormLabel><FormControl><Input placeholder="My Awesome Store" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
-                )}/>
-                <FormField control={form.control} name="storeSlug" render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Store URL Slug</FormLabel>
-                        <FormControl>
-                            <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">/</span>
-                                <Input placeholder="my-awesome-store" className="pl-6" {...field} disabled={isSubmitting || isLoading} />
-                            </div>
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}/>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <FormField control={form.control} name="storePhone" render={({ field }) => (
-                        <FormItem><FormLabel>Store Phone Number</FormLabel><FormControl><Input placeholder="+234..." {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
+                {currentStep === 1 && (
+                  <div className="grid gap-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                    <FormField control={form.control} name="name" render={({ field }) => (
+                        <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="John Doe" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
                     )}/>
-                    <FormField control={form.control} name="storeAddress" render={({ field }) => (
-                        <FormItem><FormLabel>Store Address</FormLabel><FormControl><Input placeholder="123 Business St, Lagos" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
+                    <FormField control={form.control} name="email" render={({ field }) => (
+                        <FormItem><FormLabel>Email Address</FormLabel><FormControl><Input type="email" placeholder="m@example.com" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
                     )}/>
-                </div>
-                <FormField control={form.control} name="databaseId" render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Database ID (Optional)</FormLabel>
-                        <FormControl><Input placeholder="(default)" {...field} disabled={isSubmitting || isLoading} /></FormControl>
-                        <p className="text-[10px] text-muted-foreground italic">Leave as <strong>(default)</strong> unless you have specifically created a separate Firestore database for this project.</p>
-                        <FormMessage />
-                    </FormItem>
-                )}/>
-                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <FormField control={form.control} name="password" render={({ field }) => (
-                        <FormItem><FormLabel>Password</FormLabel>
-                          <div className="relative">
-                            <FormControl><Input type={showPassword ? 'text' : 'password'} placeholder="Min. 6 chars" {...field} disabled={isSubmitting || isLoading} /></FormControl>
-                             <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7" onClick={() => setShowPassword(!showPassword)}><Eye className="h-4 w-4" /></Button>
-                          </div>
-                        <FormMessage /></FormItem>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <FormField control={form.control} name="password" render={({ field }) => (
+                            <FormItem><FormLabel>Password</FormLabel>
+                              <div className="relative">
+                                <FormControl><Input type={showPassword ? 'text' : 'password'} placeholder="Min. 6 chars" {...field} disabled={isSubmitting || isLoading} /></FormControl>
+                                 <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7" onClick={() => setShowPassword(!showPassword)}><Eye className="h-4 w-4" /></Button>
+                              </div>
+                            <FormMessage /></FormItem>
+                        )}/>
+                        <FormField control={form.control} name="confirmPassword" render={({ field }) => (
+                            <FormItem><FormLabel>Confirm Password</FormLabel><FormControl><Input type={showPassword ? 'text' : 'password'} placeholder="Repeat password" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
+                        )}/>
+                    </div>
+                  </div>
+                )}
+
+                {currentStep === 2 && (
+                  <div className="grid gap-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                    <FormField control={form.control} name="storeName" render={({ field }) => (
+                        <FormItem><FormLabel>Store Name</FormLabel><FormControl><Input placeholder="My Awesome Store" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
                     )}/>
-                    <FormField control={form.control} name="confirmPassword" render={({ field }) => (
-                        <FormItem><FormLabel>Confirm Password</FormLabel><FormControl><Input type={showPassword ? 'text' : 'password'} placeholder="Repeat password" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
+                    <FormField control={form.control} name="storeSlug" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Store URL Slug</FormLabel>
+                            <FormControl>
+                                <div className="relative">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">/</span>
+                                    <Input placeholder="my-awesome-store" className="pl-6" {...field} disabled={isSubmitting || isLoading} />
+                                </div>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
                     )}/>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <FormField control={form.control} name="storePhone" render={({ field }) => (
+                            <FormItem><FormLabel>Store Phone Number</FormLabel><FormControl><Input placeholder="+234..." {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
+                        )}/>
+                        <FormField control={form.control} name="storeAddress" render={({ field }) => (
+                            <FormItem><FormLabel>Store Address</FormLabel><FormControl><Input placeholder="123 Business St, Lagos" {...field} disabled={isSubmitting || isLoading} /></FormControl><FormMessage /></FormItem>
+                        )}/>
+                    </div>
+                  </div>
+                )}
+
+                {currentStep === 3 && (
+                  <div className="grid gap-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                    <FormField control={form.control} name="databaseId" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Database ID (Optional)</FormLabel>
+                            <FormControl><Input placeholder="(default)" {...field} disabled={isSubmitting || isLoading} /></FormControl>
+                            <p className="text-[10px] text-muted-foreground italic">Leave as <strong>(default)</strong> unless you have specifically created a separate Firestore database for this project.</p>
+                            <FormMessage />
+                        </FormItem>
+                    )}/>
+
+                    <div className="bg-muted/50 p-4 rounded-lg border space-y-3 mt-2">
+                        <h3 className="text-sm font-bold flex items-center gap-2 text-primary">
+                          <StoreIcon className="h-4 w-4" />
+                          Registration Summary
+                        </h3>
+                        <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-[11px]">
+                          <div className="text-muted-foreground">Administrator:</div>
+                          <div className="font-medium truncate">{form.getValues('name')}</div>
+                          <div className="text-muted-foreground">Email:</div>
+                          <div className="font-medium truncate">{form.getValues('email')}</div>
+                          <div className="text-muted-foreground">Store Name:</div>
+                          <div className="font-medium truncate">{form.getValues('storeName')}</div>
+                          <div className="text-muted-foreground">Store Slug:</div>
+                          <div className="font-medium truncate">/{form.getValues('storeSlug')}</div>
+                        </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex gap-4 mt-4">
+                    {currentStep > 1 && (
+                        <Button type="button" variant="outline" onClick={prevStep} className="flex-1 h-12 font-bold" disabled={isSubmitting || isLoading}>
+                            Back
+                        </Button>
+                    )}
+                    {currentStep < totalSteps ? (
+                        <Button type="button" onClick={nextStep} className="flex-1 h-12 font-bold bg-primary text-primary-foreground hover:bg-primary/90">
+                            Next <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                    ) : (
+                        <Button type="submit" className="flex-1 h-12 font-bold" disabled={isSubmitting || isLoading}>
+                            {(isSubmitting || isLoading) ? <><Spinner size="sm" className="mr-2" />Creating Store…</> : 'Create Store Account'}
+                        </Button>
+                    )}
                 </div>
 
-                <Button type="submit" className="w-full mt-2 h-12 font-bold" disabled={isSubmitting || isLoading}>
-                    {(isSubmitting || isLoading) ? <><Spinner size="sm" className="mr-2" />Creating Store…</> : 'Create Store Account'}
-                </Button>
-                <div className="text-center text-sm">
-                    Already have an account?{" "}
-                    <Link href="/login" className="underline text-primary font-bold">Log in</Link>
-                </div>
+                {currentStep === 1 && (
+                  <div className="text-center text-sm mt-2">
+                      Already have an account?{" "}
+                      <Link href="/login" className="underline text-primary font-bold">Log in</Link>
+                  </div>
+                )}
             </form>
           </Form>
         </div>
