@@ -28,11 +28,12 @@ import { useAds } from '@/contexts/ad-context';
 
 import { FastCheckoutButtons } from '@/components/store/FastCheckoutButtons';
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useStoreUrl } from '@/hooks/use-store-url';
 
 export default function CartPage() {
   const params = useParams();
+  const router = useRouter();
   const { cartItems, updateQuantity, removeFromCart, cartCount } = useCart();
   const { settings } = useSettings();
   const firestore = useFirestore();
@@ -47,6 +48,7 @@ export default function CartPage() {
   const [today, setToday] = useState<Date | null>(null);
   const [availablePaymentMethods, setAvailablePaymentMethods] = useState<any[]>([]);
   const [isLoadingMethods, setIsLoadingMethods] = useState(true);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const filteredPaymentMethods = useMemo(() => {
     return availablePaymentMethods.filter(method => {
@@ -484,11 +486,20 @@ export default function CartPage() {
                             />
                           )}
 
-                          <Button asChild size="lg" style={buttonStyle} className="w-full h-14 text-lg font-bold shadow-lg shadow-primary/20 border-none" disabled={hasIssues || subtotal === 0}>
-                             <Link href={getStoreUrl('/store/checkout')}>
-                               Checkout Now <ArrowRight className="ml-2 h-5 w-5" />
-                             </Link>
-                          </Button>
+                          <LoadingButton 
+                            size="lg" 
+                            style={buttonStyle} 
+                            className="w-full h-14 text-lg font-bold shadow-lg shadow-primary/20 border-none" 
+                            disabled={hasIssues || subtotal === 0}
+                            isLoading={isCheckingOut}
+                            onClick={() => {
+                              setIsCheckingOut(true);
+                              router.push(getStoreUrl('/store/checkout'));
+                            }}
+                            loadingText="Processing..."
+                          >
+                             Checkout Now <ArrowRight className="ml-2 h-5 w-5" />
+                          </LoadingButton>
 
                           <div className="flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground pt-4">
                               <ShoppingCart className="h-3 w-3" /> Secure Checkout Powered by StoreLink
