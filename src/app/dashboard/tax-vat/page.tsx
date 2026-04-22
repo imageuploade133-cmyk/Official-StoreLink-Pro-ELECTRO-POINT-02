@@ -15,7 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
-  ReceiptPercent, 
+  BadgePercent, 
   RotateCcw, 
   Calendar as CalendarIcon, 
   History,
@@ -36,7 +36,7 @@ import {
   limit
 } from 'firebase/firestore'; 
 import type { SaleTransaction, Order } from '@/lib/types';
-import { convertToDateSafely } from '@/lib/utils';
+import { convertToDateSafely, cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/formatUtils';
 import { Badge } from '@/components/ui/badge';
 import { useSettings } from '@/contexts/settings-context';
@@ -165,7 +165,7 @@ export default function TaxVatPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <PageHeader
-            icon={ReceiptPercent}
+            icon={BadgePercent}
             title="Tax & VAT Report"
             description="Overview of taxes collected from POS and Online Store."
         />
@@ -195,7 +195,7 @@ export default function TaxVatPage() {
         <StatCard
             title="Total Tax Collected"
             value={isLoading ? '...' : formatCurrency(stats.total, currencySymbol)}
-            icon={ReceiptPercent}
+            icon={BadgePercent}
             description="Lifetime collected tax"
             className="bg-indigo-50 dark:bg-indigo-950/20 border-indigo-100"
             valueClassName="text-indigo-600 font-black"

@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, ReceiptPercent } from 'lucide-react';
+import { Loader2, BadgePercent } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 
 const taxSettingsSchema = z.object({
@@ -86,7 +86,7 @@ export function TaxSettings({ settingsData, isLoading, storeId }: TaxSettingsPro
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader className="bg-muted/30 border-b">
             <CardTitle className="flex items-center gap-2">
-              <ReceiptPercent className="h-5 w-5 text-primary"/> Tax & VAT Settings
+              <BadgePercent className="h-5 w-5 text-primary"/> Tax & VAT Settings
             </CardTitle>
             <CardDescription>Configure tax and VAT for your public store and POS system.</CardDescription>
           </CardHeader>
