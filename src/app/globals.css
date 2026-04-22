@@ -366,20 +366,23 @@
     animation-play-state: running;
   }
 
-  /* Clean card hover effect */
-  .dark .anderd-card {
-    @apply transition-all duration-300;
-    background: hsl(215 22% 13%);
-    border: 1px solid hsl(215 21% 23%);
+  /* Apple-style Input Focus Animation */
+  @keyframes apple-focus {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.005); }
+    100% { transform: scale(1); }
+  }
+  .apple-input-focus:focus-within {
+    animation: apple-focus 0.2s ease-out;
   }
 
-  .dark .anderd-card:hover {
-    background: hsl(215 23% 18%);
-    border-color: hsl(217 100% 56% / 0.3);
-    box-shadow: 0 4px 12px hsl(0 0% 0% / 0.2);
+  /* Refined Glassmorphism */
+  .apple-glass {
+    @apply backdrop-blur-md bg-white/70 dark:bg-black/70 border border-white/20 dark:border-white/10;
   }
+}
 
-  /* Dark mode input styling - Complete with custom dark colors */
+@layer utilities {
   .dark input,
   .dark textarea,
   .dark select {
@@ -464,7 +467,7 @@
   /* Custom Global Button Styles */
   .btn-back {
     @apply border-2 border-slate-200 bg-white text-slate-900 shadow-sm transition-all duration-200 !important;
-    border-radius: 0.75rem;
+    border-radius: 1rem;
     padding-left: 1rem !important;
     padding-right: 1.25rem !important;
   }
@@ -484,7 +487,7 @@
 
   .btn-save {
     @apply border-2 border-emerald-600/20 bg-emerald-600 text-white shadow-sm transition-all duration-200 !important;
-    border-radius: 0.75rem;
+    border-radius: 1rem;
   }
 
   .btn-save:hover {
@@ -762,6 +765,7 @@
     background-color: #0f172a !important;
     border: 2px solid rgba(148, 163, 184, 0.3) !important;
     color: #f8fafc !important;
+    border-radius: 1rem !important;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
   }
 
@@ -780,6 +784,7 @@
     background-color: #059669 !important;
     border: 2px solid rgba(16, 185, 129, 0.4) !important;
     color: #ffffff !important;
+    border-radius: 1rem !important;
   }
 
   .dark .btn-save:hover {
