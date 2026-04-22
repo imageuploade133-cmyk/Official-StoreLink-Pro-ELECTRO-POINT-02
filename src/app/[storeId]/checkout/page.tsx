@@ -528,7 +528,30 @@ export default function CheckoutPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone Number (Required for WhatsApp Updates)</Label>
-                    <div className="relative"><Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Input id="phone" name="phone" type="tel" placeholder="+1 (555) 000-0000" className="pl-10" value={formData.phone} onChange={handleInputChange} required disabled={step !== 'details'} /></div>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input 
+                        id="phone" 
+                        name="phone" 
+                        type="tel" 
+                        placeholder="e.g. 08012345678" 
+                        className="pl-10" 
+                        value={formData.phone} 
+                        onChange={handleInputChange} 
+                        onBlur={() => {
+                          const formatted = formatPhoneNumberForWhatsapp(formData.phone, settings?.countryCode || '234');
+                          if (formatted) {
+                            setFormData(prev => ({ ...prev, phone: formatted }));
+                          }
+                        }}
+                        required 
+                        disabled={step !== 'details'} 
+                      />
+                    </div>
+                    <p className="text-[10px] text-muted-foreground flex items-center gap-1.5 px-1 mt-1">
+                      <Info className="h-3 w-3 text-primary" />
+                      We&apos;ll automatically format your number for WhatsApp alerts (e.g. 23480...).
+                    </p>
                   </div>
 
                   {fulfillmentType === 'delivery' && (
