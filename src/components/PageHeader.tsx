@@ -19,7 +19,7 @@ export function PageHeader({
 }: PageHeaderProps) {
   return (
     <div className={cn('flex items-start gap-4', className)}>
-      <div className="rounded-xl border bg-card p-2.5 shadow-sm dark:border-border/50">
+      <div className="rounded-xl border bg-card p-2.5 dark:border-border/50">
         <Icon className="h-6 w-6 text-primary" />
       </div>
       <div className="space-y-0.5">

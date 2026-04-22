@@ -121,8 +121,10 @@
 }
 
 @layer base {
-  * {
+  *, ::before, ::after {
     @apply border-border transition-colors duration-300 ease-in-out;
+    --tw-shadow: 0 0 #0000 !important;
+    --tw-shadow-colored: 0 0 #0000 !important;
   }
   html {
     scroll-behavior: smooth;
@@ -217,13 +219,11 @@
     @apply backdrop-blur-xl transition-all duration-500;
     background: rgba(255, 255, 255, 0.75);
     border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
   }
-  
+
   .dark .glass-card {
     background: rgba(22, 27, 34, 0.75);
     border: 1px solid rgba(48, 54, 61, 0.8);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   }
 
   .glass-nav {
@@ -231,11 +231,10 @@
     background: rgba(255, 255, 255, 0.85);
     border-color: rgba(255, 255, 255, 0.12);
   }
-  
+
   .dark .glass-nav {
     background: rgba(22, 27, 34, 0.9);
     border-color: rgba(48, 54, 61, 0.8);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
 
   /* Custom Scrollbar Styles - Anderd Dark Mood */
@@ -270,7 +269,6 @@
 
   .dark ::-webkit-scrollbar-thumb:hover {
     background-color: #059669;
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
   }
   
   html.dark ::-webkit-scrollbar-thumb {
@@ -282,18 +280,15 @@
 
   html.dark ::-webkit-scrollbar-thumb:hover {
     background-color: #059669;
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
   }
 
   /* Clean Border Focus Animation */
   @keyframes border-glow {
     0%, 100% { 
       border-color: hsl(217 100% 56% / 0.3);
-      box-shadow: 0 0 0 0px hsl(217 100% 56% / 0);
     }
     50% { 
       border-color: hsl(217 100% 56% / 0.6);
-      box-shadow: 0 0 12px 2px hsl(217 100% 56% / 0.15);
     }
   }
   .animate-border-glow {
@@ -338,8 +333,8 @@
 
   /* Premium spinner ring glow */
   @keyframes ring-glow {
-    0%, 100% { filter: drop-shadow(0 0 3px hsl(217 91% 60% / 0.3)); }
-    50% { filter: drop-shadow(0 0 8px hsl(217 91% 60% / 0.7)); }
+    0%, 100% { filter: none; }
+    50% { filter: none; }
   }
   .animate-ring-glow {
     animation: ring-glow 2s ease-in-out infinite;
@@ -390,7 +385,6 @@
     border: 1px solid #3a3f4b;
     color: #f1f5f9;
     transition: all 0.25s ease;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
   }
 
   .dark input::placeholder,
@@ -403,14 +397,12 @@
   .dark select:hover {
     border-color: #4a5059;
     background-color: #323849;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
   }
 
   .dark input:focus,
   .dark textarea:focus,
   .dark select:focus {
     border-color: hsl(var(--primary));
-    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.15), inset 0 1px 3px rgba(0, 0, 0, 0.3);
     outline: none;
     background-color: #323849;
   }
@@ -454,7 +446,6 @@
 
   .dark .input-wrapper:focus-within {
     border-color: hsl(var(--primary));
-    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
   }
 
   .dark .input-wrapper input {
@@ -466,14 +457,14 @@
 
   /* Custom Global Button Styles */
   .btn-back {
-    @apply border-2 border-slate-200 bg-white text-slate-900 shadow-sm transition-all duration-200 !important;
+    @apply border-2 border-slate-200 bg-white text-slate-900 transition-all duration-200 !important;
     border-radius: 1rem;
     padding-left: 1rem !important;
     padding-right: 1.25rem !important;
   }
 
   .btn-back:hover {
-    @apply border-slate-300 bg-slate-50 shadow-md !important;
+    @apply border-slate-300 bg-slate-50 !important;
     transform: translateY(-1px);
   }
 
@@ -486,19 +477,18 @@
   }
 
   .btn-save {
-    @apply border-2 border-emerald-600/20 bg-emerald-600 text-white shadow-sm transition-all duration-200 !important;
+    @apply border-2 border-emerald-600/20 bg-emerald-600 text-white transition-all duration-200 !important;
     border-radius: 1rem;
   }
 
   .btn-save:hover {
-    @apply bg-emerald-700 shadow-emerald-200/50 shadow-lg !important;
+    @apply bg-emerald-700 !important;
     transform: translateY(-1px);
   }
 
   /* Select dropdown styling with nice borders */
   .dark [class*="SelectTrigger"] {
     border: 1px solid hsl(var(--border)) !important;
-    box-shadow: inset 0 1px 2px hsl(0 0% 0% / 0.05) !important;
   }
 
   .dark [class*="SelectTrigger"]:hover {
@@ -508,7 +498,6 @@
   .dark [class*="SelectTrigger"]:focus,
   .dark [class*="SelectTrigger"][data-state="open"] {
     border-color: hsl(var(--primary)) !important;
-    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1), inset 0 1px 2px hsl(0 0% 0% / 0.08) !important;
   }
 }
 
@@ -639,7 +628,7 @@
 
 /* Shadow and depth for dark cards */
 .dark [class*="shadow"] {
-  box-shadow: 0 4px 12px hsl(0 0% 0% / 0.3);
+  box-shadow: none;
 }
 
 /* Header icon dark mode - Ensure icons are visible */
@@ -766,13 +755,11 @@
     border: 2px solid rgba(148, 163, 184, 0.3) !important;
     color: #f8fafc !important;
     border-radius: 1rem !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
   }
 
   .dark .btn-back:hover {
     background-color: #1e293b !important;
     border-color: rgba(148, 163, 184, 0.5) !important;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4) !important;
     transform: translateY(-1px);
   }
 
@@ -790,7 +777,6 @@
   .dark .btn-save:hover {
     background-color: #10b981 !important;
     border-color: rgba(52, 211, 153, 0.6) !important;
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3) !important;
   }
 
   .dark .btn-back svg, 
@@ -1149,7 +1135,6 @@
 .dark aside nav a[href="/pos"] svg,
 .dark aside nav a[href="/dashboard/profile"] svg {
   color: #60a5fa;
-  filter: drop-shadow(0 0 4px rgba(96, 165, 250, 0));
   transition: all 0.25s ease;
 }
 
@@ -1157,7 +1142,6 @@
 .dark aside nav a[href^="/dashboard/invoice"] svg,
 .dark aside nav a[href="/dashboard/invoicing-settings"] svg {
   color: #a78bfa;
-  filter: drop-shadow(0 0 4px rgba(167, 139, 250, 0));
 }
 
 /* ── Reports section: Emerald Green ── */
@@ -1167,13 +1151,11 @@
 .dark aside nav a[href="/dashboard/product-sales"] svg,
 .dark aside nav a[href="/dashboard/expenses"] svg {
   color: #34d399;
-  filter: drop-shadow(0 0 4px rgba(52, 211, 153, 0));
 }
 
 /* ── Financials section: Gold ── */
 .dark aside nav a[href="/dashboard/flexible-payments"] svg {
   color: #fbbf24;
-  filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0));
 }
 
 /* ── E-Commerce section: Rose Pink ── */
@@ -1181,7 +1163,6 @@
 .dark aside nav a[href="/dashboard/order-alerts"] svg,
 .dark aside nav a[href="/dashboard/online-customers"] svg {
   color: #fb7185;
-  filter: drop-shadow(0 0 4px rgba(251, 113, 133, 0));
 }
 
 /* ── Inventory section: Amber/Orange ── */
@@ -1193,21 +1174,18 @@
 .dark aside nav a[href="/dashboard/print-barcodes"] svg,
 .dark aside nav a[href="/dashboard/bulk-add-products"] svg {
   color: #fb923c;
-  filter: drop-shadow(0 0 4px rgba(251, 146, 60, 0));
 }
 
 /* ── Management section: Sky Blue ── */
 .dark aside nav a[href="/dashboard/customers"] svg,
 .dark aside nav a[href="/dashboard/staff"] svg {
   color: #38bdf8;
-  filter: drop-shadow(0 0 4px rgba(56, 189, 248, 0));
 }
 
 /* ── Marketing section: Fuchsia/Purple ── */
 .dark aside nav a[href="/dashboard/welcome-credit-settings"] svg,
 .dark aside nav a[href="/dashboard/whatsapp"] svg {
   color: #e879f9;
-  filter: drop-shadow(0 0 4px rgba(232, 121, 249, 0));
 }
 
 /* ── Website section: Cyan ── */
@@ -1228,26 +1206,22 @@
 .dark aside nav a[href^="/dashboard/homepage-sections"] svg,
 .dark aside nav a[href^="/dashboard/add-ui-section"] svg {
   color: #22d3ee;
-  filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0));
 }
 
 /* ── Administration section: Red/Slate ── */
 .dark aside nav a[href="/dashboard/settings"] svg,
 .dark aside nav a[href="/dashboard/permissions"] svg {
   color: #94a3b8;
-  filter: drop-shadow(0 0 4px rgba(148, 163, 184, 0));
 }
 
 /* ══ ICON GLOW on hover — beautiful effect ══ */
 .dark aside nav a:hover svg {
-  filter: drop-shadow(0 0 6px currentColor) !important;
   transform: scale(1.15);
 }
 
-/* ══ Active link icon: full brightness + strong glow ══ */
+/* ══ Active link icon: full brightness ══ */
 .dark aside nav a.active svg,
 .dark aside nav a[aria-current="page"] svg {
-  filter: drop-shadow(0 0 8px currentColor) !important;
   transform: scale(1.1);
   opacity: 1 !important;
 }
@@ -1308,16 +1282,15 @@
   background: hsl(var(--primary));
 }
 
-/* ═══════════════════════════════════════════════
+/* ══════════════════════════��════════════════════
    SIDEBAR ITSELF — Glass border effect
    ═══════════════════════════════════════════════ */
 .dark aside {
   border-right: 1px solid hsl(217 20% 12%) !important;
   background: linear-gradient(180deg, hsl(222 33% 5%) 0%, hsl(222 30% 4%) 100%) !important;
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4) !important;
 }
 
-/* ═════════════���═════════════════════════════════
+/* ═════════════���══════════════════��══════════════
    HEADER — Frosted glass panel
    ═══════════════════════════════════════════════ */
 .dark header {
@@ -1325,7 +1298,6 @@
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
   border-bottom: 1px solid rgba(96, 165, 250, 0.1) !important;
-  box-shadow: 0 1px 20px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* ═══════════════════════════════════════════════
@@ -1335,16 +1307,14 @@
 .dark [class*="rounded-lg"]:not(button):not(a):not(nav *) {
   background: hsl(220 25% 10%) !important;
   border: 1px solid hsl(217 20% 17%) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35) !important;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+  transition: border-color 0.2s ease !important;
 }
 
 .dark .card:hover {
   border-color: hsl(217 40% 25%) !important;
-  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.5) !important;
 }
 
-/* ═══════════════════════════════════════════════
+/* ════════════════════════════════�������������══════════════
    STAT CARD — Colored left border accent
    ═══���═══════════════════════════���═══════════════ */
 .dark [class*="StatCard"],
@@ -1434,7 +1404,6 @@
 .dark textarea:focus,
 .dark select:focus {
   border-color: hsl(217 91% 60%) !important;
-  box-shadow: 0 0 0 3px hsl(217 91% 60% / 0.15), inset 0 1px 3px rgba(0, 0, 0, 0.4) !important;
   outline: none !important;
   background-color: hsl(220 26% 14%) !important;
 }
@@ -1452,7 +1421,6 @@
   border-color: hsl(217 50% 45%) !important;
   background: hsl(217 40% 15%) !important;
   color: hsl(217 91% 70%) !important;
-  box-shadow: 0 0 12px hsl(217 91% 60% / 0.15) !important;
 }
 
 /* ═══════════════════════════════════════════════
@@ -1517,7 +1485,6 @@
 .dark a[href*="/add"]:hover {
   background-color: #16a34a !important;
   border-color: #15803d !important;
-  box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
   transform: translateY(-1px);
 }
 
@@ -1567,7 +1534,6 @@
   color: #ffffff !important;
   background-color: #ef4444 !important;
   border-color: #dc2626 !important;
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
 }
 
 .dark button[variant="destructive"] svg,
@@ -1633,7 +1599,7 @@
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-/* UI BACKGROUND SHADOW FEATURE                      */
+/* UI BACKGROUND SHADOW FEATURE - DISABLED           */
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 .ui-shadow-enabled .card,
@@ -1648,7 +1614,7 @@
 .ui-shadow-enabled [role="dialog"],
 .ui-shadow-enabled [role="menu"],
 .ui-shadow-enabled .popover {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+    box-shadow: none !important;
 }
 
 .dark.ui-shadow-enabled .card,
@@ -1663,16 +1629,16 @@
 .dark.ui-shadow-enabled [role="dialog"],
 .dark.ui-shadow-enabled [role="menu"],
 .dark.ui-shadow-enabled .popover {
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.6) !important;
+    box-shadow: none !important;
 }
 
 /* Specific fix for product cards in store */
 .ui-shadow-enabled [class*="ProductCard"],
 .ui-shadow-enabled [class*="product-card"] {
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    box-shadow: none !important;
 }
 
 .dark.ui-shadow-enabled [class*="ProductCard"],
 .dark.ui-shadow-enabled [class*="product-card"] {
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7) !important;
+    box-shadow: none !important;
 }
