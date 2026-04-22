@@ -218,15 +218,36 @@ export async function updateOrderStatusAction(orderId: string, storeId: string, 
             let message = '';
             const customerName = orderData?.guestInfo?.name || 'Customer';
             const shortOrderId = orderId.substring(0, 8).toUpperCase();
+            const amount = orderData?.totalAmount?.toLocaleString() || '0';
+
+            // Get currency
+            const globalSettingsDoc = await adminDb.collection('settings').doc('global').get();
+            const currency = globalSettingsDoc.data()?.currency || '₦';
+
+            const templateData = {
+                orderId: shortOrderId,
+                customerName,
+                amount,
+                currency,
+                status: newStatus
+            };
             
             if (newStatus === 'processing') {
-                message = `Hello Admin,\nOrder #${shortOrderId} for ${customerName} is now being processed.`;
+                message = whatsappAlertSettings.orderProcessingTemplate 
+                    ? formatWhatsAppMessage(whatsappAlertSettings.orderProcessingTemplate, templateData)
+                    : `Hello Admin,\nOrder #${shortOrderId} for ${customerName} is now being processed.`;
             } else if (newStatus === 'shipped') {
-                message = `Hello Admin,\nOrder #${shortOrderId} for ${customerName} has been shipped.`;
+                message = whatsappAlertSettings.orderShippedTemplate
+                    ? formatWhatsAppMessage(whatsappAlertSettings.orderShippedTemplate, templateData)
+                    : `Hello Admin,\nOrder #${shortOrderId} for ${customerName} has been shipped.`;
             } else if (newStatus === 'cancelled') {
-                message = `Hello Admin,\nOrder #${shortOrderId} for ${customerName} has been cancelled.`;
+                message = whatsappAlertSettings.orderCancelledTemplate
+                    ? formatWhatsAppMessage(whatsappAlertSettings.orderCancelledTemplate, templateData)
+                    : `Hello Admin,\nOrder #${shortOrderId} for ${customerName} has been cancelled.`;
             } else if (newStatus === 'delivered') {
-                message = `Hello Admin,\nOrder #${shortOrderId} for ${customerName} has been delivered successfully.`;
+                message = whatsappAlertSettings.orderDeliveredTemplate
+                    ? formatWhatsAppMessage(whatsappAlertSettings.orderDeliveredTemplate, templateData)
+                    : `Hello Admin,\nOrder #${shortOrderId} for ${customerName} has been delivered successfully.`;
             }
 
             if (message && whatsappAlertSettings.senderNumber) {
@@ -462,12 +483,32 @@ export async function validateEBulkSMSAction(username: string, apiKey: string) {
     }
 }
 
+function formatWhatsAppMessage(template: string, data: { orderId: string, customerName: string, amount: string, currency: string, status: string }) {
+    return template
+        .replace(/{orderId}/g, data.orderId)
+        .replace(/{customerName}/g, data.customerName)
+        .replace(/{amount}/g, data.amount)
+        .replace(/{currency}/g, data.currency)
+        .replace(/{status}/g, data.status);
+}
+
 export async function sendWhatsAppOrderAlert(order: any, settings: WhatsAppAlertSettings, currency: string) {
     const customerName = order.guestInfo?.name || 'Customer';
-    const amount = order.totalAmount;
+    const amount = order.totalAmount.toLocaleString();
     const orderId = order.id.substring(0, 8).toUpperCase();
     
-    const message = `Hello Admin,\nYou received a new order.\n\nOrder ID: #${orderId}\nCustomer: ${customerName}\nAmount: ${currency}${amount.toLocaleString()}\nStatus: ${order.status}\n\nLogin to dashboard now.`;
+    let message = '';
+    if (settings.orderPlacedTemplate) {
+        message = formatWhatsAppMessage(settings.orderPlacedTemplate, {
+            orderId,
+            customerName,
+            amount,
+            currency,
+            status: order.status
+        });
+    } else {
+        message = `Hello Admin,\nYou received a new order.\n\nOrder ID: #${orderId}\nCustomer: ${customerName}\nAmount: ${currency}${amount}\nStatus: ${order.status}\n\nLogin to dashboard now.`;
+    }
     
     const recipients = [];
     if (settings.senderNumber) recipients.push(settings.senderNumber);

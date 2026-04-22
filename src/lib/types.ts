@@ -151,6 +151,11 @@ export interface WhatsAppAlertSettings {
   senderNumber?: string;
   connected: boolean;
   updatedAt: Timestamp;
+  orderPlacedTemplate?: string;
+  orderProcessingTemplate?: string;
+  orderShippedTemplate?: string;
+  orderCancelledTemplate?: string;
+  orderDeliveredTemplate?: string;
 }
 
 export interface Settings {
