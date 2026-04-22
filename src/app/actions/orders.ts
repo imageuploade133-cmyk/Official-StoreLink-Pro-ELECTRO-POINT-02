@@ -412,9 +412,9 @@ export async function logWhatsAppMessageAction(logData: any) {
 
 export async function saveWhatsAppAlertSettingsAction(storeId: string, settings: any) {
     try {
-        const encryptedApiKey = settings.apiKey.startsWith('iv:') || settings.apiKey.includes(':') 
+        const encryptedApiKey = settings.apiKey && (settings.apiKey.startsWith('iv:') || settings.apiKey.includes(':')) 
             ? settings.apiKey 
-            : encrypt(settings.apiKey);
+            : (settings.apiKey ? encrypt(settings.apiKey) : '');
             
         const dataToSave = {
             ...settings,
@@ -431,6 +431,15 @@ export async function saveWhatsAppAlertSettingsAction(storeId: string, settings:
         return { success: true };
     } catch (error: any) {
         console.error('Error saving WhatsApp settings:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+export async function getDecryptedWhatsAppApiKeyAction(storeId: string) {
+    try {
+        const settings = await getWhatsAppSettings(storeId || 'global');
+        return { success: true, apiKey: settings?.apiKey || '' };
+    } catch (error: any) {
         return { success: false, error: error.message };
     }
 }

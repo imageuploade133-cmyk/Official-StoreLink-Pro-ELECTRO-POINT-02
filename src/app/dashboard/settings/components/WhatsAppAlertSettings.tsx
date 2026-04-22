@@ -17,7 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Loader2, MessageSquare, Send, CheckCircle2, XCircle, Eye, EyeOff, Info, Key, Smartphone } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Badge } from '@/components/ui/badge';
-import { validateEBulkSMSAction, saveWhatsAppAlertSettingsAction } from '@/app/actions/orders';
+import { validateEBulkSMSAction, saveWhatsAppAlertSettingsAction, getDecryptedWhatsAppApiKeyAction } from '@/app/actions/orders';
 import { useUser } from '@/firebase/auth/use-user';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
@@ -65,20 +65,39 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
   });
 
   useEffect(() => {
-    if (settingsData) {
-      form.reset({
-        enabled: settingsData.enabled || false,
-        username: settingsData.username || '',
-        apiKey: settingsData.apiKey || '',
-        senderNumber: settingsData.senderNumber || '',
-      });
-      if (settingsData.connected) {
-          setConnectionStatus('connected');
-      } else if (settingsData.username && settingsData.apiKey) {
-          setConnectionStatus('failed');
+    const initForm = async () => {
+      if (settingsData) {
+        let apiKey = settingsData.apiKey || '';
+        
+        // If the API key is encrypted (contains a colon), decrypt it for the UI
+        if (apiKey && apiKey.includes(':')) {
+          try {
+            const result = await getDecryptedWhatsAppApiKeyAction(storeId || 'global');
+            if (result.success && result.apiKey) {
+              apiKey = result.apiKey;
+            }
+          } catch (error) {
+            console.error('Failed to decrypt API key for UI:', error);
+          }
+        }
+
+        form.reset({
+          enabled: settingsData.enabled || false,
+          username: settingsData.username || '',
+          apiKey: apiKey,
+          senderNumber: settingsData.senderNumber || '',
+        });
+        
+        if (settingsData.connected) {
+            setConnectionStatus('connected');
+        } else if (settingsData.username && settingsData.apiKey) {
+            setConnectionStatus('failed');
+        }
       }
-    }
-  }, [settingsData, form]);
+    };
+
+    initForm();
+  }, [settingsData, form, storeId]);
 
   const onSubmit = async (values: FormValues) => {
     setIsSaving(true);
