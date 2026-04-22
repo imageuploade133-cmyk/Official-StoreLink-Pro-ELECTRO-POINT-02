@@ -142,7 +142,13 @@ export default function CheckoutPage() {
     return subtotal - discountedPrice;
   }, [rewardAdClicked, activeRewardAd, subtotal, applyRewardDiscount]);
 
-  const total = Math.max(0, subtotal - discountAmount - rewardDiscountAmount + shipping);
+  const taxAmount = useMemo(() => {
+    if (!settings?.enableTax || !settings?.taxRate) return 0;
+    const afterDiscount = subtotal - discountAmount - rewardDiscountAmount;
+    return (afterDiscount * settings.taxRate) / 100;
+  }, [settings, subtotal, discountAmount, rewardDiscountAmount]);
+
+  const total = Math.max(0, subtotal - discountAmount - rewardDiscountAmount + shipping + taxAmount);
 
   const [availablePaymentMethods, setAvailablePaymentMethods] = useState<any[]>([]);
   const [isLoadingMethods, setIsLoadingMethods] = useState(true);
@@ -344,6 +350,8 @@ export default function CheckoutPage() {
         guestInfo: formData,
         payCurrency: selectedMethod.provider === 'nowpayments' ? selectedCoin : null,
         gateway: selectedMethod.provider === 'nowpayments' ? 'NOWPayments' : selectedMethod.provider,
+        taxRate: settings?.taxRate || 0,
+        taxAmountCalculated: taxAmount,
       });
 
       if (!result.success) {
@@ -815,6 +823,12 @@ export default function CheckoutPage() {
                       {shipping === 0 ? 'Free' : formatCurrency(shipping, currencySymbol)}
                     </span>
                   </div>
+                  {taxAmount > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">{settings?.taxName || 'Tax'} ({settings?.taxRate}%)</span>
+                      <span className="font-medium">{formatCurrency(taxAmount, currencySymbol)}</span>
+                    </div>
+                  )}
                   <Separator />
                   <div className="flex justify-between items-baseline pt-2"><span className="text-lg font-bold">Total</span><span className="text-2xl font-black text-primary tracking-tighter">{formatCurrency(total, currencySymbol)}</span></div>
                 </div>

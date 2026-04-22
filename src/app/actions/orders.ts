@@ -47,6 +47,8 @@ export async function placeOrderAction({
   guestInfo?: any;
   payCurrency?: string;
   gateway?: string;
+  taxRate?: number;
+  taxAmountCalculated?: number;
 }) {
   try {
     const { orderId, orderData, settings, emailAlertSettings, whatsappAlertSettings } = await adminDb.runTransaction(async (transaction) => {
@@ -150,6 +152,8 @@ export async function placeOrderAction({
         guestInfo: guestInfo || null,
         payCurrency: payCurrency || null,
         gateway: gateway || null,
+        taxRate: taxRate || 0,
+        taxAmountCalculated: taxAmountCalculated || 0,
       };
       
       transaction.set(orderRef, orderData);

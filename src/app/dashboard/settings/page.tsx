@@ -25,12 +25,14 @@ import { SocialMediaSettings } from './components/SocialMediaSettings';
 import { ShopSettings } from './components/ShopSettings';
 import { LogoSizeSettings } from '@/components/dashboard/settings/LogoSizeSettings';
 import { PosProductSizeSettings } from '@/components/dashboard/settings/PosProductSizeSettings';
+import { TaxSettings } from './components/TaxSettings';
 
 // Keyword mapping for search functionality
 const settingsKeywords = {
   general: ['currency', 'country', 'region', 'phone', 'localization', 'identity', 'business'],
   api: ['api', 'key', 'keys', 'imgbb', 'integration', 'third-party'],
   pos: ['pos', 'receipt', 'printer', 'invoice', 'price modification', 'logo size', 'product size', 'columns', 'grid', 'layout'],
+  tax: ['tax', 'vat', 'gst', 'rate', 'taxation'],
   inventory: ['inventory', 'stock', 'alert', 'product image', 'deduction', 'threshold', 'wastage'],
   messaging: ['messaging', 'sms', 'whatsapp', 'webhook', 'notifications', 'messages'],
   orderAlerts: ['order alerts', 'email alerts', 'email notifications', 'order notifications', 'email provider', 'brevo', 'resend', 'smtp'],
@@ -74,15 +76,16 @@ export default function SettingsPage() {
   const visibleSections = useMemo(() => {
     const lowercasedTerm = searchTerm.toLowerCase().trim();
     if (!lowercasedTerm) {
-        return { general: true, api: true, pos: true, inventory: true, messaging: true, orderAlerts: true, payment: true, social: true, shop: true };
+        return { general: true, api: true, pos: true, tax: true, inventory: true, messaging: true, orderAlerts: true, payment: true, social: true, shop: true };
     }
     
-    const visible: Record<string, boolean> = { general: false, api: false, pos: false, inventory: false, messaging: false, orderAlerts: false, payment: false, social: false, shop: false };
+    const visible: Record<string, boolean> = { general: false, api: false, pos: false, tax: false, inventory: false, messaging: false, orderAlerts: false, payment: false, social: false, shop: false };
     
     // Check card titles and descriptions
     if ('business & regional settings'.includes(lowercasedTerm)) visible.general = true;
     if ('api keys'.includes(lowercasedTerm)) visible.api = true;
     if ('pos & receipt settings'.includes(lowercasedTerm)) visible.pos = true;
+    if ('tax & vat settings'.includes(lowercasedTerm)) visible.tax = true;
     if ('inventory & stock alerts'.includes(lowercasedTerm)) visible.inventory = true;
     if ('messaging & webhooks'.includes(lowercasedTerm)) visible.messaging = true;
     if ('order alerts'.includes(lowercasedTerm) || 'email notifications'.includes(lowercasedTerm)) visible.orderAlerts = true;
@@ -149,6 +152,7 @@ export default function SettingsPage() {
         {visibleSections.payment && <PaymentMethodsSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />}
         {visibleSections.social && <SocialMediaSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />}
         {visibleSections.api && <ApiKeysSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />}
+        {visibleSections.tax && <TaxSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />}
         {visibleSections.pos && (
             <>
                 <PosProductSizeSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />

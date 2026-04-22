@@ -203,8 +203,13 @@ export function ConfirmPaymentDialog({
                                     <span className="text-lg font-medium">Discount:</span>
                                     <span className="font-bold text-lg">-{formatCurrencyDisplay(saleData.discountAmount)}</span>
                                 </div>
-                                <Separator className="my-2" />
                                 </>
+                            ) : null}
+                            {saleData.taxAmount && saleData.taxAmount > 0 ? (
+                                <div className="flex justify-between items-center text-blue-600">
+                                    <span className="text-lg font-medium">{settings?.taxName || 'Tax'} ({saleData.taxRate}%):</span>
+                                    <span className="font-bold text-lg">+{formatCurrencyDisplay(saleData.taxAmount)}</span>
+                                </div>
                             ) : null}
                             <div className="flex justify-between items-center">
                                 <span className="text-lg font-medium text-gray-700 flex items-center gap-2"><DollarSign className="h-5 w-5 text-green-600"/> Sale Total:</span> 
@@ -254,6 +259,11 @@ export function ConfirmPaymentDialog({
                 <span className="text-sm block">
                     Subtotal: {formatCurrencyDisplay(saleData.subtotal)}
                     <span className="text-red-500 ml-2">(-{formatCurrencyDisplay(saleData.discountAmount)})</span>
+                </span>
+            )}
+            {saleData.taxAmount && saleData.taxAmount > 0 && (
+                <span className="text-sm block">
+                    {settings?.taxName || 'Tax'} Collected: <span className="text-blue-600">+{formatCurrencyDisplay(saleData.taxAmount)} ({saleData.taxRate}%)</span>
                 </span>
             )}
             Total Due: <span className="font-extrabold text-green-600">{formatCurrencyDisplay(grandTotal)}</span>
