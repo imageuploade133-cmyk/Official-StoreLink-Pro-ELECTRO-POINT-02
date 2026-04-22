@@ -521,8 +521,25 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-primary ml-1">Phone Protocol (Required for WhatsApp Updates)</Label>
                                     <div className="relative">
                                         <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                                        <Input name="phone" value={formData.phone} onChange={handleInputChange} type="tel" placeholder="+1..." className="h-14 pl-12 rounded-2xl border-none shadow-xl font-bold bg-white dark:bg-slate-800 focus-visible:ring-primary/20" />
+                                        <Input 
+                                            name="phone" 
+                                            value={formData.phone} 
+                                            onChange={handleInputChange} 
+                                            onBlur={() => {
+                                                const formatted = formatPhoneNumberForWhatsapp(formData.phone, settings?.countryCode || '234');
+                                                if (formatted) {
+                                                    setFormData(prev => ({ ...prev, phone: formatted }));
+                                                }
+                                            }}
+                                            type="tel" 
+                                            placeholder="e.g. 08012345678" 
+                                            className="h-14 pl-12 rounded-2xl border-none shadow-xl font-bold bg-white dark:bg-slate-800 focus-visible:ring-primary/20" 
+                                        />
                                     </div>
+                                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-2 ml-1 flex items-center gap-1.5">
+                                        <Info className="h-3 w-3 text-primary" />
+                                        Auto-formatted for WhatsApp (e.g. 23480...)
+                                    </p>
                                 </div>
                             </div>
 
