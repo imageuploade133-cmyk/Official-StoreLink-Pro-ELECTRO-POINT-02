@@ -3,6 +3,7 @@ import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
+import { Loader2 } from "lucide-react"
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
@@ -37,11 +38,28 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean
+  loading?: boolean
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, children, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, loading: externalLoading, children, disabled, onClick, ...props }, ref) => {
+    const [internalLoading, setInternalLoading] = React.useState(false)
+    const loading = externalLoading || internalLoading
     const Comp = asChild ? Slot : "button"
+
+    const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
+      if (onClick) {
+        const result = onClick(event)
+        if (result instanceof Promise) {
+          setInternalLoading(true)
+          try {
+            await result
+          } finally {
+            setInternalLoading(false)
+          }
+        }
+      }
+    }
 
     // Heuristic for back button: check children for "Back" text
     const getText = (node: React.ReactNode): string => {
@@ -68,8 +86,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <Comp
         className={cn(buttonVariants({ variant, size, className }), specialClass)}
         ref={ref}
+        disabled={loading || disabled}
+        onClick={handleClick}
         {...props}
       >
+        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         {children}
       </Comp>
     )

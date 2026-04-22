@@ -64,6 +64,7 @@ export function OrderDetailsModal({
   const { settings } = useSettings();
   const [isPrinting, setIsPrinting] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState<OrderStatus | null>(null);
+  const [isResendingWhatsApp, setIsResendingWhatsApp] = useState(false);
   
   const createdAt = convertToDateSafely(order.createdAt);
   
@@ -165,6 +166,7 @@ export function OrderDetailsModal({
   };
 
     const handleResendWhatsApp = async () => {
+      setIsResendingWhatsApp(true);
       try {
         const result = await sendWhatsAppOrderAlertAction(order.id, order.store_id || 'global');
         if (result.success) {
@@ -174,6 +176,8 @@ export function OrderDetailsModal({
         }
       } catch (error: any) {
         toast({ variant: 'destructive', title: "Failed to send WhatsApp", description: error.message });
+      } finally {
+        setIsResendingWhatsApp(false);
       }
     };
 
@@ -510,10 +514,10 @@ export function OrderDetailsModal({
                   variant={action.variant}
                   size="sm"
                   onClick={() => handleUpdateStatusInternal(action.status)}
-                  disabled={!!updatingStatus || isPrinting}
+                  loading={updatingStatus === action.status}
+                  disabled={isPrinting || (!!updatingStatus && updatingStatus !== action.status)}
                   className="text-[10px] sm:text-xs h-9 px-3 sm:px-4 font-bold flex-1 sm:flex-none"
                 >
-                  {updatingStatus === action.status && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
                   {action.label}
                 </Button>
               ))
@@ -523,6 +527,7 @@ export function OrderDetailsModal({
             <Button 
                 variant="outline" 
                 onClick={handleResendWhatsApp} 
+                loading={isResendingWhatsApp}
                 disabled={isPrinting || !!updatingStatus}
                 className="h-9 px-3 sm:px-4 font-bold border-[#25D366] text-[#25D366] hover:bg-[#25D366]/5 text-[10px] sm:text-xs flex-1 sm:flex-none"
             >
@@ -532,10 +537,11 @@ export function OrderDetailsModal({
             <Button 
                 variant="outline" 
                 onClick={handlePrint} 
-                disabled={isPrinting || !!updatingStatus}
+                loading={isPrinting}
+                disabled={!!updatingStatus}
                 className="h-9 px-3 sm:px-4 font-bold border-primary text-primary hover:bg-primary/5 text-[10px] sm:text-xs flex-1 sm:flex-none"
             >
-                {isPrinting ? <Loader2 className="mr-1.5 sm:mr-2 h-3.5 sm:h-4 w-3.5 sm:w-4 animate-spin" /> : <Printer className="mr-1.5 sm:mr-2 h-3.5 sm:h-4 w-3.5 sm:w-4" />}
+                {!isPrinting && <Printer className="mr-1.5 sm:mr-2 h-3.5 sm:h-4 w-3.5 sm:w-4" />}
                 Print Invoice
             </Button>
             <DialogClose asChild>
