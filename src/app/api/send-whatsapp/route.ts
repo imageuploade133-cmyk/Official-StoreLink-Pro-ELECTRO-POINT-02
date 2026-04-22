@@ -44,10 +44,14 @@ export async function POST(request: Request) {
         message
     );
 
-    if (responseData?.response?.status !== 'SUCCESS') {
+    const status = responseData?.response?.status || responseData?.status;
+    const statusdetail = responseData?.response?.statusdetail || responseData?.statusdetail;
+
+    if (status !== 'SUCCESS') {
         return NextResponse.json({ 
             error: 'Failed to send WhatsApp message',
-            details: responseData?.response?.statusdetail || 'Unknown API error'
+            details: statusdetail || `Unknown API error (Status: ${status || 'Unknown'})`,
+            providerResponse: responseData
         }, { status: 500 });
     }
     

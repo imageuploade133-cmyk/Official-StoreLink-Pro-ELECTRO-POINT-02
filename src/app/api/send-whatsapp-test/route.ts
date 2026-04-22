@@ -101,10 +101,11 @@ export async function POST(request: Request) {
         
         return NextResponse.json({ success: true, details: statusdetail });
     } else {
+        console.log('WhatsApp send failed with status:', status, 'and detail:', statusdetail);
         // If provider rejects: return exact provider response
         return NextResponse.json({ 
             success: false, 
-            error: statusdetail || 'Failed to send WhatsApp message via EBulkSMS',
+            error: statusdetail || `Failed to send WhatsApp message via EBulkSMS (Status: ${status || 'Unknown'})`,
             providerResponse: responseData
         }, { status: 400 });
     }

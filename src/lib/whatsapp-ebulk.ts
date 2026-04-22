@@ -37,6 +37,9 @@ export async function sendWhatsAppViaEBulkSMS(username: string, apiKey: string, 
         }
     }
 
+    // EBulkSMS Sender ID for WhatsApp/SMS should be max 11 characters
+    const senderId = subject.substring(0, 11);
+
     const payload = {
         WA: {
             auth: {
@@ -44,7 +47,8 @@ export async function sendWhatsAppViaEBulkSMS(username: string, apiKey: string, 
                 apikey: clearApiKey,
             },
             message: {
-                subject,
+                sender: senderId,
+                subject: subject,
                 messagetext: message,
             },
             recipients: recipients.map(r => ({
@@ -54,13 +58,17 @@ export async function sendWhatsAppViaEBulkSMS(username: string, apiKey: string, 
     };
 
     try {
-        const response = await fetch('https://api.ebulksms.com/sendwhatsapp.json', {
+        // Some versions of the EBulkSMS WhatsApp API use whatsappv1.json
+        // We'll try the most common one first.
+        const response = await fetch('https://api.ebulksms.com/whatsappv1.json', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
         });
 
         const data = await response.json();
+        console.log('EBulkSMS Response:', JSON.stringify(data));
+        
         const status = data?.response?.status || data?.status;
         const statusdetail = data?.response?.statusdetail || data?.statusdetail;
         
@@ -71,6 +79,7 @@ export async function sendWhatsAppViaEBulkSMS(username: string, apiKey: string, 
         
         return data;
     } catch (error) {
+        console.error('Error in sendWhatsAppViaEBulkSMS:', error);
         if (retries > 0) {
             console.log(`WhatsApp send error, retrying... (${retries} left)`);
             return await sendWhatsAppViaEBulkSMS(username, clearApiKey, recipients, subject, message, retries - 1);
