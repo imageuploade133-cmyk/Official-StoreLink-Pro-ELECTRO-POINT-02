@@ -43,6 +43,10 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'API Key is required' }, { status: 400 });
     }
 
+    if (finalApiKey.includes('****')) {
+        return NextResponse.json({ error: 'Please re-enter your API key to test. The stored key could not be retrieved.' }, { status: 400 });
+    }
+
     const dummyData = {
         orderId: 'TEST-12345',
         customerName: 'Test Recipient',
@@ -63,7 +67,7 @@ export async function POST(request: Request) {
     const from = `"${senderName || 'Test Store'}" <${senderEmail}>`;
     const subject = `Test Email from ${senderName || 'StoreLink Pro'}`;
 
-    const success = await sendViaProvider(provider, finalApiKey, from, testEmail, subject, html, {
+    const { success, error: providerError } = await sendViaProvider(provider, finalApiKey, from, testEmail, subject, html, {
         storeId,
         type: 'test_email'
     });
@@ -71,7 +75,9 @@ export async function POST(request: Request) {
     if (success) {
         return NextResponse.json({ success: true });
     } else {
-        return NextResponse.json({ error: 'Failed to send test email. Check your provider settings and API key.' }, { status: 500 });
+        return NextResponse.json({ 
+            error: providerError || 'Failed to send test email. Check your provider settings and API key.' 
+        }, { status: 500 });
     }
   } catch (error: any) {
     console.error('Error sending test email:', error);
