@@ -298,7 +298,7 @@ export default function CheckoutPage() {
   };
 
   const handlePlaceOrder = async () => {
-    if (!firestore) return;
+    if (!firestore || step === 'processing') return;
     
     if (paymentMethod === 'Bank Transfer' && (!selectedBankAccount || !hasConfirmedTransfer)) {
         toast({ variant: 'destructive', title: 'Action Required', description: 'Please select a bank and confirm the transfer.' });
@@ -800,6 +800,30 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+
+      {step === 'processing' && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-4 text-center">
+          <div className="max-w-md w-full space-y-6 animate-in fade-in zoom-in duration-300">
+            <div className="relative mx-auto w-24 h-24">
+              <div className="absolute inset-0 border-4 border-primary/20 rounded-full"></div>
+              <div className="absolute inset-0 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <ShoppingBag className="h-10 w-10 text-primary" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold tracking-tight">Processing Your Order</h2>
+              <p className="text-muted-foreground text-lg">
+                We're finalizing your purchase. This will only take a moment.
+              </p>
+              <div className="flex items-center justify-center gap-2 text-sm text-amber-600 font-medium bg-amber-50 dark:bg-amber-950/30 py-2 px-4 rounded-full w-fit mx-auto mt-4">
+                <Info className="h-4 w-4" />
+                Please do not refresh or close this page.
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
