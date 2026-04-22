@@ -65,6 +65,7 @@ import { formatCurrency } from '@/lib/formatUtils';
 import { cn, convertToDateSafely } from '@/lib/utils';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { OrderDetailsModal } from '@/components/orders/OrderDetailsModal';
+import { OrderAuditTab } from '@/components/orders/OrderAuditTab';
 import { useToast } from '@/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
