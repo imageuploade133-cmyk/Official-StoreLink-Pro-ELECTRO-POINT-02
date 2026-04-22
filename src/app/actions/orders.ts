@@ -235,7 +235,9 @@ export async function updateOrderStatusAction(orderId: string, storeId: string, 
                     whatsappAlertSettings.apiKey,
                     [whatsappAlertSettings.senderNumber],
                     `Order Status Updated: ${newStatus}`,
-                    message
+                    message,
+                    2,
+                    whatsappAlertSettings.senderNumber
                 ).then(result => {
                     const status = result?.response?.status || result?.status;
                     const statusdetail = result?.response?.statusdetail || result?.statusdetail;
@@ -473,7 +475,15 @@ export async function sendWhatsAppOrderAlert(order: any, settings: WhatsAppAlert
     if (recipients.length === 0) return;
 
     try {
-        const result = await sendWhatsAppViaEBulkSMS(settings.username, settings.apiKey, recipients, 'New Order Alert', message);
+        const result = await sendWhatsAppViaEBulkSMS(
+            settings.username, 
+            settings.apiKey, 
+            recipients, 
+            'New Order Alert', 
+            message,
+            2,
+            settings.senderNumber
+        );
         const status = result?.response?.status || result?.status;
         const statusdetail = result?.response?.statusdetail || result?.statusdetail;
         

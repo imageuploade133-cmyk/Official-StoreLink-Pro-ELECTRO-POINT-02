@@ -77,7 +77,9 @@ export async function POST(request: Request) {
         settings.apiKey,
         [recipient],
         "Test Alert",
-        message
+        message,
+        2,
+        settings.senderNumber
     );
 
     const status = responseData?.response?.status || responseData?.status;

@@ -41,7 +41,9 @@ export async function POST(request: Request) {
         settings.apiKey,
         recipients,
         "POS Notification",
-        message
+        message,
+        2,
+        settings.senderNumber
     );
 
     const status = responseData?.response?.status || responseData?.status;

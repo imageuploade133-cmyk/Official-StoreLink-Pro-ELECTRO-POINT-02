@@ -222,7 +222,15 @@ export async function GET(request: Request) {
             
             const message = `Hello Admin,\nPayment CONFIRMED for Order #${shortOrderId}.\n\nCustomer: ${customerName}\nAmount: ₦${amount.toLocaleString()}\nStatus: processing\n\nYou can now begin processing this order.`;
             
-            const result = await sendWhatsAppViaEBulkSMS(settings.username, settings.apiKey, [settings.senderNumber], 'Payment Confirmed Alert', message);
+            const result = await sendWhatsAppViaEBulkSMS(
+                settings.username, 
+                settings.apiKey, 
+                [settings.senderNumber], 
+                'Payment Confirmed Alert', 
+                message,
+                2,
+                settings.senderNumber
+            );
             
             await logWhatsAppMessage({
               eventType: 'staff_order_alert',
