@@ -59,9 +59,8 @@ export async function sendWhatsAppViaEBulkSMS(username: string, apiKey: string, 
     };
 
     try {
-        // Some versions of the EBulkSMS WhatsApp API use whatsappv1.json
-        // We'll try the most common one first.
-        const response = await fetch('https://api.ebulksms.com/whatsappv1.json', {
+        // Use the official EBulkSMS WhatsApp API endpoint
+        const response = await fetch('https://api.ebulksms.com/sendwhatsapp.json', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
