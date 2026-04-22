@@ -2,17 +2,32 @@ import { adminDb } from './firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { decrypt } from './encryption';
 
+/**
+ * Formats a phone number to Nigerian format (234...)
+ * @param phone Phone number to format
+ * @returns Formatted phone number as string
+ */
 export function formatNigerianPhoneNumber(phone: string): string {
+    if (!phone) return '';
     let clean = phone.replace(/\D/g, '');
+    
+    // If it starts with 0 and is 11 digits (Nigerian standard), convert to 234 format
     if (clean.startsWith('0') && clean.length === 11) {
         return '234' + clean.substring(1);
     }
+    
+    // If it's 10 digits, assume it's missing the leading 0 or country code
     if (clean.length === 10) {
         return '234' + clean;
     }
+    
     return clean;
 }
 
+/**
+ * Logs a WhatsApp message event to Firestore for tracking and analytics
+ * @param logData Data about the message sent
+ */
 export async function logWhatsAppMessage(logData: any) {
   try {
     await adminDb.collection('whatsappMessageLogs').add({
@@ -26,8 +41,29 @@ export async function logWhatsAppMessage(logData: any) {
   }
 }
 
-export async function sendWhatsAppViaEBulkSMS(username: string, apiKey: string, recipients: string[], subject: string, message: string, retries = 2, sender?: string) {
-    // Decrypt API Key if it's encrypted
+/**
+ * Sends a WhatsApp message via EBulkSMS WhatsApp JSON API.
+ * This implementation follows the official EBulkSMS WhatsApp API documentation.
+ * 
+ * @param username EBulkSMS Username
+ * @param apiKey EBulkSMS API Key (handles both plain and encrypted keys)
+ * @param recipients Array of recipient phone numbers
+ * @param subject Subject or title of the message
+ * @param message The actual message content
+ * @param retries Number of retries on failure (default: 2)
+ * @param _sender Deprecated: Sender ID (not used in current WhatsApp API structure)
+ * @returns Normalized API response object
+ */
+export async function sendWhatsAppViaEBulkSMS(
+    username: string, 
+    apiKey: string, 
+    recipients: string[], 
+    subject: string, 
+    message: string, 
+    retries = 2, 
+    _sender?: string
+): Promise<any> {
+    // Decrypt API Key if it's in the encrypted format (iv:encryptedContent)
     let clearApiKey = apiKey;
     if (apiKey && apiKey.includes(':')) {
         try {
@@ -37,94 +73,122 @@ export async function sendWhatsAppViaEBulkSMS(username: string, apiKey: string, 
         }
     }
 
-    // EBulkSMS Sender ID for WhatsApp/SMS should be max 11 characters
-    // For WhatsApp, it's often the registered phone number, otherwise truncated subject
-    const senderId = sender || subject.substring(0, 11);
-
+    // Professional JSON payload structure for EBulkSMS WhatsApp API
     const payload = {
         WA: {
             auth: {
-                username,
+                username: username,
                 apikey: clearApiKey,
             },
             message: {
-                sender: senderId,
                 subject: subject,
                 messagetext: message,
             },
-            recipients: recipients.map(r => ({
-                msisdn: formatNigerianPhoneNumber(r)
-            })),
+            recipients: recipients.map(r => formatNigerianPhoneNumber(r)),
         },
     };
 
     try {
-        // Use the official EBulkSMS WhatsApp API endpoint
+        console.log(`Sending WhatsApp via EBulkSMS to ${recipients.length} recipients...`);
+        
         const response = await fetch('https://api.ebulksms.com/sendwhatsapp.json', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
             body: JSON.stringify(payload),
         });
 
         const text = await response.text();
         let data: any;
+        
         try {
             data = JSON.parse(text);
         } catch (e) {
-            console.log('EBulkSMS Non-JSON Response:', text);
-            data = { status: 'FAILED', statusdetail: text.substring(0, 100) || 'Invalid JSON response from provider' };
+            console.warn('EBulkSMS WhatsApp API returned non-JSON response:', text);
+            data = { 
+                status: 'FAILED', 
+                statusdetail: text.substring(0, 150) || 'Invalid response from provider' 
+            };
         }
-        console.log('EBulkSMS Response:', JSON.stringify(data));
         
-        const status = data?.response?.status || data?.status || data?.WA?.status || ((data?.error || data?.message) ? 'FAILED' : (response.ok ? 'SUCCESS' : 'FAILED'));
-        const statusdetail = data?.response?.statusdetail || data?.statusdetail || data?.WA?.statusdetail || data?.error || data?.message || (response.ok ? 'OK' : `HTTP Error ${response.status}`);
+        console.log('EBulkSMS API Response:', JSON.stringify(data));
         
-        if (status !== 'SUCCESS' && status !== 'SUCCESSFUL' && retries > 0) {
+        // EBulkSMS can return status in several locations depending on the specific response type
+        const responseObj = data?.response || data?.WA || data || {};
+        let status = responseObj.status || (response.ok ? 'SUCCESS' : 'FAILED');
+        let statusdetail = responseObj.statusdetail || data.message || (response.ok ? 'OK' : `HTTP ${response.status}`);
+
+        // Standardize successful status codes
+        const successCodes = ['SUCCESS', 'SUCCESSFUL', '100', 'SENT'];
+        const isSuccessful = successCodes.includes(String(status).toUpperCase());
+
+        if (!isSuccessful && retries > 0) {
             console.log(`WhatsApp send failed (${statusdetail}), retrying... (${retries} left)`);
-            return await sendWhatsAppViaEBulkSMS(username, clearApiKey, recipients, subject, message, retries - 1, sender);
+            // Wait a bit before retrying (exponential backoff could be added here)
+            return await sendWhatsAppViaEBulkSMS(username, clearApiKey, recipients, subject, message, retries - 1);
         }
         
-        // Ensure we return an object with status and statusdetail for the caller
-        // and maintain backward compatibility with nested response object
+        // Return a normalized response for the application
         return {
             ...data,
-            status: status,
+            status: isSuccessful ? 'SUCCESS' : status,
             statusdetail: statusdetail,
             response: {
                 ...(data?.response || {}),
-                status: data?.response?.status || status,
-                statusdetail: data?.response?.statusdetail || statusdetail,
+                status: isSuccessful ? 'SUCCESS' : status,
+                statusdetail: statusdetail,
             }
         };
-    } catch (error) {
-        console.error('Error in sendWhatsAppViaEBulkSMS:', error);
+    } catch (error: any) {
+        console.error('Network or Execution error in sendWhatsAppViaEBulkSMS:', error);
+        
         if (retries > 0) {
             console.log(`WhatsApp send error, retrying... (${retries} left)`);
-            return await sendWhatsAppViaEBulkSMS(username, clearApiKey, recipients, subject, message, retries - 1, sender);
+            return await sendWhatsAppViaEBulkSMS(username, clearApiKey, recipients, subject, message, retries - 1);
         }
-        throw error;
+        
+        return {
+            status: 'FAILED',
+            statusdetail: error.message || 'An unexpected error occurred during the API request',
+            error: error
+        };
     }
 }
 
+/**
+ * Retrieves WhatsApp settings for a specific store or global settings
+ * @param storeId The ID of the store
+ * @returns WhatsApp settings object or null
+ */
 export async function getWhatsAppSettings(storeId: string) {
     let data: any = null;
-    if (storeId && storeId !== 'global') {
-        const doc = await adminDb.collection('stores').doc(storeId).collection('settings').doc('whatsappAlerts').get();
-        if (doc.exists) data = doc.data();
-    }
-    if (!data) {
-        const globalDoc = await adminDb.collection('settings').doc('whatsappAlerts').get();
-        if (globalDoc.exists) data = globalDoc.data();
-    }
-
-    if (data && data.apiKey) {
-        try {
-            if (data.apiKey.includes(':')) {
-                data.apiKey = decrypt(data.apiKey);
-            }
-        } catch (e) {
-            console.error('Failed to decrypt WhatsApp API Key:', e);
+    
+    try {
+        if (storeId && storeId !== 'global') {
+            const doc = await adminDb.collection('stores').doc(storeId).collection('settings').doc('whatsappAlerts').get();
+            if (doc.exists) data = doc.data();
         }
+        
+        if (!data) {
+            const globalDoc = await adminDb.collection('settings').doc('whatsappAlerts').get();
+            if (globalDoc.exists) data = globalDoc.data();
+        }
+    
+        // Automatically decrypt the API key if it's found in the settings
+        if (data && data.apiKey) {
+            try {
+                if (data.apiKey.includes(':')) {
+                    data.apiKey = decrypt(data.apiKey);
+                }
+            } catch (e) {
+                console.error('Failed to decrypt WhatsApp API Key in settings:', e);
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching WhatsApp settings:', error);
     }
+    
     return data;
 }
