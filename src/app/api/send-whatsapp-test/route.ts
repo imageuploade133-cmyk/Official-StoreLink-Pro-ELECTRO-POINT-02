@@ -68,14 +68,31 @@ export async function POST(request: Request) {
     }
     
     const message = `Test Message from ${storeName}.\n\nYour WhatsApp Alert system is now fully functional!`;
-    const recipient = settings.senderNumber;
     
-    console.log(`Sending WhatsApp test message for store: ${storeId || 'global'} to ${recipient}`);
+    // Collect all recipients
+    const recipients = [];
+    if (settings.senderNumber) recipients.push(settings.senderNumber);
+    if (settings.orderNotificationNumbers && Array.isArray(settings.orderNotificationNumbers)) {
+        settings.orderNotificationNumbers.forEach((num: string) => {
+            if (num && !recipients.includes(num)) {
+                recipients.push(num);
+            }
+        });
+    }
+
+    if (recipients.length === 0) {
+        return NextResponse.json({ 
+            success: false, 
+            error: 'No recipient WhatsApp numbers configured. Please add numbers in Order Alerts or WhatsApp Settings.' 
+        }, { status: 400 });
+    }
+    
+    console.log(`Sending WhatsApp test message for store: ${storeId || 'global'} to ${recipients.length} recipients: ${recipients.join(', ')}`);
 
     const responseData = await sendWhatsAppViaEBulkSMS(
         settings.username,
         settings.apiKey,
-        [recipient],
+        recipients,
         "Test Alert",
         message,
         2,
@@ -89,19 +106,22 @@ export async function POST(request: Request) {
     console.log('Provider response body:', JSON.stringify(responseData));
 
     if (status === 'SUCCESS') {
-        await logWhatsAppMessage({
-            eventType: 'custom_message',
-            messageContent: message,
-            recipientPhone: recipient,
-            status: 'sent',
-            unitsCharged: 1,
-            userId: decodedToken.uid,
-            userName: decodedToken.name || 'Admin',
-            storeId: storeId || 'global',
-            apiResponse: JSON.stringify(responseData)
-        });
+        // Log for each recipient
+        for (const recipient of recipients) {
+            await logWhatsAppMessage({
+                eventType: 'custom_message',
+                messageContent: message,
+                recipientPhone: recipient,
+                status: 'sent',
+                unitsCharged: 1,
+                userId: decodedToken.uid,
+                userName: decodedToken.name || 'Admin',
+                storeId: storeId || 'global',
+                apiResponse: JSON.stringify(responseData)
+            });
+        }
         
-        return NextResponse.json({ success: true, details: statusdetail });
+        return NextResponse.json({ success: true, details: statusdetail, recipientCount: recipients.length });
     } else {
         console.log('WhatsApp send failed with status:', status, 'and detail:', statusdetail);
         // If provider rejects: return exact provider response

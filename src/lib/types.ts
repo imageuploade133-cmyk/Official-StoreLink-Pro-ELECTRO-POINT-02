@@ -159,6 +159,7 @@ export interface WhatsAppAlertSettings {
   username: string;
   apiKey: string;
   senderNumber?: string;
+  orderNotificationNumbers?: string[];
   connected: boolean;
   updatedAt: Timestamp;
   orderPlacedTemplate?: string;
