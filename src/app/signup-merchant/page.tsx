@@ -25,12 +25,13 @@ import placeholderImages from '@/lib/placeholder-images.json';
 import { useAuth as useFirebaseAuthInstance, useUser, useFirestore, useFirebase } from "@/firebase";
 import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword, updateProfile, signOut } from "firebase/auth";
-import { doc, setDoc, writeBatch, serverTimestamp } from "firebase/firestore";
-import { useForm } from "react-hook-form";
+import { doc, setDoc, writeBatch, serverTimestamp, getDoc } from "firebase/firestore";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useAuth } from "@/contexts/auth-context";
+import { cn } from "@/lib/utils";
 
 const reservedSlugs = [
   'dashboard', 'login', 'signup', 'signup-merchant', 'pos', 'api', 'actions', 
@@ -76,12 +77,30 @@ export default function MerchantSignupPage() {
     const [currentStep, setCurrentStep] = useState(1);
     const totalSteps = 3;
 
+    const [slugStatus, setSlugStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
+    const [suggestedSlugs, setSuggestedSlugs] = useState<string[]>([]);
+
     const nextStep = async () => {
         let fieldsToValidate: (keyof SignupFormValues)[] = [];
         if (currentStep === 1) {
             fieldsToValidate = ['name', 'email', 'password', 'confirmPassword'];
         } else if (currentStep === 2) {
             fieldsToValidate = ['storeName', 'storeSlug', 'storePhone', 'storeAddress'];
+            if (slugStatus === 'taken') {
+                toast({
+                    variant: "destructive",
+                    title: "URL Taken",
+                    description: "Please choose a different store URL slug or select one from the suggestions."
+                });
+                return;
+            }
+            if (slugStatus === 'checking') {
+                toast({
+                    title: "Checking Availability",
+                    description: "Please wait while we verify the store URL."
+                });
+                return;
+            }
         }
         
         const isValid = await form.trigger(fieldsToValidate);
@@ -100,6 +119,59 @@ export default function MerchantSignupPage() {
         name: '', email: '', storeName: '', storeSlug: '', storeAddress: '', storePhone: '', databaseId: '(default)', password: '', confirmPassword: '',
       },
     });
+
+    const storeSlug = useWatch({
+        control: form.control,
+        name: 'storeSlug',
+    });
+
+    useEffect(() => {
+        const checkSlug = async () => {
+            if (!storeSlug || storeSlug.length < 2) {
+                setSlugStatus('idle');
+                setSuggestedSlugs([]);
+                return;
+            }
+
+            // Client side check for reserved slugs
+            if (reservedSlugs.includes(storeSlug)) {
+                setSlugStatus('taken');
+                setSuggestedSlugs([`${storeSlug}-shop`, `${storeSlug}-store`]);
+                return;
+            }
+
+            setSlugStatus('checking');
+            try {
+                const docRef = doc(firestore!, 'stores', storeSlug);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    setSlugStatus('taken');
+                    // Generate suggestions
+                    const suggestions = [
+                        `${storeSlug}-shop`,
+                        `${storeSlug}-pos`,
+                        `${storeSlug}-${Math.floor(100 + Math.random() * 899)}`,
+                    ];
+                    setSuggestedSlugs(suggestions);
+                } else {
+                    setSlugStatus('available');
+                    setSuggestedSlugs([]);
+                }
+            } catch (error) {
+                console.error("Error checking slug:", error);
+                setSlugStatus('idle');
+            }
+        };
+
+        const timer = setTimeout(() => {
+            if (firestore) {
+                checkSlug();
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [storeSlug, firestore]);
 
     const { isSubmitting } = form.formState;
 
@@ -394,9 +466,44 @@ export default function MerchantSignupPage() {
                             <FormControl>
                                 <div className="relative">
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">/</span>
-                                    <Input placeholder="my-awesome-store" className="pl-6" {...field} disabled={isSubmitting || isLoading} />
+                                    <Input
+                                        placeholder="my-awesome-store"
+                                        className={cn(
+                                            "pl-6",
+                                            slugStatus === 'available' && "border-green-500 focus-visible:ring-green-500",
+                                            slugStatus === 'taken' && "border-destructive focus-visible:ring-destructive"
+                                        )}
+                                        {...field}
+                                        disabled={isSubmitting || isLoading}
+                                    />
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                        {slugStatus === 'checking' && <Spinner size="sm" />}
+                                        {slugStatus === 'available' && <Check className="h-4 w-4 text-green-500" />}
+                                    </div>
                                 </div>
                             </FormControl>
+                            {slugStatus === 'taken' && (
+                                <div className="mt-2 space-y-2">
+                                    <p className="text-sm text-destructive font-medium">This URL is already taken.</p>
+                                    {suggestedSlugs.length > 0 && (
+                                        <div className="flex flex-wrap gap-2 items-center">
+                                            <span className="text-xs text-muted-foreground">Suggestions:</span>
+                                            {suggestedSlugs.map(suggestion => (
+                                                <Button
+                                                    key={suggestion}
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="h-7 px-2 text-xs hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-all"
+                                                    onClick={() => form.setValue('storeSlug', suggestion, { shouldValidate: true })}
+                                                >
+                                                    {suggestion}
+                                                </Button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                             <FormMessage />
                         </FormItem>
                     )}/>
