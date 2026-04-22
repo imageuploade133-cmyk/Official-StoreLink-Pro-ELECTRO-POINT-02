@@ -197,7 +197,7 @@ export default function StoreAppPage() {
                 </header>
             )}
 
-            <main className={cn("flex-1 overflow-y-auto hide-scrollbar dark:bg-black", showNav && "pb-24")}>
+            <main className={cn("flex-1 overflow-y-auto dark:bg-black", showNav && "pb-24")}>
                 {selectedProductId ? (
                     <ProductDetailView 
                         id={selectedProductId} 
@@ -349,8 +349,6 @@ export default function StoreAppPage() {
             </div>
 
           <style jsx global>{`
-            .hide-scrollbar::-webkit-scrollbar { display: none; }
-            .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
             body { overscroll-behavior-y: contain; }
           `}</style>
         </>
