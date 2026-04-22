@@ -102,6 +102,9 @@ import { ProductVoiceRecorder } from './ProductVoiceRecorder';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
 
+import { BarcodeScanner } from '@/components/inventory/BarcodeScanner';
+import { useBarcodeScanner } from '@/hooks/use-barcode-scanner';
+
 const badgeIcons = [
   { name: 'Truck', icon: Truck },
   { name: 'ShieldCheck', icon: ShieldCheck },
@@ -128,6 +131,7 @@ const storeProductSchema = z.object({
   purchasePrice: z.coerce.number().min(0, 'Cost price cannot be negative.'),
   stock: z.coerce.number().int().min(0, 'Stock cannot be negative.'),
   sku: z.string().optional().or(z.literal('')),
+  barcode: z.string().optional().or(z.literal('')),
   descriptionTitle: z.string().optional().or(z.literal('')),
   descriptionIcon: z.string().default('BookOpen'),
   description: z.string().optional().or(z.literal('')),
@@ -224,6 +228,7 @@ export function WebStoreProductForm() {
   const [isUploadingSizeGuide, setIsUploadingSizeGuide] = useState(false);
   const [isUploadingPoster, setIsUploadingPoster] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isBarcodeScannerOpen, setIsBarcodeScannerOpen] = useState(false);
 
   // Paginated category loading state
   const CATEGORY_BATCH_SIZE = 20;
@@ -331,6 +336,7 @@ export function WebStoreProductForm() {
       purchasePrice: 0,
       stock: 0,
       sku: '',
+      barcode: '',
       descriptionTitle: 'Product Story',
       descriptionIcon: 'BookOpen',
       description: '',
@@ -834,6 +840,61 @@ export function WebStoreProductForm() {
                     <FormItem>
                       <FormLabel className="font-bold">Initial Stock <span className="text-destructive">*</span></FormLabel>
                       <FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-dashed">
+                <FormField
+                  control={form.control}
+                  name="sku"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold">SKU (Unique ID)</FormLabel>
+                      <FormControl><Input placeholder="STK-12345" {...field} value={field.value || ''} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="barcode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold">Barcode</FormLabel>
+                      <div className="flex gap-2 items-center">
+                        <FormControl>
+                          <Input 
+                            placeholder="Scan or type barcode" 
+                            {...field} 
+                            value={field.value || ''} 
+                          />
+                        </FormControl>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="h-10 w-10 rounded-lg shadow-sm hover:shadow-md transition-all border-primary/50"
+                          onClick={() => setIsBarcodeScannerOpen(true)}
+                          title="Scan barcode"
+                        >
+                          <Barcode className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <FormDescription className="text-xs">
+                          Enter manually or use the barcode icon above.
+                      </FormDescription>
+                      <BarcodeScanner 
+                        isOpen={isBarcodeScannerOpen} 
+                        onClose={() => setIsBarcodeScannerOpen(false)} 
+                        onScan={(barcode) => {
+                            form.setValue('barcode', barcode);
+                            toast({ title: "Barcode Scanned!", description: `Set to: ${barcode}` });
+                            setIsBarcodeScannerOpen(false);
+                        }} 
+                      />
                       <FormMessage />
                     </FormItem>
                   )}

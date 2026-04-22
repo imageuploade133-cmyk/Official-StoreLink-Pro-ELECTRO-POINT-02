@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
-import { Scan, Search, X } from 'lucide-react';
+import { Barcode, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -40,7 +40,7 @@ export function BarcodeScannerField({
   return (
     <div className={cn("relative group w-full max-w-md", className)}>
       <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none transition-colors group-focus-within:text-primary">
-        <Scan className="h-4 w-4 text-muted-foreground" />
+        <Barcode className="h-4 w-4 text-muted-foreground" />
       </div>
       <Input
         ref={inputRef}

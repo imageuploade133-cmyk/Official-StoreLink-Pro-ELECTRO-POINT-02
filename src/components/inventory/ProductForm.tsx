@@ -48,6 +48,7 @@ import {
   AlertTriangle,
   Sparkles,
   Camera,
+  Barcode,
   ListChecks,
   Star
 } from 'lucide-react';
@@ -838,13 +839,13 @@ export function ProductForm({
                           size="icon"
                           className="h-10 w-10 rounded-lg shadow-sm hover:shadow-md transition-all border-primary/50"
                           onClick={() => setIsBarcodeScannerOpen(true)}
-                          title="Scan barcode with camera"
+                          title="Scan barcode"
                         >
-                          <Camera className="h-4 w-4" />
+                          <Barcode className="h-4 w-4" />
                         </Button>
                       </div>
                       <FormDescription className="text-xs">
-                          Enter manually or use the camera icon above (works on mobile/desktop).
+                          Enter manually or use the barcode icon above (works on mobile/desktop).
                       </FormDescription>
                       <BarcodeScanner 
                         isOpen={isBarcodeScannerOpen} 
