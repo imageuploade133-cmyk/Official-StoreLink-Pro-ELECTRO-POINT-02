@@ -70,7 +70,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Skeleton } from '@/components/ui/skeleton';
 import { StatCard } from '@/components/StatCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { OrderAuditTab } from '@/components/orders/OrderAuditTab';
+import { updateOrderStatusAction } from '@/app/actions/orders';
 
 const ITEMS_PER_PAGE = 15;
 
@@ -268,25 +268,18 @@ export default function WebsiteOrdersPage() {
   }, [orders, searchTerm, paymentStatusFilter]);
 
   const handleUpdateStatus = async (orderId: string, newStatus: OrderStatus) => {
-    if (!firestore || !user || !currentStoreId) return;
+    if (!user || !currentStoreId) return;
     try {
-      const orderRef = doc(firestore, 'orders', orderId);
-      const orderSnap = await getDoc(orderRef);
-      const oldStatus = orderSnap.exists() ? orderSnap.data().status : 'unknown';
+      const result = await updateOrderStatusAction(
+        orderId, 
+        currentStoreId, 
+        newStatus, 
+        user.uid, 
+        user.displayName || 'Authorized Agent', 
+        user.email || 'N/A'
+      );
 
-      await updateDoc(orderRef, { status: newStatus });
-
-      // Create Audit Log
-      await addDoc(collection(firestore, 'orderAudit'), {
-        orderId,
-        oldStatus,
-        newStatus,
-        timestamp: serverTimestamp(),
-        staffId: user.uid,
-        staffName: user.displayName || 'Authorized Agent',
-        staffEmail: user.email || 'N/A',
-        store_id: currentStoreId
-      });
+      if (!result.success) throw new Error(result.error);
 
       toast({ title: "Status Updated", description: `Order #${orderId.substring(0, 8)} is now ${newStatus}.` });
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
