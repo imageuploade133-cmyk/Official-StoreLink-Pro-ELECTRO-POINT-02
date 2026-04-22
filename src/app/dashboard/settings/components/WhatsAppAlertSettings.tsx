@@ -17,7 +17,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Loader2, MessageSquare, Send, CheckCircle2, XCircle, Eye, EyeOff, Info, Key, Smartphone } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Badge } from '@/components/ui/badge';
-import { sendTestWhatsAppAction, validateEBulkSMSAction, saveWhatsAppAlertSettingsAction } from '@/app/actions/orders';
+import { validateEBulkSMSAction, saveWhatsAppAlertSettingsAction } from '@/app/actions/orders';
+import { useUser } from '@/firebase/auth/use-user';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const whatsappAlertSettingsSchema = z.object({
@@ -34,6 +35,7 @@ interface WhatsAppAlertSettingsProps {
 }
 
 export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
+  const { user } = useUser();
   const { toast } = useToast();
   const firestore = useFirestore();
   const [isSaving, setIsSaving] = useState(false);
@@ -124,27 +126,30 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
   };
 
   const handleSendTest = async () => {
-    const values = form.getValues();
-    
-    // Validate current form values before sending test
-    const result = whatsappAlertSettingsSchema.safeParse(values);
-    if (!result.success) {
+    if (!user) {
         toast({
             variant: 'destructive',
-            title: 'Invalid Settings',
-            description: 'Please fill in all required fields correctly before sending a test.',
+            title: 'Not Authenticated',
+            description: 'You must be logged in to send a test message.',
         });
         return;
     }
 
     setIsSendingTest(true);
     try {
-        const testResult = await sendTestWhatsAppAction(
-            storeId || 'global',
-            {
-                ...values,
-            }
-        );
+        const idToken = await user.getIdToken();
+        const response = await fetch('/api/send-whatsapp-test', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`,
+            },
+            body: JSON.stringify({
+                storeId: storeId || 'global',
+            }),
+        });
+        
+        const testResult = await response.json();
         
         if (testResult.success) {
             toast({
@@ -152,7 +157,7 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
                 description: `A test WhatsApp notification has been sent.`,
             });
         } else {
-            throw new Error(testResult.error);
+            throw new Error(testResult.error || 'Failed to send test message');
         }
     } catch (error: any) {
         toast({

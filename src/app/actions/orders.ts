@@ -451,46 +451,6 @@ export async function validateEBulkSMSAction(username: string, apiKey: string) {
     }
 }
 
-export async function sendTestWhatsAppAction(storeId: string, settings: any) {
-    try {
-        let storeName = 'Test Store';
-        if (storeId && storeId !== 'global') {
-            const storeDoc = await adminDb.collection('stores').doc(storeId).get();
-            if (storeDoc.exists) {
-                storeName = storeDoc.data()?.name || 'Test Store';
-            }
-        }
-        
-        const message = `Test Message from ${storeName}.\n\nYour WhatsApp Alert system is now fully functional!`;
-        const recipient = settings.senderNumber;
-        if (!recipient) {
-            throw new Error('Please enter a "Sender WhatsApp Number" to receive the test message.');
-        }
-        
-        const result = await sendWhatsAppViaEBulkSMS(settings.username, settings.apiKey, [recipient], 'Test Alert', message);
-        const status = result?.response?.status || result?.status;
-        const statusdetail = result?.response?.statusdetail || result?.statusdetail;
-        
-        if (status === 'SUCCESS') {
-            await logWhatsAppMessage({
-                eventType: 'custom_message',
-                messageContent: message,
-                recipientPhone: recipient,
-                status: 'sent',
-                unitsCharged: 1,
-                userId: 'system',
-                userName: 'Test System',
-                storeId: storeId || 'global'
-            });
-            return { success: true };
-        }
-        
-        throw new Error(statusdetail || 'Failed to send WhatsApp');
-    } catch (error: any) {
-        return { success: false, error: error.message };
-    }
-}
-
 export async function sendWhatsAppOrderAlert(order: any, settings: WhatsAppAlertSettings, currency: string) {
     const customerName = order.guestInfo?.name || 'Customer';
     const amount = order.totalAmount;
