@@ -71,6 +71,7 @@ const generatePaymentReference = () => {
 
 export default function CheckoutPage() {
   const params = useParams();
+  const router = useRouter();
   const storeId = params?.storeId as string;
   const { cartItems, clearCart } = useCart();
   const { user, isLoading: isAuthLoading } = useUser();
