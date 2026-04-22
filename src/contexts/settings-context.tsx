@@ -76,11 +76,11 @@ export function SettingsProvider({ children, storeId: storeIdFromMiddleware }: {
   const settingsData = newSettingsData || oldSettingsData;
   const isLoadingSettings = isLoadingNewSettings || isLoadingOldSettings || isLoadingStore;
 
-  const value = { 
+  const value = useMemo(() => ({ 
     settings: settingsData, 
     store: storeData,
     isLoadingSettings 
-  };
+  }), [settingsData, storeData, isLoadingSettings]);
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
 }

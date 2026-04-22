@@ -22,10 +22,10 @@ export function ThemeContextProvider({
 
 // Keep the same export signature for downward compatibility
 export function useTheme() {
-  const { theme, setTheme, systemTheme } = useNextTheme();
+  const { theme, setTheme, systemTheme, resolvedTheme } = useNextTheme();
   
   const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
   };
 
   return { 

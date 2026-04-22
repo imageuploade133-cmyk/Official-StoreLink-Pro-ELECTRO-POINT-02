@@ -187,7 +187,7 @@
 
 .dark {
   /* Pure Black for main surfaces */
-  background-color: #000000;
+  background-color: #000000 !important;
 }
 
 .dark body, 
