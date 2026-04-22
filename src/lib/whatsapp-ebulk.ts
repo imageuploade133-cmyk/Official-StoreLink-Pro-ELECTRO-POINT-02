@@ -164,8 +164,11 @@ export async function sendWhatsAppViaEBulkSMS(
  */
 export async function getWhatsAppSettings(storeId: string) {
     let data: any = null;
+    let notificationNumbers: string[] = [];
+    let enableOrderAlerts = false;
     
     try {
+        // 1. Fetch credentials from whatsappAlerts doc
         if (storeId && storeId !== 'global') {
             const doc = await adminDb.collection('stores').doc(storeId).collection('settings').doc('whatsappAlerts').get();
             if (doc.exists) data = doc.data();
@@ -174,6 +177,46 @@ export async function getWhatsAppSettings(storeId: string) {
         if (!data) {
             const globalDoc = await adminDb.collection('settings').doc('whatsappAlerts').get();
             if (globalDoc.exists) data = globalDoc.data();
+        }
+
+        // 2. Fetch notification numbers and secondary toggle from config doc
+        if (storeId && storeId !== 'global') {
+            const configDoc = await adminDb.collection('stores').doc(storeId).collection('settings').doc('config').get();
+            if (configDoc.exists) {
+                const configData = configDoc.data();
+                notificationNumbers = configData?.orderNotificationNumbers || [];
+                enableOrderAlerts = configData?.enableOrderAlerts || false;
+            } else {
+                // Fallback for legacy
+                const legacyDoc = await adminDb.collection('settings').doc(storeId).get();
+                if (legacyDoc.exists) {
+                    const legacyData = legacyDoc.data();
+                    notificationNumbers = legacyData?.orderNotificationNumbers || [];
+                    enableOrderAlerts = legacyData?.enableOrderAlerts || false;
+                }
+            }
+        } else {
+            const globalConfigDoc = await adminDb.collection('settings').doc('global').get();
+            if (globalConfigDoc.exists) {
+                const globalConfigData = globalConfigDoc.data();
+                notificationNumbers = globalConfigData?.orderNotificationNumbers || [];
+                enableOrderAlerts = globalConfigData?.enableOrderAlerts || false;
+            }
+        }
+
+        if (data) {
+            // Merge notification numbers
+            if (!data.orderNotificationNumbers || data.orderNotificationNumbers.length === 0) {
+                data.orderNotificationNumbers = notificationNumbers;
+            } else if (notificationNumbers.length > 0) {
+                // Combine and remove duplicates
+                data.orderNotificationNumbers = Array.from(new Set([...data.orderNotificationNumbers, ...notificationNumbers]));
+            }
+
+            // Ensure enabled is true if either toggle is on
+            if (enableOrderAlerts) {
+                data.enabled = true;
+            }
         }
     
         // Automatically decrypt the API key if it's found in the settings
