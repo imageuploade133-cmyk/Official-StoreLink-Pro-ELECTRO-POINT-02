@@ -4,29 +4,46 @@ import { getWhatsAppSettings, sendWhatsAppViaEBulkSMS, logWhatsAppMessage } from
 import { verifyAuthDetailed, checkStoreAuthorization } from '@/lib/auth-admin-utils';
 
 export async function POST(request: Request) {
+  console.log('WhatsApp test request received');
   try {
     // Authenticate the user
     const { decodedToken, errorCode: authErrorCode } = await verifyAuthDetailed(request);
     if (!decodedToken) {
+      console.log('Authentication failed:', authErrorCode);
       return NextResponse.json({ success: false, error: authErrorCode || 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
+    console.log('Request payload:', JSON.stringify(body));
     const { storeId } = body;
+    console.log(`Current user/store id: ${decodedToken.uid} / ${storeId || 'global'}`);
 
     // Check if user is authorized for this store
     const { authorized, errorCode: storeErrorCode } = await checkStoreAuthorization(decodedToken.uid, storeId || 'global');
     if (!authorized) {
+      console.log('Authorization failed:', storeErrorCode);
       return NextResponse.json({ success: false, error: storeErrorCode || 'Forbidden' }, { status: 403 });
     }
 
     // Fetch credentials from Firestore (Secure)
     const settings = await getWhatsAppSettings(storeId || 'global') as any;
     
-    if (!settings || !settings.username || !settings.apiKey) {
+    if (!settings) {
+      console.log('Firestore settings missing');
       return NextResponse.json({ 
         success: false, 
-        error: 'WhatsApp credentials are not configured in settings.' 
+        error: "Settings not found" 
+      }, { status: 404 });
+    }
+    console.log('Firestore settings loaded');
+
+    const apiKeyExists = !!(settings.apiKey && settings.username);
+    console.log(`API key exists: ${apiKeyExists}`);
+
+    if (!apiKeyExists) {
+      return NextResponse.json({ 
+        success: false, 
+        error: "Missing API key" 
       }, { status: 400 });
     }
 
@@ -63,11 +80,11 @@ export async function POST(request: Request) {
         message
     );
 
-    // Log provider response in Vercel logs
-    console.log('EBulkSMS Response:', JSON.stringify(responseData, null, 2));
-
     const status = responseData?.response?.status || responseData?.status;
     const statusdetail = responseData?.response?.statusdetail || responseData?.statusdetail;
+
+    console.log('Provider response status:', status);
+    console.log('Provider response body:', JSON.stringify(responseData));
 
     if (status === 'SUCCESS') {
         await logWhatsAppMessage({
@@ -76,22 +93,25 @@ export async function POST(request: Request) {
             recipientPhone: recipient,
             status: 'sent',
             unitsCharged: 1,
-            userId: 'system',
-            userName: 'Test System',
+            userId: decodedToken.uid,
+            userName: decodedToken.name || 'Admin',
             storeId: storeId || 'global',
             apiResponse: JSON.stringify(responseData)
         });
         
         return NextResponse.json({ success: true, details: statusdetail });
     } else {
+        // If provider rejects: return exact provider response
         return NextResponse.json({ 
             success: false, 
-            error: statusdetail || 'Failed to send WhatsApp message via EBulkSMS'
-        }, { status: 500 });
+            error: statusdetail || 'Failed to send WhatsApp message via EBulkSMS',
+            providerResponse: responseData
+        }, { status: 400 });
     }
 
   } catch (error: any) {
     console.error('Error in /api/send-whatsapp-test:', error);
+    // Never return generic 500 without details
     return NextResponse.json({ 
         success: false, 
         error: error.message || 'An unexpected error occurred' 
