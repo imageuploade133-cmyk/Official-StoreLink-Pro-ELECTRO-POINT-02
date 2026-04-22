@@ -55,7 +55,13 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
     const [couponCode, setCouponCode] = useState('');
     const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
     const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
+    const [isCheckingOut, setIsCheckingOut] = useState(false);
     const [today, setToday] = useState<Date | null>(null);
+
+    const handleCheckout = () => {
+        setIsCheckingOut(true);
+        onStartCheckout();
+    };
 
     useEffect(() => {
         setToday(new Date());
@@ -349,12 +355,14 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
                                 </div>
                             </button>
                         )}
-                        <Button 
-                            onClick={onStartCheckout} 
+                        <LoadingButton 
+                            onClick={handleCheckout} 
+                            isLoading={isCheckingOut}
+                            loadingText="Processing..."
                             className="w-full h-16 rounded-[1.5rem] bg-primary text-white font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-primary/30 group transition-all active:scale-[0.98]"
                         >
                             Proceed to Checkout <ArrowRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={3} />
-                        </Button>
+                        </LoadingButton>
                         <div className="flex items-center justify-center gap-3 text-[8px] font-black uppercase tracking-[0.3em] text-slate-400 opacity-60">
                             <ShieldCheck className="h-3 w-3 text-green-500" /> Secure Transaction Encrypted
                         </div>
