@@ -421,6 +421,12 @@ export function ReceiptModal({ isOpen, onClose, saleTransaction, staffMap }: Rec
                       <span>-{formatCurrency(discountAmountCalculated, currencySymbol)}</span>
                     </div>
                   )}
+                  {transactionDetails.taxAmountCalculated && transactionDetails.taxAmountCalculated > 0 && (
+                    <div className="total-row">
+                      <span>{settings?.taxName || 'TAX'} ({transactionDetails.taxRate}%):</span>
+                      <span>{formatCurrency(transactionDetails.taxAmountCalculated, currencySymbol)}</span>
+                    </div>
+                  )}
                   <div className="grand-total-row">
                     <span>TOTAL:</span>
                     <span>{formatCurrency(grandTotal, currencySymbol)}</span>
@@ -636,6 +642,12 @@ export function ReceiptModal({ isOpen, onClose, saleTransaction, staffMap }: Rec
                                 <div className="flex justify-between items-center text-red-500">
                                     <span className="text-sm font-medium">Discount</span>
                                     <span className="font-bold">-{formatCurrency(discountAmountCalculated, currencySymbol)}</span>
+                                </div>
+                            )}
+                            {transactionDetails.taxAmountCalculated && transactionDetails.taxAmountCalculated > 0 && (
+                                <div className="flex justify-between items-center text-gray-600">
+                                    <span className="text-sm font-medium">{settings?.taxName || 'Tax'} ({transactionDetails.taxRate}%)</span>
+                                    <span className="font-bold">{formatCurrency(transactionDetails.taxAmountCalculated, currencySymbol)}</span>
                                 </div>
                             )}
                             <div className="pt-4 border-t-2 border-gray-100">

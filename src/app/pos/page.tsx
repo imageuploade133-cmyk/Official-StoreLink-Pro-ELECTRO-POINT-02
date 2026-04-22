@@ -84,6 +84,8 @@ interface SaleDataForDialog {
   grandTotal: number;
   subtotal: number;
   discountAmount?: number;
+  taxAmount?: number;
+  taxRate?: number;
   customer: Customer | null;
   notes: string;
   isCreditSale: boolean;
@@ -156,7 +158,7 @@ export default function POSPage() {
 
   const subtotal = useMemo(() => cartItems.reduce((sum, item) => sum + item.salePrice * item.quantity, 0), [cartItems]);
 
-  const { grandTotal, discountAmount } = useMemo(() => {
+  const { grandTotal, discountAmount, taxAmount } = useMemo(() => {
       let calculatedDiscount = 0;
       if (discount.type && discount.value > 0) {
           if (discount.type === 'percentage') {
@@ -165,9 +167,16 @@ export default function POSPage() {
               calculatedDiscount = Math.min(subtotal, discount.value);
           }
       }
-      const finalTotal = subtotal - calculatedDiscount;
-      return { grandTotal: finalTotal, discountAmount: calculatedDiscount };
-  }, [subtotal, discount]);
+      const afterDiscount = subtotal - calculatedDiscount;
+      
+      let calculatedTax = 0;
+      if (settings?.enableTax && settings?.taxRate) {
+          calculatedTax = (afterDiscount * settings.taxRate) / 100;
+      }
+      
+      const finalTotal = afterDiscount + calculatedTax;
+      return { grandTotal: finalTotal, discountAmount: calculatedDiscount, taxAmount: calculatedTax };
+  }, [subtotal, discount, settings]);
 
   const userStaffMap = useMemo(() => {
     const map = new Map<string, StaffMember>();
@@ -539,6 +548,8 @@ export default function POSPage() {
             discountValue: discount.value,
             discountType: discount.type,
             discountAmountCalculated: saleDataForDialog.discountAmount ?? null,
+            taxRate: saleDataForDialog.taxRate ?? null,
+            taxAmountCalculated: saleDataForDialog.taxAmount ?? null,
             amountPaidTowardsCredit: saleDataForDialog.isCreditSale ? initialPayment : 0,
             paymentHistory: paymentHistory,
             initialPaymentMadeAtTimeOfSale: initialPaymentAtSale ?? null,
@@ -627,7 +638,8 @@ export default function POSPage() {
     } else {
       setSaleDataForDialog({
         items: saleItems, grandTotal, subtotal, customer: selectedCustomer,
-        notes: '', isCreditSale: false, discountAmount: discountAmount
+        notes: '', isCreditSale: false, discountAmount: discountAmount,
+        taxAmount: taxAmount, taxRate: settings?.taxRate || 0
       });
       setIsConfirmPaymentDialogOpen(true);
     }
@@ -647,7 +659,9 @@ export default function POSPage() {
       items: saleItems, grandTotal, subtotal, customer: selectedCustomer,
       notes: '', isCreditSale: true, dueDate, initialPaymentAtSale: initialPaymentAmount,
       initialPaymentMethod: paymentMethod,
-      discountAmount
+      discountAmount,
+      taxAmount,
+      taxRate: settings?.taxRate || 0
     });
     setIsConfirmPaymentDialogOpen(true);
   };

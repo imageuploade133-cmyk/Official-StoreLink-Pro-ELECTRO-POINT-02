@@ -152,6 +152,17 @@ const PaymentSection: React.FC<{
               {formatCurrency(transaction.subtotal, currencySymbol)}
             </div>
           </div>
+          {transaction.taxAmountCalculated && transaction.taxAmountCalculated > 0 && (
+            <div className="p-4 rounded-lg bg-muted/30">
+              <div className="flex items-center gap-2 mb-2">
+                <Calculator className="w-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium text-muted-foreground">Tax Collected</span>
+              </div>
+              <div className="font-semibold font-mono text-blue-600">
+                {formatCurrency(transaction.taxAmountCalculated, currencySymbol)} ({transaction.taxRate}%)
+              </div>
+            </div>
+          )}
         </div>
         {transaction.paymentDetails && (
           <div className="p-4 rounded-lg bg-muted/30 border space-y-2">

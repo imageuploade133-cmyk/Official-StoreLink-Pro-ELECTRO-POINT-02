@@ -462,6 +462,9 @@ export interface Settings {
   deliveryLocations?: { id: string, name: string, price: number }[];
   enableBackgroundShadow?: boolean;
   checkoutSuccessRedirectUrl?: string;
+  enableTax?: boolean;
+  taxName?: string;
+  taxRate?: number;
 }
 
 export type AppSettings = Settings;
@@ -1040,6 +1043,8 @@ export interface Order {
   } | null;
   payCurrency?: string;
   gateway?: string;
+  taxRate?: number;
+  taxAmountCalculated?: number;
 }
 
 export interface ProductReview {
