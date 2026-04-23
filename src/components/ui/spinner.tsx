@@ -92,51 +92,49 @@ export function PageSpinner({
         }}
       />
 
-      {/* Minimal spinner - single rotating ring */}
-      <div className="relative flex items-center justify-center">
-        {/* Main spinner ring */}
+      {/* Spinner with centered logo */}
+      <div className="relative flex items-center justify-center" style={{ width: 120, height: 120 }}>
+        {/* Main spinner ring - rotates around logo */}
         <svg
           aria-hidden="true"
-          className="absolute"
+          className="absolute inset-0"
           style={{
-            width: 48,
-            height: 48,
-            animation: 'spin 1s linear infinite',
+            animation: 'spin 2s linear infinite',
           }}
-          viewBox="0 0 48 48"
+          viewBox="0 0 120 120"
           fill="none"
         >
           <circle
-            cx="24"
-            cy="24"
-            r="22"
+            cx="60"
+            cy="60"
+            r="55"
             stroke="currentColor"
             strokeWidth="2"
             strokeOpacity="0.1"
           />
           <circle
-            cx="24"
-            cy="24"
-            r="22"
+            cx="60"
+            cy="60"
+            r="55"
             stroke="url(#gradient)"
-            strokeWidth="2"
-            strokeDasharray="138 138"
+            strokeWidth="2.5"
+            strokeDasharray="172.7 172.7"
             strokeLinecap="round"
           />
           <defs>
             <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#0071e3" stopOpacity="1" />
-              <stop offset="100%" stopColor="#0071e3" stopOpacity="0.3" />
+              <stop offset="100%" stopColor="#0071e3" stopOpacity="0.2" />
             </linearGradient>
           </defs>
         </svg>
 
-        {/* Logo centered */}
+        {/* Logo perfectly centered inside spinner */}
         <div
-          className="relative z-10 flex items-center justify-center rounded-lg bg-black/40 backdrop-blur-sm border border-white/5"
-          style={{ width: 40, height: 40 }}
+          className="absolute flex items-center justify-center rounded-xl bg-black/30 backdrop-blur-md border border-white/10"
+          style={{ width: 56, height: 56 }}
         >
-          <ElysiumLogo className="h-5 w-5 text-blue-500" />
+          <ElysiumLogo className="h-7 w-7 text-blue-500" />
         </div>
       </div>
 
