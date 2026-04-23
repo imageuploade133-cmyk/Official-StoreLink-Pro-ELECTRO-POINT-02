@@ -80,77 +80,70 @@ export function PageSpinner({
     <div
       role="status"
       aria-label="Loading application"
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-8 bg-[hsl(222,30%,5%)]"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-black"
     >
-      {/* Ambient glow — background radial */}
+      {/* Subtle radial gradient glow */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            'radial-gradient(ellipse 60% 40% at 50% 60%, hsl(217 91% 60% / 0.08) 0%, transparent 70%)',
+            'radial-gradient(ellipse 80% 50% at 50% 40%, rgba(0, 113, 227, 0.05) 0%, transparent 60%)',
         }}
       />
 
-      {/* Spinner ring assembly */}
+      {/* Minimal spinner - single rotating ring */}
       <div className="relative flex items-center justify-center">
-        {/* Ring 1 — outermost, slow */}
-        <span
+        {/* Main spinner ring */}
+        <svg
           aria-hidden="true"
-          className="absolute rounded-full border border-primary/10 border-t-primary/50"
+          className="absolute"
           style={{
-            width: 96,
-            height: 96,
-            animation: 'spin 2s linear infinite',
+            width: 48,
+            height: 48,
+            animation: 'spin 1s linear infinite',
           }}
-        />
-        {/* Ring 2 — middle, medium */}
-        <span
-          aria-hidden="true"
-          className="absolute rounded-full border border-primary/20 border-t-primary/70"
-          style={{
-            width: 72,
-            height: 72,
-            animation: 'spin 1.4s linear infinite reverse',
-          }}
-        />
-        {/* Ring 3 — inner, fast */}
-        <span
-          aria-hidden="true"
-          className="absolute rounded-full border-2 border-primary/10 border-t-primary"
-          style={{
-            width: 52,
-            height: 52,
-            animation: 'spin 0.9s linear infinite',
-          }}
-        />
+          viewBox="0 0 48 48"
+          fill="none"
+        >
+          <circle
+            cx="24"
+            cy="24"
+            r="22"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeOpacity="0.1"
+          />
+          <circle
+            cx="24"
+            cy="24"
+            r="22"
+            stroke="url(#gradient)"
+            strokeWidth="2"
+            strokeDasharray="138 138"
+            strokeLinecap="round"
+          />
+          <defs>
+            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#0071e3" stopOpacity="1" />
+              <stop offset="100%" stopColor="#0071e3" stopOpacity="0.3" />
+            </linearGradient>
+          </defs>
+        </svg>
+
         {/* Logo centered */}
         <div
-          className="relative z-10 flex items-center justify-center rounded-xl bg-[hsl(220,25%,10%)] shadow-lg"
-          style={{ width: 36, height: 36 }}
+          className="relative z-10 flex items-center justify-center rounded-lg bg-black/40 backdrop-blur-sm border border-white/5"
+          style={{ width: 40, height: 40 }}
         >
-          <ElysiumLogo className="h-6 w-6" />
+          <ElysiumLogo className="h-5 w-5 text-blue-500" />
         </div>
       </div>
 
       {/* Text section */}
-      <div className="flex flex-col items-center gap-2 text-center">
-        <p className="text-sm font-semibold tracking-wide text-slate-200">{label}</p>
-        <p className="text-xs text-slate-500 animate-pulse">{subLabel}</p>
-      </div>
-
-      {/* Pulsing dots */}
-      <div aria-hidden="true" className="flex gap-1.5">
-        {[0, 1, 2].map((i) => (
-          <span
-            key={i}
-            className="h-1.5 w-1.5 rounded-full bg-primary/60"
-            style={{
-              animation: `pulse-dot 1.2s ease-in-out infinite`,
-              animationDelay: `${i * 0.2}s`,
-            }}
-          />
-        ))}
+      <div className="flex flex-col items-center gap-3 text-center">
+        <p className="text-base font-semibold tracking-normal text-white/95">{label}</p>
+        <p className="text-xs text-white/60">{subLabel}</p>
       </div>
     </div>
   );
