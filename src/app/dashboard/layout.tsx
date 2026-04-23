@@ -344,8 +344,8 @@ export default function DashboardLayout({
                           <Link
                             href={item.href!}
                             className={cn(
-                              'relative flex h-9 w-9 items-center justify-center rounded-lg transition-colors dark:text-foreground/70 dark:hover:text-primary dark:hover:bg-popover',
-                              (pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href!))) ? 'bg-muted text-primary dark:bg-popover dark:text-primary' : 'text-muted-foreground hover:text-primary'
+                              'relative flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-200 hover:scale-110 active:scale-95 dark:text-foreground/70 dark:hover:text-primary dark:hover:bg-popover shadow-none hover:shadow-md',
+                              (pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href!))) ? 'bg-muted text-primary dark:bg-popover dark:text-primary shadow-sm' : 'text-muted-foreground hover:text-primary'
                             )}
                           >
                             <item.icon className="h-5 w-5 dark:text-foreground/70 dark:[&.active]:text-primary" />
@@ -370,8 +370,8 @@ export default function DashboardLayout({
                       key={item.href}
                       href={item.href!}
                       className={cn(
-                        'flex items-center gap-3 rounded-lg px-3 py-2 transition-all dark:text-foreground/70 dark:hover:bg-popover dark:hover:text-primary',
-                        (pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href!))) ? 'bg-muted text-primary dark:bg-popover dark:text-primary' : 'text-muted-foreground hover:bg-muted hover:text-primary'
+                        'flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] dark:text-foreground/70 dark:hover:bg-popover dark:hover:text-primary shadow-none hover:shadow-sm',
+                        (pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href!))) ? 'bg-muted text-primary dark:bg-popover dark:text-primary font-bold shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-primary'
                       )}
                     >
                       <item.icon className="h-4 w-4 dark:text-foreground/70" />
@@ -447,8 +447,8 @@ export default function DashboardLayout({
                             key={item.href}
                             href={item.href!}
                             className={cn(
-                              'flex items-center justify-between gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:bg-muted hover:text-foreground',
-                              (pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href!))) ? 'bg-muted text-foreground' : ''
+                              'flex items-center justify-between gap-4 rounded-xl px-3 py-2 text-muted-foreground transition-all duration-200 hover:bg-muted hover:text-foreground hover:scale-[1.01] active:scale-[0.99]',
+                              (pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href!))) ? 'bg-muted text-foreground font-bold' : ''
                             )}
                             onClick={() => setIsMenuOpen(false)}
                           >

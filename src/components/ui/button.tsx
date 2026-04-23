@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 import { Loader2 } from "lucide-react"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold ring-offset-background transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold ring-offset-background transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow-sm hover:shadow-md",
   {
     variants: {
       variant: {
@@ -72,17 +72,19 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       return '';
     };
     
-    // Auto-apply special styles for Save buttons (submit type or "Save" text)
+    // Auto-apply special styles for Save buttons (submit type or "Save"/"Pay"/"Confirm" text)
     // Back buttons (containing "Back" text)
     // and Add buttons (containing "Add" text)
     const textContent = getText(children);
-    const isSave = props.type === "submit" || (/\bsave\b/i.test(textContent) && !/wishlist/i.test(textContent));
+    const isSave = props.type === "submit" || (/\b(save|pay|confirm|update|create)\b/i.test(textContent) && !/wishlist/i.test(textContent));
 
-    const isBack = /\bback\b/i.test(textContent) || (typeof className === 'string' && className.includes("btn-back"));
+    const isBack = /\b(back|cancel|close)\b/i.test(textContent) || (typeof className === 'string' && className.includes("btn-back"));
 
     const isAdd = /\badd\b/i.test(textContent) || (typeof className === 'string' && className.includes("btn-add"));
 
-    const specialClass = isSave ? "btn-save" : (isBack ? "btn-back" : (isAdd ? "btn-add" : ""));
+    const isDelete = /\b(delete|remove|clear)\b/i.test(textContent) || variant === 'destructive';
+
+    const specialClass = isSave ? "btn-save" : (isBack ? "btn-back" : (isAdd ? "btn-add" : (isDelete ? "btn-destructive-action" : "")));
 
     return (
       <Comp

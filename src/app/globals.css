@@ -302,21 +302,71 @@
   background-color: #161617 !important;
 }
 
-/* Buttons */
+/* Buttons with Enhanced Hover Effects */
+.btn-save {
+  @apply shadow-sm transition-all duration-200 hover:shadow-primary/20 hover:brightness-110 active:scale-[0.98];
+}
+
+.btn-add {
+  @apply shadow-sm transition-all duration-200 hover:shadow-green-500/20 hover:brightness-110 active:scale-[0.98] bg-green-600 hover:bg-green-500 text-white border-none;
+}
+
+.btn-back {
+  @apply shadow-sm transition-all duration-200 hover:bg-muted/80 active:scale-[0.98];
+}
+
+.btn-destructive-action {
+  @apply shadow-sm transition-all duration-200 hover:bg-destructive/10 active:scale-[0.98] border-destructive/20;
+}
+
 .dark .btn-back {
   background-color: #1c1c1e !important;
   border: 1px solid #424245 !important;
   color: #ffffff !important;
 }
 
+.dark .btn-back:hover {
+  background-color: #2c2c2e !important;
+  border-color: #525255 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .btn-destructive-action {
+  background-color: rgba(255, 69, 58, 0.1) !important;
+  border: 1px solid rgba(255, 69, 58, 0.3) !important;
+  color: #ff453a !important;
+}
+
+.dark .btn-destructive-action:hover {
+  background-color: rgba(255, 69, 58, 0.2) !important;
+  border-color: #ff453a !important;
+  box-shadow: 0 4px 12px rgba(255, 69, 58, 0.2) !important;
+}
+
 .dark .btn-save {
   background-color: #0071e3 !important;
   border: none !important;
   color: #ffffff !important;
+  box-shadow: 0 4px 14px 0 rgba(0, 113, 227, 0.39) !important;
 }
 
 .dark .btn-save:hover {
   background-color: #0077ed !important;
+  box-shadow: 0 6px 20px rgba(0, 113, 227, 0.23) !important;
+  transform: translateY(-1px);
+}
+
+.dark .btn-add {
+  background-color: #34c759 !important;
+  border: none !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px 0 rgba(52, 199, 89, 0.39) !important;
+}
+
+.dark .btn-add:hover {
+  background-color: #30d158 !important;
+  box-shadow: 0 6px 20px rgba(52, 199, 89, 0.23) !important;
+  transform: translateY(-1px);
 }
 
 /* Shadow Feature Disabled */
@@ -331,6 +381,13 @@
 .dark [class*="StatCard"],
 .dark [class*="stat-card"] {
   border-left: 2px solid #0071e3 !important;
+  @apply transition-all duration-300;
+}
+
+.dark [class*="StatCard"]:hover,
+.dark [class*="stat-card"]:hover {
+  @apply -translate-y-1 shadow-lg shadow-primary/10;
+  border-left-width: 4px !important;
 }
 
 /* ╔══════════════════════════════════════════════════════════════╗
@@ -338,95 +395,95 @@
    ║  Category-colored icons for clear visual hierarchy          ║
    ╚══════════════════════════════════════════════════════════════╝ */
 
-.dark aside nav a svg {
+.dark nav a svg {
   @apply transition-all duration-200;
 }
 
 /* ── Core nav section: Blue ── */
-.dark aside nav a[href="/dashboard"] svg,
-.dark aside nav a[href="/pos"] svg,
-.dark aside nav a[href="/dashboard/profile"] svg {
+.dark nav a[href="/dashboard"] svg,
+.dark nav a[href="/pos"] svg,
+.dark nav a[href="/dashboard/profile"] svg {
   color: #0071e3;
 }
 
 /* ── Invoicing section: Violet ── */
-.dark aside nav a[href^="/dashboard/invoice"] svg,
-.dark aside nav a[href="/dashboard/invoicing-settings"] svg {
+.dark nav a[href^="/dashboard/invoice"] svg,
+.dark nav a[href="/dashboard/invoicing-settings"] svg {
   color: #af52de;
 }
 
 /* ── Reports section: Green ── */
-.dark aside nav a[href="/dashboard/my-sales"] svg,
-.dark aside nav a[href="/dashboard/sales-history"] svg,
-.dark aside nav a[href="/dashboard/returns"] svg,
-.dark aside nav a[href="/dashboard/product-sales"] svg,
-.dark aside nav a[href="/dashboard/expenses"] svg {
+.dark nav a[href="/dashboard/my-sales"] svg,
+.dark nav a[href="/dashboard/sales-history"] svg,
+.dark nav a[href="/dashboard/returns"] svg,
+.dark nav a[href="/dashboard/product-sales"] svg,
+.dark nav a[href="/dashboard/expenses"] svg {
   color: #34c759;
 }
 
 /* ── Financials section: Gold ── */
-.dark aside nav a[href="/dashboard/flexible-payments"] svg {
+.dark nav a[href="/dashboard/flexible-payments"] svg {
   color: #ffcc00;
 }
 
 /* ── E-Commerce section: Pink ── */
-.dark aside nav a[href="/dashboard/orders"] svg,
-.dark aside nav a[href="/dashboard/order-alerts"] svg,
-.dark aside nav a[href="/dashboard/online-customers"] svg {
+.dark nav a[href="/dashboard/orders"] svg,
+.dark nav a[href="/dashboard/order-alerts"] svg,
+.dark nav a[href="/dashboard/online-customers"] svg {
   color: #ff2d55;
 }
 
 /* ── Inventory section: Orange ── */
-.dark aside nav a[href="/dashboard/inventory"] svg,
-.dark aside nav a[href="/dashboard/categories"] svg,
-.dark aside nav a[href="/dashboard/stock-audit"] svg,
-.dark aside nav a[href="/dashboard/stock-alerts"] svg,
-.dark aside nav a[href="/dashboard/restock-history"] svg,
-.dark aside nav a[href="/dashboard/print-barcodes"] svg,
-.dark aside nav a[href="/dashboard/bulk-add-products"] svg {
+.dark nav a[href="/dashboard/inventory"] svg,
+.dark nav a[href="/dashboard/categories"] svg,
+.dark nav a[href="/dashboard/stock-audit"] svg,
+.dark nav a[href="/dashboard/stock-alerts"] svg,
+.dark nav a[href="/dashboard/restock-history"] svg,
+.dark nav a[href="/dashboard/print-barcodes"] svg,
+.dark nav a[href="/dashboard/bulk-add-products"] svg {
   color: #ff9500;
 }
 
 /* ── Management section: Teal ── */
-.dark aside nav a[href="/dashboard/customers"] svg,
-.dark aside nav a[href="/dashboard/staff"] svg {
+.dark nav a[href="/dashboard/customers"] svg,
+.dark nav a[href="/dashboard/staff"] svg {
   color: #5ac8fa;
 }
 
 /* ── Marketing section: Indigo ── */
-.dark aside nav a[href="/dashboard/welcome-credit-settings"] svg,
-.dark aside nav a[href="/dashboard/whatsapp"] svg {
+.dark nav a[href="/dashboard/welcome-credit-settings"] svg,
+.dark nav a[href="/dashboard/whatsapp"] svg {
   color: #5856d6;
 }
 
 /* ── Website section: Cyan ── */
-.dark aside nav a[href^="/dashboard/flash-hub"] svg,
-.dark aside nav a[href^="/dashboard/category-gallery"] svg,
-.dark aside nav a[href^="/dashboard/voice-settings"] svg,
-.dark aside nav a[href^="/dashboard/add-store-product"] svg,
-.dark aside nav a[href^="/dashboard/manage-web"] svg,
-.dark aside nav a[href^="/dashboard/manage-coupons"] svg,
-.dark aside nav a[href^="/dashboard/stock-bar"] svg,
-.dark aside nav a[href^="/dashboard/public-web"] svg,
-.dark aside nav a[href^="/dashboard/shopping-experience"] svg,
-.dark aside nav a[href^="/dashboard/website-payment"] svg,
-.dark aside nav a[href^="/dashboard/logistics"] svg,
-.dark aside nav a[href^="/dashboard/recommendations"] svg,
-.dark aside nav a[href^="/dashboard/create-web-page"] svg,
-.dark aside nav a[href^="/dashboard/web-slide"] svg,
-.dark aside nav a[href^="/dashboard/homepage-sections"] svg,
-.dark aside nav a[href^="/dashboard/add-ui-section"] svg {
+.dark nav a[href^="/dashboard/flash-hub"] svg,
+.dark nav a[href^="/dashboard/category-gallery"] svg,
+.dark nav a[href^="/dashboard/voice-settings"] svg,
+.dark nav a[href^="/dashboard/add-store-product"] svg,
+.dark nav a[href^="/dashboard/manage-web"] svg,
+.dark nav a[href^="/dashboard/manage-coupons"] svg,
+.dark nav a[href^="/dashboard/stock-bar"] svg,
+.dark nav a[href^="/dashboard/public-web"] svg,
+.dark nav a[href^="/dashboard/shopping-experience"] svg,
+.dark nav a[href^="/dashboard/website-payment"] svg,
+.dark nav a[href^="/dashboard/logistics"] svg,
+.dark nav a[href^="/dashboard/recommendations"] svg,
+.dark nav a[href^="/dashboard/create-web-page"] svg,
+.dark nav a[href^="/dashboard/web-slide"] svg,
+.dark nav a[href^="/dashboard/homepage-sections"] svg,
+.dark nav a[href^="/dashboard/add-ui-section"] svg {
   color: #64d2ff;
 }
 
 /* ── Administration section: Grey ── */
-.dark aside nav a[href="/dashboard/settings"] svg,
-.dark aside nav a[href="/dashboard/permissions"] svg {
+.dark nav a[href="/dashboard/settings"] svg,
+.dark nav a[href="/dashboard/permissions"] svg {
   color: #8e8e93;
 }
 
 /* ══ ICON GLOW on hover ══ */
-.dark aside nav a:hover svg {
+.dark nav a:hover svg {
   transform: scale(1.1);
   filter: brightness(1.2);
 }
