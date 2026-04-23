@@ -25,7 +25,12 @@ import {
     Zap,
     Coins,
     Trophy,
-    ArrowRight
+    ArrowRight,
+    Check,
+    ChevronLeft,
+    ChevronRight,
+    MapPin,
+    ShieldCheck
 } from "lucide-react";
 import { PageSpinner, Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/hooks/use-toast";
@@ -48,6 +53,7 @@ import regions from '@/lib/regions.json';
 import type { AppSettings } from "@/lib/types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { formatCurrency } from "@/lib/formatUtils";
+import { cn } from "@/lib/utils";
 
 const iconMap = {
   PartyPopper,
@@ -90,6 +96,27 @@ export default function StoreSignupPage() {
     const { user, store, staffMember, isCustomer, isLoading: isAuthLoading } = useAuth();
     const { settings, isLoading: isLoadingSettings } = useSettings();
     const { getStoreUrl } = useStoreUrl();
+
+    const [currentStep, setCurrentStep] = useState(1);
+    const totalSteps = 3;
+
+    const nextStep = async () => {
+        let fieldsToValidate: (keyof SignupFormValues)[] = [];
+        if (currentStep === 1) {
+            fieldsToValidate = ['name', 'email', 'phone', 'gender'];
+        } else if (currentStep === 2) {
+            fieldsToValidate = ['country', 'address'];
+        }
+        
+        const isValid = await form.trigger(fieldsToValidate);
+        if (isValid) {
+            setCurrentStep(prev => Math.min(prev + 1, totalSteps));
+        }
+    };
+
+    const prevStep = () => {
+        setCurrentStep(prev => Math.max(prev - 1, 1));
+    };
     
     const form = useForm<SignupFormValues>({
       resolver: zodResolver(signupSchema),
@@ -301,65 +328,152 @@ export default function StoreSignupPage() {
                 )}
             </div>
             <h1 className="text-4xl font-bold font-headline">Create an Account</h1>
-            <p className="text-balance text-muted-foreground">
-              Enter your details below to join the elite collection.
+            <p className="text-balance text-muted-foreground text-sm">
+              {currentStep === 1 ? 'Personal details to get started.' : 
+               currentStep === 2 ? 'Where should we deliver your items?' : 
+               'Secure your account with a password.'}
             </p>
           </div>
+
+          {/* Step Indicator */}
+          <div className="flex justify-between mb-8 relative">
+            <div className="absolute top-4 left-0 w-full h-0.5 bg-muted -z-0" />
+            <div 
+              className="absolute top-4 left-0 h-0.5 transition-all duration-500 -z-0" 
+              style={{ 
+                width: `${((currentStep - 1) / (totalSteps - 1)) * 100}%`,
+                backgroundColor: settings?.storeBtnColor || '#3b82f6'
+              }}
+            />
+            {[1, 2, 3].map((step) => (
+              <div key={step} className="flex flex-col items-center gap-2 z-10">
+                <div 
+                  className={cn(
+                    "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300",
+                    currentStep > step ? "text-white" : 
+                    currentStep === step ? "text-white ring-4" : 
+                    "bg-muted text-muted-foreground"
+                  )}
+                  style={{
+                    backgroundColor: (currentStep >= step) ? (settings?.storeBtnColor || '#3b82f6') : undefined,
+                    borderColor: currentStep === step ? `${settings?.storeBtnColor || '#3b82f6'}33` : undefined,
+                    boxShadow: currentStep === step ? `0 0 0 4px ${settings?.storeBtnColor || '#3b82f6'}33` : undefined
+                  }}
+                >
+                  {currentStep > step ? <Check className="h-4 w-4" /> : step}
+                </div>
+                <span className={cn(
+                    "text-[10px] uppercase tracking-wider font-bold transition-colors duration-300",
+                    currentStep === step ? "text-primary" : "text-muted-foreground"
+                )}
+                style={{ color: currentStep === step ? (settings?.storeBtnColor || '#3b82f6') : undefined }}
+                >
+                  {step === 1 ? 'Profile' : step === 2 ? 'Address' : 'Security'}
+                </span>
+              </div>
+            ))}
+          </div>
+
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <FormField control={form.control} name="name" render={({ field }) => (
-                        <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="John Doe" {...field} disabled={isSubmitting} /></FormControl><FormMessage /></FormItem>
-                    )}/>
-                    <FormField control={form.control} name="email" render={({ field }) => (
-                        <FormItem><FormLabel>Email Address</FormLabel><FormControl><Input type="email" placeholder="m@example.com" {...field} disabled={isSubmitting} /></FormControl><FormMessage /></FormItem>
-                    )}/>
-                </div>
-                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <FormField control={form.control} name="password" render={({ field }) => (
-                        <FormItem><FormLabel>Password</FormLabel>
-                          <div className="relative">
-                            <FormControl><Input type={showPassword ? 'text' : 'password'} placeholder="Min. 6 chars" {...field} disabled={isSubmitting} /></FormControl>
-                             <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7" onClick={() => setShowPassword(!showPassword)}><Eye className="h-4 w-4" /></Button>
-                          </div>
-                        <FormMessage /></FormItem>
-                    )}/>
-                    <FormField control={form.control} name="confirmPassword" render={({ field }) => (
-                        <FormItem><FormLabel>Confirm Password</FormLabel><FormControl><Input type={showPassword ? 'text' : 'password'} placeholder="Repeat password" {...field} disabled={isSubmitting} /></FormControl><FormMessage /></FormItem>
-                    )}/>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <FormField control={form.control} name="phone" render={({ field }) => (
-                      <FormItem><FormLabel>Phone Number</FormLabel><FormControl><Input type="tel" placeholder="+1..." {...field} disabled={isSubmitting} /></FormControl><FormMessage /></FormItem>
-                  )}/>
-                  <FormField control={form.control} name="gender" render={({ field }) => (
-                      <FormItem><FormLabel>Gender</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
-                          <FormControl><SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger></FormControl>
-                          <SelectContent><SelectItem value="Male">Male</SelectItem><SelectItem value="Female">Female</SelectItem><SelectItem value="Other">Other</SelectItem><SelectItem value="Prefer not to say">Private</SelectItem></SelectContent>
-                        </Select>
-                      <FormMessage /></FormItem>
-                  )}/>
-                </div>
-                <FormField control={form.control} name="country" render={({ field }) => (
-                      <FormItem><FormLabel>Country</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
-                          <FormControl><SelectTrigger><SelectValue placeholder="Select country..." /></SelectTrigger></FormControl>
-                          <SelectContent><ScrollArea className="h-72">{regions.map(r => <SelectItem key={r.code} value={r.name}>{r.name}</SelectItem>)}</ScrollArea></SelectContent>
-                        </Select>
-                      <FormMessage /></FormItem>
-                )}/>
-                <FormField control={form.control} name="address" render={({ field }) => (
-                    <FormItem><FormLabel>Delivery Address</FormLabel><FormControl><Textarea placeholder="Full street address..." {...field} disabled={isSubmitting} className="min-h-[100px]" /></FormControl><FormMessage /></FormItem>
-                )}/>
+                {currentStep === 1 && (
+                    <div className="grid gap-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <FormField control={form.control} name="name" render={({ field }) => (
+                                <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="John Doe" {...field} disabled={isSubmitting} /></FormControl><FormMessage /></FormItem>
+                            )}/>
+                            <FormField control={form.control} name="email" render={({ field }) => (
+                                <FormItem><FormLabel>Email Address</FormLabel><FormControl><Input type="email" placeholder="m@example.com" {...field} disabled={isSubmitting} /></FormControl><FormMessage /></FormItem>
+                            )}/>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <FormField control={form.control} name="phone" render={({ field }) => (
+                                <FormItem><FormLabel>Phone Number</FormLabel><FormControl><Input type="tel" placeholder="+1..." {...field} disabled={isSubmitting} /></FormControl><FormMessage /></FormItem>
+                            )}/>
+                            <FormField control={form.control} name="gender" render={({ field }) => (
+                                <FormItem><FormLabel>Gender</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
+                                    <FormControl><SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger></FormControl>
+                                    <SelectContent><SelectItem value="Male">Male</SelectItem><SelectItem value="Female">Female</SelectItem><SelectItem value="Other">Other</SelectItem><SelectItem value="Prefer not to say">Private</SelectItem></SelectContent>
+                                    </Select>
+                                <FormMessage /></FormItem>
+                            )}/>
+                        </div>
+                    </div>
+                )}
 
-                <Button type="submit" style={buttonStyle} className="w-full mt-2 h-12 font-bold border-none" disabled={isSubmitting}>
-                    {isSubmitting ? <><Spinner size="sm" className="mr-2 text-primary-foreground" />Creating Account…</> : 'Create Account'}
-                </Button>
-                <div className="text-center text-sm">
-                    Already have an account?{" "}
-                    <Link href={getStoreUrl("/store/login")} className="underline text-primary font-bold">Log in</Link>
+                {currentStep === 2 && (
+                    <div className="grid gap-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                        <FormField control={form.control} name="country" render={({ field }) => (
+                            <FormItem><FormLabel>Country</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
+                                <FormControl><SelectTrigger><SelectValue placeholder="Select country..." /></SelectTrigger></FormControl>
+                                <SelectContent><ScrollArea className="h-72">{regions.map(r => <SelectItem key={r.code} value={r.name}>{r.name}</SelectItem>)}</ScrollArea></SelectContent>
+                                </Select>
+                            <FormMessage /></FormItem>
+                        )}/>
+                        <FormField control={form.control} name="address" render={({ field }) => (
+                            <FormItem><FormLabel>Delivery Address</FormLabel><FormControl><Textarea placeholder="Full street address..." {...field} disabled={isSubmitting} className="min-h-[100px]" /></FormControl><FormMessage /></FormItem>
+                        )}/>
+                    </div>
+                )}
+
+                {currentStep === 3 && (
+                    <div className="grid gap-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                        <div className="grid grid-cols-1 gap-4">
+                            <FormField control={form.control} name="password" render={({ field }) => (
+                                <FormItem><FormLabel>Password</FormLabel>
+                                <div className="relative">
+                                    <FormControl><Input type={showPassword ? 'text' : 'password'} placeholder="Min. 6 characters" {...field} disabled={isSubmitting} /></FormControl>
+                                    <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7" onClick={() => setShowPassword(!showPassword)}><Eye className="h-4 w-4" /></Button>
+                                </div>
+                                <FormMessage /></FormItem>
+                            )}/>
+                            <FormField control={form.control} name="confirmPassword" render={({ field }) => (
+                                <FormItem><FormLabel>Confirm Password</FormLabel><FormControl><Input type={showPassword ? 'text' : 'password'} placeholder="Repeat password" {...field} disabled={isSubmitting} /></FormControl><FormMessage /></FormItem>
+                            )}/>
+                        </div>
+                        
+                        <div className="bg-muted/50 p-4 rounded-xl border border-dashed space-y-3 mt-2">
+                            <h3 className="text-xs font-bold flex items-center gap-2" style={{ color: settings?.storeBtnColor || '#3b82f6' }}>
+                                <ShieldCheck className="h-4 w-4" />
+                                Summary
+                            </h3>
+                            <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-[10px]">
+                                <div className="text-muted-foreground">Name:</div>
+                                <div className="font-medium truncate">{form.getValues('name')}</div>
+                                <div className="text-muted-foreground">Email:</div>
+                                <div className="font-medium truncate">{form.getValues('email')}</div>
+                                <div className="text-muted-foreground">Location:</div>
+                                <div className="font-medium truncate">{form.getValues('country')}</div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                <div className="flex gap-4 mt-2">
+                    {currentStep > 1 && (
+                        <Button type="button" variant="outline" onClick={prevStep} className="flex-1 h-12 font-bold" disabled={isSubmitting}>
+                            <ChevronLeft className="mr-2 h-4 w-4" /> Back
+                        </Button>
+                    )}
+                    {currentStep < totalSteps ? (
+                        <Button type="button" onClick={nextStep} style={buttonStyle} className="flex-1 h-12 font-bold border-none">
+                            Next <ChevronRight className="ml-2 h-4 w-4" />
+                        </Button>
+                    ) : (
+                        <Button type="submit" style={buttonStyle} className="flex-1 h-12 font-bold border-none" disabled={isSubmitting}>
+                            {isSubmitting ? <><Spinner size="sm" className="mr-2 text-primary-foreground" />Creating Account…</> : 'Create Account'}
+                        </Button>
+                    )}
                 </div>
+                
+                {currentStep === 1 && (
+                    <div className="text-center text-sm">
+                        Already have an account?{" "}
+                        <Link href={getStoreUrl("/store/login")} className="underline text-primary font-bold" style={{ color: settings?.storeBtnColor }}>Log in</Link>
+                    </div>
+                )}
             </form>
           </Form>
         </div>
