@@ -383,7 +383,7 @@ export default function BulkWhatsAppPage() {
                 </Label>
             </div>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="mb-4">
               <TabsTrigger value="customers">
                 <Users className="h-4 w-4 mr-2" /> Customers ({customersWithPhone.length})
               </TabsTrigger>

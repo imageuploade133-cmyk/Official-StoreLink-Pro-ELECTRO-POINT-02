@@ -402,7 +402,7 @@ export default function ProductSalesPage() {
       </div>
 
       <Tabs defaultValue="allProducts" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-xs sm:max-w-md mb-4">
+        <TabsList className="mb-4">
             <TabsTrigger value="allProducts">By Product</TabsTrigger>
             <TabsTrigger value="dailySalesPerformance">Daily Trends</TabsTrigger>
         </TabsList>

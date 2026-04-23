@@ -495,10 +495,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
 
                 <div className="pt-4">
                     <Tabs value={activeTabSub} onValueChange={setActiveTabSub} className="w-full">
-                        <TabsList className={cn(
-                            "grid w-full h-11 bg-muted/50 rounded-xl p-1",
-                            settings?.showProductReviews ? "grid-cols-3" : "grid-cols-2"
-                        )}>
+                        <TabsList className="mb-4">
                             <TabsTrigger value="details" className="text-[10px] font-black uppercase tracking-widest">Specs</TabsTrigger>
                             <TabsTrigger value="shipping" className="text-[10px] font-black uppercase tracking-widest">Shipping</TabsTrigger>
                             {settings?.showProductReviews && (

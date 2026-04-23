@@ -218,7 +218,7 @@ export function NavigationBarSettings({ settingsData, isLoading }: NavigationBar
           
           <CardContent className="space-y-8">
             <Tabs defaultValue="style" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="mb-4">
                 <TabsTrigger value="style">Style</TabsTrigger>
                 <TabsTrigger value="visibility">Visibility</TabsTrigger>
                 <TabsTrigger value="menu">Menu</TabsTrigger>

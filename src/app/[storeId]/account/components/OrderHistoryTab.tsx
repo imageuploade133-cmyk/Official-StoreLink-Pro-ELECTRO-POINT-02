@@ -78,7 +78,7 @@ export function OrderHistoryTab({ user }: { user: any }) {
         </div>
         
         <Tabs value={filter} onValueChange={(v: any) => setFilter(v)} className="w-full sm:w-auto">
-          <TabsList className="grid grid-cols-4 w-full sm:w-auto">
+          <TabsList className="grid grid-cols-4 sm:flex sm:w-auto">
             <TabsTrigger value="ALL">All</TabsTrigger>
             <TabsTrigger value="PAID">Paid</TabsTrigger>
             <TabsTrigger value="UNPAID">Unpaid</TabsTrigger>

@@ -365,7 +365,7 @@ export default function StockAlertsPage() {
         />
 
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="mb-4">
                 <TabsTrigger value="low_stock">
                     Low Stock Alerts
                 </TabsTrigger>

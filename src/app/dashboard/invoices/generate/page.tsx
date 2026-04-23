@@ -286,7 +286,7 @@ export default function GenerateInvoicePage() {
               <div className="space-y-4">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-primary">Settlement Status</Label>
                 <Tabs value={status} onValueChange={(v: any) => setStatus(v)} className="w-full">
-                  <TabsList className="grid grid-cols-3 h-12 p-1 bg-muted/50 rounded-xl border">
+                  <TabsList className="mb-4">
                     <TabsTrigger value="draft" className="text-[10px] font-black uppercase tracking-widest rounded-lg">Draft</TabsTrigger>
                     <TabsTrigger value="paid" className="text-[10px] font-black uppercase tracking-widest rounded-lg text-green-600">Paid</TabsTrigger>
                     <TabsTrigger value="credit" className="text-[10px] font-black uppercase tracking-widest rounded-lg text-orange-600">Unpaid</TabsTrigger>

@@ -917,18 +917,13 @@ export default function WebsitePaymentSettings() {
         </CardContent>
       </Card>
       <Tabs defaultValue="paystack" className="space-y-6">
-        <TabsList className="bg-muted/50 p-1.5 h-auto flex-wrap justify-start gap-1.5 shadow-sm border border-border/50"> 
+        <TabsList className="mb-4 flex-wrap justify-start"> 
           {paymentMethods.map((method) => { 
             const active = isProviderActive(method.id); 
             return ( 
               <TabsTrigger  
                 key={method.id}  
-                value={method.id}  
-                className={cn( 
-                  "flex items-center gap-2.5 px-4 py-2.5 transition-all duration-200", 
-                  "", 
-                  "hover:bg-background/60" 
-                )} 
+                value={method.id}  className="gap-2.5"
               > 
                 <div className={cn( 
                   "p-1 rounded-md transition-colors", 

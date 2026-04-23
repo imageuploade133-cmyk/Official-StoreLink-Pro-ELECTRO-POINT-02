@@ -916,7 +916,7 @@ export default function ButtonUIStylePage() {
           </Card>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 mb-8">
+            <TabsList className="mb-8">
               <TabsTrigger
                 value="addToCart"
               >
