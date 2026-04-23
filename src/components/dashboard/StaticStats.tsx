@@ -68,7 +68,7 @@ export function StaticStats({
 
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-      <Card className="relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-blue-50/50 to-white dark:from-blue-950/20 dark:to-background border border-blue-100/50 dark:border-blue-900/30">
+      <Card className="relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-blue-50/50 to-white dark:from-blue-950/20 dark:to-background border-l-4 border-blue-500 border-t border-r border-b border-blue-200 dark:border-t-blue-800 dark:border-r-blue-800 dark:border-b-blue-800">
         <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
           <ShoppingBag className="h-12 w-12 text-blue-500" />
         </div>
@@ -104,7 +104,7 @@ export function StaticStats({
         <div className="absolute bottom-0 left-0 h-1 w-full bg-blue-500/20 group-hover:bg-blue-500/40 transition-colors" />
       </Card>
 
-      <Card className="relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-green-50/50 to-white dark:from-green-950/20 dark:to-background border border-green-100/50 dark:border-green-900/30">
+      <Card className="relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-green-50/50 to-white dark:from-green-950/20 dark:to-background border-l-4 border-green-500 border-t border-r border-b border-green-200 dark:border-t-green-800 dark:border-r-green-800 dark:border-b-green-800">
         <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
           <ShoppingBag className="h-12 w-12 text-green-500" />
         </div>
@@ -138,7 +138,7 @@ export function StaticStats({
         <div className="absolute bottom-0 left-0 h-1 w-full bg-green-500/20 group-hover:bg-green-500/40 transition-colors" />
       </Card>
 
-      <Card className="relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-purple-50/50 to-white dark:from-purple-950/20 dark:to-background border border-purple-100/50 dark:border-purple-900/30">
+      <Card className="relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-purple-50/50 to-white dark:from-purple-950/20 dark:to-background border-l-4 border-purple-500 border-t border-r border-b border-purple-200 dark:border-t-purple-800 dark:border-r-purple-800 dark:border-b-purple-800">
         <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
           <ShoppingBag className="h-12 w-12 text-purple-500" />
         </div>
@@ -174,7 +174,7 @@ export function StaticStats({
         <div className="absolute bottom-0 left-0 h-1 w-full bg-purple-500/20 group-hover:bg-purple-500/40 transition-colors" />
       </Card>
 
-      <Card className="relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-pink-50/50 to-white dark:from-pink-950/20 dark:to-background border border-pink-100/50 dark:border-pink-900/30">
+      <Card className="relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-pink-50/50 to-white dark:from-pink-950/20 dark:to-background border-l-4 border-pink-500 border-t border-r border-b border-pink-200 dark:border-t-pink-800 dark:border-r-pink-800 dark:border-b-pink-800">
         <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
           <ShoppingBag className="h-12 w-12 text-pink-500" />
         </div>

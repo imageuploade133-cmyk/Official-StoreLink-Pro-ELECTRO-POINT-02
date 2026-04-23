@@ -18,7 +18,7 @@ interface InventoryStatsProps {
 export function InventoryStats({ isLoading, stats }: InventoryStatsProps) {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      <Card className="relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-yellow-50/50 to-white dark:from-yellow-950/20 dark:to-background border border-yellow-100/50 dark:border-yellow-900/30">
+      <Card className="relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-yellow-50/50 to-white dark:from-yellow-950/20 dark:to-background border-l-4 border-yellow-500 border-t border-r border-b border-yellow-200 dark:border-t-yellow-800 dark:border-r-yellow-800 dark:border-b-yellow-800">
         <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
           <AlertTriangle className="h-12 w-12 text-yellow-600" />
         </div>
@@ -38,7 +38,7 @@ export function InventoryStats({ isLoading, stats }: InventoryStatsProps) {
         <div className="absolute bottom-0 left-0 h-1 w-full bg-yellow-500/20 group-hover:bg-yellow-500/40 transition-colors" />
       </Card>
 
-      <Card className="relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-red-50/50 to-white dark:from-red-950/20 dark:to-background border border-red-100/50 dark:border-red-900/30">
+      <Card className="relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-red-50/50 to-white dark:from-red-950/20 dark:to-background border-l-4 border-red-500 border-t border-r border-b border-red-200 dark:border-t-red-800 dark:border-r-red-800 dark:border-b-red-800">
         <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
           <PackageX className="h-12 w-12 text-red-600" />
         </div>
@@ -58,7 +58,7 @@ export function InventoryStats({ isLoading, stats }: InventoryStatsProps) {
         <div className="absolute bottom-0 left-0 h-1 w-full bg-red-500/20 group-hover:bg-red-500/40 transition-colors" />
       </Card>
 
-      <Card className="relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-orange-50/50 to-white dark:from-orange-950/20 dark:to-background border border-orange-100/50 dark:border-orange-900/30">
+      <Card className="relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-orange-50/50 to-white dark:from-orange-950/20 dark:to-background border-l-4 border-orange-500 border-t border-r border-b border-orange-200 dark:border-t-orange-800 dark:border-r-orange-800 dark:border-b-orange-800">
         <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
           <CalendarX className="h-12 w-12 text-orange-600" />
         </div>
