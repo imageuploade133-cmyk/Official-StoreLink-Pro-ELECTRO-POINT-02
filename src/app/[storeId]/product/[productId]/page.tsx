@@ -891,11 +891,11 @@ export default function ProductDetailsPage() {
                   )}
                 </div>
                 <div className="flex items-center gap-3 md:gap-4">
-                  <div className="flex items-center bg-gradient-to-r from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/15 border-2 border-primary/30 dark:border-primary/40 rounded-[18px] p-1.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.01)] dark:shadow-[inset_0_1px_2px_rgba(255,255,255,0.05)]">
+                  <div className="flex items-center bg-gradient-to-r from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/15 border-2 border-primary/30 dark:border-primary/40 rounded-[18px] p-1.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.01)] dark:shadow-[inset_0_1px_2px_rgba(255,255,255,0.05)] gap-2">
                     <Button 
                       variant="ghost" 
                       size="icon" 
-                      className="h-10 md:h-12 w-10 md:w-12 rounded-[14px] text-primary dark:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 hover:shadow-sm active:scale-95 transition-all font-bold" 
+                      className="h-10 md:h-12 w-10 md:w-12 rounded-[14px] bg-gradient-to-br from-rose-500 to-red-600 dark:from-rose-600 dark:to-red-700 text-white hover:shadow-lg dark:hover:shadow-rose-500/50 active:scale-95 transition-all font-bold" 
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     >
                       <Minus className="h-4 md:h-5 w-4 md:w-5" />
@@ -904,7 +904,7 @@ export default function ProductDetailsPage() {
                     <Button 
                       variant="ghost" 
                       size="icon" 
-                      className="h-10 md:h-12 w-10 md:w-12 rounded-[14px] text-primary dark:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 hover:shadow-sm active:scale-95 transition-all font-bold" 
+                      className="h-10 md:h-12 w-10 md:w-12 rounded-[14px] bg-gradient-to-br from-emerald-500 to-green-600 dark:from-emerald-600 dark:to-green-700 text-white hover:shadow-lg dark:hover:shadow-emerald-500/50 active:scale-95 transition-all font-bold" 
                       onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
                     >
                       <Plus className="h-4 md:h-5 w-4 md:w-5" />
