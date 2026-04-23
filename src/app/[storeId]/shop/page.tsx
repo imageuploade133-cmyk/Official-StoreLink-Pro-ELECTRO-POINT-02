@@ -402,7 +402,7 @@ function ShopPageContent() {
                                         }}
                                         onFocus={() => searchTerm.trim() && setShowSuggestions(true)}
                                         onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                                        className="pl-10 h-12 rounded-2xl text-sm w-full bg-white dark:bg-black border-[1.5px] border-black/10 dark:border-white/10 focus-visible:border-blue-500/50 focus-visible:ring-4 focus-visible:ring-blue-500/10 transition-all duration-300"
+                                        className="pl-10 h-12 rounded-2xl text-sm w-full bg-white dark:bg-black border-[1.5px] border-black/10 dark:border-white/10 hover:border-blue-500/30 hover:shadow-lg focus-visible:border-blue-500/50 focus-visible:ring-4 focus-visible:ring-blue-500/10 transition-all duration-300"
                                     />
 
                                     {/* Suggestions Dropdown */}
@@ -427,7 +427,7 @@ function ShopPageContent() {
                                                                     handleSearchSubmit({ preventDefault: () => {} } as any);
                                                                 }
                                                             }}
-                                                            className="w-full p-3 text-left hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-all flex items-center gap-4 group"
+                                                            className="w-full p-3 text-left hover:bg-blue-500/5 dark:hover:bg-blue-500/10 rounded-2xl transition-all flex items-center gap-4 group border border-transparent hover:border-blue-500/10"
                                                         >
                                                             <div className="h-12 w-12 rounded-xl bg-black/5 dark:bg-white/5 overflow-hidden flex-shrink-0">
                                                                 {product.imageUrl && (
@@ -457,7 +457,7 @@ function ShopPageContent() {
 
                             <div className="flex items-center gap-3 w-full lg:w-auto">
                                 <Select value={categoryFromUrl} onValueChange={(val) => handleCategoryChange(val)}>
-                                    <SelectTrigger className="flex-1 lg:w-[200px] h-12 rounded-2xl bg-white dark:bg-black border-[1.5px] border-black/10 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300">
+                                    <SelectTrigger className="flex-1 lg:w-[200px] h-12 rounded-2xl bg-white dark:bg-black border-[1.5px] border-black/10 dark:border-white/10 hover:border-blue-500/30 hover:shadow-lg focus:ring-4 focus:ring-blue-500/10 transition-all duration-300">
                                         <LayoutGrid className="h-4 w-4 mr-2 text-[#86868b]" />
                                         <SelectValue placeholder="Category" />
                                     </SelectTrigger>
@@ -472,7 +472,7 @@ function ShopPageContent() {
                                 </Select>
 
                                 <Select value={sortFromUrl} onValueChange={handleSortChange}>
-                                    <SelectTrigger className="flex-1 lg:w-[200px] h-12 rounded-2xl bg-white dark:bg-black border-[1.5px] border-black/10 dark:border-white/10 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300">
+                                    <SelectTrigger className="flex-1 lg:w-[200px] h-12 rounded-2xl bg-white dark:bg-black border-[1.5px] border-black/10 dark:border-white/10 hover:border-blue-500/30 hover:shadow-lg focus:ring-4 focus:ring-blue-500/10 transition-all duration-300">
                                         <ArrowUpDown className="h-4 w-4 mr-2 text-[#86868b]" />
                                         <SelectValue placeholder="Sort by" />
                                     </SelectTrigger>

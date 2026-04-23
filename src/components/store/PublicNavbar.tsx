@@ -287,7 +287,7 @@ export function PublicNavbar() {
                             </div>
                             <Input 
                                 readOnly
-                                className="w-full pl-11 pr-12 bg-black/[0.03] dark:bg-white/[0.03] border-[1.5px] border-black/5 dark:border-white/5 rounded-full h-10 text-xs font-medium tracking-tight cursor-pointer transition-all hover:bg-white dark:hover:bg-black hover:border-[#0071e3]/30"
+                                className="w-full pl-11 pr-12 bg-black/[0.03] dark:bg-white/[0.03] border-[1.5px] border-black/5 dark:border-white/5 rounded-full h-10 text-xs font-medium tracking-tight cursor-pointer transition-all hover:bg-white dark:hover:bg-black hover:border-[#0071e3]/30 hover:shadow-md active:scale-[0.98]"
                                 placeholder="Search"
                                 onClick={() => setIsSearchFocused(true)}
                             />
@@ -338,7 +338,7 @@ export function PublicNavbar() {
                                             </div>
                                         ) : (
                                             categories?.map(category => (
-                                                <DropdownMenuItem key={category.id} asChild className="cursor-pointer p-2.5 focus:bg-[#0071e3]/5 rounded-[1.5rem] mx-1 my-1 transition-all duration-300 group/item border border-transparent focus:border-[#0071e3]/10">
+                                                <DropdownMenuItem key={category.id} asChild className="cursor-pointer p-2.5 hover:bg-[#0071e3]/5 focus:bg-[#0071e3]/5 rounded-[1.5rem] mx-1 my-1 transition-all duration-300 group/item border border-transparent hover:border-[#0071e3]/10 focus:border-[#0071e3]/10">
                                                     <Link href={getStoreUrl(`/store/shop?category=${category.id}`)} className="flex items-center gap-4 w-full" onClick={() => setIsMenuOpen(false)}>
                                                         <div className="relative h-11 w-11 rounded-[1rem] overflow-hidden bg-slate-100 dark:bg-slate-900 flex-shrink-0 shadow-sm border border-black/5 dark:border-white/5 transition-all duration-500 group-hover/item:scale-110 group-hover/item:rotate-2">
                                                             <Image
