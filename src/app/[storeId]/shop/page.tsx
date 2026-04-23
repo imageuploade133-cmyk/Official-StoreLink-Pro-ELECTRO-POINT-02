@@ -21,7 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, ChevronLeft, ChevronRight, RotateCcw, PackageSearch, Loader2, SlidersHorizontal, ArrowUpDown } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, RotateCcw, PackageSearch, Loader2, SlidersHorizontal, ArrowUpDown, LayoutGrid } from 'lucide-react';
 import { ProductCardSkeleton } from '@/components/store/ProductCardSkeleton';
 import { cn } from '@/lib/utils';
 import { useStoreUrl } from '@/hooks/use-store-url';
@@ -331,27 +331,44 @@ function ShopPageContent() {
                 <div className="absolute inset-0">
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/50 to-white dark:via-black/50 dark:to-black z-10" />
                     <img
-                        src={currentCategory?.imageUrl || "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop"}
+                        src={currentCategory?.imageUrl || settings?.shopBannerImageUrl || "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop"}
                         alt="Shop Hero"
                         className="w-full h-full object-cover animate-in fade-in duration-1000"
                     />
                 </div>
 
-                <div className="relative z-20 h-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-end pb-12 sm:pb-20">
-                    <div className="max-w-3xl animate-in slide-in-from-bottom-8 duration-1000 ease-out">
+                <div className={cn(
+                    "relative z-20 h-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-between py-8 sm:py-12",
+                    settings?.shopProductsAlignment === 'center' ? "items-center text-center" : "items-start"
+                )}>
+                    <Button 
+                        onClick={() => router.back()}
+                        variant="ghost" 
+                        size="sm"
+                        className="h-10 rounded-full px-4 text-[10px] font-black uppercase tracking-[0.2em] bg-white/20 dark:bg-black/20 backdrop-blur-md hover:bg-white/40 dark:hover:bg-black/40 text-black dark:text-white border border-black/5 dark:border-white/10 transition-all shadow-lg group active:scale-95"
+                    >
+                        <ChevronLeft className="h-4 w-4 mr-1 transition-transform group-hover:-translate-x-1" /> 
+                        Back
+                    </Button>
+
+                    <div className={cn(
+                        "max-w-3xl animate-in slide-in-from-bottom-8 duration-1000 ease-out",
+                        settings?.shopProductsAlignment === 'center' ? "flex flex-col items-center" : ""
+                    )}>
                         <div className="flex items-center gap-2 mb-4">
                             <div className="h-[1px] w-8 bg-blue-500" />
                             <span className="text-blue-500 text-xs font-black uppercase tracking-[0.2em]">
                                 {currentCategory ? "Collection" : "Our Shop"}
                             </span>
+                            {settings?.shopProductsAlignment === 'center' && <div className="h-[1px] w-8 bg-blue-500" />}
                         </div>
                         <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter text-black dark:text-white mb-6">
                             {currentCategory ? currentCategory.name : (settings?.shopCollectionTitle || 'Shop Our Collection')}
                         </h1>
-                        {currentCategory?.description && (
+                        {(currentCategory?.description || settings?.shopCollectionDescription) && (
                             <div
                                 className="text-[#86868b] dark:text-[#a1a1a6] text-lg sm:text-xl font-medium leading-relaxed max-w-2xl line-clamp-3"
-                                dangerouslySetInnerHTML={{ __html: currentCategory.description }}
+                                dangerouslySetInnerHTML={{ __html: currentCategory?.description || settings?.shopCollectionDescription || '' }}
                             />
                         )}
                     </div>
@@ -366,9 +383,11 @@ function ShopPageContent() {
                 <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="py-4 flex flex-col gap-6">
                         {/* Modern Search and Filters Row */}
-                        <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+                        <div className={cn(
+                            "flex flex-col lg:flex-row gap-4 items-center justify-between",
+                            settings?.shopProductsAlignment === 'center' && "lg:justify-center lg:gap-8"
+                        )}>
                             <div className="flex items-center gap-4 w-full lg:w-auto">
-                                <h2 className="hidden lg:block text-sm font-black uppercase tracking-widest text-[#86868b]">Filter</h2>
                                 <form onSubmit={handleSearchSubmit} className="relative w-full lg:w-[400px]">
                                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#86868b] flex-shrink-0 z-10" />
                                     <Input
@@ -437,6 +456,21 @@ function ShopPageContent() {
                             </div>
 
                             <div className="flex items-center gap-3 w-full lg:w-auto">
+                                <Select value={categoryFromUrl} onValueChange={(val) => handleCategoryChange(val)}>
+                                    <SelectTrigger className="flex-1 lg:w-[200px] h-12 rounded-2xl bg-black/[0.03] dark:bg-white/[0.03] border-none focus:ring-2 focus:ring-blue-500/20">
+                                        <LayoutGrid className="h-4 w-4 mr-2 text-[#86868b]" />
+                                        <SelectValue placeholder="Category" />
+                                    </SelectTrigger>
+                                    <SelectContent className="rounded-3xl border-black/5 dark:border-white/5 shadow-2xl backdrop-blur-xl">
+                                        <SelectItem value="all" className="rounded-xl">All Products</SelectItem>
+                                        {categories?.map(category => (
+                                            <SelectItem key={category.id} value={category.id} className="rounded-xl">
+                                                {category.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+
                                 <Select value={sortFromUrl} onValueChange={handleSortChange}>
                                     <SelectTrigger className="flex-1 lg:w-[200px] h-12 rounded-2xl bg-black/[0.03] dark:bg-white/[0.03] border-none focus:ring-2 focus:ring-blue-500/20">
                                         <ArrowUpDown className="h-4 w-4 mr-2 text-[#86868b]" />
@@ -463,40 +497,6 @@ function ShopPageContent() {
                                 </Button>
                             </div>
                         </div>
-
-                        {/* Elegant Category Navigation */}
-                        <div className="relative">
-                            <ScrollArea className="w-full whitespace-nowrap">
-                                <div className="flex items-center gap-1 pb-2">
-                                    <button
-                                        onClick={() => handleCategoryChange('all')}
-                                        className={cn(
-                                            "px-6 py-2.5 rounded-full text-xs font-black transition-all duration-300 uppercase tracking-widest",
-                                            categoryFromUrl === 'all'
-                                                ? "bg-black text-white dark:bg-white dark:text-black shadow-xl scale-105"
-                                                : "text-[#86868b] hover:text-black dark:hover:text-white"
-                                        )}
-                                    >
-                                        All Products
-                                    </button>
-                                    {categories?.map(category => (
-                                        <button
-                                            key={category.id}
-                                            onClick={() => handleCategoryChange(category.id)}
-                                            className={cn(
-                                                "px-6 py-2.5 rounded-full text-xs font-black transition-all duration-300 uppercase tracking-widest",
-                                                categoryFromUrl === category.id
-                                                    ? "bg-black text-white dark:bg-white dark:text-black shadow-xl scale-105"
-                                                    : "text-[#86868b] hover:text-black dark:hover:text-white"
-                                            )}
-                                        >
-                                            {category.name}
-                                        </button>
-                                    ))}
-                                </div>
-                                <ScrollBar orientation="horizontal" className="hidden" />
-                            </ScrollArea>
-                        </div>
                     </div>
                 </div>
             </header>
@@ -504,7 +504,10 @@ function ShopPageContent() {
             <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div className="flex flex-col gap-8">
                     {/* Active Filters & Info */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className={cn(
+                        "flex flex-col sm:flex-row sm:items-center justify-between gap-4",
+                        settings?.shopProductsAlignment === 'center' && "sm:justify-center sm:gap-12"
+                    )}>
                         <div className="flex items-center gap-3">
                             <span className="text-sm font-black text-black dark:text-white uppercase tracking-[0.15em]">
                                 {totalProductsCount} Products Found
