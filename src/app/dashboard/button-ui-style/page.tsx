@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, type ChangeEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -413,7 +413,7 @@ export default function ButtonUIStylePage() {
     }
   }, [settingsData, form]);
 
-  const handleImageUpload = async (prefix: string, event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (prefix: string, event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -900,18 +900,38 @@ export default function ButtonUIStylePage() {
           </Card>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 h-auto p-1 bg-muted/50 rounded-2xl">
-              <TabsTrigger value="addToCart" className="rounded-xl py-3 data-[state=active]:bg-background data-[state=active]:shadow-md">
-                Product Page (Add to Cart)
+            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 h-auto p-1.5 bg-muted/50 rounded-2xl border border-primary/5">
+              <TabsTrigger 
+                value="addToCart" 
+                className="rounded-xl py-4 flex items-center gap-2 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
+              >
+                <ShoppingBag className="h-4 w-4" />
+                <span className="hidden sm:inline">Product Page (Add to Cart)</span>
+                <span className="sm:hidden">Product Page</span>
               </TabsTrigger>
-              <TabsTrigger value="gridCart" className="rounded-xl py-3 data-[state=active]:bg-background data-[state=active]:shadow-md">
-                Product Grid (Card Button)
+              <TabsTrigger 
+                value="gridCart" 
+                className="rounded-xl py-4 flex items-center gap-2 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
+              >
+                <Layout className="h-4 w-4" />
+                <span className="hidden sm:inline">Product Grid (Card Button)</span>
+                <span className="sm:hidden">Grid Card</span>
               </TabsTrigger>
-              <TabsTrigger value="heroBtn" className="rounded-xl py-3 data-[state=active]:bg-background data-[state=active]:shadow-md">
-                Hero/Banner Button
+              <TabsTrigger 
+                value="heroBtn" 
+                className="rounded-xl py-4 flex items-center gap-2 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
+              >
+                <Zap className="h-4 w-4" />
+                <span className="hidden sm:inline">Hero/Banner Button</span>
+                <span className="sm:hidden">Hero Btn</span>
               </TabsTrigger>
-              <TabsTrigger value="exploreBtn" className="rounded-xl py-3 data-[state=active]:bg-background data-[state=active]:shadow-md">
-                Explore Section Button
+              <TabsTrigger 
+                value="exploreBtn" 
+                className="rounded-xl py-4 flex items-center gap-2 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
+              >
+                <MousePointerClick className="h-4 w-4" />
+                <span className="hidden sm:inline">Explore Section Button</span>
+                <span className="sm:hidden">Explore</span>
               </TabsTrigger>
             </TabsList>
 
