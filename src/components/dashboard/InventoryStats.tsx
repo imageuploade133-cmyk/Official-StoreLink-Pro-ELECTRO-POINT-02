@@ -22,7 +22,6 @@ export function InventoryStats({ isLoading, stats }: InventoryStatsProps) {
         <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
           <AlertTriangle className="h-12 w-12 text-yellow-600" />
         </div>
-      <Card className="relative overflow-hidden transition-all duration-300 group bg-gradient-to-br from-yellow-50/50 to-white dark:from-yellow-950/20 dark:to-background border-yellow-100/50 dark:border-yellow-900/30">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
           <CardTitle className="text-sm font-medium text-yellow-600 dark:text-yellow-500">Low Stock</CardTitle>
           <div className="p-2 rounded-xl bg-yellow-100 dark:bg-yellow-900/50 shadow-sm">
@@ -42,7 +41,6 @@ export function InventoryStats({ isLoading, stats }: InventoryStatsProps) {
         <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
           <PackageX className="h-12 w-12 text-red-600" />
         </div>
-      <Card className="relative overflow-hidden transition-all duration-300 group bg-gradient-to-br from-red-50/50 to-white dark:from-red-950/20 dark:to-background border-red-100/50 dark:border-red-900/30">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
           <CardTitle className="text-sm font-medium text-red-600 dark:text-red-500">Out of Stock</CardTitle>
           <div className="p-2 rounded-xl bg-red-100 dark:bg-red-900/50 shadow-sm">
@@ -62,7 +60,6 @@ export function InventoryStats({ isLoading, stats }: InventoryStatsProps) {
         <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
           <CalendarX className="h-12 w-12 text-orange-600" />
         </div>
-      <Card className="relative overflow-hidden transition-all duration-300 group bg-gradient-to-br from-orange-50/50 to-white dark:from-orange-950/20 dark:to-background border-orange-100/50 dark:border-orange-900/30">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
           <CardTitle className="text-sm font-medium text-orange-600 dark:text-orange-500">Expired Products</CardTitle>
           <div className="p-2 rounded-xl bg-orange-100 dark:bg-orange-900/50 shadow-sm">
