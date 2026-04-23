@@ -757,7 +757,11 @@ export function ProductSection({ section, categories, excludeCategoryIds }: Prod
              <div className={cn("mt-12 md:mt-20", alignment === 'left' ? 'text-left' : 'text-center')}>
                 <Button
                     asChild
-                    className="store-btn-secondary h-12 px-10 text-sm font-semibold"
+                    style={buttonStyle}
+                    className={cn(
+                        "font-semibold transition-all hover:scale-105 active:scale-95 group",
+                        buttonClasses
+                    )}
                 >
                     <Link href={section.selectionType === 'all' ? getStoreUrl('/store/shop') : getStoreUrl(`/store/shop?category=${section.categoryId}`)}>
                         {exploreText} <IconComponent className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
