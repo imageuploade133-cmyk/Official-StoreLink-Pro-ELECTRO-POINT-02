@@ -284,7 +284,7 @@ export interface Settings {
   newsletterSectionBackgroundColor?: string;
   storeAddToCartText?: string;
   storeAddToCartIcon?: string;
-  storeAddToCartStyle?: 'standard' | 'gradient' | 'image' | 'outline' | 'ghost';
+  storeAddToCartStyle?: 'standard' | 'gradient' | 'image' | 'outline' | 'ghost' | 'apple';
   storeAddToCartColor?: string;
   storeAddToCartGradientStart?: string;
   storeAddToCartGradientEnd?: string;
@@ -294,7 +294,7 @@ export interface Settings {
   storeAddToCartShadow?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'inner';
   storeGridCartText?: string;
   storeGridCartIcon?: string;
-  storeGridCartStyle?: 'standard' | 'gradient' | 'image' | 'outline' | 'ghost';
+  storeGridCartStyle?: 'standard' | 'gradient' | 'image' | 'outline' | 'ghost' | 'apple';
   storeGridCartColor?: string;
   storeGridCartGradientStart?: string;
   storeGridCartGradientEnd?: string;
@@ -304,7 +304,7 @@ export interface Settings {
   storeGridCartShadow?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'inner';
   storeHeroBtnText?: string;
   storeHeroBtnIcon?: string;
-  storeHeroBtnStyle?: 'standard' | 'gradient' | 'image' | 'outline' | 'ghost';
+  storeHeroBtnStyle?: 'standard' | 'gradient' | 'image' | 'outline' | 'ghost' | 'apple';
   storeHeroBtnColor?: string;
   storeHeroBtnGradientStart?: string;
   storeHeroBtnGradientEnd?: string;
@@ -315,7 +315,7 @@ export interface Settings {
   // Explore Button settings
   storeExploreBtnText?: string;
   storeExploreBtnIcon?: string;
-  storeExploreBtnStyle?: 'standard' | 'gradient' | 'image' | 'outline' | 'ghost';
+  storeExploreBtnStyle?: 'standard' | 'gradient' | 'image' | 'outline' | 'ghost' | 'apple';
   storeExploreBtnColor?: string;
   storeExploreBtnGradientStart?: string;
   storeExploreBtnGradientEnd?: string;
@@ -324,7 +324,7 @@ export interface Settings {
   storeExploreBtnSize?: 'sm' | 'md' | 'lg' | 'xl';
   storeExploreBtnShadow?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'inner';
   // Global Store Button Style
-  storeBtnStyle?: 'standard' | 'gradient';
+  storeBtnStyle?: 'standard' | 'gradient' | 'apple';
   storeBtnColor?: string;
   storeBtnGradientStart?: string;
   storeBtnGradientEnd?: string;

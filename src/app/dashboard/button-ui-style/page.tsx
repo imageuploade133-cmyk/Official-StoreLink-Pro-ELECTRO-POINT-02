@@ -48,7 +48,8 @@ import {
   Tablet,
   Monitor,
   Layout,
-  Circle
+  Circle,
+  Apple
 } from 'lucide-react';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -94,7 +95,7 @@ const shadowOptions = [
 const shoppingExpSchema = z.object({
   storeAddToCartText: z.string().min(1, 'Label required').max(40, 'Label too long.'),
   storeAddToCartIcon: z.preprocess((val) => val || 'ShoppingCart', z.string()).default('ShoppingCart'),
-  storeAddToCartStyle: z.preprocess((val) => val || 'standard', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost'])).default('standard'),
+  storeAddToCartStyle: z.preprocess((val) => val || 'standard', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost', 'apple'])).default('standard'),
   storeAddToCartColor: z.preprocess((val) => val || '#3b82f6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#3b82f6'),
   storeAddToCartGradientStart: z.preprocess((val) => val || '#3b82f6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#3b82f6'),
   storeAddToCartGradientEnd: z.preprocess((val) => val || '#1d4ed8', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#1d4ed8'),
@@ -105,7 +106,7 @@ const shoppingExpSchema = z.object({
   
   storeGridCartText: z.string().min(1, 'Label required').max(20, 'Label too long.'),
   storeGridCartIcon: z.preprocess((val) => val || 'ShoppingCart', z.string()).default('ShoppingCart'),
-  storeGridCartStyle: z.preprocess((val) => val || 'standard', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost'])).default('standard'),
+  storeGridCartStyle: z.preprocess((val) => val || 'standard', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost', 'apple'])).default('standard'),
   storeGridCartColor: z.preprocess((val) => val || '#10b981', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#10b981'),
   storeGridCartGradientStart: z.preprocess((val) => val || '#10b981', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#10b981'),
   storeGridCartGradientEnd: z.preprocess((val) => val || '#059669', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#059669'),
@@ -116,7 +117,7 @@ const shoppingExpSchema = z.object({
   
   storeHeroBtnText: z.string().min(1, 'Label required').max(40, 'Label too long.'),
   storeHeroBtnIcon: z.preprocess((val) => val || 'ArrowRight', z.string()).default('ArrowRight'),
-  storeHeroBtnStyle: z.preprocess((val) => val || 'gradient', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost'])).default('gradient'),
+  storeHeroBtnStyle: z.preprocess((val) => val || 'gradient', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost', 'apple'])).default('gradient'),
   storeHeroBtnColor: z.preprocess((val) => val || '#8b5cf6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#8b5cf6'),
   storeHeroBtnGradientStart: z.preprocess((val) => val || '#8b5cf6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#8b5cf6'),
   storeHeroBtnGradientEnd: z.preprocess((val) => val || '#7c3aed', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#7c3aed'),
@@ -127,7 +128,7 @@ const shoppingExpSchema = z.object({
 
   storeExploreBtnText: z.string().min(1, 'Label required').max(40, 'Label too long.'),
   storeExploreBtnIcon: z.preprocess((val) => val || 'ArrowRight', z.string()).default('ArrowRight'),
-  storeExploreBtnStyle: z.preprocess((val) => val || 'standard', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost'])).default('standard'),
+  storeExploreBtnStyle: z.preprocess((val) => val || 'standard', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost', 'apple'])).default('standard'),
   storeExploreBtnColor: z.preprocess((val) => val || '#3b82f6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#3b82f6'),
   storeExploreBtnGradientStart: z.preprocess((val) => val || '#3b82f6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#3b82f6'),
   storeExploreBtnGradientEnd: z.preprocess((val) => val || '#1d4ed8', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#1d4ed8'),
@@ -152,10 +153,11 @@ function ButtonStyleSelector({
   imageUrl?: string;
 }) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
       {[
         { id: 'standard', label: 'Solid', icon: Circle, color: 'bg-primary' },
         { id: 'gradient', label: 'Gradient', icon: Sparkles, color: 'bg-gradient-to-r from-purple-500 to-pink-500' },
+        { id: 'apple', label: 'Apple', icon: Apple, color: 'bg-black dark:bg-white' },
         { id: 'outline', label: 'Outline', icon: Layout, color: 'border-2 border-primary bg-background' },
         { id: 'ghost', label: 'Ghost', icon: Eye, color: 'border-2 border-dashed border-muted' },
         { id: 'image', label: 'Image', icon: ImageIcon, color: 'bg-muted' },
@@ -175,7 +177,10 @@ function ButtonStyleSelector({
             <img src={imageUrl} alt="Preview" className="w-10 h-10 rounded-lg object-cover" />
           ) : (
             <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", style.color)}>
-               <style.icon className={cn("h-5 w-5", style.id === 'outline' || style.id === 'ghost' ? 'text-primary' : 'text-white')} />
+               <style.icon className={cn("h-5 w-5", 
+                 style.id === 'outline' || style.id === 'ghost' ? 'text-primary' : 
+                 style.id === 'apple' ? 'text-white dark:text-black' : 'text-white'
+               )} />
             </div>
           )}
           <div className="text-center">
@@ -258,6 +263,17 @@ function ButtonPreview({
         backgroundColor: 'transparent',
         color: settings[`${prefix}Color`],
         border: 'none',
+      };
+    } else if (style === 'apple') {
+      const color = settings[`${prefix}Color`] || '#007AFF';
+      return {
+        backgroundColor: color,
+        color: 'white',
+        border: '1px solid rgba(0,0,0,0.1)',
+        boxShadow: `0 10px 15px -3px ${color}40, 0 4px 6px -2px ${color}20, inset 0 1px 0 rgba(255, 255, 255, 0.3)`,
+        fontWeight: '600',
+        letterSpacing: '-0.01em',
+        borderRadius: '12px',
       };
     }
     return {
@@ -578,7 +594,7 @@ export default function ButtonUIStylePage() {
                 )}
               />
 
-              {styleValue === 'standard' || styleValue === 'outline' || styleValue === 'ghost' ? (
+              {styleValue === 'standard' || styleValue === 'outline' || styleValue === 'ghost' || styleValue === 'apple' ? (
                 <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                   <FormField
                     control={form.control}
