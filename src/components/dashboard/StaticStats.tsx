@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/formatUtils";
-import { ChevronDown } from "lucide-react";
+import { ShoppingBag, MoreHorizontal, ChevronDown } from "lucide-react";
 import { format, startOfMonth } from 'date-fns';
 import type { SaleTransaction } from '@/lib/types';
 import { useSettings } from '@/contexts/settings-context';
@@ -68,13 +68,16 @@ export function StaticStats({
 
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-      <Card className="overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-        <CardHeader className="pb-3">
+      <Card className="relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-blue-50/50 to-white dark:from-blue-950/20 dark:to-background border border-blue-100/50 dark:border-blue-900/30">
+        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+          <ShoppingBag className="h-12 w-12 text-blue-500" />
+        </div>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-auto px-0 py-1 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-transparent">
+              <Button variant="ghost" size="sm" className="h-6 px-2 -ml-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-100/50 dark:hover:bg-blue-900/50">
                 {todayYesterdayPeriod === 'today' ? "Today's Sales" : "Yesterday's Sales"}
-                <ChevronDown className="h-4 w-4 ml-1 text-slate-500 dark:text-slate-400" />
+                <ChevronDown className="h-4 w-4 ml-1 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
@@ -82,119 +85,127 @@ export function StaticStats({
               <DropdownMenuItem onSelect={() => setTodayYesterdayPeriod('yesterday')}>Yesterday's Sales</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/50">
+            <ShoppingBag className="h-4 w-4 text-blue-500" />
+          </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="relative z-10">
           {isLoading || !today ? (
             <Skeleton className="h-8 w-3/4 my-1" />
           ) : (
-            <div className="text-3xl font-bold text-slate-900 dark:text-white">
+            <div className="text-2xl font-bold tracking-tight text-blue-700 dark:text-blue-300">
               {formatCurrency(todayYesterdayPeriod === 'today' ? staticStats.todaySales : staticStats.yesterdaySales, currencySymbol)}
             </div>
           )}
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+          <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
             Net sales for {todayYesterdayPeriod}
           </p>
         </CardContent>
+        <div className="absolute bottom-0 left-0 h-1 w-full bg-blue-500/20 group-hover:bg-blue-500/40 transition-colors" />
       </Card>
 
-      <Card className="overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-        <CardHeader className="pb-3">
-          <div className="flex flex-row items-center justify-between">
-            <CardTitle className="text-sm font-semibold text-slate-700 dark:text-slate-200">Sales Snapshot</CardTitle>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-auto px-1 py-1 text-xs text-slate-700 dark:text-slate-200 hover:bg-transparent">
-                  {{ week: 'This Week', month: 'This Month' }[salesSnapshotPeriod]}
-                  <ChevronDown className="h-4 w-4 ml-1 text-slate-500 dark:text-slate-400" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onSelect={() => setSalesSnapshotPeriod('week')}>This Week</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setSalesSnapshotPeriod('month')}>This Month</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+      <Card className="relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-green-50/50 to-white dark:from-green-950/20 dark:to-background border border-green-100/50 dark:border-green-900/30">
+        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+          <ShoppingBag className="h-12 w-12 text-green-500" />
+        </div>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+          <CardTitle className="text-sm font-medium text-green-600 dark:text-green-400">Sales Snapshot</CardTitle>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-6 px-2 -mr-2 text-xs text-green-600 dark:text-green-400 hover:bg-green-100/50 dark:hover:bg-green-900/50">
+                {{ week: 'This Week', month: 'This Month' }[salesSnapshotPeriod]}
+                <ChevronDown className="h-4 w-4 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => setSalesSnapshotPeriod('week')}>This Week</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setSalesSnapshotPeriod('month')}>This Month</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </CardHeader>
-        <CardContent>
+        <CardContent className="relative z-10">
           {isLoading || !today ? (
             <Skeleton className="h-8 w-3/4 my-1" />
           ) : (
-            <div className="text-3xl font-bold text-slate-900 dark:text-white">
+            <div className="text-2xl font-bold tracking-tight text-green-700 dark:text-green-300">
               {formatCurrency(salesSnapshotValue, currencySymbol)}
             </div>
           )}
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+          <p className="text-xs text-green-600 dark:text-green-400 mt-1">
             Net sales for {{ week: 'this week', month: 'this month' }[salesSnapshotPeriod]}
           </p>
         </CardContent>
+        <div className="absolute bottom-0 left-0 h-1 w-full bg-green-500/20 group-hover:bg-green-500/40 transition-colors" />
       </Card>
 
-      <Card className="overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-        <CardHeader className="pb-3">
-          <div className="flex flex-row items-center justify-between">
-            <CardTitle className="text-sm font-semibold text-slate-700 dark:text-slate-200">Monthly Sales</CardTitle>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-auto px-1 py-1 text-xs text-slate-700 dark:text-slate-200 hover:bg-transparent">
-                  {today && selectedYear !== null && selectedMonth !== null ? format(new Date(selectedYear, selectedMonth), 'MMMM') : '...'} 
-                  <ChevronDown className="h-4 w-4 ml-1 text-slate-500 dark:text-slate-400" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {Array.from({ length: 12 }).map((_, i) => (
-                  <DropdownMenuItem key={i} onSelect={() => setSelectedMonth(i)}>
-                    {selectedYear ? format(new Date(selectedYear, i), 'MMMM') : ''}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+      <Card className="relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-purple-50/50 to-white dark:from-purple-950/20 dark:to-background border border-purple-100/50 dark:border-purple-900/30">
+        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+          <ShoppingBag className="h-12 w-12 text-purple-500" />
+        </div>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+          <CardTitle className="text-sm font-medium text-purple-600 dark:text-purple-400">Monthly Sales</CardTitle>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-6 px-2 -mr-2 text-xs text-purple-600 dark:text-purple-400 hover:bg-purple-100/50 dark:hover:bg-purple-900/50">
+                {today && selectedYear !== null && selectedMonth !== null ? format(new Date(selectedYear, selectedMonth), 'MMMM') : '...'} <ChevronDown className="h-4 w-4 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <DropdownMenuItem key={i} onSelect={() => setSelectedMonth(i)}>
+                  {selectedYear ? format(new Date(selectedYear, i), 'MMMM') : ''}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </CardHeader>
-        <CardContent>
+        <CardContent className="relative z-10">
           {isLoading || !today ? (
             <Skeleton className="h-8 w-3/4 my-1" />
           ) : (
-            <div className="text-3xl font-bold text-slate-900 dark:text-white">
+            <div className="text-2xl font-bold tracking-tight text-purple-700 dark:text-purple-300">
               {formatCurrency(salesForSelectedMonth, currencySymbol)}
             </div>
           )}
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+          <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">
             Net sales for {today && selectedYear !== null && selectedMonth !== null ? format(new Date(selectedYear, selectedMonth), 'MMMM yyyy') : '...'}
           </p>
         </CardContent>
+        <div className="absolute bottom-0 left-0 h-1 w-full bg-purple-500/20 group-hover:bg-purple-500/40 transition-colors" />
       </Card>
 
-      <Card className="overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-        <CardHeader className="pb-3">
-          <div className="flex flex-row items-center justify-between">
-            <CardTitle className="text-sm font-semibold text-slate-700 dark:text-slate-200">Yearly Sales</CardTitle>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-auto px-1 py-1 text-xs text-slate-700 dark:text-slate-200 hover:bg-transparent">
-                  {selectedYear ?? '...'} 
-                  <ChevronDown className="h-4 w-4 ml-1 text-slate-500 dark:text-slate-400" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {availableYears.map(year => (
-                  <DropdownMenuItem key={year} onSelect={() => setSelectedYear(year)}>
-                    {year}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+      <Card className="relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-pink-50/50 to-white dark:from-pink-950/20 dark:to-background border border-pink-100/50 dark:border-pink-900/30">
+        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+          <ShoppingBag className="h-12 w-12 text-pink-500" />
+        </div>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+          <CardTitle className="text-sm font-medium text-pink-600 dark:text-pink-400">Yearly Sales</CardTitle>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-6 px-2 -mr-2 text-xs text-pink-600 dark:text-pink-400 hover:bg-pink-100/50 dark:hover:bg-pink-900/50">
+                {selectedYear ?? '...'} <ChevronDown className="h-4 w-4 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {availableYears.map(year => (
+                <DropdownMenuItem key={year} onSelect={() => setSelectedYear(year)}>
+                  {year}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </CardHeader>
-        <CardContent>
+        <CardContent className="relative z-10">
           {isLoading || !today ? (
             <Skeleton className="h-8 w-3/4 my-1" />
           ) : (
-            <div className="text-3xl font-bold text-slate-900 dark:text-white">
+            <div className="text-2xl font-bold tracking-tight text-pink-700 dark:text-pink-300">
               {formatCurrency(salesForSelectedYear, currencySymbol)}
             </div>
           )}
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">Net sales for the year {selectedYear}</p>
+          <p className="text-xs text-pink-600 dark:text-pink-400 mt-1">Net sales for the year {selectedYear}</p>
         </CardContent>
+        <div className="absolute bottom-0 left-0 h-1 w-full bg-pink-500/20 group-hover:bg-pink-500/40 transition-colors" />
       </Card>
     </div>
   );
