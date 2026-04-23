@@ -22,3 +22,9 @@ export const convertToDateSafely = (date: any, fieldName?: string, docId?: strin
   }
   return null;
 };
+
+export function isWhiteOrTransparent(color?: string): boolean {
+  if (!color || color === 'transparent' || color === 'white') return true;
+  const normalized = color.toLowerCase().trim();
+  return normalized === '#ffffff' || normalized === '#fff' || normalized === 'rgb(255,255,255)' || normalized === 'rgba(255,255,255,0)' || normalized === 'transparent';
+}

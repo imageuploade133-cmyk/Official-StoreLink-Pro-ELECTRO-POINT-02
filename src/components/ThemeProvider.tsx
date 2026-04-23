@@ -9,11 +9,13 @@ import type { Settings } from '@/lib/types';
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const { settings } = useSettings();
-  const { setTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
+  const lastSettingsTheme = React.useRef<string | undefined>(undefined);
 
   useEffect(() => {
-    if (settings?.theme) {
+    if (settings?.theme && settings.theme !== lastSettingsTheme.current) {
       setTheme(settings.theme);
+      lastSettingsTheme.current = settings.theme;
     }
   }, [settings?.theme, setTheme]);
 
@@ -40,6 +42,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       body.style.backgroundSize = '';
       body.style.backgroundPosition = '';
       body.style.backgroundAttachment = '';
+
+      // If we are in dark mode, we generally want the pure black Apple theme
+      // unless specifically overridden by a background image/gradient.
+      const isDark = resolvedTheme === 'dark';
 
       // Apply custom colors from Firestore settings
       if (settings) {
@@ -77,9 +83,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
               // Fallback for UI components
               root.style.setProperty('--background', hexToHslString(settings.backgroundGradientStart));
           } else if (backgroundStyle === 'solid' && settings.colorBackground) {
-              // Set both body and UI background from the same source
-              root.style.setProperty('--background', hexToHslString(settings.colorBackground));
-              body.style.backgroundColor = settings.colorBackground;
+              // Only apply custom solid background if not in dark mode, or if it's not the default white
+              if (!isDark || settings.colorBackground !== '#ffffff') {
+                root.style.setProperty('--background', hexToHslString(settings.colorBackground));
+                body.style.backgroundColor = settings.colorBackground;
+              } else {
+                root.style.removeProperty('--background');
+                body.style.backgroundColor = '';
+              }
           } else if (backgroundStyle === 'video') {
               // The video is handled by a separate component.
               body.style.backgroundColor = '#000';
@@ -100,13 +111,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       }
       
       // Always ensure the body uses the CSS variable background as fallback
-      if (!body.style.backgroundImage) {
+      if (!body.style.backgroundImage && !body.style.backgroundColor) {
         body.style.backgroundColor = '';
       }
     };
     
     applyTheme();
-  }, [settings]);
+  }, [settings, resolvedTheme]);
 
   return <>{children}</>;
 }

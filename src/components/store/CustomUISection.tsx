@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, isWhiteOrTransparent } from '@/lib/utils';
 import type { HomepageSection } from '@/lib/types';
 import { useSettings } from '@/contexts/settings-context';
 
@@ -25,10 +25,11 @@ export function CustomUISection({ section }: CustomUISectionProps) {
   return (
     <section 
         className={cn(
-            "relative overflow-hidden py-12 md:py-24",
+            "relative overflow-hidden py-12 md:py-24 transition-colors duration-500",
+            isWhiteOrTransparent(section.backgroundColor) ? "bg-white dark:bg-black" : "",
             section.fullWidth ? "w-full" : "max-w-site-container mx-auto px-4 sm:px-6 lg:px-8"
         )}
-        style={{ backgroundColor: section.backgroundColor || 'transparent' }}
+        style={!isWhiteOrTransparent(section.backgroundColor) ? { backgroundColor: section.backgroundColor } : {}}
     >
       {isHTML ? (
         <div 
@@ -72,12 +73,24 @@ export function CustomUISection({ section }: CustomUISectionProps) {
             )}>
                 <div className="max-w-3xl space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
                     {section.overlayTitle && (
-                        <h2 className="text-3xl md:text-7xl font-black leading-none tracking-tighter uppercase whitespace-pre-line" style={{ color: section.textColor || '#FFFFFF' }}>
+                        <h2 
+                            className={cn(
+                                "text-3xl md:text-7xl font-black leading-none tracking-tighter uppercase whitespace-pre-line",
+                                (!section.textColor || section.textColor === '#FFFFFF') ? "text-white" : ""
+                            )} 
+                            style={(!section.textColor || section.textColor === '#FFFFFF') ? {} : { color: section.textColor }}
+                        >
                             {section.overlayTitle}
                         </h2>
                     )}
                     {section.overlaySubtitle && (
-                        <p className="text-lg md:text-2xl font-medium leading-relaxed max-w-xl mx-auto" style={{ color: `${section.textColor || '#FFFFFF'}E6` }}>
+                        <p 
+                            className={cn(
+                                "text-lg md:text-2xl font-medium leading-relaxed max-w-xl mx-auto",
+                                (!section.textColor || section.textColor === '#FFFFFF') ? "text-white/90" : ""
+                            )} 
+                            style={(!section.textColor || section.textColor === '#FFFFFF') ? {} : { color: section.textColor + 'E6' }}
+                        >
                             {section.overlaySubtitle}
                         </p>
                     )}

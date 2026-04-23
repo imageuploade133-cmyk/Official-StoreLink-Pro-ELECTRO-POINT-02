@@ -20,7 +20,7 @@ import { ChevronLeft, ChevronRight, Loader2, LayoutGrid, ArrowRight, Plus } from
 import type { Category } from '@/lib/types';
 import { useSettings } from '@/contexts/settings-context';
 import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/lib/utils';
+import { cn, isWhiteOrTransparent } from '@/lib/utils';
 import {
   Carousel,
   CarouselContent,
@@ -122,36 +122,48 @@ export function CategoryGallery() {
 
   return (
     <section 
-        className="py-20 md:py-28 border-y border-slate-100 dark:border-slate-900 dark:bg-black overflow-hidden group/gallery transition-colors duration-500" 
-        style={{ backgroundColor: sectionBgColor }}
+        className={cn(
+            "py-20 md:py-28 border-y border-slate-100 dark:border-slate-900 overflow-hidden group/gallery transition-colors duration-500",
+            isWhiteOrTransparent(sectionBgColor) ? "bg-white dark:bg-black" : ""
+        )} 
+        style={!isWhiteOrTransparent(sectionBgColor) ? { backgroundColor: sectionBgColor } : {}}
     >
       <div className="max-w-site-container mx-auto px-6 mb-12 md:mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-3">
             {showPreTitle && sectionPreTitle && (
                 <div 
-                    className="inline-flex items-center gap-2 font-black text-[10px] uppercase tracking-[0.3em] animate-in fade-in slide-in-from-left-4 duration-700"
-                    style={{ color: sectionTextColor }}
+                    className={cn(
+                        "inline-flex items-center gap-2 font-black text-[10px] uppercase tracking-[0.3em] animate-in fade-in slide-in-from-left-4 duration-700",
+                        (!sectionTextColor || sectionTextColor === '#000000') ? "text-black dark:text-white" : ""
+                    )}
+                    style={(!sectionTextColor || sectionTextColor === '#000000') ? {} : { color: sectionTextColor }}
                 >
                     <LayoutGrid className="h-3.5 w-3.5" />
                     {sectionPreTitle}
                 </div>
             )}
             <h2 
-                className="text-3xl md:text-5xl font-black tracking-tighter uppercase leading-none animate-in fade-in slide-in-from-left-6 duration-1000"
-                style={{ color: sectionTextColor }}
+                className={cn(
+                    "text-3xl md:text-5xl font-black tracking-tighter uppercase leading-none animate-in fade-in slide-in-from-left-6 duration-1000",
+                    (!sectionTextColor || sectionTextColor === '#000000') ? "text-black dark:text-white" : ""
+                )}
+                style={(!sectionTextColor || sectionTextColor === '#000000') ? {} : { color: sectionTextColor }}
             >
                 {sectionTitle}
             </h2>
             <p 
-                className="font-medium text-sm md:text-lg max-w-xl animate-in fade-in slide-in-from-left-8 duration-1000 delay-100 opacity-70"
-                style={{ color: sectionTextColor }}
+                className={cn(
+                    "font-medium text-sm md:text-lg max-w-xl animate-in fade-in slide-in-from-left-8 duration-1000 delay-100 opacity-70",
+                    (!sectionTextColor || sectionTextColor === '#000000') ? "text-black dark:text-white" : ""
+                )}
+                style={(!sectionTextColor || sectionTextColor === '#000000') ? {} : { color: sectionTextColor }}
             >
                 {sectionDescription}
             </p>
         </div>
-        <Button asChild variant="ghost" className="font-black text-[10px] uppercase tracking-[0.2em] gap-3 hover:bg-primary/5 p-0 h-auto group/btn self-start md:self-auto animate-in fade-in zoom-in-95 duration-1000 delay-200 dark:text-black" style={{ color: sectionTextColor }}>
+        <Button asChild variant="ghost" className={cn("font-black text-[10px] uppercase tracking-[0.2em] gap-3 hover:bg-primary/5 p-0 h-auto group/btn self-start md:self-auto animate-in fade-in zoom-in-95 duration-1000 delay-200", (!sectionTextColor || sectionTextColor === '#000000') ? "text-black dark:text-white" : "")} style={(!sectionTextColor || sectionTextColor === '#000000') ? {} : { color: sectionTextColor }}>
             <Link href={getStoreUrl('/store/categories')}>
-                View All Collections <ChevronRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1 dark:text-black" strokeWidth={3} />
+                View All Collections <ChevronRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" strokeWidth={3} />
             </Link>
         </Button>
       </div>
@@ -188,8 +200,11 @@ export function CategoryGallery() {
                     <div className="absolute inset-0 bg-black/0 group-hover/item:bg-primary/10 transition-colors duration-500" />
                   </div>
                   <span 
-                    className="mt-4 text-[10px] md:text-xs font-black text-center line-clamp-1 group-hover/item:text-primary transition-colors uppercase tracking-[0.1em]"
-                    style={{ color: sectionTextColor }}
+                    className={cn(
+                        "mt-4 text-[10px] md:text-xs font-black text-center line-clamp-1 group-hover/item:text-primary transition-colors uppercase tracking-[0.1em]",
+                        (!sectionTextColor || sectionTextColor === '#000000') ? "text-black dark:text-white" : ""
+                    )}
+                    style={(!sectionTextColor || sectionTextColor === '#000000') ? {} : { color: sectionTextColor }}
                   >
                     {category.name}
                   </span>
@@ -215,8 +230,11 @@ export function CategoryGallery() {
                             </span>
                         </div>
                         <span 
-                            className="mt-4 text-[10px] font-black uppercase tracking-widest opacity-60"
-                            style={{ color: sectionTextColor }}
+                            className={cn(
+                                "mt-4 text-[10px] font-black uppercase tracking-widest opacity-60",
+                                (!sectionTextColor || sectionTextColor === '#000000') ? "text-black dark:text-white" : ""
+                            )}
+                            style={(!sectionTextColor || sectionTextColor === '#000000') ? {} : { color: sectionTextColor }}
                         >
                             Discover All
                         </span>
