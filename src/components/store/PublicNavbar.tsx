@@ -327,19 +327,20 @@ export function PublicNavbar() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent 
                                     align="start" 
-                                    className="w-64 p-2 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] border-black/[0.05] dark:border-white/[0.05] bg-white/90 dark:bg-black/90 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200"
+                                    sideOffset={12}
+                                    className="w-72 p-3 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-2 border-black/5 dark:border-white/5 bg-white/95 dark:bg-black/95 backdrop-blur-2xl animate-in fade-in slide-in-from-top-2 duration-300"
                                 >
-                                    <div className="max-h-[400px] overflow-y-auto py-1 pr-1 custom-scrollbar">
+                                    <div className="max-h-[450px] overflow-y-auto py-1 pr-1 custom-scrollbar">
                                         {isLoadingCategories ? (
-                                            <div className="p-4 flex items-center gap-3 text-muted-foreground">
-                                                <Loader2 className="h-4 w-4 animate-spin" />
-                                                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Syncing...</span>
+                                            <div className="p-6 flex flex-col items-center justify-center gap-3 text-muted-foreground">
+                                                <Loader2 className="h-5 w-5 animate-spin text-[#0071e3]" />
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Updating Registry</span>
                                             </div>
                                         ) : (
                                             categories?.map(category => (
-                                                <DropdownMenuItem key={category.id} asChild className="cursor-pointer p-2 focus:bg-[#0071e3]/10 rounded-2xl mx-1 my-0.5 transition-colors group/item">
-                                                    <Link href={getStoreUrl(`/store/shop?category=${category.id}`)} className="flex items-center gap-3 w-full" onClick={() => setIsMenuOpen(false)}>
-                                                        <div className="relative h-10 w-10 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-900 flex-shrink-0 shadow-sm transition-transform group-hover/item:scale-105">
+                                                <DropdownMenuItem key={category.id} asChild className="cursor-pointer p-2.5 focus:bg-[#0071e3]/5 rounded-[1.5rem] mx-1 my-1 transition-all duration-300 group/item border border-transparent focus:border-[#0071e3]/10">
+                                                    <Link href={getStoreUrl(`/store/shop?category=${category.id}`)} className="flex items-center gap-4 w-full" onClick={() => setIsMenuOpen(false)}>
+                                                        <div className="relative h-11 w-11 rounded-[1rem] overflow-hidden bg-slate-100 dark:bg-slate-900 flex-shrink-0 shadow-sm border border-black/5 dark:border-white/5 transition-all duration-500 group-hover/item:scale-110 group-hover/item:rotate-2">
                                                             <Image
                                                                 src={category.imageUrl || `https://picsum.photos/seed/${category.id}/100/100`}
                                                                 alt={category.name}
@@ -348,7 +349,10 @@ export function PublicNavbar() {
                                                                 unoptimized
                                                             />
                                                         </div>
-                                                        <span className="font-bold text-[13px] tracking-tight text-slate-700 dark:text-slate-200 group-hover/item:text-[#0071e3] transition-colors truncate">{category.name}</span>
+                                                        <div className="flex flex-col min-w-0">
+                                                            <span className="font-black text-[14px] tracking-tight text-slate-800 dark:text-slate-100 group-hover/item:text-[#0071e3] transition-colors truncate">{category.name}</span>
+                                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest opacity-0 group-hover/item:opacity-100 transition-all -translate-y-1 group-hover:translate-y-0">Discover</span>
+                                                        </div>
                                                     </Link>
                                                 </DropdownMenuItem>
                                             ))
