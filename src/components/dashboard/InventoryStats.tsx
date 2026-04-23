@@ -29,7 +29,11 @@ export function InventoryStats({ isLoading, stats }: InventoryStatsProps) {
           </div>
         </CardHeader>
         <CardContent className="relative z-10">
-          {isLoading ? <Skeleton className="h-8 w-1/4 my-1" /> : <div className="text-2xl font-bold tracking-tight">{stats.lowStockCount}</div>}
+          {isLoading ? (
+            <Skeleton className="h-8 w-1/4 my-1" />
+          ) : (
+            <div className="text-2xl font-bold tracking-tight">{stats.lowStockCount}</div>
+          )}
           <p className="text-xs text-muted-foreground mt-1">Items nearing depletion</p>
           <Button variant="ghost" size="sm" className="text-xs p-0 h-auto mt-4 text-yellow-700 dark:text-yellow-400 hover:underline" asChild>
             <Link href="/dashboard/stock-alerts">Manage <ArrowRight className="ml-1 h-3 w-3" /></Link>
@@ -48,7 +52,11 @@ export function InventoryStats({ isLoading, stats }: InventoryStatsProps) {
           </div>
         </CardHeader>
         <CardContent className="relative z-10">
-          {isLoading ? <Skeleton className="h-8 w-1/4 my-1" /> : <div className="text-2xl font-bold tracking-tight">{stats.outOfStockCount}</div>}
+          {isLoading ? (
+            <Skeleton className="h-8 w-1/4 my-1" />
+          ) : (
+            <div className="text-2xl font-bold tracking-tight">{stats.outOfStockCount}</div>
+          )}
           <p className="text-xs text-muted-foreground mt-1">Items with 0 stock</p>
           <Button variant="ghost" size="sm" className="text-xs p-0 h-auto mt-4 text-red-700 dark:text-red-400 hover:underline" asChild>
             <Link href="/dashboard/inventory">Manage <ArrowRight className="ml-1 h-3 w-3" /></Link>
@@ -67,7 +75,11 @@ export function InventoryStats({ isLoading, stats }: InventoryStatsProps) {
           </div>
         </CardHeader>
         <CardContent className="relative z-10">
-          {isLoading ? <Skeleton className="h-8 w-1/4 my-1" /> : <div className="text-2xl font-bold tracking-tight">{stats.expiredProductCount}</div>}
+          {isLoading ? (
+            <Skeleton className="h-8 w-1/4 my-1" />
+          ) : (
+            <div className="text-2xl font-bold tracking-tight">{stats.expiredProductCount}</div>
+          )}
           <p className="text-xs text-muted-foreground mt-1">Past expiry date</p>
           <Button variant="ghost" size="sm" className="text-xs p-0 h-auto mt-4 text-orange-700 dark:text-orange-400 hover:underline" asChild>
             <Link href="/dashboard/inventory">Review <ArrowRight className="ml-1 h-3 w-3" /></Link>
