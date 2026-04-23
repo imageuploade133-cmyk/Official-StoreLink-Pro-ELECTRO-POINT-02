@@ -7,7 +7,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/formatUtils";
 import { ShoppingBag, MoreHorizontal, ChevronDown } from "lucide-react";
-import { format, startOfMonth } from 'date-fns';
+import { format } from 'date-fns';
 import type { SaleTransaction } from '@/lib/types';
 import { useSettings } from '@/contexts/settings-context';
 
@@ -113,7 +113,7 @@ export function StaticStats({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-6 px-2 text-xs text-green-600 dark:text-green-400 hover:bg-green-100/50 dark:hover:bg-green-900/50">
-                  {{ week: 'This Week', month: 'This Month' }[salesSnapshotPeriod]}
+                  {salesSnapshotPeriod === 'week' ? 'This Week' : 'This Month'}
                   <ChevronDown className="h-4 w-4 ml-1" />
                 </Button>
               </DropdownMenuTrigger>
@@ -136,7 +136,7 @@ export function StaticStats({
             </div>
           )}
           <p className="text-xs text-green-600 dark:text-green-400 mt-1">
-            Net sales for {{ week: 'this week', month: 'this month' }[salesSnapshotPeriod]}
+            Net sales for {salesSnapshotPeriod === 'week' ? 'this week' : 'this month'}
           </p>
         </CardContent>
       </Card>
