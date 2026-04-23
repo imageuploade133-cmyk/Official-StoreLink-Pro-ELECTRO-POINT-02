@@ -17,6 +17,7 @@ import type { Product, Category } from '@/lib/types';
 import { ProductCard } from '@/components/store/ProductCard';
 import { useSettings } from '@/contexts/settings-context';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
