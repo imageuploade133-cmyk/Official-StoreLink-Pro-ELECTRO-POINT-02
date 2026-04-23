@@ -301,7 +301,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
             ? (settings?.storeAddToCartShadow || 'sm')
             : 'sm';
 
-        const sizeClasses = {
+        const sizeClasses: Record<string, string> = {
             sm: 'h-10 text-xs px-4',
             md: 'h-12 text-sm px-6',
             lg: 'h-14 text-sm px-8',

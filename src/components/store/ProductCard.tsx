@@ -21,7 +21,7 @@ import { StockBar } from './StockBar';
 import { ProductRating } from './ProductRating';
 import { calculateRatingStats } from '@/lib/rating-utils';
 import { useProductReviews } from '@/hooks/use-product-reviews';
-import type { Product, Category } from '@/lib/types';
+import { Product, Category, AppSettings } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useStoreUrl } from '@/hooks/use-store-url';
 
@@ -183,6 +183,98 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
       );
   }
 
+  // Grid Button Style
+  const gridBtnStyle = useMemo(() => {
+    const useIndividual = settings?.useIndividualBtnSettings !== false;
+    const style = useIndividual
+        ? (settings?.storeGridCartStyle || 'standard')
+        : (settings?.storeBtnStyle || 'standard');
+
+    if (style === 'gradient') {
+        return {
+            background: `linear-gradient(135deg, ${settings?.storeGridCartGradientStart || '#10b981'}, ${settings?.storeGridCartGradientEnd || '#059669'})`,
+            color: 'white',
+            border: 'none'
+        };
+    } else if (style === 'image' && settings?.storeGridCartImageUrl) {
+        return {
+            backgroundImage: `url('${settings.storeGridCartImageUrl}')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            color: 'white',
+            textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+            border: 'none'
+        };
+    } else if (style === 'outline') {
+        return {
+            backgroundColor: 'transparent',
+            color: settings?.storeGridCartColor || '#10b981',
+            border: `2px solid ${settings?.storeGridCartColor || '#10b981'}`
+        };
+    } else if (style === 'ghost') {
+        return {
+            backgroundColor: 'transparent',
+            color: settings?.storeGridCartColor || '#10b981',
+            border: 'none'
+        };
+    }
+
+    return {
+        backgroundColor: settings?.storeGridCartColor || '#10b981',
+        color: 'white',
+        border: 'none'
+    };
+  }, [settings]);
+
+  const gridBtnClasses = useMemo(() => {
+    const useIndividual = settings?.useIndividualBtnSettings !== false;
+    const size = useIndividual
+        ? (settings?.storeGridCartSize || 'md')
+        : (settings?.storeBtnSize || 'md');
+    
+    const shape = useIndividual
+        ? (settings?.storeGridCartShape || 'md')
+        : (settings?.storeBtnShape || 'md');
+
+    const shadow = useIndividual
+        ? (settings?.storeGridCartShadow || 'sm')
+        : 'sm';
+
+    const sizeClasses: Record<string, string> = {
+        sm: 'h-8 text-[10px] px-3',
+        md: 'h-10 text-xs px-4',
+        lg: 'h-12 text-sm px-6',
+        xl: 'h-14 text-base px-8'
+    };
+
+    const shapeClasses: Record<string, string> = {
+        none: 'rounded-none',
+        sm: 'rounded-sm',
+        md: 'rounded-md',
+        lg: 'rounded-2xl',
+        full: 'rounded-full'
+    };
+
+    const shadowClasses: Record<string, string> = {
+        none: 'shadow-none',
+        sm: 'shadow-sm',
+        md: 'shadow-md',
+        lg: 'shadow-lg',
+        xl: 'shadow-xl',
+        '2xl': 'shadow-2xl',
+        inner: 'shadow-inner'
+    };
+
+    const sizeClass = sizeClasses[size] || sizeClasses.md;
+    const shapeClass = shapeClasses[shape] || 'rounded-md';
+    const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
+
+    return `${sizeClass} ${shapeClass} ${shadowClass}`;
+  }, [settings]);
+
+  const gridCartText = settings?.storeGridCartText || 'Add to Bag';
+  const gridCartIcon = settings?.storeGridCartIcon;
+
   return (
     <>
       <ProductLoadingOverlay isVisible={isLoadingProduct} productName={product.name} />
@@ -260,9 +352,13 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
                 <div className="absolute inset-x-0 bottom-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-700 hidden md:block z-20">
                 <Button
                     onClick={handleAddToCart}
-                    className="w-full bg-[#0071e3] text-white hover:bg-[#0077ed] font-semibold text-xs tracking-tight h-12 rounded-full shadow-lg transition-all active:scale-95"
+                    style={gridBtnStyle}
+                    className={cn(
+                        "w-full font-semibold tracking-tight transition-all active:scale-95",
+                        gridBtnClasses
+                    )}
                 >
-                    Add to Bag
+                    {gridCartText}
                 </Button>
                 </div>
             )}
@@ -337,7 +433,11 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
                     <div className="md:hidden">
                     <Button
                         size="icon"
-                        className="h-10 w-10 rounded-full bg-[#1d1d1f] dark:bg-[#f5f5f7] text-white dark:text-black active:scale-90 transition-transform shadow-sm"
+                        style={gridBtnStyle}
+                        className={cn(
+                            "h-10 w-10 rounded-full active:scale-90 transition-transform shadow-sm flex items-center justify-center",
+                            gridBtnClasses
+                        )}
                         onClick={handleAddToCart}
                         disabled={isOutOfStock}
                     >

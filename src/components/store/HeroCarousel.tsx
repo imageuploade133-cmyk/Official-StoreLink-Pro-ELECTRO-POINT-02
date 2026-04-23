@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import useEmblaCarousel, { type UseEmblaCarouselType } from 'embla-carousel-react';
@@ -11,6 +11,7 @@ import type { SlideShow } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 import { useStoreUrl } from '@/hooks/use-store-url';
 import { useSettings } from '@/contexts/settings-context';
@@ -90,6 +91,95 @@ export function HeroCarousel() {
 
   const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
+
+  // Hero Button Style
+  const heroBtnStyle = useMemo(() => {
+    const useIndividual = settings?.useIndividualBtnSettings !== false;
+    const style = useIndividual
+        ? (settings?.storeHeroBtnStyle || 'gradient')
+        : (settings?.storeBtnStyle || 'standard');
+
+    if (style === 'gradient') {
+        return {
+            background: `linear-gradient(135deg, ${settings?.storeHeroBtnGradientStart || '#8b5cf6'}, ${settings?.storeHeroBtnGradientEnd || '#7c3aed'})`,
+            color: 'white',
+            border: 'none'
+        };
+    } else if (style === 'image' && settings?.storeHeroBtnImageUrl) {
+        return {
+            backgroundImage: `url('${settings.storeHeroBtnImageUrl}')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            color: 'white',
+            textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+            border: 'none'
+        };
+    } else if (style === 'outline') {
+        return {
+            backgroundColor: 'transparent',
+            color: settings?.storeHeroBtnColor || '#8b5cf6',
+            border: `2px solid ${settings?.storeHeroBtnColor || '#8b5cf6'}`
+        };
+    } else if (style === 'ghost') {
+        return {
+            backgroundColor: 'transparent',
+            color: settings?.storeHeroBtnColor || '#8b5cf6',
+            border: 'none'
+        };
+    }
+
+    return {
+        backgroundColor: settings?.storeHeroBtnColor || '#8b5cf6',
+        color: 'white',
+        border: 'none'
+    };
+  }, [settings]);
+
+  const heroBtnClasses = useMemo(() => {
+    const useIndividual = settings?.useIndividualBtnSettings !== false;
+    const size = useIndividual
+        ? (settings?.storeHeroBtnSize || 'lg')
+        : (settings?.storeBtnSize || 'lg');
+    
+    const shape = useIndividual
+        ? (settings?.storeHeroBtnShape || 'lg')
+        : (settings?.storeBtnShape || 'lg');
+
+    const shadow = useIndividual
+        ? (settings?.storeHeroBtnShadow || 'md')
+        : 'md';
+
+    const sizeClasses: Record<string, string> = {
+        sm: 'h-10 text-xs px-4',
+        md: 'h-12 text-sm px-6',
+        lg: 'h-14 text-sm px-8',
+        xl: 'h-16 text-base px-10'
+    };
+
+    const shapeClasses: Record<string, string> = {
+        none: 'rounded-none',
+        sm: 'rounded-sm',
+        md: 'rounded-md',
+        lg: 'rounded-2xl',
+        full: 'rounded-full'
+    };
+
+    const shadowClasses: Record<string, string> = {
+        none: 'shadow-none',
+        sm: 'shadow-sm',
+        md: 'shadow-md',
+        lg: 'shadow-lg',
+        xl: 'shadow-xl',
+        '2xl': 'shadow-2xl',
+        inner: 'shadow-inner'
+    };
+
+    const sizeClass = sizeClasses[size] || sizeClasses.lg;
+    const shapeClass = shapeClasses[shape] || 'rounded-2xl';
+    const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-md';
+
+    return `${sizeClass} ${shapeClass} ${shadowClass}`;
+  }, [settings]);
 
   if (isLoading || isLoadingSettings) {
     return (
@@ -187,9 +277,16 @@ export function HeroCarousel() {
                         </p>
                       )}
                       {slide.showActionButton && (
-                        <Button asChild size="lg" className="group relative overflow-hidden bg-white text-slate-950 px-8 py-4 font-bold text-sm tracking-widest uppercase transition-all duration-300 hover:pr-12 hover:bg-slate-100 active:scale-95 h-auto">
+                        <Button 
+                          asChild 
+                          style={heroBtnStyle}
+                          className={cn(
+                            "group relative overflow-hidden font-bold tracking-widest uppercase transition-all duration-300 hover:pr-12 active:scale-95",
+                            heroBtnClasses
+                          )}
+                        >
                           <Link href={getStoreUrl('/store/shop')}>
-                            <span className="relative z-10">Shop Collection</span>
+                            <span className="relative z-10">{settings?.storeHeroBtnText || 'Shop Collection'}</span>
                             <span className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300">
                                <ArrowRight className="h-4 w-4" strokeWidth={2.5}/>
                             </span>

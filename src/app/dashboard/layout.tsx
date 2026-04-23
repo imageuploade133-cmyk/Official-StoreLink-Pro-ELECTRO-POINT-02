@@ -188,6 +188,7 @@ export default function DashboardLayout({
     { href: '/dashboard/manage-coupons', icon: Ticket, label: 'Promo Codes', perm: 'manage_coupons' },
     { href: '/dashboard/stock-bar-settings', icon: Activity, label: 'Stock Bar Settings', perm: 'manage_settings' },
     { href: '/dashboard/product-card-designer', icon: Palette, label: 'Product Card Designer', perm: 'manage_settings' },
+    { href: '/dashboard/button-ui-style', icon: MousePointerClick, label: 'Button UI/Style', perm: 'manage_settings' },
     { href: '/dashboard/public-web-settings', icon: Globe, label: 'General Web Settings', perm: 'manage_settings' },
     { href: '/dashboard/settings/domain', icon: Globe, label: 'Domain Settings', perm: 'manage_settings' },
     { href: '/dashboard/shop-collection-settings', icon: ShoppingBag, label: 'Shop Our Collection', perm: 'manage_settings' },

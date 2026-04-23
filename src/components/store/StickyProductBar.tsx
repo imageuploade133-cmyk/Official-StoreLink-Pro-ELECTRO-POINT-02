@@ -28,7 +28,7 @@ export function StickyProductBar({
   const { settings } = useSettings();
   const [isVisible, setIsVisible] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout>();
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const handleScroll = useCallback(() => {
     const currentScrollY = window.scrollY;
@@ -68,30 +68,36 @@ export function StickyProductBar({
       : (settings?.storeBtnStyle || 'standard');
     
     const getColor = () => {
-      if (useIndividual) {
-        if (style === 'gradient') {
-          return {
-            background: `linear-gradient(135deg, ${settings?.storeAddToCartGradientStart || '#3b82f6'}, ${settings?.storeAddToCartGradientEnd || '#1d4ed8'})`,
-            color: 'white',
-            border: 'none'
-          };
-        }
+      if (style === 'gradient') {
         return {
-          backgroundColor: settings?.storeAddToCartColor || '#3b82f6',
+          background: `linear-gradient(135deg, ${settings?.storeAddToCartGradientStart || '#3b82f6'}, ${settings?.storeAddToCartGradientEnd || '#1d4ed8'})`,
           color: 'white',
           border: 'none'
         };
-      }
-      // Global settings
-      if (style === 'gradient') {
+      } else if (style === 'image' && settings?.storeAddToCartImageUrl) {
         return {
-          background: `linear-gradient(135deg, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
+          backgroundImage: `url('${settings.storeAddToCartImageUrl}')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
           color: 'white',
+          textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+          border: 'none'
+        };
+      } else if (style === 'outline') {
+        return {
+          backgroundColor: 'transparent',
+          color: settings?.storeAddToCartColor || '#3b82f6',
+          border: `2px solid ${settings?.storeAddToCartColor || '#3b82f6'}`
+        };
+      } else if (style === 'ghost') {
+        return {
+          backgroundColor: 'transparent',
+          color: settings?.storeAddToCartColor || '#3b82f6',
           border: 'none'
         };
       }
       return {
-        backgroundColor: settings?.storeBtnColor || '#3b82f6',
+        backgroundColor: settings?.storeAddToCartColor || '#3b82f6',
         color: 'white',
         border: 'none'
       };
@@ -124,7 +130,7 @@ export function StickyProductBar({
       none: 'rounded-none',
       sm: 'rounded-sm',
       md: 'rounded-md',
-      lg: 'rounded-2xl',
+      lg: 'rounded-lg',
       full: 'rounded-full'
     };
 
