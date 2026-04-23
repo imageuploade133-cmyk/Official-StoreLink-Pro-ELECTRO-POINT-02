@@ -1,23 +1,14 @@
 'use server';
 
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { getFirestore } from 'firebase-admin/firestore';
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { adminDb } from '@/lib/firebase-admin';
 import { RESERVED_SUBDOMAINS } from '@/lib/domain';
 
 const VERCEL_TOKEN = process.env.VERCEL_TOKEN;
 const VERCEL_PROJECT_ID = process.env.VERCEL_PROJECT_ID;
 const VERCEL_TEAM_ID = process.env.VERCEL_TEAM_ID;
 
-const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
-
 const getDb = () => {
-    if (!getApps().length && serviceAccountKey) {
-        initializeApp({
-            credential: cert(JSON.parse(Buffer.from(serviceAccountKey, 'base64').toString())),
-        });
-    }
-    return getFirestore();
+    return adminDb;
 };
 
 export async function addDomainToVercel(domain: string) {

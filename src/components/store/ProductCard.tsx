@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
@@ -330,7 +330,7 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
               alt={product.name}
               fill
               className={cn(
-                "object-cover transition-transform duration-[1.5s] ease-out",
+                "object-cover transition-transform duration-[1500ms] ease-out",
                 hoverEffect === 'zoom' && "group-hover:scale-110",
                 isOutOfStock && "grayscale"
               )}
