@@ -287,7 +287,7 @@ export function PublicNavbar() {
                             </div>
                             <Input 
                                 readOnly
-                                className="w-full pl-11 pr-12 bg-[#f5f5f7]/60 dark:bg-[#1d1d1f]/60 border-none rounded-full h-10 text-xs font-medium tracking-tight cursor-pointer transition-all hover:bg-[#e8e8ed]/80 dark:hover:bg-[#2d2d2f]/80"
+                                className="w-full pl-11 pr-12 bg-black/[0.03] dark:bg-white/[0.03] border-[1.5px] border-black/5 dark:border-white/5 rounded-full h-10 text-xs font-medium tracking-tight cursor-pointer transition-all hover:bg-white dark:hover:bg-black hover:border-[#0071e3]/30 hover:shadow-md active:scale-[0.98]"
                                 placeholder="Search"
                                 onClick={() => setIsSearchFocused(true)}
                             />
@@ -320,25 +320,27 @@ export function PublicNavbar() {
                         {navbarShowCollectionsLink && (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" className="text-[#1d1d1f] dark:text-[#f5f5f7] hover:text-[#0071e3] dark:hover:text-[#0071e3] transition-colors p-0 h-auto font-semibold text-[13px] tracking-tight flex items-center gap-1.5">
+                                    <Button variant="ghost" className="text-[#1d1d1f] dark:text-[#f5f5f7] hover:text-[#0071e3] dark:hover:text-[#0071e3] transition-colors p-0 h-auto font-semibold text-[13px] tracking-tight flex items-center gap-1.5 group">
                                         Collections
-                                        <ChevronDown className="h-3.5 w-3.5 opacity-50" strokeWidth={2} />
+                                        <ChevronDown className="h-3.5 w-3.5 opacity-40 group-hover:opacity-100 transition-transform group-data-[state=open]:rotate-180" strokeWidth={2.5} />
                                     </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-72 p-2 rounded-3xl shadow-2xl border-black/[0.05] dark:border-white/[0.05] bg-white/90 dark:bg-black/90 backdrop-blur-xl">
-                                    <DropdownMenuLabel className="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">Discover</DropdownMenuLabel>
-                                    <DropdownMenuSeparator className="bg-black/[0.05] dark:bg-white/[0.05]" />
-                                    <div className="max-h-[400px] overflow-y-auto py-2">
+                                <DropdownMenuContent 
+                                    align="start" 
+                                    sideOffset={12}
+                                    className="w-72 p-4 rounded-[2.5rem] shadow-[0_30px_70px_rgba(0,0,0,0.2)] dark:shadow-[0_30px_70px_rgba(0,0,0,0.6)] border-[3px] border-black/10 dark:border-white/10 bg-white/95 dark:bg-black/95 backdrop-blur-3xl animate-in fade-in slide-in-from-top-3 duration-500"
+                                >
+                                    <div className="max-h-[480px] overflow-y-auto py-1 pr-1 custom-scrollbar">
                                         {isLoadingCategories ? (
-                                            <div className="p-4 flex items-center gap-3 text-muted-foreground">
-                                                <Loader2 className="h-4 w-4 animate-spin" />
-                                                <span className="text-xs font-bold uppercase">Syncing...</span>
+                                            <div className="p-6 flex flex-col items-center justify-center gap-3 text-muted-foreground">
+                                                <Loader2 className="h-5 w-5 animate-spin text-[#0071e3]" />
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Updating Registry</span>
                                             </div>
                                         ) : (
                                             categories?.map(category => (
-                                                <DropdownMenuItem key={category.id} asChild className="cursor-pointer p-3 focus:bg-[#0071e3]/10 rounded-2xl mx-1 my-0.5">
+                                                <DropdownMenuItem key={category.id} asChild className="cursor-pointer p-2.5 hover:bg-[#0071e3]/5 focus:bg-[#0071e3]/5 rounded-[1.5rem] mx-1 my-1 transition-all duration-300 group/item border border-transparent hover:border-[#0071e3]/10 focus:border-[#0071e3]/10">
                                                     <Link href={getStoreUrl(`/store/shop?category=${category.id}`)} className="flex items-center gap-4 w-full" onClick={() => setIsMenuOpen(false)}>
-                                                        <div className="relative h-10 w-10 rounded-xl overflow-hidden bg-muted flex-shrink-0 shadow-sm">
+                                                        <div className="relative h-11 w-11 rounded-[1rem] overflow-hidden bg-slate-100 dark:bg-slate-900 flex-shrink-0 shadow-sm border border-black/5 dark:border-white/5 transition-all duration-500 group-hover/item:scale-110 group-hover/item:rotate-2">
                                                             <Image
                                                                 src={category.imageUrl || `https://picsum.photos/seed/${category.id}/100/100`}
                                                                 alt={category.name}
@@ -347,16 +349,19 @@ export function PublicNavbar() {
                                                                 unoptimized
                                                             />
                                                         </div>
-                                                        <span className="font-bold text-sm tracking-tight">{category.name}</span>
+                                                        <div className="flex flex-col min-w-0">
+                                                            <span className="font-black text-[14px] tracking-tight text-slate-800 dark:text-slate-100 group-hover/item:text-[#0071e3] transition-colors truncate">{category.name}</span>
+                                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest opacity-0 group-hover/item:opacity-100 transition-all -translate-y-1 group-hover:translate-y-0">Discover</span>
+                                                        </div>
                                                     </Link>
                                                 </DropdownMenuItem>
                                             ))
                                         )}
                                     </div>
-                                    <DropdownMenuSeparator className="bg-black/[0.05] dark:bg-white/[0.05]" />
-                                    <DropdownMenuItem asChild className="cursor-pointer p-4 focus:bg-[#0071e3] focus:text-white rounded-2xl m-1 transition-all">
-                                        <Link href={getStoreUrl('/store/categories')} className="flex items-center justify-between font-black uppercase text-[10px] tracking-widest w-full text-[#0071e3]" onClick={() => setIsMenuOpen(false)}>
-                                            View All Collections <ChevronRight className="h-3 w-3" />
+                                    <DropdownMenuSeparator className="bg-black/10 dark:bg-white/10 mx-2 my-3 h-[2px]" />
+                                    <DropdownMenuItem asChild className="cursor-pointer p-3 focus:bg-[#0071e3] focus:text-white rounded-2xl m-1 transition-all group/all">
+                                        <Link href={getStoreUrl('/store/categories')} className="flex items-center justify-between font-black uppercase text-[9px] tracking-widest w-full text-[#0071e3] group-hover/all:text-white" onClick={() => setIsMenuOpen(false)}>
+                                            View All Collections <ChevronRight className="h-3 w-3 transition-transform group-hover/all:translate-x-1" />
                                         </Link>
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
@@ -379,6 +384,17 @@ export function PublicNavbar() {
                         {navbarShowAccount && (
                             <UserButton isLoading={isLoading} user={user} staffMember={staffMember} router={router} handleLogout={handleLogout} getInitials={getInitials} getStoreUrl={getStoreUrl} />
                         )}
+                        {navbarShowSearch && (
+                            <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="lg:hidden h-10 w-10 rounded-full text-[#1d1d1f] dark:text-[#f5f5f7] hover:bg-black/[0.05] dark:hover:bg-white/[0.05]"
+                                onClick={() => setIsSearchFocused(true)}
+                            >
+                                <Search className="h-5 w-5" strokeWidth={2} />
+                            </Button>
+                        )}
+
                         {navbarShowWishlist && (
                             <Button asChild variant="ghost" size="icon" className="group hidden sm:inline-flex h-10 w-10 rounded-full text-[#1d1d1f] dark:text-[#f5f5f7] hover:bg-black/[0.05] dark:hover:bg-white/[0.05] relative transition-all">
                                 <Link href={getStoreUrl('/store/wishlist')}>
@@ -446,11 +462,33 @@ export function PublicNavbar() {
                                         
                                         {navbarShowCollectionsLink && (
                                             <div className="mt-12">
-                                                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-6">Collections</p>
-                                                <div className="grid grid-cols-1 gap-4">
+                                                <div className="flex items-center justify-between mb-6">
+                                                    <p className="text-[10px] font-black uppercase tracking-[0.25em] text-[#0071e3]">Collections</p>
+                                                    <Link href={getStoreUrl('/store/categories')} className="text-[10px] font-black uppercase tracking-widest text-slate-400" onClick={() => setIsMenuOpen(false)}>View All</Link>
+                                                </div>
+                                                <div className="flex flex-col gap-1">
                                                     {categories?.slice(0, 10).map(cat => (
-                                                        <Link key={cat.id} href={getStoreUrl(`/store/shop?category=${cat.id}`)} className="text-xl font-medium text-[#1d1d1f]/80 dark:text-white/80 hover:text-[#0071e3] dark:hover:text-[#0071e3] transition-colors" onClick={() => setIsMenuOpen(false)}>
-                                                            {cat.name}
+                                                        <Link 
+                                                            key={cat.id} 
+                                                            href={getStoreUrl(`/store/shop?category=${cat.id}`)} 
+                                                            className="flex items-center gap-4 py-3 border-b border-black/[0.03] dark:border-white/[0.03] last:border-0 group px-2 -mx-2 active:bg-black/[0.02] dark:active:bg-white/[0.02] rounded-xl transition-colors" 
+                                                            onClick={() => setIsMenuOpen(false)}
+                                                        >
+                                                            <div className="h-12 w-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-900 shrink-0 shadow-sm">
+                                                                <Image
+                                                                    src={cat.imageUrl || `https://picsum.photos/seed/${cat.id}/100/100`}
+                                                                    alt={cat.name}
+                                                                    width={48}
+                                                                    height={48}
+                                                                    className="object-cover h-full w-full"
+                                                                    unoptimized
+                                                                />
+                                                            </div>
+                                                            <div className="flex flex-col">
+                                                                <span className="text-[17px] font-bold tracking-tight text-[#1d1d1f] dark:text-white group-active:text-[#0071e3] transition-colors">{cat.name}</span>
+                                                                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Shop Collection</span>
+                                                            </div>
+                                                            <ChevronRight className="h-4 w-4 ml-auto text-slate-300 group-active:text-[#0071e3] transition-all" />
                                                         </Link>
                                                     ))}
                                                 </div>

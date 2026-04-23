@@ -402,12 +402,12 @@ function ShopPageContent() {
                                         }}
                                         onFocus={() => searchTerm.trim() && setShowSuggestions(true)}
                                         onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                                        className="pl-10 h-12 rounded-2xl text-sm w-full bg-black/[0.03] dark:bg-white/[0.03] border-none focus-visible:ring-2 focus-visible:ring-blue-500/20 transition-all"
+                                        className="pl-10 h-12 rounded-2xl text-sm w-full bg-white dark:bg-black border-[1.5px] border-black/10 dark:border-white/10 hover:border-blue-500/30 hover:shadow-lg focus-visible:border-blue-500/50 focus-visible:ring-4 focus-visible:ring-blue-500/10 transition-all duration-300"
                                     />
 
                                     {/* Suggestions Dropdown */}
                                     {(showSuggestions || isLoadingSuggestions) && searchTerm.trim() && (
-                                        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#1d1d1f] border border-black/5 dark:border-white/5 rounded-3xl shadow-2xl z-50 max-h-80 overflow-y-auto backdrop-blur-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                                        <div className="absolute top-full left-0 right-0 mt-3 bg-white/95 dark:bg-black/95 border-[1.5px] border-black/10 dark:border-white/10 rounded-[2rem] shadow-2xl z-50 max-h-80 overflow-y-auto backdrop-blur-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
                                             {isLoadingSuggestions ? (
                                                 <div className="p-8 text-center">
                                                     <Loader2 className="h-6 w-6 animate-spin mx-auto text-blue-500" />
@@ -427,7 +427,7 @@ function ShopPageContent() {
                                                                     handleSearchSubmit({ preventDefault: () => {} } as any);
                                                                 }
                                                             }}
-                                                            className="w-full p-3 text-left hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-all flex items-center gap-4 group"
+                                                            className="w-full p-3 text-left hover:bg-blue-500/5 dark:hover:bg-blue-500/10 rounded-2xl transition-all flex items-center gap-4 group border border-transparent hover:border-blue-500/10"
                                                         >
                                                             <div className="h-12 w-12 rounded-xl bg-black/5 dark:bg-white/5 overflow-hidden flex-shrink-0">
                                                                 {product.imageUrl && (
@@ -457,11 +457,11 @@ function ShopPageContent() {
 
                             <div className="flex items-center gap-3 w-full lg:w-auto">
                                 <Select value={categoryFromUrl} onValueChange={(val) => handleCategoryChange(val)}>
-                                    <SelectTrigger className="flex-1 lg:w-[200px] h-12 rounded-2xl bg-black/[0.03] dark:bg-white/[0.03] border-none focus:ring-2 focus:ring-blue-500/20">
+                                    <SelectTrigger className="flex-1 lg:w-[200px] h-12 rounded-2xl bg-white dark:bg-black border-[1.5px] border-black/10 dark:border-white/10 hover:border-blue-500/30 hover:shadow-lg focus:ring-4 focus:ring-blue-500/10 transition-all duration-300">
                                         <LayoutGrid className="h-4 w-4 mr-2 text-[#86868b]" />
                                         <SelectValue placeholder="Category" />
                                     </SelectTrigger>
-                                    <SelectContent className="rounded-3xl border-black/5 dark:border-white/5 shadow-2xl backdrop-blur-xl">
+                                    <SelectContent className="rounded-3xl border-[1.5px] border-black/10 dark:border-white/10 shadow-2xl backdrop-blur-2xl bg-white/95 dark:bg-black/95">
                                         <SelectItem value="all" className="rounded-xl">All Products</SelectItem>
                                         {categories?.map(category => (
                                             <SelectItem key={category.id} value={category.id} className="rounded-xl">
@@ -472,11 +472,11 @@ function ShopPageContent() {
                                 </Select>
 
                                 <Select value={sortFromUrl} onValueChange={handleSortChange}>
-                                    <SelectTrigger className="flex-1 lg:w-[200px] h-12 rounded-2xl bg-black/[0.03] dark:bg-white/[0.03] border-none focus:ring-2 focus:ring-blue-500/20">
+                                    <SelectTrigger className="flex-1 lg:w-[200px] h-12 rounded-2xl bg-white dark:bg-black border-[1.5px] border-black/10 dark:border-white/10 hover:border-blue-500/30 hover:shadow-lg focus:ring-4 focus:ring-blue-500/10 transition-all duration-300">
                                         <ArrowUpDown className="h-4 w-4 mr-2 text-[#86868b]" />
                                         <SelectValue placeholder="Sort by" />
                                     </SelectTrigger>
-                                    <SelectContent className="rounded-3xl border-black/5 dark:border-white/5 shadow-2xl backdrop-blur-xl">
+                                    <SelectContent className="rounded-3xl border-[1.5px] border-black/10 dark:border-white/10 shadow-2xl backdrop-blur-2xl bg-white/95 dark:bg-black/95">
                                         <SelectItem value="newest" className="rounded-xl">Newest First</SelectItem>
                                         <SelectItem value="price-low" className="rounded-xl">Price: Low to High</SelectItem>
                                         <SelectItem value="price-high" className="rounded-xl">Price: High to Low</SelectItem>
