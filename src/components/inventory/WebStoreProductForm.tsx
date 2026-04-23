@@ -73,7 +73,8 @@ import {
   ChevronDown,
   Volume2,
   ListChecks,
-  Star
+  Star,
+  Barcode
 } from 'lucide-react';
 import { Eye } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
