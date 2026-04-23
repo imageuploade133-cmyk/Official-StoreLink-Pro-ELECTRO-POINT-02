@@ -268,10 +268,12 @@ export default function CartPage() {
       <div className="bg-muted/30">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
               <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white mb-4">Shopping Bag</h1>
-               <Link href={getStoreUrl('/store/shop')} className="text-sm text-primary hover:underline flex items-center mb-8">
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Continue Shopping
-              </Link>
+              <Button variant="ghost" asChild className="mb-8 btn-back">
+                <Link href={getStoreUrl('/store/shop')} className="flex items-center">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Continue Shopping
+                </Link>
+              </Button>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 items-start">
                   <div className="lg:col-span-2 space-y-6">

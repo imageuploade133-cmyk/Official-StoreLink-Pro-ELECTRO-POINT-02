@@ -51,8 +51,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
       if (onClick) {
-        const result = onClick(event)
-        if (result instanceof Promise) {
+        const result = onClick(event) as any
+        if (result && typeof result === 'object' && 'then' in result) {
           setInternalLoading(true)
           try {
             await result
@@ -68,17 +68,22 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       if (typeof node === 'string') return node;
       if (typeof node === 'number') return String(node);
       if (Array.isArray(node)) return node.map(getText).join('');
-      if (React.isValidElement(node)) return getText(node.props.children);
+      if (React.isValidElement(node)) return getText((node.props as any).children);
       return '';
     };
     
     // Auto-apply special styles for Save buttons (submit type or "Save" text)
-    // Back buttons (containing "Back" text)
+    // Back buttons (containing "Back", "Return", "Previous" text)
     // and Add buttons (containing "Add" text)
     const textContent = getText(children);
     const isSave = props.type === "submit" || (/\bsave\b/i.test(textContent) && !/wishlist/i.test(textContent));
 
-    const isBack = /\bback\b/i.test(textContent) || (typeof className === 'string' && className.includes("btn-back"));
+    const isBack = /\bback\b/i.test(textContent) || 
+                   /\breturn\b/i.test(textContent) || 
+                   /\bprevious\b/i.test(textContent) || 
+                   /\bprev\b/i.test(textContent) || 
+                   /\bcontinue shopping\b/i.test(textContent) ||
+                   (typeof className === 'string' && className.includes("btn-back"));
 
     const isAdd = /\badd\b/i.test(textContent) || (typeof className === 'string' && className.includes("btn-add"));
 
