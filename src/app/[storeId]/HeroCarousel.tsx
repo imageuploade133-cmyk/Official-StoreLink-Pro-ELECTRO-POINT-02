@@ -131,37 +131,48 @@ export function HeroCarousel() {
       ? (settings?.storeHeroBtnStyle || 'gradient')
       : (settings?.storeBtnStyle || 'standard');
     
-    const getColor = () => {
-      if (useIndividual) {
-        if (style === 'gradient') {
-          return {
-            background: `linear-gradient(135deg, ${settings?.storeHeroBtnGradientStart || '#8b5cf6'}, ${settings?.storeHeroBtnGradientEnd || '#7c3aed'})`,
-            color: 'white',
-            border: 'none'
-          };
-        }
-        return {
-          backgroundColor: settings?.storeHeroBtnColor || '#8b5cf6',
-          color: 'white',
-          border: 'none'
-        };
-      }
-      // Global settings
-      if (style === 'gradient') {
-        return {
-          background: `linear-gradient(135deg, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
-          color: 'white',
-          border: 'none'
-        };
-      }
+    if (style === 'gradient') {
       return {
-        backgroundColor: settings?.storeBtnColor || '#3b82f6',
+        background: `linear-gradient(135deg, ${settings?.storeHeroBtnGradientStart || (useIndividual ? '#8b5cf6' : '#3b82f6')}, ${settings?.storeHeroBtnGradientEnd || (useIndividual ? '#7c3aed' : '#1d4ed8')})`,
         color: 'white',
         border: 'none'
       };
-    };
+    } else if (style === 'image' && settings?.storeHeroBtnImageUrl) {
+        return {
+            backgroundImage: `url('${settings.storeHeroBtnImageUrl}')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            color: 'white',
+            textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+            border: 'none'
+        };
+    } else if (style === 'outline') {
+        return {
+            backgroundColor: 'transparent',
+            color: settings?.storeHeroBtnColor || (useIndividual ? '#8b5cf6' : '#3b82f6'),
+            border: `2px solid ${settings?.storeHeroBtnColor || (useIndividual ? '#8b5cf6' : '#3b82f6')}`
+        };
+    } else if (style === 'ghost') {
+        return {
+            backgroundColor: 'transparent',
+            color: settings?.storeHeroBtnColor || (useIndividual ? '#8b5cf6' : '#3b82f6'),
+            border: 'none'
+        };
+    } else if (style === 'glass') {
+        return {
+            backgroundColor: 'rgba(255, 255, 255, 0.4)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            color: settings?.storeHeroBtnColor || (useIndividual ? '#8b5cf6' : '#3b82f6'),
+            border: '1px solid rgba(255, 255, 255, 0.5)'
+        };
+    }
     
-    return getColor();
+    return {
+      backgroundColor: settings?.storeHeroBtnColor || (useIndividual ? '#8b5cf6' : '#3b82f6'),
+      color: 'white',
+      border: 'none'
+    };
   }, [settings]);
 
   // Button shape and size classes

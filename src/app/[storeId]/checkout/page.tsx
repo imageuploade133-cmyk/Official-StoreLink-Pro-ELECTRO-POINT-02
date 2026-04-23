@@ -415,6 +415,26 @@ export default function CheckoutPage() {
         color: 'white',
         border: 'none'
       };
+    } else if (style === 'outline') {
+      return {
+        backgroundColor: 'transparent',
+        color: settings?.storeBtnColor || '#3b82f6',
+        border: `2px solid ${settings?.storeBtnColor || '#3b82f6'}`
+      };
+    } else if (style === 'ghost') {
+      return {
+        backgroundColor: 'transparent',
+        color: settings?.storeBtnColor || '#3b82f6',
+        border: 'none'
+      };
+    } else if (style === 'glass') {
+      return {
+        backgroundColor: 'rgba(255, 255, 255, 0.4)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        color: settings?.storeBtnColor || '#3b82f6',
+        border: '1px solid rgba(255, 255, 255, 0.5)'
+      };
     }
     return {
       backgroundColor: settings?.storeBtnColor || '#3b82f6',

@@ -48,7 +48,10 @@ import {
   Tablet,
   Monitor,
   Layout,
-  Circle
+  Circle,
+  Shapes,
+  Maximize,
+  Box
 } from 'lucide-react';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -77,24 +80,33 @@ const buttonShapes = [
   { name: 'none', label: 'Square', description: 'No rounding', class: 'rounded-none' },
   { name: 'sm', label: 'Small', description: 'Slightly rounded', class: 'rounded-sm' },
   { name: 'md', label: 'Medium', description: 'Standard rounding', class: 'rounded-md' },
-  { name: 'lg', label: 'Large', description: 'Heavily rounded', class: 'rounded-2xl' },
+  { name: 'lg', label: 'Large', description: 'Apple-style rounded', class: 'rounded-[16px]' },
   { name: 'full', label: 'Pill', description: 'Maximum rounding', class: 'rounded-full' },
 ];
 
 const shadowOptions = [
   { name: 'none', label: 'None', class: 'shadow-none' },
-  { name: 'sm', label: 'Small', class: 'shadow-sm' },
-  { name: 'md', label: 'Medium', class: 'shadow-md' },
-  { name: 'lg', label: 'Large', class: 'shadow-lg' },
-  { name: 'xl', label: 'X-Large', class: 'shadow-xl' },
-  { name: '2xl', label: '2X-Large', class: 'shadow-2xl' },
-  { name: 'inner', label: 'Inner', class: 'shadow-inner' },
+  { name: 'sm', label: 'Soft', class: 'shadow-sm shadow-black/5' },
+  { name: 'md', label: 'Medium', class: 'shadow-md shadow-black/5' },
+  { name: 'lg', label: 'Elevated', class: 'shadow-lg shadow-black/5' },
+  { name: 'xl', label: 'High', class: 'shadow-xl shadow-black/5' },
+  { name: '2xl', label: 'Deep', class: 'shadow-2xl shadow-black/10' },
+  { name: 'inner', label: 'Pressed', class: 'shadow-inner' },
+];
+
+const buttonStyleOptions = [
+  { id: 'standard', label: 'Solid', icon: Circle, color: 'bg-primary' },
+  { id: 'gradient', label: 'Gradient', icon: Sparkles, color: 'bg-gradient-to-br from-blue-500 to-indigo-600' },
+  { id: 'glass', label: 'Glass', icon: Smartphone, color: 'bg-white/40 backdrop-blur-md border border-white/40' },
+  { id: 'outline', label: 'Outline', icon: Layout, color: 'border border-primary bg-transparent' },
+  { id: 'ghost', label: 'Ghost', icon: Eye, color: 'bg-transparent border border-dashed border-muted' },
+  { id: 'image', label: 'Image', icon: ImageIcon, color: 'bg-muted' },
 ];
 
 const shoppingExpSchema = z.object({
   storeAddToCartText: z.string().min(1, 'Label required').max(40, 'Label too long.'),
   storeAddToCartIcon: z.preprocess((val) => val || 'ShoppingCart', z.string()).default('ShoppingCart'),
-  storeAddToCartStyle: z.preprocess((val) => val || 'standard', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost'])).default('standard'),
+  storeAddToCartStyle: z.preprocess((val) => val || 'standard', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost', 'glass'])).default('standard'),
   storeAddToCartColor: z.preprocess((val) => val || '#3b82f6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#3b82f6'),
   storeAddToCartGradientStart: z.preprocess((val) => val || '#3b82f6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#3b82f6'),
   storeAddToCartGradientEnd: z.preprocess((val) => val || '#1d4ed8', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#1d4ed8'),
@@ -105,7 +117,7 @@ const shoppingExpSchema = z.object({
   
   storeGridCartText: z.string().min(1, 'Label required').max(20, 'Label too long.'),
   storeGridCartIcon: z.preprocess((val) => val || 'ShoppingCart', z.string()).default('ShoppingCart'),
-  storeGridCartStyle: z.preprocess((val) => val || 'standard', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost'])).default('standard'),
+  storeGridCartStyle: z.preprocess((val) => val || 'standard', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost', 'glass'])).default('standard'),
   storeGridCartColor: z.preprocess((val) => val || '#10b981', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#10b981'),
   storeGridCartGradientStart: z.preprocess((val) => val || '#10b981', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#10b981'),
   storeGridCartGradientEnd: z.preprocess((val) => val || '#059669', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#059669'),
@@ -116,7 +128,7 @@ const shoppingExpSchema = z.object({
   
   storeHeroBtnText: z.string().min(1, 'Label required').max(40, 'Label too long.'),
   storeHeroBtnIcon: z.preprocess((val) => val || 'ArrowRight', z.string()).default('ArrowRight'),
-  storeHeroBtnStyle: z.preprocess((val) => val || 'gradient', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost'])).default('gradient'),
+  storeHeroBtnStyle: z.preprocess((val) => val || 'gradient', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost', 'glass'])).default('gradient'),
   storeHeroBtnColor: z.preprocess((val) => val || '#8b5cf6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#8b5cf6'),
   storeHeroBtnGradientStart: z.preprocess((val) => val || '#8b5cf6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#8b5cf6'),
   storeHeroBtnGradientEnd: z.preprocess((val) => val || '#7c3aed', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#7c3aed'),
@@ -127,7 +139,7 @@ const shoppingExpSchema = z.object({
 
   storeExploreBtnText: z.string().min(1, 'Label required').max(40, 'Label too long.'),
   storeExploreBtnIcon: z.preprocess((val) => val || 'ArrowRight', z.string()).default('ArrowRight'),
-  storeExploreBtnStyle: z.preprocess((val) => val || 'standard', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost'])).default('standard'),
+  storeExploreBtnStyle: z.preprocess((val) => val || 'standard', z.enum(['standard', 'gradient', 'image', 'outline', 'ghost', 'glass'])).default('standard'),
   storeExploreBtnColor: z.preprocess((val) => val || '#3b82f6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#3b82f6'),
   storeExploreBtnGradientStart: z.preprocess((val) => val || '#3b82f6', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#3b82f6'),
   storeExploreBtnGradientEnd: z.preprocess((val) => val || '#1d4ed8', z.string().regex(/^#[0-9a-fA-F]{6}$/i)).default('#1d4ed8'),
@@ -152,38 +164,41 @@ function ButtonStyleSelector({
   imageUrl?: string;
 }) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-      {[
-        { id: 'standard', label: 'Solid', icon: Circle, color: 'bg-primary' },
-        { id: 'gradient', label: 'Gradient', icon: Sparkles, color: 'bg-gradient-to-r from-purple-500 to-pink-500' },
-        { id: 'outline', label: 'Outline', icon: Layout, color: 'border-2 border-primary bg-background' },
-        { id: 'ghost', label: 'Ghost', icon: Eye, color: 'border-2 border-dashed border-muted' },
-        { id: 'image', label: 'Image', icon: ImageIcon, color: 'bg-muted' },
-      ].map((style) => (
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      {buttonStyleOptions.map((style) => (
         <button
           key={style.id}
           type="button"
           onClick={() => onChange(style.id)}
           className={cn(
-            "relative flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all",
+            "relative flex flex-col items-center gap-2.5 p-3 rounded-2xl border transition-all duration-300 group",
             value === style.id
-              ? 'border-primary bg-primary/5 shadow-md scale-[1.02]'
-              : 'border-muted hover:border-primary/30 hover:bg-muted/30'
+              ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-500/10 shadow-[0_0_0_1px_rgba(59,130,246,0.5)]'
+              : 'border-black/[0.06] dark:border-white/[0.06] bg-white dark:bg-zinc-900 hover:border-black/[0.12] dark:hover:border-white/[0.12] hover:bg-zinc-50 dark:hover:bg-zinc-800'
           )}
         >
           {style.id === 'image' && imageUrl ? (
-            <img src={imageUrl} alt="Preview" className="w-10 h-10 rounded-lg object-cover" />
+            <div className="w-10 h-10 rounded-full overflow-hidden shadow-sm border border-black/5 ring-2 ring-white">
+              <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+            </div>
           ) : (
-            <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", style.color)}>
-               <style.icon className={cn("h-5 w-5", style.id === 'outline' || style.id === 'ghost' ? 'text-primary' : 'text-white')} />
+            <div className={cn(
+              "w-10 h-10 rounded-full flex items-center justify-center shadow-sm transition-transform group-hover:scale-110", 
+              style.color,
+              style.id === 'glass' && "bg-white/40 dark:bg-white/10 backdrop-blur-md"
+            )}>
+               <style.icon className={cn(
+                 "h-5 w-5", 
+                 (style.id === 'outline' || style.id === 'ghost' || style.id === 'glass') ? 'text-blue-500' : 'text-white'
+               )} />
             </div>
           )}
-          <div className="text-center">
-            <p className="text-xs font-bold">{style.label}</p>
-          </div>
+          <span className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">{style.label}</span>
           {value === style.id && (
-            <div className="absolute -top-2 -right-2 bg-primary text-white rounded-full p-1 shadow-lg">
-              <Check className="h-3 w-3" />
+            <div className="absolute top-1.5 right-1.5">
+              <div className="bg-blue-500 text-white rounded-full p-0.5 shadow-md">
+                <Check className="h-3 w-3 stroke-[3]" />
+              </div>
             </div>
           )}
         </button>
@@ -213,17 +228,17 @@ function ButtonPreview({
 
   const getSizeClasses = (s: string) => {
     switch (s) {
-      case 'sm': return 'px-3 py-1.5 text-xs h-8';
-      case 'md': return 'px-4 py-2 text-sm h-10';
-      case 'lg': return 'px-6 py-3 text-base h-12';
-      case 'xl': return 'px-8 py-4 text-lg h-14';
-      default: return 'px-4 py-2 text-sm h-10';
+      case 'sm': return 'px-3 py-1.5 text-xs h-9';
+      case 'md': return 'px-5 py-2.5 text-sm h-11';
+      case 'lg': return 'px-7 py-3.5 text-base h-13';
+      case 'xl': return 'px-9 py-4.5 text-lg h-15';
+      default: return 'px-5 py-2.5 text-sm h-11';
     }
   };
 
   const getShapeClass = (sh: string) => {
     const found = buttonShapes.find(s => s.name === sh);
-    return found ? found.class : 'rounded-md';
+    return found ? found.class : 'rounded-[12px]';
   };
 
   const getShadowClass = (shd: string) => {
@@ -251,13 +266,20 @@ function ButtonPreview({
       return {
         backgroundColor: 'transparent',
         color: settings[`${prefix}Color`],
-        border: `2px solid ${settings[`${prefix}Color`]}`,
+        border: `1.5px solid ${settings[`${prefix}Color`]}`,
       };
     } else if (style === 'ghost') {
       return {
         backgroundColor: 'transparent',
         color: settings[`${prefix}Color`],
         border: 'none',
+      };
+    } else if (style === 'glass') {
+      return {
+        backgroundColor: 'rgba(255, 255, 255, 0.4)',
+        backdropFilter: 'blur(12px)',
+        color: settings[`${prefix}Color`],
+        border: '1px solid rgba(255, 255, 255, 0.5)',
       };
     }
     return {
@@ -273,13 +295,19 @@ function ButtonPreview({
   const Icon = iconMap[settings[`${prefix}Icon`] || 'ShoppingCart'];
 
   return (
-    <div className="flex items-center justify-center p-12 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-slate-50 dark:bg-slate-900/50 rounded-2xl border-2 border-dashed border-muted-foreground/20">
+    <div className="flex items-center justify-center p-16 bg-[#F2F2F7] dark:bg-zinc-950 rounded-[32px] border border-black/[0.04] dark:border-white/[0.04] shadow-inner relative overflow-hidden group">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05),transparent)] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
       <Button
         type="button"
-        className={cn(getSizeClasses(size), getShapeClass(shape), getShadowClass(shadow), "font-bold transition-all duration-300 transform hover:scale-105 active:scale-95")}
+        className={cn(
+          getSizeClasses(size), 
+          getShapeClass(shape), 
+          getShadowClass(shadow), 
+          "font-bold transition-all duration-500 transform hover:scale-[1.03] active:scale-[0.97] flex items-center gap-2"
+        )}
         style={getStyleProperties()}
       >
-        {Icon && <Icon className="mr-2 h-5 w-5" />}
+        {Icon && <Icon className="h-[1.2em] w-[1.2em]" />}
         {text}
       </Button>
     </div>
@@ -476,9 +504,15 @@ export default function ButtonUIStylePage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <PageHeader icon={MousePointerClick} title="Button UI/Style" description="Loading..." />
-        <Skeleton className="h-[800px] w-full" />
+      <div className="space-y-8 p-6 lg:p-10 bg-[#F5F5F7] min-h-screen">
+        <div className="space-y-4">
+          <Skeleton className="h-10 w-64 rounded-xl" />
+          <Skeleton className="h-6 w-96 rounded-lg" />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <Skeleton className="h-[600px] w-full rounded-[32px]" />
+          <Skeleton className="h-[600px] w-full rounded-[32px]" />
+        </div>
       </div>
     );
   }
@@ -497,297 +531,330 @@ export default function ButtonUIStylePage() {
     const imageUrlValue = form.watch(`${prefix}ImageUrl` as any);
 
     return (
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-        <div className="space-y-6">
-          <Card className="border-none shadow-lg bg-gradient-to-br from-background to-muted/20">
-            <CardHeader>
-              <CardTitle className="text-xl flex items-center gap-2">
-                <Type className="h-5 w-5 text-primary" /> Content & Icon
-              </CardTitle>
-              <CardDescription>Customize what your button says and its icon.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name={`${prefix}Text` as any}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="font-bold">Button Label</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., Buy Now" {...field} className="bg-background/50" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name={`${prefix}Icon` as any}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="font-bold">Button Icon</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="bg-background/50">
-                            <SelectValue placeholder="Select icon" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {iconOptions.map(opt => (
-                            <SelectItem key={opt.name} value={opt.name}>
-                              <div className="flex items-center gap-2">
-                                <opt.icon className="h-4 w-4" />
-                                {opt.name}
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
+        <div className="space-y-8">
+          <section className="space-y-6">
+            <div className="flex items-center gap-3 px-1">
+              <div className="w-10 h-10 rounded-2xl bg-white shadow-sm border border-black/5 flex items-center justify-center">
+                <Type className="h-5 w-5 text-blue-500" />
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-none shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-xl flex items-center gap-2">
-                <Brush className="h-5 w-5 text-primary" /> Visual Style
-              </CardTitle>
-              <CardDescription>Choose the look and feel of the button background.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
+              <div>
+                <h3 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Content & Icon</h3>
+                <p className="text-xs text-zinc-500">How the button speaks to your customers.</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <FormField
                 control={form.control}
-                name={`${prefix}Style` as any}
+                name={`${prefix}Text` as any}
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-bold">Background Style</FormLabel>
-                    <ButtonStyleSelector
-                      value={field.value}
-                      onChange={field.onChange}
-                      imageUrl={imageUrlValue}
-                    />
+                  <FormItem className="space-y-2">
+                    <FormLabel className="text-[13px] font-semibold text-zinc-700 dark:text-zinc-300 ml-1">Button Label</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="e.g., Buy Now" 
+                        {...field} 
+                        className="h-12 rounded-2xl border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-zinc-900 shadow-sm focus:ring-2 focus:ring-blue-500/20 transition-all" 
+                      />
+                    </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
-
-              {styleValue === 'standard' || styleValue === 'outline' || styleValue === 'ghost' ? (
-                <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                  <FormField
-                    control={form.control}
-                    name={`${prefix}Color` as any}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="font-bold">Button Color</FormLabel>
-                        <div className="flex items-center gap-4">
-                          <FormControl>
-                            <Input type="color" {...field} className="p-1 h-12 w-20 cursor-pointer rounded-xl border-2" />
-                          </FormControl>
-                          <div className="flex-1">
-                            <Input value={field.value} onChange={field.onChange} className="font-mono bg-background/50" />
-                          </div>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              ) : styleValue === 'gradient' ? (
-                <div className="animate-in fade-in slide-in-from-top-2 duration-300 grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name={`${prefix}GradientStart` as any}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="font-bold">Start Color</FormLabel>
-                        <FormControl>
-                          <Input type="color" {...field} className="p-1 h-12 w-full cursor-pointer rounded-xl border-2" />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`${prefix}GradientEnd` as any}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="font-bold">End Color</FormLabel>
-                        <FormControl>
-                          <Input type="color" {...field} className="p-1 h-12 w-full cursor-pointer rounded-xl border-2" />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              ) : styleValue === 'image' ? (
-                <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                  <FormField
-                    control={form.control}
-                    name={`${prefix}ImageUrl` as any}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="font-bold">Background Image</FormLabel>
-                        <div className="flex gap-4 items-center">
-                          {imageUrlValue ? (
-                            <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-2 border-primary shadow-lg group">
-                              <img src={imageUrlValue} alt="Preview" className="w-full h-full object-cover" />
-                              <button
-                                type="button"
-                                className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                                onClick={() => field.onChange('')}
-                              >
-                                <X className="h-6 w-6 text-white" />
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="w-24 h-24 rounded-2xl border-2 border-dashed border-primary/30 flex items-center justify-center bg-primary/5">
-                              <ImageIcon className="h-8 w-8 text-primary/30" />
-                            </div>
-                          )}
-                          <div className="flex-1 space-y-2">
-                             <Button
-                                asChild
-                                variant="outline"
-                                disabled={isUploading}
-                                className="w-full h-12 rounded-xl"
-                              >
-                                <label className="cursor-pointer">
-                                  {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-                                  Upload Texture/Image
-                                  <input 
-                                    type="file" 
-                                    className="hidden" 
-                                    accept="image/*" 
-                                    onChange={(e) => handleImageUpload(prefix, e)}
-                                    disabled={isUploading}
-                                  />
-                                </label>
-                              </Button>
-                              <p className="text-xs text-muted-foreground text-center">Transparent PNGs work best for textures.</p>
-                          </div>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              ) : null}
-            </CardContent>
-          </Card>
-
-          <Card className="border-none shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-xl flex items-center gap-2">
-                <Palette className="h-5 w-5 text-primary" /> Shape & Shadow
-              </CardTitle>
-              <CardDescription>Adjust the geometry and depth of the button.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
               <FormField
                 control={form.control}
-                name={`${prefix}Shape` as any}
+                name={`${prefix}Icon` as any}
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-bold">Button Shape</FormLabel>
-                    <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
-                      {buttonShapes.map((shape) => (
-                        <button
-                          key={shape.name}
-                          type="button"
-                          onClick={() => field.onChange(shape.name)}
-                          className={cn(
-                            "relative flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all",
-                            field.value === shape.name
-                              ? 'border-primary bg-primary/5 shadow-inner'
-                              : 'border-muted hover:border-primary/30 hover:bg-muted/30'
-                          )}
-                        >
-                          <div className={cn("w-full h-8 bg-primary/20 border border-primary/40", shape.class)} />
-                          <p className="text-[10px] font-bold">{shape.label}</p>
-                          {field.value === shape.name && (
-                            <Check className="absolute top-1 right-1 h-3 w-3 text-primary" />
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`${prefix}Shadow` as any}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-bold">Elevation (Shadow)</FormLabel>
-                    <div className="grid grid-cols-4 lg:grid-cols-7 gap-2">
-                      {shadowOptions.map((shadow) => (
-                        <button
-                          key={shadow.name}
-                          type="button"
-                          onClick={() => field.onChange(shadow.name)}
-                          className={cn(
-                            "relative flex flex-col items-center gap-2 p-2 rounded-lg border-2 transition-all",
-                            field.value === shadow.name
-                              ? 'border-primary bg-primary/5'
-                              : 'border-muted hover:border-primary/30 hover:bg-muted/30'
-                          )}
-                        >
-                          <div className={cn("w-full h-4 bg-background border border-muted", shadow.class)} />
-                          <p className="text-[8px] font-bold truncate w-full text-center">{shadow.label}</p>
-                        </button>
-                      ))}
-                    </div>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`${prefix}Size` as any}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-bold">Button Size</FormLabel>
+                  <FormItem className="space-y-2">
+                    <FormLabel className="text-[13px] font-semibold text-zinc-700 dark:text-zinc-300 ml-1">Icon Type</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger className="h-12 rounded-xl bg-background/50">
-                          <SelectValue placeholder="Select size" />
+                        <SelectTrigger className="h-12 rounded-2xl border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-zinc-900 shadow-sm">
+                          <SelectValue placeholder="Select icon" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
-                        {buttonSizes.map(size => (
-                          <SelectItem key={size.name} value={size.name}>
-                            <div className="flex flex-col">
-                              <span className="font-bold">{size.label}</span>
-                              <span className="text-[10px] text-muted-foreground">{size.description}</span>
+                      <SelectContent className="rounded-2xl border-black/[0.08] shadow-2xl">
+                        {iconOptions.map(opt => (
+                          <SelectItem key={opt.name} value={opt.name} className="rounded-xl">
+                            <div className="flex items-center gap-2.5 py-0.5">
+                              <opt.icon className="h-4 w-4 text-blue-500" />
+                              <span className="font-medium text-zinc-700 dark:text-zinc-300">{opt.name}</span>
                             </div>
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
-            </CardContent>
-          </Card>
+            </div>
+          </section>
+
+          <Separator className="bg-black/[0.05] dark:bg-white/[0.05]" />
+
+          <section className="space-y-6">
+            <div className="flex items-center gap-3 px-1">
+              <div className="w-10 h-10 rounded-2xl bg-white shadow-sm border border-black/5 flex items-center justify-center">
+                <Brush className="h-5 w-5 text-blue-500" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Visual Style</h3>
+                <p className="text-xs text-zinc-500">The overall aesthetic and presence.</p>
+              </div>
+            </div>
+
+            <FormField
+              control={form.control}
+              name={`${prefix}Style` as any}
+              render={({ field }) => (
+                <FormItem className="space-y-4">
+                  <FormLabel className="text-[13px] font-semibold text-zinc-700 dark:text-zinc-300 ml-1">Preset Style</FormLabel>
+                  <ButtonStyleSelector
+                    value={field.value}
+                    onChange={field.onChange}
+                    imageUrl={imageUrlValue}
+                  />
+                </FormItem>
+              )}
+            />
+
+            {(styleValue === 'standard' || styleValue === 'outline' || styleValue === 'ghost' || styleValue === 'glass') && (
+              <div className="animate-in fade-in slide-in-from-top-4 duration-500">
+                <FormField
+                  control={form.control}
+                  name={`${prefix}Color` as any}
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel className="text-[13px] font-semibold text-zinc-700 dark:text-zinc-300 ml-1">Accent Color</FormLabel>
+                      <div className="flex items-center gap-4">
+                        <FormControl>
+                          <div className="relative group">
+                            <Input 
+                              type="color" 
+                              {...field} 
+                              className="p-0 h-14 w-14 cursor-pointer rounded-2xl border-2 border-white shadow-md group-hover:scale-105 transition-transform overflow-hidden" 
+                            />
+                            <div className="absolute inset-0 rounded-2xl pointer-events-none ring-1 ring-inset ring-black/5" />
+                          </div>
+                        </FormControl>
+                        <div className="flex-1">
+                          <Input 
+                            value={field.value} 
+                            onChange={field.onChange} 
+                            className="h-12 rounded-2xl font-mono text-sm border-black/[0.08] bg-white shadow-sm" 
+                          />
+                        </div>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
+
+            {styleValue === 'gradient' && (
+              <div className="animate-in fade-in slide-in-from-top-4 duration-500 grid grid-cols-2 gap-5">
+                <FormField
+                  control={form.control}
+                  name={`${prefix}GradientStart` as any}
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel className="text-[13px] font-semibold text-zinc-700 dark:text-zinc-300 ml-1">Start Color</FormLabel>
+                      <FormControl>
+                        <Input type="color" {...field} className="p-0 h-14 w-full cursor-pointer rounded-2xl border-2 border-white shadow-md" />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`${prefix}GradientEnd` as any}
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel className="text-[13px] font-semibold text-zinc-700 dark:text-zinc-300 ml-1">End Color</FormLabel>
+                      <FormControl>
+                        <Input type="color" {...field} className="p-0 h-14 w-full cursor-pointer rounded-2xl border-2 border-white shadow-md" />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
+
+            {styleValue === 'image' && (
+              <div className="animate-in fade-in slide-in-from-top-4 duration-500">
+                <FormField
+                  control={form.control}
+                  name={`${prefix}ImageUrl` as any}
+                  render={({ field }) => (
+                    <FormItem className="space-y-4">
+                      <FormLabel className="text-[13px] font-semibold text-zinc-700 dark:text-zinc-300 ml-1">Background Image</FormLabel>
+                      <div className="flex gap-6 items-center p-5 rounded-3xl bg-zinc-50 dark:bg-zinc-800/50 border border-dashed border-zinc-200 dark:border-zinc-700">
+                        {imageUrlValue ? (
+                          <div className="relative w-28 h-28 rounded-2xl overflow-hidden border border-black/5 shadow-lg group shrink-0">
+                            <img src={imageUrlValue} alt="Preview" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                            <button
+                              type="button"
+                              className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={() => field.onChange('')}
+                            >
+                              <X className="h-6 w-6 text-white" />
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="w-28 h-28 rounded-2xl border-2 border-dashed border-zinc-300 flex flex-col items-center justify-center bg-white shadow-inner shrink-0">
+                            <ImageIcon className="h-8 w-8 text-zinc-300" />
+                          </div>
+                        )}
+                        <div className="flex-1 space-y-3">
+                           <Button
+                              asChild
+                              variant="outline"
+                              disabled={isUploading}
+                              className="w-full h-12 rounded-2xl border-zinc-200 bg-white hover:bg-zinc-50 shadow-sm"
+                            >
+                              <label className="cursor-pointer">
+                                {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin text-blue-500" /> : <Upload className="mr-2 h-4 w-4 text-blue-500" />}
+                                <span className="font-bold">Choose Image</span>
+                                <input 
+                                  type="file" 
+                                  className="hidden" 
+                                  accept="image/*" 
+                                  onChange={(e) => handleImageUpload(prefix, e)}
+                                  disabled={isUploading}
+                                />
+                              </label>
+                            </Button>
+                            <p className="text-[10px] text-zinc-400 font-medium leading-relaxed">
+                              Transparent PNGs work best for textures. Max 5MB.
+                            </p>
+                        </div>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
+          </section>
+
+          <Separator className="bg-black/[0.05] dark:bg-white/[0.05]" />
+
+          <section className="space-y-6">
+            <div className="flex items-center gap-3 px-1">
+              <div className="w-10 h-10 rounded-2xl bg-white shadow-sm border border-black/5 flex items-center justify-center">
+                <Shapes className="h-5 w-5 text-blue-500" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Shape & Depth</h3>
+                <p className="text-xs text-zinc-500">Geometry and elevation settings.</p>
+              </div>
+            </div>
+
+            <FormField
+              control={form.control}
+              name={`${prefix}Shape` as any}
+              render={({ field }) => (
+                <FormItem className="space-y-4">
+                  <FormLabel className="text-[13px] font-semibold text-zinc-700 dark:text-zinc-300 ml-1">Corner Rounding</FormLabel>
+                  <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+                    {buttonShapes.map((shape) => (
+                      <button
+                        key={shape.name}
+                        type="button"
+                        onClick={() => field.onChange(shape.name)}
+                        className={cn(
+                          "relative flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all duration-300",
+                          field.value === shape.name
+                            ? 'border-blue-500 bg-blue-50/50 shadow-sm'
+                            : 'border-black/[0.06] bg-white hover:bg-zinc-50'
+                        )}
+                      >
+                        <div className={cn("w-full h-8 bg-zinc-200 border border-black/5", shape.class)} />
+                        <p className="text-[10px] font-bold text-zinc-600">{shape.label}</p>
+                        {field.value === shape.name && (
+                          <div className="absolute top-1 right-1">
+                            <Check className="h-2.5 w-2.5 text-blue-500 stroke-[3]" />
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name={`${prefix}Shadow` as any}
+              render={({ field }) => (
+                <FormItem className="space-y-4">
+                  <FormLabel className="text-[13px] font-semibold text-zinc-700 dark:text-zinc-300 ml-1">Elevation</FormLabel>
+                  <div className="grid grid-cols-4 lg:grid-cols-7 gap-3">
+                    {shadowOptions.map((shadow) => (
+                      <button
+                        key={shadow.name}
+                        type="button"
+                        onClick={() => field.onChange(shadow.name)}
+                        className={cn(
+                          "relative flex flex-col items-center gap-2 p-2 rounded-2xl border transition-all duration-300",
+                          field.value === shadow.name
+                            ? 'border-blue-500 bg-blue-50/50 shadow-sm'
+                            : 'border-black/[0.06] bg-white hover:bg-zinc-50'
+                        )}
+                      >
+                        <div className={cn("w-full h-4 bg-white border border-black/5", shadow.class)} />
+                        <p className="text-[9px] font-bold truncate w-full text-center text-zinc-500">{shadow.label}</p>
+                      </button>
+                    ))}
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name={`${prefix}Size` as any}
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <FormLabel className="text-[13px] font-semibold text-zinc-700 dark:text-zinc-300 ml-1">Button Size</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="h-12 rounded-2xl border-black/[0.08] bg-white shadow-sm">
+                        <SelectValue placeholder="Select size" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="rounded-2xl">
+                      {buttonSizes.map(size => (
+                        <SelectItem key={size.name} value={size.name} className="rounded-xl">
+                          <div className="flex flex-col py-0.5">
+                            <span className="font-bold text-zinc-800">{size.label}</span>
+                            <span className="text-[10px] text-zinc-400 font-medium">{size.description}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+          </section>
         </div>
 
-        <div className="space-y-6">
-          <Card className="sticky top-6 border-none shadow-2xl overflow-hidden">
-            <CardHeader className="bg-primary/5 border-b border-primary/10">
+        <div className="space-y-8">
+          <Card className="sticky top-10 border-none rounded-[40px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] overflow-hidden bg-white/70 backdrop-blur-3xl ring-1 ring-black/[0.05]">
+            <CardHeader className="bg-zinc-50/50 border-b border-black/[0.04] px-8 py-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <Eye className="h-5 w-5 text-primary" /> Live Preview
-                  </CardTitle>
-                  <CardDescription>Real-time look on the storefront.</CardDescription>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
+                    <Eye className="h-5 w-5 text-blue-500" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl font-bold tracking-tight">Live Preview</CardTitle>
+                    <CardDescription className="text-xs font-medium">Real-time storefront visualization.</CardDescription>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1 bg-muted p-1 rounded-lg">
+                <div className="flex items-center gap-1.5 bg-zinc-200/50 p-1.5 rounded-2xl border border-black/5">
                   {[
                     { id: 'mobile', icon: Smartphone },
                     { id: 'tablet', icon: Tablet },
@@ -797,8 +864,10 @@ export default function ButtonUIStylePage() {
                       key={device.id}
                       onClick={() => setPreviewDevice(device.id as any)}
                       className={cn(
-                        "p-2 rounded-md transition-all",
-                        previewDevice === device.id ? "bg-background shadow-sm text-primary" : "text-muted-foreground"
+                        "p-2.5 rounded-[12px] transition-all duration-300",
+                        previewDevice === device.id 
+                          ? "bg-white shadow-sm text-blue-500 scale-105" 
+                          : "text-zinc-400 hover:text-zinc-600 hover:bg-white/50"
                       )}
                     >
                       <device.icon className="h-4 w-4" />
@@ -807,24 +876,32 @@ export default function ButtonUIStylePage() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-8 flex flex-col items-center">
+            <CardContent className="p-10 flex flex-col items-center">
               <div className={cn(
-                "transition-all duration-500 w-full flex flex-col items-center",
+                "transition-all duration-1000 ease-in-out w-full flex flex-col items-center",
                 previewDevice === 'mobile' ? "max-w-[320px]" : previewDevice === 'tablet' ? "max-w-[600px]" : "max-w-full"
               )}>
-                 <ButtonPreview settings={form.watch()} type={type} />
-                 
-                 <div className="mt-8 w-full space-y-4">
-                    <div className="h-4 w-3/4 bg-muted rounded-full animate-pulse" />
-                    <div className="h-4 w-full bg-muted/50 rounded-full animate-pulse" />
-                    <div className="h-4 w-1/2 bg-muted/30 rounded-full animate-pulse" />
+                 <div className="w-full relative">
+                    <ButtonPreview settings={form.watch()} type={type} />
+                    <div className="mt-12 w-full space-y-6 px-4">
+                      <div className="flex items-center gap-4">
+                        <div className="h-10 w-10 bg-zinc-100 rounded-full animate-pulse shrink-0" />
+                        <div className="h-4 w-1/2 bg-zinc-100 rounded-full animate-pulse" />
+                      </div>
+                      <div className="space-y-3">
+                        <div className="h-3 w-full bg-zinc-50 rounded-full animate-pulse" />
+                        <div className="h-3 w-3/4 bg-zinc-50 rounded-full animate-pulse" />
+                        <div className="h-3 w-1/2 bg-zinc-50 rounded-full animate-pulse opacity-50" />
+                      </div>
+                    </div>
                  </div>
               </div>
             </CardContent>
-            <CardFooter className="bg-muted/30 border-t p-4 justify-center">
-               <p className="text-xs text-muted-foreground flex items-center gap-2">
-                 <Sparkles className="h-3 w-3 text-primary" /> Changes apply instantly to this preview.
-               </p>
+            <CardFooter className="bg-zinc-50/30 border-t border-black/[0.04] p-6 justify-center">
+               <div className="flex items-center gap-2 py-1 px-4 rounded-full bg-blue-500/5 border border-blue-500/10">
+                 <Sparkles className="h-3 w-3 text-blue-500 animate-pulse" />
+                 <p className="text-[11px] font-bold text-blue-600/70 tracking-wide uppercase">Interactive Design Engine</p>
+               </div>
             </CardFooter>
           </Card>
         </div>
@@ -833,125 +910,133 @@ export default function ButtonUIStylePage() {
   };
 
   return (
-    <div className="space-y-6 pb-20">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <PageHeader
-          icon={MousePointerClick}
-          title="Button UI/Style Designer"
-          description="Design high-converting buttons for your shopping experience"
-        />
-        <div className="flex gap-3">
-           <Button
-              variant="outline"
-              onClick={() => form.reset()}
-              disabled={isSaving}
-              className="gap-2 rounded-xl"
-            >
-              <RotateCcw className="h-4 w-4" /> Reset
-            </Button>
-            <Button
-              onClick={form.handleSubmit(onSubmit)}
-              disabled={isSaving}
-              className="gap-2 min-w-[150px] rounded-xl shadow-lg shadow-primary/20"
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Saving...</span>
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4" />
-                  <span>Save Config</span>
-                </>
-              )}
-            </Button>
-        </div>
-      </div>
-
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <Card className="border-none shadow-lg bg-primary/5 overflow-hidden">
-            <CardContent className="p-6">
-               <FormField
-                  control={form.control}
-                  name="useIndividualBtnSettings"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between">
-                      <div className="space-y-1">
-                        <FormLabel className="text-lg font-bold">Individual Button Customization</FormLabel>
-                        <FormDescription className="text-sm">
-                          When enabled, you can style each button location uniquely. 
-                          Disabling this will use global theme settings.
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch 
-                          checked={field.value} 
-                          onCheckedChange={field.onChange} 
-                          disabled={isSaving} 
-                          className="data-[state=checked]:bg-primary"
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-            </CardContent>
-          </Card>
-
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 h-auto p-1.5 bg-muted/50 rounded-2xl border border-primary/5">
-              <TabsTrigger 
-                value="addToCart" 
-                className="rounded-xl py-4 flex items-center gap-2 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
-              >
-                <ShoppingBag className="h-4 w-4" />
-                <span className="hidden sm:inline">Product Page (Add to Cart)</span>
-                <span className="sm:hidden">Product Page</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="gridCart" 
-                className="rounded-xl py-4 flex items-center gap-2 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
-              >
-                <Layout className="h-4 w-4" />
-                <span className="hidden sm:inline">Product Grid (Card Button)</span>
-                <span className="sm:hidden">Grid Card</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="heroBtn" 
-                className="rounded-xl py-4 flex items-center gap-2 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
-              >
-                <Zap className="h-4 w-4" />
-                <span className="hidden sm:inline">Hero/Banner Button</span>
-                <span className="sm:hidden">Hero Btn</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="exploreBtn" 
-                className="rounded-xl py-4 flex items-center gap-2 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
-              >
-                <MousePointerClick className="h-4 w-4" />
-                <span className="hidden sm:inline">Explore Section Button</span>
-                <span className="sm:hidden">Explore</span>
-              </TabsTrigger>
-            </TabsList>
-
-            <div className="mt-8">
-              <TabsContent value="addToCart" className="focus-visible:outline-none">
-                {renderButtonSettings('addToCart')}
-              </TabsContent>
-              <TabsContent value="gridCart" className="focus-visible:outline-none">
-                {renderButtonSettings('gridCart')}
-              </TabsContent>
-              <TabsContent value="heroBtn" className="focus-visible:outline-none">
-                {renderButtonSettings('heroBtn')}
-              </TabsContent>
-              <TabsContent value="exploreBtn" className="focus-visible:outline-none">
-                {renderButtonSettings('exploreBtn')}
-              </TabsContent>
+    <div className="min-h-screen bg-[#F5F5F7] pb-24">
+      <div className="max-w-[1600px] mx-auto px-6 lg:px-10 py-10 space-y-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+          <div className="space-y-4">
+            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white shadow-sm border border-black/5">
+              <MousePointerClick className="h-4 w-4 text-blue-500" />
+              <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Experience Designer</span>
             </div>
-          </Tabs>
-        </form>
-      </Form>
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tighter text-zinc-900 leading-tight">
+              Button Style <span className="text-blue-500">Interface</span>
+            </h1>
+            <p className="text-lg text-zinc-500 font-medium max-w-2xl leading-relaxed">
+              Craft high-conversion touchpoints with Apple-inspired design precision. Every pixel matters.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-4">
+             <Button
+                variant="ghost"
+                onClick={() => form.reset()}
+                disabled={isSaving}
+                className="h-14 px-8 rounded-3xl font-bold text-zinc-500 hover:text-zinc-900 hover:bg-white/50 transition-all"
+              >
+                <RotateCcw className="mr-2 h-4 w-4" /> Reset
+              </Button>
+              <Button
+                onClick={form.handleSubmit(onSubmit)}
+                disabled={isSaving}
+                className="h-14 px-10 rounded-3xl bg-blue-500 hover:bg-blue-600 text-white font-bold shadow-[0_20px_40px_-10px_rgba(59,130,246,0.4)] transition-all active:scale-95 group"
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    <span>Syncing...</span>
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
+                    <span>Save Configuration</span>
+                  </>
+                )}
+              </Button>
+          </div>
+        </div>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-12">
+            <Card className="border-none rounded-[32px] shadow-sm bg-white ring-1 ring-black/[0.05] overflow-hidden group hover:shadow-md transition-shadow duration-500">
+              <CardContent className="p-8">
+                 <FormField
+                    control={form.control}
+                    name="useIndividualBtnSettings"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between gap-10">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-3">
+                            <FormLabel className="text-xl font-bold tracking-tight">Granular Control</FormLabel>
+                            <div className="px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-500 text-[10px] font-black uppercase">Advanced</div>
+                          </div>
+                          <FormDescription className="text-sm font-medium text-zinc-400 max-w-xl">
+                            Enable individual customization for each button location. When off, the global theme overrides these settings.
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch 
+                            checked={field.value} 
+                            onCheckedChange={field.onChange} 
+                            disabled={isSaving} 
+                            className="scale-125 data-[state=checked]:bg-blue-500"
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+              </CardContent>
+            </Card>
+
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-10">
+              <TabsList className="flex w-full h-auto p-1.5 bg-zinc-200/50 dark:bg-zinc-800/50 rounded-[28px] border border-black/[0.03] overflow-x-auto scrollbar-hide">
+                <TabsTrigger 
+                  value="addToCart" 
+                  className="flex-1 rounded-[22px] py-5 px-6 flex items-center justify-center gap-3 transition-all duration-500 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.08)] data-[state=active]:scale-[1.02] text-zinc-500 font-bold text-sm whitespace-nowrap"
+                >
+                  <ShoppingBag className="h-4 w-4" />
+                  <span>Product Page</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="gridCart" 
+                  className="flex-1 rounded-[22px] py-5 px-6 flex items-center justify-center gap-3 transition-all duration-500 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.08)] data-[state=active]:scale-[1.02] text-zinc-500 font-bold text-sm whitespace-nowrap"
+                >
+                  <Box className="h-4 w-4" />
+                  <span>Product Card</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="heroBtn" 
+                  className="flex-1 rounded-[22px] py-5 px-6 flex items-center justify-center gap-3 transition-all duration-500 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.08)] data-[state=active]:scale-[1.02] text-zinc-500 font-bold text-sm whitespace-nowrap"
+                >
+                  <Zap className="h-4 w-4" />
+                  <span>Hero/Banner</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="exploreBtn" 
+                  className="flex-1 rounded-[22px] py-5 px-6 flex items-center justify-center gap-3 transition-all duration-500 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.08)] data-[state=active]:scale-[1.02] text-zinc-500 font-bold text-sm whitespace-nowrap"
+                >
+                  <Maximize className="h-4 w-4" />
+                  <span>Explore View</span>
+                </TabsTrigger>
+              </TabsList>
+
+              <div className="focus-visible:outline-none">
+                <TabsContent value="addToCart" className="m-0 focus-visible:outline-none">
+                  {renderButtonSettings('addToCart')}
+                </TabsContent>
+                <TabsContent value="gridCart" className="m-0 focus-visible:outline-none">
+                  {renderButtonSettings('gridCart')}
+                </TabsContent>
+                <TabsContent value="heroBtn" className="m-0 focus-visible:outline-none">
+                  {renderButtonSettings('heroBtn')}
+                </TabsContent>
+                <TabsContent value="exploreBtn" className="m-0 focus-visible:outline-none">
+                  {renderButtonSettings('exploreBtn')}
+                </TabsContent>
+              </div>
+            </Tabs>
+          </form>
+        </Form>
+      </div>
     </div>
   );
 }

@@ -217,6 +217,14 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
             color: settings?.storeGridCartColor || '#10b981',
             border: 'none'
         };
+    } else if (style === 'glass') {
+        return {
+            backgroundColor: 'rgba(255, 255, 255, 0.4)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            color: settings?.storeGridCartColor || '#10b981',
+            border: '1px solid rgba(255, 255, 255, 0.5)'
+        };
     }
 
     return {

@@ -278,6 +278,14 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                 color: settings?.storeAddToCartColor || '#3b82f6',
                 border: 'none'
             };
+        } else if (style === 'glass') {
+            return {
+                backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                color: settings?.storeAddToCartColor || '#3b82f6',
+                border: '1px solid rgba(255, 255, 255, 0.5)'
+            };
         }
 
         return {
