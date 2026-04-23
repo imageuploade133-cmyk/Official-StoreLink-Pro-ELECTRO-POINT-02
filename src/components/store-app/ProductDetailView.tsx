@@ -700,10 +700,10 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                     </button>
                     {!isOutOfStock ? (
                         <div className="flex-1 flex gap-2">
-                            <div className="flex items-center bg-gradient-to-r from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/15 rounded-2xl p-1.5 border-2 border-primary/30 dark:border-primary/40">
-                                <button onClick={() => setDetailQty(Math.max(1, detailQty - 1))} className="w-9 h-9 flex items-center justify-center text-primary dark:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-xl transition-all"><Minus className="h-4 w-4 font-bold" /></button>
-                                <span className="w-8 text-center font-black text-base text-primary dark:text-primary">{detailQty}</span>
-                                <button onClick={() => setDetailQty(Math.min(product.stock, detailQty + 1))} className="w-9 h-9 flex items-center justify-center text-primary dark:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-xl transition-all"><Plus className="h-4 w-4 font-bold" /></button>
+                            <div className="flex items-center bg-gradient-to-r from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/15 rounded-2xl p-1.5 border-2 border-primary/30 dark:border-primary/40 gap-1">
+                                <button onClick={() => setDetailQty(Math.max(1, detailQty - 1))} className="w-9 h-9 flex items-center justify-center bg-gradient-to-br from-rose-500 to-red-600 dark:from-rose-600 dark:to-red-700 text-white hover:shadow-lg dark:hover:shadow-rose-500/50 rounded-xl transition-all active:scale-90 font-bold"><Minus className="h-4 w-4 font-bold" /></button>
+                                <span className="flex-1 text-center font-black text-base text-primary dark:text-primary">{detailQty}</span>
+                                <button onClick={() => setDetailQty(Math.min(product.stock, detailQty + 1))} className="w-9 h-9 flex items-center justify-center bg-gradient-to-br from-emerald-500 to-green-600 dark:from-emerald-600 dark:to-green-700 text-white hover:shadow-lg dark:hover:shadow-emerald-500/50 rounded-xl transition-all active:scale-90 font-bold"><Plus className="h-4 w-4 font-bold" /></button>
                             </div>
                             <Button
                                 onClick={() => {
