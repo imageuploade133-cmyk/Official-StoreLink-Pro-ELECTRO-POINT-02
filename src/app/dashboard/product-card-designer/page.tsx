@@ -759,7 +759,7 @@ export default function ProductCardDesignerPage() {
               )}>
                 {/* Preview Grid */}
                 <div className={cn(
-                  'grid gap-4',
+                  'grid gap-6',
                   previewDevice === 'mobile' && 'grid-cols-2',
                   previewDevice === 'tablet' && 'grid-cols-3',
                   previewDevice === 'desktop' && 'grid-cols-2'
@@ -774,224 +774,49 @@ export default function ProductCardDesignerPage() {
                       settings={settings}
                     />
                   ) : (
-                    <div
-                      className={cn(
-                        'bg-white dark:bg-slate-800 overflow-hidden transition-all duration-300',
-                        borderRadiusClass,
-                        shadowClass,
-                        borderWidthClass,
-                        settings.productCardHoverEffect === 'lift' && 'hover:-translate-y-2',
-                        settings.productCardHoverEffect === 'glow' && 'hover:shadow-2xl hover:shadow-primary/20',
-                        settings.productCardHoverEffect === 'border' && 'hover:border-primary'
-                      )}
-                      style={{
-                        height: `${settings.productCardHeight}px`,
-                        borderColor: settings.productCardBorderColor,
-                        backgroundColor: settings.productCardBgColor,
-                      }}
-                    >
-                      {/* Image Area */}
-                      {settings.productCardShowImage && (
-                        <div className={cn(
-                          'relative overflow-hidden bg-slate-100 dark:bg-slate-700',
-                          settings.productCardImageRatio === 'square' && 'aspect-square',
-                          settings.productCardImageRatio === 'portrait' && 'aspect-[3/4]',
-                          settings.productCardImageRatio === 'landscape' && 'aspect-[4/3]'
-                        )}>
-                          <img
-                            src={sampleProduct.imageUrl}
-                            alt={sampleProduct.name}
-                            className={cn(
-                              'w-full h-full object-cover',
-                              settings.productCardHoverEffect === 'zoom' && 'hover:scale-110 transition-transform duration-500'
-                            )}
-                          />
-                          {/* Badges */}
-                          {settings.productCardShowBadges && (
-                            <div className="absolute top-3 left-3 flex flex-col gap-2">
-                              <Badge className="bg-blue-600 text-white text-[9px] uppercase">
-                                Official
-                              </Badge>
-                              <Badge className="bg-rose-500 text-white text-[9px] uppercase">
-                                -20%
-                              </Badge>
-                            </div>
-                          )}
-                          {/* Wishlist */}
-                          {settings.productCardShowWishlist && (
-                            <button className="absolute top-3 right-3 h-9 w-9 flex items-center justify-center rounded-full bg-white/90 dark:bg-slate-800/90 shadow-md">
-                              <Sparkles className="h-4 w-4 text-slate-400" />
-                            </button>
-                          )}
-                          {/* Quick Add */}
-                          {settings.productCardShowQuickAdd && (
-                            <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button size="sm" className="w-full text-xs">
-                                Add to Cart
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Content Area */}
-                      <div className="p-4 space-y-3">
-                        <p className="text-[10px] font-bold uppercase text-primary/60 tracking-wider">
-                          {sampleCategory.name}
-                        </p>
-                        <h3
-                          className={cn(
-                            'font-bold text-slate-900 dark:text-white leading-tight',
-                            settings.productCardTitleAlign === 'center' && 'text-center',
-                            settings.productCardTitleLines === 1 && 'line-clamp-1',
-                            settings.productCardTitleLines === 2 && 'line-clamp-2',
-                            settings.productCardTitleLines === 3 && 'line-clamp-3'
-                          )}
-                        >
-                          {sampleProduct.name}
-                        </h3>
-
-                        {/* Rating */}
-                        {settings.productCardShowRating && (
-                          <div className="flex items-center gap-1">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <Sparkles
-                                key={star}
-                                className={cn(
-                                  'h-3 w-3',
-                                  star <= 4 ? 'text-amber-400 fill-amber-400' : 'text-slate-300'
-                                )}
-                              />
-                            ))}
-                            <span className="text-xs text-slate-500 ml-1">(24)</span>
-                          </div>
-                        )}
-
-                        {/* Stock Bar */}
-                        {settings.productCardShowStockBar && (
-                          <div className="space-y-1">
-                            <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-green-500 rounded-full"
-                                style={{ width: '60%' }}
-                              />
-                            </div>
-                            <p className="text-[10px] text-slate-500">In Stock (15)</p>
-                          </div>
-                        )}
-
-                        {/* Price */}
-                        <div className={cn(
-                          'flex items-center gap-2',
-                          settings.productCardPriceAlign === 'center' && 'justify-center'
-                        )}>
-                          <span className="text-lg font-bold text-slate-900 dark:text-white">
-                            $299.99
-                          </span>
-                          <span className="text-xs text-slate-400 line-through">
-                            $399.99
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                    <ProductCard 
+                      product={sampleProduct}
+                      category={sampleCategory}
+                      currencySymbol="$"
+                      overrideSettings={settings}
+                    />
                   )}
 
                   {/* Preview Card 2 - Different Product */}
-                  <div
-                    className={cn(
-                      'bg-white dark:bg-slate-800 overflow-hidden transition-all duration-300',
-                      borderRadiusClass,
-                      shadowClass,
-                      borderWidthClass,
-                      settings.productCardHoverEffect === 'lift' && 'hover:-translate-y-2',
-                      settings.productCardHoverEffect === 'glow' && 'hover:shadow-2xl hover:shadow-primary/20',
-                      settings.productCardHoverEffect === 'border' && 'hover:border-primary'
-                    )}
-                    style={{
-                      height: `${settings.productCardHeight}px`,
-                      borderColor: settings.productCardBorderColor,
-                      backgroundColor: settings.productCardBgColor,
-                    }}
-                  >
-                    {settings.productCardShowImage && (
-                      <div className={cn(
-                        'relative overflow-hidden bg-slate-100 dark:bg-slate-700',
-                        settings.productCardImageRatio === 'square' && 'aspect-square',
-                        settings.productCardImageRatio === 'portrait' && 'aspect-[3/4]',
-                        settings.productCardImageRatio === 'landscape' && 'aspect-[4/3]'
-                      )}>
-                        <img
-                          src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=600&fit=crop"
-                          alt="Sample Product"
-                          className={cn(
-                            'w-full h-full object-cover',
-                            settings.productCardHoverEffect === 'zoom' && 'hover:scale-110 transition-transform duration-500'
-                          )}
-                        />
-                        {settings.productCardShowBadges && (
-                          <div className="absolute top-3 left-3">
-                            <Badge className="bg-indigo-500 text-white text-[9px] uppercase">
-                              New
-                            </Badge>
-                          </div>
-                        )}
-                        {settings.productCardShowWishlist && (
-                          <button className="absolute top-3 right-3 h-9 w-9 flex items-center justify-center rounded-full bg-white/90 dark:bg-slate-800/90 shadow-md">
-                            <Sparkles className="h-4 w-4 text-rose-500 fill-rose-500" />
-                          </button>
-                        )}
-                      </div>
-                    )}
-                    <div className="p-4 space-y-3">
-                      <p className="text-[10px] font-bold uppercase text-primary/60 tracking-wider">
-                        Footwear
-                      </p>
-                      <h3
-                        className={cn(
-                          'font-bold text-slate-900 dark:text-white leading-tight',
-                          settings.productCardTitleAlign === 'center' && 'text-center',
-                          settings.productCardTitleLines === 1 && 'line-clamp-1',
-                          settings.productCardTitleLines === 2 && 'line-clamp-2',
-                          settings.productCardTitleLines === 3 && 'line-clamp-3'
-                        )}
-                      >
-                        Red Nike Sneakers - Limited Edition 2024
-                      </h3>
-                      {settings.productCardShowRating && (
-                        <div className="flex items-center gap-1">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Sparkles
-                              key={star}
-                              className={cn(
-                                'h-3 w-3',
-                                star <= 5 ? 'text-amber-400 fill-amber-400' : 'text-slate-300'
-                              )}
-                            />
-                          ))}
-                          <span className="text-xs text-slate-500 ml-1">(156)</span>
-                        </div>
-                      )}
-                      {settings.productCardShowStockBar && (
-                        <div className="space-y-1">
-                          <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-amber-500 rounded-full"
-                              style={{ width: '25%' }}
-                            />
-                          </div>
-                          <p className="text-[10px] text-amber-600">Low Stock (3)</p>
-                        </div>
-                      )}
-                      <div className={cn(
-                        'flex items-center gap-2',
-                        settings.productCardPriceAlign === 'center' && 'justify-center'
-                      )}>
-                        <span className="text-lg font-bold text-slate-900 dark:text-white">
-                          $189.99
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+                  {settings.productCardStyle === 'custom' && settings.productCardCustomHtml ? (
+                    <CustomHtmlCardPreview
+                      html={settings.productCardCustomHtml}
+                      product={{
+                          ...sampleProduct,
+                          id: 'preview-2',
+                          name: 'Red Nike Sneakers - Limited Edition 2024',
+                          imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=600&fit=crop',
+                          sellingPrice: 189.99,
+                          isOfficialBrand: false,
+                          isNewArrival: true,
+                          stock: 3
+                      }}
+                      category={{ id: 'footwear', name: 'Footwear' }}
+                      currencySymbol="$"
+                      settings={settings}
+                    />
+                  ) : (
+                    <ProductCard 
+                      product={{
+                          ...sampleProduct,
+                          id: 'preview-2',
+                          name: 'Red Nike Sneakers - Limited Edition 2024',
+                          imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=600&fit=crop',
+                          sellingPrice: 189.99,
+                          isOfficialBrand: false,
+                          isNewArrival: true,
+                          stock: 3
+                      }}
+                      category={{ id: 'footwear', name: 'Footwear' }}
+                      currencySymbol="$"
+                      overrideSettings={settings}
+                    />
+                  )}
                 </div>
               </div>
             </CardContent>
