@@ -801,6 +801,7 @@ export interface Customer {
   totalSpent: number;
   outstandingCredit: number;
   creditBalance: number; // For deposits / overpayments
+  points?: number;
   allowSms: boolean;
   allowUsername?: string;
   allowWhatsapp: boolean;

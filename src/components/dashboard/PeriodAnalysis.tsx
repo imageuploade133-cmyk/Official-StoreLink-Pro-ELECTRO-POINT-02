@@ -58,7 +58,7 @@ export function PeriodAnalysis({ dateRange, onDateChange, stats, currencySymbol 
 
   return (
     <div>
-      <Card className="mb-6 border-none shadow-sm overflow-hidden bg-white dark:bg-card">
+      <Card className="mb-6 shadow-sm overflow-hidden bg-white dark:bg-card">
         <CardHeader className="border-b border-border/50 bg-muted/5">
           <CardTitle className="text-lg">Period Analysis</CardTitle>
           <CardDescription>Select a date range to analyze sales performance for a specific period.</CardDescription>
@@ -115,10 +115,10 @@ export function PeriodAnalysis({ dateRange, onDateChange, stats, currencySymbol 
       </Card>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 group bg-white dark:bg-card border border-border/50 dark:border-border/20">
+        <Card className="relative overflow-hidden transition-all duration-300 group bg-white dark:bg-card border-border/50 dark:border-border/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
             <CardTitle className="text-sm font-medium">Revenue (Period)</CardTitle>
-            <div className="p-2 rounded-lg bg-primary/10">
+            <div className="p-2 rounded-xl bg-primary/10 shadow-sm">
               <DollarSign className="h-4 w-4 text-primary" />
             </div>
           </CardHeader>
@@ -126,13 +126,12 @@ export function PeriodAnalysis({ dateRange, onDateChange, stats, currencySymbol 
             <div className="text-2xl font-bold tracking-tight">{formatCurrency(stats.totalRevenue, currencySymbol)}</div>
             <p className="text-xs text-muted-foreground mt-1">{getDateRangeTitle()}</p>
           </CardContent>
-          <div className="absolute bottom-0 left-0 h-1 w-full bg-primary/10 group-hover:bg-primary/30 transition-colors" />
         </Card>
 
-        <Card className="relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 group bg-white dark:bg-card border border-border/50 dark:border-border/20">
+        <Card className="relative overflow-hidden transition-all duration-300 group bg-white dark:bg-card border-border/50 dark:border-border/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
             <CardTitle className="text-sm font-medium">Profit (Period)</CardTitle>
-            <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
+            <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 shadow-sm">
               <TrendingUp className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             </div>
           </CardHeader>
@@ -140,13 +139,12 @@ export function PeriodAnalysis({ dateRange, onDateChange, stats, currencySymbol 
             <div className="text-2xl font-bold tracking-tight">{formatCurrency(stats.totalProfit, currencySymbol)}</div>
             <p className="text-xs text-muted-foreground mt-1">Net profit in selected period</p>
           </CardContent>
-          <div className="absolute bottom-0 left-0 h-1 w-full bg-emerald-500/20 group-hover:bg-emerald-500/40 transition-colors" />
         </Card>
 
-        <Card className="relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 group bg-white dark:bg-card border border-border/50 dark:border-border/20">
+        <Card className="relative overflow-hidden transition-all duration-300 group bg-white dark:bg-card border-border/50 dark:border-border/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
             <CardTitle className="text-sm font-medium text-orange-600 dark:text-orange-500">Returns (Period)</CardTitle>
-            <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/50">
+            <div className="p-2 rounded-xl bg-orange-100 dark:bg-orange-900/50 shadow-sm">
               <Undo2 className="h-4 w-4 text-orange-600 dark:text-orange-500" />
             </div>
           </CardHeader>
@@ -154,13 +152,12 @@ export function PeriodAnalysis({ dateRange, onDateChange, stats, currencySymbol 
             <div className="text-2xl font-bold tracking-tight">{formatCurrency(stats.totalReturns, currencySymbol)}</div>
             <p className="text-xs text-muted-foreground mt-1">Value of returns in period</p>
           </CardContent>
-          <div className="absolute bottom-0 left-0 h-1 w-full bg-orange-500/20 group-hover:bg-orange-500/40 transition-colors" />
         </Card>
 
-        <Card className="relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 group bg-white dark:bg-card border border-border/50 dark:border-border/20">
+        <Card className="relative overflow-hidden transition-all duration-300 group bg-white dark:bg-card border-border/50 dark:border-border/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
             <CardTitle className="text-sm font-medium">Transactions (Period)</CardTitle>
-            <div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/50">
+            <div className="p-2 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 shadow-sm">
               <ListChecks className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
             </div>
           </CardHeader>
@@ -168,7 +165,6 @@ export function PeriodAnalysis({ dateRange, onDateChange, stats, currencySymbol 
             <div className="text-2xl font-bold tracking-tight">{stats.totalTransactions.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground mt-1">Number of sales in period</p>
           </CardContent>
-          <div className="absolute bottom-0 left-0 h-1 w-full bg-indigo-500/20 group-hover:bg-indigo-500/40 transition-colors" />
         </Card>
       </div>
     </div>

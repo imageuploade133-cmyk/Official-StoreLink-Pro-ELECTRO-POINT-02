@@ -72,6 +72,7 @@ export function StaticStats({
         <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
           <ShoppingBag className="h-12 w-12 text-blue-500" />
         </div>
+      <Card className="relative overflow-hidden transition-all duration-300 group bg-gradient-to-br from-blue-50/50 to-white dark:from-blue-950/20 dark:to-background border-blue-100/50 dark:border-blue-900/30">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -85,7 +86,7 @@ export function StaticStats({
               <DropdownMenuItem onSelect={() => setTodayYesterdayPeriod('yesterday')}>Yesterday's Sales</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/50">
+          <div className="p-2 rounded-xl bg-blue-100 dark:bg-blue-900/50 shadow-sm">
             <ShoppingBag className="h-4 w-4 text-blue-500" />
           </div>
         </CardHeader>
@@ -101,27 +102,32 @@ export function StaticStats({
             Net sales for {todayYesterdayPeriod}
           </p>
         </CardContent>
-        <div className="absolute bottom-0 left-0 h-1 w-full bg-blue-500/20 group-hover:bg-blue-500/40 transition-colors" />
       </Card>
 
       <Card className="relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-green-50/50 to-white dark:from-green-950/20 dark:to-background border-l-4 border-green-500 border-t border-r border-b border-green-200 dark:border-t-green-800 dark:border-r-green-800 dark:border-b-green-800">
         <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
           <ShoppingBag className="h-12 w-12 text-green-500" />
         </div>
+      <Card className="relative overflow-hidden transition-all duration-300 group bg-gradient-to-br from-green-50/50 to-white dark:from-green-950/20 dark:to-background border-green-100/50 dark:border-green-900/30">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
           <CardTitle className="text-sm font-medium text-green-600 dark:text-green-400">Sales Snapshot</CardTitle>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-6 px-2 -mr-2 text-xs text-green-600 dark:text-green-400 hover:bg-green-100/50 dark:hover:bg-green-900/50">
-                {{ week: 'This Week', month: 'This Month' }[salesSnapshotPeriod]}
-                <ChevronDown className="h-4 w-4 ml-1" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onSelect={() => setSalesSnapshotPeriod('week')}>This Week</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setSalesSnapshotPeriod('month')}>This Month</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-6 px-2 text-xs text-green-600 dark:text-green-400 hover:bg-green-100/50 dark:hover:bg-green-900/50">
+                  {{ week: 'This Week', month: 'This Month' }[salesSnapshotPeriod]}
+                  <ChevronDown className="h-4 w-4 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onSelect={() => setSalesSnapshotPeriod('week')}>This Week</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setSalesSnapshotPeriod('month')}>This Month</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <div className="p-2 rounded-xl bg-green-100 dark:bg-green-900/50 shadow-sm">
+              <ShoppingBag className="h-4 w-4 text-green-500" />
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="relative z-10">
           {isLoading || !today ? (
@@ -135,29 +141,34 @@ export function StaticStats({
             Net sales for {{ week: 'this week', month: 'this month' }[salesSnapshotPeriod]}
           </p>
         </CardContent>
-        <div className="absolute bottom-0 left-0 h-1 w-full bg-green-500/20 group-hover:bg-green-500/40 transition-colors" />
       </Card>
 
       <Card className="relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-purple-50/50 to-white dark:from-purple-950/20 dark:to-background border-l-4 border-purple-500 border-t border-r border-b border-purple-200 dark:border-t-purple-800 dark:border-r-purple-800 dark:border-b-purple-800">
         <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
           <ShoppingBag className="h-12 w-12 text-purple-500" />
         </div>
+      <Card className="relative overflow-hidden transition-all duration-300 group bg-gradient-to-br from-purple-50/50 to-white dark:from-purple-950/20 dark:to-background border-purple-100/50 dark:border-purple-900/30">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
           <CardTitle className="text-sm font-medium text-purple-600 dark:text-purple-400">Monthly Sales</CardTitle>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-6 px-2 -mr-2 text-xs text-purple-600 dark:text-purple-400 hover:bg-purple-100/50 dark:hover:bg-purple-900/50">
-                {today && selectedYear !== null && selectedMonth !== null ? format(new Date(selectedYear, selectedMonth), 'MMMM') : '...'} <ChevronDown className="h-4 w-4 ml-1" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {Array.from({ length: 12 }).map((_, i) => (
-                <DropdownMenuItem key={i} onSelect={() => setSelectedMonth(i)}>
-                  {selectedYear ? format(new Date(selectedYear, i), 'MMMM') : ''}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-6 px-2 text-xs text-purple-600 dark:text-purple-400 hover:bg-purple-100/50 dark:hover:bg-purple-900/50">
+                  {today && selectedYear !== null && selectedMonth !== null ? format(new Date(selectedYear, selectedMonth), 'MMMM') : '...'} <ChevronDown className="h-4 w-4 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <DropdownMenuItem key={i} onSelect={() => setSelectedMonth(i)}>
+                    {selectedYear ? format(new Date(selectedYear, i), 'MMMM') : ''}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <div className="p-2 rounded-xl bg-purple-100 dark:bg-purple-900/50 shadow-sm">
+              <ShoppingBag className="h-4 w-4 text-purple-500" />
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="relative z-10">
           {isLoading || !today ? (
@@ -171,29 +182,34 @@ export function StaticStats({
             Net sales for {today && selectedYear !== null && selectedMonth !== null ? format(new Date(selectedYear, selectedMonth), 'MMMM yyyy') : '...'}
           </p>
         </CardContent>
-        <div className="absolute bottom-0 left-0 h-1 w-full bg-purple-500/20 group-hover:bg-purple-500/40 transition-colors" />
       </Card>
 
       <Card className="relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-pink-50/50 to-white dark:from-pink-950/20 dark:to-background border-l-4 border-pink-500 border-t border-r border-b border-pink-200 dark:border-t-pink-800 dark:border-r-pink-800 dark:border-b-pink-800">
         <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
           <ShoppingBag className="h-12 w-12 text-pink-500" />
         </div>
+      <Card className="relative overflow-hidden transition-all duration-300 group bg-gradient-to-br from-pink-50/50 to-white dark:from-pink-950/20 dark:to-background border-pink-100/50 dark:border-pink-900/30">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
           <CardTitle className="text-sm font-medium text-pink-600 dark:text-pink-400">Yearly Sales</CardTitle>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-6 px-2 -mr-2 text-xs text-pink-600 dark:text-pink-400 hover:bg-pink-100/50 dark:hover:bg-pink-900/50">
-                {selectedYear ?? '...'} <ChevronDown className="h-4 w-4 ml-1" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {availableYears.map(year => (
-                <DropdownMenuItem key={year} onSelect={() => setSelectedYear(year)}>
-                  {year}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-6 px-2 text-xs text-pink-600 dark:text-pink-400 hover:bg-pink-100/50 dark:hover:bg-pink-900/50">
+                  {selectedYear ?? '...'} <ChevronDown className="h-4 w-4 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {availableYears.map(year => (
+                  <DropdownMenuItem key={year} onSelect={() => setSelectedYear(year)}>
+                    {year}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <div className="p-2 rounded-xl bg-pink-100 dark:bg-pink-900/50 shadow-sm">
+              <ShoppingBag className="h-4 w-4 text-pink-500" />
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="relative z-10">
           {isLoading || !today ? (
@@ -205,7 +221,6 @@ export function StaticStats({
           )}
           <p className="text-xs text-pink-600 dark:text-pink-400 mt-1">Net sales for the year {selectedYear}</p>
         </CardContent>
-        <div className="absolute bottom-0 left-0 h-1 w-full bg-pink-500/20 group-hover:bg-pink-500/40 transition-colors" />
       </Card>
     </div>
   );
