@@ -5,7 +5,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { 
   Heart, 
-  Plus
+  Plus,
+  Star
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +17,10 @@ import { useSettings } from '@/contexts/settings-context';
 import { formatCurrency } from '@/lib/formatUtils';
 import { calculateEffectivePrice } from '@/lib/pos-utils';
 import { ProductLoadingOverlay } from './ProductLoadingOverlay';
+import { StockBar } from './StockBar';
+import { ProductRating } from './ProductRating';
+import { calculateRatingStats } from '@/lib/rating-utils';
+import { useProductReviews } from '@/hooks/use-product-reviews';
 import type { Product, Category } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useStoreUrl } from '@/hooks/use-store-url';
@@ -33,12 +38,16 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
   const { getStoreUrl } = useStoreUrl();
   const [today, setToday] = useState<Date | null>(null);
   const [isLoadingProduct, setIsLoadingProduct] = useState(false);
+  const { reviews } = useProductReviews(product.id);
 
   useEffect(() => {
     setToday(new Date());
   }, []);
 
   const isInWishlist = isProductInWishlist(product.id);
+
+  // Calculate rating stats from reviews
+  const ratingStats = useMemo(() => calculateRatingStats(reviews), [reviews]);
 
   // Pricing Engine logic
   const effectivePrice = useMemo(() => 
@@ -132,41 +141,58 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
       {/* Content Area */}
       <div className="flex flex-col flex-1 p-6 space-y-4">
         <div className="flex-1 space-y-1.5">
-          <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#86868b]">
-              {category?.name || product.categoryName || 'Collection'}
-          </p>
+          <div className="flex justify-between items-start gap-2">
+            <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#86868b]">
+                {category?.name || product.categoryName || 'Collection'}
+            </p>
+            {ratingStats.totalReviews > 0 && (
+              <ProductRating
+                averageRating={ratingStats.averageRating}
+                totalReviews={ratingStats.totalReviews}
+                size="sm"
+                showLabel={false}
+              />
+            )}
+          </div>
           
           <h3 className="text-lg font-bold text-[#1d1d1f] dark:text-white leading-tight tracking-tight line-clamp-2">
             {product.name}
           </h3>
         </div>
 
-        <div className="flex items-center justify-between pt-2">
-            <div className="flex flex-col">
-                  <span className={cn(
-                    "text-lg font-bold tracking-tight",
-                    isDiscounted ? "text-rose-600" : "text-[#1d1d1f] dark:text-white"
-                  )}>
-                    {formatCurrency(effectivePrice, currencySymbol)}
-                  </span>
-                  {isDiscounted && (
-                    <span className="text-[12px] text-[#86868b] line-through font-medium">
-                      {formatCurrency(product.sellingPrice, currencySymbol)}
+        <div className="space-y-3">
+          <StockBar 
+            stock={product.stock} 
+            lowStockThreshold={product.lowStockThreshold || 10} 
+          />
+
+          <div className="flex items-center justify-between pt-2">
+              <div className="flex flex-col">
+                    <span className={cn(
+                      "text-lg font-bold tracking-tight",
+                      isDiscounted ? "text-rose-600" : "text-[#1d1d1f] dark:text-white"
+                    )}>
+                      {formatCurrency(effectivePrice, currencySymbol)}
                     </span>
-                  )}
-            </div>
-            
-            {/* Mobile Quick Add */}
-            <div className="md:hidden">
-              <Button 
-                size="icon" 
-                className="h-10 w-10 rounded-full bg-[#0071e3] text-white active:scale-90 transition-transform shadow-lg"
-                onClick={handleAddToCart}
-                disabled={isOutOfStock}
-              >
-                <Plus className="h-5 w-5" />
-              </Button>
-            </div>
+                    {isDiscounted && (
+                      <span className="text-[12px] text-[#86868b] line-through font-medium">
+                        {formatCurrency(product.sellingPrice, currencySymbol)}
+                      </span>
+                    )}
+              </div>
+              
+              {/* Mobile Quick Add */}
+              <div className="md:hidden">
+                <Button 
+                  size="icon" 
+                  className="h-10 w-10 rounded-full bg-[#0071e3] text-white active:scale-90 transition-transform shadow-lg"
+                  onClick={handleAddToCart}
+                  disabled={isOutOfStock}
+                >
+                  <Plus className="h-5 w-5" />
+                </Button>
+              </div>
+          </div>
         </div>
       </div>
     </div>

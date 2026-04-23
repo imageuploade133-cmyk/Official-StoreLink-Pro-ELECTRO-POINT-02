@@ -98,9 +98,12 @@ export default function StoreHomePage() {
       
       {settings?.showBrandValues !== false && (
         <section 
-          className="relative group/values" 
+          className={cn(
+              "relative group/values transition-colors duration-500",
+              (!brandValuesBg || brandValuesBg === 'transparent' || brandValuesBg === '#ffffff') ? "bg-white dark:bg-black" : ""
+          )} 
           style={{ 
-            backgroundColor: brandValuesBg,
+            backgroundColor: (brandValuesBg && brandValuesBg !== 'transparent' && brandValuesBg !== '#ffffff') ? brandValuesBg : undefined,
             paddingTop: `${settings?.brandValuesVerticalPadding ?? 80}px`,
             paddingBottom: `${settings?.brandValuesVerticalPadding ?? 80}px`
           }}

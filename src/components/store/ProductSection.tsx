@@ -501,7 +501,14 @@ export function ProductSection({ section, categories, excludeCategoryIds }: Prod
   }
 
   return (
-    <section ref={sectionRef} className="py-12 md:py-24 overflow-hidden relative dark:bg-black" style={backgroundColor ? { backgroundColor } : {}}>
+    <section 
+        ref={sectionRef} 
+        className={cn(
+            "py-12 md:py-24 overflow-hidden relative transition-colors duration-500",
+            (!backgroundColor || backgroundColor === '#ffffff' || backgroundColor === 'transparent') ? "bg-white dark:bg-black" : ""
+        )} 
+        style={(backgroundColor && backgroundColor !== '#ffffff' && backgroundColor !== 'transparent') ? { backgroundColor } : {}}
+    >
       {/* Optional Section Banner */}
       {hasBanner && (
         <div className={cn("mb-16", section.fullWidth ? "w-full" : "max-w-site-container mx-auto px-4 sm:px-6 lg:px-8")}>
