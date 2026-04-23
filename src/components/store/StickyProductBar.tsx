@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import Image from 'next/image';
 import { Heart, ShoppingCart, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -14,6 +15,7 @@ interface StickyProductBarProps {
   onAddToCart: () => void;
   onToggleWishlist: () => void;
   addToCartText?: string;
+  productImage?: string;
 }
 
 export function StickyProductBar({
@@ -23,7 +25,8 @@ export function StickyProductBar({
   isOutOfStock,
   onAddToCart,
   onToggleWishlist,
-  addToCartText = 'Add to Bag'
+  addToCartText = 'Add to Bag',
+  productImage
 }: StickyProductBarProps) {
   const { settings } = useSettings();
   const [isVisible, setIsVisible] = useState(false);
@@ -177,14 +180,29 @@ export function StickyProductBar({
       isVisible ? "translate-y-0 opacity-100 shadow-lg shadow-black/5" : "translate-y-full opacity-0 pointer-events-none"
     )}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between gap-3 sm:gap-4">
-        {/* Product Info */}
-        <div className="flex-1 min-w-0">
-          <p className="text-[10px] sm:text-[11px] font-semibold text-[#86868b] truncate uppercase tracking-widest">
-            {productName}
-          </p>
-          <p className="text-lg sm:text-xl font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] tracking-tight">
-            {productPrice}
-          </p>
+        {/* Product Info with Image */}
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          {/* Product Image */}
+          {productImage && (
+            <div className="relative w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 rounded-lg overflow-hidden border border-black/10 dark:border-white/10 bg-slate-100 dark:bg-slate-800">
+              <Image
+                src={productImage}
+                alt={productName}
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 48px, 56px"
+              />
+            </div>
+          )}
+          {/* Product Details */}
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] sm:text-[11px] font-semibold text-[#86868b] truncate uppercase tracking-widest">
+              {productName}
+            </p>
+            <p className="text-lg sm:text-xl font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] tracking-tight">
+              {productPrice}
+            </p>
+          </div>
         </div>
 
         {/* Actions */}

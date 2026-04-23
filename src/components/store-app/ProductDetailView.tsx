@@ -700,10 +700,10 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                     </button>
                     {!isOutOfStock ? (
                         <div className="flex-1 flex gap-2">
-                            <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-2xl p-1 border border-slate-200/50">
-                                <button onClick={() => setDetailQty(Math.max(1, detailQty - 1))} className="w-8 h-8 flex items-center justify-center text-slate-500"><Minus className="h-3.5 w-3.5" /></button>
-                                <span className="w-6 text-center font-black text-sm">{detailQty}</span>
-                                <button onClick={() => setDetailQty(Math.min(product.stock, detailQty + 1))} className="w-8 h-8 flex items-center justify-center text-slate-500"><Plus className="h-3.5 w-3.5" /></button>
+                            <div className="flex items-center bg-gradient-to-r from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/15 rounded-2xl p-1.5 border-2 border-primary/30 dark:border-primary/40">
+                                <button onClick={() => setDetailQty(Math.max(1, detailQty - 1))} className="w-9 h-9 flex items-center justify-center text-primary dark:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-xl transition-all"><Minus className="h-4 w-4 font-bold" /></button>
+                                <span className="w-8 text-center font-black text-base text-primary dark:text-primary">{detailQty}</span>
+                                <button onClick={() => setDetailQty(Math.min(product.stock, detailQty + 1))} className="w-9 h-9 flex items-center justify-center text-primary dark:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-xl transition-all"><Plus className="h-4 w-4 font-bold" /></button>
                             </div>
                             <Button
                                 onClick={() => {
