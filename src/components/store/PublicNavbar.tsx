@@ -328,9 +328,9 @@ export function PublicNavbar() {
                                 <DropdownMenuContent 
                                     align="start" 
                                     sideOffset={12}
-                                    className="w-72 p-3 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-2 border-black/5 dark:border-white/5 bg-white/95 dark:bg-black/95 backdrop-blur-2xl animate-in fade-in slide-in-from-top-2 duration-300"
+                                    className="w-72 p-4 rounded-[2.5rem] shadow-[0_30px_70px_rgba(0,0,0,0.2)] dark:shadow-[0_30px_70px_rgba(0,0,0,0.6)] border-[3px] border-black/10 dark:border-white/10 bg-white/95 dark:bg-black/95 backdrop-blur-3xl animate-in fade-in slide-in-from-top-3 duration-500"
                                 >
-                                    <div className="max-h-[450px] overflow-y-auto py-1 pr-1 custom-scrollbar">
+                                    <div className="max-h-[480px] overflow-y-auto py-1 pr-1 custom-scrollbar">
                                         {isLoadingCategories ? (
                                             <div className="p-6 flex flex-col items-center justify-center gap-3 text-muted-foreground">
                                                 <Loader2 className="h-5 w-5 animate-spin text-[#0071e3]" />
@@ -358,7 +358,7 @@ export function PublicNavbar() {
                                             ))
                                         )}
                                     </div>
-                                    <DropdownMenuSeparator className="bg-black/[0.05] dark:bg-white/[0.05] mx-2 my-2" />
+                                    <DropdownMenuSeparator className="bg-black/10 dark:bg-white/10 mx-2 my-3 h-[2px]" />
                                     <DropdownMenuItem asChild className="cursor-pointer p-3 focus:bg-[#0071e3] focus:text-white rounded-2xl m-1 transition-all group/all">
                                         <Link href={getStoreUrl('/store/categories')} className="flex items-center justify-between font-black uppercase text-[9px] tracking-widest w-full text-[#0071e3] group-hover/all:text-white" onClick={() => setIsMenuOpen(false)}>
                                             View All Collections <ChevronRight className="h-3 w-3 transition-transform group-hover/all:translate-x-1" />
