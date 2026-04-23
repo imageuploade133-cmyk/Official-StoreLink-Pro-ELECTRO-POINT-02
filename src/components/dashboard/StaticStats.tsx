@@ -72,7 +72,6 @@ export function StaticStats({
         <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
           <ShoppingBag className="h-12 w-12 text-blue-500" />
         </div>
-      <Card className="relative overflow-hidden transition-all duration-300 group bg-gradient-to-br from-blue-50/50 to-white dark:from-blue-950/20 dark:to-background border-blue-100/50 dark:border-blue-900/30">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -108,7 +107,6 @@ export function StaticStats({
         <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
           <ShoppingBag className="h-12 w-12 text-green-500" />
         </div>
-      <Card className="relative overflow-hidden transition-all duration-300 group bg-gradient-to-br from-green-50/50 to-white dark:from-green-950/20 dark:to-background border-green-100/50 dark:border-green-900/30">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
           <CardTitle className="text-sm font-medium text-green-600 dark:text-green-400">Sales Snapshot</CardTitle>
           <div className="flex items-center gap-2">
@@ -147,7 +145,6 @@ export function StaticStats({
         <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
           <ShoppingBag className="h-12 w-12 text-purple-500" />
         </div>
-      <Card className="relative overflow-hidden transition-all duration-300 group bg-gradient-to-br from-purple-50/50 to-white dark:from-purple-950/20 dark:to-background border-purple-100/50 dark:border-purple-900/30">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
           <CardTitle className="text-sm font-medium text-purple-600 dark:text-purple-400">Monthly Sales</CardTitle>
           <div className="flex items-center gap-2">
@@ -188,7 +185,6 @@ export function StaticStats({
         <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
           <ShoppingBag className="h-12 w-12 text-pink-500" />
         </div>
-      <Card className="relative overflow-hidden transition-all duration-300 group bg-gradient-to-br from-pink-50/50 to-white dark:from-pink-950/20 dark:to-background border-pink-100/50 dark:border-pink-900/30">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
           <CardTitle className="text-sm font-medium text-pink-600 dark:text-pink-400">Yearly Sales</CardTitle>
           <div className="flex items-center gap-2">
