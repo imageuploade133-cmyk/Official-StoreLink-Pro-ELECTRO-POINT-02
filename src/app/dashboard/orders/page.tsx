@@ -456,7 +456,7 @@ export default function WebsiteOrdersPage() {
                     value={isLoadingAnalytics ? '...' : analytics.totalCancelled.toLocaleString()}
                     icon={XCircle}
                     description="Total failed conversions."
-                    className="bg-rose-50 dark:bg-rose-950/20 border-rose-100"
+                    className="bg-gradient-to-br from-rose-50/50 to-white dark:from-rose-950/20 dark:to-background border-2 border-rose-200 dark:border-rose-800"
                     valueClassName="text-rose-600 font-black"
                 />
                 <StatCard
@@ -464,7 +464,7 @@ export default function WebsiteOrdersPage() {
                     value={isLoadingAnalytics ? '...' : analytics.todayCancelled.toLocaleString()}
                     icon={TrendingDown}
                     description="Orders voided in current cycle."
-                    className="bg-orange-50 dark:bg-orange-950/20 border-orange-100"
+                    className="bg-gradient-to-br from-orange-50/50 to-white dark:from-orange-950/20 dark:to-background border-2 border-orange-200 dark:border-orange-800"
                     valueClassName="text-orange-600 font-black"
                 />
             </div>
