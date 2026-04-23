@@ -22,10 +22,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, ChevronLeft, ChevronRight, RotateCcw, PackageSearch, Loader2, SlidersHorizontal, ArrowUpDown } from 'lucide-react';
 import { ProductCardSkeleton } from '@/components/store/ProductCardSkeleton';
-import { BannerAd } from '@/components/ads/BannerAd';
 import { cn } from '@/lib/utils';
 import { useStoreUrl } from '@/hooks/use-store-url';
-import { Badge } from '@/components/ui/badge';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 const ITEMS_PER_PAGE = 12;
@@ -332,7 +330,7 @@ function ShopPageContent() {
                 "bg-white/80 dark:bg-black/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5",
                 showHeader ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
             )}>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="py-4 flex flex-col gap-4">
                         <div className="flex items-center justify-between">
                             <h1 className="text-xl sm:text-2xl font-black tracking-tight text-black dark:text-white">
@@ -477,7 +475,7 @@ function ShopPageContent() {
                 </div>
             </header>
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Banner/Category Info */}
                 {!isLoading && (
                     <div className="mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -496,14 +494,8 @@ function ShopPageContent() {
                     </div>
                 )}
 
-                <div className={cn(
-                    "flex flex-col gap-8",
-                    settings?.shopProductsAlignment === 'center' ? "items-center" : "lg:flex-row"
-                )}>
-                    <div className={cn(
-                        "flex-1 w-full",
-                        settings?.shopProductsAlignment === 'center' && "max-w-5xl"
-                    )}>
+                <div className="w-full">
+                    <div className="w-full">
                         {isLoading && products.length === 0 ? (
                             <div className={cn("grid gap-6 sm:gap-8", gridClasses)}>
                                 {Array.from({ length: 8 }).map((_, i) => (
@@ -581,23 +573,6 @@ function ShopPageContent() {
                             </div>
                         )}
                     </div>
-                    
-                    {/* Sidebar for Ads */}
-                    {settings?.shopProductsAlignment !== 'center' && (
-                        <aside className="hidden lg:block w-72 flex-shrink-0">
-                            <div className="sticky top-40 space-y-8">
-                                <BannerAd location="sidebar" />
-                                {currentCategory && (
-                                    <div className="p-8 rounded-[32px] bg-white dark:bg-[#1d1d1f] border border-black/5 dark:border-white/5 shadow-sm">
-                                        <h4 className="text-sm font-black uppercase tracking-widest mb-4">About This Collection</h4>
-                                        <p className="text-xs text-[#86868b] font-medium leading-relaxed">
-                                            Discover our curated selection of {currentCategory.name}. Every item is chosen for quality and style.
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
-                        </aside>
-                    )}
                 </div>
             </main>
         </div>
