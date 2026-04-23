@@ -30,14 +30,15 @@ export function DueCreditSales({ isLoading, dueCreditSales }: DueCreditSalesProp
   const currencySymbol = settings?.currency || '$';
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="font-headline text-xl flex items-center gap-2">
-          <CalendarClock className="h-5 w-5 text-orange-600 dark:text-orange-400" />Upcoming &amp; Overdue Payments
+    <Card className="border-none shadow-sm overflow-hidden bg-white dark:bg-card">
+      <CardHeader className="border-b border-border/50 bg-muted/5">
+        <CardTitle className="font-headline text-lg flex items-center gap-2">
+          <CalendarClock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+          <span>Upcoming & Overdue</span>
         </CardTitle>
-        <CardDescription>Top 5 unpaid credit sales needing attention (all time).</CardDescription>
+        <CardDescription>Top 5 unpaid credit sales needing attention.</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         {isLoading ? (
           <div className="max-h-[300px] space-y-2">
             <Skeleton className="h-10 w-full" /><Skeleton className="h-10 w-full" /><Skeleton className="h-10 w-full" />

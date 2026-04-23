@@ -49,14 +49,14 @@ export function LogoutCard() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Log Out</CardTitle>
+    <Card className="border-none shadow-sm overflow-hidden bg-white dark:bg-card">
+      <CardHeader className="border-b border-border/50 bg-muted/5">
+        <CardTitle className="text-lg text-destructive">Log Out</CardTitle>
         <CardDescription>
           End your current session and return to the login screen.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <AlertDialogTrigger asChild>
             <Button variant="destructive" className="w-full sm:w-auto">

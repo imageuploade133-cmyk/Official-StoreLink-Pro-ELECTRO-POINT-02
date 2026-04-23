@@ -8,14 +8,14 @@ import Link from 'next/link';
 
 export function QuickLinksCard() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Admin Access</CardTitle>
+    <Card className="border-none shadow-sm overflow-hidden bg-white dark:bg-card">
+      <CardHeader className="border-b border-border/50 bg-muted/5">
+        <CardTitle className="text-lg">Admin Access</CardTitle>
         <CardDescription>
           Quick access to system and website configuration.
         </CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-4 sm:grid-cols-2">
+      <CardContent className="pt-6 grid gap-4 sm:grid-cols-2">
         <Button asChild variant="outline" className="h-auto py-4 justify-start flex-col items-start gap-1">
           <Link href="/dashboard/settings">
             <div className="flex items-center gap-2">

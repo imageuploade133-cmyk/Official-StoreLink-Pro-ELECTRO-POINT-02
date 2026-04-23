@@ -18,17 +18,23 @@ export function PageHeader({
   children,
 }: PageHeaderProps) {
   return (
-    <div className={cn('flex items-start gap-4', className)}>
-      <div className="rounded-xl border bg-card p-2.5 dark:border-border/50">
-        <Icon className="h-6 w-6 text-primary" />
+    <div className={cn('flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8', className)}>
+      <div className="flex items-start gap-4">
+        <div className="rounded-2xl border bg-white dark:bg-card p-3 shadow-sm dark:border-border/50 transition-all duration-300 hover:shadow-md">
+          <Icon className="h-6 w-6 text-primary" />
+        </div>
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold md:text-3xl tracking-tight dark:text-foreground">
+            {title}
+          </h1>
+          <p className="text-sm text-muted-foreground dark:text-foreground/70 leading-relaxed max-w-2xl">{description}</p>
+        </div>
       </div>
-      <div className="space-y-0.5">
-        <h1 className="text-2xl font-bold md:text-3xl tracking-tight dark:text-foreground">
-          {title}
-        </h1>
-        <p className="text-sm text-muted-foreground dark:text-foreground/70 leading-relaxed">{description}</p>
-        {children}
-      </div>
+      {children && (
+        <div className="flex items-center gap-2">
+          {children}
+        </div>
+      )}
     </div>
   );
 }

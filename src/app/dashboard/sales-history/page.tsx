@@ -89,7 +89,7 @@ type SalesFilterTab = 'all' | 'paid' | 'credit' | 'outstanding' | 'returns';
 const ITEMS_PER_PAGE = 20;
 
 function SalesHistoryContent() {
-  const { settings, isLoading: isLoadingSettings } = useSettings();
+  const { settings, isLoadingSettings } = useSettings();
   const { user, staffMember, store, isLoading: isAuthLoading, isAdmin, permissions } = useAuth();
   const currencySymbol = settings?.currency || '$';
   const firestore = useFirestore();
@@ -186,7 +186,7 @@ function SalesHistoryContent() {
         });
 
         setPeriodAnalytics({
-            revenue,
+            netRevenue: revenue,
             volume: countSnap.data().count,
             refunds,
             isLoading: false
@@ -276,7 +276,7 @@ function SalesHistoryContent() {
                     })),
                     returns: (data.returns || []),
                     paymentDetails: data.paymentDetails || null,
-                } as SaleTransaction;
+                } as unknown as SaleTransaction;
             });
 
             setSales(salesList);
@@ -408,35 +408,43 @@ function SalesHistoryContent() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
             title="Net Period Revenue"
-            value={periodAnalytics.isLoading ? '...' : formatCurrency(periodAnalytics.revenue, currencySymbol)}
+            value={periodAnalytics.isLoading ? '...' : formatCurrency(periodAnalytics.netRevenue, currencySymbol)}
             icon={TrendingUp}
             description={getDateRangeTitle()}
-            className="bg-indigo-50 dark:bg-indigo-950/20 border-indigo-100"
-            valueClassName="text-indigo-600 font-black"
+            className="bg-gradient-to-br from-indigo-50/50 to-white dark:from-indigo-950/20 dark:to-background border border-indigo-100/50 dark:border-indigo-900/30"
+            titleClassName="text-indigo-600 dark:text-indigo-400"
+            iconClassName="text-indigo-500 bg-indigo-100 dark:bg-indigo-900/50"
+            valueClassName="text-indigo-700 dark:text-indigo-300 font-black"
         />
         <StatCard
             title="Transaction Volume"
             value={periodAnalytics.isLoading ? '...' : periodAnalytics.volume.toLocaleString()}
             icon={ShoppingBag}
             description="Successful sales in batch"
-            className="bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100"
-            valueClassName="text-emerald-600 font-black"
+            className="bg-gradient-to-br from-emerald-50/50 to-white dark:from-emerald-950/20 dark:to-background border border-emerald-100/50 dark:border-emerald-900/30"
+            titleClassName="text-emerald-600 dark:text-emerald-400"
+            iconClassName="text-emerald-500 bg-emerald-100 dark:bg-emerald-900/50"
+            valueClassName="text-emerald-700 dark:text-emerald-300 font-black"
         />
         <StatCard
             title="Average Sale Value"
-            value={periodAnalytics.isLoading ? '...' : formatCurrency(periodAnalytics.volume > 0 ? periodAnalytics.revenue / periodAnalytics.volume : 0, currencySymbol)}
+            value={periodAnalytics.isLoading ? '...' : formatCurrency(periodAnalytics.volume > 0 ? periodAnalytics.netRevenue / periodAnalytics.volume : 0, currencySymbol)}
             icon={DollarSign}
             description="Mean value per record"
-            className="bg-blue-50 dark:bg-blue-950/20 border-blue-100"
-            valueClassName="text-blue-600 font-black"
+            className="bg-gradient-to-br from-blue-50/50 to-white dark:from-blue-950/20 dark:to-background border border-blue-100/50 dark:border-blue-900/30"
+            titleClassName="text-blue-600 dark:text-blue-400"
+            iconClassName="text-blue-500 bg-blue-100 dark:bg-blue-900/50"
+            valueClassName="text-blue-700 dark:text-blue-300 font-black"
         />
         <StatCard
             title="Refund Attrition"
             value={periodAnalytics.isLoading ? '...' : formatCurrency(periodAnalytics.refunds, currencySymbol)}
             icon={Undo2}
             description="Value of returned items"
-            className="bg-rose-50 dark:bg-rose-950/20 border-rose-100"
-            valueClassName="text-rose-600 font-black"
+            className="bg-gradient-to-br from-rose-50/50 to-white dark:from-rose-950/20 dark:to-background border border-rose-100/50 dark:border-rose-900/30"
+            titleClassName="text-rose-600 dark:text-rose-400"
+            iconClassName="text-rose-500 bg-rose-100 dark:bg-rose-900/50"
+            valueClassName="text-rose-700 dark:text-rose-300 font-black"
         />
       </div>
 
@@ -486,7 +494,7 @@ function SalesHistoryContent() {
                                     </div>
                                     <div className="space-y-1">
                                         <Label className="text-[10px] font-black uppercase text-muted-foreground">To</Label>
-                                        <Input type="date" className="h-8 text-xs" value={dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : ''} onChange={(e) => handleCustomDateChange({ ...dateRange, to: e.target.value ? new Date(e.target.value + 'T00:00:00') : undefined })} />
+                                        <Input type="date" className="h-8 text-xs" value={dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : ''} onChange={(e) => handleCustomDateChange({ from: dateRange?.from, to: e.target.value ? new Date(e.target.value + 'T00:00:00') : undefined })} />
                                     </div>
                                 </div>
                             </div>
