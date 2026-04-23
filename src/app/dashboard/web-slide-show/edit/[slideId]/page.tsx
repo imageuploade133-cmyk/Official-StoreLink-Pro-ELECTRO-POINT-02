@@ -201,7 +201,11 @@ export default function EditSlidePage() {
       <div className="text-center">
         <h1 className="text-2xl font-bold">Slide Not Found</h1>
         <p>The slide you are trying to edit does not exist.</p>
-        <Button asChild className="mt-4 rounded-xl"><Link href="/dashboard/web-slide-show">Go Back</Link></Button>
+        <Button variant="ghost" asChild className="mt-4 btn-back mx-auto">
+          <Link href="/dashboard/web-slide-show">
+            <ArrowLeft className="h-4 w-4" /> Back to Registry
+          </Link>
+        </Button>
       </div>
     );
   }

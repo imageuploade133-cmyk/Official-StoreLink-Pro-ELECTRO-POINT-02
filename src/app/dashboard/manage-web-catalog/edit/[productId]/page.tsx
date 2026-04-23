@@ -163,7 +163,11 @@ export default function EditStoreProductPage() {
     return (
         <div className="flex flex-col items-center justify-center py-24 text-center">
             <h2 className="text-2xl font-bold">Product not found</h2>
-            <Button asChild className="mt-4"><Link href="/dashboard/manage-web-catalog">Back to Catalog</Link></Button>
+            <Button variant="ghost" asChild className="mt-4 btn-back">
+              <Link href="/dashboard/manage-web-catalog">
+                <ArrowLeft className="h-4 w-4" /> Back to Catalog
+              </Link>
+            </Button>
         </div>
     );
   }

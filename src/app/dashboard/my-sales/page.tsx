@@ -316,7 +316,7 @@ export default function MySalesHistoryPage() {
         />
         <div className="flex items-center gap-2">
           {permissions.canAccessPOS && (
-            <Button asChild variant="default" className="bg-primary hover:bg-primary/90">
+            <Button asChild variant="ghost" className="btn-back">
               <Link href="/pos">
                 <ShoppingCart className="mr-2 h-4 w-4" />
                 Back to POS

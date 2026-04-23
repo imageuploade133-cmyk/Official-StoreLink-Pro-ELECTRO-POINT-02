@@ -72,7 +72,11 @@ export default function EditHomepageSectionPage() {
           <div className="text-center">
             <h1 className="text-2xl font-bold">Section Not Found</h1>
             <p>The section you are trying to edit does not exist.</p>
-            <Button asChild className="mt-4"><Link href="/dashboard/homepage-sections">Go Back</Link></Button>
+            <Button variant="ghost" asChild className="mt-4 btn-back mx-auto">
+              <Link href="/dashboard/homepage-sections">
+                <ArrowLeft className="h-4 w-4" /> Back to Sections
+              </Link>
+            </Button>
           </div>
         );
     }
@@ -85,8 +89,8 @@ export default function EditHomepageSectionPage() {
                 description="Modify an existing product section on your homepage."
             >
                  <div className="mt-4">
-                    <Button variant="outline" asChild>
-                        <Link href="/dashboard/homepage-sections"><ArrowLeft className="mr-2" />Back to All Sections</Link>
+                    <Button variant="ghost" asChild className="btn-back">
+                        <Link href="/dashboard/homepage-sections"><ArrowLeft className="h-4 w-4" /> Back to All Sections</Link>
                     </Button>
                 </div>
             </PageHeader>

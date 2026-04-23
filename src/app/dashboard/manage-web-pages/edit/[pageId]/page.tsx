@@ -176,7 +176,11 @@ export default function EditWebPage() {
       <div className="text-center">
         <h1 className="text-2xl font-bold">Page Not Found</h1>
         <p>The page you are trying to edit does not exist.</p>
-        <Button asChild className="mt-4"><Link href="/dashboard/manage-web-pages">Go Back</Link></Button>
+        <Button variant="ghost" asChild className="mt-4 btn-back mx-auto">
+          <Link href="/dashboard/manage-web-pages">
+            <ArrowLeft className="h-4 w-4" /> Back to Pages
+          </Link>
+        </Button>
       </div>
     );
   }

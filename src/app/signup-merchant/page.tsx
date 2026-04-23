@@ -586,7 +586,7 @@ export default function MerchantSignupPage() {
 
                 <div className="flex gap-4 mt-4">
                     {currentStep > 1 && (
-                        <Button type="button" variant="outline" onClick={prevStep} className="flex-1 h-12 font-bold" disabled={isSubmitting || isLoading}>
+                        <Button type="button" variant="outline" onClick={prevStep} className="flex-1 h-12 font-bold btn-back justify-center" disabled={isSubmitting || isLoading}>
                             Back
                         </Button>
                     )}

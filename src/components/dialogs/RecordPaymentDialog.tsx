@@ -416,7 +416,7 @@ export function RecordPaymentDialog({
                 <Button variant="outline" disabled={state.isSubmitting} className="h-11">Cancel</Button>
             </DialogClose>
           ) : (
-             <Button variant="outline" onClick={() => dispatch({ type: 'SET_STEP', step: 1 })} disabled={state.isSubmitting} className="h-11">
+             <Button variant="outline" onClick={() => dispatch({ type: 'SET_STEP', step: 1 })} disabled={state.isSubmitting} className="h-11 btn-back">
                 <ChevronLeft className="mr-2 h-4 w-4" /> Back
              </Button>
           )}

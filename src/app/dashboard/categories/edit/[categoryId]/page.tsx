@@ -64,7 +64,11 @@ export default function EditCategoryPage() {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
         <h2 className="text-2xl font-bold">Category not found</h2>
-        <Button asChild className="mt-4"><Link href="/dashboard/categories">Back to Categories</Link></Button>
+        <Button variant="ghost" asChild className="mt-4 btn-back">
+          <Link href="/dashboard/categories">
+            <ArrowLeft className="h-4 w-4" /> Back to Categories
+          </Link>
+        </Button>
       </div>
     );
   }

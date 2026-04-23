@@ -453,7 +453,7 @@ export default function StoreSignupPage() {
 
                 <div className="flex gap-4 mt-2">
                     {currentStep > 1 && (
-                        <Button type="button" variant="outline" onClick={prevStep} className="flex-1 h-12 font-bold" disabled={isSubmitting}>
+                        <Button type="button" variant="outline" onClick={prevStep} className="flex-1 h-12 font-bold btn-back justify-center" disabled={isSubmitting}>
                             <ChevronLeft className="mr-2 h-4 w-4" /> Back
                         </Button>
                     )}

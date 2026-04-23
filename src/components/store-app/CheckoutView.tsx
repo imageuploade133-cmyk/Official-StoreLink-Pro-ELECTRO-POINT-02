@@ -416,7 +416,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                 </div>
             </Card>
         )}
-        <Button onClick={onClose} size="lg" className="w-full h-16 rounded-[1.5rem] font-black uppercase text-xs tracking-widest shadow-xl">Back to Store</Button>
+        <Button onClick={onClose} size="lg" className="w-full h-16 rounded-[1.5rem] font-black uppercase text-xs tracking-widest shadow-xl btn-back justify-center">Back to Store</Button>
       </div>
     );
   }
@@ -427,7 +427,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
             <div className="flex items-center justify-between px-6 py-6">
                 <button 
                   onClick={step === 'details' ? onClose : () => setStep('details')} 
-                  className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-800 active:scale-90 transition-transform"
+                  className="btn-back !p-0 w-12 h-12 flex items-center justify-center"
                 >
                   <ArrowLeft className="h-6 w-6" />
                 </button>

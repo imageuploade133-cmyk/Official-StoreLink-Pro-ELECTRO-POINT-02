@@ -171,7 +171,11 @@ export default function EditProductPage() {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
         <h2 className="text-2xl font-bold">Product not found</h2>
-        <Button asChild className="mt-4"><Link href="/dashboard/inventory">Back to Inventory</Link></Button>
+        <Button variant="ghost" asChild className="mt-4 btn-back">
+          <Link href="/dashboard/inventory">
+            <ArrowLeft className="h-4 w-4" /> Back to Inventory
+          </Link>
+        </Button>
       </div>
     );
   }

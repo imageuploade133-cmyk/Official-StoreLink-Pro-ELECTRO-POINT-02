@@ -220,7 +220,11 @@ export default function EditUISectionPage() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <h2 className="text-2xl font-bold mb-4">Section not found</h2>
-        <Button asChild><Link href="/dashboard/homepage-sections">Back to Manager</Link></Button>
+        <Button variant="ghost" asChild className="btn-back">
+          <Link href="/dashboard/homepage-sections">
+            <ArrowLeft className="h-4 w-4" /> Back to Sections
+          </Link>
+        </Button>
       </div>
     );
   }

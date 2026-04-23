@@ -59,8 +59,8 @@ export default function CreateHomepageSectionPage() {
                 description="Build a new section to feature products on your homepage."
             >
              <div className="mt-4">
-                    <Button variant="outline" asChild>
-                        <Link href="/dashboard/homepage-sections"><ArrowLeft className="mr-2" />Back to All Sections</Link>
+                    <Button variant="ghost" asChild className="btn-back">
+                        <Link href="/dashboard/homepage-sections"><ArrowLeft className="h-4 w-4" /> Back to All Sections</Link>
                     </Button>
                 </div>
             </PageHeader>

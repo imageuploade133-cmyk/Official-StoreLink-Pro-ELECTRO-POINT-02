@@ -212,7 +212,7 @@ export function ConfirmPaymentDialog({
                     </Card>
                 </div>
                 <DialogFooter className="mt-6">
-                    <Button variant="outline" onClick={() => onClose('back')} disabled={isProcessing} className="px-6 py-3 text-base">Back</Button>
+                    <Button variant="outline" onClick={() => onClose('back')} disabled={isProcessing} className="px-6 py-3 text-base btn-back">Back</Button>
                     <Button onClick={handleConfirm} disabled={isProcessing} className="px-6 py-3 text-base bg-orange-600 hover:bg-orange-700">
                         {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
                         Confirm Sale
