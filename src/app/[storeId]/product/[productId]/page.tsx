@@ -1024,17 +1024,17 @@ export default function ProductDetailsPage() {
             <div className="flex justify-center md:justify-start mb-10">
               <TabsList className="inline-flex h-auto p-1.5 bg-[#f5f5f7] dark:bg-[#1d1d1f] rounded-full border border-black/[0.05] dark:border-white/[0.1] overflow-x-auto no-scrollbar">
                 {showTechnicalSpecs && (
-                  <TabsTrigger value="details" className="group flex items-center gap-2 px-6 py-2 rounded-full transition-all font-semibold text-xs tracking-tight data-[state=active]:bg-white dark:data-[state=active]:bg-black data-[state=active]:shadow-sm">
+                  <TabsTrigger value="details" className="group flex items-center gap-2 px-6 py-2 rounded-full transition-all font-semibold text-xs tracking-tight">
                     <Info className="h-4 w-4" /> Technical Specs
                   </TabsTrigger>
                 )}
                 {showLogisticsTab && (
-                  <TabsTrigger value="shipping" className="group flex items-center gap-2 px-6 py-2 rounded-full transition-all font-semibold text-xs tracking-tight data-[state=active]:bg-white dark:data-[state=active]:bg-black data-[state=active]:shadow-sm">
+                  <TabsTrigger value="shipping" className="group flex items-center gap-2 px-6 py-2 rounded-full transition-all font-semibold text-xs tracking-tight">
                     <Truck className="h-4 w-4" /> Shipping & Returns
                   </TabsTrigger>
                 )}
                 {showVerifiedReviews && (
-                  <TabsTrigger value="reviews" className="group flex items-center gap-2 px-6 py-2 rounded-full transition-all font-semibold text-xs tracking-tight data-[state=active]:bg-white dark:data-[state=active]:bg-black data-[state=active]:shadow-sm">
+                  <TabsTrigger value="reviews" className="group flex items-center gap-2 px-6 py-2 rounded-full transition-all font-semibold text-xs tracking-tight">
                     <Star className="h-4 w-4" /> Reviews <span className="ml-1 opacity-50">{reviewStats.count}</span>
                   </TabsTrigger>
                 )}

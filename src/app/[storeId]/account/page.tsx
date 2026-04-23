@@ -209,14 +209,14 @@ export default function AccountPage() {
             <TabsList className="grid w-full grid-cols-2 p-1 bg-slate-100 dark:bg-slate-900 rounded-2xl h-14 mb-8">
               <TabsTrigger 
                 value="orders" 
-                className="rounded-xl font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm"
+                className="rounded-xl font-black uppercase text-[10px] tracking-widest"
               >
                 <ShoppingBag className="w-4 h-4 mr-2" />
                 Order History
               </TabsTrigger>
               <TabsTrigger 
                 value="profile"
-                className="rounded-xl font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 data-[state=active]:shadow-sm"
+                className="rounded-xl font-black uppercase text-[10px] tracking-widest"
               >
                 <UserCircle className="w-4 h-4 mr-2" />
                 Profile Settings

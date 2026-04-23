@@ -739,14 +739,14 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
                                         <TabsList className="grid grid-cols-2 w-full lg:w-[450px] h-14 p-1.5 bg-background/50 backdrop-blur-sm rounded-2xl border border-border shadow-inner">
                                             <TabsTrigger 
                                                 value="products" 
-                                                className="rounded-xl font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg gap-2"
+                                                className="rounded-xl font-black text-xs uppercase tracking-widest transition-all  gap-2"
                                             >
                                                 <Box className="h-4 w-4" /> 
                                                 Inventory
                                             </TabsTrigger>
                                             <TabsTrigger 
                                                 value="visual" 
-                                                className="rounded-xl font-black text-xs uppercase tracking-widest transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg gap-2"
+                                                className="rounded-xl font-black text-xs uppercase tracking-widest transition-all  gap-2"
                                             >
                                                 <Palette className="h-4 w-4" /> 
                                                 Creative
