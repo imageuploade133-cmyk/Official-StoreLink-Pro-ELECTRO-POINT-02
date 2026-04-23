@@ -21,7 +21,7 @@ interface PopularProductsProps {
 
 export function PopularProducts({ isLoading, popularProductsData }: PopularProductsProps) {
   return (
-    <Card className="lg:col-span-1 border-none shadow-sm overflow-hidden bg-white dark:bg-card">
+    <Card className="lg:col-span-1 shadow-sm overflow-hidden bg-white dark:bg-card">
       <CardHeader className="border-b border-border/50 bg-muted/5">
         <CardTitle className="font-headline text-lg">Popular Products</CardTitle>
         <CardDescription>Top 5 selling items (all time).</CardDescription>

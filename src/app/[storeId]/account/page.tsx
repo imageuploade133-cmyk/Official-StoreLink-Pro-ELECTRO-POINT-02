@@ -155,7 +155,7 @@ export default function AccountPage() {
               </div>
               <div>
                 <span className="text-3xl font-black text-slate-900 dark:text-white">
-                  {formatCurrency(customer?.balance || 0, currencySymbol)}
+                  {formatCurrency(customer?.creditBalance || 0, currencySymbol)}
                 </span>
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-tighter mt-1">Available Credit</p>
               </div>

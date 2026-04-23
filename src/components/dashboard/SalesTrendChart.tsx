@@ -51,7 +51,7 @@ export function SalesTrendChart({ isLoading, salesTrendData, dateRange }: SalesT
   const currencySymbol = settings?.currency || '$';
 
   return (
-    <Card className="lg:col-span-2 border-none shadow-sm overflow-hidden bg-white dark:bg-card">
+    <Card className="lg:col-span-2 shadow-sm overflow-hidden bg-white dark:bg-card">
       <CardHeader className="border-b border-border/50 bg-muted/5">
         <CardTitle className="font-headline text-lg">Sales Trend</CardTitle>
         <CardDescription>Daily sales performance {getDateRangeTitle(dateRange)}.</CardDescription>
