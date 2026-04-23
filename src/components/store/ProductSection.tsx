@@ -629,12 +629,12 @@ export function ProductSection({ section, categories, excludeCategoryIds }: Prod
                         alignment === 'left' ? 'items-start text-left justify-between' : 'items-center text-center justify-center'
                     )}>
                         <div className="space-y-3">
-                            <h2 className="text-3xl md:text-5xl font-black tracking-tighter text-slate-900 dark:text-white leading-tight uppercase">
+                            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-[#1d1d1f] dark:text-white leading-tight">
                                 {section.title}
                             </h2>
                             {section.description && (
                                 <p className={cn(
-                                    "text-sm md:text-lg text-slate-500 dark:text-slate-300 max-w-2xl font-medium leading-relaxed opacity-90 dark:opacity-90",
+                                    "text-sm md:text-lg text-[#86868b] dark:text-slate-400 max-w-2xl font-medium leading-relaxed",
                                     alignment === 'center' && "mx-auto"
                                 )}>
                                     {section.description}
@@ -750,17 +750,10 @@ export function ProductSection({ section, categories, excludeCategoryIds }: Prod
              <div className={cn("mt-12 md:mt-20", alignment === 'left' ? 'text-left' : 'text-center')}>
                 <Button
                     asChild
-                    className={cn(
-                        "font-black uppercase tracking-[0.25em] shadow-2xl transition-all hover:-translate-y-1 active:translate-y-0 border-none",
-                        buttonClasses
-                    )}
-                    style={isPromoActive ? {
-                        backgroundColor: hubColor,
-                        boxShadow: `0 20px 40px -5px ${hubColor}44`
-                    } : buttonStyle}
+                    className="store-btn-secondary h-12 px-10 text-sm font-semibold"
                 >
                     <Link href={section.selectionType === 'all' ? getStoreUrl('/store/shop') : getStoreUrl(`/store/shop?category=${section.categoryId}`)}>
-                        {exploreText} <IconComponent className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={3} />
+                        {exploreText} <IconComponent className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Link>
                 </Button>
             </div>

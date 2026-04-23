@@ -19,6 +19,8 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground dark:text-foreground dark:hover:bg-popover",
         link: "text-primary underline-offset-4 hover:underline",
+        store: "store-btn-primary",
+        storeSecondary: "store-btn-secondary",
       },
       size: {
         default: "h-11 px-6 py-2",

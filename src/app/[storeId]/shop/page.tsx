@@ -383,8 +383,8 @@ function ShopPageContent() {
                                 "flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-8 sm:mb-12",
                                 settings?.shopProductsAlignment === 'center' && "justify-center"
                             )}>
-                        <form onSubmit={handleSearchSubmit} className="relative w-full sm:max-w-xs">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground flex-shrink-0 z-10" />
+                        <form onSubmit={handleSearchSubmit} className="relative w-full sm:max-w-md">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#86868b] flex-shrink-0 z-10" />
                         <Input
                             ref={searchInputRef}
                             placeholder="Search products..."
@@ -397,7 +397,7 @@ function ShopPageContent() {
                             }}
                             onFocus={() => searchTerm.trim() && setShowSuggestions(true)}
                             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                            className="pl-10 h-10 rounded-lg text-sm w-full"
+                            className="pl-10 h-12 rounded-2xl text-sm w-full bg-[#f5f5f7] dark:bg-[#1d1d1f] border-none"
                         />
                         
                         {/* Search Suggestions Dropdown */}
@@ -460,18 +460,18 @@ function ShopPageContent() {
                     </form>
                     <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
                         <Select value={categoryFromUrl} onValueChange={handleCategoryChange} disabled={isLoadingCategories}>
-                            <SelectTrigger className="flex-1 sm:flex-none sm:w-[200px] h-10 rounded-lg text-sm">
+                            <SelectTrigger className="flex-1 sm:flex-none sm:w-[200px] h-12 rounded-2xl text-sm bg-[#f5f5f7] dark:bg-[#1d1d1f] border-none">
                                 <SelectValue placeholder="Filter category" />
                             </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All Categories</SelectItem>
+                            <SelectContent className="rounded-3xl border-black/[0.05] dark:border-white/[0.05] shadow-2xl">
+                                <SelectItem value="all" className="rounded-xl">All Categories</SelectItem>
                                 {categories?.map(category => (
-                                    <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>
+                                    <SelectItem key={category.id} value={category.id} className="rounded-xl">{category.name}</SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
-                        <Button variant="outline" size="icon" onClick={() => fetchProducts('initial')} disabled={isLoading} className="h-10 w-10 rounded-lg flex-shrink-0">
-                            <RotateCcw className={cn("h-4 w-4", isLoading && "animate-spin")} />
+                        <Button variant="outline" size="icon" onClick={() => fetchProducts('initial')} disabled={isLoading} className="h-12 w-12 rounded-2xl flex-shrink-0 bg-[#f5f5f7] dark:bg-[#1d1d1f] border-none hover:bg-[#e8e8ed] dark:hover:bg-[#2d2d2f]">
+                            <RotateCcw className={cn("h-4 w-4 text-[#86868b]", isLoading && "animate-spin")} />
                         </Button>
                     </div>
                 </div>
@@ -501,23 +501,23 @@ function ShopPageContent() {
                                 Page {currentPage} of {totalPages || 1} • {totalProductsCount} Items
                             </p>
                             <div className="flex items-center gap-2 sm:gap-3">
-                                <Button 
-                                    variant="outline" 
+                                <Button
+                                    variant="secondary"
                                     size="sm"
-                                    onClick={() => fetchProducts('prev')} 
+                                    onClick={() => fetchProducts('prev')}
                                     disabled={currentPage === 1 || isLoading}
-                                    className="rounded-lg h-10 px-3 text-sm"
+                                    className="rounded-full h-10 px-6 text-sm font-semibold store-btn-secondary"
                                 >
-                                    <ChevronLeft className="h-4 w-4 mr-1" /> <span className="hidden sm:inline">Previous</span>
+                                    <ChevronLeft className="h-4 w-4 mr-1" /> Previous
                                 </Button>
-                                <Button 
-                                    variant="outline" 
+                                <Button
+                                    variant="secondary"
                                     size="sm"
-                                    onClick={() => fetchProducts('next')} 
+                                    onClick={() => fetchProducts('next')}
                                     disabled={isLastPage || isLoading}
-                                    className="rounded-lg h-10 px-3 text-sm"
+                                    className="rounded-full h-10 px-6 text-sm font-semibold store-btn-secondary"
                                 >
-                                    <span className="hidden sm:inline">Next</span> <ChevronRight className="h-4 w-4 ml-1" />
+                                    Next <ChevronRight className="h-4 w-4 ml-1" />
                                 </Button>
                             </div>
                         </div>
