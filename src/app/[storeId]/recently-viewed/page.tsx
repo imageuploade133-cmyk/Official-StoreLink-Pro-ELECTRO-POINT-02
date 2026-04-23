@@ -67,7 +67,7 @@ export default function RecentlyViewedPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="text-center md:text-left">
-                <Button variant="ghost" asChild className="-ml-4 mb-4 btn-back">
+                <Button variant="ghost" asChild className="-ml-4 mb-4">
                     <Link href={getStoreUrl("/store/shop")} className="flex items-center gap-2">
                         <ArrowLeft className="h-3 w-3" /> Back to Shop
                     </Link>

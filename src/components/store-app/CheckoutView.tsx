@@ -425,12 +425,14 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
     <div className="flex flex-col h-full bg-background-light dark:bg-black animate-in slide-in-from-right-4 fade-in duration-500">
         <header className="sticky top-0 z-50 flex flex-col bg-background-light/80 dark:bg-black/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
             <div className="flex items-center justify-between px-6 py-6">
-                <button 
+                <Button 
+                  variant="ghost"
+                  size="icon"
                   onClick={step === 'details' ? onClose : () => setStep('details')} 
-                  className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-800 active:scale-90 transition-transform"
+                  className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-800 active:scale-90 transition-transform btn-back"
                 >
                   <ArrowLeft className="h-6 w-6" />
-                </button>
+                </Button>
                 <h1 className="text-xl font-black tracking-tighter uppercase">Checkout</h1>
                 <Badge variant="secondary" className="font-black h-8 px-4 rounded-full shadow-sm">{cartCount} items</Badge>
             </div>

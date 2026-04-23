@@ -77,7 +77,7 @@ export default function EditCategoryPage() {
           title={`Edit Category: ${category.name}`}
           description="Update classification details and flash sale settings."
         />
-        <Button variant="ghost" asChild className="gap-2 btn-back">
+        <Button variant="ghost" asChild className="gap-2">
           <Link href="/dashboard/categories">
             <ArrowLeft className="h-4 w-4" /> Back to Categories
           </Link>

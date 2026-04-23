@@ -51,8 +51,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
       if (onClick) {
-        const result = onClick(event) as any
-        if (result && typeof result === 'object' && 'then' in result) {
+        const result = onClick(event)
+        if (result instanceof Promise || (result && typeof result === 'object' && 'then' in result)) {
           setInternalLoading(true)
           try {
             await result
@@ -68,7 +68,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       if (typeof node === 'string') return node;
       if (typeof node === 'number') return String(node);
       if (Array.isArray(node)) return node.map(getText).join('');
-      if (React.isValidElement(node)) return getText((node.props as any).children);
+      if (React.isValidElement(node)) {
+        const props = node.props as { children?: React.ReactNode };
+        return getText(props.children);
+      }
       return '';
     };
     
@@ -82,6 +85,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                    /\breturn\b/i.test(textContent) || 
                    /\bprevious\b/i.test(textContent) || 
                    /\bprev\b/i.test(textContent) || 
+                   /\bcancel\b/i.test(textContent) ||
                    /\bcontinue shopping\b/i.test(textContent) ||
                    (typeof className === 'string' && className.includes("btn-back"));
 

@@ -7,7 +7,7 @@ import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, where, documentId, orderBy } from 'firebase/firestore';
 import type { Product, Category } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { HeartCrack } from 'lucide-react';
+import { HeartCrack, ArrowLeft, Heart } from 'lucide-react';
 import { ProductCard } from '@/components/store/ProductCard';
 import { useSettings } from '@/contexts/settings-context';
 import { ProductCardSkeleton } from '@/components/store/ProductCardSkeleton';
@@ -60,11 +60,21 @@ export default function WishlistPage() {
   return (
     <div className="bg-background">
       <header className="py-12 bg-muted dark:bg-slate-900/50 border-b dark:border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white">My Wishlist</h1>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-500">
-            Your collection of favorite items. Don't let them get away!
-          </p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="text-center md:text-left">
+                <Button variant="ghost" asChild className="-ml-4 mb-4">
+                    <Link href={getStoreUrl("/store/shop")} className="flex items-center gap-2">
+                        <ArrowLeft className="h-3 w-3" /> Back to Shop
+                    </Link>
+                </Button>
+                <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white flex items-center justify-center md:justify-start gap-4">
+                    <Heart className="h-10 w-10 text-primary" />
+                    My Wishlist
+                </h1>
+                <p className="mt-2 text-slate-500 font-medium">Your collection of favorite items. Don't let them get away!</p>
+            </div>
+          </div>
         </div>
       </header>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

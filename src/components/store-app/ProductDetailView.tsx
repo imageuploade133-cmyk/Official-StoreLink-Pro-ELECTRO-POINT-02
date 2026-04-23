@@ -381,7 +381,14 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                     />
                 )}
                 <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center bg-gradient-to-b from-black/40 to-transparent pt-8">
-                    <button onClick={onClose} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 backdrop-blur-md text-white border border-white/30 active:scale-90 transition-transform"><ChevronLeft className="h-6 w-6" /></button>
+                    <Button 
+                      variant="ghost"
+                      size="icon"
+                      onClick={onClose} 
+                      className="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 backdrop-blur-md text-white border border-white/30 active:scale-90 transition-transform btn-back"
+                    >
+                      <ChevronLeft className="h-6 w-6" />
+                    </Button>
                     <div className="flex gap-2">
                         <button onClick={handleToggleWishlist} className={cn("w-10 h-10 flex items-center justify-center rounded-full backdrop-blur-md border", isLiked ? "bg-rose-500 text-white border-rose-400" : "bg-white/20 text-white border-white/30")}><Heart className={cn("h-5 w-5", isLiked && "fill-current")} /></button>
                         <button onClick={() => { navigator.clipboard.writeText(window.location.href); toast({ title: "Link Copied" }); }} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 backdrop-blur-md text-white border border-white/30"><Share2 className="h-5 w-5" /></button>

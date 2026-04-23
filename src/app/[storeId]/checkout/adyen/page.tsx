@@ -5,6 +5,7 @@ import { useSearchParams, useRouter, useParams } from 'next/navigation';
 import AdyenCheckout from '@adyen/adyen-web';
 import '@adyen/adyen-web/styles/adyen.css';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 
 export default function AdyenPaymentPage() {
@@ -82,12 +83,13 @@ export default function AdyenPaymentPage() {
             <div className="p-4 bg-destructive/10 border border-destructive rounded-lg text-destructive text-center">
               <p className="font-bold">Error</p>
               <p>{error}</p>
-              <button 
+              <Button 
+                variant="ghost"
                 onClick={() => router.back()}
                 className="mt-4 text-sm underline font-medium"
               >
                 Go back and try again
-              </button>
+              </Button>
             </div>
           )}
           <div ref={containerRef} className={isLoading ? 'hidden' : 'block'} />

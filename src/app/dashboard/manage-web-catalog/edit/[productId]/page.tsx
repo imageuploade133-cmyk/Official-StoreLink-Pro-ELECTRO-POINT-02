@@ -176,7 +176,7 @@ export default function EditStoreProductPage() {
           title="Refine Web Product" 
           description="Multi-Part distributed data synchronization active."
         />
-        <Button variant="ghost" asChild className="gap-2 btn-back">
+        <Button variant="ghost" asChild className="gap-2">
           <Link href="/dashboard/manage-web-catalog"><ArrowLeft className="h-4 w-4" /> Back to Catalog</Link>
         </Button>
       </div>
