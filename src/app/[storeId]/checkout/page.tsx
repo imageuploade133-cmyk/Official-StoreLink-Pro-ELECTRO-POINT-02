@@ -439,7 +439,7 @@ export default function CheckoutPage() {
             <h1 className="text-4xl font-extrabold tracking-tight">Checkout</h1>
             <p className="text-muted-foreground mt-2">Complete your purchase securely.</p>
           </div>
-          <Button variant="ghost" asChild><Link href={getStoreUrl("/store/cart")}><ArrowLeft className="mr-2 h-4 w-4" /> Back to Cart</Link></Button>
+          <Button variant="ghost" asChild className="btn-back"><Link href={getStoreUrl("/store/cart")}><ArrowLeft className="h-4 w-4" /> Back to Cart</Link></Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
@@ -771,7 +771,9 @@ export default function CheckoutPage() {
               </CardContent>
               {step === 'payment' && (
                 <CardFooter className="flex justify-between border-t pt-6">
-                  <Button variant="ghost" onClick={() => setStep('details')}>Back to Details</Button>
+                  <Button variant="ghost" className="btn-back" onClick={() => setStep('details')}>
+                    <ArrowLeft className="h-4 w-4" /> Back to Details
+                  </Button>
                   <LoadingButton 
                     onClick={handlePlaceOrder} 
                     isLoading={step === 'processing'}

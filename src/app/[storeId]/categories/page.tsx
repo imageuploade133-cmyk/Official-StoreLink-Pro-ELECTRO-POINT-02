@@ -158,7 +158,7 @@ export default function AllCategoriesPage() {
                             onClick={() => router.back()}
                             variant="ghost" 
                             size="sm"
-                            className="mb-12 h-10 rounded-full px-4 text-[10px] font-black uppercase tracking-[0.2em] bg-black/5 dark:bg-white/5 backdrop-blur-md hover:bg-black/10 dark:hover:bg-white/10 text-black dark:text-white border border-black/5 dark:border-white/10 transition-all shadow-sm group active:scale-95"
+                            className="mb-12 btn-back"
                         >
                             <ChevronLeft className="h-4 w-4 mr-1 transition-transform group-hover:-translate-x-1" /> 
                             Back

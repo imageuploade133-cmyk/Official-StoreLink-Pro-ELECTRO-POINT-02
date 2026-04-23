@@ -292,11 +292,9 @@
   background-color: #161617 !important;
 }
 
-/* Buttons */
-.dark .btn-back {
-  background-color: #1c1c1e !important;
-  border: 1px solid #424245 !important;
-  color: #ffffff !important;
+/* Back Buttons */
+.btn-back {
+  @apply border border-black/10 dark:border-white/20 shadow-sm rounded-full transition-all active:scale-95 bg-white/80 dark:bg-[#1c1c1e] backdrop-blur-md hover:bg-white dark:hover:bg-[#2c2c2e] text-black dark:text-white font-medium px-4 h-10 flex items-center gap-2 !important;
 }
 
 .dark .btn-save {

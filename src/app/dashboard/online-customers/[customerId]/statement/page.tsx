@@ -345,7 +345,7 @@ export default function OnlineCustomerStatementPage() {
       <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
         <div className="bg-red-100 p-4 rounded-full text-red-600"><X className="h-8 w-8" /></div>
         <h2 className="text-2xl font-bold">Account Registry Not Found</h2>
-        <Button onClick={() => router.back()}><ArrowLeft className="mr-2 h-4 w-4" /> Go Back</Button>
+        <Button onClick={() => router.back()} className="btn-back"><ArrowLeft className="h-4 w-4" /> Go Back</Button>
       </div>
     );
   }
@@ -353,7 +353,7 @@ export default function OnlineCustomerStatementPage() {
   return (
     <div className="min-h-screen flex flex-col max-w-6xl mx-auto px-4 py-8 space-y-8">
       <div className="no-print -mb-4">
-        <Button variant="ghost" onClick={() => router.back()} className="gap-2">
+        <Button variant="ghost" onClick={() => router.back()} className="btn-back">
           <ArrowLeft className="h-4 w-4" /> Back to Online Customers
         </Button>
       </div>

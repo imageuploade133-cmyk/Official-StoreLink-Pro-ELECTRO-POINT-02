@@ -345,7 +345,7 @@ function ShopPageContent() {
                         onClick={() => router.back()}
                         variant="ghost" 
                         size="sm"
-                        className="h-10 rounded-full px-4 text-[10px] font-black uppercase tracking-[0.2em] bg-white/20 dark:bg-black/20 backdrop-blur-md hover:bg-white/40 dark:hover:bg-black/40 text-black dark:text-white border border-black/5 dark:border-white/10 transition-all shadow-lg group active:scale-95"
+                        className="btn-back"
                     >
                         <ChevronLeft className="h-4 w-4 mr-1 transition-transform group-hover:-translate-x-1" /> 
                         Back

@@ -73,7 +73,8 @@ export default function OrderDetailPage() {
         <p className="text-muted-foreground mb-8">
           The order you are looking for does not exist or you don't have permission to view it.
         </p>
-        <Button onClick={() => router.push(getStoreUrl('/store/account'))}>
+        <Button className="btn-back mx-auto" onClick={() => router.push(getStoreUrl('/store/account'))}>
+          <ChevronLeft className="h-4 w-4" />
           Back to My Account
         </Button>
       </div>
@@ -117,10 +118,10 @@ export default function OrderDetailPage() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <Button 
         variant="ghost" 
-        className="mb-6 -ml-2 text-muted-foreground"
+        className="mb-6 btn-back"
         onClick={() => router.push(getStoreUrl('/store/account'))}
       >
-        <ChevronLeft className="mr-2 h-4 w-4" />
+        <ChevronLeft className="h-4 w-4" />
         Back to Orders
       </Button>
 

@@ -111,9 +111,11 @@ function HubHero({ slides, settings, getStoreUrl }: { slides: SlideShow[], setti
                 </div>
                 
                 <div className="max-w-site-container mx-auto px-6 relative z-10 text-center space-y-8">
-                    <Link href={getStoreUrl('/store/shop')} className="inline-flex items-center gap-2 text-white/80 hover:text-white transition-colors font-black text-[10px] uppercase tracking-[0.2em] mb-4">
-                        <ArrowLeft className="h-3 w-3" /> Back to Catalog
-                    </Link>
+                    <Button asChild variant="ghost" className="btn-back mx-auto mb-4">
+                        <Link href={getStoreUrl('/store/shop')}>
+                            <ArrowLeft className="h-4 w-4" /> Back to Catalog
+                        </Link>
+                    </Button>
                     <div className="flex justify-center">
                         <div className="bg-white/10 p-3 rounded-2xl shadow-2xl rotate-3 animate-bounce border border-white/20 backdrop-blur-md">
                             {iconUrl ? (

@@ -733,7 +733,7 @@ export default function ProductDetailsPage() {
             onClick={() => router.back()}
             variant="ghost" 
             size="sm"
-            className="gap-2 text-primary hover:bg-primary/10 h-10 px-3 rounded-lg font-semibold transition-all active:scale-95"
+            className="btn-back"
           >
             <ArrowLeft className="h-5 w-5" />
             <span>Back</span>

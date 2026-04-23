@@ -7,7 +7,7 @@ import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, where, documentId, orderBy } from 'firebase/firestore';
 import type { Product, Category } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { HeartCrack } from 'lucide-react';
+import { HeartCrack, ChevronLeft } from 'lucide-react';
 import { ProductCard } from '@/components/store/ProductCard';
 import { useSettings } from '@/contexts/settings-context';
 import { ProductCardSkeleton } from '@/components/store/ProductCardSkeleton';
@@ -60,11 +60,18 @@ export default function WishlistPage() {
   return (
     <div className="bg-background">
       <header className="py-12 bg-muted dark:bg-slate-900/50 border-b dark:border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white">My Wishlist</h1>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-500">
-            Your collection of favorite items. Don't let them get away!
-          </p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Button asChild variant="ghost" className="btn-back mb-6">
+            <Link href={getStoreUrl('/store/shop')}>
+              <ChevronLeft className="h-4 w-4 mr-2" /> Back to Shop
+            </Link>
+          </Button>
+          <div className="text-center">
+            <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white">My Wishlist</h1>
+            <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-500">
+              Your collection of favorite items. Don't let them get away!
+            </p>
+          </div>
         </div>
       </header>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

@@ -85,8 +85,8 @@ export default function StoreHomePage() {
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
         <h1 className="text-4xl font-bold mb-4">Store Not Found</h1>
         <p className="text-muted-foreground mb-8">The store you are looking for does not exist or has been moved.</p>
-        <Button asChild>
-          <Link href="/">Back to Home</Link>
+        <Button asChild className="btn-back">
+          <Link href="/"><ArrowLeft className="h-4 w-4" /> Back to Home</Link>
         </Button>
       </div>
     );

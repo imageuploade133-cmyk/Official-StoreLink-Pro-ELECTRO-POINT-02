@@ -7,17 +7,21 @@ import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, where, limit } from 'firebase/firestore';
 import type { PublicPage } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AlertTriangle, Clock, Calendar } from 'lucide-react';
+import { AlertTriangle, Clock, Calendar, ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { format } from 'date-fns';
 import { convertToDateSafely } from '@/lib/utils';
+import { useStoreUrl } from '@/hooks/use-store-url';
 
 export default function DynamicPublicPage() {
   const params = useParams();
   const slug = params.slug as string;
   const firestore = useFirestore();
+  const { getStoreUrl } = useStoreUrl();
 
   const pageQuery = useMemo(() => {
     if (!firestore || !slug) return null;
@@ -85,6 +89,11 @@ export default function DynamicPublicPage() {
         </header>
 
         <main className="max-w-5xl mx-auto px-6 sm:px-10 lg:px-12 py-20">
+            <Button asChild variant="ghost" className="btn-back mb-8">
+                <Link href={getStoreUrl('/store')}>
+                    <ArrowLeft className="h-4 w-4" /> Back to Home
+                </Link>
+            </Button>
             <div className="bg-white dark:bg-slate-900 rounded-[3rem] p-8 md:p-16 border-2 border-slate-50 dark:border-slate-800 shadow-2xl">
                 <article className="prose dark:prose-invert lg:prose-xl max-w-none">
                     <div className="rich-content">

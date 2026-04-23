@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo } from 'react';
 import { useUser, useAuth, useFirestore, useDoc } from '@/firebase';
-import { Loader2, ShoppingBag, UserCircle, LogOut, Wallet, Coins, CheckCircle2 } from 'lucide-react';
+import { Loader2, ShoppingBag, UserCircle, LogOut, Wallet, Coins, CheckCircle2, ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -124,12 +124,12 @@ export default function AccountPage() {
 
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
           <Button 
-            variant="outline" 
-            className="rounded-xl font-bold uppercase text-xs tracking-widest h-11 border-slate-200 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
+            variant="ghost" 
+            className="btn-back h-11"
             onClick={() => router.push(getStoreUrl('/store/shop'))}
           >
-            <ShoppingBag className="w-4 h-4 mr-2" />
-            Continue Shopping
+            <ChevronLeft className="w-4 h-4 mr-2" />
+            Back to Shop
           </Button>
           <Button 
             variant="destructive" 
