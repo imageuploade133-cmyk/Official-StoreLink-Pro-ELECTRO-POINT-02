@@ -229,7 +229,6 @@ export interface Settings {
   storeLogoUrl?: string;
   invoiceLogoUrl?: string;
   storeLogoWidth?: number;
-  footerLogoWidth?: number;
   storeNameFontSize?: number;
   loginImageUrl?: string;
   invoiceAccentColor?: string;
@@ -329,7 +328,7 @@ export interface Settings {
   storeBtnColor?: string;
   storeBtnGradientStart?: string;
   storeBtnGradientEnd?: string;
-  storeBtnShape?: string;
+  storeBtnShape?: 'none' | 'sm' | 'md' | 'lg' | 'full';
   storeBtnSize?: 'sm' | 'md' | 'lg' | 'xl';
   // Use individual button settings flag
   useIndividualBtnSettings?: boolean;

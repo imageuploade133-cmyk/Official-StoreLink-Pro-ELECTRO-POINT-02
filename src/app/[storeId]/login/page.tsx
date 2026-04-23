@@ -126,6 +126,8 @@ export default function StoreLoginPage() {
 
     const buttonStyle = useMemo(() => {
         const style = settings?.storeBtnStyle || 'standard';
+        const primaryColor = settings?.storeBtnColor || '#3b82f6';
+        
         if (style === 'gradient') {
           return {
             background: `linear-gradient(to right, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
@@ -133,12 +135,50 @@ export default function StoreLoginPage() {
             border: 'none'
           };
         }
+
+        if (style === 'glass') {
+          return {
+            backgroundColor: 'rgba(255, 255, 255, 0.4)',
+            backdropFilter: 'blur(12px)',
+            color: primaryColor,
+            border: '1px solid rgba(255, 255, 255, 0.5)'
+          };
+        }
+
+        if (style === 'outline') {
+          return {
+            backgroundColor: 'transparent',
+            color: primaryColor,
+            border: `2px solid ${primaryColor}`
+          };
+        }
+
+        if (style === 'ghost') {
+          return {
+            backgroundColor: 'transparent',
+            color: primaryColor,
+            border: 'none'
+          };
+        }
+
         return {
-          backgroundColor: settings?.storeBtnColor || '#3b82f6',
+          backgroundColor: primaryColor,
           color: 'white',
           border: 'none'
         };
     }, [settings]);
+
+    const buttonShapeClass = useMemo(() => {
+        const shape = settings?.storeBtnShape || 'md';
+        switch (shape) {
+          case 'none': return 'rounded-none';
+          case 'sm': return 'rounded-sm';
+          case 'md': return 'rounded-md';
+          case 'lg': return 'rounded-2xl';
+          case 'full': return 'rounded-full';
+          default: return 'rounded-md';
+        }
+    }, [settings?.storeBtnShape]);
 
     if (isAuthLoading || isLoadingSettings) {
         return <PageSpinner label="Welcome Back" subLabel="Loading your store experience…" />;
@@ -262,7 +302,7 @@ export default function StoreLoginPage() {
                 </button>
               </div>
             </div>
-            <Button type="submit" style={buttonStyle} className="w-full border-none font-bold" disabled={isLoading}>
+            <Button type="submit" style={buttonStyle} className={cn("w-full border-none font-bold", buttonShapeClass)} disabled={isLoading}>
                 {isLoading && <Spinner size="sm" className="mr-2 text-primary-foreground" />}
               Login
             </Button>

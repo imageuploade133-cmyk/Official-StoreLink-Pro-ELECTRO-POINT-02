@@ -66,44 +66,50 @@ export function StickyProductBar({
     const style = useIndividual 
       ? (settings?.storeAddToCartStyle || 'standard')
       : (settings?.storeBtnStyle || 'standard');
+    const primaryColor = useIndividual
+      ? (settings?.storeAddToCartColor || '#3b82f6')
+      : (settings?.storeBtnColor || '#3b82f6');
     
-    const getColor = () => {
-      if (style === 'gradient') {
-        return {
-          background: `linear-gradient(135deg, ${settings?.storeAddToCartGradientStart || '#3b82f6'}, ${settings?.storeAddToCartGradientEnd || '#1d4ed8'})`,
-          color: 'white',
-          border: 'none'
-        };
-      } else if (style === 'image' && settings?.storeAddToCartImageUrl) {
-        return {
-          backgroundImage: `url('${settings.storeAddToCartImageUrl}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          color: 'white',
-          textShadow: '0 1px 3px rgba(0,0,0,0.5)',
-          border: 'none'
-        };
-      } else if (style === 'outline') {
-        return {
-          backgroundColor: 'transparent',
-          color: settings?.storeAddToCartColor || '#3b82f6',
-          border: `2px solid ${settings?.storeAddToCartColor || '#3b82f6'}`
-        };
-      } else if (style === 'ghost') {
-        return {
-          backgroundColor: 'transparent',
-          color: settings?.storeAddToCartColor || '#3b82f6',
-          border: 'none'
-        };
-      }
+    if (style === 'gradient') {
       return {
-        backgroundColor: settings?.storeAddToCartColor || '#3b82f6',
+        background: `linear-gradient(135deg, ${settings?.storeAddToCartGradientStart || '#3b82f6'}, ${settings?.storeAddToCartGradientEnd || '#1d4ed8'})`,
         color: 'white',
         border: 'none'
       };
+    } else if (style === 'image' && settings?.storeAddToCartImageUrl) {
+      return {
+        backgroundImage: `url('${settings.storeAddToCartImageUrl}')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        color: 'white',
+        textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+        border: 'none'
+      };
+    } else if (style === 'glass') {
+      return {
+        backgroundColor: 'rgba(255, 255, 255, 0.4)',
+        backdropFilter: 'blur(12px)',
+        color: primaryColor,
+        border: '1px solid rgba(255, 255, 255, 0.5)',
+      };
+    } else if (style === 'outline') {
+      return {
+        backgroundColor: 'transparent',
+        color: primaryColor,
+        border: `2px solid ${primaryColor}`
+      };
+    } else if (style === 'ghost') {
+      return {
+        backgroundColor: 'transparent',
+        color: primaryColor,
+        border: 'none'
+      };
+    }
+    return {
+      backgroundColor: primaryColor,
+      color: 'white',
+      border: 'none'
     };
-    
-    return getColor();
   }, [settings]);
 
   // Button shape and size classes

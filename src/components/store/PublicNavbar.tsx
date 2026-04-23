@@ -264,6 +264,62 @@ export function PublicNavbar() {
         return cn(baseClasses, positionClass, styleClasses);
     };
 
+    const buttonStyle = useMemo(() => {
+        const style = settings?.storeBtnStyle || 'standard';
+        const primaryColor = settings?.storeBtnColor || '#0071e3';
+        
+        if (style === 'gradient') {
+          return {
+            background: `linear-gradient(to right, ${settings?.storeBtnGradientStart || '#0071e3'}, ${settings?.storeBtnGradientEnd || '#005bb7'})`,
+            color: 'white',
+            border: 'none'
+          };
+        }
+
+        if (style === 'glass') {
+          return {
+            backgroundColor: 'rgba(255, 255, 255, 0.4)',
+            backdropFilter: 'blur(12px)',
+            color: primaryColor,
+            border: '1px solid rgba(255, 255, 255, 0.5)'
+          };
+        }
+
+        if (style === 'outline') {
+          return {
+            backgroundColor: 'transparent',
+            color: primaryColor,
+            border: `1.5px solid ${primaryColor}`
+          };
+        }
+
+        if (style === 'ghost') {
+          return {
+            backgroundColor: 'transparent',
+            color: primaryColor,
+            border: 'none'
+          };
+        }
+
+        return {
+          backgroundColor: primaryColor,
+          color: 'white',
+          border: 'none'
+        };
+    }, [settings]);
+
+    const buttonShapeClass = useMemo(() => {
+        const shape = settings?.storeBtnShape || 'full';
+        switch (shape) {
+          case 'none': return 'rounded-none';
+          case 'sm': return 'rounded-sm';
+          case 'md': return 'rounded-md';
+          case 'lg': return 'rounded-2xl';
+          case 'full': return 'rounded-full';
+          default: return 'rounded-full';
+        }
+    }, [settings?.storeBtnShape]);
+
     return (
         <nav className={getNavbarClasses()}>
           <div className="max-w-site-container mx-auto px-4 sm:px-6 lg:px-8">
@@ -382,7 +438,17 @@ export function PublicNavbar() {
                             </Link>
                         )}
                         {navbarShowAccount && (
-                            <UserButton isLoading={isLoading} user={user} staffMember={staffMember} router={router} handleLogout={handleLogout} getInitials={getInitials} getStoreUrl={getStoreUrl} />
+                            <UserButton 
+                                isLoading={isLoading} 
+                                user={user} 
+                                staffMember={staffMember} 
+                                router={router} 
+                                handleLogout={handleLogout} 
+                                getInitials={getInitials} 
+                                getStoreUrl={getStoreUrl}
+                                buttonStyle={buttonStyle}
+                                buttonShapeClass={buttonShapeClass}
+                            />
                         )}
                         {navbarShowSearch && (
                             <Button 
@@ -499,10 +565,10 @@ export function PublicNavbar() {
                                     <div className="mt-auto pt-10">
                                         {navbarShowAccount && !user ? (
                                             <div className="flex flex-col gap-4">
-                                                <Button asChild className="w-full h-12 rounded-full font-bold bg-[#0071e3] text-white" onClick={() => setIsMenuOpen(false)}>
+                                                <Button asChild className={cn("w-full h-12 font-bold", buttonShapeClass)} style={buttonStyle} onClick={() => setIsMenuOpen(false)}>
                                                     <Link href={getStoreUrl("/store/signup")}>Join StoreLink Pro</Link>
                                                 </Button>
-                                                <Button asChild variant="ghost" className="w-full h-12 rounded-full font-bold text-[#0071e3]" onClick={() => setIsMenuOpen(false)}>
+                                                <Button asChild variant="ghost" className={cn("w-full h-12 font-bold", buttonShapeClass)} style={{ color: settings?.storeBtnColor || '#0071e3' }} onClick={() => setIsMenuOpen(false)}>
                                                     <Link href={getStoreUrl("/store/login")}>Sign In</Link>
                                                 </Button>
                                             </div>
@@ -729,14 +795,16 @@ export function PublicNavbar() {
     );
 }
 
-function UserButton({ isLoading, user, staffMember, router, handleLogout, getInitials, getStoreUrl }: { 
+function UserButton({ isLoading, user, staffMember, router, handleLogout, getInitials, getStoreUrl, buttonStyle, buttonShapeClass }: { 
     isLoading: boolean, 
     user: any, 
     staffMember: any, 
     router: any, 
     handleLogout: () => void, 
     getInitials: (email?: string | null) => string,
-    getStoreUrl: (path: string) => string
+    getStoreUrl: (path: string) => string,
+    buttonStyle: React.CSSProperties,
+    buttonShapeClass: string
 }) {
     if (isLoading) {
         return <Button variant="ghost" size="icon" className="hidden sm:inline-flex text-slate-600 dark:text-slate-300"><Loader2 className="h-5 w-5 animate-spin" /></Button>
@@ -783,10 +851,10 @@ function UserButton({ isLoading, user, staffMember, router, handleLogout, getIni
     }
     return (
         <div className="hidden sm:flex items-center gap-3 ml-2">
-            <Button variant="ghost" asChild className="text-[12px] font-bold tracking-tight h-8 px-3 hover:bg-black/[0.05] dark:hover:bg-white/[0.05] rounded-full">
+            <Button variant="ghost" asChild className={cn("text-[12px] font-bold tracking-tight h-8 px-3 hover:bg-black/[0.05] dark:hover:bg-white/[0.05]", buttonShapeClass)}>
                 <Link href={getStoreUrl('/store/login')}>Sign In</Link>
             </Button>
-            <Button asChild className="bg-[#0071e3] text-white hover:bg-[#0077ed] rounded-full px-4 font-bold text-[12px] tracking-tight h-8 shadow-sm">
+            <Button asChild className={cn("px-4 font-bold text-[12px] tracking-tight h-8 shadow-sm border-none", buttonShapeClass)} style={buttonStyle}>
                 <Link href={getStoreUrl('/store/signup')}>Sign Up</Link>
             </Button>
         </div>

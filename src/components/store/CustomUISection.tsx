@@ -22,6 +22,56 @@ export function CustomUISection({ section }: CustomUISectionProps) {
   const isVideo = section.uiType === 'video';
   const isCenter = section.alignment === 'center';
 
+  const buttonStyle = React.useMemo(() => {
+    const style = settings?.storeBtnStyle || 'standard';
+    const primaryColor = settings?.storeBtnColor || '#3b82f6';
+    
+    if (style === 'gradient') {
+      return {
+        background: `linear-gradient(to right, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
+        color: 'white',
+        border: 'none'
+      };
+    } else if (style === 'outline') {
+      return {
+        backgroundColor: 'transparent',
+        color: primaryColor,
+        border: `2px solid ${primaryColor}`
+      };
+    } else if (style === 'ghost') {
+      return {
+        backgroundColor: 'transparent',
+        color: primaryColor,
+        border: 'none'
+      };
+    } else if (style === 'glass') {
+      return {
+        backgroundColor: 'rgba(255, 255, 255, 0.4)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        color: primaryColor,
+        border: '1px solid rgba(255, 255, 255, 0.5)'
+      };
+    }
+    return {
+      backgroundColor: primaryColor,
+      color: 'white',
+      border: 'none'
+    };
+  }, [settings]);
+
+  const buttonShapeClass = React.useMemo(() => {
+    const shape = settings?.storeBtnShape || 'full';
+    switch (shape) {
+      case 'none': return 'rounded-none';
+      case 'sm': return 'rounded-sm';
+      case 'md': return 'rounded-md';
+      case 'lg': return 'rounded-2xl';
+      case 'full': return 'rounded-full';
+      default: return 'rounded-full';
+    }
+  }, [settings?.storeBtnShape]);
+
   return (
     <section 
         className={cn(
@@ -96,7 +146,7 @@ export function CustomUISection({ section }: CustomUISectionProps) {
                     )}
                     {(section.buttonText && section.linkUrl) && (
                         <div className="pt-4">
-                            <Button asChild size="lg" className="rounded-full h-14 md:h-16 px-10 md:px-14 font-black uppercase text-xs tracking-[0.25em] shadow-2xl shadow-primary/30 group/btn transition-all active:scale-95">
+                            <Button asChild size="lg" style={buttonStyle} className={cn("h-14 md:h-16 px-10 md:px-14 font-black uppercase text-xs tracking-[0.25em] shadow-2xl shadow-primary/30 group/btn transition-all active:scale-95 border-none", buttonShapeClass)}>
                                 <Link href={section.linkUrl}>
                                     {section.buttonText}
                                     <ArrowRight className="ml-3 h-5 w-5 transition-transform group-hover/btn:translate-x-2" strokeWidth={3} />

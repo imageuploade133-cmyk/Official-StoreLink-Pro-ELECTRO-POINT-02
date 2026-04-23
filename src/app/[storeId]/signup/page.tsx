@@ -227,6 +227,8 @@ export default function StoreSignupPage() {
 
     const buttonStyle = useMemo(() => {
         const style = settings?.storeBtnStyle || 'standard';
+        const primaryColor = settings?.storeBtnColor || '#3b82f6';
+        
         if (style === 'gradient') {
           return {
             background: `linear-gradient(to right, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
@@ -234,12 +236,50 @@ export default function StoreSignupPage() {
             border: 'none'
           };
         }
+
+        if (style === 'glass') {
+          return {
+            backgroundColor: 'rgba(255, 255, 255, 0.4)',
+            backdropFilter: 'blur(12px)',
+            color: primaryColor,
+            border: '1px solid rgba(255, 255, 255, 0.5)'
+          };
+        }
+
+        if (style === 'outline') {
+          return {
+            backgroundColor: 'transparent',
+            color: primaryColor,
+            border: `2px solid ${primaryColor}`
+          };
+        }
+
+        if (style === 'ghost') {
+          return {
+            backgroundColor: 'transparent',
+            color: primaryColor,
+            border: 'none'
+          };
+        }
+
         return {
-          backgroundColor: settings?.storeBtnColor || '#3b82f6',
+          backgroundColor: primaryColor,
           color: 'white',
           border: 'none'
         };
     }, [settings]);
+
+    const buttonShapeClass = useMemo(() => {
+        const shape = settings?.storeBtnShape || 'md';
+        switch (shape) {
+          case 'none': return 'rounded-none';
+          case 'sm': return 'rounded-sm';
+          case 'md': return 'rounded-md';
+          case 'lg': return 'rounded-2xl';
+          case 'full': return 'rounded-full';
+          default: return 'rounded-md';
+        }
+    }, [settings?.storeBtnShape]);
 
     const CongratulationModal = () => {
         if (!settings) return null;
@@ -458,11 +498,11 @@ export default function StoreSignupPage() {
                         </Button>
                     )}
                     {currentStep < totalSteps ? (
-                        <Button type="button" onClick={nextStep} style={buttonStyle} className="flex-1 h-12 font-bold border-none">
+                        <Button type="button" onClick={nextStep} style={buttonStyle} className={cn("flex-1 h-12 font-bold border-none", buttonShapeClass)}>
                             Next <ChevronRight className="ml-2 h-4 w-4" />
                         </Button>
                     ) : (
-                        <Button type="submit" style={buttonStyle} className="flex-1 h-12 font-bold border-none" disabled={isSubmitting}>
+                        <Button type="submit" style={buttonStyle} className={cn("flex-1 h-12 font-bold border-none", buttonShapeClass)} disabled={isSubmitting}>
                             {isSubmitting ? <><Spinner size="sm" className="mr-2 text-primary-foreground" />Creating Account…</> : 'Create Account'}
                         </Button>
                     )}

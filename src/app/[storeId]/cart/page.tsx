@@ -236,6 +236,8 @@ export default function CartPage() {
 
   const buttonStyle = useMemo(() => {
     const style = settings?.storeBtnStyle || 'standard';
+    const primaryColor = settings?.storeBtnColor || '#3b82f6';
+    
     if (style === 'gradient') {
       return {
         background: `linear-gradient(to right, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
@@ -245,13 +247,13 @@ export default function CartPage() {
     } else if (style === 'outline') {
       return {
         backgroundColor: 'transparent',
-        color: settings?.storeBtnColor || '#3b82f6',
-        border: `2px solid ${settings?.storeBtnColor || '#3b82f6'}`
+        color: primaryColor,
+        border: `2px solid ${primaryColor}`
       };
     } else if (style === 'ghost') {
       return {
         backgroundColor: 'transparent',
-        color: settings?.storeBtnColor || '#3b82f6',
+        color: primaryColor,
         border: 'none'
       };
     } else if (style === 'glass') {
@@ -259,16 +261,28 @@ export default function CartPage() {
         backgroundColor: 'rgba(255, 255, 255, 0.4)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
-        color: settings?.storeBtnColor || '#3b82f6',
+        color: primaryColor,
         border: '1px solid rgba(255, 255, 255, 0.5)'
       };
     }
     return {
-      backgroundColor: settings?.storeBtnColor || '#3b82f6',
+      backgroundColor: primaryColor,
       color: 'white',
       border: 'none'
     };
   }, [settings]);
+
+  const buttonShapeClass = useMemo(() => {
+    const shape = settings?.storeBtnShape || 'md';
+    switch (shape) {
+      case 'none': return 'rounded-none';
+      case 'sm': return 'rounded-sm';
+      case 'md': return 'rounded-md';
+      case 'lg': return 'rounded-2xl';
+      case 'full': return 'rounded-full';
+      default: return 'rounded-2xl';
+    }
+  }, [settings?.storeBtnShape]);
 
   if (cartItems.length === 0) {
     return (
@@ -509,7 +523,7 @@ export default function CartPage() {
                           <LoadingButton 
                             size="lg" 
                             style={buttonStyle} 
-                            className="w-full h-14 text-lg font-bold shadow-lg shadow-primary/20 border-none" 
+                            className={cn("w-full h-14 text-lg font-bold shadow-lg shadow-primary/20 border-none", buttonShapeClass)} 
                             disabled={hasIssues || subtotal === 0}
                             isLoading={isCheckingOut}
                             onClick={() => {
