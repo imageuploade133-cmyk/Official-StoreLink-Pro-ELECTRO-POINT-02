@@ -58,7 +58,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         });
 
         // Handle background
-        if (settings.useBackgroundGradient && settings.backgroundGradientStart && settings.backgroundGradientEnd) {
+        if (settings.backgroundStyle === 'gradient' && settings.backgroundGradientStart && settings.backgroundGradientEnd) {
             body.style.backgroundImage = `linear-gradient(to bottom right, ${settings.backgroundGradientStart}, ${settings.backgroundGradientEnd})`;
             // For popovers, cards etc., we might want a solid fallback. Using the start of the gradient.
             root.style.setProperty('--background', hexToHslString(settings.backgroundGradientStart));
