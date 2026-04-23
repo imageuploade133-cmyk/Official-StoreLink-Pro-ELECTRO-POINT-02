@@ -919,7 +919,7 @@ export default function ButtonUIStylePage() {
             <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 h-auto p-1.5 bg-muted/50 rounded-2xl border border-primary/5">
               <TabsTrigger 
                 value="addToCart" 
-                className="rounded-xl py-4 flex items-center gap-2 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
+                className="py-4 flex items-center gap-2"
               >
                 <ShoppingBag className="h-4 w-4" />
                 <span className="hidden sm:inline">Product Page (Add to Cart)</span>
@@ -927,7 +927,7 @@ export default function ButtonUIStylePage() {
               </TabsTrigger>
               <TabsTrigger 
                 value="gridCart" 
-                className="rounded-xl py-4 flex items-center gap-2 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
+                className="py-4 flex items-center gap-2"
               >
                 <Layout className="h-4 w-4" />
                 <span className="hidden sm:inline">Product Grid (Card Button)</span>
@@ -935,7 +935,7 @@ export default function ButtonUIStylePage() {
               </TabsTrigger>
               <TabsTrigger 
                 value="heroBtn" 
-                className="rounded-xl py-4 flex items-center gap-2 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
+                className="py-4 flex items-center gap-2"
               >
                 <Zap className="h-4 w-4" />
                 <span className="hidden sm:inline">Hero/Banner Button</span>
@@ -943,7 +943,7 @@ export default function ButtonUIStylePage() {
               </TabsTrigger>
               <TabsTrigger 
                 value="exploreBtn" 
-                className="rounded-xl py-4 flex items-center gap-2 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
+                className="py-4 flex items-center gap-2"
               >
                 <MousePointerClick className="h-4 w-4" />
                 <span className="hidden sm:inline">Explore Section Button</span>
