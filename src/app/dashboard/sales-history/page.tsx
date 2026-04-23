@@ -421,7 +421,7 @@ function SalesHistoryContent() {
             value={periodAnalytics.isLoading ? '...' : periodAnalytics.volume.toLocaleString()}
             icon={ShoppingBag}
             description="Successful sales in batch"
-            className="bg-gradient-to-br from-emerald-50/50 to-white dark:from-emerald-950/20 dark:to-background border border-emerald-100/50 dark:border-emerald-900/30"
+            className="bg-gradient-to-br from-emerald-50/50 to-white dark:from-emerald-950/20 dark:to-background border-2 border-emerald-200 dark:border-emerald-800"
             titleClassName="text-emerald-600 dark:text-emerald-400"
             iconClassName="text-emerald-500 bg-emerald-100 dark:bg-emerald-900/50"
             valueClassName="text-emerald-700 dark:text-emerald-300 font-black"
@@ -431,7 +431,7 @@ function SalesHistoryContent() {
             value={periodAnalytics.isLoading ? '...' : formatCurrency(periodAnalytics.volume > 0 ? periodAnalytics.netRevenue / periodAnalytics.volume : 0, currencySymbol)}
             icon={DollarSign}
             description="Mean value per record"
-            className="bg-gradient-to-br from-blue-50/50 to-white dark:from-blue-950/20 dark:to-background border border-blue-100/50 dark:border-blue-900/30"
+            className="bg-gradient-to-br from-blue-50/50 to-white dark:from-blue-950/20 dark:to-background border-2 border-blue-200 dark:border-blue-800"
             titleClassName="text-blue-600 dark:text-blue-400"
             iconClassName="text-blue-500 bg-blue-100 dark:bg-blue-900/50"
             valueClassName="text-blue-700 dark:text-blue-300 font-black"
@@ -441,7 +441,7 @@ function SalesHistoryContent() {
             value={periodAnalytics.isLoading ? '...' : formatCurrency(periodAnalytics.refunds, currencySymbol)}
             icon={Undo2}
             description="Value of returned items"
-            className="bg-gradient-to-br from-rose-50/50 to-white dark:from-rose-950/20 dark:to-background border border-rose-100/50 dark:border-rose-900/30"
+            className="bg-gradient-to-br from-rose-50/50 to-white dark:from-rose-950/20 dark:to-background border-2 border-rose-200 dark:border-rose-800"
             titleClassName="text-rose-600 dark:text-rose-400"
             iconClassName="text-rose-500 bg-rose-100 dark:bg-rose-900/50"
             valueClassName="text-rose-700 dark:text-rose-300 font-black"

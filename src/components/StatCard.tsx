@@ -30,7 +30,7 @@ export function StatCard({
 }: StatCardProps) {
   return (
     <Card className={cn(
-      "relative overflow-hidden transition-all duration-300 group",
+      "relative overflow-hidden transition-all duration-300 group hover:shadow-lg hover:border-primary/60 border-2",
       className
     )}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
