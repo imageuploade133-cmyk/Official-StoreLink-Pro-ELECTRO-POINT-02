@@ -103,13 +103,13 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
         {/* Badges */}
         <div className="absolute top-5 left-5 flex flex-col gap-2 z-10 pointer-events-none">
           {product.isOfficialBrand && (
-            <Badge className="bg-blue-600 text-white font-black text-[9px] px-3 py-1 rounded-full border-none shadow-lg uppercase tracking-[0.1em]">
+            <Badge className="bg-[#0071e3] text-white font-semibold text-[9px] px-3 py-1 rounded-full border-none shadow-sm uppercase tracking-wider">
               Official
             </Badge>
           )}
           {isDiscounted && !isOutOfStock && (
-             <Badge className="bg-rose-500 text-white font-black text-[9px] px-3 py-1 rounded-full border-none shadow-lg uppercase tracking-[0.1em]">
-               Special Offer
+             <Badge className="bg-[#e11d48] text-white font-semibold text-[9px] px-3 py-1 rounded-full border-none shadow-sm uppercase tracking-wider">
+               Offer
              </Badge>
           )}
         </div>
@@ -130,7 +130,7 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
         <div className="absolute inset-x-0 bottom-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-700 hidden md:block z-20">
           <Button 
             onClick={handleAddToCart}
-            className="w-full bg-white text-black dark:bg-white dark:text-black hover:bg-white/90 font-black text-xs uppercase tracking-widest h-14 rounded-2xl shadow-2xl transition-all active:scale-95"
+            className="w-full bg-[#0071e3] text-white hover:bg-[#0077ed] font-semibold text-xs tracking-tight h-12 rounded-full shadow-lg transition-all active:scale-95"
           >
             Add to Bag
           </Button>
@@ -139,10 +139,10 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
       </Link>
 
       {/* Content Area */}
-      <div className="flex flex-col flex-1 p-7 space-y-5">
-        <div className="flex-1 space-y-2">
+      <div className="flex flex-col flex-1 p-6 space-y-4">
+        <div className="flex-1 space-y-1">
           <div className="flex justify-between items-center">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#86868b]">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-[#86868b]">
                 {category?.name || product.categoryName || 'Collection'}
             </p>
             {ratingStats.totalReviews > 0 && (
@@ -155,27 +155,27 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
             )}
           </div>
           
-          <h3 className="text-xl font-bold text-black dark:text-white leading-tight tracking-tight line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
+          <h3 className="text-lg font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] leading-tight tracking-tight line-clamp-2 transition-colors duration-300">
             {product.name}
           </h3>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           <StockBar 
             stock={product.stock} 
             lowStockThreshold={product.lowStockThreshold || 10} 
           />
 
-          <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center justify-between pt-1">
               <div className="flex flex-col">
                     <span className={cn(
-                      "text-2xl font-black tracking-tighter",
-                      isDiscounted ? "text-rose-500" : "text-black dark:text-white"
+                      "text-xl font-semibold tracking-tight",
+                      isDiscounted ? "text-[#e11d48]" : "text-[#1d1d1f] dark:text-[#f5f5f7]"
                     )}>
                       {formatCurrency(effectivePrice, currencySymbol)}
                     </span>
                     {isDiscounted && (
-                      <span className="text-xs text-[#86868b] line-through font-bold tracking-tight">
+                      <span className="text-xs text-[#86868b] line-through font-medium tracking-tight">
                         {formatCurrency(product.sellingPrice, currencySymbol)}
                       </span>
                     )}
@@ -185,11 +185,11 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
               <div className="md:hidden">
                 <Button 
                   size="icon" 
-                  className="h-12 w-12 rounded-2xl bg-black text-white dark:bg-white dark:text-black active:scale-90 transition-transform shadow-xl"
+                  className="h-10 w-10 rounded-full bg-[#1d1d1f] dark:bg-[#f5f5f7] text-white dark:text-black active:scale-90 transition-transform shadow-sm"
                   onClick={handleAddToCart}
                   disabled={isOutOfStock}
                 >
-                  <Plus className="h-6 w-6" />
+                  <Plus className="h-5 w-5" />
                 </Button>
               </div>
           </div>
