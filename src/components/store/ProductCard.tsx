@@ -29,16 +29,19 @@ interface ProductCardProps {
   product: Product;
   category?: Category;
   currencySymbol: string;
+  overrideSettings?: Partial<AppSettings>;
 }
 
-export function ProductCard({ product, category, currencySymbol }: ProductCardProps) {
+export function ProductCard({ product, category, currencySymbol, overrideSettings }: ProductCardProps) {
   const { addToCart } = useCart();
   const { isProductInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
-  const { settings } = useSettings();
+  const { settings: globalSettings } = useSettings();
   const { getStoreUrl } = useStoreUrl();
   const [today, setToday] = useState<Date | null>(null);
   const [isLoadingProduct, setIsLoadingProduct] = useState(false);
   const { reviews } = useProductReviews(product.id);
+
+  const settings = overrideSettings || globalSettings;
 
   useEffect(() => {
     setToday(new Date());
@@ -50,8 +53,8 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
   const ratingStats = useMemo(() => calculateRatingStats(reviews), [reviews]);
 
   // Pricing Engine logic
-  const effectivePrice = useMemo(() => 
-    calculateEffectivePrice(product as any, today, category), 
+  const effectivePrice = useMemo(() =>
+    calculateEffectivePrice(product as any, today, category),
     [product, today, category]
   );
 
@@ -78,124 +81,275 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
     setIsLoadingProduct(true);
   };
 
+  // Product Card Designer Settings
+  const cardStyle = settings?.productCardStyle || 'default';
+  const borderRadius = settings?.productCardBorderRadius || 'full';
+  const shadow = settings?.productCardShadow || 'md';
+  const borderWidth = settings?.productCardBorderWidth || 'thin';
+  const borderColor = settings?.productCardBorderColor || (cardStyle === 'modern' ? 'rgba(255,255,255,0.2)' : '');
+  const bgColor = settings?.productCardBgColor || (cardStyle === 'modern' ? 'rgba(255,255,255,0.05)' : '');
+  const hoverEffect = settings?.productCardHoverEffect || 'lift';
+  const imageRatio = settings?.productCardImageRatio || 'portrait';
+  const titleLines = settings?.productCardTitleLines || 2;
+  const titleAlign = settings?.productCardTitleAlign || 'left';
+  const priceAlign = settings?.productCardPriceAlign || 'left';
+  const cardHeight = settings?.productCardHeight;
+
+  const borderRadiusMap: Record<string, string> = {
+    none: 'rounded-none',
+    sm: 'rounded-sm',
+    md: 'rounded-md',
+    lg: 'rounded-lg',
+    xl: 'rounded-xl',
+    full: 'rounded-[32px]',
+  };
+
+  const shadowMap: Record<string, string> = {
+    none: 'shadow-none',
+    sm: 'shadow-sm',
+    md: 'shadow-md',
+    lg: 'shadow-lg',
+    xl: 'shadow-xl',
+  };
+
+  const borderWidthMap: Record<string, string> = {
+    none: 'border-0',
+    thin: 'border',
+    medium: 'border-2',
+    thick: 'border-4',
+  };
+
+  const hoverEffectMap: Record<string, string> = {
+    none: '',
+    lift: 'hover:-translate-y-2 hover:shadow-xl transition-all duration-300',
+    zoom: '', // handled on image
+    glow: 'hover:shadow-2xl hover:shadow-primary/20 transition-all duration-300',
+    border: 'hover:border-primary transition-all duration-300',
+  };
+
+  const imageRatioMap: Record<string, string> = {
+    square: 'aspect-square',
+    portrait: 'aspect-[4/5]',
+    landscape: 'aspect-[4/3]',
+  };
+
+  const processCustomHtml = (html: string) => {
+    if (!html) return '';
+    return html
+      .replace(/\{\{product\.name\}\}/g, product.name)
+      .replace(/\{\{product\.id\}\}/g, product.id)
+      .replace(/\{\{product\.price\}\}/g, effectivePrice.toFixed(2))
+      .replace(/\{\{product\.originalPrice\}\}/g, product.sellingPrice.toFixed(2))
+      .replace(/\{\{product\.imageUrl\}\}/g, product.imageUrl || '')
+      .replace(/\{\{product\.category\}\}/g, category?.name || product.categoryName || 'General')
+      .replace(/\{\{product\.stock\}\}/g, product.stock.toString())
+      .replace(/\{\{product\.stockPercentage\}\}/g, Math.min((product.stock / 50) * 100, 100).toString())
+      .replace(/\{\{product\.stockLabel\}\}/g, product.stock > 0 ? `In Stock (${product.stock})` : 'Out of Stock')
+      .replace(/\{\{product\.reviewCount\}\}/g, ratingStats.totalReviews.toString())
+      .replace(/\{\{product\.isNew\}\}/g, product.isNewArrival ? 'true' : 'false')
+      .replace(/\{\{product\.isPopular\}\}/g, product.isPopular ? 'true' : 'false')
+      .replace(/\{\{product\.isOfficial\}\}/g, product.isOfficialBrand ? 'true' : 'false')
+      .replace(/\{\{product\.discount\}\}/g, isDiscounted ? Math.round((1 - effectivePrice / product.sellingPrice) * 100).toString() : '0')
+      .replace(/\{\{currency\}\}/g, currencySymbol)
+      .replace(/\{\{cardHeight\}\}/g, (cardHeight || 380).toString())
+      // Handle simple #if blocks
+      .replace(/\{\{#if product\.isOfficial\}\}([\s\S]*?)\{\{\/if\}\}/g, product.isOfficialBrand ? '$1' : '')
+      .replace(/\{\{#if product\.isNew\}\}([\s\S]*?)\{\{\/if\}\}/g, product.isNewArrival ? '$1' : '')
+      .replace(/\{\{#if product\.isPopular\}\}([\s\S]*?)\{\{\/if\}\}/g, product.isPopular ? '$1' : '')
+      .replace(/\{\{#if product\.discount\}\}([\s\S]*?)\{\{\/if\}\}/g, isDiscounted ? '$1' : '')
+      .replace(/\{\{#if product\.originalPrice\}\}([\s\S]*?)\{\{\/if\}\}/g, isDiscounted ? '$1' : '');
+  };
+
+  const handleCustomClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    const button = target.closest('button');
+    if (button) {
+      const text = button.textContent || '';
+      if (text.includes('Add') || text.includes('🛒')) {
+        handleAddToCart(e);
+      } else if (text.includes('♡') || text.includes('Wishlist')) {
+        handleWishlistToggle(e);
+      }
+    }
+  };
+
+  if (cardStyle === 'custom' && settings?.productCardCustomHtml) {
+      return (
+          <div 
+            onClick={handleCustomClick}
+            className="cursor-pointer"
+            dangerouslySetInnerHTML={{ __html: processCustomHtml(settings.productCardCustomHtml) }} 
+          />
+      );
+  }
+
   return (
     <>
       <ProductLoadingOverlay isVisible={isLoadingProduct} productName={product.name} />
-      <div 
+      <div
         className={cn(
-          "group relative flex flex-col bg-white dark:bg-[#111111] transition-all duration-700 overflow-hidden h-full rounded-[32px] border border-black/[0.03] dark:border-white/[0.03] hover:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_32px_64px_-16px_rgba(255,255,255,0.05)]",
-          isOutOfStock && "opacity-80"
+          "group relative flex flex-col transition-all duration-500 overflow-hidden",
+          cardStyle === 'modern' ? "backdrop-blur-xl border-white/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]" : "bg-white dark:bg-[#111111] border-black/[0.08] dark:border-white/[0.12]",
+          cardStyle === 'classic' && "shadow-none hover:shadow-lg",
+          borderRadiusMap[borderRadius] || borderRadiusMap.full,
+          shadowMap[shadow] || shadowMap.md,
+          borderWidthMap[borderWidth] || borderWidthMap.thin,
+          hoverEffectMap[hoverEffect],
+          isOutOfStock && "opacity-80",
+          cardStyle === 'minimal' && "border-none shadow-none bg-transparent"
         )}
+        style={{
+            borderColor: borderColor || undefined,
+            backgroundColor: bgColor || undefined,
+            height: cardHeight ? `${cardHeight}px` : '100%',
+        }}
       >
         {/* Media Area */}
-        <Link href={getStoreUrl(`/store/product/${product.id}`)} onClick={handleProductClick} className="block relative aspect-[4/5] overflow-hidden bg-[#f5f5f7] dark:bg-[#0a0a0a]">
-        <Image
-          src={product.imageUrl || settings?.defaultProductImageUrl || 'https://placehold.co/600x600.png'}
-          alt={product.name}
-          fill
-          className={cn(
-            "object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110",
-            isOutOfStock && "grayscale"
-          )}
-          unoptimized
-        />
-        
-        {/* Badges */}
-        <div className="absolute top-5 left-5 flex flex-col gap-2 z-10 pointer-events-none">
-          {product.isOfficialBrand && (
-            <Badge className="bg-[#0071e3] text-white font-semibold text-[9px] px-3 py-1 rounded-full border-none shadow-sm uppercase tracking-wider">
-              Official
-            </Badge>
-          )}
-          {isDiscounted && !isOutOfStock && (
-             <Badge className="bg-[#e11d48] text-white font-semibold text-[9px] px-3 py-1 rounded-full border-none shadow-sm uppercase tracking-wider">
-               Offer
-             </Badge>
-          )}
-        </div>
-
-        {/* Wishlist Button */}
-        <button
-          className={cn(
-            "absolute top-5 right-5 h-10 w-10 flex items-center justify-center rounded-full bg-white/90 dark:bg-black/90 backdrop-blur-xl shadow-xl transition-all duration-500 z-10 border border-black/[0.03] dark:border-white/[0.03] opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0",
-            isInWishlist ? "text-rose-500 opacity-100 translate-y-0" : "text-black dark:text-white"
-          )}
-          onClick={handleWishlistToggle}
-        >
-          <Heart className={cn("h-4 w-4 transition-all duration-500", isInWishlist && "fill-current")} />
-        </button>
-
-        {/* Quick Add Overlay */}
-        {!isOutOfStock && (
-        <div className="absolute inset-x-0 bottom-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-700 hidden md:block z-20">
-          <Button 
-            onClick={handleAddToCart}
-            className="w-full bg-[#0071e3] text-white hover:bg-[#0077ed] font-semibold text-xs tracking-tight h-12 rounded-full shadow-lg transition-all active:scale-95"
-          >
-            Add to Bag
-          </Button>
-        </div>
-        )}
-      </Link>
-
-      {/* Content Area */}
-      <div className="flex flex-col flex-1 p-6 space-y-4">
-        <div className="flex-1 space-y-1">
-          <div className="flex justify-between items-center">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-[#86868b]">
-                {category?.name || product.categoryName || 'Collection'}
-            </p>
-            {ratingStats.totalReviews > 0 && (
-              <ProductRating
-                averageRating={ratingStats.averageRating}
-                totalReviews={ratingStats.totalReviews}
-                size="xs"
-                showLabel={false}
-              />
+        {settings?.productCardShowImage !== false && (
+          <Link
+            href={getStoreUrl(`/store/product/${product.id}`)}
+            onClick={handleProductClick}
+            className={cn(
+                "block relative overflow-hidden bg-[#f5f5f7] dark:bg-[#0a0a0a]",
+                imageRatioMap[imageRatio] || imageRatioMap.portrait
             )}
+          >
+            <Image
+              src={product.imageUrl || settings?.defaultProductImageUrl || 'https://placehold.co/600x600.png'}
+              alt={product.name}
+              fill
+              className={cn(
+                "object-cover transition-transform duration-[1.5s] ease-out",
+                hoverEffect === 'zoom' && "group-hover:scale-110",
+                isOutOfStock && "grayscale"
+              )}
+              unoptimized
+            />
+
+            {/* Badges */}
+            {settings?.productCardShowBadges !== false && (
+                <div className="absolute top-5 left-5 flex flex-col gap-2 z-10 pointer-events-none">
+                {product.isOfficialBrand && (
+                    <Badge className="bg-[#0071e3] text-white font-semibold text-[9px] px-3 py-1 rounded-full border-none shadow-sm uppercase tracking-wider">
+                    Official
+                    </Badge>
+                )}
+                {isDiscounted && !isOutOfStock && (
+                    <Badge className="bg-[#e11d48] text-white font-semibold text-[9px] px-3 py-1 rounded-full border-none shadow-sm uppercase tracking-wider">
+                    Offer
+                    </Badge>
+                )}
+                </div>
+            )}
+
+            {/* Wishlist Button */}
+            {settings?.productCardShowWishlist !== false && (
+                <button
+                className={cn(
+                    "absolute top-5 right-5 h-10 w-10 flex items-center justify-center rounded-full bg-white/90 dark:bg-black/90 backdrop-blur-xl shadow-xl transition-all duration-500 z-10 border border-black/[0.03] dark:border-white/[0.03] opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0",
+                    isInWishlist ? "text-rose-500 opacity-100 translate-y-0" : "text-black dark:text-white"
+                )}
+                onClick={handleWishlistToggle}
+                >
+                <Heart className={cn("h-4 w-4 transition-all duration-500", isInWishlist && "fill-current")} />
+                </button>
+            )}
+
+            {/* Quick Add Overlay */}
+            {!isOutOfStock && settings?.productCardShowQuickAdd !== false && (
+                <div className="absolute inset-x-0 bottom-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-700 hidden md:block z-20">
+                <Button
+                    onClick={handleAddToCart}
+                    className="w-full bg-[#0071e3] text-white hover:bg-[#0077ed] font-semibold text-xs tracking-tight h-12 rounded-full shadow-lg transition-all active:scale-95"
+                >
+                    Add to Bag
+                </Button>
+                </div>
+            )}
+          </Link>
+        )}
+
+        {/* Content Area */}
+        <div className={cn(
+            "flex flex-col flex-1 p-6 space-y-4",
+            cardStyle === 'minimal' && "p-4 px-0"
+        )}>
+          <div className="flex-1 space-y-1">
+            <div className={cn(
+                "flex justify-between items-center",
+                titleAlign === 'center' && "flex-col gap-1"
+            )}>
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-[#86868b]">
+                  {category?.name || product.categoryName || 'Collection'}
+              </p>
+              {settings?.productCardShowRating !== false && ratingStats.totalReviews > 0 && (
+                <ProductRating
+                  averageRating={ratingStats.averageRating}
+                  totalReviews={ratingStats.totalReviews}
+                  size="xs"
+                  showLabel={false}
+                />
+              )}
+            </div>
+
+            <h3 className={cn(
+                "text-lg font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] leading-tight tracking-tight transition-colors duration-300",
+                titleAlign === 'center' && "text-center",
+                titleLines === 1 && "line-clamp-1",
+                titleLines === 2 && "line-clamp-2",
+                titleLines === 3 && "line-clamp-3"
+            )}>
+              {product.name}
+            </h3>
           </div>
-          
-          <h3 className="text-lg font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] leading-tight tracking-tight line-clamp-2 transition-colors duration-300">
-            {product.name}
-          </h3>
-        </div>
 
-        <div className="space-y-3">
-          <StockBar 
-            stock={product.stock} 
-            lowStockThreshold={product.lowStockThreshold || 10} 
-          />
+          <div className="space-y-3">
+            {settings?.productCardShowStockBar !== false && (
+                <StockBar
+                    stock={product.stock}
+                    lowStockThreshold={product.lowStockThreshold || 10}
+                />
+            )}
 
-          <div className="flex items-center justify-between pt-1">
-              <div className="flex flex-col">
+            <div className={cn(
+                "flex items-center justify-between pt-1",
+                priceAlign === 'center' && "flex-col gap-2 justify-center"
+            )}>
+                <div className={cn(
+                    "flex flex-col",
+                    priceAlign === 'center' && "items-center"
+                )}>
                     <span className={cn(
-                      "text-xl font-semibold tracking-tight",
-                      isDiscounted ? "text-[#e11d48]" : "text-[#1d1d1f] dark:text-[#f5f5f7]"
+                        "text-xl font-semibold tracking-tight",
+                        isDiscounted ? "text-[#e11d48]" : "text-[#1d1d1f] dark:text-[#f5f5f7]"
                     )}>
-                      {formatCurrency(effectivePrice, currencySymbol)}
+                        {formatCurrency(effectivePrice, currencySymbol)}
                     </span>
                     {isDiscounted && (
-                      <span className="text-xs text-[#86868b] line-through font-medium tracking-tight">
+                        <span className="text-xs text-[#86868b] line-through font-medium tracking-tight">
                         {formatCurrency(product.sellingPrice, currencySymbol)}
-                      </span>
+                        </span>
                     )}
-              </div>
-              
-              {/* Mobile Quick Add */}
-              <div className="md:hidden">
-                <Button 
-                  size="icon" 
-                  className="h-10 w-10 rounded-full bg-[#1d1d1f] dark:bg-[#f5f5f7] text-white dark:text-black active:scale-90 transition-transform shadow-sm"
-                  onClick={handleAddToCart}
-                  disabled={isOutOfStock}
-                >
-                  <Plus className="h-5 w-5" />
-                </Button>
-              </div>
+                </div>
+
+                {/* Mobile Quick Add */}
+                {settings?.productCardShowQuickAdd !== false && (
+                    <div className="md:hidden">
+                    <Button
+                        size="icon"
+                        className="h-10 w-10 rounded-full bg-[#1d1d1f] dark:bg-[#f5f5f7] text-white dark:text-black active:scale-90 transition-transform shadow-sm"
+                        onClick={handleAddToCart}
+                        disabled={isOutOfStock}
+                    >
+                        <Plus className="h-5 w-5" />
+                    </Button>
+                    </div>
+                )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </>
   );
 }
+

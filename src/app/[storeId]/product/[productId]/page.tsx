@@ -820,7 +820,20 @@ export default function ProductDetailsPage() {
                     <><span className={cn("text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight", isDiscounted ? "text-[#e11d48]" : "text-[#1d1d1f] dark:text-[#f5f5f7]")}>{formatCurrency(effectivePrice, currencySymbol)}</span>
                     {isDiscounted && <span className="text-sm md:text-base text-[#86868b] line-through">Was: {formatCurrency(product.sellingPrice, currencySymbol)}</span>}</>
                   )}
-                  <div className="pt-0.5 md:pt-1"><Badge variant={isOutOfStock ? "destructive" : "secondary"} className="h-6 md:h-7 px-3 md:px-4 rounded-full font-medium text-[10px] md:text-[11px]">{isOutOfStock ? 'Sold Out' : 'In Stock'}</Badge></div>
+                  <div className="pt-0.5 md:pt-1">
+                    <Badge 
+                      variant="outline"
+                      className={cn(
+                        "h-6 md:h-7 px-3 md:px-4 rounded-full font-bold text-[10px] md:text-[11px] border-none shadow-sm flex items-center gap-1.5",
+                        isOutOfStock 
+                          ? "bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400" 
+                          : "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
+                      )}
+                    >
+                      <span className={cn("w-1.5 h-1.5 rounded-full", isOutOfStock ? "bg-rose-500 animate-pulse" : "bg-emerald-500")} />
+                      {isOutOfStock ? 'Sold Out' : 'In Stock'}
+                    </Badge>
+                  </div>
                 </div>
               </div>
             </div>
@@ -855,18 +868,29 @@ export default function ProductDetailsPage() {
             )}
 
             {!isOutOfStock && (
-              <div className="space-y-3 md:space-y-4 p-4 md:p-5 bg-[#f5f5f7] dark:bg-[#1d1d1f] rounded-3xl transition-all duration-500 shadow-sm border-2 border-black/10 dark:border-white/10">
+              <div className="space-y-3 md:space-y-4 p-4 md:p-5 bg-[#f5f5f7] dark:bg-[#1d1d1f] rounded-3xl transition-all duration-500 shadow-sm border-2 border-black/10 dark:border-white/20">
                 {(activeSectionPromo?.endDate || (isDiscounted && product.promo?.endDate)) && (
                   <PromoCountdown endDate={activeSectionPromo?.endDate || convertToDateSafely(product.promo!.endDate)!} />
                 )}
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#1d1d1f] dark:text-[#f5f5f7]">Select Quantity</label>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#1d1d1f] dark:text-[#f5f5f7]">Select Quantity</label>
+                    {isDiscounted && !isOutOfStock && today && (
+                      <div 
+                        className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider animate-pulse"
+                        style={{ color: settings?.flashHubColor || '#e11d48' }}
+                      >
+                        <Zap className="h-3 w-3 fill-current" />
+                        Flash Sale Live
+                      </div>
+                    )}
+                  </div>
                   {product.stock <= 5 && product.stock > 0 && (
                     <span className="text-[10px] font-bold text-[#e11d48] animate-pulse">Only {product.stock} left!</span>
                   )}
                 </div>
                 <div className="flex items-center gap-3 md:gap-4">
-                  <div className="flex items-center bg-black/[0.03] dark:bg-white/[0.08] border-2 border-black/10 dark:border-white/10 rounded-[18px] p-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+                  <div className="flex items-center bg-black/[0.03] dark:bg-white/[0.08] border-2 border-black/10 dark:border-white/20 rounded-[18px] p-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                     <Button 
                       variant="ghost" 
                       size="icon" 
@@ -901,7 +925,7 @@ export default function ProductDetailsPage() {
                 <StockBar stock={product.stock} lowStockThreshold={lowStockThreshold} className="mt-4" />
                 
                 {filteredPaymentMethods.find(m => m.id === 'fast_checkout')?.config?.enableQuickPayButtons && !isOutOfStock && (
-                  <div className="pt-6 border-t border-black/[0.05] dark:border-white/[0.05]">
+                  <div className="pt-6 border-t border-black/[0.05] dark:border-white/[0.1]">
                     <FastCheckoutButtons 
                       storeId={storeId}
                       amount={effectivePrice * quantity}
@@ -949,7 +973,7 @@ export default function ProductDetailsPage() {
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-3 md:gap-4 pt-6 md:pt-8 border-t border-black/[0.05] dark:border-white/[0.05]">
+            <div className="grid grid-cols-2 gap-3 md:gap-4 pt-6 md:pt-8 border-t border-black/[0.05] dark:border-white/[0.1]">
               {(product.badge1Enabled !== false) && (
                 <div className="flex items-center gap-3 text-[11px] font-medium text-[#86868b]">
                   <div className="h-10 w-10 rounded-full bg-[#f5f5f7] dark:bg-[#1d1d1f] flex items-center justify-center text-[#1d1d1f] dark:text-[#f5f5f7] flex-shrink-0"><Badge1Icon className="h-5 w-5" /></div>
@@ -971,7 +995,7 @@ export default function ProductDetailsPage() {
             <BannerAd location="product_details" className="mt-12" />
             <section className="mt-24 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
               <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-2xl bg-[#f5f5f7] dark:bg-[#1d1d1f] flex items-center justify-center text-[#1d1d1f] dark:text-[#f5f5f7] border-2 border-black/10 dark:border-white/10 shadow-sm">
+                <div className="h-12 w-12 rounded-2xl bg-[#f5f5f7] dark:bg-[#1d1d1f] flex items-center justify-center text-[#1d1d1f] dark:text-[#f5f5f7] border-2 border-black/10 dark:border-white/20 shadow-sm">
                   <DescriptionIcon className="h-6 w-6" />
                 </div>
                 <div>
@@ -979,7 +1003,7 @@ export default function ProductDetailsPage() {
                   <p className="text-xs font-medium uppercase tracking-widest text-[#86868b] mt-1">Detailed insights</p>
                 </div>
               </div>
-              <div className="bg-[#f5f5f7] dark:bg-[#1d1d1f] rounded-[2.5rem] p-6 md:p-8 border-2 border-black/10 dark:border-white/10 transition-all duration-500 shadow-sm relative overflow-hidden">
+              <div className="bg-[#f5f5f7] dark:bg-[#1d1d1f] rounded-[2.5rem] p-6 md:p-8 border-2 border-black/10 dark:border-white/20 transition-all duration-500 shadow-sm relative overflow-hidden">
                 <div className="prose dark:prose-invert max-w-none text-[#1d1d1f] dark:text-[#f5f5f7] leading-relaxed text-lg font-normal relative z-10">
                   <div className="rich-content">
                     <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{product.description}</ReactMarkdown>
@@ -998,7 +1022,7 @@ export default function ProductDetailsPage() {
         <div className="mt-24">
           <Tabs defaultValue={showTechnicalSpecs ? "details" : showLogisticsTab ? "shipping" : "reviews"} className="w-full">
             <div className="flex justify-center md:justify-start mb-10">
-              <TabsList className="inline-flex h-auto p-1.5 bg-[#f5f5f7] dark:bg-[#1d1d1f] rounded-full border border-black/[0.05] dark:border-white/[0.05] overflow-x-auto no-scrollbar">
+              <TabsList className="inline-flex h-auto p-1.5 bg-[#f5f5f7] dark:bg-[#1d1d1f] rounded-full border border-black/[0.05] dark:border-white/[0.1] overflow-x-auto no-scrollbar">
                 {showTechnicalSpecs && (
                   <TabsTrigger value="details" className="group flex items-center gap-2 px-6 py-2 rounded-full transition-all font-semibold text-xs tracking-tight data-[state=active]:bg-white dark:data-[state=active]:bg-black data-[state=active]:shadow-sm">
                     <Info className="h-4 w-4" /> Technical Specs
@@ -1021,14 +1045,14 @@ export default function ProductDetailsPage() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
                 <div className="lg:col-span-7 space-y-8">
                   {(product.specifications && product.specifications.length > 0) && (
-                    <div className="p-6 rounded-[2rem] bg-[#f5f5f7] dark:bg-[#1d1d1f] space-y-4 border-2 border-black/10 dark:border-white/10">
+                    <div className="p-6 rounded-[2rem] bg-[#f5f5f7] dark:bg-[#1d1d1f] space-y-4 border-2 border-black/10 dark:border-white/20">
                       <h3 className="text-2xl font-semibold tracking-tight flex items-center gap-4 text-[#1d1d1f] dark:text-[#f5f5f7]">
                         <ListChecks className="h-6 w-6" /> 
                         {product.specificationsTitle || 'Specifications'}
                       </h3>
                       <div className="grid grid-cols-1">
                         {product.specifications?.map((spec, i) => (
-                          <div key={`custom-${i}`} className="flex justify-between py-4 border-b last:border-0 border-black/[0.05] dark:border-white/[0.05]">
+                          <div key={`custom-${i}`} className="flex justify-between py-4 border-b last:border-0 border-black/[0.05] dark:border-white/[0.1]">
                             <span className="text-[#86868b] font-medium text-sm">{spec.label}</span>
                             <span className="font-semibold text-sm text-right text-[#1d1d1f] dark:text-[#f5f5f7]">{spec.value}</span>
                           </div>
@@ -1037,14 +1061,14 @@ export default function ProductDetailsPage() {
                     </div>
                   )}
                   {(product.variations && product.variations.length > 0) && (
-                    <div className="p-6 rounded-[2rem] bg-[#f5f5f7] dark:bg-[#1d1d1f] space-y-4 border-2 border-black/10 dark:border-white/10">
+                    <div className="p-6 rounded-[2rem] bg-[#f5f5f7] dark:bg-[#1d1d1f] space-y-4 border-2 border-black/10 dark:border-white/20">
                       <h3 className="text-2xl font-semibold tracking-tight flex items-center gap-4 text-[#1d1d1f] dark:text-[#f5f5f7]">
                         <Layers className="h-6 w-6" /> 
                         {product.variationsTitle || 'Variations'}
                       </h3>
                       <div className="flex flex-wrap gap-2">
                         {product.variations.map((v, i) => (
-                          <Badge key={i} variant="outline" className="px-4 py-2 rounded-full text-sm font-medium bg-white dark:bg-black border-black/[0.05] dark:border-white/[0.05]">
+                          <Badge key={i} variant="outline" className="px-4 py-2 rounded-full text-sm font-medium bg-white dark:bg-black border-black/[0.05] dark:border-white/[0.1]">
                             {v.name}
                           </Badge>
                         ))}
@@ -1052,12 +1076,12 @@ export default function ProductDetailsPage() {
                     </div>
                   )}
                   {product.sizeGuideImageUrl && (
-                    <div className="p-6 rounded-[2rem] bg-[#f5f5f7] dark:bg-[#1d1d1f] space-y-4 border-2 border-black/10 dark:border-white/10">
+                    <div className="p-6 rounded-[2rem] bg-[#f5f5f7] dark:bg-[#1d1d1f] space-y-4 border-2 border-black/10 dark:border-white/20">
                       <h3 className="text-2xl font-semibold tracking-tight flex items-center gap-4 text-[#1d1d1f] dark:text-[#f5f5f7]">
                         <Maximize className="h-6 w-6" /> 
                         Sizing Guide
                       </h3>
-                      <div className="relative aspect-video rounded-2xl overflow-hidden border border-black/[0.05] dark:border-white/[0.05] bg-white p-4">
+                      <div className="relative aspect-video rounded-2xl overflow-hidden border border-black/[0.05] dark:border-white/[0.1] bg-white p-4">
                         <Image src={product.sizeGuideImageUrl} alt="Size guide" fill className="object-contain" unoptimized />
                       </div>
                     </div>
@@ -1065,14 +1089,14 @@ export default function ProductDetailsPage() {
                 </div>
                 <div className="lg:col-span-5 space-y-8">
                   {product.whatsInTheBox && product.whatsInTheBox.length > 0 && (
-                    <div className="bg-[#f5f5f7] dark:bg-[#1d1d1f] p-6 rounded-[2rem] space-y-4 border-2 border-black/10 dark:border-white/10">
+                    <div className="bg-[#f5f5f7] dark:bg-[#1d1d1f] p-6 rounded-[2rem] space-y-4 border-2 border-black/10 dark:border-white/20">
                       <h3 className="text-2xl font-semibold tracking-tight flex items-center gap-4 text-[#1d1d1f] dark:text-[#f5f5f7]">
                         <Package className="h-6 w-6" /> 
                         {product.whatsInTheBoxTitle || 'In the Box'}
                       </h3>
                       <div className="space-y-3">
                         {product.whatsInTheBox.map((item, i) => (
-                          <div key={i} className="flex items-center gap-3 text-sm font-medium text-[#1d1d1f] dark:text-[#f5f5f7] bg-white dark:bg-black/40 p-4 rounded-xl border border-black/[0.05] dark:border-white/[0.05]">
+                          <div key={i} className="flex items-center gap-3 text-sm font-medium text-[#1d1d1f] dark:text-[#f5f5f7] bg-white dark:bg-black/40 p-4 rounded-xl border border-black/[0.05] dark:border-white/[0.1]">
                             <div className="h-1.5 w-1.5 rounded-full bg-[#1d1d1f] dark:bg-[#f5f5f7]" />
                             {item.name}
                           </div>
@@ -1081,14 +1105,14 @@ export default function ProductDetailsPage() {
                     </div>
                   )}
                   {(product.showProductInsight === true) && (
-                    <div className="bg-[#f5f5f7] dark:bg-[#1d1d1f] p-6 rounded-[2rem] space-y-4 border-2 border-black/10 dark:border-white/10">
+                    <div className="bg-[#f5f5f7] dark:bg-[#1d1d1f] p-6 rounded-[2rem] space-y-4 border-2 border-black/10 dark:border-white/20">
                       <h3 className="text-2xl font-semibold tracking-tight flex items-center gap-4 text-[#1d1d1f] dark:text-[#f5f5f7]">
                         <Info className="h-6 w-6" />
                         Insights
                       </h3>
                       <div className="space-y-6">
                         {product.supplierName && (
-                          <div className="flex justify-between items-center pb-4 border-b border-black/[0.05] dark:border-white/[0.05]">
+                          <div className="flex justify-between items-center pb-4 border-b border-black/[0.05] dark:border-white/[0.1]">
                             <span className="text-xs font-medium text-[#86868b] uppercase tracking-wider">Brand</span>
                             <span className="font-semibold text-sm text-[#1d1d1f] dark:text-[#f5f5f7]">{product.supplierName}</span>
                           </div>
@@ -1116,14 +1140,14 @@ export default function ProductDetailsPage() {
               <TabsContent value="shipping" className="mt-0">
                 <div className="max-w-5xl space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="p-6 rounded-[2rem] space-y-3 bg-[#f5f5f7] dark:bg-[#1d1d1f] border-2 border-black/10 dark:border-white/10">
+                    <div className="p-6 rounded-[2rem] space-y-3 bg-[#f5f5f7] dark:bg-[#1d1d1f] border-2 border-black/10 dark:border-white/20">
                       <div className="h-12 w-12 rounded-full bg-white dark:bg-black flex items-center justify-center text-[#1d1d1f] dark:text-[#f5f5f7] mb-4 shadow-sm border-2 border-black/5 dark:border-white/5">
                         <Truck className="h-6 w-6" />
                       </div>
                       <h4 className="font-semibold text-xl tracking-tight">Free Express Delivery</h4>
                       <p className="text-sm text-[#86868b] leading-relaxed">{settings?.shippingPolicy || "Orders are processed within 24 hours. Domestic delivery typically arrives in 3-5 business days."}</p>
                     </div>
-                    <div className="p-6 rounded-[2rem] space-y-3 bg-[#f5f5f7] dark:bg-[#1d1d1f] border-2 border-black/10 dark:border-white/10">
+                    <div className="p-6 rounded-[2rem] space-y-3 bg-[#f5f5f7] dark:bg-[#1d1d1f] border-2 border-black/10 dark:border-white/20">
                       <div className="h-12 w-12 rounded-full bg-white dark:bg-black flex items-center justify-center text-[#1d1d1f] dark:text-[#f5f5f7] mb-4 shadow-sm border-2 border-black/5 dark:border-white/5">
                         <RotateCcw className="h-6 w-6" />
                       </div>
@@ -1138,7 +1162,7 @@ export default function ProductDetailsPage() {
             <TabsContent value="reviews" className="mt-0">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
                 <div className="lg:col-span-4 space-y-8">
-                  <div className="bg-[#f5f5f7] dark:bg-[#1d1d1f] p-6 rounded-[2rem] text-center border-2 border-black/10 dark:border-white/10">
+                  <div className="bg-[#f5f5f7] dark:bg-[#1d1d1f] p-6 rounded-[2rem] text-center border-2 border-black/10 dark:border-white/20">
                     <p className="text-6xl font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] tracking-tight">{reviewStats.avg}</p>
                     <div className="flex justify-center text-amber-400 my-4">
                       {[...Array(5)].map((_, i) => (
