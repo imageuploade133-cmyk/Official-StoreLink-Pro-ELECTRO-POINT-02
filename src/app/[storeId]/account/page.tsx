@@ -206,17 +206,15 @@ export default function AccountPage() {
         {/* Tabs Content */}
         <div className="lg:col-span-8">
           <Tabs defaultValue="orders" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 p-1 bg-slate-100 dark:bg-slate-900 rounded-2xl h-14 mb-8">
-              <TabsTrigger 
-                value="orders" 
-                className="rounded-xl font-black uppercase text-[10px] tracking-widest"
+            <TabsList className="grid w-full grid-cols-2 mb-8">
+              <TabsTrigger
+                value="orders"
               >
                 <ShoppingBag className="w-4 h-4 mr-2" />
                 Order History
               </TabsTrigger>
-              <TabsTrigger 
+              <TabsTrigger
                 value="profile"
-                className="rounded-xl font-black uppercase text-[10px] tracking-widest"
               >
                 <UserCircle className="w-4 h-4 mr-2" />
                 Profile Settings

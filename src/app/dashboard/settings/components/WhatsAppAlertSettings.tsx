@@ -393,12 +393,12 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
                 </div>
 
                 <Tabs defaultValue="orderPlaced" className="w-full">
-                    <TabsList className="grid grid-cols-2 md:grid-cols-5 h-auto p-1 bg-gray-100 rounded-xl">
-                        <TabsTrigger value="orderPlaced" className="py-2 text-xs rounded-lg">Placed</TabsTrigger>
-                        <TabsTrigger value="orderProcessing" className="py-2 text-xs rounded-lg">Processing</TabsTrigger>
-                        <TabsTrigger value="orderShipped" className="py-2 text-xs rounded-lg">Shipped</TabsTrigger>
-                        <TabsTrigger value="orderDelivered" className="py-2 text-xs rounded-lg">Delivered</TabsTrigger>
-                        <TabsTrigger value="orderCancelled" className="py-2 text-xs rounded-lg">Cancelled</TabsTrigger>
+                    <TabsList className="grid grid-cols-2 md:grid-cols-5 mb-4">
+                        <TabsTrigger value="orderPlaced">Placed</TabsTrigger>
+                        <TabsTrigger value="orderProcessing">Processing</TabsTrigger>
+                        <TabsTrigger value="orderShipped">Shipped</TabsTrigger>
+                        <TabsTrigger value="orderDelivered">Delivered</TabsTrigger>
+                        <TabsTrigger value="orderCancelled">Cancelled</TabsTrigger>
                     </TabsList>
                     
                     {[

@@ -916,34 +916,30 @@ export default function ButtonUIStylePage() {
           </Card>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 h-auto p-1.5 bg-muted/50 rounded-2xl border border-primary/5">
-              <TabsTrigger 
-                value="addToCart" 
-                className="rounded-xl py-4 flex items-center gap-2 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
+            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 mb-8">
+              <TabsTrigger
+                value="addToCart"
               >
                 <ShoppingBag className="h-4 w-4" />
                 <span className="hidden sm:inline">Product Page (Add to Cart)</span>
                 <span className="sm:hidden">Product Page</span>
               </TabsTrigger>
-              <TabsTrigger 
-                value="gridCart" 
-                className="rounded-xl py-4 flex items-center gap-2 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
+              <TabsTrigger
+                value="gridCart"
               >
                 <Layout className="h-4 w-4" />
                 <span className="hidden sm:inline">Product Grid (Card Button)</span>
                 <span className="sm:hidden">Grid Card</span>
               </TabsTrigger>
-              <TabsTrigger 
-                value="heroBtn" 
-                className="rounded-xl py-4 flex items-center gap-2 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
+              <TabsTrigger
+                value="heroBtn"
               >
                 <Zap className="h-4 w-4" />
                 <span className="hidden sm:inline">Hero/Banner Button</span>
                 <span className="sm:hidden">Hero Btn</span>
               </TabsTrigger>
-              <TabsTrigger 
-                value="exploreBtn" 
-                className="rounded-xl py-4 flex items-center gap-2 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
+              <TabsTrigger
+                value="exploreBtn"
               >
                 <MousePointerClick className="h-4 w-4" />
                 <span className="hidden sm:inline">Explore Section Button</span>

@@ -270,24 +270,21 @@ export default function ProductCardDesignerPage() {
         {/* Left Column - Settings */}
         <div className="space-y-6">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 h-auto p-1.5 bg-muted/50 rounded-2xl border border-primary/5">
-              <TabsTrigger 
-                value="presets" 
-                className="rounded-xl py-4 flex items-center gap-2 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
+            <TabsList className="grid w-full grid-cols-3 mb-8">
+              <TabsTrigger
+                value="presets"
               >
                 <Layout className="h-4 w-4" />
                 Presets
               </TabsTrigger>
-              <TabsTrigger 
-                value="customize" 
-                className="rounded-xl py-4 flex items-center gap-2 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
+              <TabsTrigger
+                value="customize"
               >
                 <Palette className="h-4 w-4" />
                 Customize
               </TabsTrigger>
-              <TabsTrigger 
-                value="html" 
-                className="rounded-xl py-4 flex items-center gap-2 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
+              <TabsTrigger
+                value="html"
               >
                 <Code className="h-4 w-4" />
                 Custom HTML

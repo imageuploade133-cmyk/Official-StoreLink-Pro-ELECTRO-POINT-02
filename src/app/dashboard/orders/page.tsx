@@ -472,11 +472,11 @@ export default function WebsiteOrdersPage() {
       </div>
 
       <Tabs value={activeMainTab} onValueChange={setActiveMainTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6 h-12 p-1 bg-muted/50 rounded-2xl border">
-          <TabsTrigger value="registry" className="rounded-xl font-bold uppercase text-[10px] tracking-widest gap-2">
+        <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsTrigger value="registry">
             <ShoppingBag className="h-3.5 w-3.5" /> Active Registry
           </TabsTrigger>
-          <TabsTrigger value="audit" className="rounded-xl font-bold uppercase text-[10px] tracking-widest gap-2">
+          <TabsTrigger value="audit">
             <ClipboardList className="h-3.5 w-3.5" /> Fulfillment Audit
           </TabsTrigger>
         </TabsList>

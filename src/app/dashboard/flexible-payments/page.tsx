@@ -255,11 +255,11 @@ export default function FlexiblePaymentsPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6 h-12 p-1 bg-muted/50 rounded-2xl border">
-          <TabsTrigger value="registry" className="rounded-xl font-bold uppercase text-[10px] tracking-widest gap-2">
+        <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsTrigger value="registry">
             <Users className="h-3.5 w-3.5" /> Account Registry
           </TabsTrigger>
-          <TabsTrigger value="audit" className="rounded-xl font-bold uppercase text-[10px] tracking-widest gap-2">
+          <TabsTrigger value="audit">
             <History className="h-3.5 w-3.5" /> Deposit Audit Log
           </TabsTrigger>
         </TabsList>
