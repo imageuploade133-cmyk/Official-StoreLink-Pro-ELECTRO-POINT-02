@@ -73,30 +73,42 @@ export function StockBar({
   const stockPercentage = isActualOutOfStock ? 0 : Math.min((stock / (lowStockThreshold * 5)) * 100, 100);
 
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn("space-y-2.5", className)}>
       {showLabels && (
-        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
-          <span 
-            className={cn(
-                "opacity-80",
-                !activeColor && (isActualOutOfStock ? "text-destructive" : isActualLowStock ? "text-orange-600" : "text-primary/60")
-            )}
-            style={{ color: activeColor || undefined }}
-          >
-            {stock} items left
-          </span>
+        <div className="flex justify-between items-center text-[11px] font-medium tracking-tight">
+          <div className="flex items-center gap-1.5">
+            <div className={cn(
+              "h-1.5 w-1.5 rounded-full",
+              isActualOutOfStock ? "bg-destructive" : isActualLowStock ? "bg-[#e11d48] animate-pulse" : "bg-[#34c759]"
+            )} />
+            <span className={cn(
+                "text-[#86868b]",
+                isActualOutOfStock && "text-destructive font-semibold",
+                isActualLowStock && "text-[#e11d48] font-semibold"
+            )}>
+              {isActualOutOfStock ? outLabel : isActualLowStock ? `${stock} items remaining` : "Available in Stock"}
+            </span>
+          </div>
+          {!isActualOutOfStock && !isActualLowStock && (
+            <span className="text-[#86868b] opacity-60 font-medium">{stock}+ units</span>
+          )}
         </div>
       )}
-      <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden shadow-inner">
+      <div className="h-1.5 w-full bg-black/[0.08] dark:bg-white/[0.15] rounded-full overflow-hidden">
         <div 
           className={cn(
             "h-full rounded-full transition-all duration-1000 ease-in-out",
-            barColorClass
+            !activeColor ? (
+              isActualOutOfStock 
+                ? "bg-destructive" 
+                : isActualLowStock 
+                  ? "bg-[#e11d48]" 
+                  : "bg-[#0071e3]"
+            ) : ""
           )} 
           style={{ 
             width: `${stockPercentage}%`,
             backgroundColor: activeColor || undefined,
-            boxShadow: activeColor ? `0 0 10px ${activeColor}66` : undefined
           }}
         />
       </div>

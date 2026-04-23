@@ -859,12 +859,31 @@ export default function ProductDetailsPage() {
                 {(activeSectionPromo?.endDate || (isDiscounted && product.promo?.endDate)) && (
                   <PromoCountdown endDate={activeSectionPromo?.endDate || convertToDateSafely(product.promo!.endDate)!} />
                 )}
-                <div className="flex items-center justify-between mb-1 md:mb-2"><label className="text-[10px] md:text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">Quantity</label></div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-[11px] font-semibold uppercase tracking-widest text-[#86868b]">Select Quantity</label>
+                  {product.stock <= 5 && product.stock > 0 && (
+                    <span className="text-[10px] font-bold text-[#e11d48] animate-pulse">Only {product.stock} left!</span>
+                  )}
+                </div>
                 <div className="flex items-center gap-3 md:gap-4">
-                  <div className="flex items-center bg-white dark:bg-black/40 border border-black/[0.08] dark:border-white/[0.08] rounded-full p-1 shadow-sm">
-                    <Button variant="ghost" size="icon" className="h-10 md:h-12 w-10 md:w-12 rounded-full hover:bg-black/5 dark:hover:bg-white/5" onClick={() => setQuantity(Math.max(1, quantity - 1))}><Minus className="h-4 md:h-5 w-4 md:w-5" /></Button>
-                    <span className="w-10 md:w-12 text-center text-lg font-medium">{quantity}</span>
-                    <Button variant="ghost" size="icon" className="h-10 md:h-12 w-10 md:w-12 rounded-full hover:bg-black/5 dark:hover:bg-white/5" onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}><Plus className="h-4 md:h-5 w-4 md:w-5" /></Button>
+                  <div className="flex items-center bg-black/[0.03] dark:bg-white/[0.08] border border-black/[0.05] dark:border-white/[0.05] rounded-[18px] p-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-10 md:h-12 w-10 md:w-12 rounded-[14px] hover:bg-white dark:hover:bg-white/10 hover:shadow-sm active:scale-95 transition-all" 
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    >
+                      <Minus className="h-4 md:h-5 w-4 md:w-5" />
+                    </Button>
+                    <span className="w-10 md:w-12 text-center text-lg font-semibold tabular-nums tracking-tight">{quantity}</span>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-10 md:h-12 w-10 md:w-12 rounded-[14px] hover:bg-white dark:hover:bg-white/10 hover:shadow-sm active:scale-95 transition-all" 
+                      onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                    >
+                      <Plus className="h-4 md:h-5 w-4 md:w-5" />
+                    </Button>
                   </div>
                   <Button 
                     onClick={isOutOfStock ? () => setIsOutOfDataDrawerOpen(true) : handleAddToCart} 
