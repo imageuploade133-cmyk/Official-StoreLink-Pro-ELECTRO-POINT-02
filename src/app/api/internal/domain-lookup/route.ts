@@ -1,21 +1,7 @@
 import { NextResponse } from 'next/server';
-import { getFirestore } from 'firebase-admin/firestore';
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { adminDb } from '@/lib/firebase-admin';
 
-const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
-if (!serviceAccountKey) {
-    throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY is not defined');
-}
-
-const serviceAccount = JSON.parse(Buffer.from(serviceAccountKey, 'base64').toString());
-
-if (!getApps().length) {
-  initializeApp({
-    credential: cert(serviceAccount),
-  });
-}
-
-const db = getFirestore();
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -26,6 +12,8 @@ export async function GET(request: Request) {
   console.log('Domain lookup:', { domain, subdomain, storeId });
 
   try {
+    const db = adminDb;
+    
     if (storeId) {
       // 1. Check if the storeId is the document ID
       const storeDoc = await db.collection('stores').doc(storeId).get();

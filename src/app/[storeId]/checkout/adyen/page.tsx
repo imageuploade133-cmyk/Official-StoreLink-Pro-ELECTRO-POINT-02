@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useRouter, useParams } from 'next/navigation';
-import AdyenCheckout from '@adyen/adyen-web';
+import { AdyenCheckout } from '@adyen/adyen-web';
 import '@adyen/adyen-web/styles/adyen.css';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
@@ -36,7 +36,7 @@ export default function AdyenPaymentPage() {
           throw new Error('Adyen client key not found');
         }
 
-        const checkout = await AdyenCheckout({
+        const checkout: any = await AdyenCheckout({
           environment: adyenMethod.mode === 'live' ? 'live' : 'test',
           clientKey: adyenMethod.publicKey,
           session: {

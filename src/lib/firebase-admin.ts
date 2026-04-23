@@ -21,27 +21,18 @@ if (!admin.apps.length) {
       } catch (parseError) {
         console.error('Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY. Ensure it is valid JSON or Base64 encoded JSON.');
         // Fallback to ADC
-        admin.initializeApp({
-          projectId: projectId,
-        });
+        if (!admin.apps.length) {
+          admin.initializeApp({
+            projectId: projectId,
+          });
+        }
       }
     } else {
-      try {
-        // Try to load from a local file if it exists (useful for local development as per ticket instructions)
-        // We look for serviceAccountKey.json in the root directory
-        const serviceAccount = require('../../serviceAccountKey.json');
-        admin.initializeApp({
-          credential: admin.credential.cert(serviceAccount),
-          projectId: projectId,
-        });
-        console.log('Firebase Admin initialized with local serviceAccountKey.json');
-      } catch (fileError) {
-        // Fallback to Application Default Credentials (ADC)
-        admin.initializeApp({
-          projectId: projectId,
-        });
-        console.log('Firebase Admin initialized with Application Default Credentials');
-      }
+      // Fallback to Application Default Credentials (ADC)
+      admin.initializeApp({
+        projectId: projectId,
+      });
+      console.log('Firebase Admin initialized with Application Default Credentials');
     }
   } catch (error) {
     console.error('Firebase admin initialization error', error);
