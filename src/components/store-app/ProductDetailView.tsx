@@ -278,6 +278,16 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                 color: settings?.storeAddToCartColor || '#3b82f6',
                 border: 'none'
             };
+        } else if (style === 'apple') {
+            const color = settings?.storeAddToCartColor || '#007AFF';
+            return {
+                backgroundColor: color,
+                color: 'white',
+                border: '1px solid rgba(0,0,0,0.1)',
+                boxShadow: `inset 0 1px 0 rgba(255, 255, 255, 0.3)`,
+                fontWeight: '600',
+                letterSpacing: '-0.01em',
+            };
         }
 
         return {
@@ -327,8 +337,19 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
         };
 
         const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
-        const shapeClass = shapeClasses[shape] || 'rounded-2xl';
-        const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
+        let shapeClass = shapeClasses[shape] || 'rounded-2xl';
+        let shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
+
+        const style = useIndividual
+            ? (settings?.storeAddToCartStyle || 'standard')
+            : (settings?.storeBtnStyle || 'standard');
+
+        if (style === 'apple') {
+            shapeClass = 'rounded-xl';
+            const color = settings?.storeAddToCartColor || '#007AFF';
+            // Custom shadow for Apple style
+            shadowClass = 'shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-2px_rgba(0,0,0,0.05)]';
+        }
 
         return `${sizeClass} ${shapeClass} ${shadowClass}`;
     }, [settings]);

@@ -217,6 +217,16 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
             color: settings?.storeGridCartColor || '#10b981',
             border: 'none'
         };
+    } else if (style === 'apple') {
+        const color = settings?.storeGridCartColor || '#007AFF';
+        return {
+            backgroundColor: color,
+            color: 'white',
+            border: '1px solid rgba(0,0,0,0.1)',
+            boxShadow: `inset 0 1px 0 rgba(255, 255, 255, 0.3)`,
+            fontWeight: '600',
+            letterSpacing: '-0.01em',
+        };
     }
 
     return {
@@ -266,8 +276,17 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
     };
 
     const sizeClass = sizeClasses[size] || sizeClasses.md;
-    const shapeClass = shapeClasses[shape] || 'rounded-md';
-    const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
+    let shapeClass = shapeClasses[shape] || 'rounded-md';
+    let shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
+
+    const style = useIndividual
+        ? (settings?.storeGridCartStyle || 'standard')
+        : (settings?.storeBtnStyle || 'standard');
+
+    if (style === 'apple') {
+        shapeClass = 'rounded-xl';
+        shadowClass = 'shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-2px_rgba(0,0,0,0.05)]';
+    }
 
     return `${sizeClass} ${shapeClass} ${shadowClass}`;
   }, [settings]);
