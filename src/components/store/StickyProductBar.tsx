@@ -148,16 +148,16 @@ export function StickyProductBar({
   return (
     /* Overlay bar - no spacer needed, content scrolls under it */
     <div className={cn(
-      "fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 transition-all duration-300 ease-out",
-      isVisible ? "translate-y-0 opacity-100 shadow-lg shadow-slate-900/10" : "translate-y-full opacity-0 pointer-events-none"
+      "fixed bottom-0 left-0 right-0 z-50 bg-white/80 dark:bg-black/80 backdrop-blur-xl border-t border-black/[0.05] dark:border-white/[0.05] transition-all duration-300 ease-out",
+      isVisible ? "translate-y-0 opacity-100 shadow-lg shadow-black/5" : "translate-y-full opacity-0 pointer-events-none"
     )}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex items-center justify-between gap-3 sm:gap-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between gap-3 sm:gap-4">
         {/* Product Info */}
         <div className="flex-1 min-w-0">
-          <p className="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-400 truncate uppercase tracking-wide">
+          <p className="text-[10px] sm:text-[11px] font-semibold text-[#86868b] truncate uppercase tracking-widest">
             {productName}
           </p>
-          <p className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+          <p className="text-lg sm:text-xl font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] tracking-tight">
             {productPrice}
           </p>
         </div>
@@ -170,8 +170,8 @@ export function StickyProductBar({
             variant="ghost"
             onClick={onToggleWishlist}
             className={cn(
-              "h-12 w-12 rounded-2xl transition-all duration-300 hover:bg-slate-100 dark:hover:bg-slate-800",
-              isInWishlist ? "text-rose-500" : "text-slate-600 dark:text-slate-400"
+              "h-10 w-10 sm:h-12 sm:w-12 rounded-full transition-all duration-300 hover:bg-black/5 dark:hover:bg-white/5",
+              isInWishlist ? "text-rose-500" : "text-[#1d1d1f] dark:text-[#f5f5f7]"
             )}
           >
             <Heart className={cn(
@@ -186,7 +186,7 @@ export function StickyProductBar({
             disabled={isOutOfStock}
             style={buttonStyle}
             className={cn(
-              "font-black text-xs sm:text-sm uppercase tracking-wide transition-all duration-300 flex items-center gap-1.5 shrink-0 border-none",
+              "font-semibold text-xs sm:text-sm tracking-tight transition-all duration-300 flex items-center gap-1.5 shrink-0 border-none shadow-sm active:scale-[0.98]",
               buttonClasses,
               isOutOfStock && "opacity-50 cursor-not-allowed"
             )}
