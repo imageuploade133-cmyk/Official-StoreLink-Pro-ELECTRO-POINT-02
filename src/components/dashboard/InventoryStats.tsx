@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertTriangle, PackageX, CalendarX, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 interface InventoryStatsProps {
   isLoading: boolean;
@@ -19,11 +19,8 @@ export function InventoryStats({ isLoading, stats }: InventoryStatsProps) {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       <Card className="overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <CardHeader className="pb-3">
           <CardTitle className="text-sm font-semibold text-slate-700 dark:text-slate-200">Low Stock</CardTitle>
-          <div className="p-2 rounded-lg bg-yellow-100 dark:bg-yellow-900/30">
-            <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
-          </div>
         </CardHeader>
         <CardContent>
           {isLoading ? <Skeleton className="h-8 w-1/4 my-1" /> : <div className="text-3xl font-bold text-slate-900 dark:text-white">{stats.lowStockCount}</div>}
@@ -35,11 +32,8 @@ export function InventoryStats({ isLoading, stats }: InventoryStatsProps) {
       </Card>
 
       <Card className="overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <CardHeader className="pb-3">
           <CardTitle className="text-sm font-semibold text-slate-700 dark:text-slate-200">Out of Stock</CardTitle>
-          <div className="p-2 rounded-lg bg-red-100 dark:bg-red-900/30">
-            <PackageX className="h-4 w-4 text-red-600 dark:text-red-500" />
-          </div>
         </CardHeader>
         <CardContent>
           {isLoading ? <Skeleton className="h-8 w-1/4 my-1" /> : <div className="text-3xl font-bold text-slate-900 dark:text-white">{stats.outOfStockCount}</div>}
@@ -51,11 +45,8 @@ export function InventoryStats({ isLoading, stats }: InventoryStatsProps) {
       </Card>
 
       <Card className="overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <CardHeader className="pb-3">
           <CardTitle className="text-sm font-semibold text-slate-700 dark:text-slate-200">Expired Products</CardTitle>
-          <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/30">
-            <CalendarX className="h-4 w-4 text-orange-600 dark:text-orange-500" />
-          </div>
         </CardHeader>
         <CardContent>
           {isLoading ? <Skeleton className="h-8 w-1/4 my-1" /> : <div className="text-3xl font-bold text-slate-900 dark:text-white">{stats.expiredProductCount}</div>}
