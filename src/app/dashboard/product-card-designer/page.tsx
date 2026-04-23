@@ -270,222 +270,95 @@ export default function ProductCardDesignerPage() {
         {/* Left Column - Settings */}
         <div className="space-y-6">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="presets">
-                <Layout className="h-4 w-4 mr-2" />
+            <TabsList className="grid w-full grid-cols-3 h-auto p-1.5 bg-muted/50 rounded-2xl border border-primary/5">
+              <TabsTrigger 
+                value="presets" 
+                className="rounded-xl py-4 flex items-center gap-2 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
+              >
+                <Layout className="h-4 w-4" />
                 Presets
               </TabsTrigger>
-              <TabsTrigger value="customize">
-                <Palette className="h-4 w-4 mr-2" />
+              <TabsTrigger 
+                value="customize" 
+                className="rounded-xl py-4 flex items-center gap-2 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
+              >
+                <Palette className="h-4 w-4" />
                 Customize
               </TabsTrigger>
-              <TabsTrigger value="html">
-                <Code className="h-4 w-4 mr-2" />
+              <TabsTrigger 
+                value="html" 
+                className="rounded-xl py-4 flex items-center gap-2 transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
+              >
+                <Code className="h-4 w-4" />
                 Custom HTML
               </TabsTrigger>
             </TabsList>
 
-            {/* Presets Tab */}
-            <TabsContent value="presets" className="space-y-4 mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Card Style Presets</CardTitle>
-                  <CardDescription>
-                    Choose from pre-designed card styles or create your own.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 gap-3">
-                    {cardStyles.map((style) => {
-                      const Icon = style.icon;
-                      const isSelected = settings.productCardStyle === style.id;
-                      return (
-                        <button
-                          key={style.id}
-                          onClick={() => updateSetting('productCardStyle', style.id as any)}
-                          className={cn(
-                            'flex items-center gap-4 p-4 rounded-lg border-2 transition-all text-left',
-                            isSelected
-                              ? 'border-primary bg-primary/5'
-                              : 'border-slate-200 dark:border-slate-800 hover:border-primary/50'
-                          )}
-                        >
-                          <div className={cn(
-                            'p-3 rounded-lg',
-                            isSelected ? 'bg-primary text-white' : 'bg-slate-100 dark:bg-slate-800'
-                          )}>
-                            <Icon className="h-5 w-5" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="font-semibold">{style.name}</p>
-                            <p className="text-sm text-slate-500 dark:text-slate-400">{style.description}</p>
-                          </div>
-                          {isSelected && (
-                            <Badge variant="default" className="bg-primary">Selected</Badge>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Customize Tab */}
-            <TabsContent value="customize" className="space-y-4 mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Appearance</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Border Radius */}
-                  <div className="space-y-3">
-                    <Label>Border Radius</Label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {borderRadiusOptions.map((option) => (
-                        <button
-                          key={option.value}
-                          onClick={() => updateSetting('productCardBorderRadius', option.value as any)}
-                          className={cn(
-                            'px-3 py-2 text-sm rounded-md border-2 transition-all',
-                            settings.productCardBorderRadius === option.value
-                              ? 'border-primary bg-primary/10'
-                              : 'border-slate-200 dark:border-slate-700'
-                          )}
-                        >
-                          {option.label}
-                        </button>
-                      ))}
+            <div className="mt-8">
+              {/* Presets Tab */}
+              <TabsContent value="presets" className="space-y-4 focus-visible:outline-none">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Card Style Presets</CardTitle>
+                    <CardDescription>
+                      Choose from pre-designed card styles or create your own.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 gap-3">
+                      {cardStyles.map((style) => {
+                        const Icon = style.icon;
+                        const isSelected = settings.productCardStyle === style.id;
+                        return (
+                          <button
+                            key={style.id}
+                            onClick={() => updateSetting('productCardStyle', style.id as any)}
+                            className={cn(
+                              'flex items-center gap-4 p-4 rounded-lg border-2 transition-all text-left',
+                              isSelected
+                                ? 'border-primary bg-primary/5'
+                                : 'border-slate-200 dark:border-slate-800 hover:border-primary/50'
+                            )}
+                          >
+                            <div className={cn(
+                              'p-3 rounded-lg',
+                              isSelected ? 'bg-primary text-white' : 'bg-slate-100 dark:bg-slate-800'
+                            )}>
+                              <Icon className="h-5 w-5" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-semibold">{style.name}</p>
+                              <p className="text-sm text-slate-500 dark:text-slate-400">{style.description}</p>
+                            </div>
+                            {isSelected && (
+                              <Badge variant="default" className="bg-primary">Selected</Badge>
+                            )}
+                          </button>
+                        );
+                      })}
                     </div>
-                  </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-                  {/* Shadow */}
-                  <div className="space-y-3">
-                    <Label>Shadow</Label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {shadowOptions.map((option) => (
-                        <button
-                          key={option.value}
-                          onClick={() => updateSetting('productCardShadow', option.value as any)}
-                          className={cn(
-                            'px-3 py-2 text-sm rounded-md border-2 transition-all',
-                            settings.productCardShadow === option.value
-                              ? 'border-primary bg-primary/10'
-                              : 'border-slate-200 dark:border-slate-700'
-                          )}
-                        >
-                          {option.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Border */}
-                  <div className="space-y-3">
-                    <Label>Border Width</Label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {borderWidthOptions.map((option) => (
-                        <button
-                          key={option.value}
-                          onClick={() => updateSetting('productCardBorderWidth', option.value as any)}
-                          className={cn(
-                            'px-3 py-2 text-sm rounded-md border-2 transition-all',
-                            settings.productCardBorderWidth === option.value
-                              ? 'border-primary bg-primary/10'
-                              : 'border-slate-200 dark:border-slate-700'
-                          )}
-                        >
-                          {option.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Colors */}
-                  <div className="space-y-3">
-                    <Label>Border Color</Label>
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="color"
-                        value={settings.productCardBorderColor}
-                        onChange={(e) => updateSetting('productCardBorderColor', e.target.value)}
-                        className="h-10 w-20 rounded cursor-pointer"
-                      />
-                      <Input
-                        value={settings.productCardBorderColor}
-                        onChange={(e) => updateSetting('productCardBorderColor', e.target.value)}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <Label>Background Color</Label>
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="color"
-                        value={settings.productCardBgColor}
-                        onChange={(e) => updateSetting('productCardBgColor', e.target.value)}
-                        className="h-10 w-20 rounded cursor-pointer"
-                      />
-                      <Input
-                        value={settings.productCardBgColor}
-                        onChange={(e) => updateSetting('productCardBgColor', e.target.value)}
-                        className="flex-1"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Hover Effect */}
-                  <div className="space-y-3">
-                    <Label>Hover Effect</Label>
-                    <Select
-                      value={settings.productCardHoverEffect}
-                      onValueChange={(value) => updateSetting('productCardHoverEffect', value as any)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {hoverEffectOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Content & Layout</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Image Settings */}
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Show Product Image</Label>
-                      <p className="text-sm text-slate-500">Display the product image on the card</p>
-                    </div>
-                    <Switch
-                      checked={settings.productCardShowImage}
-                      onCheckedChange={(checked) => updateSetting('productCardShowImage', checked)}
-                    />
-                  </div>
-
-                  {settings.productCardShowImage && (
+              {/* Customize Tab */}
+              <TabsContent value="customize" className="space-y-4 focus-visible:outline-none">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Appearance</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* Border Radius */}
                     <div className="space-y-3">
-                      <Label>Image Aspect Ratio</Label>
+                      <Label>Border Radius</Label>
                       <div className="grid grid-cols-3 gap-2">
-                        {imageRatioOptions.map((option) => (
+                        {borderRadiusOptions.map((option) => (
                           <button
                             key={option.value}
-                            onClick={() => updateSetting('productCardImageRatio', option.value as any)}
+                            onClick={() => updateSetting('productCardBorderRadius', option.value as any)}
                             className={cn(
                               'px-3 py-2 text-sm rounded-md border-2 transition-all',
-                              settings.productCardImageRatio === option.value
+                              settings.productCardBorderRadius === option.value
                                 ? 'border-primary bg-primary/10'
                                 : 'border-slate-200 dark:border-slate-700'
                             )}
@@ -495,153 +368,291 @@ export default function ProductCardDesignerPage() {
                         ))}
                       </div>
                     </div>
-                  )}
 
-                  <Separator />
+                    {/* Shadow */}
+                    <div className="space-y-3">
+                      <Label>Shadow</Label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {shadowOptions.map((option) => (
+                          <button
+                            key={option.value}
+                            onClick={() => updateSetting('productCardShadow', option.value as any)}
+                            className={cn(
+                              'px-3 py-2 text-sm rounded-md border-2 transition-all',
+                              settings.productCardShadow === option.value
+                                ? 'border-primary bg-primary/10'
+                                : 'border-slate-200 dark:border-slate-700'
+                            )}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
 
-                  {/* Toggle Elements */}
-                  <div className="space-y-4">
+                    {/* Border */}
+                    <div className="space-y-3">
+                      <Label>Border Width</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {borderWidthOptions.map((option) => (
+                          <button
+                            key={option.value}
+                            onClick={() => updateSetting('productCardBorderWidth', option.value as any)}
+                            className={cn(
+                              'px-3 py-2 text-sm rounded-md border-2 transition-all',
+                              settings.productCardBorderWidth === option.value
+                                ? 'border-primary bg-primary/10'
+                                : 'border-slate-200 dark:border-slate-700'
+                            )}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Colors */}
+                    <div className="space-y-3">
+                      <Label>Border Color</Label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="color"
+                          value={settings.productCardBorderColor}
+                          onChange={(e) => updateSetting('productCardBorderColor', e.target.value)}
+                          className="h-10 w-20 rounded cursor-pointer"
+                        />
+                        <Input
+                          value={settings.productCardBorderColor}
+                          onChange={(e) => updateSetting('productCardBorderColor', e.target.value)}
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <Label>Background Color</Label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="color"
+                          value={settings.productCardBgColor}
+                          onChange={(e) => updateSetting('productCardBgColor', e.target.value)}
+                          className="h-10 w-20 rounded cursor-pointer"
+                        />
+                        <Input
+                          value={settings.productCardBgColor}
+                          onChange={(e) => updateSetting('productCardBgColor', e.target.value)}
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Hover Effect */}
+                    <div className="space-y-3">
+                      <Label>Hover Effect</Label>
+                      <Select
+                        value={settings.productCardHoverEffect}
+                        onValueChange={(value) => updateSetting('productCardHoverEffect', value as any)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {hoverEffectOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Content & Layout</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* Image Settings */}
                     <div className="flex items-center justify-between">
-                      <Label>Show Badges</Label>
+                      <div className="space-y-0.5">
+                        <Label>Show Product Image</Label>
+                        <p className="text-sm text-slate-500">Display the product image on the card</p>
+                      </div>
                       <Switch
-                        checked={settings.productCardShowBadges}
-                        onCheckedChange={(checked) => updateSetting('productCardShowBadges', checked)}
+                        checked={settings.productCardShowImage}
+                        onCheckedChange={(checked) => updateSetting('productCardShowImage', checked)}
                       />
                     </div>
-                    <div className="flex items-center justify-between">
-                      <Label>Show Rating</Label>
-                      <Switch
-                        checked={settings.productCardShowRating}
-                        onCheckedChange={(checked) => updateSetting('productCardShowRating', checked)}
+
+                    {settings.productCardShowImage && (
+                      <div className="space-y-3">
+                        <Label>Image Aspect Ratio</Label>
+                        <div className="grid grid-cols-3 gap-2">
+                          {imageRatioOptions.map((option) => (
+                            <button
+                              key={option.value}
+                              onClick={() => updateSetting('productCardImageRatio', option.value as any)}
+                              className={cn(
+                                'px-3 py-2 text-sm rounded-md border-2 transition-all',
+                                settings.productCardImageRatio === option.value
+                                  ? 'border-primary bg-primary/10'
+                                  : 'border-slate-200 dark:border-slate-700'
+                              )}
+                            >
+                              {option.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <Separator />
+
+                    {/* Toggle Elements */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <Label>Show Badges</Label>
+                        <Switch
+                          checked={settings.productCardShowBadges}
+                          onCheckedChange={(checked) => updateSetting('productCardShowBadges', checked)}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <Label>Show Rating</Label>
+                        <Switch
+                          checked={settings.productCardShowRating}
+                          onCheckedChange={(checked) => updateSetting('productCardShowRating', checked)}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <Label>Show Stock Bar</Label>
+                        <Switch
+                          checked={settings.productCardShowStockBar}
+                          onCheckedChange={(checked) => updateSetting('productCardShowStockBar', checked)}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <Label>Show Wishlist Button</Label>
+                        <Switch
+                          checked={settings.productCardShowWishlist}
+                          onCheckedChange={(checked) => updateSetting('productCardShowWishlist', checked)}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <Label>Show Quick Add Button</Label>
+                        <Switch
+                          checked={settings.productCardShowQuickAdd}
+                          onCheckedChange={(checked) => updateSetting('productCardShowQuickAdd', checked)}
+                        />
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Title Settings */}
+                    <div className="space-y-3">
+                      <Label>Title Lines</Label>
+                      <div className="flex items-center gap-4">
+                        {[1, 2, 3].map((lines) => (
+                          <button
+                            key={lines}
+                            onClick={() => updateSetting('productCardTitleLines', lines as any)}
+                            className={cn(
+                              'px-4 py-2 text-sm rounded-md border-2 transition-all',
+                              settings.productCardTitleLines === lines
+                                ? 'border-primary bg-primary/10'
+                                : 'border-slate-200 dark:border-slate-700'
+                            )}
+                          >
+                            {lines} {lines === 1 ? 'Line' : 'Lines'}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Card Height */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Label>Card Height</Label>
+                        <span className="text-sm text-slate-500">{settings.productCardHeight}px</span>
+                      </div>
+                      <Slider
+                        value={[settings.productCardHeight || 380]}
+                        onValueChange={(value) => updateSetting('productCardHeight', value[0])}
+                        min={200}
+                        max={800}
+                        step={10}
+                      />
+                      <div className="flex justify-between text-xs text-slate-500">
+                        <span>200px (Compact)</span>
+                        <span>800px (Spacious)</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Custom HTML Tab */}
+              <TabsContent value="html" className="space-y-4 focus-visible:outline-none">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Custom HTML Template</CardTitle>
+                    <CardDescription>
+                      Create your own product card using HTML and Tailwind CSS classes.
+                      Use placeholders like {'{{product.name}}'}, {'{{product.price}}'}, {'{{product.imageUrl}}'} etc.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>HTML Template</Label>
+                      <Textarea
+                        value={settings.productCardCustomHtml}
+                        onChange={(e) => updateSetting('productCardCustomHtml', e.target.value)}
+                        rows={25}
+                        className="font-mono text-sm"
+                        placeholder={defaultHtmlTemplate}
                       />
                     </div>
-                    <div className="flex items-center justify-between">
-                      <Label>Show Stock Bar</Label>
-                      <Switch
-                        checked={settings.productCardShowStockBar}
-                        onCheckedChange={(checked) => updateSetting('productCardShowStockBar', checked)}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label>Show Wishlist Button</Label>
-                      <Switch
-                        checked={settings.productCardShowWishlist}
-                        onCheckedChange={(checked) => updateSetting('productCardShowWishlist', checked)}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label>Show Quick Add Button</Label>
-                      <Switch
-                        checked={settings.productCardShowQuickAdd}
-                        onCheckedChange={(checked) => updateSetting('productCardShowQuickAdd', checked)}
-                      />
-                    </div>
-                  </div>
 
-                  <Separator />
-
-                  {/* Title Settings */}
-                  <div className="space-y-3">
-                    <Label>Title Lines</Label>
-                    <div className="flex items-center gap-4">
-                      {[1, 2, 3].map((lines) => (
-                        <button
-                          key={lines}
-                          onClick={() => updateSetting('productCardTitleLines', lines as any)}
-                          className={cn(
-                            'px-4 py-2 text-sm rounded-md border-2 transition-all',
-                            settings.productCardTitleLines === lines
-                              ? 'border-primary bg-primary/10'
-                              : 'border-slate-200 dark:border-slate-700'
-                          )}
-                        >
-                          {lines} {lines === 1 ? 'Line' : 'Lines'}
-                        </button>
-                      ))}
+                    <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg">
+                      <p className="text-sm font-semibold mb-2">Available Placeholders:</p>
+                      <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                        <code>{'{{product.name}}'}</code>
+                        <code>{'{{product.price}}'}</code>
+                        <code>{'{{product.imageUrl}}'}</code>
+                        <code>{'{{product.category}}'}</code>
+                        <code>{'{{product.stock}}'}</code>
+                        <code>{'{{product.isNew}}'}</code>
+                        <code>{'{{product.isPopular}}'}</code>
+                        <code>{'{{product.isOfficial}}'}</code>
+                        <code>{'{{currency}}'}</code>
+                        <code>{'{{addToCart}}'}</code>
+                        <code>{'{{wishlist}}'}</code>
+                        <code>{'{{rating}}'}</code>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Card Height */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <Label>Card Height</Label>
-                      <span className="text-sm text-slate-500">{settings.productCardHeight}px</span>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => updateSetting('productCardCustomHtml', defaultHtmlTemplate)}
+                      >
+                        <RotateCcw className="h-4 w-4 mr-2" />
+                        Reset to Default
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => updateSetting('productCardCustomHtml', minimalHtmlTemplate)}
+                      >
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        Minimal Template
+                      </Button>
                     </div>
-                    <Slider
-                      value={[settings.productCardHeight || 380]}
-                      onValueChange={(value) => updateSetting('productCardHeight', value[0])}
-                      min={200}
-                      max={800}
-                      step={10}
-                    />
-                    <div className="flex justify-between text-xs text-slate-500">
-                      <span>200px (Compact)</span>
-                      <span>800px (Spacious)</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Custom HTML Tab */}
-            <TabsContent value="html" className="space-y-4 mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Custom HTML Template</CardTitle>
-                  <CardDescription>
-                    Create your own product card using HTML and Tailwind CSS classes.
-                    Use placeholders like {'{{product.name}}'}, {'{{product.price}}'}, {'{{product.imageUrl}}'} etc.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>HTML Template</Label>
-                    <Textarea
-                      value={settings.productCardCustomHtml}
-                      onChange={(e) => updateSetting('productCardCustomHtml', e.target.value)}
-                      rows={25}
-                      className="font-mono text-sm"
-                      placeholder={defaultHtmlTemplate}
-                    />
-                  </div>
-
-                  <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg">
-                    <p className="text-sm font-semibold mb-2">Available Placeholders:</p>
-                    <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                      <code>{'{{product.name}}'}</code>
-                      <code>{'{{product.price}}'}</code>
-                      <code>{'{{product.imageUrl}}'}</code>
-                      <code>{'{{product.category}}'}</code>
-                      <code>{'{{product.stock}}'}</code>
-                      <code>{'{{product.isNew}}'}</code>
-                      <code>{'{{product.isPopular}}'}</code>
-                      <code>{'{{product.isOfficial}}'}</code>
-                      <code>{'{{currency}}'}</code>
-                      <code>{'{{addToCart}}'}</code>
-                      <code>{'{{wishlist}}'}</code>
-                      <code>{'{{rating}}'}</code>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => updateSetting('productCardCustomHtml', defaultHtmlTemplate)}
-                    >
-                      <RotateCcw className="h-4 w-4 mr-2" />
-                      Reset to Default
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => updateSetting('productCardCustomHtml', minimalHtmlTemplate)}
-                    >
-                      <Sparkles className="h-4 w-4 mr-2" />
-                      Minimal Template
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </div>
           </Tabs>
 
           {/* Save Button */}
