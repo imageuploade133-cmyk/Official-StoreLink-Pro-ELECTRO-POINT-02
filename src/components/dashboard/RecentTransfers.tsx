@@ -18,12 +18,15 @@ interface RecentTransfersProps {
 
 export function RecentTransfers({ isLoading, recentStockTransfers }: RecentTransfersProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="font-headline text-xl flex items-center gap-2"><Truck className="h-5 w-5 text-primary" />Recent Stock Transfers</CardTitle>
+    <Card className="border-none shadow-sm overflow-hidden bg-white dark:bg-card">
+      <CardHeader className="border-b border-border/50 bg-muted/5">
+        <CardTitle className="font-headline text-lg flex items-center gap-2">
+          <Truck className="h-5 w-5 text-primary" />
+          <span>Stock Transfers</span>
+        </CardTitle>
         <CardDescription>Latest 3 recorded stock movements.</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         {isLoading ? (
           <div className="max-h-[300px] space-y-2">
             <Skeleton className="h-10 w-full" /><Skeleton className="h-10 w-full" /><Skeleton className="h-10 w-full" />

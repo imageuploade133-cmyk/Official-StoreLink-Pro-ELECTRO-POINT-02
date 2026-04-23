@@ -400,7 +400,9 @@ export default function WebsiteOrdersPage() {
                 value={isLoadingAnalytics ? '...' : analytics.totalOrders.toLocaleString()}
                 icon={BarChart3}
                 description="Cumulative volume from storefront."
-                className="bg-primary/5 border-primary/10"
+                className="bg-gradient-to-br from-primary/5 to-white dark:from-primary/10 dark:to-background border border-primary/10 dark:border-primary/20"
+                titleClassName="text-primary font-bold"
+                iconClassName="text-primary bg-primary/10 dark:bg-primary/20"
                 valueClassName="text-primary font-black"
             />
             <StatCard
@@ -408,24 +410,30 @@ export default function WebsiteOrdersPage() {
                 value={isLoadingAnalytics ? '...' : analytics.todayOrders.toLocaleString()}
                 icon={ShoppingBag}
                 description="Volume in latest 24H cycle."
-                className="bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100"
-                valueClassName="text-emerald-600 font-black"
+                className="bg-gradient-to-br from-emerald-50/50 to-white dark:from-emerald-950/20 dark:to-background border border-emerald-100/50 dark:border-emerald-900/30"
+                titleClassName="text-emerald-600 dark:text-emerald-400"
+                iconClassName="text-emerald-500 bg-emerald-100 dark:bg-emerald-900/50"
+                valueClassName="text-emerald-700 dark:text-emerald-300 font-black"
             />
             <StatCard
                 title="Gross Web Income"
                 value={isLoadingAnalytics ? '...' : formatCurrency(analytics.totalIncome, currencySymbol)}
                 icon={TrendingUp}
                 description="Total value of successful sales."
-                className="bg-blue-50 dark:bg-blue-950/20 border-blue-100"
-                valueClassName="text-blue-600 font-black"
+                className="bg-gradient-to-br from-blue-50/50 to-white dark:from-blue-950/20 dark:to-background border border-blue-100/50 dark:border-blue-900/30"
+                titleClassName="text-blue-600 dark:text-blue-400"
+                iconClassName="text-blue-500 bg-blue-100 dark:bg-blue-900/50"
+                valueClassName="text-blue-700 dark:text-blue-300 font-black"
             />
             <StatCard
                 title="Today's Web Revenue"
                 value={isLoadingAnalytics ? '...' : formatCurrency(analytics.todayIncome, currencySymbol)}
                 icon={DollarSign}
                 description="Net earnings for the current day."
-                className="bg-amber-50 dark:bg-amber-950/20 border-amber-100"
-                valueClassName="text-amber-600 font-black"
+                className="bg-gradient-to-br from-amber-50/50 to-white dark:from-amber-950/20 dark:to-background border border-amber-100/50 dark:border-amber-900/30"
+                titleClassName="text-amber-600 dark:text-amber-400"
+                iconClassName="text-amber-500 bg-amber-100 dark:bg-amber-900/50"
+                valueClassName="text-amber-700 dark:text-amber-300 font-black"
             />
         </div>
 

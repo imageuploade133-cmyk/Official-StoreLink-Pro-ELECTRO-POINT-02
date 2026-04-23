@@ -58,12 +58,12 @@ export function PeriodAnalysis({ dateRange, onDateChange, stats, currencySymbol 
 
   return (
     <div>
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Period Analysis</CardTitle>
+      <Card className="mb-6 border-none shadow-sm overflow-hidden bg-white dark:bg-card">
+        <CardHeader className="border-b border-border/50 bg-muted/5">
+          <CardTitle className="text-lg">Period Analysis</CardTitle>
           <CardDescription>Select a date range to analyze sales performance for a specific period.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <div className="flex flex-wrap items-center gap-2">
             <div className="flex items-center gap-1 rounded-md bg-muted p-1">
               <Button variant={activePreset === 'last7' ? 'default' : 'ghost'} size="sm" className="h-8 px-3 text-xs" onClick={() => handleDatePresetChange('last7')}>Last 7 Days</Button>
@@ -115,45 +115,60 @@ export function PeriodAnalysis({ dateRange, onDateChange, stats, currencySymbol 
       </Card>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card className="relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 group bg-white dark:bg-card border border-border/50 dark:border-border/20">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
             <CardTitle className="text-sm font-medium">Revenue (Period)</CardTitle>
-            <DollarSign className="h-5 w-5 text-muted-foreground" />
+            <div className="p-2 rounded-lg bg-primary/10">
+              <DollarSign className="h-4 w-4 text-primary" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(stats.totalRevenue, currencySymbol)}</div>
-            <p className="text-xs text-muted-foreground">{getDateRangeTitle()}</p>
+          <CardContent className="relative z-10">
+            <div className="text-2xl font-bold tracking-tight">{formatCurrency(stats.totalRevenue, currencySymbol)}</div>
+            <p className="text-xs text-muted-foreground mt-1">{getDateRangeTitle()}</p>
           </CardContent>
+          <div className="absolute bottom-0 left-0 h-1 w-full bg-primary/10 group-hover:bg-primary/30 transition-colors" />
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+
+        <Card className="relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 group bg-white dark:bg-card border border-border/50 dark:border-border/20">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
             <CardTitle className="text-sm font-medium">Profit (Period)</CardTitle>
-            <TrendingUp className="h-5 w-5 text-muted-foreground" />
+            <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
+              <TrendingUp className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(stats.totalProfit, currencySymbol)}</div>
-            <p className="text-xs text-muted-foreground">Net profit in selected period</p>
+          <CardContent className="relative z-10">
+            <div className="text-2xl font-bold tracking-tight">{formatCurrency(stats.totalProfit, currencySymbol)}</div>
+            <p className="text-xs text-muted-foreground mt-1">Net profit in selected period</p>
           </CardContent>
+          <div className="absolute bottom-0 left-0 h-1 w-full bg-emerald-500/20 group-hover:bg-emerald-500/40 transition-colors" />
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+
+        <Card className="relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 group bg-white dark:bg-card border border-border/50 dark:border-border/20">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
             <CardTitle className="text-sm font-medium text-orange-600 dark:text-orange-500">Returns (Period)</CardTitle>
-            <Undo2 className="h-5 w-5 text-orange-600 dark:text-orange-500" />
+            <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/50">
+              <Undo2 className="h-4 w-4 text-orange-600 dark:text-orange-500" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(stats.totalReturns, currencySymbol)}</div>
-            <p className="text-xs text-muted-foreground">Value of returns in period</p>
+          <CardContent className="relative z-10">
+            <div className="text-2xl font-bold tracking-tight">{formatCurrency(stats.totalReturns, currencySymbol)}</div>
+            <p className="text-xs text-muted-foreground mt-1">Value of returns in period</p>
           </CardContent>
+          <div className="absolute bottom-0 left-0 h-1 w-full bg-orange-500/20 group-hover:bg-orange-500/40 transition-colors" />
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+
+        <Card className="relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 group bg-white dark:bg-card border border-border/50 dark:border-border/20">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
             <CardTitle className="text-sm font-medium">Transactions (Period)</CardTitle>
-            <ListChecks className="h-5 w-5 text-muted-foreground" />
+            <div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/50">
+              <ListChecks className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalTransactions.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">Number of sales in period</p>
+          <CardContent className="relative z-10">
+            <div className="text-2xl font-bold tracking-tight">{stats.totalTransactions.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground mt-1">Number of sales in period</p>
           </CardContent>
+          <div className="absolute bottom-0 left-0 h-1 w-full bg-indigo-500/20 group-hover:bg-indigo-500/40 transition-colors" />
         </Card>
       </div>
     </div>

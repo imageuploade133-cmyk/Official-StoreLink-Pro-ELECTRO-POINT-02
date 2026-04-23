@@ -37,9 +37,9 @@ export function InventoryStats({
         value={totalStock.toLocaleString()}
         description="Total quantity of all items in stock."
         icon={Boxes}
-        className="bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-900/30"
+        className="bg-gradient-to-br from-blue-50/50 to-white dark:from-blue-950/20 dark:to-background border border-blue-100/50 dark:border-blue-900/30"
         titleClassName="text-blue-600 dark:text-blue-400"
-        iconClassName="text-blue-500"
+        iconClassName="text-blue-500 bg-blue-100 dark:bg-blue-900/50"
         valueClassName="text-blue-700 dark:text-blue-300"
       />
       <StatCard
@@ -47,9 +47,9 @@ export function InventoryStats({
         value={formatCurrency(totalStockValue, currencySymbol)}
         description="Total cost value of all inventory."
         icon={Warehouse}
-        className="bg-purple-50 dark:bg-purple-900/20 border-purple-100 dark:border-purple-900/30"
+        className="bg-gradient-to-br from-purple-50/50 to-white dark:from-purple-950/20 dark:to-background border border-purple-100/50 dark:border-purple-900/30"
         titleClassName="text-purple-600 dark:text-purple-400"
-        iconClassName="text-purple-500"
+        iconClassName="text-purple-500 bg-purple-100 dark:bg-purple-900/50"
         valueClassName="text-purple-700 dark:text-purple-300"
       />
       <StatCard
@@ -57,9 +57,9 @@ export function InventoryStats({
         value={formatCurrency(totalStockProfit, currencySymbol)}
         description="Estimated profit from selling all stock."
         icon={TrendingUp}
-        className="bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-900/30"
+        className="bg-gradient-to-br from-green-50/50 to-white dark:from-green-950/20 dark:to-background border border-green-100/50 dark:border-green-900/30"
         titleClassName="text-green-600 dark:text-green-400"
-        iconClassName="text-green-500"
+        iconClassName="text-green-500 bg-green-100 dark:bg-green-900/50"
         valueClassName="text-green-700 dark:text-green-300"
       />
     </div>

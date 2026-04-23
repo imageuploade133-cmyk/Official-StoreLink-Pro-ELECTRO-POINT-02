@@ -227,13 +227,13 @@
 
 /* Cards: Elevated Grey */
 .dark .card,
-.dark [class*="rounded-lg"]:not(button):not(a):not(nav *):not(input) {
-  background-color: #1c1c1e !important;
-  border: 1px solid #323235 !important;
+.dark [class*="rounded-lg"]:not(button):not(a):not(nav *):not(input):not(.border-none) {
+  background-color: #1c1c1e;
+  border: 1px solid #323235;
 }
 
 .dark .card:hover {
-  border-color: #424245 !important;
+  border-color: #424245;
 }
 
 /* Inputs: Recessed Dark */
@@ -380,14 +380,12 @@
 /* Stat Cards */
 .dark [class*="StatCard"],
 .dark [class*="stat-card"] {
-  border-left: 2px solid #0071e3 !important;
   @apply transition-all duration-300;
 }
 
 .dark [class*="StatCard"]:hover,
 .dark [class*="stat-card"]:hover {
   @apply -translate-y-1 shadow-lg shadow-primary/10;
-  border-left-width: 4px !important;
 }
 
 /* ╔══════════════════════════════════════════════════════════════╗

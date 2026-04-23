@@ -21,12 +21,12 @@ interface PopularProductsProps {
 
 export function PopularProducts({ isLoading, popularProductsData }: PopularProductsProps) {
   return (
-    <Card className="lg:col-span-1">
-      <CardHeader>
-        <CardTitle className="font-headline">Popular Products</CardTitle>
+    <Card className="lg:col-span-1 border-none shadow-sm overflow-hidden bg-white dark:bg-card">
+      <CardHeader className="border-b border-border/50 bg-muted/5">
+        <CardTitle className="font-headline text-lg">Popular Products</CardTitle>
         <CardDescription>Top 5 selling items (all time).</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         {isLoading ? (
           <div className="h-[300px] flex flex-col justify-center space-y-3 px-2">
             <Skeleton className="h-8 w-full" /> <Skeleton className="h-8 w-full" /> <Skeleton className="h-8 w-full" /> <Skeleton className="h-8 w-4/5" /> <Skeleton className="h-8 w-3/5" />
