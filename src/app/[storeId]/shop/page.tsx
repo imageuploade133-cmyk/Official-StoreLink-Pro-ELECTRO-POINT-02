@@ -17,6 +17,7 @@ import type { Product, Category } from '@/lib/types';
 import { ProductCard } from '@/components/store/ProductCard';
 import { useSettings } from '@/contexts/settings-context';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -314,7 +315,7 @@ function ShopPageContent() {
     }, [categoryFromUrl, categories]);
 
     return (
-        <div className="bg-[#f5f5f7] dark:bg-[#000000] min-h-screen">
+        <div className="bg-white dark:bg-[#000000] min-h-screen">
             {/* Category Auto-Switch Notification */}
             {categoryNotification.show && (
                 <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -325,102 +326,119 @@ function ShopPageContent() {
                 </div>
             )}
 
+            {/* Premium Hero Section */}
+            <div className="relative h-[40vh] min-h-[300px] w-full overflow-hidden bg-[#f5f5f7] dark:bg-[#1d1d1f]">
+                <div className="absolute inset-0">
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/50 to-white dark:via-black/50 dark:to-black z-10" />
+                    <img
+                        src={currentCategory?.imageUrl || "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop"}
+                        alt="Shop Hero"
+                        className="w-full h-full object-cover animate-in fade-in duration-1000"
+                    />
+                </div>
+
+                <div className="relative z-20 h-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-end pb-12 sm:pb-20">
+                    <div className="max-w-3xl animate-in slide-in-from-bottom-8 duration-1000 ease-out">
+                        <div className="flex items-center gap-2 mb-4">
+                            <div className="h-[1px] w-8 bg-blue-500" />
+                            <span className="text-blue-500 text-xs font-black uppercase tracking-[0.2em]">
+                                {currentCategory ? "Collection" : "Our Shop"}
+                            </span>
+                        </div>
+                        <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter text-black dark:text-white mb-6">
+                            {currentCategory ? currentCategory.name : (settings?.shopCollectionTitle || 'Shop Our Collection')}
+                        </h1>
+                        {currentCategory?.description && (
+                            <div
+                                className="text-[#86868b] dark:text-[#a1a1a6] text-lg sm:text-xl font-medium leading-relaxed max-w-2xl line-clamp-3"
+                                dangerouslySetInnerHTML={{ __html: currentCategory.description }}
+                            />
+                        )}
+                    </div>
+                </div>
+            </div>
+
             <header className={cn(
                 "sticky top-0 z-40 transition-all duration-500 ease-in-out",
                 "bg-white/80 dark:bg-black/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5",
                 showHeader ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
             )}>
                 <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="py-4 flex flex-col gap-4">
-                        <div className="flex items-center justify-between">
-                            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-black dark:text-white">
-                                {currentCategory ? currentCategory.name : (settings?.shopCollectionTitle || 'Shop Our Collection')}
-                            </h1>
-                            <div className="flex items-center gap-2">
-                                <Button 
-                                    variant="ghost" 
-                                    size="icon" 
-                                    onClick={() => fetchProducts('initial')} 
-                                    disabled={isLoading} 
-                                    className="h-10 w-10 rounded-full hover:bg-black/5 dark:hover:bg-white/5"
-                                >
-                                    <RotateCcw className={cn("h-4 w-4 text-[#86868b]", isLoading && "animate-spin")} />
-                                </Button>
+                    <div className="py-4 flex flex-col gap-6">
+                        {/* Modern Search and Filters Row */}
+                        <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+                            <div className="flex items-center gap-4 w-full lg:w-auto">
+                                <h2 className="hidden lg:block text-sm font-black uppercase tracking-widest text-[#86868b]">Filter</h2>
+                                <form onSubmit={handleSearchSubmit} className="relative w-full lg:w-[400px]">
+                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#86868b] flex-shrink-0 z-10" />
+                                    <Input
+                                        ref={searchInputRef}
+                                        placeholder="Search products..."
+                                        value={searchTerm}
+                                        onChange={(e) => {
+                                            setSearchTerm(e.target.value);
+                                            if (!e.target.value.trim()) {
+                                                setShowSuggestions(false);
+                                            }
+                                        }}
+                                        onFocus={() => searchTerm.trim() && setShowSuggestions(true)}
+                                        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                                        className="pl-10 h-12 rounded-2xl text-sm w-full bg-black/[0.03] dark:bg-white/[0.03] border-none focus-visible:ring-2 focus-visible:ring-blue-500/20 transition-all"
+                                    />
+
+                                    {/* Suggestions Dropdown */}
+                                    {(showSuggestions || isLoadingSuggestions) && searchTerm.trim() && (
+                                        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#1d1d1f] border border-black/5 dark:border-white/5 rounded-3xl shadow-2xl z-50 max-h-80 overflow-y-auto backdrop-blur-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                                            {isLoadingSuggestions ? (
+                                                <div className="p-8 text-center">
+                                                    <Loader2 className="h-6 w-6 animate-spin mx-auto text-blue-500" />
+                                                    <p className="text-xs text-[#86868b] mt-3 font-medium">Searching...</p>
+                                                </div>
+                                            ) : searchSuggestions.length > 0 ? (
+                                                <div className="p-2">
+                                                    {searchSuggestions.map(product => (
+                                                        <button
+                                                            key={product.id}
+                                                            onClick={() => {
+                                                                setSearchTerm(product.name);
+                                                                setShowSuggestions(false);
+                                                                if (product.categoryId && product.categoryId !== categoryFromUrl) {
+                                                                    handleCategoryChange(product.categoryId, true);
+                                                                } else {
+                                                                    handleSearchSubmit({ preventDefault: () => {} } as any);
+                                                                }
+                                                            }}
+                                                            className="w-full p-3 text-left hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-all flex items-center gap-4 group"
+                                                        >
+                                                            <div className="h-12 w-12 rounded-xl bg-black/5 dark:bg-white/5 overflow-hidden flex-shrink-0">
+                                                                {product.imageUrl && (
+                                                                    <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                                )}
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <p className="text-sm font-bold text-black dark:text-white truncate group-hover:text-blue-500 transition-colors">
+                                                                    {product.name}
+                                                                </p>
+                                                                <p className="text-xs text-[#86868b] font-medium">
+                                                                    {currencySymbol}{product.sellingPrice.toLocaleString()}
+                                                                </p>
+                                                            </div>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <div className="p-8 text-center">
+                                                    <p className="text-sm text-black dark:text-white font-bold">No results found</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </form>
                             </div>
-                        </div>
 
-                        {/* Modern Search and Filters */}
-                        <div className="flex flex-col md:flex-row gap-4 items-center">
-                            <form onSubmit={handleSearchSubmit} className="relative w-full md:max-w-md">
-                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#86868b] flex-shrink-0 z-10" />
-                                <Input
-                                    ref={searchInputRef}
-                                    placeholder="Search products, styles, collections..."
-                                    value={searchTerm}
-                                    onChange={(e) => {
-                                        setSearchTerm(e.target.value);
-                                        if (!e.target.value.trim()) {
-                                            setShowSuggestions(false);
-                                        }
-                                    }}
-                                    onFocus={() => searchTerm.trim() && setShowSuggestions(true)}
-                                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                                    className="pl-10 h-12 rounded-2xl text-sm w-full bg-black/[0.03] dark:bg-white/[0.03] border-none focus-visible:ring-1 focus-visible:ring-black/10 dark:focus-visible:ring-white/10 transition-all"
-                                />
-                                
-                                {/* Suggestions Dropdown */}
-                                {(showSuggestions || isLoadingSuggestions) && searchTerm.trim() && (
-                                    <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#1d1d1f] border border-black/5 dark:border-white/5 rounded-3xl shadow-2xl z-50 max-h-80 overflow-y-auto backdrop-blur-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                                        {isLoadingSuggestions ? (
-                                            <div className="p-8 text-center">
-                                                <Loader2 className="h-6 w-6 animate-spin mx-auto text-blue-500" />
-                                                <p className="text-xs text-[#86868b] mt-3 font-medium">Searching our collection...</p>
-                                            </div>
-                                        ) : searchSuggestions.length > 0 ? (
-                                            <div className="p-2">
-                                                {searchSuggestions.map(product => (
-                                                    <button
-                                                        key={product.id}
-                                                        onClick={() => {
-                                                            setSearchTerm(product.name);
-                                                            setShowSuggestions(false);
-                                                            if (product.categoryId && product.categoryId !== categoryFromUrl) {
-                                                                handleCategoryChange(product.categoryId, true);
-                                                            } else {
-                                                                handleSearchSubmit({ preventDefault: () => {} } as any);
-                                                            }
-                                                        }}
-                                                        className="w-full p-3 text-left hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-all flex items-center gap-4 group"
-                                                    >
-                                                        <div className="h-12 w-12 rounded-xl bg-black/5 dark:bg-white/5 overflow-hidden flex-shrink-0">
-                                                            {product.imageUrl && (
-                                                                <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                                            )}
-                                                        </div>
-                                                        <div className="flex-1 min-w-0">
-                                                            <p className="text-sm font-bold text-black dark:text-white truncate group-hover:text-blue-500 transition-colors">
-                                                                {product.name}
-                                                            </p>
-                                                            <p className="text-xs text-[#86868b] font-medium">
-                                                                {currencySymbol}{product.sellingPrice.toLocaleString()}
-                                                            </p>
-                                                        </div>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        ) : (
-                                            <div className="p-8 text-center">
-                                                <p className="text-sm text-black dark:text-white font-bold">No results found</p>
-                                                <p className="text-xs text-[#86868b] mt-1 font-medium">Try a different search term</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                            </form>
-
-                            <div className="flex items-center gap-2 w-full md:w-auto">
+                            <div className="flex items-center gap-3 w-full lg:w-auto">
                                 <Select value={sortFromUrl} onValueChange={handleSortChange}>
-                                    <SelectTrigger className="flex-1 md:w-[180px] h-12 rounded-2xl bg-black/[0.03] dark:bg-white/[0.03] border-none focus:ring-0">
+                                    <SelectTrigger className="flex-1 lg:w-[200px] h-12 rounded-2xl bg-black/[0.03] dark:bg-white/[0.03] border-none focus:ring-2 focus:ring-blue-500/20">
                                         <ArrowUpDown className="h-4 w-4 mr-2 text-[#86868b]" />
                                         <SelectValue placeholder="Sort by" />
                                     </SelectTrigger>
@@ -432,143 +450,159 @@ function ShopPageContent() {
                                     </SelectContent>
                                 </Select>
 
-                                <div className="hidden md:flex h-12 w-[1px] bg-black/5 dark:bg-white/5 mx-2" />
-                                
-                                <Button variant="outline" size="icon" className="h-12 w-12 rounded-2xl bg-black/[0.03] dark:bg-white/[0.03] border-none md:hidden">
-                                    <SlidersHorizontal className="h-4 w-4 text-[#86868b]" />
+                                <div className="h-12 w-[1px] bg-black/5 dark:bg-white/5 mx-1 hidden sm:block" />
+
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => fetchProducts('initial')}
+                                    disabled={isLoading}
+                                    className="h-12 w-12 rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 flex-shrink-0"
+                                >
+                                    <RotateCcw className={cn("h-4 w-4 text-[#86868b]", isLoading && "animate-spin")} />
                                 </Button>
                             </div>
                         </div>
 
-                        {/* Category Chips */}
-                        <ScrollArea className="w-full whitespace-nowrap -mx-4 px-4 pb-2">
-                            <div className="flex w-max space-x-2 py-1">
-                                <button
-                                    onClick={() => handleCategoryChange('all')}
-                                    className={cn(
-                                        "px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 border",
-                                        categoryFromUrl === 'all' 
-                                            ? "bg-black text-white border-black dark:bg-white dark:text-black dark:border-white shadow-lg" 
-                                            : "bg-white text-black border-black/5 dark:bg-[#1d1d1f] dark:text-white dark:border-white/5 hover:border-black/20 dark:hover:border-white/20"
-                                    )}
-                                >
-                                    All Products
-                                </button>
-                                {categories?.map(category => (
+                        {/* Elegant Category Navigation */}
+                        <div className="relative">
+                            <ScrollArea className="w-full whitespace-nowrap">
+                                <div className="flex items-center gap-1 pb-2">
                                     <button
-                                        key={category.id}
-                                        onClick={() => handleCategoryChange(category.id)}
+                                        onClick={() => handleCategoryChange('all')}
                                         className={cn(
-                                            "px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 border",
-                                            categoryFromUrl === category.id 
-                                                ? "bg-black text-white border-black dark:bg-white dark:text-black dark:border-white shadow-lg" 
-                                                : "bg-white text-black border-black/5 dark:bg-[#1d1d1f] dark:text-white dark:border-white/5 hover:border-black/20 dark:hover:border-white/20"
+                                            "px-6 py-2.5 rounded-full text-xs font-black transition-all duration-300 uppercase tracking-widest",
+                                            categoryFromUrl === 'all'
+                                                ? "bg-black text-white dark:bg-white dark:text-black shadow-xl scale-105"
+                                                : "text-[#86868b] hover:text-black dark:hover:text-white"
                                         )}
                                     >
-                                        {category.name}
+                                        All Products
                                     </button>
-                                ))}
-                            </div>
-                            <ScrollBar orientation="horizontal" className="hidden" />
-                        </ScrollArea>
+                                    {categories?.map(category => (
+                                        <button
+                                            key={category.id}
+                                            onClick={() => handleCategoryChange(category.id)}
+                                            className={cn(
+                                                "px-6 py-2.5 rounded-full text-xs font-black transition-all duration-300 uppercase tracking-widest",
+                                                categoryFromUrl === category.id
+                                                    ? "bg-black text-white dark:bg-white dark:text-black shadow-xl scale-105"
+                                                    : "text-[#86868b] hover:text-black dark:hover:text-white"
+                                            )}
+                                        >
+                                            {category.name}
+                                        </button>
+                                    ))}
+                                </div>
+                                <ScrollBar orientation="horizontal" className="hidden" />
+                            </ScrollArea>
+                        </div>
                     </div>
                 </div>
             </header>
 
-            <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Banner/Category Info */}
-                {!isLoading && (
-                    <div className="mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                        {currentCategory?.description && (
-                            <div className="max-w-3xl">
-                                <p className="text-blue-500 text-xs font-bold uppercase tracking-widest mb-3">Collection</p>
-                                <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-black dark:text-white mb-4">
-                                    {currentCategory.name}
-                                </h2>
-                                <div 
-                                    className="text-[#86868b] text-base sm:text-lg font-medium leading-relaxed"
-                                    dangerouslySetInnerHTML={{ __html: currentCategory.description }}
-                                />
-                            </div>
-                        )}
-                    </div>
-                )}
+            <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div className="flex flex-col gap-8">
+                    {/* Active Filters & Info */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                            <span className="text-sm font-black text-black dark:text-white uppercase tracking-[0.15em]">
+                                {totalProductsCount} Products Found
+                            </span>
+                            {searchTerm && (
+                                <Badge variant="secondary" className="bg-blue-500/10 text-blue-500 border-none rounded-full px-4 py-1 font-bold text-[10px] uppercase tracking-wider">
+                                    Search: {searchTerm}
+                                </Badge>
+                            )}
+                        </div>
 
-                <div className="w-full">
+                        <div className="flex items-center gap-4 text-[#86868b] text-[11px] font-bold uppercase tracking-widest">
+                            <span>Grid View</span>
+                            <div className="flex gap-1">
+                                <div className="h-3 w-3 rounded-sm bg-black dark:bg-white" />
+                                <div className="h-3 w-3 rounded-sm bg-black/20 dark:bg-white/20" />
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="w-full">
                         {isLoading && products.length === 0 ? (
-                            <div className={cn("grid gap-6 sm:gap-8", gridClasses)}>
+                            <div className={cn("grid gap-6 sm:gap-10", gridClasses)}>
                                 {Array.from({ length: 8 }).map((_, i) => (
                                    <ProductCardSkeleton key={i} />
                                 ))}
                             </div>
                         ) : products.length > 0 ? (
-                            <div className="space-y-12 sm:space-y-16">
-                                <div className={cn("grid gap-6 sm:gap-8", gridClasses)}>
+                            <div className="space-y-20">
+                                <div className={cn("grid gap-6 sm:gap-10", gridClasses)}>
                                     {products.map((product, idx) => (
-                                        <div 
+                                        <div
                                             key={product.id}
-                                            className="animate-in fade-in slide-in-from-bottom-8 duration-500 fill-mode-both"
-                                            style={{ animationDelay: `${idx * 50}ms` }}
+                                            className="animate-in fade-in slide-in-from-bottom-12 duration-700 fill-mode-both"
+                                            style={{ animationDelay: `${idx * 100}ms` }}
                                         >
-                                            <ProductCard 
-                                                product={product} 
+                                            <ProductCard
+                                                product={product}
                                                 category={categories?.find(c => c.id === product.categoryId)}
-                                                currencySymbol={currencySymbol} 
+                                                currencySymbol={currencySymbol}
                                             />
                                         </div>
                                     ))}
                                 </div>
-                                
-                                {/* Pagination */}
-                                <div className="flex flex-col sm:flex-row items-center justify-between pt-12 border-t border-black/5 dark:border-white/5 gap-8">
-                                    <div className="flex flex-col gap-1 text-center sm:text-left">
-                                        <p className="text-sm font-black text-black dark:text-white uppercase tracking-wider">
-                                            Displaying {products.length} of {totalProductsCount} products
+
+                                {/* Refined Pagination */}
+                                <div className="flex flex-col sm:flex-row items-center justify-between py-12 border-t border-black/5 dark:border-white/5 gap-8">
+                                    <div className="flex flex-col gap-1.5 text-center sm:text-left">
+                                        <p className="text-xs font-black text-black dark:text-white uppercase tracking-[0.2em]">
+                                            Showing {products.length} of {totalProductsCount}
                                         </p>
-                                        <p className="text-xs text-[#86868b] font-medium">
-                                            Page {currentPage} of {totalPages || 1}
-                                        </p>
+                                        <div className="flex items-center gap-2 justify-center sm:justify-start">
+                                            {Array.from({ length: totalPages }).map((_, i) => (
+                                                <div
+                                                    key={i}
+                                                    className={cn(
+                                                        "h-1 rounded-full transition-all duration-300",
+                                                        currentPage === i + 1 ? "w-8 bg-blue-500" : "w-2 bg-black/10 dark:bg-white/10"
+                                                    )}
+                                                />
+                                            ))}
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-4">
                                         <Button
-                                            variant="secondary"
+                                            variant="ghost"
                                             size="sm"
                                             onClick={() => fetchProducts('prev')}
                                             disabled={currentPage === 1 || isLoading}
-                                            className="rounded-full h-12 px-8 text-sm font-bold bg-white dark:bg-[#1d1d1f] border border-black/5 dark:border-white/5 hover:scale-105 active:scale-95 transition-all shadow-sm"
+                                            className="rounded-2xl h-14 px-8 text-xs font-black uppercase tracking-widest hover:bg-black/5 dark:hover:bg-white/5 transition-all"
                                         >
-                                            <ChevronLeft className="h-4 w-4 mr-2" /> Previous
+                                            <ChevronLeft className="h-4 w-4 mr-2" /> Back
                                         </Button>
                                         <Button
-                                            variant="secondary"
-                                            size="sm"
                                             onClick={() => fetchProducts('next')}
                                             disabled={isLastPage || isLoading}
-                                            className="rounded-full h-12 px-8 text-sm font-bold bg-white dark:bg-[#1d1d1f] border border-black/5 dark:border-white/5 hover:scale-105 active:scale-95 transition-all shadow-sm"
+                                            className="rounded-2xl h-14 px-10 text-xs font-black uppercase tracking-widest bg-black text-white dark:bg-white dark:text-black hover:scale-105 active:scale-95 transition-all shadow-xl"
                                         >
-                                            Next <ChevronRight className="h-4 w-4 ml-2" />
+                                            Next Page <ChevronRight className="h-4 w-4 ml-2" />
                                         </Button>
                                     </div>
                                 </div>
                             </div>
                         ) : (
-                            <div className="text-center py-24 px-4 bg-white dark:bg-[#1d1d1f] rounded-[40px] border border-black/5 dark:border-white/5 shadow-2xl shadow-black/5">
-                                <div className="h-24 w-24 bg-black/[0.03] dark:bg-white/[0.03] rounded-full flex items-center justify-center mx-auto mb-8">
-                                    <PackageSearch className="h-10 w-10 text-[#86868b]" />
+                            <div className="text-center py-32 px-4 bg-[#f5f5f7] dark:bg-[#1d1d1f] rounded-[50px] border border-black/5 dark:border-white/5">
+                                <div className="h-24 w-24 bg-white dark:bg-black rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl">
+                                    <PackageSearch className="h-10 w-10 text-blue-500" />
                                 </div>
-                                <h3 className="text-2xl font-black tracking-tight text-black dark:text-white">No Products Found</h3>
-                                <p className="mt-3 text-[#86868b] font-medium max-w-sm mx-auto">
-                                    {searchTerm || categoryFromUrl !== 'all' 
-                                        ? "We couldn't find anything matching your current filters. Try broadening your search." 
-                                        : "Our collection is currently empty. Check back soon for new arrivals!"}
+                                <h3 className="text-3xl font-black tracking-tight text-black dark:text-white">Nothing matches your search</h3>
+                                <p className="mt-4 text-[#86868b] font-medium max-w-sm mx-auto text-lg">
+                                    Try adjusting your filters or search terms to find what you're looking for.
                                 </p>
-                                <Button 
-                                    variant="outline" 
-                                    className="mt-10 rounded-full h-12 px-8 text-sm font-bold border-black/10 dark:border-white/10 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all" 
+                                <Button
+                                    variant="outline"
+                                    className="mt-12 rounded-full h-14 px-10 text-xs font-black uppercase tracking-widest border-black/10 dark:border-white/10 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all"
                                     onClick={() => { setSearchTerm(''); handleCategoryChange('all'); }}
                                 >
-                                    View All Products
+                                    Reset All Filters
                                 </Button>
                             </div>
                         )}

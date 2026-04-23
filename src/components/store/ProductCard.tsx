@@ -83,33 +83,33 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
       <ProductLoadingOverlay isVisible={isLoadingProduct} productName={product.name} />
       <div 
         className={cn(
-          "group relative flex flex-col bg-white dark:bg-[#1d1d1f] transition-all duration-500 overflow-hidden h-full rounded-3xl border border-black/[0.05] dark:border-white/[0.05] hover:shadow-2xl hover:shadow-black/5 dark:hover:shadow-white/5",
+          "group relative flex flex-col bg-white dark:bg-[#111111] transition-all duration-700 overflow-hidden h-full rounded-[32px] border border-black/[0.03] dark:border-white/[0.03] hover:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_32px_64px_-16px_rgba(255,255,255,0.05)]",
           isOutOfStock && "opacity-80"
         )}
       >
         {/* Media Area */}
-        <Link href={getStoreUrl(`/store/product/${product.id}`)} onClick={handleProductClick} className="block relative aspect-square overflow-hidden bg-[#f5f5f7] dark:bg-black">
+        <Link href={getStoreUrl(`/store/product/${product.id}`)} onClick={handleProductClick} className="block relative aspect-[4/5] overflow-hidden bg-[#f5f5f7] dark:bg-[#0a0a0a]">
         <Image
           src={product.imageUrl || settings?.defaultProductImageUrl || 'https://placehold.co/600x600.png'}
           alt={product.name}
           fill
           className={cn(
-            "object-cover transition-transform duration-1000 group-hover:scale-105",
+            "object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110",
             isOutOfStock && "grayscale"
           )}
           unoptimized
         />
         
         {/* Badges */}
-        <div className="absolute top-4 left-4 flex flex-col gap-2 z-10 pointer-events-none">
+        <div className="absolute top-5 left-5 flex flex-col gap-2 z-10 pointer-events-none">
           {product.isOfficialBrand && (
-            <Badge className="bg-[#0071e3] text-white font-bold text-[10px] px-3 py-1 rounded-full border-none shadow-sm uppercase tracking-wider">
+            <Badge className="bg-blue-600 text-white font-black text-[9px] px-3 py-1 rounded-full border-none shadow-lg uppercase tracking-[0.1em]">
               Official
             </Badge>
           )}
           {isDiscounted && !isOutOfStock && (
-             <Badge className="bg-rose-600 text-white font-bold text-[10px] px-3 py-1 rounded-full border-none shadow-sm uppercase tracking-wider">
-               Offer
+             <Badge className="bg-rose-500 text-white font-black text-[9px] px-3 py-1 rounded-full border-none shadow-lg uppercase tracking-[0.1em]">
+               Special Offer
              </Badge>
           )}
         </div>
@@ -117,20 +117,20 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
         {/* Wishlist Button */}
         <button
           className={cn(
-            "absolute top-4 right-4 h-9 w-9 flex items-center justify-center rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md shadow-sm transition-all duration-300 z-10 border border-black/[0.05] dark:border-white/[0.05] hover:scale-110 active:scale-95",
-            isInWishlist ? "text-rose-500" : "text-[#1d1d1f] dark:text-white"
+            "absolute top-5 right-5 h-10 w-10 flex items-center justify-center rounded-full bg-white/90 dark:bg-black/90 backdrop-blur-xl shadow-xl transition-all duration-500 z-10 border border-black/[0.03] dark:border-white/[0.03] opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0",
+            isInWishlist ? "text-rose-500 opacity-100 translate-y-0" : "text-black dark:text-white"
           )}
           onClick={handleWishlistToggle}
         >
-          <Heart className={cn("h-4.5 w-4.5 transition-all duration-300", isInWishlist && "fill-current")} />
+          <Heart className={cn("h-4 w-4 transition-all duration-500", isInWishlist && "fill-current")} />
         </button>
 
         {/* Quick Add Overlay */}
         {!isOutOfStock && (
-        <div className="absolute inset-x-0 bottom-0 p-5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 hidden md:block z-20">
+        <div className="absolute inset-x-0 bottom-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-700 hidden md:block z-20">
           <Button 
             onClick={handleAddToCart}
-            className="w-full store-btn-primary h-12 text-sm shadow-xl"
+            className="w-full bg-white text-black dark:bg-white dark:text-black hover:bg-white/90 font-black text-xs uppercase tracking-widest h-14 rounded-2xl shadow-2xl transition-all active:scale-95"
           >
             Add to Bag
           </Button>
@@ -139,28 +139,28 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
       </Link>
 
       {/* Content Area */}
-      <div className="flex flex-col flex-1 p-6 space-y-4">
-        <div className="flex-1 space-y-1.5">
-          <div className="flex justify-between items-start gap-2">
-            <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#86868b]">
+      <div className="flex flex-col flex-1 p-7 space-y-5">
+        <div className="flex-1 space-y-2">
+          <div className="flex justify-between items-center">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#86868b]">
                 {category?.name || product.categoryName || 'Collection'}
             </p>
             {ratingStats.totalReviews > 0 && (
               <ProductRating
                 averageRating={ratingStats.averageRating}
                 totalReviews={ratingStats.totalReviews}
-                size="sm"
+                size="xs"
                 showLabel={false}
               />
             )}
           </div>
           
-          <h3 className="text-lg font-bold text-[#1d1d1f] dark:text-white leading-tight tracking-tight line-clamp-2">
+          <h3 className="text-xl font-bold text-black dark:text-white leading-tight tracking-tight line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
             {product.name}
           </h3>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           <StockBar 
             stock={product.stock} 
             lowStockThreshold={product.lowStockThreshold || 10} 
@@ -169,13 +169,13 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
           <div className="flex items-center justify-between pt-2">
               <div className="flex flex-col">
                     <span className={cn(
-                      "text-lg font-bold tracking-tight",
-                      isDiscounted ? "text-rose-600" : "text-[#1d1d1f] dark:text-white"
+                      "text-2xl font-black tracking-tighter",
+                      isDiscounted ? "text-rose-500" : "text-black dark:text-white"
                     )}>
                       {formatCurrency(effectivePrice, currencySymbol)}
                     </span>
                     {isDiscounted && (
-                      <span className="text-[12px] text-[#86868b] line-through font-medium">
+                      <span className="text-xs text-[#86868b] line-through font-bold tracking-tight">
                         {formatCurrency(product.sellingPrice, currencySymbol)}
                       </span>
                     )}
@@ -185,11 +185,11 @@ export function ProductCard({ product, category, currencySymbol }: ProductCardPr
               <div className="md:hidden">
                 <Button 
                   size="icon" 
-                  className="h-10 w-10 rounded-full bg-[#0071e3] text-white active:scale-90 transition-transform shadow-lg"
+                  className="h-12 w-12 rounded-2xl bg-black text-white dark:bg-white dark:text-black active:scale-90 transition-transform shadow-xl"
                   onClick={handleAddToCart}
                   disabled={isOutOfStock}
                 >
-                  <Plus className="h-5 w-5" />
+                  <Plus className="h-6 w-6" />
                 </Button>
               </div>
           </div>
