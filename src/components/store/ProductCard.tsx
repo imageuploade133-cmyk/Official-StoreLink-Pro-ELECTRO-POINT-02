@@ -86,7 +86,7 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
   const borderRadius = settings?.productCardBorderRadius || 'full';
   const shadow = settings?.productCardShadow || 'md';
   const borderWidth = settings?.productCardBorderWidth || 'thin';
-  const borderColor = settings?.productCardBorderColor || (cardStyle === 'modern' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.08)');
+  const borderColor = settings?.productCardBorderColor || (cardStyle === 'modern' ? 'rgba(255,255,255,0.2)' : '');
   const bgColor = settings?.productCardBgColor || (cardStyle === 'modern' ? 'rgba(255,255,255,0.05)' : '');
   const hoverEffect = settings?.productCardHoverEffect || 'lift';
   const imageRatio = settings?.productCardImageRatio || 'portrait';
@@ -189,7 +189,7 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
       <div
         className={cn(
           "group relative flex flex-col transition-all duration-500 overflow-hidden",
-          cardStyle === 'modern' ? "backdrop-blur-xl border-white/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]" : "bg-white dark:bg-[#111111]",
+          cardStyle === 'modern' ? "backdrop-blur-xl border-white/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]" : "bg-white dark:bg-[#111111] border-black/[0.08] dark:border-white/[0.12]",
           cardStyle === 'classic' && "shadow-none hover:shadow-lg",
           borderRadiusMap[borderRadius] || borderRadiusMap.full,
           shadowMap[shadow] || shadowMap.md,
@@ -199,7 +199,7 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
           cardStyle === 'minimal' && "border-none shadow-none bg-transparent"
         )}
         style={{
-            borderColor: borderColor,
+            borderColor: borderColor || undefined,
             backgroundColor: bgColor || undefined,
             height: cardHeight ? `${cardHeight}px` : '100%',
         }}
