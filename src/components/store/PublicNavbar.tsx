@@ -320,45 +320,98 @@ export function PublicNavbar() {
                         {navbarShowCollectionsLink && (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" className="text-[#1d1d1f] dark:text-[#f5f5f7] hover:text-[#0071e3] dark:hover:text-[#0071e3] transition-colors p-0 h-auto font-semibold text-[13px] tracking-tight flex items-center gap-1.5">
+                                    <Button variant="ghost" className="text-[#1d1d1f] dark:text-[#f5f5f7] hover:text-[#0071e3] dark:hover:text-[#0071e3] transition-colors p-0 h-auto font-semibold text-[13px] tracking-tight flex items-center gap-1.5 group">
                                         Collections
-                                        <ChevronDown className="h-3.5 w-3.5 opacity-50" strokeWidth={2} />
+                                        <ChevronDown className="h-3.5 w-3.5 opacity-40 group-hover:opacity-100 group-hover:translate-y-0.5 transition-all" strokeWidth={2.5} />
                                     </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-72 p-2 rounded-3xl shadow-2xl border-black/[0.05] dark:border-white/[0.05] bg-white/90 dark:bg-black/90 backdrop-blur-xl">
-                                    <DropdownMenuLabel className="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">Discover</DropdownMenuLabel>
-                                    <DropdownMenuSeparator className="bg-black/[0.05] dark:bg-white/[0.05]" />
-                                    <div className="max-h-[400px] overflow-y-auto py-2">
-                                        {isLoadingCategories ? (
-                                            <div className="p-4 flex items-center gap-3 text-muted-foreground">
-                                                <Loader2 className="h-4 w-4 animate-spin" />
-                                                <span className="text-xs font-bold uppercase">Syncing...</span>
+                                <DropdownMenuContent 
+                                    align="center" 
+                                    className="w-[700px] p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] border-black/[0.05] dark:border-white/[0.05] bg-white/95 dark:bg-black/95 backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-300"
+                                >
+                                    <div className="grid grid-cols-12 gap-8">
+                                        <div className="col-span-4 flex flex-col space-y-6">
+                                            <div>
+                                                <h4 className="text-[10px] font-black uppercase tracking-[0.25em] text-[#0071e3] mb-6">Featured</h4>
+                                                <div className="space-y-4">
+                                                    {categories?.slice(0, 2).map(category => (
+                                                        <Link 
+                                                            key={category.id} 
+                                                            href={getStoreUrl(`/store/shop?category=${category.id}`)}
+                                                            className="block group/feat"
+                                                            onClick={() => setIsMenuOpen(false)}
+                                                        >
+                                                            <div className="relative aspect-[16/10] rounded-2xl overflow-hidden mb-3 shadow-md">
+                                                                <Image
+                                                                    src={category.imageUrl || `https://picsum.photos/seed/${category.id}/400/250`}
+                                                                    alt={category.name}
+                                                                    fill
+                                                                    className="object-cover transition-transform duration-700 group-hover/feat:scale-110"
+                                                                    unoptimized
+                                                                />
+                                                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60" />
+                                                                <div className="absolute bottom-3 left-3 text-white">
+                                                                    <p className="text-[10px] font-black uppercase tracking-widest opacity-80">Collection</p>
+                                                                    <p className="font-black text-sm uppercase tracking-tighter leading-none">{category.name}</p>
+                                                                </div>
+                                                            </div>
+                                                        </Link>
+                                                    ))}
+                                                </div>
                                             </div>
-                                        ) : (
-                                            categories?.map(category => (
-                                                <DropdownMenuItem key={category.id} asChild className="cursor-pointer p-3 focus:bg-[#0071e3]/10 rounded-2xl mx-1 my-0.5">
-                                                    <Link href={getStoreUrl(`/store/shop?category=${category.id}`)} className="flex items-center gap-4 w-full" onClick={() => setIsMenuOpen(false)}>
-                                                        <div className="relative h-10 w-10 rounded-xl overflow-hidden bg-muted flex-shrink-0 shadow-sm">
-                                                            <Image
-                                                                src={category.imageUrl || `https://picsum.photos/seed/${category.id}/100/100`}
-                                                                alt={category.name}
-                                                                fill
-                                                                className="object-cover"
-                                                                unoptimized
-                                                            />
-                                                        </div>
-                                                        <span className="font-bold text-sm tracking-tight">{category.name}</span>
-                                                    </Link>
-                                                </DropdownMenuItem>
-                                            ))
-                                        )}
+                                            
+                                            <div className="mt-auto pt-6 border-t border-black/[0.05] dark:border-white/[0.05]">
+                                                <Link 
+                                                    href={getStoreUrl('/store/categories')} 
+                                                    className="flex items-center justify-between text-[11px] font-black uppercase tracking-widest text-[#0071e3] hover:translate-x-1 transition-transform"
+                                                    onClick={() => setIsMenuOpen(false)}
+                                                >
+                                                    View All <ArrowRight className="h-4 w-4" />
+                                                </Link>
+                                            </div>
+                                        </div>
+
+                                        <div className="col-span-8">
+                                            <h4 className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 mb-6">Browse by Category</h4>
+                                            <div className="grid grid-cols-2 gap-x-6 gap-y-1 max-h-[450px] overflow-y-auto pr-2">
+                                                {isLoadingCategories ? (
+                                                    <div className="col-span-2 py-10 flex flex-col items-center justify-center gap-3 text-slate-400">
+                                                        <Loader2 className="h-6 w-6 animate-spin" />
+                                                        <span className="text-[10px] font-black uppercase tracking-widest">Updating...</span>
+                                                    </div>
+                                                ) : (
+                                                    categories?.map(category => (
+                                                        <DropdownMenuItem key={category.id} asChild className="p-0 bg-transparent focus:bg-transparent">
+                                                            <Link 
+                                                                href={getStoreUrl(`/store/shop?category=${category.id}`)} 
+                                                                className="flex items-center gap-4 p-3 rounded-2xl hover:bg-black/[0.03] dark:hover:bg-white/[0.03] transition-all duration-300 group/item"
+                                                                onClick={() => setIsMenuOpen(false)}
+                                                            >
+                                                                <div className="h-12 w-12 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center shrink-0 overflow-hidden shadow-sm group-hover/item:shadow-md transition-all">
+                                                                    <Image
+                                                                        src={category.imageUrl || `https://picsum.photos/seed/${category.id}/100/100`}
+                                                                        alt={category.name}
+                                                                        width={48}
+                                                                        height={48}
+                                                                        className="object-cover h-full w-full group-hover/item:scale-110 transition-transform duration-500"
+                                                                        unoptimized
+                                                                    />
+                                                                </div>
+                                                                <div className="flex flex-col min-w-0">
+                                                                    <span className="font-bold text-sm tracking-tight text-slate-900 dark:text-white group-hover/item:text-[#0071e3] transition-colors truncate">
+                                                                        {category.name}
+                                                                    </span>
+                                                                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest opacity-0 group-hover/item:opacity-100 transition-opacity">
+                                                                        Shop Now
+                                                                    </span>
+                                                                </div>
+                                                            </Link>
+                                                        </DropdownMenuItem>
+                                                    ))
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
-                                    <DropdownMenuSeparator className="bg-black/[0.05] dark:bg-white/[0.05]" />
-                                    <DropdownMenuItem asChild className="cursor-pointer p-4 focus:bg-[#0071e3] focus:text-white rounded-2xl m-1 transition-all">
-                                        <Link href={getStoreUrl('/store/categories')} className="flex items-center justify-between font-black uppercase text-[10px] tracking-widest w-full text-[#0071e3]" onClick={() => setIsMenuOpen(false)}>
-                                            View All Collections <ChevronRight className="h-3 w-3" />
-                                        </Link>
-                                    </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         )}
@@ -446,11 +499,30 @@ export function PublicNavbar() {
                                         
                                         {navbarShowCollectionsLink && (
                                             <div className="mt-12">
-                                                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-6">Collections</p>
-                                                <div className="grid grid-cols-1 gap-4">
-                                                    {categories?.slice(0, 10).map(cat => (
-                                                        <Link key={cat.id} href={getStoreUrl(`/store/shop?category=${cat.id}`)} className="text-xl font-medium text-[#1d1d1f]/80 dark:text-white/80 hover:text-[#0071e3] dark:hover:text-[#0071e3] transition-colors" onClick={() => setIsMenuOpen(false)}>
-                                                            {cat.name}
+                                                <div className="flex items-center justify-between mb-6">
+                                                    <p className="text-[10px] font-black uppercase tracking-[0.25em] text-[#0071e3]">Collections</p>
+                                                    <Link href={getStoreUrl('/store/categories')} className="text-[10px] font-black uppercase tracking-widest text-slate-400" onClick={() => setIsMenuOpen(false)}>View All</Link>
+                                                </div>
+                                                <div className="flex flex-col gap-1">
+                                                    {categories?.slice(0, 8).map(cat => (
+                                                        <Link 
+                                                            key={cat.id} 
+                                                            href={getStoreUrl(`/store/shop?category=${cat.id}`)} 
+                                                            className="flex items-center gap-4 py-3 border-b border-black/[0.03] dark:border-white/[0.03] group" 
+                                                            onClick={() => setIsMenuOpen(false)}
+                                                        >
+                                                            <div className="h-10 w-10 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-900 shrink-0">
+                                                                <Image
+                                                                    src={cat.imageUrl || `https://picsum.photos/seed/${cat.id}/100/100`}
+                                                                    alt={cat.name}
+                                                                    width={40}
+                                                                    height={40}
+                                                                    className="object-cover h-full w-full"
+                                                                    unoptimized
+                                                                />
+                                                            </div>
+                                                            <span className="text-lg font-bold tracking-tight text-[#1d1d1f] dark:text-white group-active:text-[#0071e3] transition-colors">{cat.name}</span>
+                                                            <ChevronRight className="h-4 w-4 ml-auto text-slate-300" />
                                                         </Link>
                                                     ))}
                                                 </div>
