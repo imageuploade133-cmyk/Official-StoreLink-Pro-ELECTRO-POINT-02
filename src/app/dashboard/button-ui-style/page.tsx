@@ -77,7 +77,7 @@ const buttonShapes = [
   { name: 'none', label: 'Square', description: 'No rounding', class: 'rounded-none' },
   { name: 'sm', label: 'Small', description: 'Slightly rounded', class: 'rounded-sm' },
   { name: 'md', label: 'Medium', description: 'Standard rounding', class: 'rounded-md' },
-  { name: 'lg', label: 'Large', description: 'Heavily rounded', class: 'rounded-lg' },
+  { name: 'lg', label: 'Large', description: 'Heavily rounded', class: 'rounded-2xl' },
   { name: 'full', label: 'Pill', description: 'Maximum rounding', class: 'rounded-full' },
 ];
 

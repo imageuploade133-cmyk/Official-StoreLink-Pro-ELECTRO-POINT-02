@@ -430,7 +430,7 @@ export function ProductSection({ section, categories, excludeCategoryIds }: Prod
     };
 
     const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
-    const shapeClass = shapeClasses[shape] || 'rounded-full';
+    const shapeClass = shapeClasses[shape] || 'rounded-2xl';
     const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
 
     return `${sizeClass} ${shapeClass} ${shadowClass}`;

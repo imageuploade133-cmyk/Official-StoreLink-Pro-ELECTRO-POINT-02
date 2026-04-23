@@ -251,7 +251,7 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
         none: 'rounded-none',
         sm: 'rounded-sm',
         md: 'rounded-md',
-        lg: 'rounded-lg',
+        lg: 'rounded-2xl',
         full: 'rounded-full'
     };
 

@@ -116,7 +116,7 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
             none: 'rounded-none',
             sm: 'rounded-sm',
             md: 'rounded-md',
-            lg: 'rounded-full',
+            lg: 'rounded-2xl',
             full: 'rounded-full'
         };
 
@@ -131,7 +131,7 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
         };
 
         const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
-        const shapeClass = shapeClasses[shape] || 'rounded-full';
+        const shapeClass = shapeClasses[shape] || 'rounded-2xl';
         const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-md';
 
         return `${sizeClass} ${shapeClass} ${shadowClass}`;
