@@ -89,7 +89,7 @@ type SalesFilterTab = 'all' | 'paid' | 'credit' | 'outstanding' | 'returns';
 const ITEMS_PER_PAGE = 20;
 
 function SalesHistoryContent() {
-  const { settings, isLoading: isLoadingSettings } = useSettings();
+  const { settings, isLoadingSettings } = useSettings();
   const { user, staffMember, store, isLoading: isAuthLoading, isAdmin, permissions } = useAuth();
   const currencySymbol = settings?.currency || '$';
   const firestore = useFirestore();
@@ -186,7 +186,7 @@ function SalesHistoryContent() {
         });
 
         setPeriodAnalytics({
-            revenue,
+            netRevenue: revenue,
             volume: countSnap.data().count,
             refunds,
             isLoading: false
@@ -276,7 +276,7 @@ function SalesHistoryContent() {
                     })),
                     returns: (data.returns || []),
                     paymentDetails: data.paymentDetails || null,
-                } as SaleTransaction;
+                } as unknown as SaleTransaction;
             });
 
             setSales(salesList);
@@ -408,7 +408,7 @@ function SalesHistoryContent() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
             title="Net Period Revenue"
-            value={periodAnalytics.isLoading ? '...' : formatCurrency(periodAnalytics.revenue, currencySymbol)}
+            value={periodAnalytics.isLoading ? '...' : formatCurrency(periodAnalytics.netRevenue, currencySymbol)}
             icon={TrendingUp}
             description={getDateRangeTitle()}
             className="bg-gradient-to-br from-indigo-50/50 to-white dark:from-indigo-950/20 dark:to-background border border-indigo-100/50 dark:border-indigo-900/30"
@@ -428,7 +428,7 @@ function SalesHistoryContent() {
         />
         <StatCard
             title="Average Sale Value"
-            value={periodAnalytics.isLoading ? '...' : formatCurrency(periodAnalytics.volume > 0 ? periodAnalytics.revenue / periodAnalytics.volume : 0, currencySymbol)}
+            value={periodAnalytics.isLoading ? '...' : formatCurrency(periodAnalytics.volume > 0 ? periodAnalytics.netRevenue / periodAnalytics.volume : 0, currencySymbol)}
             icon={DollarSign}
             description="Mean value per record"
             className="bg-gradient-to-br from-blue-50/50 to-white dark:from-blue-950/20 dark:to-background border border-blue-100/50 dark:border-blue-900/30"
@@ -494,7 +494,7 @@ function SalesHistoryContent() {
                                     </div>
                                     <div className="space-y-1">
                                         <Label className="text-[10px] font-black uppercase text-muted-foreground">To</Label>
-                                        <Input type="date" className="h-8 text-xs" value={dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : ''} onChange={(e) => handleCustomDateChange({ ...dateRange, to: e.target.value ? new Date(e.target.value + 'T00:00:00') : undefined })} />
+                                        <Input type="date" className="h-8 text-xs" value={dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : ''} onChange={(e) => handleCustomDateChange({ from: dateRange?.from, to: e.target.value ? new Date(e.target.value + 'T00:00:00') : undefined })} />
                                     </div>
                                 </div>
                             </div>

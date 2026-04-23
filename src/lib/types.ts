@@ -229,7 +229,6 @@ export interface Settings {
   storeLogoUrl?: string;
   invoiceLogoUrl?: string;
   storeLogoWidth?: number;
-  footerLogoWidth?: number;
   storeNameFontSize?: number;
   loginImageUrl?: string;
   invoiceAccentColor?: string;
@@ -1109,4 +1108,17 @@ export interface StockAuditEntry {
   staffId: string;
   staffName: string;
   timestamp: Timestamp;
+}
+
+export interface StockTransfer {
+  id: string;
+  store_id: string;
+  productId: string;
+  productName: string;
+  quantity: number;
+  fromLocation: string;
+  toLocation: string;
+  transferDate: Timestamp | Date;
+  staffId: string;
+  notes?: string;
 }

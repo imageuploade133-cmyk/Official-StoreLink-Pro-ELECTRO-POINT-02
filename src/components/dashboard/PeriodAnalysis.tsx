@@ -100,7 +100,7 @@ export function PeriodAnalysis({ dateRange, onDateChange, stats, currencySymbol 
                                 value={dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : ''} 
                                 onChange={(e) => {
                                     const d = e.target.value ? new Date(e.target.value + 'T00:00:00') : undefined;
-                                    handleCustomDateChange({ ...dateRange, to: d });
+                                    handleCustomDateChange({ from: dateRange?.from, to: d });
                                 }}
                                 className="h-8 text-xs"
                             />

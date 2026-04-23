@@ -121,8 +121,8 @@ export default function DashboardPage() {
           grandTotal: typeof data.grandTotal === 'number' ? data.grandTotal : 0,
           returnedAmount: typeof data.returnedAmount === 'number' ? data.returnedAmount : 0,
           returns: Array.isArray(data.returns) ? data.returns.map((r: any) => ({...r, returnDate: convertToDateSafely(r.returnDate)})) : [],
-        } as SaleTransaction;
-      });
+        } as unknown as SaleTransaction;
+        });
       salesData.sort((a, b) => (convertToDateSafely(b.createdAt)?.getTime() ?? 0) - (convertToDateSafely(a.createdAt)?.getTime() ?? 0));
 
       const productsData: Product[] = productsSnapshot.docs.map(doc => {
