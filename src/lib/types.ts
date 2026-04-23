@@ -214,7 +214,7 @@ export interface Settings {
   footerBackgroundGradientStart?: string;
   footerBackgroundGradientEnd?: string;
   footerTextColor?: string;
-  footerDesign?: 'standard' | 'modern' | 'minimal';
+  footerDesign?: 'standard' | 'modern' | 'minimal' | 'apple';
   footerBannerUrl?: string;
   footerBannerSize?: 'small' | 'big' | number;
   footerBgType?: 'text' | 'image' | 'none';

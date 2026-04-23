@@ -32,7 +32,7 @@ const footerSettingsSchema = z.object({
   footerBackgroundGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').optional(),
   footerBackgroundGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').optional(),
   footerTextColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').optional(),
-  footerDesign: z.enum(['standard', 'modern', 'minimal']).optional(),
+  footerDesign: z.enum(['standard', 'modern', 'minimal', 'apple']).optional(),
   footerBannerUrl: z.string().url('Must be a valid URL.').or(z.literal('')).optional(),
   footerBannerSize: z.union([z.enum(['small', 'big']), z.coerce.number()]).optional(),
   footerBgType: z.enum(['text', 'image', 'none']).optional(),
@@ -320,6 +320,7 @@ export function FooterSettings({ settingsData, isLoading, storeId }: FooterSetti
                               <SelectItem value="standard">Standard (Classic)</SelectItem>
                               <SelectItem value="modern">Modern (Spacious)</SelectItem>
                               <SelectItem value="minimal">Minimal (Clean)</SelectItem>
+                              <SelectItem value="apple">Apple Design (Iconic)</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormDescription>Choose the structural layout of your footer links and info.</FormDescription>
