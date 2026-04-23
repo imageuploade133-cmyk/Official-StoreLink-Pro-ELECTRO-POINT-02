@@ -31,13 +31,20 @@ export function StickyProductBar({
   const { settings } = useSettings();
   const [isVisible, setIsVisible] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [isScrollingUp, setIsScrollingUp] = useState(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const handleScroll = useCallback(() => {
     const currentScrollY = window.scrollY;
     
-    // Show bar when scrolling down past 400px or anytime after that
-    const shouldShow = currentScrollY > 400;
+    // Determine if user is scrolling up or down
+    const scrollingUp = currentScrollY < lastScrollY;
+    setIsScrollingUp(scrollingUp);
+    
+    // Show bar when:
+    // 1. User has scrolled past 300px (product details are out of view)
+    // 2. AND user is scrolling up (revealing the bar)
+    const shouldShow = currentScrollY > 300 && (scrollingUp || lastScrollY > 300);
     
     setIsVisible(shouldShow);
     setLastScrollY(currentScrollY);
@@ -48,7 +55,7 @@ export function StickyProductBar({
     }
     scrollTimeoutRef.current = setTimeout(() => {
       // Small delay for smoother transitions
-    }, 100);
+    }, 50);
   }, [lastScrollY]);
 
   useEffect(() => {
@@ -176,21 +183,22 @@ export function StickyProductBar({
   return (
     /* Overlay bar - no spacer needed, content scrolls under it */
     <div className={cn(
-      "fixed bottom-0 left-0 right-0 z-50 bg-white/80 dark:bg-black/80 backdrop-blur-xl border-t border-black/[0.08] dark:border-white/[0.12] transition-all duration-300 ease-out",
-      isVisible ? "translate-y-0 opacity-100 shadow-lg shadow-black/5" : "translate-y-full opacity-0 pointer-events-none"
+      "fixed bottom-0 left-0 right-0 z-50 bg-white/90 dark:bg-black/90 backdrop-blur-2xl border-t-2 border-black/[0.06] dark:border-white/[0.1] transition-all duration-300 ease-out",
+      isVisible ? "translate-y-0 opacity-100 shadow-2xl shadow-black/10" : "translate-y-full opacity-0 pointer-events-none"
     )}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between gap-3 sm:gap-4">
         {/* Product Info with Image */}
         <div className="flex items-center gap-3 flex-1 min-w-0">
           {/* Product Image */}
           {productImage && (
-            <div className="relative w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 rounded-lg overflow-hidden border border-black/10 dark:border-white/10 bg-slate-100 dark:bg-slate-800">
+            <div className="relative w-14 h-14 sm:w-16 sm:h-16 flex-shrink-0 rounded-xl overflow-hidden border-2 border-primary/20 dark:border-primary/30 bg-gradient-to-br from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-900 shadow-sm hover:shadow-md transition-shadow">
               <Image
                 src={productImage}
                 alt={productName}
                 fill
                 className="object-cover"
-                sizes="(max-width: 640px) 48px, 56px"
+                sizes="(max-width: 640px) 56px, 64px"
+                priority
               />
             </div>
           )}
@@ -242,9 +250,11 @@ export function StickyProductBar({
       </div>
       
       {/* Visual indicator */}
-      <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 flex justify-center">
-        <ChevronUp className="h-4 w-4 text-slate-400 dark:text-slate-600 animate-bounce" />
-      </div>
+      {isVisible && (
+        <div className="absolute -top-2 left-1/2 -translate-x-1/2 flex justify-center">
+          <ChevronUp className="h-5 w-5 text-primary/60 dark:text-primary/50 animate-bounce" />
+        </div>
+      )}
     </div>
   );
 }
