@@ -287,7 +287,7 @@ export function PublicNavbar() {
                             </div>
                             <Input 
                                 readOnly
-                                className="w-full pl-11 pr-12 bg-[#f5f5f7]/60 dark:bg-[#1d1d1f]/60 border-none rounded-full h-10 text-xs font-medium tracking-tight cursor-pointer transition-all hover:bg-[#e8e8ed]/80 dark:hover:bg-[#2d2d2f]/80"
+                                className="w-full pl-11 pr-12 bg-black/[0.03] dark:bg-white/[0.03] border-[1.5px] border-black/5 dark:border-white/5 rounded-full h-10 text-xs font-medium tracking-tight cursor-pointer transition-all hover:bg-white dark:hover:bg-black hover:border-[#0071e3]/30"
                                 placeholder="Search"
                                 onClick={() => setIsSearchFocused(true)}
                             />
