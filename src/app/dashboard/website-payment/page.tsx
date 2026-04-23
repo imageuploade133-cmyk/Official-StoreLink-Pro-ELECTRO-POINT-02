@@ -926,7 +926,7 @@ export default function WebsitePaymentSettings() {
                 value={method.id}  
                 className={cn( 
                   "flex items-center gap-2.5 px-4 py-2.5 transition-all duration-200", 
-                  "data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-primary/20", 
+                  "", 
                   "hover:bg-background/60" 
                 )} 
               > 
