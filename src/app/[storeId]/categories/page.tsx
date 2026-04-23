@@ -38,35 +38,35 @@ function CategoryCard({ category }: { category: Category }) {
     return (
         <Link 
             href={getStoreUrl(`/store/shop?category=${category.id}`)}
-            className="group relative rounded-[2.5rem] overflow-hidden transition-all duration-700 h-full block bg-slate-50 dark:bg-slate-900 shadow-sm hover:shadow-2xl hover:-translate-y-1"
+            className="group relative rounded-[2rem] overflow-hidden transition-all duration-700 h-full block bg-slate-50 dark:bg-slate-900 shadow-sm hover:shadow-2xl hover:-translate-y-1"
         >
-            <div className="aspect-[4/5] relative overflow-hidden">
+            <div className="aspect-square relative overflow-hidden">
                 <Image
                     alt={category.name}
                     className={cn(
                         "object-cover transition-transform duration-1000 ease-in-out",
                         settings?.enableHoverZoom !== false && "group-hover:scale-110"
                     )}
-                    src={category.imageUrl || `https://placehold.co/600x800.png?text=${encodeURIComponent(category.name)}`}
+                    src={category.imageUrl || `https://placehold.co/600x600.png?text=${encodeURIComponent(category.name)}`}
                     fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                     unoptimized
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-700" />
             </div>
             
-            <div className="absolute inset-0 p-8 flex flex-col justify-end text-white">
-                <div className="space-y-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500">Explore Collection</span>
-                    <h3 className="text-3xl font-black tracking-tighter leading-tight">{category.name}</h3>
+            <div className="absolute inset-0 p-4 sm:p-6 flex flex-col justify-end text-white">
+                <div className="space-y-1 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500">Explore Collection</span>
+                    <h3 className="text-xl sm:text-2xl font-black tracking-tighter leading-tight">{category.name}</h3>
                     {category.description && (
                       <div 
-                        className="text-white/70 text-sm line-clamp-2 overflow-hidden font-medium leading-relaxed max-w-xs opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100"
+                        className="text-white/70 text-[10px] sm:text-xs line-clamp-1 overflow-hidden font-medium leading-relaxed max-w-xs opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100"
                         dangerouslySetInnerHTML={{ __html: category.description }}
                       />
                     )}
-                    <div className="pt-4 flex items-center gap-2 text-xs font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all duration-500 delay-200">
-                        View Products <ChevronRight className="h-4 w-4" />
+                    <div className="pt-2 flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all duration-500 delay-200">
+                        View Products <ChevronRight className="h-3 w-3" />
                     </div>
                 </div>
             </div>
@@ -213,14 +213,14 @@ export default function AllCategoriesPage() {
                 </div>
 
                 {isLoading && categories.length === 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
-                        {Array.from({ length: 6 }).map((_, i) => (
-                           <Skeleton key={i} className="aspect-[4/5] rounded-[3rem]" />
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6 md:gap-8">
+                        {Array.from({ length: 12 }).map((_, i) => (
+                           <Skeleton key={i} className="aspect-square rounded-[2rem]" />
                         ))}
                     </div>
                 ) : categories.length > 0 ? (
                     <div className="space-y-24">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6 md:gap-8">
                             {categories.map((category, idx) => (
                                 <div 
                                     key={category.id}
