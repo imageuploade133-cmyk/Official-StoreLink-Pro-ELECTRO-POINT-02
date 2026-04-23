@@ -30,15 +30,12 @@ export function StatCard({
 }: StatCardProps) {
   return (
     <Card className={cn(
-      "relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 group",
+      "relative overflow-hidden transition-all duration-300 group",
       className
     )}>
-      <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-        <Icon className="h-12 w-12" />
-      </div>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
         <CardTitle className={cn("text-sm font-medium", titleClassName)}>{title}</CardTitle>
-        <div className={cn("p-2 rounded-lg bg-background/50", iconClassName)}>
+        <div className={cn("p-2 rounded-xl bg-background/50 backdrop-blur-sm shadow-sm", iconClassName)}>
           <Icon className="h-4 w-4" />
         </div>
       </CardHeader>
@@ -48,7 +45,6 @@ export function StatCard({
           <p className="text-xs text-muted-foreground mt-1">{description}</p>
         )}
       </CardContent>
-      <div className="absolute bottom-0 left-0 h-1 w-full bg-primary/10 group-hover:bg-primary/30 transition-colors" />
     </Card>
   );
 }

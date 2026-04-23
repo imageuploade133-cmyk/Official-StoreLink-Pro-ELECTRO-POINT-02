@@ -18,7 +18,7 @@ interface RecentTransfersProps {
 
 export function RecentTransfers({ isLoading, recentStockTransfers }: RecentTransfersProps) {
   return (
-    <Card className="border-none shadow-sm overflow-hidden bg-white dark:bg-card">
+    <Card className="shadow-sm overflow-hidden bg-white dark:bg-card">
       <CardHeader className="border-b border-border/50 bg-muted/5">
         <CardTitle className="font-headline text-lg flex items-center gap-2">
           <Truck className="h-5 w-5 text-primary" />

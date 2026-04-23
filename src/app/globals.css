@@ -110,8 +110,6 @@
 
   *, ::before, ::after {
     @apply border-border transition-colors duration-300 ease-in-out;
-    --tw-shadow: 0 0 #0000 !important;
-    --tw-shadow-colored: 0 0 #0000 !important;
   }
   html {
     scroll-behavior: smooth;
@@ -367,14 +365,6 @@
   background-color: #30d158 !important;
   box-shadow: 0 6px 20px rgba(52, 199, 89, 0.23) !important;
   transform: translateY(-1px);
-}
-
-/* Shadow Feature Disabled */
-.ui-shadow-enabled .card,
-.ui-shadow-enabled [class*="card"],
-.ui-shadow-enabled input,
-.ui-shadow-enabled button {
-  box-shadow: none !important;
 }
 
 /* Stat Cards */

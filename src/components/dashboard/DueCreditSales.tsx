@@ -30,7 +30,7 @@ export function DueCreditSales({ isLoading, dueCreditSales }: DueCreditSalesProp
   const currencySymbol = settings?.currency || '$';
 
   return (
-    <Card className="border-none shadow-sm overflow-hidden bg-white dark:bg-card">
+    <Card className="shadow-sm overflow-hidden bg-white dark:bg-card">
       <CardHeader className="border-b border-border/50 bg-muted/5">
         <CardTitle className="font-headline text-lg flex items-center gap-2">
           <CalendarClock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
