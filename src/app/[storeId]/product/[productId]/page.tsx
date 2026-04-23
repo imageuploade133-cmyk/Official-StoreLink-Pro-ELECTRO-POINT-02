@@ -875,7 +875,7 @@ export default function ProductDetailsPage() {
                 )}
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex flex-col gap-1">
-                    <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#1d1d1f] dark:text-[#f5f5f7]">Select Quantity</label>
+                    <label className="text-[11px] font-black uppercase tracking-[0.2em] text-primary dark:text-primary bg-gradient-to-r from-primary/20 to-transparent px-2.5 py-1 rounded-lg inline-w-max w-fit">Select Quantity</label>
                     {isDiscounted && !isOutOfStock && today && (
                       <div 
                         className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider animate-pulse"
@@ -891,20 +891,20 @@ export default function ProductDetailsPage() {
                   )}
                 </div>
                 <div className="flex items-center gap-3 md:gap-4">
-                  <div className="flex items-center bg-black/[0.03] dark:bg-white/[0.08] border-2 border-black/10 dark:border-white/20 rounded-[18px] p-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+                  <div className="flex items-center bg-gradient-to-r from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/15 border-2 border-primary/30 dark:border-primary/40 rounded-[18px] p-1.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.01)] dark:shadow-[inset_0_1px_2px_rgba(255,255,255,0.05)]">
                     <Button 
                       variant="ghost" 
                       size="icon" 
-                      className="h-10 md:h-12 w-10 md:w-12 rounded-[14px] hover:bg-white dark:hover:bg-white/10 hover:shadow-sm active:scale-95 transition-all" 
+                      className="h-10 md:h-12 w-10 md:w-12 rounded-[14px] text-primary dark:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 hover:shadow-sm active:scale-95 transition-all font-bold" 
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     >
                       <Minus className="h-4 md:h-5 w-4 md:w-5" />
                     </Button>
-                    <span className="w-10 md:w-12 text-center text-lg font-semibold tabular-nums tracking-tight">{quantity}</span>
+                    <span className="w-10 md:w-12 text-center text-lg font-black tabular-nums tracking-tight text-primary dark:text-primary">{quantity}</span>
                     <Button 
                       variant="ghost" 
                       size="icon" 
-                      className="h-10 md:h-12 w-10 md:w-12 rounded-[14px] hover:bg-white dark:hover:bg-white/10 hover:shadow-sm active:scale-95 transition-all" 
+                      className="h-10 md:h-12 w-10 md:w-12 rounded-[14px] text-primary dark:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 hover:shadow-sm active:scale-95 transition-all font-bold" 
                       onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
                     >
                       <Plus className="h-4 md:h-5 w-4 md:w-5" />
