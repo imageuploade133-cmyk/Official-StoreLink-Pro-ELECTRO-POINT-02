@@ -127,23 +127,26 @@ export default function StoreHomePage() {
                   <CarouselItem key={index} className="pl-4 md:pl-8 basis-full sm:basis-1/2 lg:basis-1/4">
                     <div 
                       className={cn(
-                        "flex flex-col items-center text-center p-8 rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 transition-all duration-500 group h-full",
-                        settings?.brandValuesEnableShadow !== false && "shadow-sm hover:shadow-2xl",
-                        settings?.brandValuesEnableZoom !== false && "hover:-translate-y-1.5"
+                        "flex flex-col items-center text-center p-8 rounded-[2.5rem] bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border border-white/40 dark:border-slate-800/50 transition-all duration-700 group h-full relative overflow-hidden",
+                        settings?.brandValuesEnableShadow !== false && "shadow-[0_20px_50px_rgba(0,0,0,0.05)] hover:shadow-[0_40px_80px_rgba(0,0,0,0.1)]",
+                        settings?.brandValuesEnableZoom !== false && "hover:-translate-y-2"
                       )}
                     >
                       <div className={cn(
-                        "h-16 w-16 mb-6 rounded-2xl bg-primary/5 flex items-center justify-center text-primary transition-all duration-500 shadow-inner",
-                        settings?.brandValuesEnableZoom !== false && "group-hover:scale-110 group-hover:bg-primary group-hover:text-white"
+                        "h-20 w-20 mb-8 rounded-[2rem] bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center text-primary transition-all duration-700 shadow-inner",
+                        settings?.brandValuesEnableZoom !== false && "group-hover:scale-110 group-hover:bg-primary group-hover:text-white group-hover:rotate-[10deg]"
                       )}>
                         <DynamicIcon name={value.icon} />
                       </div>
-                      <h4 className="font-black text-xs md:text-sm uppercase tracking-[0.2em] mb-2 text-slate-900 dark:text-white">
+                      <h4 className="font-bold text-lg md:text-xl mb-3 text-slate-900 dark:text-white tracking-tight leading-tight">
                         {value.title}
                       </h4>
-                      <p className="text-xs font-bold text-slate-400 dark:text-slate-500 leading-relaxed uppercase tracking-tighter">
+                      <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed max-w-[200px]">
                         {value.description}
                       </p>
+                      
+                      {/* Decorative Background Element */}
+                      <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors duration-700" />
                     </div>
                   </CarouselItem>
                 ))}
