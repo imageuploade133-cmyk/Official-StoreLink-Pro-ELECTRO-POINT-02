@@ -820,7 +820,20 @@ export default function ProductDetailsPage() {
                     <><span className={cn("text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight", isDiscounted ? "text-[#e11d48]" : "text-[#1d1d1f] dark:text-[#f5f5f7]")}>{formatCurrency(effectivePrice, currencySymbol)}</span>
                     {isDiscounted && <span className="text-sm md:text-base text-[#86868b] line-through">Was: {formatCurrency(product.sellingPrice, currencySymbol)}</span>}</>
                   )}
-                  <div className="pt-0.5 md:pt-1"><Badge variant={isOutOfStock ? "destructive" : "secondary"} className="h-6 md:h-7 px-3 md:px-4 rounded-full font-medium text-[10px] md:text-[11px]">{isOutOfStock ? 'Sold Out' : 'In Stock'}</Badge></div>
+                  <div className="pt-0.5 md:pt-1">
+                    <Badge 
+                      variant="outline"
+                      className={cn(
+                        "h-6 md:h-7 px-3 md:px-4 rounded-full font-bold text-[10px] md:text-[11px] border-none shadow-sm flex items-center gap-1.5",
+                        isOutOfStock 
+                          ? "bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400" 
+                          : "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
+                      )}
+                    >
+                      <span className={cn("w-1.5 h-1.5 rounded-full", isOutOfStock ? "bg-rose-500 animate-pulse" : "bg-emerald-500")} />
+                      {isOutOfStock ? 'Sold Out' : 'In Stock'}
+                    </Badge>
+                  </div>
                 </div>
               </div>
             </div>
@@ -860,7 +873,18 @@ export default function ProductDetailsPage() {
                   <PromoCountdown endDate={activeSectionPromo?.endDate || convertToDateSafely(product.promo!.endDate)!} />
                 )}
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#1d1d1f] dark:text-[#f5f5f7]">Select Quantity</label>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#1d1d1f] dark:text-[#f5f5f7]">Select Quantity</label>
+                    {isDiscounted && !isOutOfStock && today && (
+                      <div 
+                        className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider animate-pulse"
+                        style={{ color: settings?.flashHubColor || '#e11d48' }}
+                      >
+                        <Zap className="h-3 w-3 fill-current" />
+                        Flash Sale Live
+                      </div>
+                    )}
+                  </div>
                   {product.stock <= 5 && product.stock > 0 && (
                     <span className="text-[10px] font-bold text-[#e11d48] animate-pulse">Only {product.stock} left!</span>
                   )}
