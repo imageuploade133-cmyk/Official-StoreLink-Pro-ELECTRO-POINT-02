@@ -68,6 +68,10 @@ export function StaticStats({
 
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <Card className="relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-blue-50/50 to-white dark:from-blue-950/20 dark:to-background border-l-4 border-blue-500 border-t border-r border-b border-blue-200 dark:border-t-blue-800 dark:border-r-blue-800 dark:border-b-blue-800">
+        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+          <ShoppingBag className="h-12 w-12 text-blue-500" />
+        </div>
       <Card className="relative overflow-hidden transition-all duration-300 group bg-gradient-to-br from-blue-50/50 to-white dark:from-blue-950/20 dark:to-background border-blue-100/50 dark:border-blue-900/30">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
           <DropdownMenu>
@@ -100,6 +104,10 @@ export function StaticStats({
         </CardContent>
       </Card>
 
+      <Card className="relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-green-50/50 to-white dark:from-green-950/20 dark:to-background border-l-4 border-green-500 border-t border-r border-b border-green-200 dark:border-t-green-800 dark:border-r-green-800 dark:border-b-green-800">
+        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+          <ShoppingBag className="h-12 w-12 text-green-500" />
+        </div>
       <Card className="relative overflow-hidden transition-all duration-300 group bg-gradient-to-br from-green-50/50 to-white dark:from-green-950/20 dark:to-background border-green-100/50 dark:border-green-900/30">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
           <CardTitle className="text-sm font-medium text-green-600 dark:text-green-400">Sales Snapshot</CardTitle>
@@ -135,6 +143,10 @@ export function StaticStats({
         </CardContent>
       </Card>
 
+      <Card className="relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-purple-50/50 to-white dark:from-purple-950/20 dark:to-background border-l-4 border-purple-500 border-t border-r border-b border-purple-200 dark:border-t-purple-800 dark:border-r-purple-800 dark:border-b-purple-800">
+        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+          <ShoppingBag className="h-12 w-12 text-purple-500" />
+        </div>
       <Card className="relative overflow-hidden transition-all duration-300 group bg-gradient-to-br from-purple-50/50 to-white dark:from-purple-950/20 dark:to-background border-purple-100/50 dark:border-purple-900/30">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
           <CardTitle className="text-sm font-medium text-purple-600 dark:text-purple-400">Monthly Sales</CardTitle>
@@ -172,6 +184,10 @@ export function StaticStats({
         </CardContent>
       </Card>
 
+      <Card className="relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-pink-50/50 to-white dark:from-pink-950/20 dark:to-background border-l-4 border-pink-500 border-t border-r border-b border-pink-200 dark:border-t-pink-800 dark:border-r-pink-800 dark:border-b-pink-800">
+        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+          <ShoppingBag className="h-12 w-12 text-pink-500" />
+        </div>
       <Card className="relative overflow-hidden transition-all duration-300 group bg-gradient-to-br from-pink-50/50 to-white dark:from-pink-950/20 dark:to-background border-pink-100/50 dark:border-pink-900/30">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
           <CardTitle className="text-sm font-medium text-pink-600 dark:text-pink-400">Yearly Sales</CardTitle>
