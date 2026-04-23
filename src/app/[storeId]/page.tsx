@@ -18,7 +18,7 @@ import { BannerAd } from '@/components/ads/BannerAd';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useParams } from 'next/navigation';
-import { cn } from '@/lib/utils';
+import { cn, isWhiteOrTransparent } from '@/lib/utils';
 
 const iconComponents = { Truck, ShieldCheck, Headset, Leaf, Sparkles, Gift };
 const DynamicIcon = ({ name }: { name: string }) => {
@@ -100,10 +100,10 @@ export default function StoreHomePage() {
         <section 
           className={cn(
               "relative group/values transition-colors duration-500",
-              (!brandValuesBg || brandValuesBg === 'transparent' || brandValuesBg === '#ffffff') ? "bg-white dark:bg-black" : ""
+              isWhiteOrTransparent(brandValuesBg) ? "bg-white dark:bg-black" : ""
           )} 
           style={{ 
-            backgroundColor: (brandValuesBg && brandValuesBg !== 'transparent' && brandValuesBg !== '#ffffff') ? brandValuesBg : undefined,
+            backgroundColor: !isWhiteOrTransparent(brandValuesBg) ? brandValuesBg : undefined,
             paddingTop: `${settings?.brandValuesVerticalPadding ?? 80}px`,
             paddingBottom: `${settings?.brandValuesVerticalPadding ?? 80}px`
           }}

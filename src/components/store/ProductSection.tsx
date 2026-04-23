@@ -50,7 +50,7 @@ const iconMap: Record<string, any> = {
 import type { HomepageSection, Product, Category } from '@/lib/types';
 import { useSettings } from '@/contexts/settings-context';
 import { ProductCardSkeleton } from './ProductCardSkeleton';
-import { cn, convertToDateSafely } from '@/lib/utils';
+import { cn, convertToDateSafely, isWhiteOrTransparent } from '@/lib/utils';
 import { useStoreUrl } from '@/hooks/use-store-url';
 
 interface ProductSectionProps {
@@ -505,9 +505,9 @@ export function ProductSection({ section, categories, excludeCategoryIds }: Prod
         ref={sectionRef} 
         className={cn(
             "py-12 md:py-24 overflow-hidden relative transition-colors duration-500",
-            (!backgroundColor || backgroundColor === '#ffffff' || backgroundColor === 'transparent') ? "bg-white dark:bg-black" : ""
+            isWhiteOrTransparent(backgroundColor) ? "bg-white dark:bg-black" : ""
         )} 
-        style={(backgroundColor && backgroundColor !== '#ffffff' && backgroundColor !== 'transparent') ? { backgroundColor } : {}}
+        style={!isWhiteOrTransparent(backgroundColor) ? { backgroundColor } : {}}
     >
       {/* Optional Section Banner */}
       {hasBanner && (

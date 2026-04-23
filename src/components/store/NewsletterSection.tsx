@@ -2,6 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { useSettings } from '@/contexts/settings-context';
+import { cn, isWhiteOrTransparent } from '@/lib/utils';
 
 export function NewsletterSection() {
   const { settings } = useSettings();
@@ -49,9 +50,9 @@ export function NewsletterSection() {
     <section 
         className={cn(
             "py-20 transition-colors duration-500",
-            (!backgroundColor || backgroundColor === '#f1f5f9' || backgroundColor === 'transparent') ? "bg-slate-100 dark:bg-black" : ""
+            isWhiteOrTransparent(backgroundColor) ? "bg-slate-100 dark:bg-black" : ""
         )} 
-        style={(backgroundColor && backgroundColor !== '#f1f5f9' && backgroundColor !== 'transparent') ? { backgroundColor: backgroundColor } : {}}
+        style={!isWhiteOrTransparent(backgroundColor) ? { backgroundColor: backgroundColor } : {}}
     >
         <div className="max-w-4xl mx-auto px-4 text-center">
             <h2 className={`text-3xl font-bold mb-4 ${titleColorClass}`}>{title}</h2>

@@ -20,7 +20,7 @@ import { ChevronLeft, ChevronRight, Loader2, LayoutGrid, ArrowRight, Plus } from
 import type { Category } from '@/lib/types';
 import { useSettings } from '@/contexts/settings-context';
 import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/lib/utils';
+import { cn, isWhiteOrTransparent } from '@/lib/utils';
 import {
   Carousel,
   CarouselContent,
@@ -124,9 +124,9 @@ export function CategoryGallery() {
     <section 
         className={cn(
             "py-20 md:py-28 border-y border-slate-100 dark:border-slate-900 overflow-hidden group/gallery transition-colors duration-500",
-            (!sectionBgColor || sectionBgColor === '#FFFFFF' || sectionBgColor === 'transparent') ? "bg-white dark:bg-black" : ""
+            isWhiteOrTransparent(sectionBgColor) ? "bg-white dark:bg-black" : ""
         )} 
-        style={(sectionBgColor && sectionBgColor !== '#FFFFFF' && sectionBgColor !== 'transparent') ? { backgroundColor: sectionBgColor } : {}}
+        style={!isWhiteOrTransparent(sectionBgColor) ? { backgroundColor: sectionBgColor } : {}}
     >
       <div className="max-w-site-container mx-auto px-6 mb-12 md:mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-3">

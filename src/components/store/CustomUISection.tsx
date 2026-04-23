@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, isWhiteOrTransparent } from '@/lib/utils';
 import type { HomepageSection } from '@/lib/types';
 import { useSettings } from '@/contexts/settings-context';
 
@@ -26,10 +26,10 @@ export function CustomUISection({ section }: CustomUISectionProps) {
     <section 
         className={cn(
             "relative overflow-hidden py-12 md:py-24 transition-colors duration-500",
-            (!section.backgroundColor || section.backgroundColor === 'transparent' || section.backgroundColor === '#ffffff') ? "bg-white dark:bg-black" : "",
+            isWhiteOrTransparent(section.backgroundColor) ? "bg-white dark:bg-black" : "",
             section.fullWidth ? "w-full" : "max-w-site-container mx-auto px-4 sm:px-6 lg:px-8"
         )}
-        style={{ backgroundColor: (section.backgroundColor && section.backgroundColor !== 'transparent' && section.backgroundColor !== '#ffffff') ? section.backgroundColor : undefined }}
+        style={!isWhiteOrTransparent(section.backgroundColor) ? { backgroundColor: section.backgroundColor } : {}}
     >
       {isHTML ? (
         <div 

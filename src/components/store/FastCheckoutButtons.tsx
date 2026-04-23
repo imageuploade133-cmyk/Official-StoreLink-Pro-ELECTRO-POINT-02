@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Zap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { formatCurrency } from '@/lib/formatUtils';
+import { cn } from '@/lib/utils';
 
 interface FastCheckoutButtonsProps {
   storeId: string;
