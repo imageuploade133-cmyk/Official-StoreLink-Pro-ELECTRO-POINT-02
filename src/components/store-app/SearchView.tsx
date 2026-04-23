@@ -138,47 +138,38 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
 
     return (
             <div className="flex flex-col h-full bg-background-light dark:bg-black animate-in fade-in duration-500">
-            <header className="sticky top-0 z-50 flex items-center bg-background-light/80 dark:bg-black/80 backdrop-blur-md px-4 py-6 justify-between border-b border-slate-200 dark:border-slate-800">
+            <header className="sticky top-0 z-50 flex items-center bg-background/80 dark:bg-black/80 backdrop-blur-xl px-4 py-4 justify-between border-b border-border/40">
                 <div className="flex items-center gap-4">
                     <button 
                         onClick={onClose}
-                        className="flex size-10 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-800 hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
+                        className="flex size-10 items-center justify-center rounded-full bg-secondary/50 dark:bg-slate-900/50 hover:bg-secondary transition-all active:scale-90"
                     >
-                        <ArrowLeft className="h-5 w-5" strokeWidth={3} />
+                        <ArrowLeft className="h-5 w-5" strokeWidth={2.5} />
                     </button>
-                    <h1 className="text-xl font-black leading-tight tracking-tighter uppercase">Exploration</h1>
+                    <h1 className="text-lg font-bold tracking-tight">Search</h1>
                 </div>
             </header>
 
-            <div className="flex flex-col h-full">
-                {/* Fixed Header */}
-                <div className="px-6 pt-12 pb-6 space-y-4 flex-shrink-0 bg-background-light dark:bg-black border-b border-slate-100 dark:border-slate-800">
-                    <div className="space-y-2">
-                        <div className="flex items-center gap-2 font-black text-[10px] uppercase tracking-[0.3em] text-primary">
-                            <Sparkles className="h-3.5 w-3.5" />
-                            Discovery Suite
-                        </div>
-                        <h2 className="text-4xl font-black tracking-tighter uppercase leading-none">Search</h2>
-                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Robust substring discovery across the entire catalog.</p>
-                    </div>
-
-                    <div className="relative group pt-2">
-                        <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 z-10 transition-colors group-focus-within:text-primary">
-                            <SearchIcon className="h-6 w-6" strokeWidth={3} />
+            <div className="flex flex-col h-full overflow-hidden">
+                {/* Search Header */}
+                <div className="px-6 py-4 space-y-4 flex-shrink-0 bg-background dark:bg-black">
+                    <div className="relative group">
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground z-10 transition-colors group-focus-within:text-primary">
+                            <SearchIcon className="h-5 w-5" strokeWidth={2} />
                         </div>
                         <Input 
                             autoFocus={!initialCategoryId}
-                            placeholder="Type name, iron, solar, etc..." 
-                            className="h-16 pl-14 pr-12 rounded-[1.5rem] bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 shadow-2xl text-lg font-bold tracking-tight focus-visible:ring-4 focus-visible:ring-primary/10 transition-all"
+                            placeholder="Search products by name or SKU..." 
+                            className="h-12 pl-11 pr-10 rounded-2xl bg-secondary/50 dark:bg-slate-900/50 border-none shadow-none text-base font-medium placeholder:text-muted-foreground/70 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all"
                             value={searchQuery}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                         {searchQuery && (
                             <button 
                                 onClick={() => setSearchTerm('')}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-slate-100 dark:bg-slate-700 rounded-xl hover:bg-primary/10 hover:text-primary transition-all active:scale-90"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 bg-muted dark:bg-slate-800 rounded-full text-muted-foreground hover:text-foreground transition-all active:scale-90"
                             >
-                                <X className="h-4 w-4" strokeWidth={3} />
+                                <X className="h-4 w-4" strokeWidth={2.5} />
                             </button>
                         )}
                     </div>
@@ -214,40 +205,40 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                     </div>
                     
                     {isLoading && results.length === 0 ? (
-                        <div className="grid grid-cols-1 gap-4">
-                            {[...Array(4)].map((_, i) => (
-                                <div key={i} className="h-32 w-full bg-white dark:bg-slate-800 rounded-[2rem] animate-pulse" />
+                        <div className="grid grid-cols-1 gap-3">
+                            {[...Array(6)].map((_, i) => (
+                                <div key={i} className="h-24 w-full bg-slate-100/50 dark:bg-slate-900/50 rounded-2xl animate-pulse" />
                             ))}
                         </div>
                     ) : results.length > 0 ? (
-                        <div className="grid grid-cols-1 gap-4">
+                        <div className="grid grid-cols-1 gap-3">
                             {results.map((p) => (
                                 <div 
                                     key={p.id} 
                                     onClick={() => onSelectProduct(p.id)} 
-                                    className="flex items-center gap-5 p-5 bg-white dark:bg-slate-800 rounded-[2rem] shadow-xl border-2 border-slate-200 dark:border-slate-700 transition-all active:scale-[0.98] w-full text-left group cursor-pointer"
+                                    className="flex items-center gap-4 p-3 bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800/50 transition-all active:scale-[0.98] w-full text-left group cursor-pointer hover:shadow-md"
                                 >
-                                    <div className="relative h-20 w-20 rounded-2xl overflow-hidden shrink-0 border bg-muted shadow-sm">
+                                    <div className="relative h-16 w-16 rounded-xl overflow-hidden shrink-0 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800">
                                         <Image 
                                             src={p.imageUrl || 'https://placehold.co/200x200.png'} 
                                             alt={p.name} 
                                             fill 
                                             className={cn(
                                                 "object-cover transition-transform duration-700",
-                                                settings?.enableHoverZoom !== false && "group-hover:scale-110"
+                                                settings?.enableHoverZoom !== false && "group-hover:scale-105"
                                             )}
                                             unoptimized 
                                         />
                                     </div>
-                                    <div className="flex-1 min-w-0 space-y-1">
-                                        <p className="text-[8px] font-black uppercase text-primary/60 tracking-widest">
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-[9px] font-bold uppercase text-primary tracking-wide mb-0.5 opacity-80">
                                             {categories?.find(c => c.id === p.categoryId)?.name || 'Premium Series'}
                                         </p>
-                                        <p className="font-black text-lg text-slate-900 dark:text-white truncate leading-tight tracking-tight">{p.name}</p>
-                                        <p className="text-primary font-black text-sm mt-1">{formatCurrency(calculateEffectivePrice(p as any, new Date()), currencySymbol)}</p>
+                                        <p className="font-bold text-base text-slate-900 dark:text-slate-100 truncate leading-tight tracking-tight">{p.name}</p>
+                                        <p className="text-primary font-bold text-sm mt-0.5">{formatCurrency(calculateEffectivePrice(p as any, new Date()), currencySymbol)}</p>
                                     </div>
-                                    <div className="h-10 w-10 rounded-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
-                                        <ChevronRight className="h-5 w-5" strokeWidth={3} />
+                                    <div className="h-8 w-8 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-all">
+                                        <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-primary" strokeWidth={2.5} />
                                     </div>
                                 </div>
                             ))}
@@ -271,19 +262,19 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                         </div>
                     ) : (
                         <div className="py-24 text-center space-y-6 animate-in zoom-in-95 duration-700">
-                            <div className="h-32 w-32 bg-slate-100 dark:bg-slate-800/50 rounded-full flex items-center justify-center mx-auto shadow-inner group">
-                                <SearchIcon className="h-14 w-14 text-slate-300 group-hover:scale-110 transition-transform duration-500" strokeWidth={1.5} />
+                            <div className="h-24 w-24 bg-slate-100 dark:bg-slate-900/50 rounded-full flex items-center justify-center mx-auto group">
+                                <SearchIcon className="h-10 w-10 text-slate-300 group-hover:scale-110 transition-transform duration-500" strokeWidth={1.5} />
                             </div>
                             <div className="space-y-2">
-                                <h3 className="text-2xl font-black tracking-tight uppercase">No matches found</h3>
-                                <p className="text-sm font-medium text-slate-500 max-w-[220px] mx-auto leading-relaxed">Search uses robust substring logic. Try "solar" instead of "portable solar".</p>
+                                <h3 className="text-xl font-bold tracking-tight">No Results Found</h3>
+                                <p className="text-sm text-muted-foreground max-w-[220px] mx-auto leading-relaxed">We couldn't find any matches for your search. Try different keywords.</p>
                             </div>
                             <Button 
                                 variant="outline" 
-                                className="rounded-xl font-black uppercase text-[10px] tracking-widest px-8 h-12 shadow-sm" 
+                                className="rounded-full font-bold px-8 h-12 border-slate-200 dark:border-slate-800" 
                                 onClick={() => { setSearchTerm(''); setSelectedCategoryId(null); if (onClearCategory) onClearCategory(); }}
                             >
-                                Reset Registry Exploration
+                                Reset Search
                             </Button>
                         </div>
                     )}
