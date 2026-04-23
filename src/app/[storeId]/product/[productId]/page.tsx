@@ -855,18 +855,18 @@ export default function ProductDetailsPage() {
             )}
 
             {!isOutOfStock && (
-              <div className="space-y-4 md:space-y-6 p-6 md:p-8 bg-[#f5f5f7] dark:bg-[#1d1d1f] rounded-3xl transition-all duration-500 shadow-sm border border-black/[0.03] dark:border-white/[0.03]">
+              <div className="space-y-3 md:space-y-4 p-4 md:p-5 bg-[#f5f5f7] dark:bg-[#1d1d1f] rounded-3xl transition-all duration-500 shadow-sm border-2 border-black/10 dark:border-white/10">
                 {(activeSectionPromo?.endDate || (isDiscounted && product.promo?.endDate)) && (
                   <PromoCountdown endDate={activeSectionPromo?.endDate || convertToDateSafely(product.promo!.endDate)!} />
                 )}
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-[11px] font-semibold uppercase tracking-widest text-[#86868b]">Select Quantity</label>
+                  <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#1d1d1f] dark:text-[#f5f5f7]">Select Quantity</label>
                   {product.stock <= 5 && product.stock > 0 && (
                     <span className="text-[10px] font-bold text-[#e11d48] animate-pulse">Only {product.stock} left!</span>
                   )}
                 </div>
                 <div className="flex items-center gap-3 md:gap-4">
-                  <div className="flex items-center bg-black/[0.03] dark:bg-white/[0.08] border border-black/[0.05] dark:border-white/[0.05] rounded-[18px] p-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+                  <div className="flex items-center bg-black/[0.03] dark:bg-white/[0.08] border-2 border-black/10 dark:border-white/10 rounded-[18px] p-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                     <Button 
                       variant="ghost" 
                       size="icon" 
@@ -971,7 +971,7 @@ export default function ProductDetailsPage() {
             <BannerAd location="product_details" className="mt-12" />
             <section className="mt-24 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
               <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-2xl bg-[#f5f5f7] dark:bg-[#1d1d1f] flex items-center justify-center text-[#1d1d1f] dark:text-[#f5f5f7]">
+                <div className="h-12 w-12 rounded-2xl bg-[#f5f5f7] dark:bg-[#1d1d1f] flex items-center justify-center text-[#1d1d1f] dark:text-[#f5f5f7] border-2 border-black/10 dark:border-white/10 shadow-sm">
                   <DescriptionIcon className="h-6 w-6" />
                 </div>
                 <div>
@@ -979,7 +979,7 @@ export default function ProductDetailsPage() {
                   <p className="text-xs font-medium uppercase tracking-widest text-[#86868b] mt-1">Detailed insights</p>
                 </div>
               </div>
-              <div className="bg-[#f5f5f7] dark:bg-[#1d1d1f] rounded-[2.5rem] p-8 md:p-12 border border-black/[0.03] dark:border-white/[0.03] transition-all duration-500 shadow-sm relative overflow-hidden">
+              <div className="bg-[#f5f5f7] dark:bg-[#1d1d1f] rounded-[2.5rem] p-6 md:p-8 border-2 border-black/10 dark:border-white/10 transition-all duration-500 shadow-sm relative overflow-hidden">
                 <div className="prose dark:prose-invert max-w-none text-[#1d1d1f] dark:text-[#f5f5f7] leading-relaxed text-lg font-normal relative z-10">
                   <div className="rich-content">
                     <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{product.description}</ReactMarkdown>
@@ -1021,7 +1021,7 @@ export default function ProductDetailsPage() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
                 <div className="lg:col-span-7 space-y-8">
                   {(product.specifications && product.specifications.length > 0) && (
-                    <div className="p-8 rounded-[2rem] bg-[#f5f5f7] dark:bg-[#1d1d1f] space-y-6">
+                    <div className="p-6 rounded-[2rem] bg-[#f5f5f7] dark:bg-[#1d1d1f] space-y-4 border-2 border-black/10 dark:border-white/10">
                       <h3 className="text-2xl font-semibold tracking-tight flex items-center gap-4 text-[#1d1d1f] dark:text-[#f5f5f7]">
                         <ListChecks className="h-6 w-6" /> 
                         {product.specificationsTitle || 'Specifications'}
@@ -1037,7 +1037,7 @@ export default function ProductDetailsPage() {
                     </div>
                   )}
                   {(product.variations && product.variations.length > 0) && (
-                    <div className="p-8 rounded-[2rem] bg-[#f5f5f7] dark:bg-[#1d1d1f] space-y-6">
+                    <div className="p-6 rounded-[2rem] bg-[#f5f5f7] dark:bg-[#1d1d1f] space-y-4 border-2 border-black/10 dark:border-white/10">
                       <h3 className="text-2xl font-semibold tracking-tight flex items-center gap-4 text-[#1d1d1f] dark:text-[#f5f5f7]">
                         <Layers className="h-6 w-6" /> 
                         {product.variationsTitle || 'Variations'}
@@ -1052,7 +1052,7 @@ export default function ProductDetailsPage() {
                     </div>
                   )}
                   {product.sizeGuideImageUrl && (
-                    <div className="p-8 rounded-[2rem] bg-[#f5f5f7] dark:bg-[#1d1d1f] space-y-6">
+                    <div className="p-6 rounded-[2rem] bg-[#f5f5f7] dark:bg-[#1d1d1f] space-y-4 border-2 border-black/10 dark:border-white/10">
                       <h3 className="text-2xl font-semibold tracking-tight flex items-center gap-4 text-[#1d1d1f] dark:text-[#f5f5f7]">
                         <Maximize className="h-6 w-6" /> 
                         Sizing Guide
@@ -1065,7 +1065,7 @@ export default function ProductDetailsPage() {
                 </div>
                 <div className="lg:col-span-5 space-y-8">
                   {product.whatsInTheBox && product.whatsInTheBox.length > 0 && (
-                    <div className="bg-[#f5f5f7] dark:bg-[#1d1d1f] p-8 rounded-[2rem] space-y-6">
+                    <div className="bg-[#f5f5f7] dark:bg-[#1d1d1f] p-6 rounded-[2rem] space-y-4 border-2 border-black/10 dark:border-white/10">
                       <h3 className="text-2xl font-semibold tracking-tight flex items-center gap-4 text-[#1d1d1f] dark:text-[#f5f5f7]">
                         <Package className="h-6 w-6" /> 
                         {product.whatsInTheBoxTitle || 'In the Box'}
@@ -1081,7 +1081,7 @@ export default function ProductDetailsPage() {
                     </div>
                   )}
                   {(product.showProductInsight === true) && (
-                    <div className="bg-[#f5f5f7] dark:bg-[#1d1d1f] p-8 rounded-[2rem] space-y-6">
+                    <div className="bg-[#f5f5f7] dark:bg-[#1d1d1f] p-6 rounded-[2rem] space-y-4 border-2 border-black/10 dark:border-white/10">
                       <h3 className="text-2xl font-semibold tracking-tight flex items-center gap-4 text-[#1d1d1f] dark:text-[#f5f5f7]">
                         <Info className="h-6 w-6" />
                         Insights
@@ -1116,15 +1116,15 @@ export default function ProductDetailsPage() {
               <TabsContent value="shipping" className="mt-0">
                 <div className="max-w-5xl space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="p-10 rounded-[2rem] space-y-4 bg-[#f5f5f7] dark:bg-[#1d1d1f]">
-                      <div className="h-12 w-12 rounded-full bg-white dark:bg-black flex items-center justify-center text-[#1d1d1f] dark:text-[#f5f5f7] mb-4 shadow-sm">
+                    <div className="p-6 rounded-[2rem] space-y-3 bg-[#f5f5f7] dark:bg-[#1d1d1f] border-2 border-black/10 dark:border-white/10">
+                      <div className="h-12 w-12 rounded-full bg-white dark:bg-black flex items-center justify-center text-[#1d1d1f] dark:text-[#f5f5f7] mb-4 shadow-sm border-2 border-black/5 dark:border-white/5">
                         <Truck className="h-6 w-6" />
                       </div>
                       <h4 className="font-semibold text-xl tracking-tight">Free Express Delivery</h4>
                       <p className="text-sm text-[#86868b] leading-relaxed">{settings?.shippingPolicy || "Orders are processed within 24 hours. Domestic delivery typically arrives in 3-5 business days."}</p>
                     </div>
-                    <div className="p-10 rounded-[2rem] space-y-4 bg-[#f5f5f7] dark:bg-[#1d1d1f]">
-                      <div className="h-12 w-12 rounded-full bg-white dark:bg-black flex items-center justify-center text-[#1d1d1f] dark:text-[#f5f5f7] mb-4 shadow-sm">
+                    <div className="p-6 rounded-[2rem] space-y-3 bg-[#f5f5f7] dark:bg-[#1d1d1f] border-2 border-black/10 dark:border-white/10">
+                      <div className="h-12 w-12 rounded-full bg-white dark:bg-black flex items-center justify-center text-[#1d1d1f] dark:text-[#f5f5f7] mb-4 shadow-sm border-2 border-black/5 dark:border-white/5">
                         <RotateCcw className="h-6 w-6" />
                       </div>
                       <h4 className="font-semibold text-xl tracking-tight">Easy Returns</h4>
@@ -1138,7 +1138,7 @@ export default function ProductDetailsPage() {
             <TabsContent value="reviews" className="mt-0">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
                 <div className="lg:col-span-4 space-y-8">
-                  <div className="bg-[#f5f5f7] dark:bg-[#1d1d1f] p-10 rounded-[2rem] text-center">
+                  <div className="bg-[#f5f5f7] dark:bg-[#1d1d1f] p-6 rounded-[2rem] text-center border-2 border-black/10 dark:border-white/10">
                     <p className="text-6xl font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] tracking-tight">{reviewStats.avg}</p>
                     <div className="flex justify-center text-amber-400 my-4">
                       {[...Array(5)].map((_, i) => (
@@ -1194,7 +1194,7 @@ export default function ProductDetailsPage() {
                       })}
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center py-20 text-center border border-dashed rounded-[2rem] bg-black/[0.02] dark:bg-white/[0.02] border-black/[0.1] dark:border-white/[0.1]">
+                    <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed rounded-[2rem] bg-black/[0.02] dark:bg-white/[0.02] border-black/20 dark:border-white/20">
                       <MessageSquare className="h-10 w-10 text-[#86868b] mb-4 opacity-20" />
                       <h4 className="text-xl font-semibold tracking-tight text-[#1d1d1f] dark:text-[#f5f5f7]">No reviews yet</h4>
                       <p className="text-sm text-[#86868b] max-w-xs mx-auto">Be the first to share your experience with this product!</p>
