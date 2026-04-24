@@ -786,27 +786,50 @@ export default function BulkWhatsAppPage() {
         </CardContent>
         <CardFooter className="flex flex-col items-stretch gap-4">
           {isSending && (
-            <div className="space-y-2 w-full">
-              <div className="flex justify-between text-sm font-medium">
-                <span>Sending messages...</span>
-                <span>{sendProgress} / {totalToSend}</span>
+            <div className="space-y-3 w-full bg-muted/50 p-4 rounded-xl border border-green-100 dark:border-green-900/30">
+              <div className="flex justify-between text-sm font-bold text-green-700 dark:text-green-400">
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Sending Campaign...
+                </span>
+                <span>{sendProgress} / {totalToSend} ({Math.round((sendProgress / totalToSend) * 100)}%)</span>
               </div>
-              <Progress value={(sendProgress / totalToSend) * 100} className="h-2 w-full" />
+              <Progress value={(sendProgress / totalToSend) * 100} className="h-3 w-full bg-green-100 dark:bg-green-900/20" />
+              <p className="text-xs text-muted-foreground text-center italic">
+                Please keep this page open until the process is complete.
+              </p>
             </div>
           )}
           <Button 
             onClick={handleSendMessage} 
             disabled={isSending || selectedRecipientCount === 0 || !message.trim() || isMessageTooLong}
             size="lg"
-            className="bg-green-600 hover:bg-green-700 text-white w-full md:min-w-[280px]"
+            className="w-full md:min-w-[300px] h-16 text-lg font-bold transition-all duration-300 shadow-xl hover:shadow-green-500/40 group bg-gradient-to-r from-green-600 via-emerald-600 to-green-600 bg-[length:200%_auto] hover:bg-right border-none text-white relative overflow-hidden active:scale-[0.98] disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"
           >
             {isSending ? (
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              <div className="flex items-center gap-3">
+                <Loader2 className="h-6 w-6 animate-spin" />
+                <span className="tracking-wide">PROCESSING CAMPAIGN...</span>
+              </div>
             ) : (
-              <Send className="mr-2 h-5 w-5" />
+              <div className="flex items-center justify-center gap-4 w-full">
+                <div className="bg-white/20 p-2.5 rounded-xl group-hover:rotate-12 group-hover:scale-110 transition-all duration-300">
+                  <Send className="h-6 w-6" />
+                </div>
+                <div className="flex flex-col items-start leading-tight">
+                  <span className="text-xs font-bold uppercase tracking-widest opacity-80 mb-0.5">Ready to Launch</span>
+                  <span className="text-xl">Send to {selectedRecipientCount.toLocaleString()} Recipient(s)</span>
+                </div>
+              </div>
             )}
-            Send to {selectedRecipientCount} Selected Recipient(s)
+            
+            {/* Animated shine effect */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] pointer-events-none" />
           </Button>
+          
+          <p className="text-[10px] text-center text-muted-foreground uppercase tracking-tighter opacity-70">
+            Estimated Cost: ~{((selectedRecipientCount || 0) * UNIT_COST_PER_MESSAGE).toLocaleString()} Units • Delivered via Secure WhatsApp Gateway
+          </p>
         </CardFooter>
       </Card>
     </div>

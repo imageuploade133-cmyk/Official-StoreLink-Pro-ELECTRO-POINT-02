@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, MessageSquare, XCircle, Loader2, Receipt } from 'lucide-react';
 import { collection, query, getDocs, orderBy, limit, Timestamp, where } from 'firebase/firestore';
@@ -20,7 +20,7 @@ export default function WhatsappDashboard() {
   const { toast } = useToast();
   const firestore = useFirestore();
   const { store, staffMember } = useAuth();
-  const currentStoreId = React.useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   useEffect(() => {
     const fetchMessageLogs = async () => {
@@ -66,7 +66,7 @@ export default function WhatsappDashboard() {
     };
 
     fetchMessageLogs();
-  }, [toast, firestore]);
+  }, [toast, firestore, currentStoreId]);
 
   if (isLoading) {
     return (

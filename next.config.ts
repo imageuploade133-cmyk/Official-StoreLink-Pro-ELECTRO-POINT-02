@@ -9,17 +9,14 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
 
-  // ─── Fix: Allow network devices (phones, tablets on same WiFi) ───────────
-  // Next.js 15 requires hostnames only (no protocol or port)
-  allowedDevOrigins: [
-    '192.168.0.9',
-    '192.168.0.*',
-    '*.local',
-  ],
-
   experimental: {
     serverActions: {
       bodySizeLimit: '20mb',
+      allowedOrigins: [
+        '192.168.0.9',
+        '192.168.0.*',
+        '*.local',
+      ],
     },
     // Speed: optimize imports from large icon/component libraries
     optimizePackageImports: [

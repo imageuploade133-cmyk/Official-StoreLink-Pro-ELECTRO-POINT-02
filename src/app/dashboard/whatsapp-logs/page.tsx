@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useFirestore, useCollection } from '@/firebase';
 import { 
   collection, 
@@ -59,7 +59,7 @@ export default function WhatsAppLogsPage() {
 
     try {
       const constraints: any[] = [
-        where('storeId', '==', currentStoreId),
+        where('store_id', '==', currentStoreId),
         orderBy('timestamp', 'desc'),
         limit(ITEMS_PER_PAGE)
       ];
