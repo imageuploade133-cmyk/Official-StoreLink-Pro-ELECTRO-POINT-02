@@ -115,7 +115,7 @@ export default function DashboardLayout({
     return query(collection(firestore, 'orders'), where('store_id', '==', storeId), where('status', '==', 'pending'));
   }, [firestore, user, staffMember, store]);
   const { data: pendingOrders } = useCollection<Order>(pendingOrdersQuery);
-  const pendingCount = pendingOrders?.length || 0;
+  const pendingCount = pendingOrders?.filter(o => o.isRead !== true).length || 0;
 
   // Restore zoom level from localStorage on mount
   useEffect(() => {
