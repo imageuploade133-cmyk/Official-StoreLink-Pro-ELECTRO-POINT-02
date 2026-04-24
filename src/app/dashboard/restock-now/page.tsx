@@ -90,6 +90,14 @@ export default function RestockNowPage() {
         limit(5)
       );
 
+      const nameQ = query(
+        collection(firestore, 'products'),
+        where('store_id', '==', currentStoreId),
+        where('name', '>=', trimmedTerm),
+        where('name', '<=', trimmedTerm + '\uf8ff'),
+        limit(10)
+      );
+
       const [barcodeSnap, nameSnap] = await Promise.all([
         getDocs(barcodeQ),
         getDocs(nameQ)
@@ -514,9 +522,9 @@ export default function RestockNowPage() {
                       {isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <PackagePlus className="mr-2 h-5 w-5" />}
                       Complete Restock
                     </Button>
-                    </form>
-                    </CardContent>
-
+                  </form>
+                </CardContent>
+              </Card>
 
               <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/10 border-b">
