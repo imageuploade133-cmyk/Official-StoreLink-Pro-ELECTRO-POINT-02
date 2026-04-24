@@ -9,7 +9,7 @@ import {
   sendWhatsAppViaEBulkSMS, 
   logWhatsAppMessage 
 } from '@/lib/whatsapp-ebulk';
-import { sendWhatsAppOrderAlert } from '../../actions/orders';
+import { sendWhatsAppOrderAlert } from '../../../actions/orders';
 
 export async function POST(request: Request) {
   try {
