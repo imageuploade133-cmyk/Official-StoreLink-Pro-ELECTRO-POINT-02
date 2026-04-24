@@ -14,7 +14,9 @@ import {
   AlertCircle,
   SlidersHorizontal,
   ListPlus,
-  CheckCircle2
+  CheckCircle2,
+  Sparkles,
+  Star
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +34,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { uploadImage } from '@/ai/flows/image-upload-flow';
+import { removeBackground } from '@/ai/flows/background-removal-flow';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
@@ -44,10 +47,12 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
   const { control, watch, setValue, formState: { errors } } = useFormContext();
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState<string | null>(null);
+  const [isProcessingAi, setIsProcessingAi] = useState<string | null>(null);
 
   const hasVariants = watch('hasVariants');
   const variantOptions = watch('variantOptions') || [];
   const variants = watch('variants') || [];
+  const mainImageUrl = watch('imageUrl');
 
   const { fields: optionFields, append: appendOption, remove: removeOption } = useFieldArray({
     control,
@@ -139,6 +144,52 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
         setIsUploading(null);
       }
     };
+  };
+
+  const handleRemoveBackground = async (variantIndex: number) => {
+    const imageUrl = variants[variantIndex].imageUrl;
+    if (!imageUrl) {
+      toast({ variant: "destructive", title: "No Image", description: "Please upload an image first." });
+      return;
+    }
+
+    const variantId = variants[variantIndex].id;
+    setIsProcessingAi(variantId);
+
+    try {
+      // Convert image URL to data URI
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const imageDataUri = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+
+      // Remove background
+      const result = await removeBackground({ imageDataUri });
+
+      // Upload the background-removed image to store it permanently
+      const uploadResult = await uploadImage({ imageDataUri: result.display_url, storeId });
+
+      setValue(`variants.${variantIndex}.imageUrl`, uploadResult.display_url);
+      toast({ title: "Background Removed", description: "AI mockup generated successfully." });
+    } catch (error: any) {
+      console.error('Background removal failed:', error);
+      toast({ variant: "destructive", title: "AI Processing Failed", description: error.message || "Could not remove background." });
+    } finally {
+      setIsProcessingAi(null);
+    }
+  };
+
+  const handleUsePrimaryImage = (variantIndex: number) => {
+    if (!mainImageUrl) {
+      toast({ variant: "destructive", title: "No Primary Image", description: "Main product image is not set." });
+      return;
+    }
+    setValue(`variants.${variantIndex}.imageUrl`, mainImageUrl);
+    toast({ title: "Image Synced", description: "Using primary product image for this variant." });
   };
 
   return (
@@ -292,7 +343,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                     <CardContent className="p-0">
                       <div className="flex flex-col md:flex-row items-center">
                         {/* Image Section */}
-                        <div className="w-full md:w-40 h-40 md:h-auto self-stretch bg-muted relative group overflow-hidden">
+                        <div className="w-full md:w-40 h-48 md:h-auto self-stretch bg-muted relative group overflow-hidden border-b md:border-b-0 md:border-r">
                           {variant.imageUrl ? (
                             <Image 
                               src={variant.imageUrl} 
@@ -307,21 +358,50 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                               <span className="text-[10px] font-bold uppercase">No Image</span>
                             </div>
                           )}
-                          <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center cursor-pointer text-white gap-2">
-                            <Upload className="h-6 w-6" />
-                            <span className="text-[10px] font-bold uppercase">Upload Photo</span>
-                            <input 
-                              type="file" 
-                              accept="image/*" 
-                              className="hidden" 
-                              onChange={(e) => handleImageUpload(index, e)}
-                              disabled={!!isUploading}
-                            />
-                          </label>
-                          {isUploading === variant.id && (
+                          
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2">
+                            <label className="w-full">
+                              <Button type="button" variant="secondary" size="sm" className="w-full h-8 gap-2 text-[10px] font-bold uppercase bg-white text-black hover:bg-white/90">
+                                <Upload className="h-3 w-3" /> Upload
+                              </Button>
+                              <input 
+                                type="file" 
+                                accept="image/*" 
+                                className="hidden" 
+                                onChange={(e) => handleImageUpload(index, e)}
+                                disabled={!!isUploading}
+                              />
+                            </label>
+                            
+                            <Button 
+                              type="button" 
+                              variant="secondary" 
+                              size="sm" 
+                              className="w-full h-8 gap-2 text-[10px] font-bold uppercase bg-primary text-white hover:bg-primary/90"
+                              onClick={() => handleUsePrimaryImage(index)}
+                              disabled={!mainImageUrl}
+                            >
+                              <Star className="h-3 w-3" /> Primary
+                            </Button>
+
+                            <Button 
+                              type="button" 
+                              variant="secondary" 
+                              size="sm" 
+                              className="w-full h-8 gap-2 text-[10px] font-bold uppercase bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                              onClick={() => handleRemoveBackground(index)}
+                              disabled={!variant.imageUrl || !!isProcessingAi}
+                            >
+                              {isProcessingAi === variant.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />} AI Mockup
+                            </Button>
+                          </div>
+
+                          {(isUploading === variant.id || isProcessingAi === variant.id) && (
                             <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center gap-2">
                               <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                              <span className="text-[10px] font-black text-primary uppercase">Uploading...</span>
+                              <span className="text-[10px] font-black text-primary uppercase">
+                                {isUploading === variant.id ? 'Uploading...' : 'AI Processing...'}
+                              </span>
                             </div>
                           )}
                         </div>
@@ -391,6 +471,15 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                                 {...control.register(`variants.${index}.stock` as const)}
                               />
                             </div>
+                          </div>
+
+                          <div className="mt-4 pt-4 border-t border-dashed">
+                            <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Variant Description (Optional)</Label>
+                            <Input 
+                              placeholder="Specific details for this variant..." 
+                              className="h-9 text-xs bg-muted/20 border-none focus-visible:ring-1 focus-visible:ring-primary/30 mt-1.5"
+                              {...control.register(`variants.${index}.description` as const)}
+                            />
                           </div>
                         </div>
                       </div>

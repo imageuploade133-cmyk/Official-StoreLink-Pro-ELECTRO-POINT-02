@@ -975,6 +975,17 @@ export default function ProductDetailsPage() {
                     ))}
                   </div>
                 )}
+                {selectedVariant?.description && (
+                  <div className="mb-6 p-4 rounded-2xl bg-primary/5 border border-primary/10 animate-in fade-in slide-in-from-top-2 duration-500">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <Sparkles className="h-3.5 w-3.5 text-primary" />
+                      <span className="text-[10px] font-black uppercase tracking-wider text-primary">Variant Details</span>
+                    </div>
+                    <p className="text-xs font-medium text-[#1d1d1f] dark:text-[#f5f5f7] leading-relaxed">
+                      {selectedVariant.description}
+                    </p>
+                  </div>
+                )}
                 {(activeSectionPromo?.endDate || (isDiscounted && product.promo?.endDate)) && (
                   <PromoCountdown endDate={activeSectionPromo?.endDate || convertToDateSafely(product.promo!.endDate)!} />
                 )}
