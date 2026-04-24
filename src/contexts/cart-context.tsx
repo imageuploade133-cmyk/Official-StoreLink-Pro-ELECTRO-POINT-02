@@ -56,6 +56,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addToCart = useCallback((product: Product, salePrice: number) => {
     const productStock = ensureNumber(product.stock, 0);
+    const selectedVariantId = (product as any).selectedVariantId;
 
     if (productStock <= 0) {
         toast({
@@ -68,7 +69,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     setCartItems(prevItems => {
         triggerAd('add_to_cart');
-        const existingItem = prevItems.find(item => item.id === product.id);
+        const existingItem = prevItems.find(item => 
+          item.id === product.id && item.selectedVariantId === selectedVariantId
+        );
         if (existingItem) {
             if (existingItem.quantity >= productStock) {
                 setTimeout(() => {
@@ -84,7 +87,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                 toast({ title: "Added to Cart", description: `Increased quantity for ${product.name}.` });
             }, 0);
             return prevItems.map(item =>
-                item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+                (item.id === product.id && item.selectedVariantId === selectedVariantId) ? { ...item, quantity: item.quantity + 1 } : item
             );
         } else {
             setTimeout(() => {

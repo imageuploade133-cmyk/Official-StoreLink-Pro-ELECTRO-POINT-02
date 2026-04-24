@@ -275,6 +275,49 @@ export default function ProductDetailsPage() {
   const [isOutOfDataDrawerOpen, setIsOutOfDataDrawerOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: string }>({});
+
+  const selectedVariant = useMemo(() => {
+    if (!product?.hasVariants || !product.variants) return null;
+    if (Object.keys(selectedOptions).length === 0) return null;
+    return product.variants.find(v => 
+      v.isActive && 
+      Object.entries(selectedOptions).every(([key, value]) => v.options[key] === value)
+    );
+  }, [product, selectedOptions]);
+
+  const currentPrice = useMemo(() => {
+    if (selectedVariant && selectedVariant.sellingPrice) {
+       // Re-calculate effective price if variant has its own price
+       return calculateEffectivePrice({ ...product, sellingPrice: selectedVariant.sellingPrice } as any, today, category);
+    }
+    return effectivePrice;
+  }, [selectedVariant, effectivePrice, product, today, category]);
+
+  const currentStock = selectedVariant ? selectedVariant.stock : (product?.stock || 0);
+  const isCurrentlyOutOfStock = currentStock <= 0;
+
+  // Update active image when selected variant changes
+  useEffect(() => {
+    if (selectedVariant?.imageUrl) {
+      setActiveImage(selectedVariant.imageUrl);
+      setShowVideo(false);
+    }
+  }, [selectedVariant]);
+
+  // Initial selection
+  useEffect(() => {
+    if (product?.hasVariants && product.variantOptions) {
+      const initial: { [key: string]: string } = {};
+      product.variantOptions.forEach(opt => {
+        if (opt.values.length > 0) {
+          initial[opt.name] = opt.values[0];
+        }
+      });
+      setSelectedOptions(initial);
+    }
+  }, [product]);
+
   const filteredPaymentMethods = useMemo(() => {
     return availablePaymentMethods.filter(method => {
       // Filter by Region if store has a payment region set
@@ -524,7 +567,7 @@ export default function ProductDetailsPage() {
   }, [product, today, category, activeSectionPromo, rewardAdClicked, activeRewardAd, applyRewardDiscount]);
 
   const isDiscounted = product ? (effectivePrice < product.sellingPrice) : false;
-  const isOutOfStock = product ? product.stock <= 0 : false;
+  const isOutOfStock = product ? (product.hasVariants ? isCurrentlyOutOfStock : product.stock <= 0) : false;
   const isInWishlist = isProductInWishlist(productId);
 
   const galleryImages = useMemo(() => {
@@ -550,7 +593,13 @@ export default function ProductDetailsPage() {
   const handleAddToCart = () => {
     if (product) {
       for (let i = 0; i < quantity; i++) {
-        addToCart(product, effectivePrice);
+        const itemWithVariant = {
+          ...product,
+          stock: currentStock, // Use variant stock
+          selectedVariantId: selectedVariant?.id,
+          selectedOptions: product.hasVariants ? selectedOptions : undefined,
+        };
+        addToCart(itemWithVariant as any, currentPrice);
       }
     }
   };
@@ -719,7 +768,7 @@ export default function ProductDetailsPage() {
     <div className="bg-white dark:bg-black min-h-screen">
       <StickyProductBar
         productName={product.name}
-        productPrice={formatCurrency(effectivePrice, currencySymbol)}
+        productPrice={formatCurrency(currentPrice, currencySymbol)}
         isInWishlist={isInWishlist}
         isOutOfStock={isOutOfStock}
         onAddToCart={isOutOfStock ? () => setIsOutOfDataDrawerOpen(true) : handleAddToCart}
@@ -818,7 +867,7 @@ export default function ProductDetailsPage() {
               <div className="flex items-start gap-3 pt-2">
                 <div className="flex flex-col gap-1 md:gap-1.5">
                   {!today ? <Skeleton className="h-8 md:h-10 w-32" /> : (
-                    <><span className={cn("text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight", isDiscounted ? "text-[#e11d48]" : "text-[#1d1d1f] dark:text-[#f5f5f7]")}>{formatCurrency(effectivePrice, currencySymbol)}</span>
+                    <><span className={cn("text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight", isDiscounted ? "text-[#e11d48]" : "text-[#1d1d1f] dark:text-[#f5f5f7]")}>{formatCurrency(currentPrice, currencySymbol)}</span>
                     {isDiscounted && <span className="text-sm md:text-base text-[#86868b] line-through">Was: {formatCurrency(product.sellingPrice, currencySymbol)}</span>}</>
                   )}
                   <div className="pt-0.5 md:pt-1">
@@ -870,6 +919,62 @@ export default function ProductDetailsPage() {
 
             {!isOutOfStock && (
               <div className="space-y-3 md:space-y-4 p-4 md:p-5 bg-[#f5f5f7] dark:bg-[#1d1d1f] rounded-3xl transition-all duration-500 shadow-sm border-2 border-black/10 dark:border-white/20">
+                {product.hasVariants && product.variantOptions && (
+                  <div className="space-y-6 mb-6">
+                    {product.variantOptions.map((option) => (
+                      <div key={option.name} className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <label className="text-[11px] font-black uppercase tracking-[0.2em] text-[#86868b]">
+                            Select {option.name}
+                          </label>
+                          <span className="text-[11px] font-bold text-primary">
+                            {selectedOptions[option.name]}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {option.values.map((value) => {
+                            const isSelected = selectedOptions[option.name] === value;
+                            const isColor = option.name.toLowerCase().includes('color');
+                            
+                            if (isColor) {
+                              return (
+                                <button
+                                  key={value}
+                                  onClick={() => setSelectedOptions(prev => ({ ...prev, [option.name]: value }))}
+                                  className={cn(
+                                    "w-10 h-10 rounded-full border-2 transition-all p-1",
+                                    isSelected ? "border-primary scale-110 shadow-md" : "border-transparent hover:scale-105"
+                                  )}
+                                  title={value}
+                                >
+                                  <div 
+                                    className="w-full h-full rounded-full border border-black/10" 
+                                    style={{ backgroundColor: value.toLowerCase() }}
+                                  />
+                                </button>
+                              );
+                            }
+                            
+                            return (
+                              <button
+                                key={value}
+                                onClick={() => setSelectedOptions(prev => ({ ...prev, [option.name]: value }))}
+                                className={cn(
+                                  "px-4 py-2 rounded-xl border-2 text-xs font-bold transition-all",
+                                  isSelected 
+                                    ? "border-primary bg-primary text-white shadow-md scale-105" 
+                                    : "border-black/5 bg-white dark:bg-black text-[#1d1d1f] dark:text-white hover:border-primary/50"
+                                )}
+                              >
+                                {value}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 {(activeSectionPromo?.endDate || (isDiscounted && product.promo?.endDate)) && (
                   <PromoCountdown endDate={activeSectionPromo?.endDate || convertToDateSafely(product.promo!.endDate)!} />
                 )}
@@ -929,7 +1034,7 @@ export default function ProductDetailsPage() {
                   <div className="pt-6 border-t border-black/[0.05] dark:border-white/[0.1]">
                     <FastCheckoutButtons 
                       storeId={storeId}
-                      amount={effectivePrice * quantity}
+                      amount={currentPrice * quantity}
                       currency={settings?.currency || 'NGN'}
                       availableMethods={filteredPaymentMethods}
                       onSuccess={(orderId) => {}}
@@ -943,9 +1048,11 @@ export default function ProductDetailsPage() {
                               items: [{
                                 productId: product.id,
                                 quantity,
-                                price: effectivePrice
+                                price: currentPrice,
+                                variantId: selectedVariant?.id,
+                                selectedOptions: product.hasVariants ? selectedOptions : undefined,
                               }],
-                              totalAmount: effectivePrice * quantity,
+                              totalAmount: currentPrice * quantity,
                               totalCost: (product.purchasePrice || 0) * quantity,
                             })
                           }).then(r => r.json());

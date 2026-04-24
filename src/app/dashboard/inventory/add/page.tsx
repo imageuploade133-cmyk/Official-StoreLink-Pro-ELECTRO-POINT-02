@@ -57,6 +57,10 @@ export default function AddProductPage() {
         isVisibleOnWeb: restValues.isVisibleOnWeb ?? true,
       };
 
+      if (values.hasVariants && values.variants && values.variants.length > 0) {
+        productData.stock = values.variants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
+      }
+
       if (isPromo && promoType && promoValue !== undefined) {
         productData.promo = {
           type: promoType,

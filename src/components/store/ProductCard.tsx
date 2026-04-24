@@ -3,6 +3,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { 
   Heart, 
   Plus,
@@ -33,6 +34,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, category, currencySymbol, overrideSettings }: ProductCardProps) {
+  const router = useRouter();
   const { addToCart } = useCart();
   const { isProductInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const { settings: globalSettings } = useSettings();
@@ -64,6 +66,10 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (product.hasVariants) {
+      router.push(getStoreUrl(`/store/product/${product.id}`));
+      return;
+    }
     addToCart(product, effectivePrice);
   };
 
@@ -291,7 +297,7 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
     return `${sizeClass} ${shapeClass} ${shadowClass}`;
   }, [settings]);
 
-  const gridCartText = settings?.storeGridCartText || 'Add to Bag';
+  const gridCartText = product.hasVariants ? 'Select Options' : (settings?.storeGridCartText || 'Add to Bag');
   const gridCartIcon = settings?.storeGridCartIcon;
 
   return (

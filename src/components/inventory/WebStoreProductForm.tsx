@@ -98,6 +98,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn, convertToDateSafely } from '@/lib/utils';
 import { ProductImageGallery } from '@/components/inventory/ProductImageGallery';
 import { StoreMerchandisingSettings } from '@/components/inventory/StoreMerchandisingSettings';
+import { ProductVariantsManager } from './ProductVariantsManager';
 import { AdvancedVideoManager } from './AdvancedVideoManager';
 import { ProductVoiceRecorder } from './ProductVoiceRecorder';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -196,6 +197,21 @@ const storeProductSchema = z.object({
   showLogisticsInfo: z.boolean().default(true),
   showVerifiedReviews: z.boolean().default(true),
   rewardAdsEnabled: z.boolean().default(false),
+  hasVariants: z.boolean().default(false),
+  variantOptions: z.array(z.object({
+    name: z.string().min(1, 'Option name is required'),
+    values: z.array(z.string().min(1, 'Value is required')).min(1, 'At least one value is required'),
+  })).optional().default([]),
+  variants: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    options: z.record(z.string()),
+    sku: z.string().optional().or(z.literal('')),
+    sellingPrice: z.coerce.number().optional(),
+    stock: z.coerce.number().int().min(0, 'Stock cannot be negative.'),
+    imageUrl: z.string().url().optional().or(z.literal('')),
+    isActive: z.boolean().default(true),
+  })).optional().default([]),
 }).refine(data => !data.isPromo || (!!data.promoType && !!data.promoValue && data.promoValue > 0), {
     message: 'Promo value is required and must be positive when active.',
     path: ['promoValue']
@@ -385,6 +401,9 @@ export function WebStoreProductForm() {
       showLogisticsInfo: true,
       showVerifiedReviews: true,
       rewardAdsEnabled: false,
+      hasVariants: false,
+      variantOptions: [],
+      variants: [],
     }
   });
 
@@ -530,6 +549,10 @@ export function WebStoreProductForm() {
         allowPriceModification: true,
         barcodeGenerated: false,
       };
+
+      if (values.hasVariants && values.variants && values.variants.length > 0) {
+        productData.stock = values.variants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
+      }
 
       if (isPromo && promoType && promoValue !== undefined) {
         productData.promo = {
@@ -883,6 +906,7 @@ export function WebStoreProductForm() {
                         >
                           <Barcode className="h-4 w-4" />
                         </Button>
+              <ProductVariantsManager storeId={currentStoreId} />
                       </div>
                       <FormDescription className="text-xs">
                           Enter manually or use the barcode icon above.

@@ -34,7 +34,13 @@ export async function placeOrderAction({
 }: {
   userId: string;
   storeId: string | null;
-  items: { productId: string; quantity: number; price: number }[];
+  items: { 
+    productId: string; 
+    quantity: number; 
+    price: number; 
+    variantId?: string; 
+    selectedOptions?: any;
+  }[];
   totalAmount: number;
   totalCost: number;
   paymentMethod: string;
@@ -128,15 +134,35 @@ export async function placeOrderAction({
 
       // Now perform all writes
       for (const { item, snap, ref } of productSnaps) {
-        const data = snap.data();
-        const currentStock = Number(data?.stock || 0);
+        const data = snap.data() as any;
+        let currentStock = Number(data?.stock || 0);
         const quantity = Number(item.quantity || 0);
 
-        if (currentStock < quantity) {
-          throw new Error(`Insufficient stock for "${data?.name || item.productId}". Only ${currentStock} left.`);
+        if (item.variantId && data?.hasVariants && data?.variants) {
+          const variants = [...data.variants];
+          const variantIndex = variants.findIndex(v => v.id === item.variantId);
+          if (variantIndex !== -1) {
+             const variant = { ...variants[variantIndex] };
+             if (variant.stock < quantity) {
+               throw new Error(`Insufficient stock for "${data?.name} (${variant.name})". Only ${variant.stock} left.`);
+             }
+             variant.stock -= quantity;
+             variants[variantIndex] = variant;
+             // Also update main product stock (total sum)
+             currentStock -= quantity;
+             transaction.update(ref, { variants, stock: currentStock });
+          } else {
+             if (currentStock < quantity) {
+               throw new Error(`Insufficient stock for "${data?.name}". Only ${currentStock} left.`);
+             }
+             transaction.update(ref, { stock: currentStock - quantity });
+          }
+        } else {
+          if (currentStock < quantity) {
+            throw new Error(`Insufficient stock for "${data?.name || item.productId}". Only ${currentStock} left.`);
+          }
+          transaction.update(ref, { stock: currentStock - quantity });
         }
-        
-        transaction.update(ref, { stock: currentStock - quantity });
         
         enrichedItems.push({
           ...item,
@@ -678,7 +704,14 @@ function formatWhatsAppMessage(template: string, data: {
 }
 
 function formatOrderItemsForWhatsApp(items: any[], currency: string) {
-    return items.map(item => `*• ${item.productName} x ${item.quantity} - ${currency}${item.price.toLocaleString()}*`).join('\n');
+    return items.map(item => {
+        let name = item.productName;
+        if (item.selectedOptions) {
+            const options = Object.entries(item.selectedOptions).map(([k, v]) => `${v}`).join(' / ');
+            name += ` [${options}]`;
+        }
+        return `*• ${name} x ${item.quantity} - ${currency}${item.price.toLocaleString()}*`;
+    }).join('\n');
 }
 
 async function getCustomerPhone(userId: string) {
