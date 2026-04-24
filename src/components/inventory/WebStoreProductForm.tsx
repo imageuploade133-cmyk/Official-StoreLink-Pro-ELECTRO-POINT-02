@@ -429,6 +429,18 @@ export function WebStoreProductForm() {
   const watchVideoEnabled = form.watch('videoEnabled');
   const watchVoiceEnabled = form.watch('voiceEnabled');
   const watchVideoPoster = form.watch('videoPosterUrl');
+  const watchHasVariants = form.watch('hasVariants');
+  const watchVariants = form.watch('variants');
+
+  // Auto-calculate total stock from variants
+  useEffect(() => {
+    if (watchHasVariants && watchVariants && watchVariants.length > 0) {
+      const totalStock = watchVariants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
+      if (form.getValues('stock') !== totalStock) {
+        form.setValue('stock', totalStock, { shouldValidate: true });
+      }
+    }
+  }, [watchHasVariants, watchVariants, form]);
 
   const handleAiAssist = async () => {
     if (!watchName || !watchCategory) {
@@ -540,6 +552,12 @@ export function WebStoreProductForm() {
     try {
       const { isPromo, promoType, promoValue, promoStartDate, promoEndDate, voiceSignatures, ...rest } = values;
       
+      // Clean up variants if not enabled for data integrity
+      if (!values.hasVariants) {
+        (rest as any).variants = [];
+        (rest as any).variantOptions = [];
+      }
+
       const productData: any = {
         ...rest,
         store_id: currentStoreId,
@@ -862,8 +880,25 @@ export function WebStoreProductForm() {
                   name="stock"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="font-bold">Initial Stock <span className="text-destructive">*</span></FormLabel>
-                      <FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl>
+                      <FormLabel className="font-bold">
+                        {watchHasVariants ? "Total Stock (Auto)" : "Initial Stock"} 
+                        {!watchHasVariants && <span className="text-destructive"> *</span>}
+                      </FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          {...field} 
+                          value={field.value ?? ''} 
+                          disabled={watchHasVariants}
+                          className={cn(watchHasVariants && "bg-muted font-bold opacity-70")}
+                          placeholder={watchHasVariants ? "Calculated from variants" : "0"}
+                        />
+                      </FormControl>
+                      {watchHasVariants && (
+                        <FormDescription className="text-[10px] text-primary font-medium italic">
+                          Automatically summed from all active variants.
+                        </FormDescription>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -923,6 +958,10 @@ export function WebStoreProductForm() {
                     </FormItem>
                   )}
                 />
+              </div>
+
+              <div className="pt-6 border-t border-dashed">
+                <ProductVariantsManager storeId={currentStoreId} />
               </div>
 
               <div className="space-y-4 pt-4 border-t border-dashed">
@@ -1021,8 +1060,6 @@ export function WebStoreProductForm() {
               </div>
             </CardContent>
           </Card>
-
-          <ProductVariantsManager storeId={currentStoreId} />
 
           <Card className="shadow-xl border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">

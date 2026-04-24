@@ -913,7 +913,6 @@ export function ProductForm({
                             initialFocus
                           />
                           <div className="p-3 border-t">
-          <ProductVariantsManager storeId={currentStoreId} />
                             <Button
                               variant="ghost"
                               size="sm"

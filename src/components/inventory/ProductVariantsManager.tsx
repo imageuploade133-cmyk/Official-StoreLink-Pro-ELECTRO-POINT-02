@@ -47,16 +47,22 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
 
   const hasVariants = watch('hasVariants');
   const variantOptions = watch('variantOptions') || [];
-  const variants = watch('variants') || [];
 
   const { fields: optionFields, append: appendOption, remove: removeOption } = useFieldArray({
     control,
     name: "variantOptions"
   });
 
+  const { fields: variantFields, remove: removeVariant, replace: replaceVariants } = useFieldArray({
+    control,
+    name: "variants"
+  });
+
+  const variants = watch('variants') || [];
+
   const generateVariants = useCallback(() => {
     if (variantOptions.length === 0) {
-      setValue('variants', []);
+      replaceVariants([]);
       return;
     }
 
@@ -75,11 +81,10 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
     };
 
     const newCombos = combinations(variantOptions);
-    const existingVariants = variants;
 
     const newVariants = newCombos.map((combo) => {
       const name = Object.values(combo).join(' / ');
-      const existing = existingVariants.find((v: any) => v.name === name);
+      const existing = variants.find((v: any) => v.name === name);
       
       if (existing) return existing;
 
@@ -95,8 +100,8 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
       };
     });
 
-    setValue('variants', newVariants);
-  }, [variantOptions, setValue, watch, variants]);
+    replaceVariants(newVariants);
+  }, [variantOptions, replaceVariants, watch, variants]);
 
   const handleAddOptionValue = (optionIndex: number, value: string) => {
     if (!value.trim()) return;
@@ -143,33 +148,36 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
 
   return (
     <div className="space-y-6">
-      <Card className={cn("border-none shadow-lg ring-1 ring-border transition-all", hasVariants && "ring-primary/20 bg-primary/5")}>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className={cn(
-                "p-3 rounded-2xl transition-colors",
-                hasVariants ? "bg-primary text-white" : "bg-muted text-muted-foreground"
-              )}>
-                <SlidersHorizontal className="h-6 w-6" />
-              </div>
-              <div className="space-y-0.5">
-                <Label className="text-lg font-bold leading-none">Product Variants</Label>
-                <p className="text-sm text-muted-foreground">Enable this if the product comes in different sizes, colors, etc.</p>
-              </div>
+      <div className={cn(
+        "p-6 rounded-2xl border transition-all duration-300",
+        hasVariants 
+          ? "bg-primary/5 border-primary/20 shadow-sm" 
+          : "bg-muted/30 border-border"
+      )}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className={cn(
+              "p-3 rounded-2xl transition-colors",
+              hasVariants ? "bg-primary text-white" : "bg-muted text-muted-foreground"
+            )}>
+              <SlidersHorizontal className="h-6 w-6" />
             </div>
-            <Switch 
-              checked={hasVariants} 
-              onCheckedChange={(checked) => setValue('hasVariants', checked)} 
-              className="data-[state=checked]:bg-primary"
-            />
+            <div className="space-y-0.5">
+              <Label className="text-lg font-bold leading-none">Product Variants</Label>
+              <p className="text-sm text-muted-foreground">Enable if the product has multiple versions (size, color, etc.)</p>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+          <Switch 
+            checked={hasVariants} 
+            onCheckedChange={(checked) => setValue('hasVariants', checked)} 
+            className="data-[state=checked]:bg-primary"
+          />
+        </div>
+      </div>
 
       {hasVariants && (
         <div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
-          <Card className="border-none shadow-md ring-1 ring-border overflow-hidden">
+          <div className="rounded-2xl border border-border bg-background overflow-hidden shadow-sm">
             <div className="bg-muted/30 px-6 py-4 border-b flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <ListPlus className="h-4 w-4 text-primary" />
@@ -179,13 +187,13 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                 type="button" 
                 variant="outline" 
                 size="sm" 
-                className="h-8 gap-2 bg-background border-primary/20 text-primary hover:bg-primary/5"
+                className="h-8 gap-2 bg-background border-primary/20 text-primary hover:bg-primary/5 rounded-lg"
                 onClick={() => appendOption({ name: '', values: [] })}
               >
                 <Plus className="h-3.5 w-3.5" /> Add Option
               </Button>
             </div>
-            <CardContent className="p-6 space-y-4">
+            <div className="p-6 space-y-4">
               {optionFields.length === 0 ? (
                 <div className="text-center py-12 bg-muted/10 rounded-2xl border-2 border-dashed border-muted-foreground/10">
                   <p className="text-sm text-muted-foreground">No options added. Add options like "Size" or "Color".</p>
@@ -267,8 +275,8 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                   </Button>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {variants.length > 0 && (
             <div className="space-y-4 pt-4">
@@ -284,119 +292,131 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
               </div>
               
               <div className="space-y-3">
-                {variants.map((variant: any, index: number) => (
-                  <Card key={variant.id} className={cn(
-                    "overflow-hidden border-none ring-1 ring-border transition-all duration-300 hover:ring-primary/30 hover:shadow-md",
-                    !variant.isActive && "opacity-60 grayscale bg-muted/30"
-                  )}>
-                    <CardContent className="p-0">
-                      <div className="flex flex-col md:flex-row items-center">
-                        {/* Image Section */}
-                        <div className="w-full md:w-40 h-40 md:h-auto self-stretch bg-muted relative group overflow-hidden">
-                          {variant.imageUrl ? (
-                            <Image 
-                              src={variant.imageUrl} 
-                              alt={variant.name} 
-                              fill 
-                              className="object-cover transition-transform duration-500 group-hover:scale-110"
-                              unoptimized
-                            />
-                          ) : (
-                            <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground gap-2 p-4 text-center">
-                              <ImageIcon className="h-8 w-8 opacity-20" />
-                              <span className="text-[10px] font-bold uppercase">No Image</span>
-                            </div>
-                          )}
-                          <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center cursor-pointer text-white gap-2">
-                            <Upload className="h-6 w-6" />
-                            <span className="text-[10px] font-bold uppercase">Upload Photo</span>
-                            <input 
-                              type="file" 
-                              accept="image/*" 
-                              className="hidden" 
-                              onChange={(e) => handleImageUpload(index, e)}
-                              disabled={!!isUploading}
-                            />
-                          </label>
-                          {isUploading === variant.id && (
-                            <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center gap-2">
-                              <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                              <span className="text-[10px] font-black text-primary uppercase">Uploading...</span>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Info & Inputs Section */}
-                        <div className="flex-1 p-6">
-                          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-3">
-                                <h4 className="font-black text-lg tracking-tight">{variant.name}</h4>
-                                {!variant.isActive && <Badge variant="outline" className="text-[10px] uppercase font-black text-muted-foreground">Disabled</Badge>}
-                              </div>
-                              <div className="flex flex-wrap gap-1.5">
-                                {Object.entries(variant.options).map(([key, val]: [string, any]) => (
-                                  <Badge key={key} variant="outline" className="text-[10px] px-2 py-0 h-5 bg-muted/30 border-muted-foreground/20 font-medium">
-                                    <span className="opacity-50 mr-1">{key}:</span> {val}
-                                  </Badge>
-                                ))}
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-3 px-4 py-2 bg-muted/20 rounded-xl border border-muted-foreground/10">
-                              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Active</Label>
-                              <Switch 
-                                checked={variant.isActive} 
-                                onCheckedChange={(checked) => setValue(`variants.${index}.isActive`, checked)} 
-                                className="data-[state=checked]:bg-primary"
+                {variantFields.map((field, index) => {
+                  const variant = variants[index] || field;
+                  return (
+                    <Card key={field.id} className={cn(
+                      "overflow-hidden border-none ring-1 ring-border transition-all duration-300 hover:ring-primary/30 hover:shadow-md",
+                      !variant.isActive && "opacity-60 grayscale bg-muted/30"
+                    )}>
+                      <CardContent className="p-0">
+                        <div className="flex flex-col md:flex-row items-center">
+                          <div className="w-full md:w-40 h-40 md:h-auto self-stretch bg-muted relative group overflow-hidden">
+                            {variant.imageUrl ? (
+                              <Image 
+                                src={variant.imageUrl} 
+                                alt={variant.name} 
+                                fill 
+                                className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                unoptimized
                               />
-                            </div>
+                            ) : (
+                              <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground gap-2 p-4 text-center">
+                                <ImageIcon className="h-8 w-8 opacity-20" />
+                                <span className="text-[10px] font-bold uppercase">No Image</span>
+                              </div>
+                            )}
+                            <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center cursor-pointer text-white gap-2">
+                              <Upload className="h-6 w-6" />
+                              <span className="text-[10px] font-bold uppercase">Upload Photo</span>
+                              <input 
+                                type="file" 
+                                accept="image/*" 
+                                className="hidden" 
+                                onChange={(e) => handleImageUpload(index, e)}
+                                disabled={!!isUploading}
+                              />
+                            </label>
+                            {isUploading === variant.id && (
+                              <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center gap-2">
+                                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                                <span className="text-[10px] font-black text-primary uppercase">Uploading...</span>
+                              </div>
+                            )}
                           </div>
 
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div className="space-y-1.5">
-                              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">SKU Code</Label>
-                              <Input 
-                                placeholder="STK-VOL-01" 
-                                className="h-9 text-xs font-mono bg-muted/20 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
-                                {...control.register(`variants.${index}.sku` as const)}
-                              />
+                          <div className="flex-1 p-6">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-3">
+                                  <h4 className="font-black text-lg tracking-tight">{variant.name}</h4>
+                                  {!variant.isActive && <Badge variant="outline" className="text-[10px] uppercase font-black text-muted-foreground">Disabled</Badge>}
+                                </div>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {Object.entries(variant.options || {}).map(([key, val]: [string, any]) => (
+                                    <Badge key={key} variant="outline" className="text-[10px] px-2 py-0 h-5 bg-muted/30 border-muted-foreground/20 font-medium">
+                                      <span className="opacity-50 mr-1">{key}:</span> {val}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-3 px-4 py-2 bg-muted/20 rounded-xl border border-muted-foreground/10">
+                                  <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Active</Label>
+                                  <Switch 
+                                    checked={variant.isActive} 
+                                    onCheckedChange={(checked) => setValue(`variants.${index}.isActive`, checked)} 
+                                    className="data-[state=checked]:bg-primary"
+                                  />
+                                </div>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-10 w-10 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl transition-colors"
+                                  onClick={() => removeVariant(index)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
                             </div>
-                            <div className="space-y-1.5">
-                              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Barcode</Label>
-                              <Input 
-                                placeholder="UPC / EAN" 
-                                className="h-9 text-xs font-mono bg-muted/20 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
-                                {...control.register(`variants.${index}.barcode` as const)}
-                              />
-                            </div>
-                            <div className="space-y-1.5">
-                              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Sale Price</Label>
-                              <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-bold">$</span>
+
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                              <div className="space-y-1.5">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">SKU Code</Label>
+                                <Input 
+                                  placeholder="STK-VOL-01" 
+                                  className="h-9 text-xs font-mono bg-muted/20 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
+                                  {...control.register(`variants.${index}.sku` as const)}
+                                />
+                              </div>
+                              <div className="space-y-1.5">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Barcode</Label>
+                                <Input 
+                                  placeholder="UPC / EAN" 
+                                  className="h-9 text-xs font-mono bg-muted/20 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
+                                  {...control.register(`variants.${index}.barcode` as const)}
+                                />
+                              </div>
+                              <div className="space-y-1.5">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Sale Price</Label>
+                                <div className="relative">
+                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-bold">$</span>
+                                  <Input 
+                                    type="number" 
+                                    step="0.01"
+                                    placeholder="0.00" 
+                                    className="h-9 text-xs pl-7 font-bold bg-muted/20 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
+                                    {...control.register(`variants.${index}.sellingPrice` as const)}
+                                  />
+                                </div>
+                              </div>
+                              <div className="space-y-1.5">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Stock Level</Label>
                                 <Input 
                                   type="number" 
-                                  step="0.01"
-                                  placeholder="0.00" 
-                                  className="h-9 text-xs pl-7 font-bold bg-muted/20 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
-                                  {...control.register(`variants.${index}.sellingPrice` as const)}
+                                  placeholder="0" 
+                                  className="h-9 text-xs font-bold bg-muted/20 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
+                                  {...control.register(`variants.${index}.stock` as const)}
                                 />
                               </div>
                             </div>
-                            <div className="space-y-1.5">
-                              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Stock Level</Label>
-                              <Input 
-                                type="number" 
-                                placeholder="0" 
-                                className="h-9 text-xs font-bold bg-muted/20 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
-                                {...control.register(`variants.${index}.stock` as const)}
-                              />
-                            </div>
                           </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             </div>
           )}
