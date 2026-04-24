@@ -1,13 +1,14 @@
 
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -16,7 +17,7 @@ import { useFirestore } from '@/firebase';
 import { collection, getDocs, query, addDoc, serverTimestamp, type Timestamp, where } from 'firebase/firestore'; 
 import type { Customer, WhatsappPayload, WhatsappMessageLog, StaffMember } from '@/lib/types';
 import { sendWhatsAppReceipt } from '@/lib/whatsapp';
-import { MessageSquare, Send, Users, Loader2, AlertTriangle, RotateCcw, Search, Smile, Contact, Hand, PartyPopper } from 'lucide-react';
+import { MessageSquare, Send, Users, Loader2, AlertTriangle, RotateCcw, Search, Smile, Contact, Hand, PartyPopper, Hash, Upload, FileUp, X, CheckCircle2 } from 'lucide-react';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 import WhatsappDashboard from '@/components/whatsapp-marketing/whatsapp-dashboard';
 import { useAuth } from '@/contexts/auth-context'; 
@@ -25,6 +26,7 @@ import { useSettings } from '@/contexts/settings-context';
 import { formatPhoneNumberForWhatsapp } from '@/lib/phone-utils';
 import { Switch } from '@/components/ui/switch';
 import AccessDenied from '@/components/staff-management/AccessDenied';
+import * as Papa from 'papaparse';
 
 const MAX_MESSAGE_LENGTH = 3000; 
 const UNIT_COST_PER_MESSAGE = 3.1; 
@@ -44,6 +46,8 @@ export default function BulkWhatsAppPage() {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [sendProgress, setSendProgress] = useState(0);
+  const [totalToSend, setTotalToSend] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const { toast } = useToast();
@@ -51,6 +55,10 @@ export default function BulkWhatsAppPage() {
   const [useCountryCode, setUseCountryCode] = useState(true);
   const [includeGreeting, setIncludeGreeting] = useState(true);
   const [includeFooter, setIncludeFooter] = useState(true);
+
+  const [manualNumbers, setManualNumbers] = useState('');
+  const [importedContacts, setImportedContacts] = useState<{name: string, phone: string}[]>([]);
+  const [selectedImportedIndices, setSelectedImportedIndices] = useState<Set<number>>(new Set());
 
   const fetchContacts = useCallback(async () => {
     if (!firestore || !currentStoreId) return;
@@ -157,6 +165,69 @@ export default function BulkWhatsAppPage() {
     }
   };
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        const parsedData = results.data as any[];
+        const contacts = parsedData
+          .map(row => {
+            const name = String(row.name || row.Name || row.full_name || row.FullName || 'Contact').trim();
+            const phone = String(row.phone || row.Phone || row.phoneNumber || row.PhoneNumber || row.mobile || row.Mobile || '').trim();
+            return { name, phone };
+          })
+          .filter(contact => contact.phone && contact.phone.length > 5);
+
+        if (contacts.length > 0) {
+          setImportedContacts(contacts);
+          setSelectedImportedIndices(new Set(contacts.map((_, i) => i)));
+          toast({
+            title: "Contacts Imported",
+            description: `Successfully imported ${contacts.length} contacts.`,
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Import Failed",
+            description: "No valid contacts found in the file. Make sure you have a 'name' and 'phone' column.",
+          });
+        }
+      },
+      error: (error) => {
+        console.error("CSV Parsing Error:", error);
+        toast({
+          variant: "destructive",
+          title: "Import Error",
+          description: "Failed to parse the CSV file.",
+        });
+      }
+    });
+  };
+
+  const handleSelectImported = (index: number, checked: boolean) => {
+    setSelectedImportedIndices(prev => {
+      const newSet = new Set(prev);
+      if (checked) {
+        newSet.add(index);
+      } else {
+        newSet.delete(index);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSelectAllImported = (checked: boolean) => {
+    if (checked) {
+      setSelectedImportedIndices(new Set(importedContacts.map((_, i) => i)));
+    } else {
+      setSelectedImportedIndices(new Set());
+    }
+  };
+
   const handleSendMessage = async () => {
     if (settings?.enableWhatsapp === false) {
         toast({ variant: "destructive", title: "WhatsApp Disabled", description: "WhatsApp notifications are currently disabled in system settings." });
@@ -172,22 +243,35 @@ export default function BulkWhatsAppPage() {
       return;
     }
 
-    let allRecipients: (Customer | StaffMember)[] = [];
+    let allRecipients: { name: string; phone: string; allowWhatsapp?: boolean }[] = [];
     if (activeTab === 'customers') {
       if (selectedCustomers.length === 0) {
         toast({ variant: "default", title: "No Recipients Selected", description: "Please select at least one customer." });
         return;
       }
-      allRecipients = selectedCustomers;
+      allRecipients = selectedCustomers.map(c => ({ name: c.name, phone: c.phone!, allowWhatsapp: c.allowWhatsapp }));
     } else if (activeTab === 'staff') {
       if (selectedStaff.length === 0) {
         toast({ variant: "default", title: "No Recipients Selected", description: "Please select at least one staff member." });
         return;
       }
-      allRecipients = selectedStaff;
+      allRecipients = selectedStaff.map(s => ({ name: s.name, phone: s.phone!, allowWhatsapp: s.allowWhatsapp }));
+    } else if (activeTab === 'manual') {
+      const numbers = manualNumbers.split(/[\n,]+/).map(n => n.trim()).filter(n => n !== '');
+      if (numbers.length === 0) {
+        toast({ variant: "default", title: "No Numbers Entered", description: "Please enter at least one phone number." });
+        return;
+      }
+      allRecipients = numbers.map(n => ({ name: n, phone: n }));
+    } else if (activeTab === 'import') {
+      if (selectedImportedIndices.size === 0) {
+        toast({ variant: "default", title: "No Recipients Selected", description: "Please select at least one imported contact." });
+        return;
+      }
+      allRecipients = importedContacts.filter((_, i) => selectedImportedIndices.has(i));
     }
     
-    const eligibleRecipients = allRecipients.filter(r => (r as Customer).allowWhatsapp !== false);
+    const eligibleRecipients = allRecipients.filter(r => r.allowWhatsapp !== false);
     const ineligibleCount = allRecipients.length - eligibleRecipients.length;
 
     if (ineligibleCount > 0) {
@@ -200,18 +284,28 @@ export default function BulkWhatsAppPage() {
     }
 
     setIsSending(true);
+    setSendProgress(0);
+    setTotalToSend(eligibleRecipients.length);
+    
     const whatsappMessageLogsRef = collection(firestore, "whatsappMessageLogs");
     const currentUserId = user?.uid || 'anonymous';
     const currentUserName = user?.displayName || 'Anonymous User';
 
-    const sendPromises = eligibleRecipients.map(async (recipient) => {
-        const phoneToSend = useCountryCode
-            ? formatPhoneNumberForWhatsapp(recipient.phone!, settings?.countryCode)
-            : recipient.phone;
+    let successCount = 0;
+    let failCount = 0;
+
+    for (let i = 0; i < eligibleRecipients.length; i++) {
+        const recipient = eligibleRecipients[i];
+        const phoneToSend = formatPhoneNumberForWhatsapp(
+            recipient.phone!, 
+            useCountryCode ? settings?.countryCode : undefined
+        );
             
-        if (!phoneToSend) {
-          console.warn(`Skipping recipient ${recipient.name} due to invalid phone number.`);
-          return;
+        if (!phoneToSend || phoneToSend.length < 5) {
+          console.warn(`Skipping recipient ${recipient.name} due to invalid phone number: ${recipient.phone}`);
+          failCount++;
+          setSendProgress(i + 1);
+          continue;
         }
 
         const finalGreeting = includeGreeting && settings?.whatsappMarketingGreeting
@@ -246,9 +340,11 @@ export default function BulkWhatsAppPage() {
         try {
             await sendWhatsAppReceipt(payload);
             status = 'sent';
+            successCount++;
         } catch (error: any) {
             console.error(`Failed to send message to ${recipient.name}:`, error);
             status = 'failed';
+            failCount++;
             errorDetails = error.message || 'Unknown error';
         } finally {
             const logEntry: WhatsappMessageLog & { store_id?: string } = {
@@ -265,16 +361,17 @@ export default function BulkWhatsAppPage() {
                 store_id: currentStoreId
             };
             await addDoc(whatsappMessageLogsRef, logEntry);
+            setSendProgress(i + 1);
         }
-    });
+    }
 
     try {
-        await Promise.all(sendPromises);
         toast({
-            title: "Bulk WhatsApp Message Sending Initiated",
-            description: `Messages are being processed for ${eligibleRecipients.length} recipient(s). Please check the dashboard for status updates.`,
+            title: "Bulk WhatsApp Sending Complete",
+            description: `Successfully sent ${successCount} messages. ${failCount > 0 ? `${failCount} failed.` : ''}`,
         });
         setMessage('');
+        if (activeTab === 'manual') setManualNumbers('');
     } catch (error: any) {
         console.error("Error during bulk send operation:", error);
         toast({
@@ -304,7 +401,11 @@ export default function BulkWhatsAppPage() {
   const isAllStaffSelected = filteredStaff.length > 0 && selectedStaffIds.size === filteredStaff.length;
   const isMessageTooLong = message.length > MAX_MESSAGE_LENGTH;
 
-  const selectedRecipientCount = activeTab === 'customers' ? selectedCustomerIds.size : selectedStaffIds.size;
+  const selectedRecipientCount = 
+    activeTab === 'customers' ? selectedCustomerIds.size : 
+    activeTab === 'staff' ? selectedStaffIds.size :
+    activeTab === 'manual' ? manualNumbers.split(/[\n,]+/).map(n => n.trim()).filter(n => n !== '').length :
+    selectedImportedIndices.size;
   
   if (isAuthLoading) {
     return (
@@ -383,12 +484,18 @@ export default function BulkWhatsAppPage() {
                 </Label>
             </div>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="customers">
                 <Users className="h-4 w-4 mr-2" /> Customers ({customersWithPhone.length})
               </TabsTrigger>
               <TabsTrigger value="staff">
                 <Contact className="h-4 w-4 mr-2" /> Staff ({staffWithPhone.length})
+              </TabsTrigger>
+              <TabsTrigger value="manual">
+                <Hash className="h-4 w-4 mr-2" /> Manual Entry
+              </TabsTrigger>
+              <TabsTrigger value="import">
+                <Upload className="h-4 w-4 mr-2" /> Import
               </TabsTrigger>
             </TabsList>
             <TabsContent value="customers" className="mt-4">
@@ -523,6 +630,104 @@ export default function BulkWhatsAppPage() {
                 </Card>
               )}
             </TabsContent>
+            <TabsContent value="manual" className="mt-4">
+              <div className="space-y-4">
+                <div className="flex flex-col space-y-2">
+                  <div className="flex justify-between items-center">
+                    <Label htmlFor="manualNumbers" className="text-sm font-medium">Phone Numbers (comma or newline separated)</Label>
+                    {manualNumbers.trim() && (
+                        <span className="text-xs font-semibold bg-primary/10 text-primary px-2 py-1 rounded-full">
+                            {manualNumbers.split(/[\n,]+/).map(n => n.trim()).filter(n => n !== '').length} numbers detected
+                        </span>
+                    )}
+                  </div>
+                  <Textarea
+                    id="manualNumbers"
+                    placeholder="Enter phone numbers here...&#10;e.g. 08123456789, 09012345678"
+                    value={manualNumbers}
+                    onChange={(e) => setManualNumbers(e.target.value)}
+                    rows={8}
+                    className="font-mono text-sm"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Enter one number per line or separate them with commas. Non-digit characters will be removed.
+                  </p>
+                </div>
+              </div>
+            </TabsContent>
+            <TabsContent value="import" className="mt-4">
+              <div className="space-y-4">
+                <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-10 bg-muted/30 hover:bg-muted/50 transition-colors">
+                  <input
+                    type="file"
+                    id="csv-upload"
+                    accept=".csv"
+                    className="hidden"
+                    onChange={handleFileUpload}
+                  />
+                  <label htmlFor="csv-upload" className="flex flex-col items-center cursor-pointer">
+                    <FileUp className="h-12 w-12 text-muted-foreground mb-4" />
+                    <span className="text-lg font-medium">Click to upload CSV</span>
+                    <span className="text-sm text-muted-foreground mt-1 text-center">
+                        Upload a CSV file with 'name' and 'phone' columns.<br/>
+                        <span className="text-xs opacity-70 italic">(Also supports 'Full Name', 'Mobile', 'PhoneNumber')</span>
+                    </span>
+                  </label>
+                </div>
+
+                {importedContacts.length > 0 && (
+                  <div className="space-y-4 pt-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold text-lg flex items-center gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-green-500" />
+                        Imported Contacts ({importedContacts.length})
+                      </h3>
+                      <Button variant="outline" size="sm" onClick={() => {
+                        setImportedContacts([]);
+                        setSelectedImportedIndices(new Set());
+                      }}>
+                        <X className="h-4 w-4 mr-2" /> Clear All
+                      </Button>
+                    </div>
+                    <ScrollArea className="h-[300px] border rounded-md">
+                      <Table>
+                        <TableHeader className="sticky top-0 bg-card">
+                          <TableRow>
+                            <TableHead className="w-[50px]">
+                              <Checkbox
+                                checked={importedContacts.length > 0 && selectedImportedIndices.size === importedContacts.length}
+                                onCheckedChange={(checked) => handleSelectAllImported(checked as boolean)}
+                                aria-label="Select all imported contacts"
+                              />
+                            </TableHead>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Phone Number</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {importedContacts.map((contact, index) => (
+                            <TableRow key={index} data-state={selectedImportedIndices.has(index) ? "selected" : ""}>
+                              <TableCell>
+                                <Checkbox
+                                  checked={selectedImportedIndices.has(index)}
+                                  onCheckedChange={(checked) => handleSelectImported(index, checked as boolean)}
+                                  aria-label={`Select contact ${contact.name}`}
+                                />
+                              </TableCell>
+                              <TableCell className="font-medium">{contact.name}</TableCell>
+                              <TableCell>{contact.phone}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </ScrollArea>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedImportedIndices.size} contact(s) selected out of {importedContacts.length}.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
           </Tabs>
 
           <div className="space-y-4 pt-4 border-t">
@@ -579,12 +784,21 @@ export default function BulkWhatsAppPage() {
               </div>
           </div>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="flex flex-col items-stretch gap-4">
+          {isSending && (
+            <div className="space-y-2 w-full">
+              <div className="flex justify-between text-sm font-medium">
+                <span>Sending messages...</span>
+                <span>{sendProgress} / {totalToSend}</span>
+              </div>
+              <Progress value={(sendProgress / totalToSend) * 100} className="h-2 w-full" />
+            </div>
+          )}
           <Button 
             onClick={handleSendMessage} 
             disabled={isSending || selectedRecipientCount === 0 || !message.trim() || isMessageTooLong}
             size="lg"
-            className="bg-green-600 hover:bg-green-700 text-white min-w-[280px]"
+            className="bg-green-600 hover:bg-green-700 text-white w-full md:min-w-[280px]"
           >
             {isSending ? (
               <Loader2 className="mr-2 h-5 w-5 animate-spin" />
