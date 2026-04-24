@@ -176,6 +176,7 @@ export async function placeOrderAction({
         deliveryLocationId: deliveryLocationId || null,
         deliveryPrice: finalDeliveryPrice,
         status: 'pending',
+        isRead: false,
         paymentStatus: 'UNPAID',
         isPaid: false,
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -249,6 +250,7 @@ export async function updateOrderStatusAction(orderId: string, storeId: string, 
         
         await orderRef.update({ 
             status: newStatus,
+            isRead: true,
             updatedAt: admin.firestore.FieldValue.serverTimestamp()
         });
 
@@ -553,6 +555,97 @@ export async function validateEBulkSMSAction(username: string, apiKey: string) {
     }
 }
 
+export async function markAllOrdersAsDeliveredAction(storeId: string, staffId: string, staffName: string, staffEmail: string) {
+    try {
+        const ordersRef = adminDb.collection('orders');
+        const q = ordersRef.where('store_id', '==', storeId).where('status', 'in', ['pending', 'processing', 'shipped']);
+        const snapshot = await q.get();
+
+        if (snapshot.empty) {
+            return { success: true, count: 0 };
+        }
+
+        const batch = adminDb.batch();
+        snapshot.docs.forEach(doc => {
+            batch.update(doc.ref, { 
+                status: 'delivered',
+                isRead: true,
+                updatedAt: admin.firestore.FieldValue.serverTimestamp() 
+            });
+            
+            // Add audit log for each
+            const auditRef = adminDb.collection('orderAudit').doc();
+            batch.set(auditRef, {
+                orderId: doc.id,
+                oldStatus: doc.data().status,
+                newStatus: 'delivered',
+                timestamp: admin.firestore.FieldValue.serverTimestamp(),
+                staffId,
+                staffName,
+                staffEmail,
+                store_id: storeId,
+                bulkAction: true
+            });
+        });
+
+        await batch.commit();
+        return { success: true, count: snapshot.size };
+    } catch (error: any) {
+        console.error('Error marking all orders as delivered:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+export async function markAllOrdersAsReadAction(storeId: string) {
+    try {
+        const ordersRef = adminDb.collection('orders');
+        const q = ordersRef.where('store_id', '==', storeId).where('isRead', '==', false);
+        const snapshot = await q.get();
+
+        // Also check for ones where isRead is missing and status is pending (legacy)
+        const qLegacy = ordersRef.where('store_id', '==', storeId).where('status', '==', 'pending');
+        const snapshotLegacy = await qLegacy.get();
+
+        const batch = adminDb.batch();
+        let count = 0;
+        
+        const handledIds = new Set();
+
+        snapshot.docs.forEach(doc => {
+            batch.update(doc.ref, { isRead: true });
+            handledIds.add(doc.id);
+            count++;
+        });
+
+        snapshotLegacy.docs.forEach(doc => {
+            const data = doc.data();
+            if (!handledIds.has(doc.id) && data.isRead !== true) {
+                batch.update(doc.ref, { isRead: true });
+                count++;
+            }
+        });
+
+        if (count > 0) {
+            await batch.commit();
+        }
+
+        return { success: true, count };
+    } catch (error: any) {
+        console.error('Error marking all orders as read:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+export async function markOrderAsReadAction(orderId: string) {
+    try {
+        await adminDb.collection('orders').doc(orderId).update({ isRead: true });
+        return { success: true };
+    } catch (error: any) {
+        console.error('Error marking order as read:', error);
+        return { success: false, error: error.message };
+    }
+}
+
 function formatWhatsAppMessage(template: string, data: { 
     orderId: string, 
     customerName: string, 
@@ -596,6 +689,26 @@ async function getCustomerPhone(userId: string) {
         return data?.alternativePhoneNumber || data?.phone || null;
     } catch (e) {
         return null;
+    }
+}
+
+async function getCustomerName(userId: string) {
+    if (!userId || userId === 'GUEST') return 'Customer';
+    try {
+        const doc = await adminDb.collection('users').doc(userId).get();
+        return doc.data()?.displayName || doc.data()?.name || 'Customer';
+    } catch (e) {
+        return 'Customer';
+    }
+}
+
+async function getCustomerEmail(userId: string) {
+    if (!userId || userId === 'GUEST') return 'N/A';
+    try {
+        const doc = await adminDb.collection('users').doc(userId).get();
+        return doc.data()?.email || 'N/A';
+    } catch (e) {
+        return 'N/A';
     }
 }
 
@@ -739,25 +852,5 @@ export async function sendWhatsAppOrderAlert(order: any, settings: WhatsAppAlert
         } catch (err) {
             console.error('Error sending customer WhatsApp confirmation:', err);
         }
-    }
-}
-
-async function getCustomerName(userId: string) {
-    if (!userId || userId === 'GUEST') return 'Customer';
-    try {
-        const doc = await adminDb.collection('users').doc(userId).get();
-        return doc.data()?.displayName || doc.data()?.name || 'Customer';
-    } catch (e) {
-        return 'Customer';
-    }
-}
-
-async function getCustomerEmail(userId: string) {
-    if (!userId || userId === 'GUEST') return 'N/A';
-    try {
-        const doc = await adminDb.collection('users').doc(userId).get();
-        return doc.data()?.email || 'N/A';
-    } catch (e) {
-        return 'N/A';
     }
 }

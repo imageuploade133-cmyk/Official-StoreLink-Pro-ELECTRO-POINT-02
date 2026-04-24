@@ -59,7 +59,9 @@ import {
   History,
   ClipboardList,
   Phone,
-  Store
+  Store,
+  MailCheck,
+  CheckCheck
 } from 'lucide-react';
 import { format, startOfDay, endOfDay } from 'date-fns';
 import { formatCurrency } from '@/lib/formatUtils';
@@ -72,7 +74,12 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Skeleton } from '@/components/ui/skeleton';
 import { StatCard } from '@/components/StatCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { updateOrderStatusAction } from '@/app/actions/orders';
+import { 
+  updateOrderStatusAction, 
+  markAllOrdersAsDeliveredAction, 
+  markAllOrdersAsReadAction,
+  markOrderAsReadAction
+} from '@/app/actions/orders';
 
 const ITEMS_PER_PAGE = 15;
 
@@ -94,6 +101,53 @@ export default function WebsiteOrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [showSecondaryStats, setShowSecondaryStats] = useState(false);
+  const [isBulkLoading, setIsBulkLoading] = useState(false);
+
+  const handleMarkAllAsDelivered = async () => {
+    if (!currentStoreId || !user) return;
+    if (!confirm('Are you sure you want to mark all pending/processing/shipped orders as delivered?')) return;
+    
+    setIsBulkLoading(true);
+    try {
+      const result = await markAllOrdersAsDeliveredAction(
+        currentStoreId,
+        user.uid,
+        user.displayName || 'Authorized Agent',
+        user.email || 'N/A'
+      );
+      if (result.success) {
+        toast({ title: "Success", description: `Marked ${result.count} orders as delivered.` });
+        fetchOrders('initial');
+        fetchAnalytics();
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error: any) {
+      toast({ variant: 'destructive', title: "Bulk Update Failed", description: error.message });
+    } finally {
+      setIsBulkLoading(false);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    if (!currentStoreId) return;
+    
+    setIsBulkLoading(true);
+    try {
+      const result = await markAllOrdersAsReadAction(currentStoreId);
+      if (result.success) {
+        toast({ title: "Success", description: `Marked ${result.count} orders as read.` });
+        fetchOrders('initial');
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error: any) {
+      toast({ variant: 'destructive', title: "Bulk Update Failed", description: error.message });
+    } finally {
+      setIsBulkLoading(false);
+    }
+  };
+
 
   // Analytics State
   const [analytics, setAnalytics] = useState({
@@ -386,10 +440,32 @@ export default function WebsiteOrdersPage() {
           title="Website Orders"
           description="Direct telemetry from your public storefront. Unified fulfillment control."
         />
-        <Button variant="outline" onClick={() => { fetchOrders('initial'); fetchAnalytics(); }} disabled={isLoadingOrders}>
-          <RotateCcw className={cn("mr-2 h-4 w-4", isLoadingOrders && "animate-spin")} />
-          Sync Portal
-        </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button 
+            variant="outline" 
+            className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100" 
+            onClick={handleMarkAllAsRead} 
+            loading={isBulkLoading}
+            disabled={isLoadingOrders}
+          >
+            <MailCheck className="mr-2 h-4 w-4" />
+            Mark All Read
+          </Button>
+          <Button 
+            variant="outline" 
+            className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100" 
+            onClick={handleMarkAllAsDelivered} 
+            loading={isBulkLoading}
+            disabled={isLoadingOrders}
+          >
+            <CheckCheck className="mr-2 h-4 w-4" />
+            Mark All Delivered
+          </Button>
+          <Button variant="outline" onClick={() => { fetchOrders('initial'); fetchAnalytics(); }} disabled={isLoadingOrders || isBulkLoading}>
+            <RotateCcw className={cn("mr-2 h-4 w-4", (isLoadingOrders || isBulkLoading) && "animate-spin")} />
+            Sync Portal
+          </Button>
+        </div>
       </div>
 
       {/* Analytics Command Center */}
@@ -563,9 +639,16 @@ export default function WebsiteOrdersPage() {
                           const createdAt = convertToDateSafely(order.createdAt);
                           const hasUnavailableItems = order.items.some(item => !productMap.has(item.productId));
                           return (
-                            <TableRow key={order.id} className={cn("group transition-colors hover:bg-muted/30", hasUnavailableItems && "bg-red-50/30")}>
-                              <TableCell className="pl-6">
+                            <TableRow key={order.id} className={cn(
+                              "group transition-colors hover:bg-muted/30", 
+                              hasUnavailableItems && "bg-red-50/30",
+                              order.status === 'pending' && order.isRead !== true && "bg-primary/[0.03] dark:bg-primary/10"
+                            )}>
+                              <TableCell className={cn("pl-6", order.status === 'pending' && order.isRead !== true && "border-l-2 border-primary")}>
                                 <div className="flex items-center gap-2">
+                                    {order.status === 'pending' && order.isRead !== true && (
+                                      <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
+                                    )}
                                     {hasUnavailableItems && <ArchiveX className="h-4 w-4 text-red-600 flex-shrink-0" />}
                                     <span className="font-mono text-xs font-bold text-primary">#{order.id.substring(0, 8).toUpperCase()}</span>
                                 </div>
@@ -613,7 +696,11 @@ export default function WebsiteOrdersPage() {
                               </TableCell>
                               <TableCell>{getStatusBadge(order)}</TableCell>
                               <TableCell className="text-right pr-6">
-                                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-primary/10 hover:text-primary" onClick={() => { setSelectedOrder(order); setIsDetailsModalOpen(true); }}>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-primary/10 hover:text-primary" onClick={() => { 
+                                  setSelectedOrder(order); 
+                                  setIsDetailsModalOpen(true); 
+                                  if (!order.isRead) markOrderAsReadAction(order.id);
+                                }}>
                                   <Eye className="h-4 w-4" />
                                 </Button>
                               </TableCell>

@@ -1088,6 +1088,7 @@ export interface Order {
   couponCode?: string;
   status: OrderStatus;
   isPaid: boolean;
+  isRead?: boolean;
   createdAt: Timestamp;
   updatedAt?: Timestamp;
   selectedBankAccount?: BankAccount | null;
