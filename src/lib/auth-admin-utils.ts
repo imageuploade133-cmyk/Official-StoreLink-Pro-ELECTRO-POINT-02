@@ -148,15 +148,19 @@ export async function checkStoreAuthorization(uid: string, storeId: string) {
       }
     }
 
-    return { authorized: false, errorCode: 'not_store_owner' };
+    return { authorized: false, errorCode: 'not_store_owner', errorMessage: 'You are not the store owner or authorized staff.' };
   } catch (error: any) {
     console.error('Error checking store authorization:', error);
     // Include error message in response to help debugging if needed
     // In production this would return a generic 'auth_check_failed' but here we can be more helpful
     const message = error.message || 'Unknown error';
     if (message.includes('Could not load the default credentials')) {
-        return { authorized: false, errorCode: `auth_check_failed: Missing Google Cloud credentials. Please ensure FIREBASE_SERVICE_ACCOUNT_KEY is set in your environment or serviceAccountKey.json exists. See FIREBASE_ADMIN_SETUP.md for instructions.in your environment or serviceAccountKey.json exists. See FIREBASE_ADMIN_SETUP.md for instructions.in your environment or serviceAccountKey.json exists. See FIREBASE_ADMIN_SETUP.md for instructions.` };
+        return { 
+          authorized: false, 
+          errorCode: 'missing_credentials', 
+          errorMessage: `Missing Google Cloud credentials. Please ensure FIREBASE_SERVICE_ACCOUNT_KEY is set in your environment or serviceAccountKey.json exists. See FIREBASE_ADMIN_SETUP.md for instructions.` 
+        };
     }
-    return { authorized: false, errorCode: `auth_check_failed: ${message}` };
+    return { authorized: false, errorCode: 'auth_check_failed', errorMessage: message };
   }
 }
