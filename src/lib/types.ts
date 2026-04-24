@@ -795,6 +795,8 @@ export interface StaffMember {
   totalSales?: number;
   totalTransactions?: number;
   todaySales?: number;
+  allowWhatsapp?: boolean;
+  allowSms?: boolean;
 }
 
 export interface SaleTransaction {
@@ -997,6 +999,7 @@ export interface WhatsappMessageLog {
     errorDetails?: string | null;
     userId: string;
     userName: string;
+    store_id?: string;
 }
 
 export interface CreditPaymentReceiptInfo {

@@ -73,7 +73,7 @@ export async function POST(request: Request) {
     const message = `Test Message from ${storeName}.\n\nYour WhatsApp Alert system is now fully functional!`;
     
     // Collect all recipients
-    const recipients = [];
+    const recipients: string[] = [];
     if (settings.senderNumber) recipients.push(settings.senderNumber);
     if (settings.orderNotificationNumbers && Array.isArray(settings.orderNotificationNumbers)) {
         settings.orderNotificationNumbers.forEach((num: string) => {
