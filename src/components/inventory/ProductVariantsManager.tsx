@@ -192,6 +192,23 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
     toast({ title: "Image Synced", description: "Using primary product image for this variant." });
   };
 
+  const handleRemoveVariant = (index: number) => {
+    const updatedVariants = variants.filter((_: any, i: number) => i !== index);
+    setValue('variants', updatedVariants, { shouldDirty: true });
+    toast({ 
+      title: "Variant Removed", 
+      description: "The variant has been removed from this product." 
+    });
+  };
+
+  const handleRemoveVariantImage = (index: number) => {
+    setValue(`variants.${index}.imageUrl`, '', { shouldDirty: true });
+    toast({ 
+      title: "Image Removed", 
+      description: "Variant image has been cleared." 
+    });
+  };
+
   return (
     <div className="space-y-6">
       <Card className={cn("border-none shadow-lg ring-1 ring-border transition-all", hasVariants && "ring-primary/20 bg-primary/5")}>
@@ -359,41 +376,58 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                             </div>
                           )}
                           
-                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2">
-                            <label className="w-full">
-                              <Button type="button" variant="secondary" size="sm" className="w-full h-8 gap-2 text-[10px] font-bold uppercase bg-white text-black hover:bg-white/90">
-                                <Upload className="h-3 w-3" /> Upload
-                              </Button>
-                              <input 
-                                type="file" 
-                                accept="image/*" 
-                                className="hidden" 
-                                onChange={(e) => handleImageUpload(index, e)}
-                                disabled={!!isUploading}
-                              />
-                            </label>
-                            
-                            <Button 
-                              type="button" 
-                              variant="secondary" 
-                              size="sm" 
-                              className="w-full h-8 gap-2 text-[10px] font-bold uppercase bg-primary text-white hover:bg-primary/90"
-                              onClick={() => handleUsePrimaryImage(index)}
-                              disabled={!mainImageUrl}
-                            >
-                              <Star className="h-3 w-3" /> Primary
-                            </Button>
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3">
+                            <div className="w-full space-y-2">
+                              <label className="flex w-full">
+                                <div className={cn(
+                                  "w-full h-8 gap-2 text-[10px] font-bold uppercase bg-white text-black hover:bg-white/90 inline-flex items-center justify-center rounded-md cursor-pointer transition-colors",
+                                  !!isUploading && "opacity-50 cursor-not-allowed"
+                                )}>
+                                  <Upload className="h-3 w-3" /> Upload
+                                </div>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={(e) => handleImageUpload(index, e)}
+                                  disabled={!!isUploading}
+                                />
+                              </label>
 
-                            <Button 
-                              type="button" 
-                              variant="secondary" 
-                              size="sm" 
-                              className="w-full h-8 gap-2 text-[10px] font-bold uppercase bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
-                              onClick={() => handleRemoveBackground(index)}
-                              disabled={!variant.imageUrl || !!isProcessingAi}
-                            >
-                              {isProcessingAi === variant.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />} AI Mockup
-                            </Button>
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                className="w-full h-8 gap-2 text-[10px] font-bold uppercase bg-primary text-white hover:bg-primary/90"
+                                onClick={() => handleUsePrimaryImage(index)}
+                                disabled={!mainImageUrl}
+                              >
+                                <Star className="h-3 w-3" /> Primary
+                              </Button>
+
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                className="w-full h-8 gap-2 text-[10px] font-bold uppercase bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                                onClick={() => handleRemoveBackground(index)}
+                                disabled={!variant.imageUrl || !!isProcessingAi}
+                              >
+                                {isProcessingAi === variant.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />} AI Mockup
+                              </Button>
+
+                              {variant.imageUrl && (
+                                <Button
+                                  type="button"
+                                  variant="destructive"
+                                  size="sm"
+                                  className="w-full h-8 gap-2 text-[10px] font-bold uppercase"
+                                  onClick={() => handleRemoveVariantImage(index)}
+                                >
+                                  <Trash2 className="h-3 w-3" /> Remove Image
+                                </Button>
+                              )}
+                            </div>
                           </div>
 
                           {(isUploading === variant.id || isProcessingAi === variant.id) && (
@@ -423,12 +457,26 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                               </div>
                             </div>
                             <div className="flex items-center gap-3 px-4 py-2 bg-muted/20 rounded-xl border border-muted-foreground/10">
-                              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Active</Label>
-                              <Switch 
-                                checked={variant.isActive} 
-                                onCheckedChange={(checked) => setValue(`variants.${index}.isActive`, checked)} 
-                                className="data-[state=checked]:bg-primary"
-                              />
+                              <div className="flex items-center gap-3">
+                                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Active</Label>
+                                <Switch 
+                                  checked={variant.isActive} 
+                                  onCheckedChange={(checked) => setValue(`variants.${index}.isActive`, checked)} 
+                                  className="data-[state=checked]:bg-primary"
+                                  disabled={isUploading === variant.id || isProcessingAi === variant.id}
+                                />
+                              </div>
+                              <Separator orientation="vertical" className="h-4" />
+                              <Button 
+                                type="button" 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                onClick={() => handleRemoveVariant(index)}
+                                disabled={isUploading === variant.id || isProcessingAi === variant.id}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
                             </div>
                           </div>
 
