@@ -329,7 +329,7 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
           price: item.salePrice
         })),
         totalAmount: total,
-        totalCost: cartItems.reduce((sum, item) => sum + (item.purchasePrice * item.quantity), 0),
+        totalCost: cartItems.reduce((sum, item) => sum + ((item.purchasePrice || item.salePrice || 0) * item.quantity), 0),
         paymentMethod: paymentMethod,
         paymentReference: paymentMethod === 'Bank Transfer' ? paymentReference : null,
         paymentReceiptUrl: paymentMethod === 'Bank Transfer' ? receiptUrl : null,
@@ -883,8 +883,8 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                 ) : (
                     <LoadingButton 
                         onClick={handlePlaceOrder}
-                        isLoading={step === 'processing'}
-                        disabled={(paymentMethod === 'Bank Transfer' && !hasConfirmedTransfer) || filteredPaymentMethods.length === 0}
+                        isLoading={step as string === 'processing'}
+                        disabled={(paymentMethod === 'Bank Transfer' && !hasConfirmedTransfer) || filteredPaymentMethods.length === 0 || step === 'processing'}
                         loadingText="Processing..."
                         className="w-full h-16 rounded-[1.5rem] bg-primary text-white font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-primary/30 group transition-all active:scale-[0.98]"
                     >
