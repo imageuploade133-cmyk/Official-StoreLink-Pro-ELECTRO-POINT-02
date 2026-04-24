@@ -725,7 +725,7 @@ export default function ProductDetailsPage() {
         onAddToCart={isOutOfStock ? () => setIsOutOfDataDrawerOpen(true) : handleAddToCart}
         onToggleWishlist={handleToggleWishlist}
         addToCartText={isOutOfStock ? "Out of Stock" : addToCartText}
-        productImage={product.images?.[0]}
+        productImage={product.imageUrl}
       />
       
       <main className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 md:py-8">
