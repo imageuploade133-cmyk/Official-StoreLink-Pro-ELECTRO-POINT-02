@@ -472,6 +472,7 @@ export function ProductForm({
   const watchAdditionalUrls = form.watch('additionalImageUrls') || [];
   const watchVideoEnabled = form.watch('videoEnabled');
   const watchVoiceEnabled = form.watch('voiceEnabled');
+  const watchHasVariants = form.watch('hasVariants');
   const watchVideoPoster = form.watch('videoPosterUrl');
 
   const handleAiAssist = async () => {
@@ -913,7 +914,6 @@ export function ProductForm({
                             initialFocus
                           />
                           <div className="p-3 border-t">
-          <ProductVariantsManager storeId={currentStoreId} />
                             <Button
                               variant="ghost"
                               size="sm"
@@ -936,6 +936,7 @@ export function ProductForm({
 
             </CardContent>
           </Card>
+          <ProductVariantsManager storeId={currentStoreId} />
 
           <Card className="shadow-xl border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">

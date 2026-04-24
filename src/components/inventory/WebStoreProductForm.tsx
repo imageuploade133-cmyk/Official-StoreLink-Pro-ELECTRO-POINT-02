@@ -428,6 +428,7 @@ export function WebStoreProductForm() {
   const watchCategory = form.watch('categoryId');
   const watchVideoEnabled = form.watch('videoEnabled');
   const watchVoiceEnabled = form.watch('voiceEnabled');
+  const watchHasVariants = form.watch('hasVariants');
   const watchVideoPoster = form.watch('videoPosterUrl');
 
   const handleAiAssist = async () => {
@@ -924,8 +925,18 @@ export function WebStoreProductForm() {
                   )}
                 />
               </div>
+            </CardContent>
+          </Card>
 
-              <div className="space-y-4 pt-4 border-t border-dashed">
+          <ProductVariantsManager storeId={currentStoreId} />
+
+          <Card className="shadow-xl border-none ring-1 ring-border">
+            <CardHeader className="bg-muted/30">
+              <CardTitle>Product Description & AI</CardTitle>
+              <CardDescription>Compose a compelling narrative for your customers.</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-6">
+              <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <div className="flex-1 mr-4">
                     <FormField
@@ -1022,7 +1033,6 @@ export function WebStoreProductForm() {
             </CardContent>
           </Card>
 
-          <ProductVariantsManager storeId={currentStoreId} />
 
           <Card className="shadow-xl border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
