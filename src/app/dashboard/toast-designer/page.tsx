@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -32,25 +32,26 @@ import {
   Info,
   XCircle,
   Layout,
+  ArrowLeftRight,
 } from 'lucide-react';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
 const toastSchema = z.object({
-  toastBackgroundColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#ffffff'),
-  toastTextColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#000000'),
-  toastBorderColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#e2e8f0'),
+  toastBackgroundColor: z.string().regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/i).default('#ffffff'),
+  toastTextColor: z.string().regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/i).default('#000000'),
+  toastBorderColor: z.string().regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/i).default('#e2e8f0'),
   toastBorderRadius: z.enum(['none', 'sm', 'md', 'lg', 'xl', '2xl', 'full']).default('2xl'),
-  toastSuccessColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#10b981'),
-  toastErrorColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#ef4444'),
-  toastWarningColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#f59e0b'),
-  toastInfoColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#3b82f6'),
+  toastSuccessColor: z.string().regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/i).default('#10b981'),
+  toastErrorColor: z.string().regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/i).default('#ef4444'),
+  toastWarningColor: z.string().regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/i).default('#f59e0b'),
+  toastInfoColor: z.string().regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/i).default('#3b82f6'),
   toastPosition: z.enum(['top-right', 'top-left', 'bottom-right', 'bottom-left', 'top-center', 'bottom-center']).default('top-center'),
   toastAnimation: z.enum(['slide', 'fade', 'zoom']).default('slide'),
   toastUseGradient: z.boolean().default(false),
-  toastGradientStartColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#ffffff'),
-  toastGradientEndColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#f8fafc'),
+  toastGradientStartColor: z.string().regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/i).default('#ffffff'),
+  toastGradientEndColor: z.string().regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/i).default('#f8fafc'),
   toastGradientAngle: z.number().min(0).max(360).default(135),
 });
 
@@ -66,6 +67,15 @@ const borderRadii = [
   { name: 'full', label: 'Pill', class: 'rounded-full' },
 ];
 
+const solidPresets = [
+  { name: 'White', color: '#ffffff' },
+  { name: 'Black', color: '#000000' },
+  { name: 'Slate', color: '#0f172a' },
+  { name: 'Royal', color: '#1e3a8a' },
+  { name: 'Emerald', color: '#064e3b' },
+  { name: 'Rose', color: '#4c0519' },
+];
+
 const gradientPresets = [
   { name: 'Soft Gray', start: '#ffffff', end: '#f8fafc', angle: 135 },
   { name: 'Sunset', start: '#ff7e5f', end: '#feb47b', angle: 135 },
@@ -73,7 +83,33 @@ const gradientPresets = [
   { name: 'Emerald', start: '#11998e', end: '#38ef7d', angle: 135 },
   { name: 'Royal', start: '#24243e', end: '#302b63', angle: 135 },
   { name: 'Midnight', start: '#232526', end: '#414345', angle: 135 },
+  { name: 'Passion', start: '#e52d27', end: '#b31217', angle: 135 },
+  { name: 'Frost', start: '#00c6ff', end: '#0072ff', angle: 135 },
+  { name: 'Lush', start: '#a8ff78', end: '#78ffd6', angle: 135 },
+  { name: 'Purpure', start: '#6a11cb', end: '#2575fc', angle: 135 },
+  { name: 'Cyberpunk', start: '#ff00cc', end: '#3333ff', angle: 135 },
+  { name: 'Gold', start: '#f2994a', end: '#f2c94c', angle: 135 },
 ];
+
+const getContrastingColor = (hex: string) => {
+  if (!hex) return '#000000';
+  const color = hex.startsWith('#') ? hex.slice(1) : hex;
+  if (color.length === 3) {
+    const r = parseInt(color[0] + color[0], 16);
+    const g = parseInt(color[1] + color[1], 16);
+    const b = parseInt(color[2] + color[2], 16);
+    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+    return yiq >= 128 ? '#000000' : '#ffffff';
+  }
+  if (color.length === 6) {
+    const r = parseInt(color.slice(0, 2), 16);
+    const g = parseInt(color.slice(2, 4), 16);
+    const b = parseInt(color.slice(4, 6), 16);
+    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+    return yiq >= 128 ? '#000000' : '#ffffff';
+  }
+  return '#000000';
+};
 
 export default function ToastDesignerPage() {
   const firestore = useFirestore();
@@ -292,7 +328,7 @@ export default function ToastDesignerPage() {
                       control={form.control}
                       name="toastBackgroundColor"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className={watchedValues.toastUseGradient ? 'opacity-40 grayscale pointer-events-none' : ''}>
                           <FormLabel className="font-bold">Background Color</FormLabel>
                           <div className="flex items-center gap-3">
                             <FormControl>
@@ -300,6 +336,7 @@ export default function ToastDesignerPage() {
                             </FormControl>
                             <Input value={field.value} onChange={field.onChange} className="font-mono bg-background/50" />
                           </div>
+                          {watchedValues.toastUseGradient && <p className="text-[10px] text-muted-foreground italic">Overridden by gradient</p>}
                         </FormItem>
                       )}
                     />
@@ -308,7 +345,23 @@ export default function ToastDesignerPage() {
                       name="toastTextColor"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="font-bold">Text Color</FormLabel>
+                          <div className="flex items-center justify-between">
+                            <FormLabel className="font-bold">Text Color</FormLabel>
+                            <Button 
+                              type="button" 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-6 text-[10px] uppercase font-bold text-primary hover:bg-primary/10"
+                              onClick={() => {
+                                const bg = watchedValues.toastUseGradient 
+                                  ? watchedValues.toastGradientStartColor 
+                                  : watchedValues.toastBackgroundColor;
+                                form.setValue('toastTextColor', getContrastingColor(bg));
+                              }}
+                            >
+                              Auto-Contrast
+                            </Button>
+                          </div>
                           <div className="flex items-center gap-3">
                             <FormControl>
                               <Input type="color" {...field} className="p-1 h-10 w-14 cursor-pointer rounded-lg border-2" />
@@ -355,6 +408,32 @@ export default function ToastDesignerPage() {
                       )}
                     />
                   </div>
+
+                  {!watchedValues.toastUseGradient && (
+                    <div className="space-y-3 pt-4 border-t border-dashed">
+                      <FormLabel className="text-xs font-bold uppercase text-muted-foreground">Quick Solid Presets</FormLabel>
+                      <div className="flex flex-wrap gap-2">
+                        {solidPresets.map((preset) => (
+                          <Button
+                            key={preset.name}
+                            type="button"
+                            variant="outline"
+                            className="text-[10px] h-7 px-2 gap-1.5 rounded-full hover:bg-muted"
+                            onClick={() => {
+                              form.setValue('toastBackgroundColor', preset.color);
+                              form.setValue('toastTextColor', getContrastingColor(preset.color));
+                            }}
+                          >
+                            <div 
+                              className="h-3 w-3 rounded-full border border-muted" 
+                              style={{ backgroundColor: preset.color }}
+                            />
+                            {preset.name}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -389,7 +468,7 @@ export default function ToastDesignerPage() {
 
                   {watchedValues.toastUseGradient && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
                         <FormField
                           control={form.control}
                           name="toastGradientStartColor"
@@ -405,6 +484,22 @@ export default function ToastDesignerPage() {
                             </FormItem>
                           )}
                         />
+                        <div className="hidden md:flex absolute left-1/2 top-9 -translate-x-1/2 z-10">
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            size="icon" 
+                            className="rounded-full h-8 w-8 bg-background shadow-sm hover:bg-primary hover:text-primary-foreground transition-colors"
+                            onClick={() => {
+                              const start = form.getValues('toastGradientStartColor');
+                              const end = form.getValues('toastGradientEndColor');
+                              form.setValue('toastGradientStartColor', end);
+                              form.setValue('toastGradientEndColor', start);
+                            }}
+                          >
+                            <ArrowLeftRight className="h-4 w-4" />
+                          </Button>
+                        </div>
                         <FormField
                           control={form.control}
                           name="toastGradientEndColor"
@@ -420,6 +515,21 @@ export default function ToastDesignerPage() {
                             </FormItem>
                           )}
                         />
+                      </div>
+                      <div className="md:hidden flex justify-center">
+                         <Button 
+                            type="button" 
+                            variant="outline" 
+                            className="rounded-xl gap-2 text-xs"
+                            onClick={() => {
+                              const start = form.getValues('toastGradientStartColor');
+                              const end = form.getValues('toastGradientEndColor');
+                              form.setValue('toastGradientStartColor', end);
+                              form.setValue('toastGradientEndColor', start);
+                            }}
+                          >
+                            <ArrowLeftRight className="h-3 w-3" /> Swap Colors
+                          </Button>
                       </div>
 
                       <FormField
@@ -461,6 +571,7 @@ export default function ToastDesignerPage() {
                                 form.setValue('toastGradientStartColor', preset.start);
                                 form.setValue('toastGradientEndColor', preset.end);
                                 form.setValue('toastGradientAngle', preset.angle);
+                                form.setValue('toastTextColor', getContrastingColor(preset.start));
                               }}
                             >
                               <div 
