@@ -45,7 +45,8 @@ import {
   DollarSign,
   ChevronLeft,
   ChevronRight,
-  RotateCcw
+  RotateCcw,
+  Wallet
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -67,7 +68,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { useSettings } from '@/contexts/settings-context';
 import { formatCurrency } from '@/lib/formatUtils';
 import { convertToDateSafely, cn } from '@/lib/utils';
-import { format } from 'date-fns';
+import { format, subDays } from 'date-fns';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import type { Customer, Order, CreditPaymentReceiptInfo } from '@/lib/types';
 import Link from 'next/link';
@@ -78,7 +79,14 @@ import { ActionModal } from '@/components/dialogs/ActionModal';
 import { Separator } from '@/components/ui/separator';
 import { BulkPaymentDialog } from '@/components/dialogs/BulkPaymentDialog';
 import { CreditPaymentReceiptModal } from '@/components/dialogs/credit-payment-receipt-modal';
+import { RecordDepositDialog } from '@/components/dialogs/RecordDepositDialog';
 import { Skeleton } from '@/components/ui/skeleton';
+import { 
+  Tabs, 
+  TabsList, 
+  TabsTrigger, 
+  TabsContent 
+} from '@/components/ui/tabs';
 
 const ITEMS_PER_PAGE = 15;
 
@@ -96,6 +104,7 @@ export default function OnlineCustomersPage() {
   const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState('all');
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerWithOrders | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
@@ -109,7 +118,9 @@ export default function OnlineCustomersPage() {
 
   // Bulk Payment State
   const [isBulkPaymentOpen, setIsBulkPaymentOpen] = useState(false);
+  const [isRecordDepositOpen, setIsRecordDepositOpen] = useState(false);
   const [customerForBulkPayment, setCustomerForBulkPayment] = useState<CustomerWithOrders | null>(null);
+  const [customerForDeposit, setCustomerForDeposit] = useState<CustomerWithOrders | null>(null);
   const [paymentReceiptInfo, setPaymentReceiptInfo] = useState<CreditPaymentReceiptInfo | null>(null);
   const [isPaymentReceiptOpen, setIsPaymentReceiptOpen] = useState(false);
 
@@ -209,15 +220,32 @@ export default function OnlineCustomersPage() {
     }
   }, [isAuthLoading, permissions.view_online_customers, fetchCustomers, currentStoreId]);
 
+  const filteredByTab = useMemo(() => {
+    if (activeTab === 'all') return customers;
+    
+    const thirtyDaysAgo = subDays(new Date(), 30);
+    
+    return customers.filter(customer => {
+      const createdAt = convertToDateSafely(customer.createdAt);
+      if (!createdAt) return activeTab === 'old'; // Treat as old if date is missing
+      
+      if (activeTab === 'new') {
+        return createdAt >= thirtyDaysAgo;
+      } else {
+        return createdAt < thirtyDaysAgo;
+      }
+    });
+  }, [customers, activeTab]);
+
   const filteredCustomers = useMemo(() => {
     const term = searchTerm.toLowerCase().trim();
-    if (!term) return customers;
-    return customers.filter(c => 
+    if (!term) return filteredByTab;
+    return filteredByTab.filter(c => 
       c.name.toLowerCase().includes(term) || 
       c.email?.toLowerCase().includes(term) ||
       c.phone?.includes(term)
     );
-  }, [customers, searchTerm]);
+  }, [filteredByTab, searchTerm]);
 
   const handleNextPage = () => fetchCustomers('next');
   const handlePrevPage = () => fetchCustomers('prev');
@@ -240,6 +268,12 @@ export default function OnlineCustomersPage() {
   const handleBulkPayment = (customer: CustomerWithOrders) => {
     setCustomerForBulkPayment(customer);
     setIsBulkPaymentOpen(true);
+    setIsActionModalOpen(false);
+  };
+  
+  const handleRecordDeposit = (customer: CustomerWithOrders) => {
+    setCustomerForDeposit(customer);
+    setIsRecordDepositOpen(true);
     setIsActionModalOpen(false);
   };
 
@@ -348,17 +382,26 @@ export default function OnlineCustomersPage() {
       </div>
 
       <Card className="shadow-sm border-none ring-1 ring-border overflow-hidden">
-        <CardHeader>
+        <CardHeader className="pb-3">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <CardTitle className="text-lg font-bold">Member Directory</CardTitle>
-            <div className="relative w-full md:w-72">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input 
-                placeholder="Local search in page..." 
-                value={searchTerm} 
-                onChange={(e) => setSearchTerm(e.target.value)} 
-                className="pl-10 h-10" 
-              />
+            <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
+                    <TabsList className="grid w-full grid-cols-3 md:w-72">
+                        <TabsTrigger value="all">All</TabsTrigger>
+                        <TabsTrigger value="new">New</TabsTrigger>
+                        <TabsTrigger value="old">Old</TabsTrigger>
+                    </TabsList>
+                </Tabs>
+                <div className="relative w-full md:w-72">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                        placeholder="Search in page..." 
+                        value={searchTerm} 
+                        onChange={(e) => setSearchTerm(e.target.value)} 
+                        className="pl-10 h-10" 
+                    />
+                </div>
             </div>
           </div>
         </CardHeader>
@@ -453,6 +496,9 @@ export default function OnlineCustomersPage() {
         {selectedCustomerForActions && (
           <div className="space-y-4">
             <div className="grid grid-cols-1 gap-2">
+              <Button variant="default" className="justify-start bg-blue-600 hover:bg-blue-700 h-11" onClick={() => handleRecordDeposit(selectedCustomerForActions)}>
+                <Wallet className="mr-2 h-4 w-4" /> Grant Wallet Bonus
+              </Button>
               <Button variant="default" className="justify-start bg-green-600 hover:bg-green-700 h-11" onClick={() => handleBulkPayment(selectedCustomerForActions)} disabled={(selectedCustomerForActions.outstandingCredit || 0) <= 0.01}>
                 <DollarSign className="mr-2 h-4 w-4" /> Record Bulk Payment
               </Button>
@@ -498,6 +544,14 @@ export default function OnlineCustomersPage() {
         customer={customerForBulkPayment}
         currencySymbol={currencySymbol}
         onPaymentRecorded={onBulkPaymentRecorded}
+      />
+
+      <RecordDepositDialog
+        isOpen={isRecordDepositOpen}
+        onOpenChange={setIsRecordDepositOpen}
+        customer={customerForDeposit}
+        currencySymbol={currencySymbol}
+        onSuccess={onBulkPaymentRecorded}
       />
 
       {paymentReceiptInfo && (
