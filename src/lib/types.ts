@@ -651,6 +651,7 @@ export interface ProductVariant {
   barcode?: string;
   sellingPrice?: number;
   stock: number;
+  description?: string;
   imageUrl?: string;
   isActive: boolean;
 }

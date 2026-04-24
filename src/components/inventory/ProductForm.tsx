@@ -212,6 +212,7 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
       sku: z.string().optional().or(z.literal("")),
       sellingPrice: z.coerce.number().optional(),
       stock: z.coerce.number().int().min(0, "Stock cannot be negative."),
+      description: z.string().optional().or(z.literal("")),
       imageUrl: z.string().url().optional().or(z.literal("")),
       isActive: z.boolean().default(true),
     })).optional().default([]),
