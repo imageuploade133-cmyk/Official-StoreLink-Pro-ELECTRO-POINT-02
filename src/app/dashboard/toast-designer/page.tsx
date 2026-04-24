@@ -1,0 +1,509 @@
+'use client';
+
+import { useState, useEffect, useMemo } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { useFirestore, useDoc } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import { saveGlobalSettings, saveStoreSettings } from '@/firebase/firestore/settings';
+import type { AppSettings } from '@/lib/types';
+import { useAuth } from '@/contexts/auth-context';
+import { useToast } from '@/hooks/use-toast';
+import { PageHeader } from '@/components/PageHeader';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { 
+  BellRing, 
+  Loader2, 
+  Save, 
+  RotateCcw, 
+  Sparkles, 
+  Eye, 
+  Palette,
+  Brush,
+  CheckCircle2,
+  AlertTriangle,
+  Info,
+  XCircle,
+  Layout,
+} from 'lucide-react';
+import AccessDenied from '@/components/staff-management/AccessDenied';
+import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
+
+const toastSchema = z.object({
+  toastBackgroundColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#ffffff'),
+  toastTextColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#000000'),
+  toastBorderColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#e2e8f0'),
+  toastBorderRadius: z.enum(['none', 'sm', 'md', 'lg', 'xl', '2xl', 'full']).default('2xl'),
+  toastSuccessColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#10b981'),
+  toastErrorColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#ef4444'),
+  toastWarningColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#f59e0b'),
+  toastInfoColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#3b82f6'),
+  toastPosition: z.enum(['top-right', 'top-left', 'bottom-right', 'bottom-left', 'top-center', 'bottom-center']).default('top-center'),
+  toastAnimation: z.enum(['slide', 'fade', 'zoom']).default('slide'),
+});
+
+type FormValues = z.infer<typeof toastSchema>;
+
+const borderRadii = [
+  { name: 'none', label: 'Square', class: 'rounded-none' },
+  { name: 'sm', label: 'Small', class: 'rounded-sm' },
+  { name: 'md', label: 'Medium', class: 'rounded-md' },
+  { name: 'lg', label: 'Large', class: 'rounded-lg' },
+  { name: 'xl', label: 'X-Large', class: 'rounded-xl' },
+  { name: '2xl', label: '2X-Large', class: 'rounded-2xl' },
+  { name: 'full', label: 'Pill', class: 'rounded-full' },
+];
+
+export default function ToastDesignerPage() {
+  const firestore = useFirestore();
+  const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
+  const { toast } = useToast();
+  const [isSaving, setIsSaving] = useState(false);
+
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
+
+  const settingsRef = useMemo(
+    () => {
+        if (!firestore) return null;
+        if (currentStoreId) {
+            return doc(firestore, 'stores', currentStoreId, 'settings', 'config');
+        }
+        return doc(firestore, 'settings', 'global');
+    },
+    [firestore, currentStoreId]
+  );
+
+  const { data: settingsData, isLoading: isLoadingSettings } = useDoc<AppSettings>(settingsRef);
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(toastSchema),
+    defaultValues: {
+      toastBackgroundColor: '#ffffff',
+      toastTextColor: '#000000',
+      toastBorderColor: '#e2e8f0',
+      toastBorderRadius: '2xl',
+      toastSuccessColor: '#10b981',
+      toastErrorColor: '#ef4444',
+      toastWarningColor: '#f59e0b',
+      toastInfoColor: '#3b82f6',
+      toastPosition: 'top-center',
+      toastAnimation: 'slide',
+    }
+  });
+
+  useEffect(() => {
+    if (settingsData) {
+      form.reset({
+        toastBackgroundColor: settingsData.toastBackgroundColor || '#ffffff',
+        toastTextColor: settingsData.toastTextColor || '#000000',
+        toastBorderColor: settingsData.toastBorderColor || '#e2e8f0',
+        toastBorderRadius: (settingsData.toastBorderRadius as any) || '2xl',
+        toastSuccessColor: settingsData.toastSuccessColor || '#10b981',
+        toastErrorColor: settingsData.toastErrorColor || '#ef4444',
+        toastWarningColor: settingsData.toastWarningColor || '#f59e0b',
+        toastInfoColor: settingsData.toastInfoColor || '#3b82f6',
+        toastPosition: (settingsData.toastPosition as any) || 'top-center',
+        toastAnimation: (settingsData.toastAnimation as any) || 'slide',
+      });
+    }
+  }, [settingsData, form]);
+
+  const onSubmit = async (data: FormValues) => {
+    if (!firestore) return;
+    setIsSaving(true);
+    try {
+      if (currentStoreId) {
+        await saveStoreSettings(firestore, currentStoreId, data);
+      } else {
+        await saveGlobalSettings(firestore, data);
+      }
+      toast({ title: 'Success', description: 'Your Toast UI settings have been saved.' });
+    } catch (e) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Failed to save settings.' });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const isLoading = isAuthLoading || isLoadingSettings;
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <PageHeader icon={BellRing} title="Toast Designer" description="Loading..." />
+        <Skeleton className="h-[800px] w-full" />
+      </div>
+    );
+  }
+
+  if (!permissions.manage_settings) {
+    return <AccessDenied />;
+  }
+
+  const watchedValues = form.watch();
+
+  const getBorderRadiusClass = (radius: string) => {
+    const found = borderRadii.find(r => r.name === radius);
+    return found ? found.class : 'rounded-2xl';
+  };
+
+  const ToastPreview = ({ type }: { type: 'default' | 'success' | 'error' | 'warning' | 'info' }) => {
+    let icon = <Info className="h-5 w-5" />;
+    let title = "Notification Title";
+    let description = "This is a toast message description.";
+    let accentColor = watchedValues.toastInfoColor;
+
+    if (type === 'success') {
+      icon = <CheckCircle2 className="h-5 w-5" />;
+      title = "Success Message";
+      description = "Your action was completed successfully.";
+      accentColor = watchedValues.toastSuccessColor;
+    } else if (type === 'error') {
+      icon = <XCircle className="h-5 w-5" />;
+      title = "Error Occurred";
+      description = "Something went wrong. Please try again.";
+      accentColor = watchedValues.toastErrorColor;
+    } else if (type === 'warning') {
+      icon = <AlertTriangle className="h-5 w-5" />;
+      title = "Warning Issued";
+      description = "Please be careful with this action.";
+      accentColor = watchedValues.toastWarningColor;
+    }
+
+    return (
+      <div 
+        className={cn(
+          "w-full max-w-sm p-4 border shadow-lg flex items-center gap-4 relative overflow-hidden",
+          getBorderRadiusClass(watchedValues.toastBorderRadius)
+        )}
+        style={{
+          backgroundColor: watchedValues.toastBackgroundColor,
+          color: watchedValues.toastTextColor,
+          borderColor: watchedValues.toastBorderColor,
+        }}
+      >
+        <div 
+          className="flex-shrink-0 p-2 rounded-xl"
+          style={{ backgroundColor: `${accentColor}20`, color: accentColor }}
+        >
+          {icon}
+        </div>
+        <div className="flex-1">
+          <h4 className="font-bold text-sm">{title}</h4>
+          <p className="text-xs opacity-70">{description}</p>
+        </div>
+        
+        {/* Progress bar simulation */}
+        <div className="absolute bottom-0 left-0 h-1 w-full bg-black/5">
+          <div 
+            className="h-full" 
+            style={{ 
+              backgroundColor: type === 'default' ? watchedValues.toastInfoColor : accentColor,
+              width: '60%' 
+            }}
+          />
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="space-y-6 pb-20">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <PageHeader
+          icon={BellRing}
+          title="Toast Notification Designer"
+          description="Customize the look and feel of your app's notifications"
+        />
+        <div className="flex gap-3">
+           <Button
+              variant="outline"
+              onClick={() => form.reset()}
+              disabled={isSaving}
+              className="gap-2 rounded-xl"
+            >
+              <RotateCcw className="h-4 w-4" /> Reset
+            </Button>
+            <Button
+              onClick={form.handleSubmit(onSubmit)}
+              disabled={isSaving}
+              className="gap-2 min-w-[150px] rounded-xl shadow-lg shadow-primary/20"
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Saving...</span>
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4" />
+                  <span>Save Config</span>
+                </>
+              )}
+            </Button>
+        </div>
+      </div>
+
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            <div className="space-y-6">
+              <Card className="border-none shadow-lg bg-gradient-to-br from-background to-muted/20">
+                <CardHeader>
+                  <CardTitle className="text-xl flex items-center gap-2">
+                    <Brush className="h-5 w-5 text-primary" /> Colors & Base Style
+                  </CardTitle>
+                  <CardDescription>Adjust the fundamental colors and shape of your toasts.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="toastBackgroundColor"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-bold">Background Color</FormLabel>
+                          <div className="flex items-center gap-3">
+                            <FormControl>
+                              <Input type="color" {...field} className="p-1 h-10 w-14 cursor-pointer rounded-lg border-2" />
+                            </FormControl>
+                            <Input value={field.value} onChange={field.onChange} className="font-mono bg-background/50" />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="toastTextColor"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-bold">Text Color</FormLabel>
+                          <div className="flex items-center gap-3">
+                            <FormControl>
+                              <Input type="color" {...field} className="p-1 h-10 w-14 cursor-pointer rounded-lg border-2" />
+                            </FormControl>
+                            <Input value={field.value} onChange={field.onChange} className="font-mono bg-background/50" />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="toastBorderColor"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-bold">Border Color</FormLabel>
+                          <div className="flex items-center gap-3">
+                            <FormControl>
+                              <Input type="color" {...field} className="p-1 h-10 w-14 cursor-pointer rounded-lg border-2" />
+                            </FormControl>
+                            <Input value={field.value} onChange={field.onChange} className="font-mono bg-background/50" />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="toastBorderRadius"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-bold">Corner Rounding</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="rounded-xl bg-background/50">
+                                <SelectValue placeholder="Select rounding" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {borderRadii.map(r => (
+                                <SelectItem key={r.name} value={r.name}>{r.label}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-none shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-xl flex items-center gap-2">
+                    <Palette className="h-5 w-5 text-primary" /> Variant Colors
+                  </CardTitle>
+                  <CardDescription>Customize colors for different notification types.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="toastSuccessColor"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-bold flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-green-500" /> Success Color
+                          </FormLabel>
+                          <div className="flex items-center gap-3">
+                            <FormControl>
+                              <Input type="color" {...field} className="p-1 h-10 w-14 cursor-pointer rounded-lg border-2" />
+                            </FormControl>
+                            <Input value={field.value} onChange={field.onChange} className="font-mono bg-background/50" />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="toastErrorColor"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-bold flex items-center gap-2">
+                            <XCircle className="h-4 w-4 text-red-500" /> Error Color
+                          </FormLabel>
+                          <div className="flex items-center gap-3">
+                            <FormControl>
+                              <Input type="color" {...field} className="p-1 h-10 w-14 cursor-pointer rounded-lg border-2" />
+                            </FormControl>
+                            <Input value={field.value} onChange={field.onChange} className="font-mono bg-background/50" />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="toastWarningColor"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-bold flex items-center gap-2">
+                            <AlertTriangle className="h-4 w-4 text-amber-500" /> Warning Color
+                          </FormLabel>
+                          <div className="flex items-center gap-3">
+                            <FormControl>
+                              <Input type="color" {...field} className="p-1 h-10 w-14 cursor-pointer rounded-lg border-2" />
+                            </FormControl>
+                            <Input value={field.value} onChange={field.onChange} className="font-mono bg-background/50" />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="toastInfoColor"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-bold flex items-center gap-2">
+                            <Info className="h-4 w-4 text-blue-500" /> Info Color
+                          </FormLabel>
+                          <div className="flex items-center gap-3">
+                            <FormControl>
+                              <Input type="color" {...field} className="p-1 h-10 w-14 cursor-pointer rounded-lg border-2" />
+                            </FormControl>
+                            <Input value={field.value} onChange={field.onChange} className="font-mono bg-background/50" />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-none shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-xl flex items-center gap-2">
+                    <Layout className="h-5 w-5 text-primary" /> Behavior & Placement
+                  </CardTitle>
+                  <CardDescription>Control where and how toasts appear on the screen.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="toastPosition"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-bold">Default Position</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="rounded-xl bg-background/50">
+                                <SelectValue placeholder="Select position" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="top-left">Top Left</SelectItem>
+                              <SelectItem value="top-center">Top Center</SelectItem>
+                              <SelectItem value="top-right">Top Right</SelectItem>
+                              <SelectItem value="bottom-left">Bottom Left</SelectItem>
+                              <SelectItem value="bottom-center">Bottom Center</SelectItem>
+                              <SelectItem value="bottom-right">Bottom Right</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="toastAnimation"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-bold">Animation Style</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="rounded-xl bg-background/50">
+                                <SelectValue placeholder="Select animation" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="slide">Slide In</SelectItem>
+                              <SelectItem value="fade">Fade In</SelectItem>
+                              <SelectItem value="zoom">Zoom In</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="space-y-6">
+              <Card className="sticky top-6 border-none shadow-2xl overflow-hidden">
+                <CardHeader className="bg-primary/5 border-b border-primary/10">
+                  <CardTitle className="flex items-center gap-2">
+                    <Eye className="h-5 w-5 text-primary" /> Live Preview
+                  </CardTitle>
+                  <CardDescription>Real-time look of your notifications.</CardDescription>
+                </CardHeader>
+                <CardContent className="p-8 flex flex-col items-center gap-8 bg-slate-50 dark:bg-slate-900/50 min-h-[500px] justify-center">
+                  <div className="w-full space-y-4 flex flex-col items-center">
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-2 bg-muted px-2 py-1 rounded">Default Style</p>
+                    <ToastPreview type="default" />
+                  </div>
+                  
+                  <div className="w-full space-y-6 flex flex-col items-center">
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-2 bg-muted px-2 py-1 rounded">Variant Examples</p>
+                    <ToastPreview type="success" />
+                    <ToastPreview type="error" />
+                    <ToastPreview type="warning" />
+                  </div>
+                </CardContent>
+                <CardFooter className="bg-muted/30 border-t p-4 justify-center">
+                   <p className="text-xs text-muted-foreground flex items-center gap-2">
+                     <Sparkles className="h-3 w-3 text-primary" /> Changes apply instantly to this preview.
+                   </p>
+                </CardFooter>
+              </Card>
+            </div>
+          </div>
+        </form>
+      </Form>
+    </div>
+  );
+}

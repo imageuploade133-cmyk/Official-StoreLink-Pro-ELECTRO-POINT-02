@@ -465,6 +465,17 @@ export interface Settings {
   enableTax?: boolean;
   taxName?: string;
   taxRate?: number;
+  // Toast Customization
+  toastBackgroundColor?: string;
+  toastTextColor?: string;
+  toastBorderColor?: string;
+  toastBorderRadius?: string;
+  toastSuccessColor?: string;
+  toastErrorColor?: string;
+  toastWarningColor?: string;
+  toastInfoColor?: string;
+  toastPosition?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center';
+  toastAnimation?: 'slide' | 'fade' | 'zoom';
 }
 
 export type AppSettings = Settings;
