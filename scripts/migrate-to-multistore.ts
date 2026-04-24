@@ -29,13 +29,35 @@ async function migrate() {
         
         try {
             const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
-            if (serviceAccountKey) {
-                // Handle potential quoting issues and whitespace
-                const cleanedKey = serviceAccountKey.trim().replace(/^['"](.*)['"]$/, '$1');
-                const key = cleanedKey.startsWith('{') 
-                    ? JSON.parse(cleanedKey) 
-                    : JSON.parse(Buffer.from(cleanedKey, 'base64').toString());
+            let key: any;
 
+            if (serviceAccountKey) {
+                try {
+                    // Handle potential quoting issues and whitespace
+                    const cleanedKey = serviceAccountKey.trim().replace(/^['"](.*)['"]$/, '$1');
+                    key = cleanedKey.startsWith('{') 
+                        ? JSON.parse(cleanedKey) 
+                        : JSON.parse(Buffer.from(cleanedKey, 'base64').toString());
+                } catch (e) {
+                    console.error('Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY env var');
+                }
+            }
+
+            // Fallback to serviceAccountKey.json file if env var failed or was missing
+            if (!key) {
+                const filePath = path.join(process.cwd(), 'serviceAccountKey.json');
+                const fs = require('fs');
+                if (fs.existsSync(filePath)) {
+                    try {
+                        key = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+                        console.log('Firebase Admin: Using credentials from serviceAccountKey.json');
+                    } catch (fileError) {
+                        console.error('Failed to read serviceAccountKey.json:', fileError);
+                    }
+                }
+            }
+
+            if (key) {
                 // Ensure the private key has correct newline formatting
                 if (key.private_key && typeof key.private_key === 'string') {
                     key.private_key = key.private_key.replace(/\\n/g, '\n');
@@ -45,11 +67,13 @@ async function migrate() {
                     credential: admin.credential.cert(key),
                     projectId: projectId
                 });
+                console.log('Firebase Admin initialized with service account credentials');
             } else {
                 // Fallback to default credentials or just project ID (for local emulator or authorized environments)
                 admin.initializeApp({
                     projectId: projectId
                 });
+                console.log('Firebase Admin initialized with default credentials');
             }
         } catch (error) {
             console.error('Firebase admin initialization error:', error);
