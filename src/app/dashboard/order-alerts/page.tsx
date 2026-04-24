@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import * as React from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -18,7 +19,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { BellRing, Loader2, Save, Plus, Trash2, Smartphone, Info, Mail } from 'lucide-react';
+import { BellRing, Loader2, Save, Plus, Trash2, Smartphone, Info, Mail, CheckCircle2 } from 'lucide-react';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -153,9 +154,17 @@ export default function OrderAlertsPage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-8">
         <PageHeader icon={BellRing} title="Order Alerts" description="Configure notifications for new website orders." />
-        <Skeleton className="h-[400px] w-full" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-8">
+            <Skeleton className="h-[400px] w-full rounded-3xl" />
+            <Skeleton className="h-[400px] w-full rounded-3xl" />
+          </div>
+          <div className="lg:col-span-1">
+            <Skeleton className="h-[300px] w-full rounded-3xl sticky top-6" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -178,20 +187,27 @@ export default function OrderAlertsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>WhatsApp Alerts</CardTitle>
-                  <CardDescription>Configure WhatsApp notifications for new orders.</CardDescription>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <Card className="border-none shadow-xl shadow-black/5 rounded-3xl overflow-hidden bg-white">
+                <CardHeader className="bg-muted/30 pb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                      <Smartphone className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">WhatsApp Alerts</CardTitle>
+                      <CardDescription>Configure WhatsApp notifications for new orders.</CardDescription>
+                    </div>
+                  </div>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-8 pt-6">
                   <FormField
                     control={form.control}
                     name="enableOrderAlerts"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-xl border p-4 bg-muted/30">
+                      <FormItem className="flex flex-row items-center justify-between rounded-2xl border border-muted-foreground/10 p-5 bg-muted/20 transition-all hover:bg-muted/30">
                         <div className="space-y-0.5">
-                          <FormLabel className="text-base">Enable WhatsApp Alerts</FormLabel>
+                          <FormLabel className="text-base font-semibold">Enable WhatsApp Alerts</FormLabel>
                           <FormDescription>
                             If on, WhatsApp messages will be sent to the numbers below.
                           </FormDescription>
@@ -200,6 +216,7 @@ export default function OrderAlertsPage() {
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            className="data-[state=checked]:bg-primary"
                           />
                         </FormControl>
                       </FormItem>
@@ -214,35 +231,42 @@ export default function OrderAlertsPage() {
                           <Smartphone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                           <Input 
                             placeholder="e.g., +2348012345678" 
-                            className="pl-10" 
+                            className="pl-10 h-11 rounded-xl border-muted-foreground/20 focus:ring-primary/20" 
                             value={newNumber} 
                             onChange={(e) => setNewNumber(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddNumber())}
                           />
                         </div>
                       </div>
-                      <Button type="button" onClick={handleAddNumber} variant="secondary">
+                      <Button 
+                        type="button" 
+                        onClick={handleAddNumber} 
+                        className="h-11 px-6 rounded-xl font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
+                      >
                         <Plus className="mr-2 h-4 w-4" /> Add
                       </Button>
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="grid grid-cols-1 gap-3">
                       {configuredNumbers.length === 0 ? (
-                        <div className="text-center py-6 border-2 border-dashed rounded-xl text-muted-foreground bg-muted/5">
-                          <p className="text-sm">No phone numbers configured.</p>
+                        <div className="text-center py-8 border-2 border-dashed rounded-2xl text-muted-foreground bg-muted/5 transition-colors hover:bg-muted/10">
+                          <p className="text-sm font-medium">No phone numbers configured.</p>
+                          <p className="text-xs mt-1">Add a number above to start receiving alerts.</p>
                         </div>
                       ) : (
                         configuredNumbers.map((num, idx) => (
-                          <div key={idx} className="flex items-center justify-between p-3 border rounded-xl bg-background">
+                          <div key={idx} className="group flex items-center justify-between p-4 border rounded-2xl bg-background transition-all hover:border-primary/30 hover:shadow-md hover:shadow-primary/5">
                             <div className="flex items-center gap-3">
-                              <Smartphone className="h-4 w-4 text-primary" />
-                              <span className="font-medium text-sm">{num}</span>
+                              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                <Smartphone className="h-5 w-5" />
+                              </div>
+                              <span className="font-semibold text-sm tracking-wide">{num}</span>
                             </div>
                             <Button 
                               type="button" 
                               variant="ghost" 
                               size="icon" 
-                              className="text-destructive h-8 w-8" 
+                              className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-9 w-9 rounded-xl transition-colors" 
                               onClick={() => handleRemoveNumber(idx)}
                             >
                               <Trash2 className="h-4 w-4" />
@@ -255,19 +279,26 @@ export default function OrderAlertsPage() {
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Email Alerts</CardTitle>
-                  <CardDescription>Configure Email notifications for new orders (Powered by Gmail SMTP).</CardDescription>
+              <Card className="border-none shadow-xl shadow-black/5 rounded-3xl overflow-hidden bg-white">
+                <CardHeader className="bg-muted/30 pb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                      <Mail className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">Email Alerts</CardTitle>
+                      <CardDescription>Configure Email notifications for new orders.</CardDescription>
+                    </div>
+                  </div>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-8 pt-6">
                   <FormField
                     control={form.control}
                     name="enableEmailAlerts"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-xl border p-4 bg-muted/30">
+                      <FormItem className="flex flex-row items-center justify-between rounded-2xl border border-muted-foreground/10 p-5 bg-muted/20 transition-all hover:bg-muted/30">
                         <div className="space-y-0.5">
-                          <FormLabel className="text-base">Enable Email Alerts</FormLabel>
+                          <FormLabel className="text-base font-semibold">Enable Email Alerts</FormLabel>
                           <FormDescription>
                             If on, branded email notifications will be sent to the addresses below.
                           </FormDescription>
@@ -276,6 +307,7 @@ export default function OrderAlertsPage() {
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            className="data-[state=checked]:bg-primary"
                           />
                         </FormControl>
                       </FormItem>
@@ -290,35 +322,42 @@ export default function OrderAlertsPage() {
                           <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                           <Input 
                             placeholder="e.g., admin@store.com" 
-                            className="pl-10" 
+                            className="pl-10 h-11 rounded-xl border-muted-foreground/20 focus:ring-primary/20" 
                             value={newEmail} 
                             onChange={(e) => setNewEmail(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddEmail())}
                           />
                         </div>
                       </div>
-                      <Button type="button" onClick={handleAddEmail} variant="secondary">
+                      <Button 
+                        type="button" 
+                        onClick={handleAddEmail} 
+                        className="h-11 px-6 rounded-xl font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
+                      >
                         <Plus className="mr-2 h-4 w-4" /> Add
                       </Button>
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="grid grid-cols-1 gap-3">
                       {configuredEmails.length === 0 ? (
-                        <div className="text-center py-6 border-2 border-dashed rounded-xl text-muted-foreground bg-muted/5">
-                          <p className="text-sm">No email addresses configured.</p>
+                        <div className="text-center py-8 border-2 border-dashed rounded-2xl text-muted-foreground bg-muted/5 transition-colors hover:bg-muted/10">
+                          <p className="text-sm font-medium">No email addresses configured.</p>
+                          <p className="text-xs mt-1">Add an email above to start receiving alerts.</p>
                         </div>
                       ) : (
                         configuredEmails.map((email, idx) => (
-                          <div key={idx} className="flex items-center justify-between p-3 border rounded-xl bg-background">
+                          <div key={idx} className="group flex items-center justify-between p-4 border rounded-2xl bg-background transition-all hover:border-primary/30 hover:shadow-md hover:shadow-primary/5">
                             <div className="flex items-center gap-3">
-                              <Mail className="h-4 w-4 text-primary" />
-                              <span className="font-medium text-sm">{email}</span>
+                              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                <Mail className="h-5 w-5" />
+                              </div>
+                              <span className="font-semibold text-sm tracking-wide">{email}</span>
                             </div>
                             <Button 
                               type="button" 
                               variant="ghost" 
                               size="icon" 
-                              className="text-destructive h-8 w-8" 
+                              className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-9 w-9 rounded-xl transition-colors" 
                               onClick={() => handleRemoveEmail(idx)}
                             >
                               <Trash2 className="h-4 w-4" />
@@ -331,9 +370,14 @@ export default function OrderAlertsPage() {
                 </CardContent>
               </Card>
 
-              <div className="flex justify-end">
-                <Button type="submit" disabled={isSaving} size="lg" className="min-w-[200px] font-bold">
-                  {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              <div className="flex justify-end pt-4">
+                <Button 
+                  type="submit" 
+                  disabled={isSaving} 
+                  size="lg" 
+                  className="min-w-[240px] h-14 rounded-2xl font-bold shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] hover:shadow-xl active:scale-[0.98]"
+                >
+                  {isSaving ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Save className="mr-2 h-5 w-5" />}
                   Save All Alert Settings
                 </Button>
               </div>
@@ -342,26 +386,36 @@ export default function OrderAlertsPage() {
         </div>
 
         <div className="lg:col-span-1">
-          <Card className="bg-primary/5 border-primary/20 shadow-none sticky top-6">
+          <Card className="bg-primary/5 border-none shadow-xl shadow-primary/5 rounded-3xl sticky top-6 overflow-hidden">
+            <div className="h-2 bg-primary" />
             <CardHeader>
               <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary uppercase tracking-widest">
                 <Info className="h-4 w-4" /> How it works
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-sm space-y-4 text-muted-foreground leading-relaxed">
-              <p>When an order is placed, everyone on these lists will receive notifications containing:</p>
-              <ul className="list-disc pl-5 space-y-2 font-medium">
-                <li>Order ID Reference</li>
-                <li>Customer Name</li>
-                <li>Items & Quantities</li>
-                <li>Total Order Value</li>
-                <li>Payment Status</li>
-                <li>Delivery Address</li>
-              </ul>
+            <CardContent className="text-sm space-y-6 text-muted-foreground leading-relaxed">
+              <p className="font-medium text-foreground/80">When an order is placed, everyone on these lists will receive notifications containing:</p>
+              <div className="grid grid-cols-1 gap-3">
+                {[
+                  'Order ID Reference',
+                  'Customer Name',
+                  'Items & Quantities',
+                  'Total Order Value',
+                  'Payment Status',
+                  'Delivery Address'
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-3 bg-white/50 p-2 rounded-xl border border-primary/10">
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                    <span className="font-semibold text-xs">{item}</span>
+                  </div>
+                ))}
+              </div>
               <Separator className="bg-primary/10" />
-              <p className="text-xs italic">
-                Note: Emails are sent via Gmail SMTP. Customers also receive an automatic confirmation email if enabled in settings.
-              </p>
+              <div className="bg-white/50 p-4 rounded-2xl border border-primary/5">
+                <p className="text-xs italic leading-normal">
+                  <span className="font-bold text-primary not-italic">Pro Tip:</span> WhatsApp alerts are instant. Make sure your numbers include the country code (e.g. +234).
+                </p>
+              </div>
             </CardContent>
           </Card>
         </div>
