@@ -99,6 +99,18 @@ export function HeroCarousel() {
         ? (settings?.storeHeroBtnStyle || 'gradient')
         : (settings?.storeBtnStyle || 'standard');
 
+    if (style === 'apple') {
+        const color = useIndividual ? (settings?.storeHeroBtnColor || '#007AFF') : (settings?.storeBtnColor || '#007AFF');
+        return {
+            background: `linear-gradient(180deg, ${color} 0%, ${color}ee 100%)`,
+            color: 'white',
+            border: '0.5px solid rgba(0,0,0,0.15)',
+            boxShadow: `0 8px 20px -4px ${color}60, inset 0 1px 1px rgba(255, 255, 255, 0.25)`,
+            fontWeight: '600',
+            letterSpacing: '-0.02em',
+        };
+    }
+
     if (style === 'gradient') {
         return {
             background: `linear-gradient(135deg, ${settings?.storeHeroBtnGradientStart || '#8b5cf6'}, ${settings?.storeHeroBtnGradientEnd || '#7c3aed'})`,
@@ -175,8 +187,17 @@ export function HeroCarousel() {
     };
 
     const sizeClass = sizeClasses[size] || sizeClasses.lg;
-    const shapeClass = shapeClasses[shape] || 'rounded-2xl';
-    const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-md';
+    let shapeClass = shapeClasses[shape] || 'rounded-2xl';
+    let shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-md';
+
+    const style = useIndividual
+        ? (settings?.storeHeroBtnStyle || 'gradient')
+        : (settings?.storeBtnStyle || 'standard');
+
+    if (style === 'apple') {
+        shapeClass = 'rounded-xl';
+        shadowClass = 'shadow-none';
+    }
 
     return `${sizeClass} ${shapeClass} ${shadowClass}`;
   }, [settings]);

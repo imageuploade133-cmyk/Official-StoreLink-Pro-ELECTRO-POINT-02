@@ -227,6 +227,17 @@ export default function StoreSignupPage() {
 
     const buttonStyle = useMemo(() => {
         const style = settings?.storeBtnStyle || 'standard';
+        if (style === 'apple') {
+            const color = settings?.storeBtnColor || '#007AFF';
+            return {
+                background: `linear-gradient(180deg, ${color} 0%, ${color}ee 100%)`,
+                color: 'white',
+                border: '0.5px solid rgba(0,0,0,0.15)',
+                boxShadow: `0 8px 20px -4px ${color}60, inset 0 1px 1px rgba(255, 255, 255, 0.25)`,
+                fontWeight: '600',
+                letterSpacing: '-0.02em',
+            };
+        }
         if (style === 'gradient') {
           return {
             background: `linear-gradient(to right, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
@@ -239,6 +250,48 @@ export default function StoreSignupPage() {
           color: 'white',
           border: 'none'
         };
+    }, [settings]);
+
+    const buttonClasses = useMemo(() => {
+        const shape = settings?.storeBtnShape || 'md';
+        const shadow = settings?.storeBtnShadow || 'sm';
+        const size = settings?.storeBtnSize || 'md';
+
+        const sizeClasses: Record<string, string> = {
+            sm: 'h-9 text-xs px-3',
+            md: 'h-11 text-sm px-6',
+            lg: 'h-14 text-base px-10',
+            xl: 'h-16 text-lg px-12'
+        };
+
+        const shapeClasses: Record<string, string> = {
+            none: 'rounded-none',
+            sm: 'rounded-sm',
+            md: 'rounded-md',
+            lg: 'rounded-2xl',
+            full: 'rounded-full'
+        };
+
+        const shadowClasses: Record<string, string> = {
+            none: 'shadow-none',
+            sm: 'shadow-sm',
+            md: 'shadow-md',
+            lg: 'shadow-lg',
+            xl: 'shadow-xl',
+            '2xl': 'shadow-2xl',
+            inner: 'shadow-inner'
+        };
+
+        const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.md;
+        let shapeClass = shapeClasses[shape] || 'rounded-md';
+        let shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
+
+        if (settings?.storeBtnStyle === 'apple') {
+            shapeClass = 'rounded-xl';
+            shadowClass = 'shadow-none';
+        }
+
+        return `${sizeClass} ${shapeClass} ${shadowClass}`;
     }, [settings]);
 
     const CongratulationModal = () => {
@@ -458,11 +511,27 @@ export default function StoreSignupPage() {
                         </Button>
                     )}
                     {currentStep < totalSteps ? (
-                        <Button type="button" onClick={nextStep} style={buttonStyle} className="flex-1 h-12 font-bold border-none">
+                        <Button 
+                            type="button" 
+                            onClick={nextStep} 
+                            style={buttonStyle} 
+                            className={cn(
+                                "flex-1 font-bold border-none transition-all",
+                                buttonClasses
+                            )}
+                        >
                             Next <ChevronRight className="ml-2 h-4 w-4" />
                         </Button>
                     ) : (
-                        <Button type="submit" style={buttonStyle} className="flex-1 h-12 font-bold border-none" disabled={isSubmitting}>
+                        <Button 
+                            type="submit" 
+                            style={buttonStyle} 
+                            className={cn(
+                                "flex-1 font-bold border-none transition-all",
+                                buttonClasses
+                            )} 
+                            disabled={isSubmitting}
+                        >
                             {isSubmitting ? <><Spinner size="sm" className="mr-2 text-primary-foreground" />Creating Account…</> : 'Create Account'}
                         </Button>
                     )}

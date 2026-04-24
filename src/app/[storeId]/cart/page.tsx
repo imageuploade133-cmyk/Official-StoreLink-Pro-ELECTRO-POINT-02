@@ -236,6 +236,17 @@ export default function CartPage() {
 
   const buttonStyle = useMemo(() => {
     const style = settings?.storeBtnStyle || 'standard';
+    if (style === 'apple') {
+      const color = settings?.storeBtnColor || '#007AFF';
+      return {
+        background: `linear-gradient(180deg, ${color} 0%, ${color}ee 100%)`,
+        color: 'white',
+        border: '0.5px solid rgba(0,0,0,0.15)',
+        boxShadow: `0 8px 20px -4px ${color}60, inset 0 1px 1px rgba(255, 255, 255, 0.25)`,
+        fontWeight: '600',
+        letterSpacing: '-0.02em',
+      };
+    }
     if (style === 'gradient') {
       return {
         background: `linear-gradient(to right, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
@@ -248,6 +259,39 @@ export default function CartPage() {
       color: 'white',
       border: 'none'
     };
+  }, [settings]);
+
+  const buttonClasses = useMemo(() => {
+    const shape = settings?.storeBtnShape || 'md';
+    const shadow = settings?.storeBtnShadow || 'sm';
+    
+    const shapeClasses: Record<string, string> = {
+      none: 'rounded-none',
+      sm: 'rounded-sm',
+      md: 'rounded-md',
+      lg: 'rounded-2xl',
+      full: 'rounded-full'
+    };
+
+    const shadowClasses: Record<string, string> = {
+      none: 'shadow-none',
+      sm: 'shadow-sm',
+      md: 'shadow-md',
+      lg: 'shadow-lg',
+      xl: 'shadow-xl',
+      '2xl': 'shadow-2xl',
+      inner: 'shadow-inner'
+    };
+
+    let shapeClass = shapeClasses[shape] || 'rounded-md';
+    let shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
+
+    if (settings?.storeBtnStyle === 'apple') {
+      shapeClass = 'rounded-xl';
+      shadowClass = 'shadow-none';
+    }
+
+    return `${shapeClass} ${shadowClass}`;
   }, [settings]);
 
   if (cartItems.length === 0) {
@@ -489,7 +533,10 @@ export default function CartPage() {
                           <LoadingButton 
                             size="lg" 
                             style={buttonStyle} 
-                            className="w-full h-14 text-lg font-bold shadow-lg shadow-primary/20 border-none" 
+                            className={cn(
+                                "w-full h-14 text-lg font-bold border-none transition-all",
+                                buttonClasses
+                            )}
                             disabled={hasIssues || subtotal === 0}
                             isLoading={isCheckingOut}
                             onClick={() => {

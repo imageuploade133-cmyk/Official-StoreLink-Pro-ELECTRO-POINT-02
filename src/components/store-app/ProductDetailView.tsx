@@ -710,7 +710,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                                 }}
                                 style={addToCartButtonStyle}
                                 className={cn(
-                                    "flex-1 rounded-2xl text-white font-black uppercase tracking-widest shadow-xl transition-all active:scale-[0.98] group",
+                                    "flex-1 text-white font-black uppercase tracking-widest transition-all active:scale-[0.98] group",
                                     addToCartButtonClasses
                                 )}
                             >

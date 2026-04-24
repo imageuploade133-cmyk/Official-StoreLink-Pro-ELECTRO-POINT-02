@@ -409,6 +409,17 @@ export default function CheckoutPage() {
 
   const buttonStyle = useMemo(() => {
     const style = settings?.storeBtnStyle || 'standard';
+    if (style === 'apple') {
+      const color = settings?.storeBtnColor || '#007AFF';
+      return {
+        background: `linear-gradient(180deg, ${color} 0%, ${color}ee 100%)`,
+        color: 'white',
+        border: '0.5px solid rgba(0,0,0,0.15)',
+        boxShadow: `0 8px 20px -4px ${color}60, inset 0 1px 1px rgba(255, 255, 255, 0.25)`,
+        fontWeight: '600',
+        letterSpacing: '-0.02em',
+      };
+    }
     if (style === 'gradient') {
       return {
         background: `linear-gradient(to right, ${settings?.storeBtnGradientStart || '#3b82f6'}, ${settings?.storeBtnGradientEnd || '#1d4ed8'})`,
@@ -421,6 +432,39 @@ export default function CheckoutPage() {
       color: 'white',
       border: 'none'
     };
+  }, [settings]);
+
+  const buttonClasses = useMemo(() => {
+    const shape = settings?.storeBtnShape || 'md';
+    const shadow = settings?.storeBtnShadow || 'sm';
+    
+    const shapeClasses: Record<string, string> = {
+      none: 'rounded-none',
+      sm: 'rounded-sm',
+      md: 'rounded-md',
+      lg: 'rounded-2xl',
+      full: 'rounded-full'
+    };
+
+    const shadowClasses: Record<string, string> = {
+      none: 'shadow-none',
+      sm: 'shadow-sm',
+      md: 'shadow-md',
+      lg: 'shadow-lg',
+      xl: 'shadow-xl',
+      '2xl': 'shadow-2xl',
+      inner: 'shadow-inner'
+    };
+
+    let shapeClass = shapeClasses[shape] || 'rounded-md';
+    let shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
+
+    if (settings?.storeBtnStyle === 'apple') {
+      shapeClass = 'rounded-xl';
+      shadowClass = 'shadow-none';
+    }
+
+    return `${shapeClass} ${shadowClass}`;
   }, [settings]);
 
   if (isAuthLoading || isLoadingSettings || isProfileLoading || isLoadingMethods) {
@@ -590,7 +634,7 @@ export default function CheckoutPage() {
                     </>
                   )}
 
-                  {step === 'details' && <Button type="submit" style={buttonStyle} className="border-none font-bold w-full h-12">Continue to Payment</Button>}
+                  {step === 'details' && <Button type="submit" style={buttonStyle} className={cn("border-none font-bold w-full h-12 transition-all", buttonClasses)}>Continue to Payment</Button>}
                 </form>
               </CardContent>
             </Card>
@@ -778,7 +822,7 @@ export default function CheckoutPage() {
                     disabled={(paymentMethod === 'Bank Transfer' && !hasConfirmedTransfer) || filteredPaymentMethods.length === 0}
                     size="lg" 
                     style={buttonStyle}
-                    className="px-10 border-none font-bold"
+                    className={cn("px-10 border-none font-bold transition-all", buttonClasses)}
                     loadingText="Processing..."
                   >
                     <ShieldCheck className="mr-2 h-4 w-4" />

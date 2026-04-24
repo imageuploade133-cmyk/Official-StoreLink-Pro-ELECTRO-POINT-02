@@ -610,7 +610,17 @@ export default function ProductDetailsPage() {
       ? (settings?.storeAddToCartStyle || 'standard')
       : (settings?.storeBtnStyle || 'standard');
     
-    if (style === 'gradient') {
+    if (style === 'apple') {
+        const color = settings?.storeAddToCartColor || '#007AFF';
+        return {
+          background: `linear-gradient(180deg, ${color} 0%, ${color}ee 100%)`,
+          color: 'white',
+          border: '0.5px solid rgba(0,0,0,0.15)',
+          boxShadow: `0 8px 20px -4px ${color}60, inset 0 1px 1px rgba(255, 255, 255, 0.25)`,
+          fontWeight: '600',
+          letterSpacing: '-0.02em',
+        };
+    } else if (style === 'gradient') {
         return {
           background: `linear-gradient(135deg, ${settings?.storeAddToCartGradientStart || '#3b82f6'}, ${settings?.storeAddToCartGradientEnd || '#1d4ed8'})`,
           color: 'white',
@@ -655,6 +665,10 @@ export default function ProductDetailsPage() {
       ? (settings?.storeAddToCartSize || 'lg')
       : (settings?.storeBtnSize || 'md');
     
+    const shadow = useIndividual
+      ? (settings?.storeAddToCartShadow || 'sm')
+      : 'sm';
+    
     const sizeClasses: Record<string, string> = {
       sm: 'px-3 py-2 text-xs h-10',
       md: 'px-4 py-2.5 text-sm h-12',
@@ -669,11 +683,27 @@ export default function ProductDetailsPage() {
         lg: 'rounded-2xl',
         full: 'rounded-full'
     };
+
+    const shadowClasses: Record<string, string> = {
+        none: 'shadow-none',
+        sm: 'shadow-sm',
+        md: 'shadow-md',
+        lg: 'shadow-lg',
+        xl: 'shadow-xl',
+        '2xl': 'shadow-2xl',
+        inner: 'shadow-inner'
+    };
     
     const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
-    const shapeClass = shapeClasses[shape] || 'rounded-2xl';
+    let shapeClass = shapeClasses[shape] || 'rounded-2xl';
+    let shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
 
-    return `${shapeClass} ${sizeClass}`;
+    if (style === 'apple') {
+        shapeClass = 'rounded-xl';
+        shadowClass = 'shadow-none';
+    }
+
+    return `${shapeClass} ${sizeClass} ${shadowClass}`;
   }, [settings]);
 
   if (isLoadingProduct) {
@@ -914,7 +944,7 @@ export default function ProductDetailsPage() {
                     onClick={isOutOfStock ? () => setIsOutOfDataDrawerOpen(true) : handleAddToCart} 
                     style={isOutOfStock ? { backgroundColor: '#e2e8f0', color: '#94a3b8' } : buttonStyle}
                     className={cn(
-                        "flex-1 font-semibold tracking-tight shadow-sm transition-all active:scale-[0.98] group", 
+                        "flex-1 font-semibold tracking-tight transition-all active:scale-[0.98] group", 
                         buttonClasses,
                         isOutOfStock && "cursor-pointer"
                     )}

@@ -131,6 +131,18 @@ export function HeroCarousel() {
       ? (settings?.storeHeroBtnStyle || 'gradient')
       : (settings?.storeBtnStyle || 'standard');
     
+    if (style === 'apple') {
+      const color = useIndividual ? (settings?.storeHeroBtnColor || '#007AFF') : (settings?.storeBtnColor || '#007AFF');
+      return {
+        background: `linear-gradient(180deg, ${color} 0%, ${color}ee 100%)`,
+        color: 'white',
+        border: '0.5px solid rgba(0,0,0,0.15)',
+        boxShadow: `0 8px 20px -4px ${color}60, inset 0 1px 1px rgba(255, 255, 255, 0.25)`,
+        fontWeight: '600',
+        letterSpacing: '-0.02em',
+      };
+    }
+
     const getColor = () => {
       if (useIndividual) {
         if (style === 'gradient') {
@@ -203,8 +215,17 @@ export function HeroCarousel() {
     };
     
     const sizeClass = sizeClasses[size as keyof typeof sizeClasses] || sizeClasses.lg;
-    const shapeClass = shapeClasses[shape] || 'rounded-[2rem]';
-    const shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-md';
+    let shapeClass = shapeClasses[shape] || 'rounded-[2rem]';
+    let shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-md';
+
+    const style = useIndividual 
+      ? (settings?.storeHeroBtnStyle || 'gradient')
+      : (settings?.storeBtnStyle || 'standard');
+
+    if (style === 'apple') {
+      shapeClass = 'rounded-xl';
+      shadowClass = 'shadow-none';
+    }
 
     return `${shapeClass} ${sizeClass} ${shadowClass}`;
   }, [settings]);
@@ -306,7 +327,7 @@ export function HeroCarousel() {
                         )}
                         {slide.showActionButton && (
                           <div className="pt-2 md:pt-10 animate-in fade-in zoom-in-95 duration-1000 delay-300">
-                            <Button asChild style={buttonStyle} className={`group relative overflow-hidden font-black shadow-2xl active:scale-95 border-none transition-all duration-500 ${buttonClasses}`}>
+                            <Button asChild style={buttonStyle} className={`group relative overflow-hidden font-black active:scale-95 border-none transition-all duration-500 ${buttonClasses}`}>
                               <Link href={getStoreUrl('/store/shop')}>
                                 <span className="relative z-10 flex items-center gap-2 md:gap-4">
                                   {heroBtnText}

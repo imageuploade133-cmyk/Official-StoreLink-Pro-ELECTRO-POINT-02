@@ -427,7 +427,7 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                                                         asChild 
                                                         style={heroButtonStyle}
                                                         className={cn(
-                                                            "font-black uppercase tracking-widest bg-white text-slate-950 hover:bg-primary hover:text-white transition-all shadow-xl active:scale-90 border-none",
+                                                            "font-black uppercase tracking-widest transition-all active:scale-90 border-none",
                                                             heroButtonClasses
                                                         )}
                                                     >
@@ -673,7 +673,7 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                                     size="icon" 
                                     style={gridCartButtonStyle}
                                     className={cn(
-                                        "rounded-2xl text-white shadow-2xl hover:scale-110 transition-transform active:scale-90 border-none",
+                                        "text-white hover:scale-110 transition-transform active:scale-90 border-none",
                                         gridCartButtonClasses
                                     )}
                                     onClick={(e) => {
