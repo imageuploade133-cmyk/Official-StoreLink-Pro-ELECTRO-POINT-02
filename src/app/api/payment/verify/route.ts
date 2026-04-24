@@ -8,6 +8,7 @@ import {
   sendWhatsAppViaEBulkSMS, 
   logWhatsAppMessage 
 } from '@/lib/whatsapp-ebulk';
+import { sendWhatsAppOrderAlert } from '../../actions/orders';
 import Stripe from 'stripe';
 
 export async function GET(request: Request) {
@@ -213,37 +214,21 @@ export async function GET(request: Request) {
 
         // Trigger WhatsApp notification for payment confirmed
         getWhatsAppSettings(tData.storeId || 'global').then(async (settings) => {
-          if (settings && settings.enabled && settings.senderNumber) {
+          if (settings && settings.enabled) {
             const orderSnap = await orderRef.get();
             const orderData = orderSnap.data();
-            const customerName = orderData?.guestInfo?.name || 'Customer';
-            const shortOrderId = tData.orderId.substring(0, 8).toUpperCase();
-            const amount = orderData?.totalAmount || 0;
-            
-            const message = `*Hello ${orderData?.storeName || 'Admin'},*\n*Payment CONFIRMED for Order #${shortOrderId}.*\n\n*Customer: ${customerName}*\n*Amount: ₦${amount.toLocaleString()}*\n*Status: processing*\n\n*You can now begin processing this order.*`;
-            
-            const result = await sendWhatsAppViaEBulkSMS(
-                settings.username, 
-                settings.apiKey, 
-                [settings.senderNumber], 
-                'Payment Confirmed Alert', 
-                message,
-                2,
-                settings.senderNumber
-            );
-            
-            await logWhatsAppMessage({
-              eventType: 'staff_order_alert',
-              messageContent: message,
-              recipientPhone: settings.senderNumber,
-              customerName: customerName,
-              status: result?.response?.status === 'SUCCESS' ? 'sent' : 'failed',
-              unitsCharged: 1,
-              userId: 'system-verify',
-              userName: 'Payment Verification',
-              storeId: tData.storeId || 'global',
-              errorDetails: result?.response?.status !== 'SUCCESS' ? result?.response?.statusdetail : null
-            });
+            if (orderData) {
+              const globalSettingsDoc = await adminDb.collection('settings').doc('global').get();
+              const currency = globalSettingsDoc.data()?.currency || '₦';
+              
+              // This sends full order details to both Admin and Customer
+              await sendWhatsAppOrderAlert({ 
+                id: tData.orderId, 
+                ...orderData, 
+                status: 'processing', 
+                paymentStatus: 'PAID' 
+              }, settings, currency);
+            }
           }
         }).catch(err => console.error('Error sending WhatsApp payment alert:', err));
       });

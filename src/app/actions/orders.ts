@@ -173,24 +173,19 @@ export async function placeOrderAction({
         ).catch(err => console.error('Error sending order emails:', err));
 
         // Send WhatsApp Notifications (non-blocking)
-        const waSettings: any = whatsappAlertSettings ? { ...whatsappAlertSettings } : {
-            enabled: (settings as any).enableWhatsapp || (settings as any).enableOrderAlerts,
-            username: (settings as any).eBulkUsername,
-            apiKey: (settings as any).eBulkApiKey,
-            senderNumber: (settings as any).orderNotificationNumbers?.[0],
+        const waSettings: any = {
+            enabled: (settings as any).enableOrderAlerts || (settings as any).enableWhatsapp || whatsappAlertSettings?.enabled,
+            username: whatsappAlertSettings?.username || (settings as any).eBulkUsername,
+            apiKey: whatsappAlertSettings?.apiKey || (settings as any).eBulkApiKey,
+            senderNumber: whatsappAlertSettings?.senderNumber || (settings as any).orderNotificationNumbers?.[0],
+            orderNotificationNumbers: Array.from(new Set([
+                ...(whatsappAlertSettings?.orderNotificationNumbers || []),
+                ...((settings as any).orderNotificationNumbers || [])
+            ])),
+            orderPlacedTemplate: whatsappAlertSettings?.orderPlacedTemplate,
         };
 
-        // Always ensure we have the list of numbers from general settings if they aren't in waSettings
-        if (!waSettings.orderNotificationNumbers || waSettings.orderNotificationNumbers.length === 0) {
-            waSettings.orderNotificationNumbers = (settings as any).orderNotificationNumbers || [];
-        }
-
-        // If the main toggle in Order Alerts is on, ensure waSettings is enabled
-        if ((settings as any).enableOrderAlerts) {
-            waSettings.enabled = true;
-        }
-
-        if (waSettings && waSettings.enabled && waSettings.username && waSettings.apiKey) {
+        if (waSettings.enabled && waSettings.username && waSettings.apiKey) {
             sendWhatsAppOrderAlert(
                 { id: orderId, ...orderData },
                 waSettings as WhatsAppAlertSettings,
@@ -521,7 +516,21 @@ export async function validateEBulkSMSAction(username: string, apiKey: string) {
     }
 }
 
-function formatWhatsAppMessage(template: string, data: { orderId: string, customerName: string, amount: string, currency: string, status: string, itemsDetails?: string, paymentMethod?: string, storeName?: string }) {
+function formatWhatsAppMessage(template: string, data: { 
+    orderId: string, 
+    customerName: string, 
+    amount: string, 
+    currency: string, 
+    status: string, 
+    itemsDetails?: string, 
+    paymentMethod?: string, 
+    storeName?: string,
+    fulfillmentType?: string,
+    deliveryAddress?: string,
+    customerEmail?: string,
+    customerPhone?: string,
+    paymentStatus?: string
+}) {
     return template
         .replace(/{orderId}/g, data.orderId)
         .replace(/{customerName}/g, data.customerName)
@@ -530,7 +539,12 @@ function formatWhatsAppMessage(template: string, data: { orderId: string, custom
         .replace(/{status}/g, data.status)
         .replace(/{itemsDetails}/g, data.itemsDetails || '')
         .replace(/{paymentMethod}/g, data.paymentMethod || '')
-        .replace(/{storeName}/g, data.storeName || 'Admin');
+        .replace(/{storeName}/g, data.storeName || 'Admin')
+        .replace(/{fulfillmentType}/g, data.fulfillmentType || '')
+        .replace(/{deliveryAddress}/g, data.deliveryAddress || '')
+        .replace(/{customerEmail}/g, data.customerEmail || '')
+        .replace(/{customerPhone}/g, data.customerPhone || '')
+        .replace(/{paymentStatus}/g, data.paymentStatus || '');
 }
 
 function formatOrderItemsForWhatsApp(items: any[], currency: string) {
@@ -550,13 +564,34 @@ async function getCustomerPhone(userId: string) {
 
 export async function sendWhatsAppOrderAlert(order: any, settings: WhatsAppAlertSettings, currency: string) {
     const customerName = order.guestInfo?.name || (order.user_id !== 'GUEST' ? await getCustomerName(order.user_id) : 'Customer');
+    const customerEmail = order.guestInfo?.email || (order.user_id !== 'GUEST' ? await getCustomerEmail(order.user_id) : 'N/A');
+    const customerPhone = order.guestInfo?.phone || order.guestInfo?.whatsapp || (order.user_id !== 'GUEST' ? await getCustomerPhone(order.user_id) : null);
+    
     const amount = order.totalAmount.toLocaleString();
     const orderId = order.id.substring(0, 8).toUpperCase();
     const itemsDetails = formatOrderItemsForWhatsApp(order.items, currency);
     const paymentMethod = order.paymentMethod || 'N/A';
+    const fulfillmentType = order.fulfillmentType === 'pickup' ? 'Store Pickup' : 'Delivery';
+    const deliveryAddress = order.fulfillmentType === 'pickup' ? 'N/A (Store Pickup)' : (order.guestInfo?.address || 'N/A');
     
     const productTotal = order.items.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
     const deliveryFee = order.deliveryPrice || 0;
+
+    const templateData = {
+        orderId,
+        customerName,
+        customerEmail,
+        customerPhone: customerPhone || 'N/A',
+        amount,
+        currency,
+        status: order.status,
+        itemsDetails,
+        paymentMethod,
+        storeName: order.storeName || 'Admin',
+        fulfillmentType,
+        deliveryAddress,
+        paymentStatus: order.paymentStatus || 'UNPAID'
+    };
 
     // 1. Send to Admin
     const adminRecipients = [];
@@ -572,18 +607,21 @@ export async function sendWhatsAppOrderAlert(order: any, settings: WhatsAppAlert
     if (adminRecipients.length > 0) {
         let adminMessage = '';
         if (settings.orderPlacedTemplate) {
-            adminMessage = formatWhatsAppMessage(settings.orderPlacedTemplate, {
-                orderId,
-                customerName,
-                amount,
-                currency,
-                status: order.status,
-                itemsDetails,
-                paymentMethod,
-                storeName: order.storeName || 'Admin'
-            });
+            adminMessage = formatWhatsAppMessage(settings.orderPlacedTemplate, templateData);
         } else {
-            adminMessage = `*Hello ${order.storeName || 'Admin'},*\n*You received a new order.*\n\n*Order ID: #${orderId}*\n*Customer: ${customerName}*\n*Product Fee: ${currency}${productTotal.toLocaleString()}*\n*Delivery Fee: ${currency}${deliveryFee.toLocaleString()}*\n*Total: ${currency}${order.totalAmount.toLocaleString()}*\n*Payment Method: ${paymentMethod}*\n*Status: ${order.status}*\n\n*Items:*\n${itemsDetails}\n\n*Login to dashboard now.*`;
+            adminMessage = `*Hello ${order.storeName || 'Admin'},*\n*You received a new order!*\n\n` +
+                           `*Order ID: #${orderId}*\n` +
+                           `*Customer: ${customerName}*\n` +
+                           `*Email: ${customerEmail}*\n` +
+                           `*Phone: ${customerPhone || 'N/A'}*\n\n` +
+                           `*Fulfillment: ${fulfillmentType}*\n` +
+                           (order.fulfillmentType !== 'pickup' ? `*Address: ${deliveryAddress}*\n` : '') +
+                           `*Payment: ${paymentMethod} (${order.paymentStatus || 'UNPAID'})*\n\n` +
+                           `*Items:*\n${itemsDetails}\n\n` +
+                           `*Product Total: ${currency}${productTotal.toLocaleString()}*\n` +
+                           `*Delivery Fee: ${currency}${deliveryFee.toLocaleString()}*\n` +
+                           `*GRAND TOTAL: ${currency}${order.totalAmount.toLocaleString()}*\n\n` +
+                           `*Log in to dashboard to process.*`;
         }
 
         try {
@@ -591,7 +629,7 @@ export async function sendWhatsAppOrderAlert(order: any, settings: WhatsAppAlert
                 settings.username, 
                 settings.apiKey, 
                 adminRecipients, 
-                'New Order Alert (Admin)', 
+                'New Order Alert', 
                 adminMessage,
                 2,
                 settings.senderNumber
@@ -619,17 +657,23 @@ export async function sendWhatsAppOrderAlert(order: any, settings: WhatsAppAlert
     }
 
     // 2. Send to Customer
-    const customerPhone = order.guestInfo?.phone || order.guestInfo?.whatsapp || (order.user_id !== 'GUEST' ? await getCustomerPhone(order.user_id) : null);
     if (customerPhone) {
         let extraMsg = '';
         if (order.paymentMethod === 'Bank Transfer' && order.selectedBankAccount) {
             extraMsg = `\n\n*Payment Instructions:*\n*Please transfer ${currency}${amount} to:*\n*Bank: ${order.selectedBankAccount.bankName}*\n*Account: ${order.selectedBankAccount.accountNumber}*\n*Name: ${order.selectedBankAccount.accountName}*\n*Ref: ${order.paymentReference}*\n`;
         }
 
-        const customerEmail = order.guestInfo?.email || (order.user_id !== 'GUEST' ? await getCustomerEmail(order.user_id) : 'N/A');
-        const deliveryAddress = order.fulfillmentType === 'pickup' ? '*Method: Store Pickup*' : `*Address: ${order.guestInfo?.address || 'N/A'}*`;
-
-        const customerMessage = `*Hello ${customerName},*\n*Your order #${orderId} at ${order.storeName || 'our store'} has been placed successfully!*\n\n*Order Details:*\n${itemsDetails}\n\n*Product Fee: ${currency}${productTotal.toLocaleString()}*\n*Delivery Fee: ${currency}${deliveryFee.toLocaleString()}*\n*Total: ${currency}${order.totalAmount.toLocaleString()}*\n*Payment Method: ${paymentMethod}*\n*Status: ${order.status}*${extraMsg}\n\n*Delivery Details:*\n*Name: ${customerName}*\n*Email: ${customerEmail}*\n*Phone: ${customerPhone}*\n${deliveryAddress}\n\n*Thank you for shopping with us!*`;
+        const customerMessage = `*Hello ${customerName},*\n*Your order #${orderId} at ${order.storeName || 'our store'} has been placed successfully!*\n\n` +
+                               `*Order Details:*\n${itemsDetails}\n\n` +
+                               `*Fulfillment: ${fulfillmentType}*\n` +
+                               (order.fulfillmentType === 'pickup' ? '*Method: Store Pickup*\n' : `*Address: ${deliveryAddress}*\n`) +
+                               `*Payment: ${paymentMethod}*\n` +
+                               `*Status: ${order.status}*${extraMsg}\n\n` +
+                               `*Summary:*\n` +
+                               `*Product Total: ${currency}${productTotal.toLocaleString()}*\n` +
+                               `*Delivery Fee: ${currency}${deliveryFee.toLocaleString()}*\n` +
+                               `*Total Amount: ${currency}${order.totalAmount.toLocaleString()}*\n\n` +
+                               `*Thank you for shopping with us!*`;
 
         try {
             const result = await sendWhatsAppViaEBulkSMS(
