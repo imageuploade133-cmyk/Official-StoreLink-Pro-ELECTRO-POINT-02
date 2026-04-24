@@ -127,6 +127,10 @@ export default {
           '0%, 100%': { top: '0%' },
           '50%': { top: '100%' },
         },
+        'shrink': {
+          from: { width: '100%' },
+          to: { width: '0%' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -135,6 +139,7 @@ export default {
         'shimmer': 'shimmer 2s infinite linear',
         'spin-slow': 'spin 3s linear infinite',
         'scan-move': 'scan-move 2s ease-in-out infinite',
+        'shrink': 'shrink linear forwards',
       },
     },
   },
