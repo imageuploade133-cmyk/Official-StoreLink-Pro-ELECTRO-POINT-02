@@ -476,6 +476,10 @@ export interface Settings {
   toastInfoColor?: string;
   toastPosition?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center';
   toastAnimation?: 'slide' | 'fade' | 'zoom';
+  toastUseGradient?: boolean;
+  toastGradientStartColor?: string;
+  toastGradientEndColor?: string;
+  toastGradientAngle?: number;
 }
 
 export type AppSettings = Settings;
