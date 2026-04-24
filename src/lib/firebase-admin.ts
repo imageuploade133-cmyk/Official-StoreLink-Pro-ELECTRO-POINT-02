@@ -8,10 +8,17 @@ if (!admin.apps.length) {
 
     if (serviceAccountKey) {
       try {
-        // If service account is provided via environment variables
-        const key = serviceAccountKey.startsWith('{') 
-          ? JSON.parse(serviceAccountKey) 
-          : JSON.parse(Buffer.from(serviceAccountKey, 'base64').toString());
+        // Handle potential quoting issues and whitespace
+        const cleanedKey = serviceAccountKey.trim().replace(/^['"](.*)['"]$/, '$1');
+        
+        const key = cleanedKey.startsWith('{') 
+          ? JSON.parse(cleanedKey) 
+          : JSON.parse(Buffer.from(cleanedKey, 'base64').toString());
+
+        // Ensure the private key has correct newline formatting
+        if (key.private_key && typeof key.private_key === 'string') {
+          key.private_key = key.private_key.replace(/\\n/g, '\n');
+        }
 
         admin.initializeApp({
           credential: admin.credential.cert(key),
@@ -19,7 +26,7 @@ if (!admin.apps.length) {
         });
         console.log('Firebase Admin initialized with FIREBASE_SERVICE_ACCOUNT_KEY');
       } catch (parseError) {
-        console.error('Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY. Ensure it is valid JSON or Base64 encoded JSON.');
+        console.error('Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY:', parseError);
         // Fallback to ADC
         if (!admin.apps.length) {
           admin.initializeApp({

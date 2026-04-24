@@ -30,8 +30,19 @@ async function migrate() {
         try {
             const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
             if (serviceAccountKey) {
+                // Handle potential quoting issues and whitespace
+                const cleanedKey = serviceAccountKey.trim().replace(/^['"](.*)['"]$/, '$1');
+                const key = cleanedKey.startsWith('{') 
+                    ? JSON.parse(cleanedKey) 
+                    : JSON.parse(Buffer.from(cleanedKey, 'base64').toString());
+
+                // Ensure the private key has correct newline formatting
+                if (key.private_key && typeof key.private_key === 'string') {
+                    key.private_key = key.private_key.replace(/\\n/g, '\n');
+                }
+
                 admin.initializeApp({
-                    credential: admin.credential.cert(JSON.parse(serviceAccountKey)),
+                    credential: admin.credential.cert(key),
                     projectId: projectId
                 });
             } else {
