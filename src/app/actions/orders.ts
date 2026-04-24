@@ -53,6 +53,15 @@ export async function placeOrderAction({
   taxAmountCalculated?: number;
 }) {
   try {
+    // Basic validation
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return { success: false, error: 'Cannot place an empty order.' };
+    }
+
+    if (totalAmount < 0) {
+      return { success: false, error: 'Invalid total amount.' };
+    }
+
     let resultOrderId = '';
     let orderDataForNotification: any = null;
     let settingsForNotification: any = null;
@@ -107,13 +116,18 @@ export async function placeOrderAction({
 
       // 1. Check stock for all items and get names
       const enrichedItems = [];
-
+      
+      // Perform all reads first
+      const productSnaps = [];
       for (const item of items) {
         const productRef = adminDb.collection('products').doc(item.productId);
         const snap = await transaction.get(productRef);
-        
         if (!snap.exists) throw new Error(`Product with ID "${item.productId}" not found.`);
-        
+        productSnaps.push({ item, snap, ref: productRef });
+      }
+
+      // Now perform all writes
+      for (const { item, snap, ref } of productSnaps) {
         const data = snap.data();
         const currentStock = Number(data?.stock || 0);
         const quantity = Number(item.quantity || 0);
@@ -122,7 +136,7 @@ export async function placeOrderAction({
           throw new Error(`Insufficient stock for "${data?.name || item.productId}". Only ${currentStock} left.`);
         }
         
-        transaction.update(productRef, { stock: currentStock - quantity });
+        transaction.update(ref, { stock: currentStock - quantity });
         
         enrichedItems.push({
           ...item,
@@ -138,13 +152,21 @@ export async function placeOrderAction({
 
       // 3. Create the order
       const orderRef = adminDb.collection('orders').doc();
+      
+      // Ensure all numbers are valid
+      const finalTotalAmount = Number(totalAmount) || 0;
+      const finalTotalCost = Number(totalCost) || 0;
+      const finalDeliveryPrice = Number(deliveryPrice) || 0;
+      const finalTaxRate = Number(taxRate) || 0;
+      const finalTaxAmountCalculated = Number(taxAmountCalculated) || 0;
+
       const orderData = {
         user_id: userId,
         store_id: storeId,
         storeName: (settings as any).storeName || 'Our Store',
         items: enrichedItems,
-        totalAmount,
-        totalCost,
+        totalAmount: finalTotalAmount,
+        totalCost: finalTotalCost,
         paymentMethod,
         paymentReference: paymentReference || null,
         paymentReceiptUrl: paymentReceiptUrl || null,
@@ -152,7 +174,7 @@ export async function placeOrderAction({
         selectedBankAccount: selectedBankAccount || null,
         fulfillmentType: fulfillmentType || 'delivery',
         deliveryLocationId: deliveryLocationId || null,
-        deliveryPrice: deliveryPrice || 0,
+        deliveryPrice: finalDeliveryPrice,
         status: 'pending',
         paymentStatus: 'UNPAID',
         isPaid: false,
@@ -160,8 +182,8 @@ export async function placeOrderAction({
         guestInfo: guestInfo || null,
         payCurrency: payCurrency || null,
         gateway: gateway || null,
-        taxRate: taxRate || 0,
-        taxAmountCalculated: taxAmountCalculated || 0,
+        taxRate: finalTaxRate,
+        taxAmountCalculated: finalTaxAmountCalculated,
       };
       
       transaction.set(orderRef, orderData);
