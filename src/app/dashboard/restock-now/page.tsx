@@ -32,7 +32,10 @@ import {
   PlusCircle,
   Truck,
   FileText,
-  PackageSearch
+  PackageSearch,
+  Eye,
+  Upload,
+  X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -69,6 +72,11 @@ export default function RestockNowPage() {
   const [restockQuantity, setRestockQuantity] = useState<number>(1);
   const [costPrice, setCostPrice] = useState<number>(0);
   const [supplierName, setSupplierName] = useState('');
+  const [supplierContactName, setSupplierContactName] = useState('');
+  const [supplierPhone, setSupplierPhone] = useState('');
+  const [supplierLocation, setSupplierLocation] = useState('');
+  const [stockDocumentUrl, setStockDocumentUrl] = useState('');
+  const [isUploadingStockDoc, setIsUploadingStockDoc] = useState(false);
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -188,6 +196,42 @@ export default function RestockNowPage() {
     }
   };
 
+  const handleStockDocUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    // Check file type
+    const isImage = file.type.startsWith('image/');
+    const isPdf = file.type === 'application/pdf';
+    
+    if (!isImage && !isPdf) {
+        toast({ variant: "destructive", title: "Invalid format", description: "Only images and PDF receipts are accepted." });
+        return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) { 
+      toast({ variant: "destructive", title: "File too large", description: "Receipt must be smaller than 5MB." });
+      return;
+    }
+    
+    setIsUploadingStockDoc(true);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      try {
+        const imageDataUri = reader.result as string;
+        const { uploadImage } = await import('@/ai/flows/image-upload-flow');
+        const result = await uploadImage({ imageDataUri, storeId: currentStoreId });
+        setStockDocumentUrl(result.display_url);
+        toast({ title: "Receipt Uploaded", description: "Stock document has been saved." });
+      } catch (error: any) {
+        toast({ variant: "destructive", title: "Upload Failed", description: error.message || "Could not upload document." });
+      } finally {
+        setIsUploadingStockDoc(false);
+      }
+    };
+  };
+
   const handleRestock = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedProduct || !firestore || !currentStoreId || !user) return;
@@ -248,6 +292,10 @@ export default function RestockNowPage() {
           costPricePerUnit: costPrice,
           totalCost: restockQuantity * costPrice,
           supplierName: supplierName || null,
+          supplierContactName: supplierContactName || null,
+          supplierPhone: supplierPhone || null,
+          supplierLocation: supplierLocation || null,
+          receiptUrl: stockDocumentUrl || null,
           notes: notes || null,
           restockDate: serverTimestamp() as any,
           createdAt: serverTimestamp() as any,
@@ -277,6 +325,11 @@ export default function RestockNowPage() {
       // Refresh product data
       setSelectedProduct({ ...selectedProduct, stock: (selectedProduct.stock || 0) + restockQuantity, purchasePrice: costPrice });
       setRestockQuantity(1);
+      setSupplierName('');
+      setSupplierContactName('');
+      setSupplierPhone('');
+      setSupplierLocation('');
+      setStockDocumentUrl('');
       setNotes('');
     } catch (error: any) {
       console.error('Restock error:', error);
@@ -492,17 +545,106 @@ export default function RestockNowPage() {
                         </div>
                       </div>
                     </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="supplier">Supplier Company (Optional)</Label>
+                        <div className="relative">
+                          <Truck className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id="supplier"
+                            className="pl-8"
+                            placeholder="e.g., Electronics Wholesale Ltd"
+                            value={supplierName}
+                            onChange={(e) => setSupplierName(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="supplierAgent">Supplier Agent Name (Optional)</Label>
+                        <div className="relative">
+                          <PlusCircle className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id="supplierAgent"
+                            className="pl-8"
+                            placeholder="e.g., John Doe"
+                            value={supplierContactName}
+                            onChange={(e) => setSupplierContactName(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="supplierPhone">Supplier Phone (Optional)</Label>
+                        <div className="relative">
+                          <Truck className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id="supplierPhone"
+                            className="pl-8"
+                            placeholder="+1 234 567 890"
+                            value={supplierPhone}
+                            onChange={(e) => setSupplierPhone(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="supplierLocation">Supplier Location (Optional)</Label>
+                        <div className="relative">
+                          <FileText className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id="supplierLocation"
+                            className="pl-8"
+                            placeholder="City, Country"
+                            value={supplierLocation}
+                            onChange={(e) => setSupplierLocation(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="space-y-2">
-                      <Label htmlFor="supplier">Supplier Name (Optional)</Label>
-                      <div className="relative">
-                        <Truck className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="supplier"
-                          className="pl-8"
-                          placeholder="Main Distributor, Local Wholesaler..."
-                          value={supplierName}
-                          onChange={(e) => setSupplierName(e.target.value)}
-                        />
+                      <Label className="flex items-center gap-2">
+                          <FileText className="h-4 w-4 text-primary" /> Stock Document / Receipt (Optional)
+                      </Label>
+                      <div className="flex items-start gap-4">
+                          {stockDocumentUrl && (
+                              <div className="relative w-20 h-20 rounded-lg border overflow-hidden shrink-0 shadow-sm bg-muted flex items-center justify-center">
+                                  {stockDocumentUrl.match(/\.(jpeg|jpg|gif|png)$/) != null || stockDocumentUrl.includes('imgbb') ? (
+                                    <Image src={stockDocumentUrl} alt="Receipt" fill className="object-contain" unoptimized />
+                                  ) : (
+                                    <FileText className="h-8 w-8 text-muted-foreground" />
+                                  )}
+                                  <Button type="button" variant="destructive" size="icon" className="absolute top-0.5 right-0.5 h-5 w-5 rounded-full" onClick={() => setStockDocumentUrl('')}>
+                                      <X className="h-3 w-3" />
+                                  </Button>
+                              </div>
+                          )}
+                          <div className="flex-grow space-y-2">
+                              <Input 
+                                placeholder="URL or upload below" 
+                                value={stockDocumentUrl} 
+                                onChange={(e) => setStockDocumentUrl(e.target.value)}
+                                disabled={isSubmitting || isUploadingStockDoc} 
+                                className="h-10" 
+                              />
+                              <div className="flex items-center gap-2">
+                                <Button asChild variant="outline" size="sm" disabled={isSubmitting || isUploadingStockDoc}>
+                                    <label htmlFor="restock-doc-upload-page" className="cursor-pointer flex items-center gap-1">
+                                        {isUploadingStockDoc ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
+                                        Upload Receipt
+                                    </label>
+                                </Button>
+                                {stockDocumentUrl && (
+                                  <Button type="button" variant="ghost" size="sm" asChild>
+                                    <a href={stockDocumentUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1">
+                                      <Eye className="h-3 w-3" /> View
+                                    </a>
+                                  </Button>
+                                )}
+                              </div>
+                              <input id="restock-doc-upload-page" type="file" accept="image/*,.pdf" className="hidden" onChange={handleStockDocUpload} disabled={isSubmitting || isUploadingStockDoc} />
+                          </div>
                       </div>
                     </div>
                     <div className="space-y-2">
