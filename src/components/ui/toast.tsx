@@ -26,15 +26,15 @@ const ToastViewport = React.forwardRef<
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName
 
 const toastVariants = cva(
-  "group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-2xl border p-4 pr-8 shadow-2xl transition-all data-[swipe=cancel]:translate-y-0 data-[swipe=end]:translate-y-[var(--radix-toast-swipe-end-y)] data-[swipe=move]:translate-y-[var(--radix-toast-swipe-move-y)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=open]:slide-in-from-top-full data-[state=closed]:slide-out-to-top-full",
+  "group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-2xl border p-4 pr-8 transition-all data-[swipe=cancel]:translate-y-0 data-[swipe=end]:translate-y-[var(--radix-toast-swipe-end-y)] data-[swipe=move]:translate-y-[var(--radix-toast-swipe-move-y)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=open]:slide-in-from-top-full data-[state=closed]:slide-out-to-top-full",
   {
     variants: {
       variant: {
-        default: "apple-glass text-foreground",
-        destructive: "apple-glass border-red-500/50 text-foreground",
-        success: "apple-glass border-green-500/50 text-foreground",
-        info: "apple-glass border-blue-500/50 text-foreground",
-        warning: "apple-glass border-yellow-500/50 text-foreground",
+        default: "bg-white/95 dark:bg-zinc-950/90 border-zinc-200 dark:border-zinc-800 text-foreground backdrop-blur-xl",
+        destructive: "bg-red-50/90 dark:bg-red-950/50 border-red-100 dark:border-red-900/30 text-red-900 dark:text-red-200 backdrop-blur-xl",
+        success: "bg-green-50/90 dark:bg-green-950/50 border-green-100 dark:border-green-900/30 text-green-900 dark:text-green-200 backdrop-blur-xl",
+        info: "bg-blue-50/90 dark:bg-blue-950/50 border-blue-100 dark:border-blue-900/30 text-blue-900 dark:text-blue-200 backdrop-blur-xl",
+        warning: "bg-amber-50/90 dark:bg-amber-950/50 border-amber-100 dark:border-amber-900/30 text-amber-900 dark:text-amber-200 backdrop-blur-xl",
       },
     },
     defaultVariants: {
@@ -78,10 +78,11 @@ const Toast = React.forwardRef<
         <div
           className={cn(
             "h-full countdown-bar animate-shrink",
-            variant === "destructive" ? "bg-red-500/50" : 
-            variant === "success" ? "bg-green-500/50" : 
-            variant === "warning" ? "bg-yellow-500/50" : 
-            "bg-blue-500/50"
+            variant === "destructive" ? "bg-red-500" : 
+            variant === "success" ? "bg-green-500" : 
+            variant === "warning" ? "bg-amber-500" : 
+            variant === "info" ? "bg-blue-500" :
+            "bg-primary"
           )}
           style={{
             animationDuration: `${duration}ms`,

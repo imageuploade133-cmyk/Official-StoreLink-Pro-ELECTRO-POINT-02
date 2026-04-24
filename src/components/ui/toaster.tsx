@@ -21,39 +21,39 @@ export function Toaster() {
         const getIcon = () => {
           switch (variant) {
             case "destructive":
-              return <AlertCircle className="h-5 w-5 text-red-500" />
+              return <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
             case "success":
-              return <CheckCircle2 className="h-5 w-5 text-green-500" />
+              return <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
             case "warning":
-              return <AlertTriangle className="h-5 w-5 text-yellow-500" />
+              return <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
             case "info":
-              return <Info className="h-5 w-5 text-blue-500" />
+              return <Info className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             case "default":
             default:
               // If title includes "Success", use success icon, otherwise info
               if (typeof title === 'string' && title.toLowerCase().includes('success')) {
-                return <CheckCircle2 className="h-5 w-5 text-green-500" />
+                return <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
               }
-              return <Info className="h-5 w-5 text-blue-500" />
+              return <Info className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           }
         }
 
         const getIconBg = () => {
           switch (variant) {
             case "destructive":
-              return "bg-red-500/10"
+              return "bg-red-100 dark:bg-red-900/40"
             case "success":
-              return "bg-green-500/10"
+              return "bg-green-100 dark:bg-green-900/40"
             case "warning":
-              return "bg-yellow-500/10"
+              return "bg-amber-100 dark:bg-amber-900/40"
             case "info":
-              return "bg-blue-500/10"
+              return "bg-blue-100 dark:bg-blue-900/40"
             case "default":
             default:
               if (typeof title === 'string' && title.toLowerCase().includes('success')) {
-                return "bg-green-500/10"
+                return "bg-green-100 dark:bg-green-900/40"
               }
-              return "bg-blue-500/10"
+              return "bg-blue-100 dark:bg-blue-900/40"
           }
         }
 
