@@ -46,8 +46,8 @@ interface CartAreaProps {
   grandTotal: number;
   discountAmount: number;
   discount: { type: 'percentage' | 'fixed' | null; value: number };
-  onUpdateQuantity: (productId: string, newQuantity: number) => void;
-  onRemoveItem: (productId: string) => void;
+  onUpdateQuantity: (productId: string, newQuantity: number, variantId?: string) => void;
+  onRemoveItem: (productId: string, variantId?: string) => void;
   onClearCart: () => void;
   onCustomerSelect: (customer: Customer) => void;
   onClearCustomer: () => void;
@@ -98,13 +98,13 @@ export function CartArea({
     const [localDiscountValue, setLocalDiscountValue] = useState('');
 
 
-    const handleQuantityChange = (productId: string, value: string) => {
+    const handleQuantityChange = (productId: string, value: string, variantId?: string) => {
         const newQuantity = parseInt(value, 10);
         if (isNaN(newQuantity) || newQuantity < 1) {
-            onUpdateQuantity(productId, 1); // Reset to 1 if input is invalid/empty
+            onUpdateQuantity(productId, 1, variantId); // Reset to 1 if input is invalid/empty
             return;
         }
-        onUpdateQuantity(productId, newQuantity);
+        onUpdateQuantity(productId, newQuantity, variantId);
     }
 
     const handleApplyDiscountClick = () => {
@@ -176,16 +176,28 @@ export function CartArea({
                 <ScrollArea className="flex-1 min-h-0 mb-3 -mx-4 px-4">
                     <ul className="divide-y divide-border">
                         {cartItems.map((item) => (
-                            <li key={item.id} className="flex items-center py-3 space-x-3">
+                            <li key={`${item.id}-${item.selectedVariantId || 'base'}`} className="flex items-center py-3 space-x-3">
                                 <div className="relative w-12 h-12 rounded overflow-hidden shrink-0"><Image src={item.imageUrl || defaultProductImageUrl} alt={item.name} fill sizes="48px" className="object-cover" data-ai-hint={item.dataAiHint || item.name.toLowerCase().split(' ').slice(0, 2).join(' ')}/></div>
-                                <div className="flex-grow min-w-0"><p className="text-sm font-medium" title={item.name} style={{ overflow: 'hidden', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2 }}>{item.name}</p><p className="text-xs text-muted-foreground">{formatCurrency(item.salePrice, currencySymbol)}{item.sellingPrice !== item.salePrice && (<span className="line-through ml-1 text-red-500/70">{currencySymbol}{item.sellingPrice.toFixed(2)}</span>)}</p></div>
+                                <div className="flex-grow min-w-0">
+                                    <p className="text-sm font-medium" title={item.name} style={{ overflow: 'hidden', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2 }}>{item.name}</p>
+                                    {item.selectedOptions && (
+                                        <div className="flex flex-wrap gap-1 mt-0.5">
+                                            {Object.entries(item.selectedOptions).map(([key, value]) => (
+                                                <Badge key={key} variant="outline" className="text-[9px] px-1 py-0 h-3.5 bg-muted/30">
+                                                    {value}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    )}
+                                    <p className="text-xs text-muted-foreground mt-0.5">{formatCurrency(item.salePrice, currencySymbol)}{item.sellingPrice !== item.salePrice && (<span className="line-through ml-1 text-red-500/70">{currencySymbol}{item.sellingPrice.toFixed(2)}</span>)}</p>
+                                </div>
                                 <div className="flex items-center gap-1 shrink-0">
-                                    <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}><MinusIconLucide className="h-3.5 w-3.5" /></Button>
-                                    <Input type="number" value={item.quantity} onChange={(e) => handleQuantityChange(item.id, e.target.value)} className="w-10 h-7 text-center text-sm p-0" min="1" max={item.stock} step="1" aria-label={`Quantity for ${item.name}`}/>
-                                    <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}><PlusIconLucide className="h-3.5 w-3.5" /></Button>
+                                    <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => onUpdateQuantity(item.id, item.quantity - 1, item.selectedVariantId)}><MinusIconLucide className="h-3.5 w-3.5" /></Button>
+                                    <Input type="number" value={item.quantity} onChange={(e) => handleQuantityChange(item.id, e.target.value, item.selectedVariantId)} className="w-10 h-7 text-center text-sm p-0" min="1" max={item.stock} step="1" aria-label={`Quantity for ${item.name}`}/>
+                                    <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => onUpdateQuantity(item.id, item.quantity + 1, item.selectedVariantId)}><PlusIconLucide className="h-3.5 w-3.5" /></Button>
                                 </div>
                                 <p className="text-sm font-semibold w-20 text-right shrink-0">{formatCurrency(item.salePrice * item.quantity, currencySymbol)}</p>
-                                <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive shrink-0" onClick={() => onRemoveItem(item.id)}><Trash2 className="h-4 w-4" /></Button>
+                                <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive shrink-0" onClick={() => onRemoveItem(item.id, item.selectedVariantId)}><Trash2 className="h-4 w-4" /></Button>
                             </li>
                         ))}
                     </ul>

@@ -1,0 +1,96 @@
+  const handleRestock = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedProduct || !firestore || !currentStoreId || !user) return;
+    
+    setIsSubmitting(true);
+    try {
+      const productRef = doc(firestore, 'products', selectedProduct.id);
+      const restockRef = doc(collection(firestore, 'restockEntries'));
+      const auditRef = doc(collection(firestore, 'stockAudit'));
+      
+      await runTransaction(firestore, async (transaction) => {
+        const productDoc = await transaction.get(productRef);
+        if (!productDoc.exists()) throw new Error('Product not found');
+        
+        const currentStock = productDoc.data().stock || 0;
+        const newStock = currentStock + restockQuantity;
+        
+        let variantName = '';
+        if (selectedVariantId && productDoc.data().hasVariants && productDoc.data().variants) {
+          const variants = [...productDoc.data().variants];
+          const variantIndex = variants.findIndex((v: any) => v.id === selectedVariantId);
+          if (variantIndex !== -1) {
+            const variant = { ...variants[variantIndex] };
+            variant.stock += restockQuantity;
+            variants[variantIndex] = variant;
+            variantName = ` (${variant.name})`;
+            
+            transaction.update(productRef, { 
+              variants,
+              stock: newStock,
+              purchasePrice: costPrice,
+              updatedAt: serverTimestamp()
+            });
+          } else {
+            transaction.update(productRef, { 
+              stock: newStock,
+              purchasePrice: costPrice,
+              updatedAt: serverTimestamp()
+            });
+          }
+        } else {
+          // Update product stock
+          transaction.update(productRef, { 
+            stock: newStock,
+            purchasePrice: costPrice, // Update last purchase price
+            updatedAt: serverTimestamp()
+          });
+        }
+        
+        // Create restock entry
+        const restockData: RestockEntry = {
+          id: restockRef.id,
+          store_id: currentStoreId,
+          productId: selectedProduct.id,
+          productName: selectedProduct.name + variantName,
+          quantity: restockQuantity,
+          costPricePerUnit: costPrice,
+          totalCost: restockQuantity * costPrice,
+          supplierName: supplierName || null,
+          notes: notes || null,
+          restockDate: serverTimestamp() as any,
+          createdAt: serverTimestamp() as any,
+          userEmail: user.email || 'system'
+        };
+        transaction.set(restockRef, restockData);
+        
+        // Create audit log
+        transaction.set(auditRef, {
+          store_id: currentStoreId,
+          productId: selectedProduct.id,
+          productName: selectedProduct.name + variantName,
+          variantId: selectedVariantId || null,
+          type: 'RESTOCK',
+          referenceId: restockRef.id,
+          beforeStock: currentStock,
+          afterStock: newStock,
+          change: restockQuantity,
+          staffId: user.uid,
+          staffName: user.displayName || user.email || 'Staff',
+          timestamp: serverTimestamp()
+        });
+      });
+      
+      toast({ title: 'Stock Updated', description: `Successfully added ${restockQuantity} units to "${selectedProduct.name}".` });
+      
+      // Refresh product data
+      setSelectedProduct({ ...selectedProduct, stock: (selectedProduct.stock || 0) + restockQuantity, purchasePrice: costPrice });
+      setRestockQuantity(1);
+      setNotes('');
+    } catch (error: any) {
+      console.error('Restock error:', error);
+      toast({ variant: 'destructive', title: 'Restock Failed', description: error.message || 'Failed to update stock.' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };

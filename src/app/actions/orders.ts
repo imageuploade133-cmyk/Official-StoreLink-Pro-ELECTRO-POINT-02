@@ -151,19 +151,67 @@ export async function placeOrderAction({
              // Also update main product stock (total sum)
              currentStock -= quantity;
              transaction.update(ref, { variants, stock: currentStock });
-          } else {
+
+             // Log Stock Audit
+             const auditRef = adminDb.collection('stockAudit').doc();
+             transaction.set(auditRef, {
+                productId: item.productId,
+                productName: (data?.name || 'Product') + ` (${variant.name})`,
+                variantId: item.variantId,
+                selectedOptions: item.selectedOptions || null,
+                store_id: storeId,
+                type: 'SALE',
+                referenceId: 'ONLINE-ORDER',
+                beforeStock: currentStock + quantity,
+                afterStock: currentStock,
+                change: -quantity,
+                staffId: userId || 'customer',
+                staffName: 'Online Customer',
+                timestamp: admin.firestore.FieldValue.serverTimestamp()
+             });
+             } else {
              if (currentStock < quantity) {
                throw new Error(`Insufficient stock for "${data?.name}". Only ${currentStock} left.`);
              }
              transaction.update(ref, { stock: currentStock - quantity });
-          }
-        } else {
-          if (currentStock < quantity) {
-            throw new Error(`Insufficient stock for "${data?.name || item.productId}". Only ${currentStock} left.`);
-          }
-          transaction.update(ref, { stock: currentStock - quantity });
-        }
-        
+
+             const auditRef = adminDb.collection('stockAudit').doc();
+             transaction.set(auditRef, {
+                productId: item.productId,
+                productName: data?.name || 'Product',
+                store_id: storeId,
+                type: 'SALE',
+                referenceId: 'ONLINE-ORDER',
+                beforeStock: currentStock,
+                afterStock: currentStock - quantity,
+                change: -quantity,
+                staffId: userId || 'customer',
+                staffName: 'Online Customer',
+                timestamp: admin.firestore.FieldValue.serverTimestamp()
+             });
+             }
+             } else {
+             if (currentStock < quantity) {
+             throw new Error(`Insufficient stock for "${data?.name || item.productId}". Only ${currentStock} left.`);
+             }
+             transaction.update(ref, { stock: currentStock - quantity });
+
+             const auditRef = adminDb.collection('stockAudit').doc();
+             transaction.set(auditRef, {
+             productId: item.productId,
+             productName: data?.name || 'Product',
+             store_id: storeId,
+             type: 'SALE',
+             referenceId: 'ONLINE-ORDER',
+             beforeStock: currentStock,
+             afterStock: currentStock - quantity,
+             change: -quantity,
+             staffId: userId || 'customer',
+             staffName: 'Online Customer',
+             timestamp: admin.firestore.FieldValue.serverTimestamp()
+             });
+             }
+
         enrichedItems.push({
           ...item,
           productName: data?.name || 'Product'

@@ -67,6 +67,40 @@ export function ProductArea({ onAddToCart, onProductsLoaded, isScannerEnabled = 
     const searchInputContainerRef = useRef<HTMLDivElement>(null);
 
     const handleScan = useCallback((barcode: string) => {
+        // First try to find a variant with this barcode
+        let foundVariant: ProductVariant | null = null;
+        let parentOfVariant: DisplayProduct | null = null;
+
+        for (const p of products) {
+            if (p.hasVariants && p.variants) {
+                const variant = p.variants.find(v => v.barcode === barcode && v.isActive);
+                if (variant) {
+                    foundVariant = variant;
+                    parentOfVariant = p;
+                    break;
+                }
+            }
+        }
+
+        if (foundVariant && parentOfVariant) {
+            const variantProduct: DisplayProduct = {
+                ...parentOfVariant,
+                sellingPrice: foundVariant.sellingPrice || parentOfVariant.sellingPrice,
+                stock: foundVariant.stock,
+                sku: foundVariant.sku || parentOfVariant.sku,
+                imageUrl: foundVariant.imageUrl || parentOfVariant.imageUrl,
+                hasVariants: true,
+                selectedVariantId: foundVariant.id,
+                selectedOptions: foundVariant.options,
+                name: `${parentOfVariant.name} (${foundVariant.name})`
+            } as any;
+            onAddToCart(variantProduct, variantProduct.sellingPrice);
+            setSearchTerm('');
+            setIsSearchDropdownOpen(false);
+            return;
+        }
+
+        // Then try to find a parent product with this barcode
         const foundProduct = products.find(p => p.barcode === barcode);
         if (foundProduct) {
             onAddToCart(foundProduct, calculateEffectivePrice(foundProduct, today));
@@ -143,8 +177,18 @@ export function ProductArea({ onAddToCart, onProductsLoaded, isScannerEnabled = 
           const nameMatch = product.name.toLowerCase().includes(searchTermLower);
           const barcodeMatch = product.barcode?.toLowerCase().includes(searchTermLower) ?? false;
           const skuMatch = product.sku?.toLowerCase().includes(searchTermLower) ?? false;
+          
+          let variantMatch = false;
+          if (product.hasVariants && product.variants) {
+            variantMatch = product.variants.some(v => 
+                v.sku?.toLowerCase().includes(searchTermLower) || 
+                v.barcode?.toLowerCase().includes(searchTermLower) ||
+                v.name.toLowerCase().includes(searchTermLower)
+            );
+          }
+
           const categoryMatch = selectedCategory === 'all' || product.categoryId === selectedCategory;
-          return (nameMatch || barcodeMatch || skuMatch) && categoryMatch;
+          return (nameMatch || barcodeMatch || skuMatch || variantMatch) && categoryMatch;
         });
         setFilteredProducts(gridFiltered);
         setCurrentPage(1);
@@ -153,11 +197,21 @@ export function ProductArea({ onAddToCart, onProductsLoaded, isScannerEnabled = 
     useEffect(() => {
         const currentSearchTermLower = searchTerm.toLowerCase().trim();
         if (currentSearchTermLower) {
-          const liveResults = products.filter(p =>
-            p.name.toLowerCase().includes(currentSearchTermLower) ||
-            p.barcode?.toLowerCase().includes(currentSearchTermLower) ||
-            p.sku?.toLowerCase().includes(currentSearchTermLower)
-          ).slice(0, 7);
+          const liveResults = products.filter(p => {
+            const nameMatch = p.name.toLowerCase().includes(currentSearchTermLower);
+            const barcodeMatch = p.barcode?.toLowerCase().includes(currentSearchTermLower) ?? false;
+            const skuMatch = p.sku?.toLowerCase().includes(currentSearchTermLower) ?? false;
+            
+            let variantMatch = false;
+            if (p.hasVariants && p.variants) {
+                variantMatch = p.variants.some(v => 
+                    v.sku?.toLowerCase().includes(currentSearchTermLower) || 
+                    v.barcode?.toLowerCase().includes(currentSearchTermLower) ||
+                    v.name.toLowerCase().includes(currentSearchTermLower)
+                );
+            }
+            return nameMatch || barcodeMatch || skuMatch || variantMatch;
+          }).slice(0, 7);
           setLiveSearchResults(liveResults);
           setIsSearchDropdownOpen(liveResults.length > 0);
         } else {

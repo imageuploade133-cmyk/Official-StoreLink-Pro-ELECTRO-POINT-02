@@ -648,6 +648,7 @@ export interface ProductVariant {
   name: string; // e.g., "Red / S"
   options: { [key: string]: string }; // e.g., { "Color": "Red", "Size": "S" }
   sku?: string;
+  barcode?: string;
   sellingPrice?: number;
   stock: number;
   imageUrl?: string;
@@ -917,6 +918,8 @@ export interface HeldSaleItem {
     stock: number;
     barcode: string | null;
     categoryId: string | null;
+    variantId?: string;
+    selectedOptions?: { [key: string]: string };
 }
 
 export interface HeldSale {
@@ -1188,6 +1191,8 @@ export interface StockAuditEntry {
   store_id?: string; // Multi-store support
   productId: string;
   productName: string;
+  variantId?: string | null;
+  selectedOptions?: { [key: string]: string } | null;
   type: 'SALE' | 'RESTOCK' | 'ADJUSTMENT' | 'RETURN' | 'MANUAL_EDIT' | 'DELETE';
   referenceId: string;
   beforeStock: number;
