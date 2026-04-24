@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -14,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, MessageSquare, Send, CheckCircle2, XCircle, Eye, EyeOff, Info, Key, RotateCcw } from 'lucide-react';
+import { Loader2, MessageSquare, Send, CheckCircle2, XCircle, Eye, EyeOff, Info, Key, RotateCcw, Save } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Badge } from '@/components/ui/badge';
 import { validateEBulkSMSAction, saveWhatsAppAlertSettingsAction, getDecryptedWhatsAppApiKeyAction } from '@/app/actions/orders';
@@ -445,11 +446,11 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
                 </Tabs>
             </div>
           </CardContent>
-          <CardFooter className="px-8 py-6 flex items-center justify-between mt-4 border-t border-gray-50">
+          <CardFooter className="px-8 py-6 flex items-center justify-between mt-4 border-t border-gray-50 bg-muted/5">
             <Button 
                 type="button" 
                 variant="outline" 
-                className="rounded-xl border-gray-200 text-gray-600 hover:bg-gray-50 transition-all font-medium"
+                className="rounded-xl border-gray-200 text-gray-600 hover:bg-gray-50 transition-all font-medium hover:scale-[1.02] active:scale-[0.98]"
                 onClick={handleSendTest}
                 disabled={isSendingTest || !form.watch('enabled')}
             >
@@ -459,9 +460,9 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
             <Button 
                 type="submit" 
                 disabled={isSaving} 
-                className="rounded-xl px-8 font-semibold shadow-lg shadow-[#25D366]/20 transition-all hover:scale-[1.02] active:scale-[0.98] bg-[#25D366] hover:bg-[#128C7E] text-white"
+                className="rounded-xl px-8 h-12 font-semibold shadow-lg shadow-[#25D366]/20 transition-all hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] bg-[#25D366] hover:bg-[#128C7E] text-white"
             >
-              {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
+              {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Save className="mr-2 h-4 w-4" />}
               Save Settings
             </Button>
           </CardFooter>
