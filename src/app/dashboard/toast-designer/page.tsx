@@ -16,6 +16,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
 import { 
   BellRing, 
   Loader2, 
@@ -46,6 +48,10 @@ const toastSchema = z.object({
   toastInfoColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#3b82f6'),
   toastPosition: z.enum(['top-right', 'top-left', 'bottom-right', 'bottom-left', 'top-center', 'bottom-center']).default('top-center'),
   toastAnimation: z.enum(['slide', 'fade', 'zoom']).default('slide'),
+  toastUseGradient: z.boolean().default(false),
+  toastGradientStartColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#ffffff'),
+  toastGradientEndColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i).default('#f8fafc'),
+  toastGradientAngle: z.number().min(0).max(360).default(135),
 });
 
 type FormValues = z.infer<typeof toastSchema>;
@@ -58,6 +64,15 @@ const borderRadii = [
   { name: 'xl', label: 'X-Large', class: 'rounded-xl' },
   { name: '2xl', label: '2X-Large', class: 'rounded-2xl' },
   { name: 'full', label: 'Pill', class: 'rounded-full' },
+];
+
+const gradientPresets = [
+  { name: 'Soft Gray', start: '#ffffff', end: '#f8fafc', angle: 135 },
+  { name: 'Sunset', start: '#ff7e5f', end: '#feb47b', angle: 135 },
+  { name: 'Ocean', start: '#2b5876', end: '#4e4376', angle: 135 },
+  { name: 'Emerald', start: '#11998e', end: '#38ef7d', angle: 135 },
+  { name: 'Royal', start: '#24243e', end: '#302b63', angle: 135 },
+  { name: 'Midnight', start: '#232526', end: '#414345', angle: 135 },
 ];
 
 export default function ToastDesignerPage() {
@@ -94,6 +109,10 @@ export default function ToastDesignerPage() {
       toastInfoColor: '#3b82f6',
       toastPosition: 'top-center',
       toastAnimation: 'slide',
+      toastUseGradient: false,
+      toastGradientStartColor: '#ffffff',
+      toastGradientEndColor: '#f8fafc',
+      toastGradientAngle: 135,
     }
   });
 
@@ -110,6 +129,10 @@ export default function ToastDesignerPage() {
         toastInfoColor: settingsData.toastInfoColor || '#3b82f6',
         toastPosition: (settingsData.toastPosition as any) || 'top-center',
         toastAnimation: (settingsData.toastAnimation as any) || 'slide',
+        toastUseGradient: settingsData.toastUseGradient || false,
+        toastGradientStartColor: settingsData.toastGradientStartColor || '#ffffff',
+        toastGradientEndColor: settingsData.toastGradientEndColor || '#f8fafc',
+        toastGradientAngle: settingsData.toastGradientAngle || 135,
       });
     }
   }, [settingsData, form]);
@@ -183,7 +206,9 @@ export default function ToastDesignerPage() {
           getBorderRadiusClass(watchedValues.toastBorderRadius)
         )}
         style={{
-          backgroundColor: watchedValues.toastBackgroundColor,
+          background: watchedValues.toastUseGradient 
+            ? `linear-gradient(${watchedValues.toastGradientAngle}deg, ${watchedValues.toastGradientStartColor}, ${watchedValues.toastGradientEndColor})`
+            : watchedValues.toastBackgroundColor,
           color: watchedValues.toastTextColor,
           borderColor: watchedValues.toastBorderColor,
         }}
@@ -330,6 +355,125 @@ export default function ToastDesignerPage() {
                       )}
                     />
                   </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-none shadow-lg bg-gradient-to-br from-background to-muted/20">
+                <CardHeader>
+                  <CardTitle className="text-xl flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-primary" /> Gradient Background
+                  </CardTitle>
+                  <CardDescription>Enhance your toasts with a beautiful gradient effect.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="toastUseGradient"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-background/50">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base font-bold">Use Gradient</FormLabel>
+                          <FormDescription>
+                            Enable linear gradient background for notifications.
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  {watchedValues.toastUseGradient && (
+                    <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormField
+                          control={form.control}
+                          name="toastGradientStartColor"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="font-bold">Start Color</FormLabel>
+                              <div className="flex items-center gap-3">
+                                <FormControl>
+                                  <Input type="color" {...field} className="p-1 h-10 w-14 cursor-pointer rounded-lg border-2" />
+                                </FormControl>
+                                <Input value={field.value} onChange={field.onChange} className="font-mono bg-background/50" />
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="toastGradientEndColor"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="font-bold">End Color</FormLabel>
+                              <div className="flex items-center gap-3">
+                                <FormControl>
+                                  <Input type="color" {...field} className="p-1 h-10 w-14 cursor-pointer rounded-lg border-2" />
+                                </FormControl>
+                                <Input value={field.value} onChange={field.onChange} className="font-mono bg-background/50" />
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <FormField
+                        control={form.control}
+                        name="toastGradientAngle"
+                        render={({ field }) => (
+                          <FormItem className="space-y-4">
+                            <div className="flex justify-between">
+                              <FormLabel className="font-bold">Gradient Angle ({field.value}°)</FormLabel>
+                              <span className="text-xs font-mono text-muted-foreground">{field.value}°</span>
+                            </div>
+                            <FormControl>
+                              <Slider
+                                min={0}
+                                max={360}
+                                step={1}
+                                value={[field.value]}
+                                onValueChange={(vals) => field.onChange(vals[0])}
+                                className="py-4"
+                              />
+                            </FormControl>
+                            <FormDescription className="text-xs">
+                              Adjust the direction of the gradient from 0° to 360°.
+                            </FormDescription>
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="space-y-3">
+                        <FormLabel className="font-bold">Quick Presets</FormLabel>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          {gradientPresets.map((preset) => (
+                            <Button
+                              key={preset.name}
+                              type="button"
+                              variant="outline"
+                              className="text-xs h-8 justify-start gap-2 px-2 hover:bg-muted/50"
+                              onClick={() => {
+                                form.setValue('toastGradientStartColor', preset.start);
+                                form.setValue('toastGradientEndColor', preset.end);
+                                form.setValue('toastGradientAngle', preset.angle);
+                              }}
+                            >
+                              <div 
+                                className="h-4 w-4 rounded-full border border-muted" 
+                                style={{ background: `linear-gradient(${preset.angle}deg, ${preset.start}, ${preset.end})` }}
+                              />
+                              {preset.name}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 

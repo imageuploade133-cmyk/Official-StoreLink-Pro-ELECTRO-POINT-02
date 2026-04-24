@@ -73,7 +73,9 @@ export function Toaster() {
         const effectiveVariant = variant || (typeof title === 'string' && title.toLowerCase().includes('success') ? 'success' : 'default');
 
         const customStyles: any = settings?.toastBackgroundColor ? {
-          backgroundColor: settings.toastBackgroundColor,
+          background: settings.toastUseGradient 
+            ? `linear-gradient(${settings.toastGradientAngle ?? 135}deg, ${settings.toastGradientStartColor ?? '#ffffff'}, ${settings.toastGradientEndColor ?? '#f8fafc'})`
+            : settings.toastBackgroundColor,
           color: settings.toastTextColor,
           borderColor: settings.toastBorderColor,
           borderRadius: settings.toastBorderRadius === 'none' ? '0' : 
