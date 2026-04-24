@@ -216,7 +216,7 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                                 <div 
                                     key={p.id} 
                                     onClick={() => onSelectProduct(p.id)} 
-                                    className="flex items-center gap-4 p-3 bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800/50 transition-all active:scale-[0.98] w-full text-left group cursor-pointer hover:shadow-md"
+                                    className="flex items-center gap-4 p-3 bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800/50 transition-all active:scale-[0.98] w-full text-left group cursor-pointer"
                                 >
                                     <div className="relative h-16 w-16 rounded-xl overflow-hidden shrink-0 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800">
                                         <Image 

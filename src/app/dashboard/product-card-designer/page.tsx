@@ -844,7 +844,7 @@ export default function ProductCardDesignerPage() {
 }
 
 // Default HTML Template
-const defaultHtmlTemplate = `<div class="group relative flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all duration-500 hover:border-primary/30 overflow-hidden h-full hover:-translate-y-1 hover:shadow-xl" style="height: {{cardHeight}}px;">
+const defaultHtmlTemplate = `<div class="group relative flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all duration-500 hover:border-primary/30 overflow-hidden h-full hover:-translate-y-1" style="height: {{cardHeight}}px;">
   <!-- Media Area -->
   <a href="/store/product/{{product.id}}" class="block relative overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900" style="height: 60%;">
     <img
@@ -944,7 +944,7 @@ const defaultHtmlTemplate = `<div class="group relative flex flex-col bg-white d
 </div>`;
 
 // Minimal HTML Template
-const minimalHtmlTemplate = `<div class="group relative bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-300 hover:shadow-lg" style="height: {{cardHeight}}px;">
+const minimalHtmlTemplate = `<div class="group relative bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-300" style="height: {{cardHeight}}px;">
   <a href="/store/product/{{product.id}}" class="block">
     <div class="aspect-square overflow-hidden bg-slate-100">
       <img
