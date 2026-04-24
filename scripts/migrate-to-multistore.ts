@@ -1,22 +1,13 @@
 import * as admin from 'firebase-admin';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import * as fs from 'fs';
 
 // Load environment variables from .env file
 dotenv.config();
 
 /**
  * Migration Script: Update existing documents for Multi-Store support.
- * 
- * Requirements:
- * 1. For each existing user:
- *    - Create a store document in /stores
- *    - Set owner_id = user UID
- * 2. For all collections (products, categories, customers, orders, etc.):
- *    - Add store_id = user's storeId
- * 3. Only update documents where store_id is missing
- * 4. Ensure no data is lost
- * 5. Use batch writes or Firebase Admin SDK
  */
 
 async function migrate() {
@@ -25,59 +16,57 @@ async function migrate() {
     // Initialize Firebase Admin
     if (!admin.apps.length) {
         const projectId = process.env.FIREBASE_PROJECT_ID || 'valentino-ice-cream';
-        console.log(`Initializing Firebase Admin for project: ${projectId}`);
+        const serviceAccountKeyEnv = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
         
-        try {
-            const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
-            let key: any;
+        let serviceAccount: any = null;
 
-            if (serviceAccountKey) {
+        // 1. Try environment variable
+        if (serviceAccountKeyEnv) {
+            const cleaned = serviceAccountKeyEnv.trim();
+            if (cleaned.startsWith('{') || cleaned.replace(/^['"](.*)['"]$/, '$1').startsWith('{')) {
                 try {
-                    // Handle potential quoting issues and whitespace
-                    const cleanedKey = serviceAccountKey.trim().replace(/^['"](.*)['"]$/, '$1');
-                    key = cleanedKey.startsWith('{') 
-                        ? JSON.parse(cleanedKey) 
-                        : JSON.parse(Buffer.from(cleanedKey, 'base64').toString());
+                    serviceAccount = JSON.parse(cleaned.replace(/^['"](.*)['"]$/, '$1'));
                 } catch (e) {
-                    console.error('Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY env var');
+                    console.error('Failed to parse service account JSON from env');
                 }
-            }
-
-            // Fallback to serviceAccountKey.json file if env var failed or was missing
-            if (!key) {
-                const filePath = path.join(process.cwd(), 'serviceAccountKey.json');
-                const fs = require('fs');
-                if (fs.existsSync(filePath)) {
-                    try {
-                        key = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-                        console.log('Firebase Admin: Using credentials from serviceAccountKey.json');
-                    } catch (fileError) {
-                        console.error('Failed to read serviceAccountKey.json:', fileError);
-                    }
-                }
-            }
-
-            if (key) {
-                // Ensure the private key has correct newline formatting
-                if (key.private_key && typeof key.private_key === 'string') {
-                    key.private_key = key.private_key.replace(/\\n/g, '\n');
-                }
-
-                admin.initializeApp({
-                    credential: admin.credential.cert(key),
-                    projectId: projectId
-                });
-                console.log('Firebase Admin initialized with service account credentials');
             } else {
-                // Fallback to default credentials or just project ID (for local emulator or authorized environments)
+                try {
+                    const decoded = Buffer.from(cleaned, 'base64').toString('utf8');
+                    if (decoded.startsWith('{')) {
+                        serviceAccount = JSON.parse(decoded);
+                    }
+                } catch (e) {}
+            }
+        }
+
+        // 2. Try local file
+        if (!serviceAccount) {
+            const filePath = path.join(process.cwd(), 'serviceAccountKey.json');
+            if (fs.existsSync(filePath)) {
+                try {
+                    serviceAccount = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+                } catch (e) {
+                    console.error('Failed to read serviceAccountKey.json');
+                }
+            }
+        }
+
+        try {
+            if (serviceAccount) {
+                if (serviceAccount.private_key && typeof serviceAccount.private_key === 'string') {
+                    serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+                }
                 admin.initializeApp({
+                    credential: admin.credential.cert(serviceAccount),
                     projectId: projectId
                 });
-                console.log('Firebase Admin initialized with default credentials');
+                console.log('Firebase Admin initialized with service account key.');
+            } else {
+                admin.initializeApp({ projectId });
+                console.log('Firebase Admin initialized with default credentials.');
             }
         } catch (error) {
             console.error('Firebase admin initialization error:', error);
-            // Still try to continue if it might work (e.g. already initialized)
         }
     }
 
@@ -103,7 +92,6 @@ async function migrate() {
         let storeId;
         if (existingStoreSnap.empty) {
             // Requirement 1: Create a store document in /stores
-            // We use the userId as the document ID for the store to ensure 1-to-1 mapping and easy identification
             storeId = userId; 
             await db.collection('stores').doc(storeId).set({
                 id: storeId,
@@ -120,54 +108,32 @@ async function migrate() {
     }
 
     // Determine the "Default/Primary" store for orphaned global data.
-    // We'll look for the first staff member with 'admin' role.
     let defaultStoreId: string | null = null;
     const staffSnap = await db.collection('staff').where('role', '==', 'admin').limit(1).get();
     
     if (!staffSnap.empty) {
         const adminUid = staffSnap.docs[0].data().uid;
-        defaultStoreId = userStoreMap.get(adminUid) || adminUid; // Fallback to UID if store doc wasn't created yet
+        defaultStoreId = userStoreMap.get(adminUid) || adminUid;
     }
     
     if (!defaultStoreId && userStoreMap.size > 0) {
-        // Fallback to the first user found
         defaultStoreId = Array.from(userStoreMap.values())[0];
     }
 
     if (!defaultStoreId) {
-        console.warn('Warning: No default store ID could be determined. Global documents without owner references may not be updated.');
+        console.warn('Warning: No default store ID could be determined.');
     } else {
-        console.log(`Default store ID for global documents: ${defaultStoreId}`);
+        console.log(`Default store ID: ${defaultStoreId}`);
     }
 
     // List of collections to migrate
     const collectionsToMigrate = [
-        'products',
-        'categories',
-        'customers',
-        'orders',
-        'saleTransactions',
-        'restockEntries',
-        'staff',
-        'heldSales',
-        'creditPayments',
-        'expenses',
-        'reversals',
-        'stockAudit',
-        'adLinks',
-        'coupons',
-        'flash_sales',
-        'invoices',
-        'stockAuditEntries',
-        'websiteTraffic',
-        'homepageSections',
-        'slideShows',
-        'publicPages',
-        'whatsappMessageLogs',
-        'payment_providers',
-        'branches',
-        'customerHistory',
-        'stockTransfers'
+        'products', 'categories', 'customers', 'orders', 'saleTransactions',
+        'restockEntries', 'staff', 'heldSales', 'creditPayments', 'expenses',
+        'reversals', 'stockAudit', 'adLinks', 'coupons', 'flash_sales',
+        'invoices', 'stockAuditEntries', 'websiteTraffic', 'homepageSections',
+        'slideShows', 'publicPages', 'whatsappMessageLogs', 'payment_providers',
+        'branches', 'customerHistory', 'stockTransfers'
     ];
 
     // 3. Update documents in each collection
@@ -183,19 +149,12 @@ async function migrate() {
         for (const doc of snapshot.docs) {
             const data = doc.data();
             
-            // Requirement 3: Only update documents where store_id is missing
             if (!data.store_id && !data.storeId) {
                 let targetStoreId = defaultStoreId;
 
-                // Attempt to find a more specific storeId based on user references in the document
                 const possibleUserIds = [
-                    data.user_id, 
-                    data.userId, 
-                    data.uid, 
-                    data.staffId, 
-                    data.recordedBy, 
-                    data.reversedBy,
-                    data.customerId
+                    data.user_id, data.userId, data.uid, data.staffId, 
+                    data.recordedBy, data.reversedBy, data.customerId
                 ];
 
                 for (const uid of possibleUserIds) {
@@ -206,15 +165,12 @@ async function migrate() {
                 }
 
                 if (targetStoreId) {
-                    // Requirement 2 & 5: Add store_id and use batch writes
                     batch.update(doc.ref, { store_id: targetStoreId });
                     updateCount++;
                     batchCount++;
                     
-                    // Firestore batches are limited to 500 operations
                     if (batchCount === 500) {
                         await batch.commit();
-                        console.log(`Committed batch of 500 for ${collectionName}`);
                         batch = db.batch();
                         batchCount = 0;
                     }
@@ -228,7 +184,7 @@ async function migrate() {
         console.log(`Finished ${collectionName}: Updated ${updateCount} documents.`);
     }
 
-    // Special case for settings (usually a small number of docs)
+    // Special case for settings
     console.log('Updating settings...');
     const settingsSnap = await db.collection('settings').get();
     for (const doc of settingsSnap.docs) {

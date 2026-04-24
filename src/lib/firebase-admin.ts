@@ -1,64 +1,125 @@
-
 import * as admin from 'firebase-admin';
 import * as fs from 'fs';
 import * as path from 'path';
 
-if (!admin.apps.length) {
-  try {
-    const projectId = process.env.FIREBASE_PROJECT_ID || 'valentino-ice-cream';
-    const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+/**
+ * Singleton Firebase Admin instance management for Next.js
+ */
+function getAdminApp() {
+  // Check if Firebase Admin is already initialized
+  if (admin.apps.length > 0) {
+    return admin.apps[0]!;
+  }
 
-    let key: any;
+  const projectId = process.env.FIREBASE_PROJECT_ID || 'valentino-ice-cream';
+  const serviceAccountKeyEnv = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
 
-    if (serviceAccountKey) {
+  let serviceAccount: any = null;
+  let initMethod = '';
+
+  // 1. Try parsing from FIREBASE_SERVICE_ACCOUNT_KEY environment variable
+  if (serviceAccountKeyEnv && serviceAccountKeyEnv !== 'undefined' && serviceAccountKeyEnv !== 'null') {
+    const cleanedKey = serviceAccountKeyEnv.trim();
+    
+    // Check if it's a JSON string
+    if (cleanedKey.startsWith('{') || cleanedKey.replace(/^['"](.*)['"]$/, '$1').startsWith('{')) {
       try {
-        // Handle potential quoting issues and whitespace
-        const cleanedKey = serviceAccountKey.trim().replace(/^['"](.*)['"]$/, '$1');
-        
-        key = cleanedKey.startsWith('{') 
-          ? JSON.parse(cleanedKey) 
-          : JSON.parse(Buffer.from(cleanedKey, 'base64').toString());
-      } catch (parseError) {
-        console.error('Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY env var:', parseError);
+        const jsonStr = cleanedKey.replace(/^['"](.*)['"]$/, '$1');
+        serviceAccount = JSON.parse(jsonStr);
+        initMethod = 'environment variable (JSON)';
+      } catch (e) {
+        console.error('Firebase Admin: Failed to parse service account JSON from env:', e);
+      }
+    } 
+    // Check if it might be Base64
+    else {
+      try {
+        const decoded = Buffer.from(cleanedKey, 'base64').toString('utf8');
+        if (decoded.trim().startsWith('{')) {
+          serviceAccount = JSON.parse(decoded);
+          initMethod = 'environment variable (Base64)';
+        }
+      } catch (e) {
+        // Not Base64 or failed to parse
       }
     }
 
-    // Fallback to serviceAccountKey.json file if env var failed or was missing
-    if (!key) {
-      const filePath = path.join(process.cwd(), 'serviceAccountKey.json');
-      if (fs.existsSync(filePath)) {
-        try {
-          key = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-          console.log('Firebase Admin: Using credentials from serviceAccountKey.json');
-        } catch (fileError) {
-          console.error('Failed to read serviceAccountKey.json:', fileError);
+    // Check if it's a file path
+    if (!serviceAccount) {
+      try {
+        if (fs.existsSync(cleanedKey)) {
+          serviceAccount = JSON.parse(fs.readFileSync(cleanedKey, 'utf8'));
+          initMethod = `file path from env (${cleanedKey})`;
+        }
+      } catch (e) {
+        // Not a valid file path
+      }
+    }
+  }
+
+  // 2. Fallback: Try reading from serviceAccountKey.json in the project root
+  if (!serviceAccount) {
+    try {
+      const rootPath = process.cwd();
+      const fallbackPaths = [
+        path.join(rootPath, 'serviceAccountKey.json'),
+        path.join(rootPath, 'config', 'serviceAccountKey.json'),
+        path.join(rootPath, 'src', 'lib', 'serviceAccountKey.json')
+      ];
+
+      for (const filePath of fallbackPaths) {
+        if (fs.existsSync(filePath)) {
+          serviceAccount = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+          initMethod = `local file (${filePath})`;
+          break;
         }
       }
+    } catch (e) {
+      console.error('Firebase Admin: Error checking for local serviceAccountKey.json:', e);
     }
+  }
 
-    if (key) {
-      // Ensure the private key has correct newline formatting
-      if (key.private_key && typeof key.private_key === 'string') {
-        key.private_key = key.private_key.replace(/\\n/g, '\n');
+  // Final initialization
+  try {
+    if (serviceAccount && (serviceAccount.private_key || serviceAccount.privateKey)) {
+      // Standardize private key field name and format
+      const privateKey = serviceAccount.private_key || serviceAccount.privateKey;
+      if (typeof privateKey === 'string') {
+        serviceAccount.private_key = privateKey.replace(/\\n/g, '\n');
       }
 
-      admin.initializeApp({
-        credential: admin.credential.cert(key),
+      const initializedApp = admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
         projectId: projectId,
       });
-      console.log('Firebase Admin initialized with service account credentials');
+      
+      console.log(`Firebase Admin initialized successfully via ${initMethod}`);
+      return initializedApp;
     } else {
-      // Fallback to Application Default Credentials (ADC)
-      admin.initializeApp({
+      // 3. Last resort: Application Default Credentials (ADC)
+      console.warn('Firebase Admin: No valid service account key found. Falling back to Application Default Credentials.');
+      
+      return admin.initializeApp({
         projectId: projectId,
       });
-      console.log('Firebase Admin initialized with Application Default Credentials');
     }
-  } catch (error) {
-    console.error('Firebase admin initialization error', error);
+  } catch (initError: any) {
+    // Handle the case where another process/hot-reload initialized it just now
+    if (initError.code === 'app/duplicate-app') {
+      return admin.app();
+    }
+    
+    console.error('Firebase Admin: Critical initialization error:', initError);
+    throw initError;
   }
 }
 
-export const adminDb = admin.firestore();
-export const adminAuth = admin.auth();
-export const adminStorage = admin.storage();
+// Ensure singleton instance is exported
+const app = getAdminApp();
+
+// Use the initialized app for Firestore, Auth, etc.
+export const adminDb = admin.firestore(app);
+export const adminAuth = admin.auth(app);
+export const adminStorage = admin.storage(app);
+
+export default app;

@@ -74,7 +74,7 @@ export async function POST(request: Request) {
     console.error('Paystack initialization error:', error);
     const message = error.message || 'Unknown error';
     if (message.includes('Could not load the default credentials')) {
-        return NextResponse.json({ error: 'Missing Google Cloud credentials. Please ensure FIREBASE_SERVICE_ACCOUNT_KEY is set.' }, { status: 500 });
+        return NextResponse.json({ error: 'Missing Google Cloud credentials. Please ensure FIREBASE_SERVICE_ACCOUNT_KEY is set in your environment or serviceAccountKey.json exists. See FIREBASE_ADMIN_SETUP.md for instructions.' }, { status: 500 });
     }
     return NextResponse.json({ error: message }, { status: 500 });
   }
