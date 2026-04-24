@@ -134,6 +134,7 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
     supplierContactName: z.string().optional().or(z.literal('')),
     supplierPhone: z.string().optional().or(z.literal('')),
     supplierLocation: z.string().optional().or(z.literal('')),
+    supplierSku: z.string().optional().or(z.literal('')),
     stockDocumentUrl: z.string().optional().or(z.literal('')),
     imageUrl: z.string().url('Must be a valid URL for the image.').optional().or(z.literal('')),    
     additionalImageUrls: z.array(z.string().url()).optional().default([]),
@@ -315,6 +316,7 @@ export function ProductForm({
       supplierContactName: '',
       supplierPhone: '',
       supplierLocation: '',
+      supplierSku: '',
       stockDocumentUrl: '',
       imageUrl: '',
       additionalImageUrls: [],
@@ -403,6 +405,7 @@ export function ProductForm({
           supplierContactName: defaultValues?.supplierContactName ?? '',
           supplierPhone: defaultValues?.supplierPhone ?? '',
           supplierLocation: defaultValues?.supplierLocation ?? '',
+          supplierSku: defaultValues?.supplierSku ?? '',
           stockDocumentUrl: defaultValues?.stockDocumentUrl ?? '',
           imageUrl: defaultValues?.imageUrl ?? '',
           additionalImageUrls: defaultValues?.additionalImageUrls || [],
@@ -971,7 +974,7 @@ export function ProductForm({
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <FormField
                   control={form.control}
                   name="supplierPhone"
@@ -979,6 +982,17 @@ export function ProductForm({
                     <FormItem>
                       <FormLabel className="font-bold">Supplier Phone</FormLabel>
                       <FormControl><Input placeholder="+1 234 567 890" {...field} value={field.value || ''} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="supplierSku"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold">Supplier SKU</FormLabel>
+                      <FormControl><Input placeholder="REF-001" {...field} value={field.value || ""} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

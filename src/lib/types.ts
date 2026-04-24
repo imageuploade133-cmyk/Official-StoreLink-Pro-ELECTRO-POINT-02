@@ -692,6 +692,7 @@ export interface Product {
   supplierContactName?: string;
   supplierPhone?: string;
   supplierLocation?: string;
+  supplierSku?: string;
   stockDocumentUrl?: string;
   imageUrl?: string;
   additionalImageUrls?: string[];

@@ -212,6 +212,13 @@ const storeProductSchema = z.object({
     imageUrl: z.string().url().optional().or(z.literal('')),
     isActive: z.boolean().default(true),
   })).optional().default([]),
+  supplierName: z.string().optional().or(z.literal('')),
+  supplierBusinessName: z.string().optional().or(z.literal('')),
+  supplierContactName: z.string().optional().or(z.literal('')),
+  supplierPhone: z.string().optional().or(z.literal('')),
+  supplierLocation: z.string().optional().or(z.literal('')),
+  supplierSku: z.string().optional().or(z.literal('')),
+  stockDocumentUrl: z.string().optional().or(z.literal('')),
 }).refine(data => !data.isPromo || (!!data.promoType && !!data.promoValue && data.promoValue > 0), {
     message: 'Promo value is required and must be positive when active.',
     path: ['promoValue']
@@ -404,6 +411,13 @@ export function WebStoreProductForm() {
       hasVariants: false,
       variantOptions: [],
       variants: [],
+      supplierName: '',
+      supplierBusinessName: '',
+      supplierContactName: '',
+      supplierPhone: '',
+      supplierLocation: '',
+      supplierSku: '',
+      stockDocumentUrl: '',
     }
   });
 
@@ -927,6 +941,92 @@ export function WebStoreProductForm() {
               </div>
             </CardContent>
           </Card>
+          <Card className="shadow-xl border-none ring-1 ring-border">
+            <CardHeader className="bg-muted/30">
+              <CardTitle className="flex items-center gap-2">
+                <Truck className="h-5 w-5 text-primary" />
+                Supplier & Procurement Details (Optional)
+              </CardTitle>
+              <CardDescription>Internal records of where this product was sourced.</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="supplierName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold text-sm">Supplier Primary Name</FormLabel>
+                      <FormControl><Input placeholder="e.g. Global Tech Distributors" {...field} value={field.value || ""} className="h-11"/></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="supplierBusinessName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold text-sm">Supplier Business Reg Name</FormLabel>
+                      <FormControl><Input placeholder="e.g. GTD Solutions Inc." {...field} value={field.value || ""} className="h-11"/></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <FormField
+                  control={form.control}
+                  name="supplierContactName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold text-sm">Contact Person</FormLabel>
+                      <FormControl><Input placeholder="Full name of contact" {...field} value={field.value || ""} className="h-11"/></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="supplierPhone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold text-sm">Supplier Phone</FormLabel>
+                      <FormControl><Input placeholder="+123..." {...field} value={field.value || ""} className="h-11"/></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="supplierSku"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold text-sm">Supplier Reference SKU</FormLabel>
+                      <FormControl><Input placeholder="REF-00X-99" {...field} value={field.value || ""} className="h-11"/></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="supplierLocation"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-bold text-sm">Supplier Headquarters / Pickup Location</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Full physical address or warehouse location" {...field} value={field.value || ""} className="h-11"/>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+
 
           <ProductVariantsManager storeId={currentStoreId} />
 
