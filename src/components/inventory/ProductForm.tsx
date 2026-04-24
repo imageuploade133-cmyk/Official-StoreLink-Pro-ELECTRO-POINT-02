@@ -99,6 +99,7 @@ import { CameraCaptureModal } from '@/components/media/CameraCaptureModal';
 import { BarcodeScanner } from '@/components/inventory/BarcodeScanner';
 import { useBarcodeScanner } from '@/hooks/use-barcode-scanner';
 import { StoreMerchandisingSettings } from './StoreMerchandisingSettings';
+import { ProductVariantsManager } from './ProductVariantsManager';
 
 const badgeIcons = [
   { name: 'Truck', icon: Truck },
@@ -199,6 +200,21 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
     showLogisticsInfo: z.boolean().default(true),
     showVerifiedReviews: z.boolean().default(true),
     rewardAdsEnabled: z.boolean().default(false),
+    hasVariants: z.boolean().default(false),
+    variantOptions: z.array(z.object({
+      name: z.string().min(1, "Option name is required"),
+      values: z.array(z.string().min(1, "Value is required")).min(1, "At least one value is required"),
+    })).optional().default([]),
+    variants: z.array(z.object({
+      id: z.string(),
+      name: z.string(),
+      options: z.record(z.string()),
+      sku: z.string().optional().or(z.literal("")),
+      sellingPrice: z.coerce.number().optional(),
+      stock: z.coerce.number().int().min(0, "Stock cannot be negative."),
+      imageUrl: z.string().url().optional().or(z.literal("")),
+      isActive: z.boolean().default(true),
+    })).optional().default([]),
   });
 
   return baseSchema
@@ -348,6 +364,9 @@ export function ProductForm({
       showLogisticsInfo: true,
       showVerifiedReviews: true,
       rewardAdsEnabled: false,
+      hasVariants: false,
+      variantOptions: [],
+      variants: [],
     },
   });
 
@@ -433,6 +452,9 @@ export function ProductForm({
           showLogisticsInfo: defaultValues?.showLogisticsInfo ?? true,
           showVerifiedReviews: defaultValues?.showVerifiedReviews ?? true,
           rewardAdsEnabled: defaultValues?.rewardAdsEnabled ?? false,
+          hasVariants: defaultValues?.hasVariants ?? false,
+          variantOptions: defaultValues?.variantOptions || [],
+          variants: defaultValues?.variants || [],
         });
         setHasInitialReset(true);
         lastResetId.current = currentId;
@@ -891,6 +913,7 @@ export function ProductForm({
                             initialFocus
                           />
                           <div className="p-3 border-t">
+          <ProductVariantsManager storeId={currentStoreId} />
                             <Button
                               variant="ghost"
                               size="sm"

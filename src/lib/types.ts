@@ -643,6 +643,23 @@ export interface VoiceSignature {
   mode?: 'mic' | 'link';
 }
 
+export interface ProductVariant {
+  id: string;
+  name: string; // e.g., "Red / S"
+  options: { [key: string]: string }; // e.g., { "Color": "Red", "Size": "S" }
+  sku?: string;
+  barcode?: string;
+  sellingPrice?: number;
+  stock: number;
+  imageUrl?: string;
+  isActive: boolean;
+}
+
+export interface ProductOption {
+  name: string; // e.g., "Color"
+  values: string[]; // e.g., ["Red", "Black"]
+}
+
 export interface Product {
   id: string;
   store_id?: string; // Multi-store support
@@ -712,6 +729,9 @@ export interface Product {
   showLogisticsInfo?: boolean;
   showVerifiedReviews?: boolean;
   rewardAdsEnabled?: boolean;
+  hasVariants?: boolean;
+  variants?: ProductVariant[];
+  variantOptions?: ProductOption[];
 }
 
 export interface DisplayProduct extends Product {
@@ -721,11 +741,15 @@ export interface DisplayProduct extends Product {
 export interface CartItem extends DisplayProduct {
   quantity: number;
   salePrice: number;
+  selectedVariantId?: string;
+  selectedOptions?: { [key: string]: string };
 }
 
 export type StoreCartItem = Product & {
   quantity: number;
   salePrice: number; // Price at the time of adding to cart
+  selectedVariantId?: string;
+  selectedOptions?: { [key: string]: string };
 };
 
 export interface BarcodeProduct extends Product {
@@ -894,6 +918,8 @@ export interface HeldSaleItem {
     stock: number;
     barcode: string | null;
     categoryId: string | null;
+    variantId?: string;
+    selectedOptions?: { [key: string]: string };
 }
 
 export interface HeldSale {
@@ -1147,6 +1173,8 @@ export interface SaleTransactionItem {
   unitPrice: number;
   totalPrice: number;
   originalPrice?: number | null;
+  variantId?: string;
+  selectedOptions?: { [key: string]: string };
 }
 
 export interface SaleReturn {
@@ -1163,6 +1191,8 @@ export interface StockAuditEntry {
   store_id?: string; // Multi-store support
   productId: string;
   productName: string;
+  variantId?: string | null;
+  selectedOptions?: { [key: string]: string } | null;
   type: 'SALE' | 'RESTOCK' | 'ADJUSTMENT' | 'RETURN' | 'MANUAL_EDIT' | 'DELETE';
   referenceId: string;
   beforeStock: number;

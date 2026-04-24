@@ -334,7 +334,9 @@ export default function CheckoutPage() {
         items: cartItems.map(item => ({
           productId: item.id,
           quantity: item.quantity,
-          price: item.salePrice
+          price: item.salePrice,
+          variantId: item.selectedVariantId,
+          selectedOptions: item.selectedOptions,
         })),
         totalAmount: total,
         totalCost: cartItems.reduce((sum, item) => sum + ((item.purchasePrice || item.salePrice || 0) * item.quantity), 0),
@@ -795,9 +797,21 @@ export default function CheckoutPage() {
               <CardContent className="p-0">
                 <ScrollArea className="max-h-[300px]">
                   <div className="p-6 divide-y">
-                    {cartItems.map((item) => (
-                      <div key={item.id} className="py-3 flex justify-between gap-4">
-                        <div className="min-w-0"><p className="font-medium text-sm truncate">{item.name}</p><p className="text-xs text-muted-foreground">Qty: {item.quantity}</p></div>
+                    {cartItems.map((item, idx) => (
+                      <div key={`${item.id}-${idx}`} className="py-3 flex justify-between gap-4">
+                        <div className="min-w-0">
+                          <p className="font-medium text-sm truncate">{item.name}</p>
+                          {item.selectedOptions && (
+                            <div className="flex flex-wrap gap-1 mt-0.5">
+                              {Object.entries(item.selectedOptions).map(([key, val]) => (
+                                <span key={key} className="text-[9px] uppercase font-bold text-muted-foreground border rounded px-1">
+                                  {key}: {val}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
+                        </div>
                         <p className="font-semibold text-sm shrink-0">{formatCurrency(item.salePrice * item.quantity, currencySymbol)}</p>
                       </div>
                     ))}

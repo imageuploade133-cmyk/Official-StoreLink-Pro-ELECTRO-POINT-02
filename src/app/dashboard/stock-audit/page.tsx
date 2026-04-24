@@ -346,7 +346,16 @@ export default function StockAuditPage() {
                         </TableCell>
                         <TableCell>
                           <div className="font-bold text-sm leading-tight text-gray-900">{log.productName}</div>
-                          <div className="text-[10px] font-mono text-muted-foreground uppercase">Ref: {log.referenceId?.substring(0, 12)}...</div>
+                          {log.selectedOptions && (
+                            <div className="flex flex-wrap gap-1 mt-1">
+                                {Object.entries(log.selectedOptions).map(([key, value]) => (
+                                    <Badge key={key} variant="outline" className="text-[8px] px-1 py-0 h-3.5 bg-muted/50 border-muted-foreground/20">
+                                        {value}
+                                    </Badge>
+                                ))}
+                            </div>
+                          )}
+                          <div className="text-[10px] font-mono text-muted-foreground uppercase mt-1">Ref: {log.referenceId?.substring(0, 12)}...</div>
                         </TableCell>
                         <TableCell>
                           {getTypeBadge(log.type)}

@@ -401,6 +401,11 @@ export function ReceiptModal({ isOpen, onClose, saleTransaction, staffMap }: Rec
                         <span>{item.productName.toUpperCase()}</span>
                         <span>{formatCurrency(item.totalPrice, currencySymbol)}</span>
                       </div>
+                      {item.selectedOptions && (
+                        <div className="item-meta" style={{ fontStyle: 'italic', marginBottom: '2px' }}>
+                          {Object.values(item.selectedOptions).join(' / ').toUpperCase()}
+                        </div>
+                      )}
                       <div className="item-meta">
                         {item.quantity} x {formatCurrency(item.unitPrice, currencySymbol)}
                       </div>
@@ -565,6 +570,11 @@ export function ReceiptModal({ isOpen, onClose, saleTransaction, staffMap }: Rec
                                     <tr key={idx}>
                                         <td>
                                             <p className="font-bold text-gray-900">{item.productName}</p>
+                                            {item.selectedOptions && (
+                                                <p className="text-xs text-gray-600 italic">
+                                                    {Object.entries(item.selectedOptions).map(([k, v]) => `${k}: ${v}`).join(', ')}
+                                                </p>
+                                            )}
                                             <p className="text-[10px] text-gray-400 mt-0.5 uppercase tracking-wide">ID: {item.productId.substring(0, 8)}</p>
                                         </td>
                                         <td style={{ textAlign: 'center' }} className="text-gray-700 font-medium">{item.quantity}</td>

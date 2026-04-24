@@ -64,6 +64,7 @@ export default function RestockNowPage() {
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
   const [foundProducts, setFoundProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
   
   const [restockQuantity, setRestockQuantity] = useState<number>(1);
   const [costPrice, setCostPrice] = useState<number>(0);
@@ -88,15 +89,6 @@ export default function RestockNowPage() {
         where('barcode', '==', trimmedTerm),
         limit(5)
       );
-      
-      // Try name match
-      const nameQ = query(
-        collection(firestore, 'products'),
-        where('store_id', '==', currentStoreId),
-        where('name', '>=', lowerTerm),
-        where('name', '<=', lowerTerm + '\uf8ff'),
-        limit(5)
-      );
 
       const [barcodeSnap, nameSnap] = await Promise.all([
         getDocs(barcodeQ),
@@ -106,6 +98,24 @@ export default function RestockNowPage() {
       const productsMap = new Map<string, Product>();
       barcodeSnap.docs.forEach(d => productsMap.set(d.id, { id: d.id, ...d.data() } as Product));
       nameSnap.docs.forEach(d => productsMap.set(d.id, { id: d.id, ...d.data() } as Product));
+
+      // Also search within variants for barcode/SKU match
+      const allProductsQ = query(
+        collection(firestore, 'products'),
+        where('store_id', '==', currentStoreId)
+      );
+      const allProductsSnap = await getDocs(allProductsQ);
+      allProductsSnap.docs.forEach(d => {
+        const p = { id: d.id, ...d.data() } as Product;
+        if (p.hasVariants && p.variants) {
+          const match = p.variants.some(v => 
+            v.barcode === trimmedTerm || 
+            v.sku?.toLowerCase() === lowerTerm ||
+            v.name.toLowerCase().includes(lowerTerm)
+          );
+          if (match) productsMap.set(p.id, p);
+        }
+      });
 
       const products = Array.from(productsMap.values());
       setFoundProducts(products);
@@ -125,6 +135,7 @@ export default function RestockNowPage() {
 
   const handleSelectProduct = (product: Product) => {
     setSelectedProduct(product);
+    setSelectedVariantId(null);
     setCostPrice(product.purchasePrice || 0);
     setFoundProducts([]);
     setSearchTerm('');
@@ -185,20 +196,46 @@ export default function RestockNowPage() {
         
         const currentStock = productDoc.data().stock || 0;
         const newStock = currentStock + restockQuantity;
-        
-        // Update product stock
-        transaction.update(productRef, { 
-          stock: newStock,
-          purchasePrice: costPrice, // Update last purchase price
-          updatedAt: serverTimestamp()
-        });
-        
+
+        let variantName = '';
+        if (selectedVariantId && productDoc.data().hasVariants && productDoc.data().variants) {
+          const variants = [...productDoc.data().variants];
+          const variantIndex = variants.findIndex((v: any) => v.id === selectedVariantId);
+          if (variantIndex !== -1) {
+            const variant = { ...variants[variantIndex] };
+            variant.stock += restockQuantity;
+            if (costPrice > 0) variant.sellingPrice = variant.sellingPrice; // Keep current price or update? usually keep.
+            variants[variantIndex] = variant;
+            variantName = ` (${variant.name})`;
+
+            transaction.update(productRef, {
+              variants,
+              stock: newStock,
+              purchasePrice: costPrice,
+              updatedAt: serverTimestamp()
+            });
+          } else {
+            transaction.update(productRef, {
+              stock: newStock,
+              purchasePrice: costPrice,
+              updatedAt: serverTimestamp()
+            });
+          }
+        } else {
+          // Update product stock
+          transaction.update(productRef, {
+            stock: newStock,
+            purchasePrice: costPrice, // Update last purchase price
+            updatedAt: serverTimestamp()
+          });
+        }
+
         // Create restock entry
         const restockData: RestockEntry = {
           id: restockRef.id,
           store_id: currentStoreId,
           productId: selectedProduct.id,
-          productName: selectedProduct.name,
+          productName: selectedProduct.name + variantName,
           quantity: restockQuantity,
           costPricePerUnit: costPrice,
           totalCost: restockQuantity * costPrice,
@@ -209,12 +246,13 @@ export default function RestockNowPage() {
           userEmail: user.email || 'system'
         };
         transaction.set(restockRef, restockData);
-        
+
         // Create audit log
         transaction.set(auditRef, {
           store_id: currentStoreId,
           productId: selectedProduct.id,
-          productName: selectedProduct.name,
+          productName: selectedProduct.name + variantName,
+          variantId: selectedVariantId || null,
           type: 'RESTOCK',
           referenceId: restockRef.id,
           beforeStock: currentStock,
@@ -224,10 +262,10 @@ export default function RestockNowPage() {
           staffName: user.displayName || user.email || 'Staff',
           timestamp: serverTimestamp()
         });
-      });
-      
-      toast({ title: 'Stock Updated', description: `Successfully added ${restockQuantity} units to "${selectedProduct.name}".` });
-      
+        });
+
+        toast({ title: 'Stock Updated', description: `Successfully added ${restockQuantity} units to "${selectedProduct.name}".` });
+
       // Refresh product data
       setSelectedProduct({ ...selectedProduct, stock: (selectedProduct.stock || 0) + restockQuantity, purchasePrice: costPrice });
       setRestockQuantity(1);
@@ -341,13 +379,57 @@ export default function RestockNowPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-3 rounded-xl bg-primary/5 border border-primary/10">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Selling Price</Label>
-                        <div className="text-lg font-bold">{formatCurrency(selectedProduct.sellingPrice, currencySymbol)}</div>
+                        <div className="text-lg font-bold">
+                          {formatCurrency(
+                            (selectedVariantId && selectedProduct.variants
+                              ? selectedProduct.variants.find(v => v.id === selectedVariantId)?.sellingPrice
+                              : selectedProduct.sellingPrice) || selectedProduct.sellingPrice,
+                            currencySymbol
+                          )}
+                        </div>
                     </div>
                     <div className="p-3 rounded-xl bg-secondary/5 border border-secondary/10">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Purchase Price</Label>
                         <div className="text-lg font-bold">{formatCurrency(selectedProduct.purchasePrice, currencySymbol)}</div>
                     </div>
                   </div>
+
+                  {selectedProduct.hasVariants && selectedProduct.variants && (
+                    <div className="space-y-2 pt-2">
+                      <Label className="text-xs font-bold uppercase tracking-wider">Select Variant to Restock</Label>
+                      <div className="grid grid-cols-1 gap-2">
+                        {selectedProduct.variants.filter(v => v.isActive).map(variant => (
+                          <button
+                            key={variant.id}
+                            type="button"
+                            onClick={() => setSelectedVariantId(variant.id)}
+                            className={cn(
+                              "text-left px-3 py-2 rounded-lg border-2 transition-all flex justify-between items-center",
+                              selectedVariantId === variant.id
+                                ? "border-primary bg-primary/5 ring-1 ring-primary"
+                                : "border-muted hover:border-primary/50"
+                            )}
+                          >
+                            <div className="flex items-center gap-2">
+                              {variant.imageUrl && (
+                                <div className="relative h-8 w-8 rounded overflow-hidden border">
+                                  <Image src={variant.imageUrl} alt={variant.name} fill className="object-cover" unoptimized />
+                                </div>
+                              )}
+                              <div>
+                                <p className="text-sm font-bold">{variant.name}</p>
+                                <p className="text-[10px] text-muted-foreground uppercase">SKU: {variant.sku || 'N/A'}</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xs font-black">{variant.stock} in stock</p>
+                              {variant.sellingPrice && <p className="text-[10px] text-primary font-bold">{formatCurrency(variant.sellingPrice, currencySymbol)}</p>}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   <Button variant="outline" className="w-full" onClick={() => { setSelectedProduct(null); setFoundProducts([]); setProductSales([]); }}>
                     Change Product
@@ -428,13 +510,13 @@ export default function RestockNowPage() {
                         />
                       </div>
                     </div>
-                    <Button type="submit" className="w-full h-12 text-lg font-bold shadow-lg shadow-primary/20" disabled={isSubmitting}>
+                    <Button type="submit" className="w-full h-12 text-lg font-bold shadow-lg shadow-primary/20" disabled={isSubmitting || (selectedProduct.hasVariants && !selectedVariantId)}>
                       {isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <PackagePlus className="mr-2 h-5 w-5" />}
                       Complete Restock
                     </Button>
-                  </form>
-                </CardContent>
-              </Card>
+                    </form>
+                    </CardContent>
+
 
               <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
                 <CardHeader className="bg-muted/10 border-b">

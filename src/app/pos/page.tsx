@@ -67,6 +67,7 @@ import { ConfirmHoldSaleDialog } from '@/components/pos/confirm-hold-sale-dialog
 import { CalculatorDialog } from '@/components/pos/CalculatorDialog';
 import { ConfirmPaymentDialog } from '@/components/pos/confirm-payment-dialog';
 import { CreditSaleDialog } from '@/components/pos/credit-sale-dialog';
+import { VariantSelectorDialog } from '@/components/pos/VariantSelectorDialog';
 import { ReceiptModal } from '@/components/dialogs/receipt-modal';
 import { ProductArea } from '@/components/pos/ProductArea';
 import { CartArea } from '@/components/pos/CartArea';
@@ -76,6 +77,7 @@ import { Button } from '@/components/ui/button';
 import { UserNav } from '@/components/UserNav';
 import { OutOfDataDrawer } from '@/components/ui/out-of-data-drawer';
 import { useRouter } from 'next/navigation';
+import type { ProductVariant } from '@/lib/types';
 
 type HeldSaleDisplay = HeldSaleType & { id: string };
 
@@ -132,6 +134,8 @@ export default function POSPage() {
   const [isCreditSaleDialogOpen, setIsCreditSaleDialogOpen] = useState(false);
   const [isConfirmHoldSaleDialogOpen, setIsConfirmHoldSaleDialogOpen] = useState(false);
   const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
+  const [isVariantSelectorOpen, setIsVariantSelectorOpen] = useState(false);
+  const [productForVariantSelection, setProductForVariantSelection] = useState<DisplayProduct | null>(null);
   const [isOutOfDataDrawerOpen, setIsOutOfDataDrawerOpen] = useState(false);
   const [outOfDataDrawerInfo, setOutOfDataDrawerInfo] = useState({ title: '', description: '', type: 'data' as 'data' | 'stock' | 'error' });
   const [currentSaleForReceipt, setCurrentSaleForReceipt] = useState<SaleTransaction | null>(null);
@@ -218,9 +222,19 @@ export default function POSPage() {
 
   const handleAddToCart = useCallback(
     (product: DisplayProduct, priceForSale: number) => {
-        const existingItem = cartItems.find((item) => item.id === product.id);
+        if (product.hasVariants && !product.selectedVariantId) {
+            setProductForVariantSelection(product);
+            setIsVariantSelectorOpen(true);
+            return;
+        }
 
-        if (product.stock <= 0) {
+        const existingItem = cartItems.find((item) => 
+            item.id === product.id && item.selectedVariantId === product.selectedVariantId
+        );
+
+        const currentStock = product.stock;
+
+        if (currentStock <= 0) {
             setOutOfDataDrawerInfo({
                 title: 'Out of Stock',
                 description: `${product.name} is currently out of stock and cannot be added to the cart.`,
@@ -230,10 +244,10 @@ export default function POSPage() {
             return;
         }
         
-        if (existingItem && existingItem.quantity >= product.stock) {
+        if (existingItem && existingItem.quantity >= currentStock) {
             setOutOfDataDrawerInfo({
                 title: 'Stock Limit Reached',
-                description: `You have reached the maximum available stock for ${product.name}. Max available: ${product.stock}.`,
+                description: `You have reached the maximum available stock for ${product.name}. Max available: ${currentStock}.`,
                 type: 'stock'
             });
             setIsOutOfDataDrawerOpen(true);
@@ -248,7 +262,9 @@ export default function POSPage() {
         if (existingItem) {
             setCartItems((prevItems) => {
                 const newItems = prevItems.map((item) =>
-                    item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+                    (item.id === product.id && item.selectedVariantId === product.selectedVariantId) 
+                    ? { ...item, quantity: item.quantity + 1 } 
+                    : item
                 );
                 setTimeout(() => { toast({ title: 'Added to Cart', description: `Increased quantity for ${product.name}.` }); }, 0);
                 return newItems;
@@ -264,19 +280,19 @@ export default function POSPage() {
     [cartItems, toast]
 );
   
-  const handleRemoveFromCart = (productId: string) => {
+  const handleRemoveFromCart = (productId: string, variantId?: string) => {
     setCartItems((prevItems) =>
-      prevItems.filter((item) => item.id !== productId)
+      prevItems.filter((item) => !(item.id === productId && item.selectedVariantId === variantId))
     );
   };
 
-  const handleUpdateQuantity = (productId: string, newQuantity: number) => {
+  const handleUpdateQuantity = (productId: string, newQuantity: number, variantId?: string) => {
     if (newQuantity < 1) {
-        handleRemoveFromCart(productId);
+        handleRemoveFromCart(productId, variantId);
         return;
     }
     setCartItems(prevItems => prevItems.map(item => {
-        if (item.id === productId) {
+        if (item.id === productId && item.selectedVariantId === variantId) {
             if (newQuantity <= item.stock) {
                 return { ...item, quantity: newQuantity };
             }
@@ -368,14 +384,34 @@ export default function POSPage() {
       for (const heldItem of heldSaleData.items) {
         const productInDb = products.find(p => p.id === heldItem.id);
         if (!productInDb) throw new Error(`${heldItem.name} no longer exists in inventory.`);
-        if (productInDb.stock < heldItem.quantity) throw new Error(`Insufficient stock for ${heldItem.name}.`);
-        if (!productInDb.isVisibleInPOS) throw new Error(`${heldItem.name} is currently not visible in POS.`);
+        
+        let stockToCheck = productInDb.stock;
+        let priceToUse = heldItem.sellingPrice;
+        let imageUrlToUse = heldItem.imageUrl || productInDb.imageUrl;
+        let variantName = '';
+
+        if (heldItem.variantId && productInDb.variants) {
+          const variant = productInDb.variants.find(v => v.id === heldItem.variantId);
+          if (variant) {
+            stockToCheck = variant.stock;
+            variantName = ` (${variant.name})`;
+            imageUrlToUse = variant.imageUrl || imageUrlToUse;
+          }
+        }
+
+        if (stockToCheck < heldItem.quantity) throw new Error(`Insufficient stock for ${heldItem.name}${variantName}.`);
+        if (!productInDb.isVisibleInPOS) throw new Error(`${heldItem.name}${variantName} is currently not visible in POS.`);
         
         restoredCartItems.push({
             ...productInDb,
+            name: heldItem.variantId ? `${productInDb.name}${variantName}` : productInDb.name,
             quantity: heldItem.quantity,
-            salePrice: heldItem.sellingPrice,
-        });
+            salePrice: priceToUse,
+            stock: stockToCheck,
+            imageUrl: imageUrlToUse,
+            selectedVariantId: heldItem.variantId,
+            selectedOptions: heldItem.selectedOptions,
+        } as any);
       }
 
       setCartItems(restoredCartItems);
@@ -467,16 +503,34 @@ export default function POSPage() {
             throw new Error(`Product ${item.productName} not found.`);
           }
           const currentStock = productDoc.data().stock || 0;
-          if (currentStock < item.quantity) {
-            throw new Error(`Insufficient stock for ${item.productName}. Only ${currentStock} left.`);
-          }
-          const newStock = currentStock - item.quantity;
+          let newStock = currentStock - item.quantity;
           
+          // --- HANDLE VARIANTS STOCK ---
+          if (item.variantId && productDoc.data().hasVariants && productDoc.data().variants) {
+            const variants = [...productDoc.data().variants];
+            const variantIndex = variants.findIndex((v: any) => v.id === item.variantId);
+            if (variantIndex !== -1) {
+              const variant = { ...variants[variantIndex] };
+              if (variant.stock < item.quantity) {
+                throw new Error(`Insufficient stock for variant ${variant.name}.`);
+              }
+              variant.stock -= item.quantity;
+              variants[variantIndex] = variant;
+              transaction.update(productRefs[i], { variants, stock: newStock });
+            } else {
+              transaction.update(productRefs[i], { stock: newStock });
+            }
+          } else {
+            transaction.update(productRefs[i], { stock: newStock });
+          }
+
           // --- LOG STOCK AUDIT ---
           const auditRef = doc(collection(firestore, 'stockAudit'));
           transaction.set(auditRef, {
             productId: item.productId,
             productName: item.productName,
+            variantId: item.variantId || null,
+            selectedOptions: item.selectedOptions || null,
             store_id: currentStoreId!,
             type: 'SALE',
             referenceId: docRef.id,
@@ -487,9 +541,6 @@ export default function POSPage() {
             staffName: currentUser.displayName || currentUser.email || 'Staff',
             timestamp: serverTimestamp()
           });
-
-          // Queue the WRITE
-          transaction.update(productRefs[i], { stock: newStock });
         }
 
         if (customerDocSnap && customerRef) {
@@ -620,9 +671,14 @@ export default function POSPage() {
     if (cartItems.length === 0) return;
     
     const saleItems: SaleTransactionItem[] = cartItems.map((item) => ({
-        productId: item.id, productName: item.name, quantity: item.quantity, unitPrice: item.salePrice,
+        productId: item.id, 
+        productName: item.name, 
+        quantity: item.quantity, 
+        unitPrice: item.salePrice,
         originalPrice: item.sellingPrice !== item.salePrice ? ensureNumber(item.sellingPrice) : null,
         totalPrice: item.salePrice * item.quantity,
+        variantId: item.selectedVariantId,
+        selectedOptions: item.selectedOptions,
       }));
 
     if (isCredit) {
@@ -650,9 +706,14 @@ export default function POSPage() {
     if (!selectedCustomer) return;
 
     const saleItems: SaleTransactionItem[] = cartItems.map((item) => ({
-      productId: item.id, productName: item.name, quantity: item.quantity, unitPrice: item.salePrice,
+      productId: item.id, 
+      productName: item.name, 
+      quantity: item.quantity, 
+      unitPrice: item.salePrice,
       originalPrice: ensureNumber(item.sellingPrice) !== item.salePrice ? ensureNumber(item.sellingPrice) : null,
       totalPrice: item.salePrice * item.quantity,
+      variantId: item.selectedVariantId,
+      selectedOptions: item.selectedOptions,
     }));
 
     setSaleDataForDialog({
@@ -681,6 +742,8 @@ export default function POSPage() {
             stock: item.stock,
             barcode: item.barcode || null,
             categoryId: item.categoryId,
+            variantId: item.selectedVariantId,
+            selectedOptions: item.selectedOptions,
         })),
         store_id: currentStoreId!,
         totalAmount: grandTotal,
@@ -699,6 +762,26 @@ export default function POSPage() {
         setIsConfirmHoldSaleDialogOpen(false);
         setIsProcessingSale(false);
     }
+  };
+
+  const handleVariantConfirm = (variant: ProductVariant, selectedOptions: { [key: string]: string }) => {
+    if (!productForVariantSelection) return;
+
+    const variantProduct: DisplayProduct = {
+        ...productForVariantSelection,
+        sellingPrice: variant.sellingPrice || productForVariantSelection.sellingPrice,
+        stock: variant.stock,
+        sku: variant.sku || productForVariantSelection.sku,
+        imageUrl: variant.imageUrl || productForVariantSelection.imageUrl,
+        hasVariants: true, 
+        selectedVariantId: variant.id,
+        selectedOptions: selectedOptions,
+        name: `${productForVariantSelection.name} (${variant.name})`
+    } as any;
+
+    handleAddToCart(variantProduct, variantProduct.sellingPrice);
+    setIsVariantSelectorOpen(false);
+    setProductForVariantSelection(null);
   };
 
   if (authLoading || !permissions) {
@@ -793,13 +876,22 @@ export default function POSPage() {
             settings={settings}
             onSendComplete={() => handlePostSendActions(saleForReceipt!.transaction)}
         />
-        <OutOfDataDrawer 
-            isOpen={isOutOfDataDrawerOpen} 
+        <OutOfDataDrawer
+            isOpen={isOutOfDataDrawerOpen}
             onOpenChange={setIsOutOfDataDrawerOpen}
             title={outOfDataDrawerInfo.title}
             description={outOfDataDrawerInfo.description}
             type={outOfDataDrawerInfo.type}
         />
+        {productForVariantSelection && (
+          <VariantSelectorDialog
+              isOpen={isVariantSelectorOpen}
+              onClose={() => { setIsVariantSelectorOpen(false); setProductForVariantSelection(null); }}
+              product={productForVariantSelection}
+              onConfirm={handleVariantConfirm}
+              currencySymbol={currencySymbol}
+          />
+        )}
       </div>
     </TooltipProvider>
   );

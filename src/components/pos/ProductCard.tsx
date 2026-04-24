@@ -6,8 +6,8 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, Undo2, TrendingUp, TrendingDown, Tag } from 'lucide-react';
-import type { DisplayProduct } from '@/lib/types';
+import { ShoppingCart, Undo2, TrendingUp, TrendingDown, Tag, Layers } from 'lucide-react';
+import type { DisplayProduct, ProductVariant } from '@/lib/types';
 import { formatCurrency } from '@/lib/formatUtils';
 import { ensureNumber, calculateEffectivePrice } from '@/lib/pos-utils';
 import { useSettings } from '@/contexts/settings-context';
@@ -227,7 +227,7 @@ export const ProductCard = React.memo(({ product, onAddToCart, priority, currenc
             onClick={handleAddToCartClick}
             disabled={isAddToCartDisabled}
             >
-            <ShoppingCart className={cn("mr-2", isSmallMode ? "h-3.5 w-3.5" : "h-5 w-5")} /> Add to Cart
+            {product.hasVariants ? <Layers className={cn("mr-2", isSmallMode ? "h-3.5 w-3.5" : "h-5 w-5")} /> : <ShoppingCart className={cn("mr-2", isSmallMode ? "h-3.5 w-3.5" : "h-5 w-5")} />} {product.hasVariants ? "Select Options" : "Add to Cart"}
             </Button>
         </CardFooter>
         </Card>

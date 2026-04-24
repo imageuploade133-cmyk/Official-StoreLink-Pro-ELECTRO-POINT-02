@@ -115,15 +115,30 @@ export default function CartPage() {
       const dbProduct = dbProducts.find(p => p.id === cartItem.id);
       if (!dbProduct) return { ...cartItem, isUnavailable: true };
 
-      const currentPrice = calculateEffectivePrice(dbProduct as any, today);
+      let salePrice = calculateEffectivePrice(dbProduct as any, today);
+      let stock = dbProduct.stock;
+      let variantImageUrl = dbProduct.imageUrl;
+      
+      if (cartItem.selectedVariantId && dbProduct.hasVariants && dbProduct.variants) {
+        const variant = dbProduct.variants.find(v => v.id === cartItem.selectedVariantId);
+        if (variant) {
+          if (variant.sellingPrice) {
+            salePrice = calculateEffectivePrice({ ...dbProduct, sellingPrice: variant.sellingPrice } as any, today);
+          }
+          stock = variant.stock;
+          if (variant.imageUrl) variantImageUrl = variant.imageUrl;
+        }
+      }
       
       return {
         ...cartItem,
         ...dbProduct,
-        salePrice: currentPrice,
+        imageUrl: variantImageUrl,
+        salePrice,
+        stock,
         isUnavailable: dbProduct.isVisibleInPOS === false,
-        isLowStock: dbProduct.stock < cartItem.quantity && dbProduct.stock > 0,
-        isOutOfStock: dbProduct.stock <= 0
+        isLowStock: stock < cartItem.quantity && stock > 0,
+        isOutOfStock: stock <= 0
       };
     });
   }, [cartItems, dbProducts, today]);
@@ -307,6 +322,15 @@ export default function CartPage() {
                                               </div>
                                               <div className="flex-grow space-y-1">
                                                   <h3 className="font-bold text-lg leading-tight">{item.name}</h3>
+                                                  {item.selectedOptions && (
+                                                      <div className="flex flex-wrap gap-2 mt-1">
+                                                          {Object.entries(item.selectedOptions).map(([key, val]) => (
+                                                              <Badge key={key} variant="outline" className="text-[10px] uppercase font-bold px-2 py-0">
+                                                                  {key}: {val}
+                                                              </Badge>
+                                                          ))}
+                                                      </div>
+                                                  )}
                                                   <div className="flex flex-wrap gap-2 items-center">
                                                     <p className="text-sm text-muted-foreground font-medium">{formatCurrency(item.salePrice, currencySymbol)}</p>
                                                     {item.isOutOfStock && <Badge variant="destructive">Out of Stock</Badge>}
@@ -469,7 +493,9 @@ export default function CartPage() {
                                       items: realTimeCartItems.map(item => ({
                                         productId: item.id,
                                         quantity: item.quantity,
-                                        price: item.salePrice
+                                        price: item.salePrice,
+                                        variantId: item.selectedVariantId,
+                                        selectedOptions: item.selectedOptions,
                                       })),
                                       totalAmount: total,
                                       totalCost: realTimeCartItems.reduce((sum, item) => sum + ((item.purchasePrice || 0) * item.quantity), 0),
