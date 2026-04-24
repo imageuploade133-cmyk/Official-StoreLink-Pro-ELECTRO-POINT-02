@@ -44,6 +44,7 @@ import {
   RotateCcw,
   Sparkles,
   Eye,
+  Info,
   Smartphone,
   Tablet,
   Monitor,
@@ -54,6 +55,16 @@ import {
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+
+const appleColors = [
+  { name: 'Blue', color: '#007AFF' },
+  { name: 'Green', color: '#34C759' },
+  { name: 'Red', color: '#FF3B30' },
+  { name: 'Orange', color: '#FF9500' },
+  { name: 'Indigo', color: '#5856D6' },
+  { name: 'Pink', color: '#FF2D55' },
+  { name: 'Black', color: '#000000' },
+];
 
 const iconOptions = [
   { name: 'ShoppingCart', icon: ShoppingCart },
@@ -157,7 +168,7 @@ function ButtonStyleSelector({
       {[
         { id: 'standard', label: 'Solid', icon: Circle, color: 'bg-primary' },
         { id: 'gradient', label: 'Gradient', icon: Sparkles, color: 'bg-gradient-to-r from-purple-500 to-pink-500' },
-        { id: 'apple', label: 'Apple', icon: Apple, color: 'bg-black dark:bg-white' },
+        { id: 'apple', label: 'Apple', icon: Apple, color: 'bg-[#007AFF]' },
         { id: 'outline', label: 'Outline', icon: Layout, color: 'border-2 border-primary bg-background' },
         { id: 'ghost', label: 'Ghost', icon: Eye, color: 'border-2 border-dashed border-muted' },
         { id: 'image', label: 'Image', icon: ImageIcon, color: 'bg-muted' },
@@ -178,8 +189,7 @@ function ButtonStyleSelector({
           ) : (
             <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", style.color)}>
                <style.icon className={cn("h-5 w-5", 
-                 style.id === 'outline' || style.id === 'ghost' ? 'text-primary' : 
-                 style.id === 'apple' ? 'text-white dark:text-black' : 'text-white'
+                 style.id === 'outline' || style.id === 'ghost' ? 'text-primary' : 'text-white'
                )} />
             </div>
           )}
@@ -267,12 +277,12 @@ function ButtonPreview({
     } else if (style === 'apple') {
       const color = settings[`${prefix}Color`] || '#007AFF';
       return {
-        backgroundColor: color,
+        background: `linear-gradient(180deg, ${color} 0%, ${color}ee 100%)`,
         color: 'white',
-        border: '1px solid rgba(0,0,0,0.1)',
-        boxShadow: `0 10px 15px -3px ${color}40, 0 4px 6px -2px ${color}20, inset 0 1px 0 rgba(255, 255, 255, 0.3)`,
+        border: '0.5px solid rgba(0,0,0,0.15)',
+        boxShadow: `0 8px 20px -4px ${color}60, inset 0 1px 1px rgba(255, 255, 255, 0.25)`,
         fontWeight: '600',
-        letterSpacing: '-0.01em',
+        letterSpacing: '-0.02em',
         borderRadius: '12px',
       };
     }
@@ -292,7 +302,11 @@ function ButtonPreview({
     <div className="flex items-center justify-center p-12 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-slate-50 dark:bg-slate-900/50 rounded-2xl border-2 border-dashed border-muted-foreground/20">
       <Button
         type="button"
-        className={cn(getSizeClasses(size), getShapeClass(shape), getShadowClass(shadow), "font-bold transition-all duration-300 transform hover:scale-105 active:scale-95")}
+        className={cn(
+          getSizeClasses(size), 
+          style === 'apple' ? 'rounded-xl shadow-none' : cn(getShapeClass(shape), getShadowClass(shadow)), 
+          "font-bold transition-all duration-300 transform hover:scale-105 active:scale-95"
+        )}
         style={getStyleProperties()}
       >
         {Icon && <Icon className="mr-2 h-5 w-5" />}
@@ -606,8 +620,25 @@ export default function ButtonUIStylePage() {
                           <FormControl>
                             <Input type="color" {...field} className="p-1 h-12 w-20 cursor-pointer rounded-xl border-2" />
                           </FormControl>
-                          <div className="flex-1">
+                          <div className="flex-1 space-y-2">
                             <Input value={field.value} onChange={field.onChange} className="font-mono bg-background/50" />
+                            {styleValue === 'apple' && (
+                              <div className="flex flex-wrap gap-2 mt-2">
+                                {appleColors.map((ac) => (
+                                  <button
+                                    key={ac.color}
+                                    type="button"
+                                    className={cn(
+                                      "w-6 h-6 rounded-full border border-muted transition-transform hover:scale-110 active:scale-90",
+                                      field.value === ac.color && "ring-2 ring-primary ring-offset-2"
+                                    )}
+                                    style={{ backgroundColor: ac.color }}
+                                    title={ac.name}
+                                    onClick={() => field.onChange(ac.color)}
+                                  />
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </FormItem>
@@ -710,6 +741,11 @@ export default function ButtonUIStylePage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="font-bold">Button Shape</FormLabel>
+                    {styleValue === 'apple' && (
+                      <p className="text-[10px] text-primary font-medium mb-2 flex items-center gap-1 animate-in fade-in slide-in-from-left-2">
+                        <Info className="h-3 w-3" /> Apple design uses a standard refined shape.
+                      </p>
+                    )}
                     <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
                       {buttonShapes.map((shape) => (
                         <button
@@ -741,6 +777,11 @@ export default function ButtonUIStylePage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="font-bold">Elevation (Shadow)</FormLabel>
+                    {styleValue === 'apple' && (
+                      <p className="text-[10px] text-primary font-medium mb-2 flex items-center gap-1 animate-in fade-in slide-in-from-left-2">
+                        <Info className="h-3 w-3" /> Apple design uses a custom dynamic shadow.
+                      </p>
+                    )}
                     <div className="grid grid-cols-4 lg:grid-cols-7 gap-2">
                       {shadowOptions.map((shadow) => (
                         <button

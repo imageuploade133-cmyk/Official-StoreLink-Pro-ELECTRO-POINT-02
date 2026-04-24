@@ -87,12 +87,12 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
         } else if (style === 'apple') {
             const color = settings?.storeHeroBtnColor || '#007AFF';
             return {
-                backgroundColor: color,
+                background: `linear-gradient(180deg, ${color} 0%, ${color}ee 100%)`,
                 color: 'white',
-                border: '1px solid rgba(0,0,0,0.1)',
-                boxShadow: `inset 0 1px 0 rgba(255, 255, 255, 0.3)`,
+                border: '0.5px solid rgba(0,0,0,0.15)',
+                boxShadow: `0 8px 20px -4px ${color}60, inset 0 1px 1px rgba(255, 255, 255, 0.25)`,
                 fontWeight: '600',
-                letterSpacing: '-0.01em',
+                letterSpacing: '-0.02em',
             };
         }
         
@@ -150,7 +150,7 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
 
         if (style === 'apple') {
             shapeClass = 'rounded-xl';
-            shadowClass = 'shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-2px_rgba(0,0,0,0.05)]';
+            shadowClass = 'shadow-none';
         }
 
         return `${sizeClass} ${shapeClass} ${shadowClass}`;
@@ -192,12 +192,12 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
         } else if (style === 'apple') {
             const color = settings?.storeGridCartColor || '#007AFF';
             return {
-                backgroundColor: color,
+                background: `linear-gradient(180deg, ${color} 0%, ${color}ee 100%)`,
                 color: 'white',
-                border: '1px solid rgba(0,0,0,0.1)',
-                boxShadow: `inset 0 1px 0 rgba(255, 255, 255, 0.3)`,
+                border: '0.5px solid rgba(0,0,0,0.15)',
+                boxShadow: `0 8px 20px -4px ${color}60, inset 0 1px 1px rgba(255, 255, 255, 0.25)`,
                 fontWeight: '600',
-                letterSpacing: '-0.01em',
+                letterSpacing: '-0.02em',
             };
         }
         
@@ -255,7 +255,7 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
 
         if (style === 'apple') {
             shapeClass = 'rounded-xl';
-            shadowClass = 'shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-2px_rgba(0,0,0,0.05)]';
+            shadowClass = 'shadow-none';
         }
 
         return `${sizeClass} ${shapeClass} ${shadowClass}`;
