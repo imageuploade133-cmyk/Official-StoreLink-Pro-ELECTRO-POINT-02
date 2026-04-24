@@ -1,7 +1,7 @@
 'use server'
 
 import { adminDb } from '@/lib/firebase-admin';
-import { FieldValue } from 'firebase-admin/firestore';
+import * as admin from 'firebase-admin';
 import { sendOrderNotifications } from '@/lib/email';
 import { WhatsAppAlertSettings, OrderStatus } from '@/lib/types';
 import { 
@@ -53,7 +53,22 @@ export async function placeOrderAction({
   taxAmountCalculated?: number;
 }) {
   try {
-    const { orderId, orderData, settings, emailAlertSettings, whatsappAlertSettings } = await adminDb.runTransaction(async (transaction) => {
+    // Basic validation
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return { success: false, error: 'Cannot place an empty order.' };
+    }
+
+    if (totalAmount < 0) {
+      return { success: false, error: 'Invalid total amount.' };
+    }
+
+    let resultOrderId = '';
+    let orderDataForNotification: any = null;
+    let settingsForNotification: any = null;
+    let emailAlertSettingsForNotification: any = null;
+    let whatsappAlertSettingsForNotification: any = null;
+
+    await adminDb.runTransaction(async (transaction) => {
       // 0. Baseline settings from global
       let settings: any = { id: 'global' };
       let emailAlertSettings: any = null;
@@ -100,23 +115,28 @@ export async function placeOrderAction({
       }
 
       // 1. Check stock for all items and get names
-      const productRefs = items.map(item => adminDb.collection('products').doc(item.productId));
-      const productSnaps = await Promise.all(productRefs.map(ref => transaction.get(ref)));
-
       const enrichedItems = [];
-
-      for (let i = 0; i < items.length; i++) {
-        const item = items[i];
-        const snap = productSnaps[i];
+      
+      // Perform all reads first
+      const productSnaps = [];
+      for (const item of items) {
+        const productRef = adminDb.collection('products').doc(item.productId);
+        const snap = await transaction.get(productRef);
         if (!snap.exists) throw new Error(`Product with ID "${item.productId}" not found.`);
-        
+        productSnaps.push({ item, snap, ref: productRef });
+      }
+
+      // Now perform all writes
+      for (const { item, snap, ref } of productSnaps) {
         const data = snap.data();
-        const currentStock = data?.stock || 0;
-        if (currentStock < item.quantity) {
+        const currentStock = Number(data?.stock || 0);
+        const quantity = Number(item.quantity || 0);
+
+        if (currentStock < quantity) {
           throw new Error(`Insufficient stock for "${data?.name || item.productId}". Only ${currentStock} left.`);
         }
         
-        transaction.update(productRefs[i], { stock: currentStock - item.quantity });
+        transaction.update(ref, { stock: currentStock - quantity });
         
         enrichedItems.push({
           ...item,
@@ -127,18 +147,26 @@ export async function placeOrderAction({
       // 2. Update coupon if applicable
       if (appliedCouponId) {
         const couponRef = adminDb.collection('coupons').doc(appliedCouponId);
-        transaction.update(couponRef, { usageCount: FieldValue.increment(1) });
+        transaction.update(couponRef, { usageCount: admin.firestore.FieldValue.increment(1) });
       }
 
       // 3. Create the order
       const orderRef = adminDb.collection('orders').doc();
+      
+      // Ensure all numbers are valid
+      const finalTotalAmount = Number(totalAmount) || 0;
+      const finalTotalCost = Number(totalCost) || 0;
+      const finalDeliveryPrice = Number(deliveryPrice) || 0;
+      const finalTaxRate = Number(taxRate) || 0;
+      const finalTaxAmountCalculated = Number(taxAmountCalculated) || 0;
+
       const orderData = {
         user_id: userId,
         store_id: storeId,
         storeName: (settings as any).storeName || 'Our Store',
         items: enrichedItems,
-        totalAmount,
-        totalCost,
+        totalAmount: finalTotalAmount,
+        totalCost: finalTotalCost,
         paymentMethod,
         paymentReference: paymentReference || null,
         paymentReceiptUrl: paymentReceiptUrl || null,
@@ -146,58 +174,67 @@ export async function placeOrderAction({
         selectedBankAccount: selectedBankAccount || null,
         fulfillmentType: fulfillmentType || 'delivery',
         deliveryLocationId: deliveryLocationId || null,
-        deliveryPrice: deliveryPrice || 0,
+        deliveryPrice: finalDeliveryPrice,
         status: 'pending',
         paymentStatus: 'UNPAID',
         isPaid: false,
-        createdAt: FieldValue.serverTimestamp(),
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
         guestInfo: guestInfo || null,
         payCurrency: payCurrency || null,
         gateway: gateway || null,
-        taxRate: taxRate || 0,
-        taxAmountCalculated: taxAmountCalculated || 0,
+        taxRate: finalTaxRate,
+        taxAmountCalculated: finalTaxAmountCalculated,
       };
       
       transaction.set(orderRef, orderData);
 
-      return { orderId: orderRef.id, orderData, settings, emailAlertSettings, whatsappAlertSettings };
+      // Prepare data for non-blocking notifications
+      resultOrderId = orderRef.id;
+      orderDataForNotification = { 
+        ...orderData, 
+        id: resultOrderId,
+        createdAt: new Date() // Use current date for notifications instead of FieldValue
+      };
+      settingsForNotification = settings;
+      emailAlertSettingsForNotification = emailAlertSettings;
+      whatsappAlertSettingsForNotification = whatsappAlertSettings;
     });
 
     // Send Email Notifications (non-blocking)
-    if (orderId && orderData) {
+    if (resultOrderId && orderDataForNotification) {
         sendOrderNotifications(
-            { id: orderId, ...orderData }, 
-            settings, 
-            (settings as any).storeName || 'Our Store',
-            emailAlertSettings
+            orderDataForNotification, 
+            settingsForNotification, 
+            (settingsForNotification as any).storeName || 'Our Store',
+            emailAlertSettingsForNotification
         ).catch(err => console.error('Error sending order emails:', err));
 
         // Send WhatsApp Notifications (non-blocking)
         const waSettings: any = {
-            enabled: (settings as any).enableOrderAlerts || (settings as any).enableWhatsapp || whatsappAlertSettings?.enabled,
-            username: whatsappAlertSettings?.username || (settings as any).eBulkUsername,
-            apiKey: whatsappAlertSettings?.apiKey || (settings as any).eBulkApiKey,
-            senderNumber: whatsappAlertSettings?.senderNumber || (settings as any).orderNotificationNumbers?.[0],
+            enabled: (settingsForNotification as any).enableOrderAlerts || (settingsForNotification as any).enableWhatsapp || whatsappAlertSettingsForNotification?.enabled,
+            username: whatsappAlertSettingsForNotification?.username || (settingsForNotification as any).eBulkUsername,
+            apiKey: whatsappAlertSettingsForNotification?.apiKey || (settingsForNotification as any).eBulkApiKey,
+            senderNumber: whatsappAlertSettingsForNotification?.senderNumber || (settingsForNotification as any).orderNotificationNumbers?.[0],
             orderNotificationNumbers: Array.from(new Set([
-                ...(whatsappAlertSettings?.orderNotificationNumbers || []),
-                ...((settings as any).orderNotificationNumbers || [])
+                ...(Array.isArray(whatsappAlertSettingsForNotification?.orderNotificationNumbers) ? whatsappAlertSettingsForNotification.orderNotificationNumbers : []),
+                ...(Array.isArray((settingsForNotification as any).orderNotificationNumbers) ? (settingsForNotification as any).orderNotificationNumbers : [])
             ])),
-            orderPlacedTemplate: whatsappAlertSettings?.orderPlacedTemplate,
+            orderPlacedTemplate: whatsappAlertSettingsForNotification?.orderPlacedTemplate,
         };
 
         if (waSettings.enabled && waSettings.username && waSettings.apiKey) {
             sendWhatsAppOrderAlert(
-                { id: orderId, ...orderData },
+                orderDataForNotification,
                 waSettings as WhatsAppAlertSettings,
-                (settings as any).currency || '₦'
+                (settingsForNotification as any).currency || '₦'
             ).catch(err => console.error('Error sending WhatsApp alert:', err));
         }
     }
 
-    return { success: true, orderId };
+    return { success: true, orderId: resultOrderId };
   } catch (error: any) {
     console.error('Error placing order:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: error.message || 'An unknown error occurred during order placement' };
   }
 }
 
@@ -212,7 +249,7 @@ export async function updateOrderStatusAction(orderId: string, storeId: string, 
         
         await orderRef.update({ 
             status: newStatus,
-            updatedAt: FieldValue.serverTimestamp()
+            updatedAt: admin.firestore.FieldValue.serverTimestamp()
         });
 
         // Create Audit Log
@@ -220,7 +257,7 @@ export async function updateOrderStatusAction(orderId: string, storeId: string, 
             orderId,
             oldStatus,
             newStatus,
-            timestamp: FieldValue.serverTimestamp(),
+            timestamp: admin.firestore.FieldValue.serverTimestamp(),
             staffId,
             staffName,
             staffEmail,
@@ -475,7 +512,7 @@ export async function saveWhatsAppAlertSettingsAction(storeId: string, settings:
         const dataToSave = {
             ...settings,
             apiKey: encryptedApiKey,
-            updatedAt: FieldValue.serverTimestamp(),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         };
 
         if (storeId && storeId !== 'global') {

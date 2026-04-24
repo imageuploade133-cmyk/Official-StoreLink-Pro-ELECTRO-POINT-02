@@ -337,7 +337,7 @@ export default function CheckoutPage() {
           price: item.salePrice
         })),
         totalAmount: total,
-        totalCost: cartItems.reduce((sum, item) => sum + (item.purchasePrice * item.quantity), 0),
+        totalCost: cartItems.reduce((sum, item) => sum + ((item.purchasePrice || item.salePrice || 0) * item.quantity), 0),
         paymentMethod: paymentMethod,
         paymentReference: paymentMethod === 'Bank Transfer' ? paymentReference : null,
         paymentReceiptUrl: paymentMethod === 'Bank Transfer' ? receiptUrl : null,
@@ -477,7 +477,7 @@ export default function CheckoutPage() {
                                 price: item.salePrice
                             })),
                             totalAmount: total,
-                            totalCost: cartItems.reduce((sum, item) => sum + (item.purchasePrice * item.quantity), 0),
+                            totalCost: cartItems.reduce((sum, item) => sum + ((item.purchasePrice || item.salePrice || 0) * item.quantity), 0),
                             paymentMethod: 'Express Checkout',
                             fulfillmentType,
                             deliveryLocationId: fulfillmentType === 'delivery' ? selectedLocationId : null,
@@ -774,8 +774,8 @@ export default function CheckoutPage() {
                   <Button variant="ghost" onClick={() => setStep('details')}>Back to Details</Button>
                   <LoadingButton 
                     onClick={handlePlaceOrder} 
-                    isLoading={step === 'processing'}
-                    disabled={(paymentMethod === 'Bank Transfer' && !hasConfirmedTransfer) || filteredPaymentMethods.length === 0}
+                    isLoading={step as string === 'processing'}
+                    disabled={(paymentMethod === 'Bank Transfer' && !hasConfirmedTransfer) || filteredPaymentMethods.length === 0 || step as string === 'processing'}
                     size="lg" 
                     style={buttonStyle}
                     className="px-10 border-none font-bold"
