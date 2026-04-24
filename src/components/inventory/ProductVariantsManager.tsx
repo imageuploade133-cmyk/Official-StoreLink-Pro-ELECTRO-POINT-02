@@ -37,6 +37,8 @@ import { uploadImage } from '@/ai/flows/image-upload-flow';
 import { removeBackground } from '@/ai/flows/background-removal-flow';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { compressAndResizeImage } from '@/lib/image-utils';
+import { useSettings } from '@/contexts/settings-context';
 import Image from 'next/image';
 
 interface ProductVariantsManagerProps {
@@ -46,6 +48,7 @@ interface ProductVariantsManagerProps {
 export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps) {
   const { control, watch, setValue, formState: { errors } } = useFormContext();
   const { toast } = useToast();
+  const { settings } = useSettings();
   const [isUploading, setIsUploading] = useState<string | null>(null);
   const [isProcessingAi, setIsProcessingAi] = useState<string | null>(null);
 
@@ -122,28 +125,53 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      toast({ variant: "destructive", title: "File too large", description: "Image must be smaller than 2MB." });
+    const maxFileSizeMb = settings?.imageMaxFileSizeMb || 5;
+    const maxSizeBytes = maxFileSizeMb * 1024 * 1024;
+
+    if (file.size > maxSizeBytes) {
+      toast({ 
+        variant: "destructive", 
+        title: "File too large", 
+        description: `Image must be smaller than ${maxFileSizeMb}MB.` 
+      });
       return;
     }
 
-    const variantId = variants[variantIndex].id;
+    const variantId = variants[variantIndex]?.id;
+    if (!variantId) return;
+
     setIsUploading(variantId);
 
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = async () => {
+    try {
+      const reader = new FileReader();
+      const imageDataUri = await new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      // Optimize image before upload
+      let optimizedDataUri = imageDataUri;
       try {
-        const imageDataUri = reader.result as string;
-        const result = await uploadImage({ imageDataUri, storeId });
-        setValue(`variants.${variantIndex}.imageUrl`, result.display_url);
-        toast({ title: "Image Uploaded", description: "Variant image updated." });
-      } catch (error: any) {
-        toast({ variant: "destructive", title: "Upload Failed", description: error.message || "Could not upload image." });
-      } finally {
-        setIsUploading(null);
+        optimizedDataUri = await compressAndResizeImage(
+          imageDataUri, 
+          settings?.imageUploadQuality || 80, 
+          settings?.imageMaxWidth || 1920
+        );
+      } catch (optError) {
+        console.error("Optimization failed:", optError);
       }
-    };
+
+      const result = await uploadImage({ imageDataUri: optimizedDataUri, storeId });
+      setValue(`variants.${variantIndex}.imageUrl`, result.display_url, { shouldDirty: true });
+      toast({ title: "Image Uploaded", description: "Variant image updated." });
+    } catch (error: any) {
+      console.error("Upload failed:", error);
+      toast({ variant: "destructive", title: "Upload Failed", description: error.message || "Could not upload image." });
+    } finally {
+      setIsUploading(null);
+      if (event.target) event.target.value = '';
+    }
   };
 
   const handleRemoveBackground = async (variantIndex: number) => {
