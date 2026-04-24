@@ -219,22 +219,22 @@ export function RestockForm({
                 </AccordionContent>
             </AccordionItem>
             <AccordionItem value="supplier-info">
-                <AccordionTrigger className="text-sm font-medium flex items-center gap-1"><Truck className="h-4 w-4"/>Supplier Information (Optional)</AccordionTrigger>
+                <AccordionTrigger className="text-sm font-medium flex items-center gap-1"><Truck className="h-4 w-4"/>Supplier & Procurement Details (Optional)</AccordionTrigger>
                 <AccordionContent className="pt-4 space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField control={form.control} name="supplierName" render={({ field }) => (
-                            <FormItem><FormLabel>Stock Supplier</FormLabel><FormControl><Input placeholder="Company Name" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>Stock Supplier (Company)</FormLabel><FormControl><Input placeholder="e.g., Electronics Wholesale Ltd" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                         )}/>
                         <FormField control={form.control} name="supplierContactName" render={({ field }) => (
-                            <FormItem><FormLabel>Supplier Name</FormLabel><FormControl><Input placeholder="Contact Person" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>Supplier Agent Name</FormLabel><FormControl><Input placeholder="e.g., John Doe" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                         )}/>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField control={form.control} name="supplierPhone" render={({ field }) => (
-                            <FormItem><FormLabel>Supplier Phone</FormLabel><FormControl><Input placeholder="Phone Number" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>Supplier Phone</FormLabel><FormControl><Input placeholder="+1 234 567 890" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                         )}/>
                         <FormField control={form.control} name="supplierLocation" render={({ field }) => (
-                            <FormItem><FormLabel>Supplier Location</FormLabel><FormControl><Input placeholder="Location" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>Supplier Location</FormLabel><FormControl><Input placeholder="City, Country" {...field} value={field.value ?? ''} /></FormControl><FormMessage /></FormItem>
                         )}/>
                     </div>
                     <FormField
