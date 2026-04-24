@@ -386,8 +386,8 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
                     <h4 className="text-sm font-semibold text-amber-900 flex items-center gap-2">
                         <Info className="h-4 w-4" /> Available Placeholders
                     </h4>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
-                        {['{orderId}', '{customerName}', '{amount}', '{currency}', '{status}', '{paymentMethod}', '{storeName}', '{itemsDetails}'].map(p => (
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2">
+                        {['{orderId}', '{customerName}', '{customerEmail}', '{customerPhone}', '{amount}', '{currency}', '{status}', '{paymentMethod}', '{storeName}', '{itemsDetails}', '{fulfillmentType}', '{deliveryAddress}', '{paymentStatus}'].map(p => (
                             <code key={p} className="text-xs bg-white/50 border border-amber-200 rounded px-2 py-1 text-amber-800">{p}</code>
                         ))}
                     </div>

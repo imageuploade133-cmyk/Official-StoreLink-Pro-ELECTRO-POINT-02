@@ -2,13 +2,14 @@ import { NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase-admin';
 import { Timestamp } from 'firebase-admin/firestore';
 import { decrypt } from '@/lib/encryption';
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 import { Transaction } from '@/lib/types';
 import { 
   getWhatsAppSettings, 
   sendWhatsAppViaEBulkSMS, 
   logWhatsAppMessage 
 } from '@/lib/whatsapp-ebulk';
+import { sendWhatsAppOrderAlert } from '../../actions/orders';
 
 export async function POST(request: Request) {
   try {
@@ -177,37 +178,21 @@ async function processSuccessfulTransaction(reference: string, metadata?: any) {
 
           // Trigger WhatsApp notification for payment confirmed
           getWhatsAppSettings(transactionData?.storeId || metadata?.storeId || 'global').then(async (settings) => {
-            if (settings && settings.enabled && settings.senderNumber) {
+            if (settings && settings.enabled) {
               const orderSnap = await orderRef.get();
               const orderData = orderSnap.data();
-              const customerName = orderData?.guestInfo?.name || 'Customer';
-              const shortOrderId = orderId.substring(0, 8).toUpperCase();
-              const amount = orderData?.totalAmount || 0;
-              
-              const message = `*Hello ${orderData?.storeName || 'Admin'},*\n*Payment CONFIRMED for Order #${shortOrderId}.*\n\n*Customer: ${customerName}*\n*Amount: ₦${amount.toLocaleString()}*\n*Status: processing*\n\n*You can now begin processing this order.*`;
-              
-              const result = await sendWhatsAppViaEBulkSMS(
-                  settings.username, 
-                  settings.apiKey, 
-                  [settings.senderNumber], 
-                  'Payment Confirmed Alert', 
-                  message,
-                  2,
-                  settings.senderNumber
-              );
-              
-              await logWhatsAppMessage({
-                eventType: 'staff_order_alert',
-                messageContent: message,
-                recipientPhone: settings.senderNumber,
-                customerName: customerName,
-                status: result?.response?.status === 'SUCCESS' ? 'sent' : 'failed',
-                unitsCharged: 1,
-                userId: 'system-webhook',
-                userName: 'Payment Webhook',
-                storeId: transactionData?.storeId || metadata?.storeId || 'global',
-                errorDetails: result?.response?.status !== 'SUCCESS' ? result?.response?.statusdetail : null
-              });
+              if (orderData) {
+                const globalSettingsDoc = await adminDb.collection('settings').doc('global').get();
+                const currency = globalSettingsDoc.data()?.currency || '₦';
+                
+                // This sends full order details to both Admin and Customer
+                await sendWhatsAppOrderAlert({ 
+                  id: orderId, 
+                  ...orderData, 
+                  status: 'processing', 
+                  paymentStatus: 'PAID' 
+                }, settings, currency);
+              }
             }
           }).catch(err => console.error('Error sending WhatsApp payment alert:', err));
         }
