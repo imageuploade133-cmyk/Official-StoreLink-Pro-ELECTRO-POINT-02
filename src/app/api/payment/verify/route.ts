@@ -8,7 +8,7 @@ import {
   sendWhatsAppViaEBulkSMS, 
   logWhatsAppMessage 
 } from '@/lib/whatsapp-ebulk';
-import { sendWhatsAppOrderAlert } from '../../actions/orders';
+import { sendWhatsAppOrderAlert } from '../../../actions/orders';
 import Stripe from 'stripe';
 
 export async function GET(request: Request) {
