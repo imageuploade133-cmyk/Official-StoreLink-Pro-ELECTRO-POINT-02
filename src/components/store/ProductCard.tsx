@@ -121,9 +121,9 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
 
   const hoverEffectMap: Record<string, string> = {
     none: '',
-    lift: 'hover:-translate-y-2 hover:shadow-xl transition-all duration-300',
+    lift: 'hover:-translate-y-2 transition-all duration-300',
     zoom: '', // handled on image
-    glow: 'hover:shadow-2xl hover:shadow-primary/20 transition-all duration-300',
+    glow: 'transition-all duration-300',
     border: 'hover:border-primary transition-all duration-300',
   };
 
@@ -301,7 +301,7 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
         className={cn(
           "group relative flex flex-col transition-all duration-500 overflow-hidden",
           cardStyle === 'modern' ? "backdrop-blur-xl border-white/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]" : "bg-white dark:bg-[#111111] border-black/[0.08] dark:border-white/[0.12]",
-          cardStyle === 'classic' && "shadow-none hover:shadow-lg",
+          cardStyle === 'classic' && "shadow-none",
           borderRadiusMap[borderRadius] || borderRadiusMap.full,
           shadowMap[shadow] || shadowMap.md,
           borderWidthMap[borderWidth] || borderWidthMap.thin,
