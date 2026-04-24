@@ -480,6 +480,34 @@ export interface Settings {
   toastGradientStartColor?: string;
   toastGradientEndColor?: string;
   toastGradientAngle?: number;
+  showLogisticsOnPublicSite?: boolean;
+  logisticsFaq?: { question: string; answer: string }[];
+  shippingPolicy?: string;
+  returnsPolicy?: string;
+  logisticsImageUrl?: string;
+  showRelatedProducts?: boolean;
+  relatedProductsBackgroundColor?: string;
+  relatedProductsTitle?: string;
+  relatedProductsDescription?: string;
+  plan?: string;
+  enableWelcomeCredit?: boolean;
+  welcomeCreditAmount?: number;
+  store_id?: string;
+  enableOrderAlerts?: boolean;
+  orderNotificationNumbers?: string[];
+  invoiceLogoHeight?: number;
+  terminalLogoHeight?: number;
+  posProductSize?: 'big' | 'small' | 'custom';
+  posCustomColumns?: number;
+  enableLogoOnReceipt?: boolean;
+  smallReceiptLogoSize?: number;
+  smallReceiptStoreNameBold?: boolean;
+  smallReceiptStoreAddressBold?: boolean;
+  enableLogoOnInvoice?: boolean;
+  invoiceWatermarkLogoOpacity?: number;
+  invoiceWatermarkLogoPosition?: string;
+  invoiceWatermarkLogoSize?: number;
+  storeContact?: string;
 }
 
 export type AppSettings = Settings;
@@ -489,6 +517,18 @@ export interface WebsiteTraffic {
   totalViews: number;
   todayViews: number;
   lastDailyUpdate: string;
+}
+
+export interface PublicPage {
+  id: string;
+  store_id?: string;
+  title: string;
+  slug: string;
+  content: string;
+  bannerImageUrl?: string;
+  isPublished: boolean;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
 }
 
 export interface SlideShow {
@@ -620,6 +660,9 @@ export interface Product {
   isNewArrival?: boolean;
   isPopular?: boolean;
   isOldStock?: boolean;
+  isUnavailable?: boolean;
+  isOutOfStock?: boolean;
+  isLowStock?: boolean;
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
   barcode?: string;
