@@ -65,6 +65,7 @@ import { cn, convertToDateSafely } from '@/lib/utils';
 import type { Product, Category, ProductVideo } from '@/lib/types';
 import { generateMarketingContent } from '@/ai/flows/product-marketing-flow';
 import { uploadImage } from '@/ai/flows/image-upload-flow';
+import { compressAndResizeImage } from "@/lib/image-utils";
 
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -212,6 +213,7 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
       sku: z.string().optional().or(z.literal("")),
       sellingPrice: z.coerce.number().optional(),
       stock: z.coerce.number().int().min(0, "Stock cannot be negative."),
+      barcode: z.string().optional().or(z.literal("")),
       description: z.string().optional().or(z.literal("")),
       imageUrl: z.string().url().optional().or(z.literal("")),
       isActive: z.boolean().default(true),
