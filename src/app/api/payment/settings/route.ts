@@ -15,9 +15,12 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const storeId = searchParams.get('storeId') || 'global';
 
-    const { authorized, errorCode: storeErrorCode } = await checkStoreAuthorization(decodedToken.uid, storeId);
+    const { authorized, errorCode: storeErrorCode, errorMessage } = await checkStoreAuthorization(decodedToken.uid, storeId);
     if (!authorized) {
-      return NextResponse.json({ error: storeErrorCode }, { status: 403 });
+      return NextResponse.json(
+        { error: errorMessage || storeErrorCode }, 
+        { status: storeErrorCode === 'missing_credentials' ? 500 : 403 }
+      );
     }
 
     const providersRef = adminDb.collection('payment_providers');
@@ -112,9 +115,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Provider name is required' }, { status: 400 });
     }
 
-    const { authorized, errorCode: storeErrorCode } = await checkStoreAuthorization(decodedToken.uid, storeId);
+    const { authorized, errorCode: storeErrorCode, errorMessage } = await checkStoreAuthorization(decodedToken.uid, storeId);
     if (!authorized) {
-      return NextResponse.json({ error: storeErrorCode }, { status: 403 });
+      return NextResponse.json(
+        { error: errorMessage || storeErrorCode }, 
+        { status: storeErrorCode === 'missing_credentials' ? 500 : 403 }
+      );
     }
 
     const providerId = `${storeId}_${providerName}`;

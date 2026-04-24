@@ -19,10 +19,13 @@ export async function POST(request: Request) {
     console.log(`Current user/store id: ${decodedToken.uid} / ${storeId || 'global'}`);
 
     // Check if user is authorized for this store
-    const { authorized, errorCode: storeErrorCode } = await checkStoreAuthorization(decodedToken.uid, storeId || 'global');
+    const { authorized, errorCode: storeErrorCode, errorMessage } = await checkStoreAuthorization(decodedToken.uid, storeId || 'global');
     if (!authorized) {
-      console.log('Authorization failed:', storeErrorCode);
-      return NextResponse.json({ success: false, error: storeErrorCode || 'Forbidden' }, { status: 403 });
+      console.log('Authorization failed:', errorMessage || storeErrorCode);
+      return NextResponse.json(
+        { success: false, error: errorMessage || storeErrorCode || 'Forbidden' }, 
+        { status: storeErrorCode === 'missing_credentials' ? 500 : 403 }
+      );
     }
 
     // Fetch credentials from Firestore (Secure)
