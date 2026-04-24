@@ -11,18 +11,33 @@ const ToastProvider = ToastPrimitives.Provider
 
 const ToastViewport = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Viewport>,
-  React.ComponentPropsWithoutRef<typeof ToastPrimitives.Viewport>
->(({ className, ...props }, ref) => (
-  <ToastPrimitives.Viewport
-    ref={ref}
-    className={cn(
-      "fixed top-4 left-1/2 z-[100] flex -translate-x-1/2 flex-col gap-2 w-full max-w-[420px] p-4",
-      className
-    )}
-    suppressHydrationWarning
-    {...props}
-  />
-))
+  React.ComponentPropsWithoutRef<typeof ToastPrimitives.Viewport> & { position?: string }
+>(({ className, position, ...props }, ref) => {
+  const getPositionClasses = (pos?: string) => {
+    switch (pos) {
+      case 'top-left': return "top-0 left-0 flex-col";
+      case 'top-center': return "top-0 left-1/2 -translate-x-1/2 flex-col";
+      case 'top-right': return "top-0 right-0 flex-col text-right";
+      case 'bottom-left': return "bottom-0 left-0 flex-col-reverse";
+      case 'bottom-center': return "bottom-0 left-1/2 -translate-x-1/2 flex-col-reverse";
+      case 'bottom-right': return "bottom-0 right-0 flex-col-reverse text-right";
+      default: return "top-4 left-1/2 -translate-x-1/2 flex-col";
+    }
+  };
+
+  return (
+    <ToastPrimitives.Viewport
+      ref={ref}
+      className={cn(
+        "fixed z-[100] flex gap-2 w-full max-w-[420px] p-4",
+        getPositionClasses(position),
+        className
+      )}
+      suppressHydrationWarning
+      {...props}
+    />
+  );
+})
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName
 
 const toastVariants = cva(
@@ -46,8 +61,11 @@ const toastVariants = cva(
 const Toast = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Root>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root> &
-    VariantProps<typeof toastVariants>
->(({ className, variant, ...props }, ref) => {
+    VariantProps<typeof toastVariants> & { 
+      customStyles?: React.CSSProperties;
+      animation?: 'slide' | 'fade' | 'zoom';
+    }
+>(({ className, variant, customStyles, animation, ...props }, ref) => {
   // Extract duration and onOpenChange to manage auto-dismiss via CSS animation
   const { onOpenChange, duration: propsDuration, ...restProps } = props;
   const duration = typeof propsDuration === 'number' ? propsDuration : 5000;
@@ -59,14 +77,22 @@ const Toast = React.forwardRef<
     }
   };
 
+  const animationClasses = cn(
+    animation === 'fade' && "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+    animation === 'zoom' && "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+    // Default is slide (already in toastVariants)
+  );
+
   return (
     <ToastPrimitives.Root
       ref={ref}
       className={cn(
         toastVariants({ variant }), 
+        animationClasses,
         className, 
         'overflow-hidden cursor-default'
       )}
+      style={customStyles}
       onOpenChange={onOpenChange}
       // Critical: Set duration to Infinity so Radix doesn't close it with its own timer.
       // The closing is now exclusively driven by handleAnimationEnd which respects the hover-pause.
@@ -78,14 +104,17 @@ const Toast = React.forwardRef<
         <div
           className={cn(
             "h-full countdown-bar animate-shrink group-hover:[animation-play-state:paused] group-focus-within:[animation-play-state:paused]",
-            variant === "destructive" ? "bg-red-500" : 
-            variant === "success" ? "bg-green-500" : 
-            variant === "warning" ? "bg-amber-500" : 
-            variant === "info" ? "bg-blue-500" :
-            "bg-primary"
+            !customStyles && (
+              variant === "destructive" ? "bg-red-500" : 
+              variant === "success" ? "bg-green-500" : 
+              variant === "warning" ? "bg-amber-500" : 
+              variant === "info" ? "bg-blue-500" :
+              "bg-primary"
+            )
           )}
           style={{
             animationDuration: `${duration}ms`,
+            backgroundColor: customStyles ? (customStyles as any)['--progress-bg'] : undefined
           }}
           onAnimationEnd={handleAnimationEnd}
         />
