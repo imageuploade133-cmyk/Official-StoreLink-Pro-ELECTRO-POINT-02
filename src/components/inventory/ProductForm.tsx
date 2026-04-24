@@ -131,6 +131,7 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
     newPrice: z.preprocess((val) => (val === '' ? null : val), z.coerce.number().min(0.01, 'Discount price must be greater than 0.').optional().nullable()),
     lowStockThreshold: z.coerce.number().int().min(0, 'Low stock threshold cannot be negative.').optional().nullable(),
     supplierName: z.string().optional().or(z.literal('')),
+    supplierBusinessName: z.string().optional().or(z.literal('')),
     supplierContactName: z.string().optional().or(z.literal('')),
     supplierPhone: z.string().optional().or(z.literal('')),
     supplierLocation: z.string().optional().or(z.literal('')),
@@ -313,6 +314,7 @@ export function ProductForm({
       sellingPrice: 0,
       lowStockThreshold: null,
       supplierName: '',
+      supplierBusinessName: '',
       supplierContactName: '',
       supplierPhone: '',
       supplierLocation: '',
@@ -949,14 +951,25 @@ export function ProductForm({
               <CardDescription>Record where this stock was acquired for better tracking.</CardDescription>
             </CardHeader>
             <CardContent className="pt-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <FormField
                   control={form.control}
                   name="supplierName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="font-bold">Stock Supplier (Company)</FormLabel>
-                      <FormControl><Input placeholder="e.g., Electronics Wholesale Ltd" {...field} value={field.value || ''} /></FormControl>
+                      <FormLabel className="font-bold">Supplier Primary Name</FormLabel>
+                      <FormControl><Input placeholder="e.g., Global Tech Distributors" {...field} value={field.value || ""}/></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="supplierBusinessName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold">Business Reg Name</FormLabel>
+                      <FormControl><Input placeholder="e.g., GTD Solutions Inc." {...field} value={field.value || ""}/></FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -966,14 +979,13 @@ export function ProductForm({
                   name="supplierContactName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="font-bold">Supplier Agent Name</FormLabel>
-                      <FormControl><Input placeholder="e.g., John Doe" {...field} value={field.value || ''} /></FormControl>
+                      <FormLabel className="font-bold">Contact Person</FormLabel>
+                      <FormControl><Input placeholder="e.g., John Doe" {...field} value={field.value || ""}/></FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <FormField
                   control={form.control}
