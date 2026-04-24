@@ -264,7 +264,7 @@ export function WebStoreProductForm() {
     if (!firestore || !currentStoreId) return null;
     return query(collection(firestore, 'categories'), where('store_id', '==', currentStoreId), orderBy('name'));
   }, [firestore, currentStoreId]);
-  const { data: categories, refetch: refetchCategories } = useCollection<Category>(categoriesQuery);
+  const { data: categories, refetch: refetchCategories } = useCollection<Category>(categoriesQuery || undefined);
 
   const filteredCategories = useMemo(() => {
     return (categories || []).filter(c => c.name.toLowerCase().includes(categorySearchTerm.toLowerCase()));
@@ -906,7 +906,6 @@ export function WebStoreProductForm() {
                         >
                           <Barcode className="h-4 w-4" />
                         </Button>
-              <ProductVariantsManager storeId={currentStoreId} />
                       </div>
                       <FormDescription className="text-xs">
                           Enter manually or use the barcode icon above.
@@ -1022,6 +1021,8 @@ export function WebStoreProductForm() {
               </div>
             </CardContent>
           </Card>
+
+          <ProductVariantsManager storeId={currentStoreId} />
 
           <Card className="shadow-xl border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
