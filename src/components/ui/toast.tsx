@@ -65,7 +65,7 @@ const Toast = React.forwardRef<
       className={cn(
         toastVariants({ variant }), 
         className, 
-        'overflow-hidden hover:[&_.countdown-bar]:[animation-play-state:paused] cursor-default'
+        'overflow-hidden cursor-default'
       )}
       onOpenChange={onOpenChange}
       // Critical: Set duration to Infinity so Radix doesn't close it with its own timer.
@@ -77,7 +77,7 @@ const Toast = React.forwardRef<
       <div className="absolute bottom-0 left-0 h-1 w-full bg-foreground/5 pointer-events-none">
         <div
           className={cn(
-            "h-full countdown-bar animate-shrink",
+            "h-full countdown-bar animate-shrink group-hover:[animation-play-state:paused] group-focus-within:[animation-play-state:paused]",
             variant === "destructive" ? "bg-red-500" : 
             variant === "success" ? "bg-green-500" : 
             variant === "warning" ? "bg-amber-500" : 
