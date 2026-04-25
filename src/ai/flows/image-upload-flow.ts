@@ -31,8 +31,6 @@ const UploadImageOutputSchema = z.object({
 });
 export type UploadImageOutput = z.infer<typeof UploadImageOutputSchema>;
 
-export const maxDuration = 60;
-
 export async function uploadImage(input: UploadImageInput): Promise<UploadImageOutput> {
   return uploadImageFlow(input);
 }
