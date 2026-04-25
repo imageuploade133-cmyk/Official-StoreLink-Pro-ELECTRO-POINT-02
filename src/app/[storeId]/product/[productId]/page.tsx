@@ -449,11 +449,8 @@ export default function ProductDetailsPage() {
     if (!product) return 0;
     if (!product.hasVariants || !product.variants) return product.stock || 0;
     
-    // If variants exist but none selected, show "unassigned" stock
-    const totalVariantStock = product.variants
-        .filter(v => v.isActive)
-        .reduce((acc, v) => acc + (Number(v.stock) || 0), 0);
-    return Math.max(0, (product.stock || 0) - totalVariantStock);
+    // If variants exist but none selected, show total product stock
+    return product.stock || 0;
   }, [product, selectedVariant]);
 
   const isCurrentlyOutOfStock = currentStock <= 0;

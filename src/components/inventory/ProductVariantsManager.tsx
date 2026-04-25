@@ -187,8 +187,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
     const manualVariants = currentVariants.filter((v: any) => v.isManual);
     const newVariants = [...generatedVariants, ...manualVariants];
 
-    /* 
-    // Redistribution logic deactivated to allow "Standard" product stock to coexist with variants
+    // Redistribution logic to allow "Standard" product stock to coexist with variants
     const totalOldStock = currentVariants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
     const totalNewStock = newVariants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
     
@@ -202,7 +201,6 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
         stock: (Number(newVariants[finalTargetIdx].stock) || 0) + stockToDistribute
       };
     }
-    */
 
     if (JSON.stringify(newVariants) !== JSON.stringify(currentVariants)) {
       setValue('variants', newVariants);
@@ -960,11 +958,9 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                           <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Stock</Label>
                           <Input 
                             type="number" 
-                            readOnly
-                            className="h-10 text-xs font-black bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl cursor-not-allowed opacity-70"
+                            className="h-10 text-xs font-black bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl"
                             {...control.register(`variants.${index}.stock` as const)}
                           />
-                          <p className="text-[8px] text-primary font-bold">Edit in 'Current Stock' above</p>
                         </div>
                         <div className="space-y-1">
                           <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Status</Label>
