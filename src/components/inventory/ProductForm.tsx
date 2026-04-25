@@ -829,36 +829,99 @@ export function ProductForm({
                   control={form.control}
                   name="stock"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="font-bold flex items-center justify-between"><span>Current Stock <span className="text-destructive">*</span></span>{settings?.preventManualStockReduction && (<Badge variant="outline" className="text-[9px] uppercase border-orange-200 text-orange-600 bg-orange-50">Reduction Restricted</Badge>)}</FormLabel>
+                    <FormItem className={cn(watchHasVariants ? "md:col-span-4" : "md:col-span-1")}>
+                      <FormLabel className="font-bold flex items-center justify-between">
+                        <span>Current Stock <span className="text-destructive">*</span></span>
+                        {settings?.preventManualStockReduction && (
+                          <Badge variant="outline" className="text-[9px] uppercase border-orange-200 text-orange-600 bg-orange-50">Reduction Restricted</Badge>
+                        )}
+                      </FormLabel>
                       <FormControl>
-                          <div className="relative group">
-                            <Input 
-                              type="number" 
-                              {...field} 
-                              value={field.value ?? ''} 
-                              readOnly={watchHasVariants}
-                              className={cn(
-                                "pr-10",
-                                (settings?.preventManualStockReduction || watchHasVariants) && "border-orange-100 focus-visible:ring-orange-200",
-                                watchHasVariants && "bg-muted cursor-not-allowed"
-                              )}
-                            />
-                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                              <Boxes className={cn("h-4 w-4", (settings?.preventManualStockReduction || watchHasVariants) ? "text-orange-400" : "text-muted-foreground")} />
-                            </div>
+                        <div className="relative group">
+                          <Input 
+                            type="number" 
+                            {...field} 
+                            value={field.value ?? ''} 
+                            readOnly={watchHasVariants}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value) || 0;
+                              const originalVal = defaultValues?.stock ?? 0;
+                              if (settings?.preventManualStockReduction && isEditing && val < originalVal) {
+                                toast({
+                                  variant: "destructive",
+                                  title: "Reduction Restricted",
+                                  description: "Stock reduction is disabled. Use Sales or Transfers for deductions.",
+                                });
+                                return;
+                              }
+                              field.onChange(val);
+                            }}
+                            className={cn(
+                              "pr-10",
+                              (settings?.preventManualStockReduction || watchHasVariants) && "border-orange-100 focus-visible:ring-orange-200",
+                              watchHasVariants && "bg-muted cursor-not-allowed"
+                            )}
+                          />
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                            <Boxes className={cn("h-4 w-4", (settings?.preventManualStockReduction || watchHasVariants) ? "text-orange-400" : "text-muted-foreground")} />
                           </div>
-                        </FormControl>
-                        {watchHasVariants && (
-                          <FormDescription className="text-[10px] text-primary font-medium">
-                            Total stock is automatically calculated from variants below.
+                        </div>
+                      </FormControl>
+                      {watchHasVariants && (
+                        <div className="mt-4 space-y-3 bg-primary/5 p-4 rounded-2xl border border-primary/10 animate-in fade-in slide-in-from-top-2">
+                          <div className="flex items-center gap-2 mb-2">
+                            <SlidersHorizontal className="h-3 w-3 text-primary" />
+                            <span className="text-[10px] font-black uppercase tracking-widest text-primary">Variant Stock Breakdown</span>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                            {watchVariants.map((variant: any, index: number) => (
+                              <div key={variant.id || index} className="flex items-center justify-between gap-3 p-2.5 bg-background rounded-xl border border-dashed border-primary/20 hover:border-primary/40 transition-colors">
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-[10px] font-black truncate leading-tight uppercase tracking-tight">{variant.name}</p>
+                                  <p className="text-[9px] text-muted-foreground font-mono">{variant.sku || 'No SKU'}</p>
+                                </div>
+                                <div className="w-20">
+                                  <FormField
+                                    control={form.control}
+                                    name={`variants.${index}.stock`}
+                                    render={({ field: vField }) => (
+                                      <FormControl>
+                                        <Input
+                                          type="number"
+                                          {...vField}
+                                          className="h-8 text-xs font-black text-center px-1 bg-muted/20 border-none focus-visible:ring-1 focus-visible:ring-primary/20"
+                                          onChange={(e) => {
+                                            const val = parseInt(e.target.value) || 0;
+                                            const originalVal = (defaultValues?.variants?.[index] as any)?.stock ?? 0;
+                                            if (settings?.preventManualStockReduction && isEditing && val < originalVal) {
+                                              toast({
+                                                variant: "destructive",
+                                                title: "Reduction Restricted",
+                                                description: `${variant.name} stock cannot be lowered manually.`,
+                                              });
+                                              return;
+                                            }
+                                            vField.onChange(val);
+                                          }}
+                                        />
+                                      </FormControl>
+                                    )}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          <FormDescription className="text-[10px] text-primary font-bold mt-2 flex items-center gap-1.5">
+                            <Info className="h-3 w-3" />
+                            Total stock is automatically calculated from the variants above.
                           </FormDescription>
-                        )}
-                        {!watchHasVariants && settings?.preventManualStockReduction && (
-                          <FormDescription className="text-[10px] text-orange-600 font-medium">
-                            Manual reduction is disabled in settings. You can only increase stock here.
-                          </FormDescription>
-                        )}
+                        </div>
+                      )}
+                      {!watchHasVariants && settings?.preventManualStockReduction && (
+                        <FormDescription className="text-[10px] text-orange-600 font-medium">
+                          Manual reduction is disabled in settings. You can only increase stock here.
+                        </FormDescription>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}

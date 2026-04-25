@@ -624,9 +624,11 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                           <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Stock</Label>
                           <Input 
                             type="number" 
-                            className="h-10 text-xs font-black bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl"
+                            readOnly
+                            className="h-10 text-xs font-black bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl cursor-not-allowed opacity-70"
                             {...control.register(`variants.${index}.stock` as const)}
                           />
+                          <p className="text-[8px] text-primary font-bold">Edit in 'Current Stock' above</p>
                         </div>
                         <div className="space-y-1">
                           <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Status</Label>
