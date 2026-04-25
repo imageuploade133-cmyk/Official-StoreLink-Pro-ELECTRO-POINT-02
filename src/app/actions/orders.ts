@@ -527,10 +527,10 @@ export async function updateOrderStatusAction(orderId: string, storeId: string, 
                     : `*Hello ${orderDataForWhatsApp?.storeName || 'Admin'},*\n*Order #${shortOrderId} for ${customerName} has been delivered successfully.*`;
             }
 
-            const adminRecipients = [];
+            const adminRecipients: string[] = [];
             if (whatsappAlertSettings.senderNumber) adminRecipients.push(whatsappAlertSettings.senderNumber);
             if (whatsappAlertSettings.orderNotificationNumbers && Array.isArray(whatsappAlertSettings.orderNotificationNumbers)) {
-                whatsappAlertSettings.orderNotificationNumbers.forEach(num => {
+                whatsappAlertSettings.orderNotificationNumbers.forEach((num: string) => {
                     if (num && !adminRecipients.includes(num)) {
                         adminRecipients.push(num);
                     }
@@ -970,10 +970,10 @@ export async function sendWhatsAppOrderAlert(order: any, settings: WhatsAppAlert
     };
 
     // 1. Send to Admin
-    const adminRecipients = [];
+    const adminRecipients: string[] = [];
     if (settings.senderNumber) adminRecipients.push(settings.senderNumber);
     if (settings.orderNotificationNumbers && Array.isArray(settings.orderNotificationNumbers)) {
-        settings.orderNotificationNumbers.forEach(num => {
+        settings.orderNotificationNumbers.forEach((num: string) => {
             if (num && !adminRecipients.includes(num)) {
                 adminRecipients.push(num);
             }
