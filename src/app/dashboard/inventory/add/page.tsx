@@ -59,9 +59,17 @@ export default function AddProductPage() {
 
       // Calculate total stock if variants exist
       if (values.hasVariants && values.variants && values.variants.length > 0) {
-        productData.stock = values.variants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
+        const total = values.variants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
+        productData.stock = total;
+        // Ensure variants have numeric values
+        productData.variants = values.variants.map((v: any) => ({
+            ...v,
+            stock: Number(v.stock) || 0,
+            sellingPrice: Number(v.sellingPrice) || 0
+        }));
       } else {
         productData.stock = Number(values.stock) || 0;
+        productData.variants = [];
       }
 
       if (isPromo && promoType && promoValue !== undefined) {

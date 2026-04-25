@@ -233,7 +233,7 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
     )
     .refine(
       (data) => !(preventReduction && originalStock !== undefined && data.stock < originalStock),
-      { message: "Stock cannot be reduced manually here. Current stock is " + originalStock + ". Use Restock page for adjustments.", path: ["stock"] }
+      { message: "Manual stock reduction is restricted. Current stock is " + originalStock + ". Use the 'Restock Now' page for adjustments.", path: ["stock"] }
     )
     .refine(
       (data) => !data.newPrice || data.newPrice < data.sellingPrice,

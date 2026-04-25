@@ -76,9 +76,17 @@ export default function EditProductPage() {
 
       // Calculate total stock if variants exist
       if (values.hasVariants && values.variants && values.variants.length > 0) {
-        productData.stock = values.variants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
+        const total = values.variants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
+        productData.stock = total;
+        // Ensure variants also have numeric stock values
+        productData.variants = values.variants.map((v: any) => ({
+            ...v,
+            stock: Number(v.stock) || 0,
+            sellingPrice: Number(v.sellingPrice) || 0
+        }));
       } else {
         productData.stock = Number(values.stock) || 0;
+        productData.variants = [];
       }
 
       if (isPromo && promoType && promoValue !== undefined) {
@@ -99,7 +107,7 @@ export default function EditProductPage() {
 
       // --- LOG AUDIT IF STOCK CHANGED MANUALLY ---
       const beforeStock = Number(product.stock) || 0;
-      const afterStock = productData.stock;
+      const afterStock = Number(productData.stock);
       if (beforeStock !== afterStock) {
           const auditRef = doc(collection(firestore, 'stockAudit'));
           batch.set(auditRef, {
@@ -112,7 +120,7 @@ export default function EditProductPage() {
               change: afterStock - beforeStock,
               staffId: user?.uid || 'SYSTEM',
               staffName: user?.displayName || user?.email || 'Staff',
-              store_id: (product as any).store_id || (store as any)?.id || null,
+              store_id: currentStoreId || (product as any).store_id || null,
               timestamp: serverTimestamp()
           });
       }
