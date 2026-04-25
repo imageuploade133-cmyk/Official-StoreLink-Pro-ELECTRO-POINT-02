@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase-admin';
+import * as admin from 'firebase-admin';
 import { Timestamp } from 'firebase-admin/firestore';
 import { decrypt } from '@/lib/encryption';
 import { PaymentProvider, Transaction } from '@/lib/types';
@@ -211,6 +212,31 @@ export async function GET(request: Request) {
           isPaid: true,
           updatedAt: Timestamp.now(),
         });
+
+        // Also update the corresponding saleTransaction
+        const saleQuery = adminDb.collection('saleTransactions').where('orderId', '==', tData.orderId).limit(1);
+        const saleSnap = await dbTransaction.get(saleQuery);
+        if (!saleSnap.empty) {
+            dbTransaction.update(saleSnap.docs[0].ref, {
+                isPaid: true,
+                updatedAt: Timestamp.now()
+            });
+        }
+
+        // Update customer totalSpent
+        if (tData.user_id && tData.user_id !== 'GUEST') {
+            const customerQuery = adminDb.collection('customers')
+                .where('uid', '==', tData.user_id)
+                .where('store_id', '==', tData.storeId)
+                .limit(1);
+            const customerSnap = await dbTransaction.get(customerQuery);
+            if (!customerSnap.empty) {
+                dbTransaction.update(customerSnap.docs[0].ref, {
+                    totalSpent: admin.firestore.FieldValue.increment(tData.amount),
+                    updatedAt: Timestamp.now()
+                });
+            }
+        }
 
         // Trigger WhatsApp notification for payment confirmed
         getWhatsAppSettings(tData.storeId || 'global').then(async (settings) => {
