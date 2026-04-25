@@ -187,12 +187,11 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
     const manualVariants = currentVariants.filter((v: any) => v.isManual);
     const newVariants = [...generatedVariants, ...manualVariants];
 
-    // Redistribution logic to avoid "Manual stock reduction" error
+    /* 
+    // Redistribution logic deactivated to allow "Standard" product stock to coexist with variants
     const totalOldStock = currentVariants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
     const totalNewStock = newVariants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
     
-    // If total stock is decreasing (meaning some variants were removed), or if turning on variants (old stock 0)
-    // and main stock > 0, we redistribute the missing units to the first variant.
     const stockToDistribute = Math.max(totalOldStock, currentMainStock) - totalNewStock;
 
     if (stockToDistribute > 0 && newVariants.length > 0) {
@@ -203,6 +202,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
         stock: (Number(newVariants[finalTargetIdx].stock) || 0) + stockToDistribute
       };
     }
+    */
 
     if (JSON.stringify(newVariants) !== JSON.stringify(currentVariants)) {
       setValue('variants', newVariants);

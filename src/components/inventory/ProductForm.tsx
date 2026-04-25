@@ -481,15 +481,15 @@ export function ProductForm({
   const watchVariants = form.watch("variants") || [];
 
   // Sync total stock if variants exist
-  useEffect(() => {
-    if (watchHasVariants && watchVariants.length > 0) {
-      const totalStock = watchVariants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
-      const currentStock = form.getValues("stock");
-      if (totalStock !== currentStock) {
-        form.setValue("stock", totalStock, { shouldValidate: true, shouldDirty: true });
-      }
-    }
-  }, [watchVariants, watchHasVariants, form]);
+//  useEffect(() => {
+//    if (watchHasVariants && watchVariants.length > 0) {
+//      const totalStock = watchVariants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
+//      const currentStock = form.getValues("stock");
+//      if (totalStock !== currentStock) {
+//        form.setValue("stock", totalStock, { shouldValidate: true, shouldDirty: true });
+//      }
+//    }
+//  }, [watchVariants, watchHasVariants, form]);
   const watchVideoPoster = form.watch('videoPosterUrl');
 
   const handleAiAssist = async () => {
@@ -842,7 +842,7 @@ export function ProductForm({
                             type="number" 
                             {...field} 
                             value={field.value ?? ''} 
-                            readOnly={watchHasVariants}
+                            readOnly={false}
                             onChange={(e) => {
                               const val = parseInt(e.target.value) || 0;
                               const originalVal = defaultValues?.stock ?? 0;
@@ -858,12 +858,12 @@ export function ProductForm({
                             }}
                             className={cn(
                               "pr-10",
-                              (settings?.preventManualStockReduction || watchHasVariants) && "border-orange-100 focus-visible:ring-orange-200",
-                              watchHasVariants && "bg-muted cursor-not-allowed"
+                              (settings?.preventManualStockReduction) && "border-orange-100 focus-visible:ring-orange-200",
+                              watchHasVariants && "border-primary/40 bg-primary/5"
                             )}
                           />
                           <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                            <Boxes className={cn("h-4 w-4", (settings?.preventManualStockReduction || watchHasVariants) ? "text-orange-400" : "text-muted-foreground")} />
+                            <Boxes className={cn("h-4 w-4", (settings?.preventManualStockReduction) ? "text-orange-400" : "text-primary")} />
                           </div>
                         </div>
                       </FormControl>
@@ -871,8 +871,12 @@ export function ProductForm({
                         <div className="mt-4 space-y-3 bg-primary/5 p-4 rounded-2xl border border-primary/10 animate-in fade-in slide-in-from-top-2">
                           <div className="flex items-center gap-2 mb-2">
                             <SlidersHorizontal className="h-3 w-3 text-primary" />
-                            <span className="text-[10px] font-black uppercase tracking-widest text-primary">Variant Stock Breakdown</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-primary">Consolidated Inventory Management</span>
                           </div>
+                                                    <p className="text-[10px] font-bold text-muted-foreground mb-4">
+                                                        Total stock includes base product units and all variant units. 
+                                                        Unassigned units will be sold as "Standard" in the store.
+                                                    </p>
                           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                             {watchVariants.map((variant: any, index: number) => (
                               <div key={variant.id || index} className="flex items-center justify-between gap-3 p-2.5 bg-background rounded-xl border border-dashed border-primary/20 hover:border-primary/40 transition-colors">
