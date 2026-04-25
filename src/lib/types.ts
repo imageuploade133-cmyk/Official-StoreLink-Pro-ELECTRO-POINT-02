@@ -779,7 +779,7 @@ export interface RestockEntry {
     userEmail: string;
 }
 
-export type ProductForRestockForm = Pick<Product, 'id' | 'name' | 'sku' | 'barcode' | 'stock' | 'purchasePrice' | 'sellingPrice'>;
+export type ProductForRestockForm = Pick<Product, 'id' | 'name' | 'sku' | 'barcode' | 'stock' | 'purchasePrice' | 'sellingPrice' | 'hasVariants' | 'variants'>;
 export type StockAlertItem = Product;
 
 

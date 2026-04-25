@@ -36,6 +36,7 @@ import Image from 'next/image';
 
 const createRestockFormSchema = (allowDeduction: boolean) => z.object({
   productId: z.string().min(1, 'Product is required.'),
+  variantId: z.string().optional().nullable(),
   quantity: z.coerce.number().int('Must be an integer.').refine(val => val !== 0, 'Quantity cannot be zero.').refine(val => allowDeduction || val > 0, "Deducting stock is disabled in settings."),
   costPricePerUnit: z.coerce.number().min(0, 'Cost price cannot be negative.'),
   newPurchasePrice: z.coerce.number().min(0, 'Purchase price cannot be negative.').optional().nullable(),
@@ -90,6 +91,7 @@ export function RestockForm({
       const product = defaultProduct || null;
       form.reset({
         productId: product?.id || '',
+        variantId: null,
         quantity: 1,
         costPricePerUnit: product?.purchasePrice || 0,
         newPurchasePrice: product?.purchasePrice || 0,
@@ -109,6 +111,7 @@ export function RestockForm({
     const product = products.find(p => p.id === productId);
     if (product) {
       form.setValue('productId', product.id, { shouldValidate: true });
+      form.setValue('variantId', null);
       form.setValue('costPricePerUnit', product.purchasePrice || 0);
       form.setValue('newPurchasePrice', product.purchasePrice || 0);
       form.setValue('newSellingPrice', product.sellingPrice || 0);
@@ -211,6 +214,53 @@ export function RestockForm({
           )}
         />
 
+        {selectedProduct?.hasVariants && selectedProduct.variants && (
+          <FormField
+            control={form.control}
+            name="variantId"
+            render={({ field }) => (
+              <FormItem className="space-y-2">
+                <FormLabel className="text-xs font-bold uppercase tracking-wider">Select Variant to Restock</FormLabel>
+                <div className="grid grid-cols-1 gap-2">
+                  {selectedProduct.variants?.filter(v => v.isActive).map(variant => (
+                    <button
+                      key={variant.id}
+                      type="button"
+                      onClick={() => {
+                        field.onChange(variant.id);
+                        if (variant.sellingPrice) form.setValue('newSellingPrice', variant.sellingPrice);
+                      }}
+                      className={cn(
+                        "text-left px-3 py-2 rounded-lg border-2 transition-all flex justify-between items-center",
+                        field.value === variant.id
+                          ? "border-primary bg-primary/5 ring-1 ring-primary"
+                          : "border-muted hover:border-primary/50"
+                      )}
+                    >
+                      <div className="flex items-center gap-2">
+                        {variant.imageUrl && (
+                          <div className="relative h-8 w-8 rounded overflow-hidden border">
+                            <Image src={variant.imageUrl} alt={variant.name} fill className="object-cover" unoptimized />
+                          </div>
+                        )}
+                        <div>
+                          <p className="text-sm font-bold">{variant.name}</p>
+                          <p className="text-[10px] text-muted-foreground uppercase">SKU: {variant.sku || 'N/A'}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs font-black">{variant.stock} in stock</p>
+                        {variant.sellingPrice && <p className="text-[10px] text-primary font-bold">{variant.sellingPrice}</p>}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
         <div className="grid grid-cols-2 gap-4">
           <FormField control={form.control} name="quantity" render={({ field }) => (
             <FormItem><FormLabel>Quantity</FormLabel><FormControl><Input type="number" placeholder="e.g., 10 or -2" {...field}/></FormControl><FormMessage/></FormItem>
@@ -311,7 +361,7 @@ export function RestockForm({
         {isMobile ? (
           <DrawerFooter className="px-0">
             <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>Cancel</Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting || (selectedProduct?.hasVariants && !form.watch('variantId'))}>
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Add Entry
             </Button>
@@ -319,7 +369,7 @@ export function RestockForm({
         ) : (
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>Cancel</Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting || (selectedProduct?.hasVariants && !form.watch('variantId'))}>
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Add Entry
             </Button>
