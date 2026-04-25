@@ -16,7 +16,9 @@ import {
   ListPlus,
   CheckCircle2,
   Sparkles,
-  Star
+  Star,
+  Palette,
+  Type as TypeIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,7 +32,7 @@ import {
   FormMessage,
   FormDescription
 } from '@/components/ui/form';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { uploadImage } from '@/ai/flows/image-upload-flow';
@@ -41,12 +43,29 @@ import { compressAndResizeImage } from '@/lib/image-utils';
 import { useSettings } from '@/contexts/settings-context';
 import Image from 'next/image';
 
+const SUGGESTIONS = {
+  color: [
+    { name: 'Red', hex: '#FF0000' },
+    { name: 'Black', hex: '#000000' },
+    { name: 'White', hex: '#FFFFFF' },
+    { name: 'Blue', hex: '#0000FF' },
+    { name: 'Green', hex: '#008000' },
+    { name: 'Yellow', hex: '#FFFF00' },
+    { name: 'Pink', hex: '#FFC0CB' },
+    { name: 'Purple', hex: '#800080' },
+    { name: 'Gray', hex: '#808080' },
+    { name: 'Brown', hex: '#A52A2A' },
+  ],
+  size: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
+  material: ['Cotton', 'Silk', 'Leather', 'Polyester', 'Nylon', 'Wool', 'Linen', 'Denim'],
+};
+
 interface ProductVariantsManagerProps {
   storeId?: string;
 }
 
 export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps) {
-  const { control, watch, setValue, formState: { errors } } = useFormContext();
+  const { control, watch, setValue, getValues, formState: { errors } } = useFormContext();
   const { toast } = useToast();
   const { settings } = useSettings();
   const [isUploading, setIsUploading] = useState<string | null>(null);
@@ -63,8 +82,19 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
   });
 
   const generateVariants = useCallback(() => {
-    if (variantOptions.length === 0) {
-      setValue('variants', []);
+    const currentOptions = getValues('variantOptions') || [];
+    const currentVariants = getValues('variants') || [];
+    const baseSellingPrice = getValues('sellingPrice');
+
+    if (currentOptions.length === 0) {
+      if (currentVariants.length > 0) setValue('variants', []);
+      return;
+    }
+
+    // Check if all options have at least one value
+    const validOptions = currentOptions.filter((opt: any) => opt.name && opt.values && opt.values.length > 0);
+    if (validOptions.length === 0) {
+      if (currentVariants.length > 0) setValue('variants', []);
       return;
     }
 
@@ -82,12 +112,17 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
       return result;
     };
 
-    const newCombos = combinations(variantOptions);
-    const existingVariants = variants;
+    const newCombos = combinations(validOptions);
 
     const newVariants = newCombos.map((combo) => {
-      const name = Object.values(combo).join(' / ');
-      const existing = existingVariants.find((v: any) => v.name === name);
+      const name = Object.entries(combo)
+        .map(([key, val]) => val)
+        .join(' / ');
+      
+      const existing = currentVariants.find((v: any) => {
+        return Object.entries(combo).every(([key, val]) => v.options[key] === val) &&
+               Object.keys(v.options).length === Object.keys(combo).length;
+      });
       
       if (existing) return existing;
 
@@ -96,15 +131,26 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
         name,
         options: combo,
         sku: '',
-        sellingPrice: watch('sellingPrice'),
+        sellingPrice: baseSellingPrice,
         stock: 0,
         imageUrl: '',
         isActive: true
       };
     });
 
-    setValue('variants', newVariants);
-  }, [variantOptions, setValue, watch, variants]);
+    // Only set value if it's different to avoid unnecessary re-renders
+    if (JSON.stringify(newVariants) !== JSON.stringify(currentVariants)) {
+      setValue('variants', newVariants);
+    }
+  }, [setValue, getValues]);
+
+  // Auto-generate variants when options change
+  const optionsString = JSON.stringify(variantOptions);
+  useEffect(() => {
+    if (hasVariants) {
+      generateVariants();
+    }
+  }, [optionsString, hasVariants, generateVariants]);
 
   const handleAddOptionValue = (optionIndex: number, value: string) => {
     if (!value.trim()) return;
@@ -287,274 +333,310 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                   <p className="text-sm text-muted-foreground">No options added. Add options like "Size" or "Color".</p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {optionFields.map((field, index) => (
-                    <div key={field.id} className="relative group grid grid-cols-1 md:grid-cols-12 gap-4 p-5 rounded-2xl bg-muted/20 border border-transparent hover:border-primary/20 transition-all">
-                      <Button 
-                        type="button" 
-                        variant="ghost" 
-                        size="icon" 
-                        className="absolute -top-2 -right-2 h-7 w-7 rounded-full bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                        onClick={() => removeOption(index)}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
+                <div className="space-y-6">
+                  {optionFields.map((field, index) => {
+                    const optionName = variantOptions[index]?.name?.toLowerCase() || '';
+                    const isColor = optionName.includes('color');
+                    const isSize = optionName.includes('size');
+                    const isMaterial = optionName.includes('material');
 
-                      <div className="md:col-span-4 space-y-2">
-                        <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Option Name</Label>
-                        <Input 
-                          placeholder="e.g. Color, Size" 
-                          className="bg-background"
-                          {...control.register(`variantOptions.${index}.name` as const)}
-                        />
-                      </div>
-                      
-                      <div className="md:col-span-8 space-y-2">
-                        <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Option Values</Label>
-                        <div className="space-y-3">
-                          <div className="flex flex-wrap gap-2 min-h-[2.5rem] p-2 bg-background rounded-lg border border-input focus-within:ring-1 focus-within:ring-primary/20">
-                            {variantOptions[index]?.values?.map((val: string, valIndex: number) => (
-                              <Badge key={valIndex} variant="secondary" className="pl-3 pr-1 py-1 gap-1.5 bg-primary/10 text-primary hover:bg-primary/20 transition-colors border-none ring-1 ring-primary/20">
-                                {val}
-                                <button 
-                                  type="button" 
-                                  onClick={() => handleRemoveOptionValue(index, valIndex)}
-                                  className="hover:bg-primary/20 rounded-full p-0.5 transition-colors"
-                                >
-                                  <X className="h-3 w-3" />
-                                </button>
-                              </Badge>
-                            ))}
-                            {(!variantOptions[index]?.values || variantOptions[index].values.length === 0) && (
-                              <span className="text-xs text-muted-foreground flex items-center h-6">No values added...</span>
-                            )}
-                          </div>
-                          <div className="relative">
-                            <Input 
-                              placeholder="Type value (e.g. Red) and press Enter" 
-                              className="pr-12"
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                  e.preventDefault();
-                                  handleAddOptionValue(index, e.currentTarget.value);
-                                  e.currentTarget.value = '';
-                                }
-                              }}
-                            />
-                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                              <Badge variant="outline" className="text-[10px] opacity-50">ENTER</Badge>
+                    return (
+                      <div key={field.id} className="relative group p-6 rounded-3xl bg-background border shadow-sm hover:shadow-md transition-all">
+                        <Button 
+                          type="button" 
+                          variant="ghost" 
+                          size="icon" 
+                          className="absolute top-4 right-4 h-8 w-8 rounded-full bg-destructive/10 text-destructive hover:bg-destructive hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                          onClick={() => removeOption(index)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                          <div className="md:col-span-4 space-y-3">
+                            <div className="flex items-center gap-2">
+                              <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
+                                {isColor ? <Palette className="h-4 w-4" /> : isSize ? <TypeIcon className="h-4 w-4" /> : <SlidersHorizontal className="h-4 w-4" />}
+                              </div>
+                              <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Option Name</Label>
                             </div>
+                            <Input 
+                              placeholder="e.g. Color, Size" 
+                              className="h-12 bg-muted/30 border-none focus-visible:ring-2 focus-visible:ring-primary/20 font-bold"
+                              {...control.register(`variantOptions.${index}.name` as const)}
+                            />
+                          </div>
+                          
+                          <div className="md:col-span-8 space-y-3">
+                            <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Option Values</Label>
+                            
+                            <div className="flex flex-wrap gap-2 min-h-[3rem] p-3 bg-muted/30 rounded-2xl border border-transparent focus-within:border-primary/20 transition-all">
+                              {variantOptions[index]?.values?.map((val: string, valIndex: number) => {
+                                // Try to find if it's a color from suggestions
+                                const colorSuggestion = isColor ? SUGGESTIONS.color.find(c => c.name.toLowerCase() === val.toLowerCase()) : null;
+                                
+                                return (
+                                  <Badge 
+                                    key={valIndex} 
+                                    variant="secondary" 
+                                    className="pl-3 pr-1 py-1.5 gap-2 bg-white dark:bg-slate-900 text-foreground hover:bg-white transition-colors border shadow-sm rounded-xl font-bold"
+                                  >
+                                    {isColor && (
+                                      <div 
+                                        className="w-3 h-3 rounded-full border border-black/10" 
+                                        style={{ backgroundColor: colorSuggestion?.hex || val.toLowerCase() }} 
+                                      />
+                                    )}
+                                    {val}
+                                    <button 
+                                      type="button" 
+                                      onClick={() => handleRemoveOptionValue(index, valIndex)}
+                                      className="hover:bg-destructive/10 hover:text-destructive rounded-full p-0.5 transition-colors"
+                                    >
+                                      <X className="h-3 w-3" />
+                                    </button>
+                                  </Badge>
+                                );
+                              })}
+                              
+                              <Input 
+                                placeholder="Add value..." 
+                                className="flex-1 min-w-[120px] h-8 bg-transparent border-none focus-visible:ring-0 p-0 text-sm"
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    handleAddOptionValue(index, e.currentTarget.value);
+                                    e.currentTarget.value = '';
+                                  }
+                                }}
+                              />
+                            </div>
+
+                            {/* Suggestions */}
+                            {(isColor || isSize || isMaterial) && (
+                              <div className="space-y-2">
+                                <p className="text-[10px] font-black uppercase tracking-tighter text-muted-foreground/60 px-1">Suggested {optionName}:</p>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {isColor && SUGGESTIONS.color.map((c) => (
+                                    <button
+                                      key={c.name}
+                                      type="button"
+                                      onClick={() => handleAddOptionValue(index, c.name)}
+                                      className="group flex items-center gap-1.5 px-2 py-1 rounded-lg border bg-background hover:border-primary/40 hover:bg-primary/5 transition-all"
+                                      title={c.name}
+                                    >
+                                      <div className="w-3 h-3 rounded-full border border-black/10" style={{ backgroundColor: c.hex }} />
+                                      <span className="text-[10px] font-bold">{c.name}</span>
+                                    </button>
+                                  ))}
+                                  {isSize && SUGGESTIONS.size.map((s) => (
+                                    <button
+                                      key={s}
+                                      type="button"
+                                      onClick={() => handleAddOptionValue(index, s)}
+                                      className="px-2.5 py-1 rounded-lg border bg-background hover:border-primary/40 hover:bg-primary/5 transition-all text-[10px] font-bold"
+                                    >
+                                      {s}
+                                    </button>
+                                  ))}
+                                  {isMaterial && SUGGESTIONS.material.map((m) => (
+                                    <button
+                                      key={m}
+                                      type="button"
+                                      onClick={() => handleAddOptionValue(index, m)}
+                                      className="px-2.5 py-1 rounded-lg border bg-background hover:border-primary/40 hover:bg-primary/5 transition-all text-[10px] font-bold"
+                                    >
+                                      {m}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {variantOptions.length > 0 && (
-                <div className="pt-4 flex justify-end">
-                  <Button 
-                    type="button" 
-                    className="gap-2 px-8 h-12 font-bold shadow-lg shadow-primary/20 rounded-xl"
-                    onClick={generateVariants}
-                  >
-                    <CheckCircle2 className="h-4 w-4" /> Generate Variants
-                  </Button>
+                    );
+                  })}
                 </div>
               )}
             </CardContent>
           </Card>
 
           {variants.length > 0 && (
-            <div className="space-y-4 pt-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-primary text-white font-bold">{variants.length}</Badge>
-                  <h3 className="text-sm font-bold uppercase tracking-wider">Generated Variants</h3>
+            <div className="space-y-6 pt-4">
+              <div className="flex items-center justify-between bg-primary/5 p-4 rounded-2xl border border-primary/10">
+                <div className="flex items-center gap-3">
+                  <div className="bg-primary text-white p-2 rounded-xl shadow-lg shadow-primary/20">
+                    <CheckCircle2 className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black uppercase tracking-wider">Generated Variants</h3>
+                    <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-tight">{variants.length} unique combinations created</p>
+                  </div>
                 </div>
-                <div className="text-[10px] font-black uppercase text-muted-foreground flex items-center gap-1">
+                <div className="text-[10px] font-black uppercase text-primary/60 flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border shadow-sm">
                   <AlertCircle className="h-3 w-3" />
-                  Prices default to base price
+                  Prices synced with base product
                 </div>
               </div>
               
-              <div className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {variants.map((variant: any, index: number) => (
                   <Card key={variant.id} className={cn(
-                    "overflow-hidden border-none ring-1 ring-border transition-all duration-300 hover:ring-primary/30 hover:shadow-md",
+                    "group overflow-hidden border shadow-sm hover:shadow-xl transition-all duration-300 rounded-3xl",
                     !variant.isActive && "opacity-60 grayscale bg-muted/30"
                   )}>
-                    <CardContent className="p-0">
-                      <div className="flex flex-col md:flex-row items-center">
-                        {/* Image Section */}
-                        <div className="w-full md:w-40 h-48 md:h-auto self-stretch bg-muted relative group overflow-hidden border-b md:border-b-0 md:border-r">
-                          {variant.imageUrl ? (
-                            <Image 
-                              src={variant.imageUrl} 
-                              alt={variant.name} 
-                              fill 
-                              className="object-cover transition-transform duration-500 group-hover:scale-110"
-                              unoptimized
+                    <div className="aspect-[4/3] relative bg-muted overflow-hidden">
+                      {variant.imageUrl ? (
+                        <Image 
+                          src={variant.imageUrl} 
+                          alt={variant.name} 
+                          fill 
+                          className="object-cover transition-transform duration-700 group-hover:scale-110"
+                          unoptimized
+                        />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground gap-2 p-4 text-center">
+                          <ImageIcon className="h-10 w-10 opacity-10" />
+                          <span className="text-[10px] font-black uppercase tracking-widest opacity-40">No Image</span>
+                        </div>
+                      )}
+                      
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-4">
+                        <div className="grid grid-cols-2 gap-2 w-full">
+                          <label className="flex">
+                            <div className={cn(
+                              "w-full h-9 gap-2 text-[10px] font-black uppercase bg-white text-black hover:bg-white/90 inline-flex items-center justify-center rounded-xl cursor-pointer transition-colors shadow-sm",
+                              !!isUploading && "opacity-50 cursor-not-allowed"
+                            )}>
+                              <Upload className="h-3.5 w-3.5" /> Upload
+                            </div>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => handleImageUpload(index, e)}
+                              disabled={!!isUploading}
                             />
-                          ) : (
-                            <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground gap-2 p-4 text-center">
-                              <ImageIcon className="h-8 w-8 opacity-20" />
-                              <span className="text-[10px] font-bold uppercase">No Image</span>
-                            </div>
-                          )}
-                          
-                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3">
-                            <div className="w-full space-y-2">
-                              <label className="flex w-full">
-                                <div className={cn(
-                                  "w-full h-8 gap-2 text-[10px] font-bold uppercase bg-white text-black hover:bg-white/90 inline-flex items-center justify-center rounded-md cursor-pointer transition-colors",
-                                  !!isUploading && "opacity-50 cursor-not-allowed"
-                                )}>
-                                  <Upload className="h-3 w-3" /> Upload
-                                </div>
-                                <input
-                                  type="file"
-                                  accept="image/*"
-                                  className="hidden"
-                                  onChange={(e) => handleImageUpload(index, e)}
-                                  disabled={!!isUploading}
-                                />
-                              </label>
+                          </label>
 
-                              <Button
-                                type="button"
-                                variant="secondary"
-                                size="sm"
-                                className="w-full h-8 gap-2 text-[10px] font-bold uppercase bg-primary text-white hover:bg-primary/90"
-                                onClick={() => handleUsePrimaryImage(index)}
-                                disabled={!mainImageUrl}
-                              >
-                                <Star className="h-3 w-3" /> Primary
-                              </Button>
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            className="h-9 gap-2 text-[10px] font-black uppercase bg-primary text-white hover:bg-primary/90 rounded-xl shadow-sm"
+                            onClick={() => handleUsePrimaryImage(index)}
+                            disabled={!mainImageUrl}
+                          >
+                            <Star className="h-3.5 w-3.5" /> Primary
+                          </Button>
 
-                              <Button
-                                type="button"
-                                variant="secondary"
-                                size="sm"
-                                className="w-full h-8 gap-2 text-[10px] font-bold uppercase bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
-                                onClick={() => handleRemoveBackground(index)}
-                                disabled={!variant.imageUrl || !!isProcessingAi}
-                              >
-                                {isProcessingAi === variant.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />} AI Mockup
-                              </Button>
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            className="h-9 gap-2 text-[10px] font-black uppercase bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-xl shadow-md col-span-2"
+                            onClick={() => handleRemoveBackground(index)}
+                            disabled={!variant.imageUrl || !!isProcessingAi}
+                          >
+                            {isProcessingAi === variant.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />} AI Mockup
+                          </Button>
 
-                              {variant.imageUrl && (
-                                <Button
-                                  type="button"
-                                  variant="destructive"
-                                  size="sm"
-                                  className="w-full h-8 gap-2 text-[10px] font-bold uppercase"
-                                  onClick={() => handleRemoveVariantImage(index)}
-                                >
-                                  <Trash2 className="h-3 w-3" /> Remove Image
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-
-                          {(isUploading === variant.id || isProcessingAi === variant.id) && (
-                            <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center gap-2">
-                              <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                              <span className="text-[10px] font-black text-primary uppercase">
-                                {isUploading === variant.id ? 'Uploading...' : 'AI Processing...'}
-                              </span>
-                            </div>
+                          {variant.imageUrl && (
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="sm"
+                              className="h-9 gap-2 text-[10px] font-black uppercase rounded-xl shadow-sm col-span-2"
+                              onClick={() => handleRemoveVariantImage(index)}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" /> Remove Image
+                            </Button>
                           )}
                         </div>
+                      </div>
 
-                        {/* Info & Inputs Section */}
-                        <div className="flex-1 p-6">
-                          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-3">
-                                <h4 className="font-black text-lg tracking-tight">{variant.name}</h4>
-                                {!variant.isActive && <Badge variant="outline" className="text-[10px] uppercase font-black text-muted-foreground">Disabled</Badge>}
-                              </div>
-                              <div className="flex flex-wrap gap-1.5">
-                                {Object.entries(variant.options).map(([key, val]: [string, any]) => (
-                                  <Badge key={key} variant="outline" className="text-[10px] px-2 py-0 h-5 bg-muted/30 border-muted-foreground/20 font-medium">
-                                    <span className="opacity-50 mr-1">{key}:</span> {val}
-                                  </Badge>
-                                ))}
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-3 px-4 py-2 bg-muted/20 rounded-xl border border-muted-foreground/10">
-                              <div className="flex items-center gap-3">
-                                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Active</Label>
-                                <Switch 
-                                  checked={variant.isActive} 
-                                  onCheckedChange={(checked) => setValue(`variants.${index}.isActive`, checked)} 
-                                  className="data-[state=checked]:bg-primary"
-                                  disabled={isUploading === variant.id || isProcessingAi === variant.id}
-                                />
-                              </div>
-                              <Separator orientation="vertical" className="h-4" />
-                              <Button 
-                                type="button" 
-                                variant="ghost" 
-                                size="icon" 
-                                className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                onClick={() => handleRemoveVariant(index)}
-                                disabled={isUploading === variant.id || isProcessingAi === variant.id}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
+                      <div className="absolute top-3 left-3 right-3 flex justify-between items-start">
+                        <Badge className={cn(
+                          "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-sm",
+                          variant.isActive ? "bg-green-500 text-white" : "bg-muted text-muted-foreground"
+                        )}>
+                          {variant.isActive ? 'Active' : 'Hidden'}
+                        </Badge>
+                        <Button 
+                          type="button" 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 rounded-full bg-white/20 backdrop-blur-md text-white hover:bg-destructive hover:text-white transition-all shadow-sm"
+                          onClick={() => handleRemoveVariant(index)}
+                          disabled={isUploading === variant.id || isProcessingAi === variant.id}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+
+                      {(isUploading === variant.id || isProcessingAi === variant.id) && (
+                        <div className="absolute inset-0 bg-background/80 backdrop-blur-md flex flex-col items-center justify-center gap-3">
+                          <div className="p-3 bg-primary/10 rounded-2xl">
+                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
                           </div>
+                          <span className="text-[10px] font-black text-primary uppercase tracking-widest">
+                            {isUploading === variant.id ? 'Uploading...' : 'AI Processing...'}
+                          </span>
+                        </div>
+                      )}
+                    </div>
 
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div className="space-y-1.5">
-                              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">SKU Code</Label>
-                              <Input 
-                                placeholder="STK-VOL-01" 
-                                className="h-9 text-xs font-mono bg-muted/20 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
-                                {...control.register(`variants.${index}.sku` as const)}
-                              />
-                            </div>
-                            <div className="space-y-1.5">
-                              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Barcode</Label>
-                              <Input 
-                                placeholder="UPC / EAN" 
-                                className="h-9 text-xs font-mono bg-muted/20 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
-                                {...control.register(`variants.${index}.barcode` as const)}
-                              />
-                            </div>
-                            <div className="space-y-1.5">
-                              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Sale Price</Label>
-                              <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-bold">$</span>
-                                <Input 
-                                  type="number" 
-                                  step="0.01"
-                                  placeholder="0.00" 
-                                  className="h-9 text-xs pl-7 font-bold bg-muted/20 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
-                                  {...control.register(`variants.${index}.sellingPrice` as const)}
-                                />
-                              </div>
-                            </div>
-                            <div className="space-y-1.5">
-                              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Stock Level</Label>
-                              <Input 
-                                type="number" 
-                                placeholder="0" 
-                                className="h-9 text-xs font-bold bg-muted/20 border-none focus-visible:ring-1 focus-visible:ring-primary/30"
-                                {...control.register(`variants.${index}.stock` as const)}
-                              />
-                            </div>
-                          </div>
+                    <CardContent className="p-5 space-y-4">
+                      <div className="space-y-1">
+                        <h4 className="font-black text-base truncate leading-tight" title={variant.name}>{variant.name}</h4>
+                        <div className="flex flex-wrap gap-1">
+                          {Object.entries(variant.options).map(([key, val]: [string, any]) => (
+                            <span key={key} className="text-[10px] font-bold text-muted-foreground/60 uppercase">
+                              {val}{' '}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
 
-                          <div className="mt-4 pt-4 border-t border-dashed">
-                            <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">Variant Description (Optional)</Label>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">SKU Code</Label>
+                          <Input 
+                            placeholder="SKU..." 
+                            className="h-10 text-xs font-mono bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl"
+                            {...control.register(`variants.${index}.sku` as const)}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Price</Label>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-[10px] font-bold">$</span>
                             <Input 
-                              placeholder="Specific details for this variant..." 
-                              className="h-9 text-xs bg-muted/20 border-none focus-visible:ring-1 focus-visible:ring-primary/30 mt-1.5"
-                              {...control.register(`variants.${index}.description` as const)}
+                              type="number" 
+                              step="0.01"
+                              className="h-10 text-xs pl-7 font-black bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl"
+                              {...control.register(`variants.${index}.sellingPrice` as const)}
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Stock</Label>
+                          <Input 
+                            type="number" 
+                            className="h-10 text-xs font-black bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl"
+                            {...control.register(`variants.${index}.stock` as const)}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Status</Label>
+                          <div className="flex items-center justify-between h-10 px-3 bg-muted/30 rounded-xl">
+                            <span className="text-[10px] font-bold uppercase">{variant.isActive ? 'On' : 'Off'}</span>
+                            <Switch 
+                              checked={variant.isActive} 
+                              onCheckedChange={(checked) => setValue(`variants.${index}.isActive`, checked)} 
+                              className="scale-75 data-[state=checked]:bg-primary"
+                              disabled={isUploading === variant.id || isProcessingAi === variant.id}
                             />
                           </div>
                         </div>
