@@ -23,7 +23,8 @@ import {
   ExternalLink,
   Link as LinkIcon,
   Send,
-  Copy
+  Copy,
+  LayoutGrid
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
@@ -191,6 +192,14 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
                     <div className="flex flex-col">
                         <div className="flex items-center gap-2">
                             {product.name}
+                            {product.hasVariants && (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <LayoutGrid className="h-3.5 w-3.5 text-indigo-500 cursor-help" />
+                                    </TooltipTrigger>
+                                    <TooltipContent>This product has variants</TooltipContent>
+                                </Tooltip>
+                            )}
                             {isExpired && (
                                 <Tooltip>
                                     <TooltipTrigger asChild>

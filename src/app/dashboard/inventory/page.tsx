@@ -1,4 +1,3 @@
-
 'use client';
 
 import { 
@@ -14,7 +13,8 @@ import {
   Copy,
   Share2,
   Scan,
-  PackageSearch 
+  PackageSearch,
+  LayoutGrid
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/PageHeader';
@@ -72,7 +72,7 @@ export default function InventoryPage() {
   const [isCloning, setIsCloning] = useState(false);
   const [isUpdatingSettings, setIsUpdatingSettings] = useState(false);
   const [isBarcodeScannerOpen, setIsBarcodeScannerOpen] = useState(false);
-  const [stockFilter, setStockFilter] = useState<'all' | 'low' | 'out'>('all');
+  const [stockFilter, setStockFilter] = useState<'all' | 'low' | 'out' | 'variant'>('all');
 
   const firestore = useFirestore();
   const { user, store, staffMember } = useAuth();
@@ -91,6 +91,7 @@ export default function InventoryPage() {
   const [totalProductCount, setTotalProductCount] = useState(0);
   const [lowStockCount, setLowStockCount] = useState(0);
   const [outOfStockCount, setOutOfStockCount] = useState(0);
+  const [variantStockCount, setVariantStockCount] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(15);
 
   // Stable cursors using refs to avoid infinite loops in useEffect
@@ -117,6 +118,8 @@ export default function InventoryPage() {
         q = query(q, where('stock', '<=', 0));
       } else if (stockFilter === 'low') {
         q = query(q, where('stock', '<=', globalLowStockThreshold), where('stock', '>', 0));
+      } else if (stockFilter === 'variant') {
+        q = query(q, where('hasVariants', '==', true));
       }
       
       q = query(q, orderBy('name', 'asc'));
@@ -130,14 +133,17 @@ export default function InventoryPage() {
         const baseQ = query(collection(firestore, 'products'), where('store_id', '==', currentStoreId));
         const outQ = query(baseQ, where('stock', '<=', 0));
         const lowQ = query(baseQ, where('stock', '<=', globalLowStockThreshold), where('stock', '>', 0));
+        const variantQ = query(baseQ, where('hasVariants', '==', true));
 
-        const [outSnap, lowSnap] = await Promise.all([
+        const [outSnap, lowSnap, variantSnap] = await Promise.all([
           getCountFromServer(outQ),
-          getCountFromServer(lowQ)
+          getCountFromServer(lowQ),
+          getCountFromServer(variantQ)
         ]);
 
         setOutOfStockCount(outSnap.data().count);
         setLowStockCount(lowSnap.data().count);
+        setVariantStockCount(variantSnap.data().count);
       }
 
       // 2. Apply cursors from refs
@@ -446,7 +452,7 @@ export default function InventoryPage() {
     lastDocRef.current = null;
   };
 
-  const handleStockFilterChange = (filter: 'all' | 'low' | 'out') => {
+  const handleStockFilterChange = (filter: 'all' | 'low' | 'out' | 'variant') => {
     setStockFilter(filter);
     setCurrentPage(1);
     firstDocRef.current = null;
@@ -526,6 +532,7 @@ export default function InventoryPage() {
         currencySymbol={currencySymbol}
         lowStockCount={lowStockCount}
         outOfStockCount={outOfStockCount}
+        variantStockCount={variantStockCount}
       />
 
       <div className="flex items-center gap-2 bg-muted/30 p-1 rounded-xl w-fit border">
@@ -536,6 +543,15 @@ export default function InventoryPage() {
           className="rounded-lg h-8 px-4 font-bold text-xs uppercase tracking-wider"
         >
           All Products
+        </Button>
+        <Button 
+          variant={stockFilter === 'variant' ? 'default' : 'ghost'} 
+          size="sm" 
+          onClick={() => handleStockFilterChange('variant')}
+          className="rounded-lg h-8 px-4 font-bold text-xs uppercase tracking-wider"
+        >
+          <LayoutGrid className="mr-2 h-3 w-3" />
+          Variant Stock
         </Button>
         <Button 
           variant={stockFilter === 'low' ? 'default' : 'ghost'} 
