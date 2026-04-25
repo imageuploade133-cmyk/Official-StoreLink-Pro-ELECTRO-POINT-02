@@ -513,7 +513,18 @@ export function ProductForm({
     reader.readAsDataURL(file);
     reader.onload = async () => {
       try {
-        const imageDataUri = reader.result as string;
+        let imageDataUri = reader.result as string;
+
+        try {
+            imageDataUri = await compressAndResizeImage(
+                imageDataUri,
+                settings?.imageUploadQuality || 80,
+                settings?.imageMaxWidth || 1920
+            );
+        } catch (optError) {
+            console.error("Optimization failed:", optError);
+        }
+
         const result = await uploadImage({ imageDataUri, storeId: currentStoreId });
         form.setValue(field, result.display_url, { shouldValidate: true });
         toast({ title: "Asset Uploaded", description: "Product video poster updated." });
@@ -537,7 +548,18 @@ export function ProductForm({
     reader.readAsDataURL(file);
     reader.onload = async () => {
       try {
-        const imageDataUri = reader.result as string;
+        let imageDataUri = reader.result as string;
+
+        try {
+            imageDataUri = await compressAndResizeImage(
+                imageDataUri,
+                settings?.imageUploadQuality || 80,
+                settings?.imageMaxWidth || 1920
+            );
+        } catch (optError) {
+            console.error("Optimization failed:", optError);
+        }
+
         const result = await uploadImage({ imageDataUri, storeId: currentStoreId });
         form.setValue('sizeGuideImageUrl', result.display_url, { shouldValidate: true });
         toast({ title: "Size Guide Uploaded", description: "Your sizing chart has been saved." });
@@ -565,7 +587,20 @@ export function ProductForm({
     reader.readAsDataURL(file);
     reader.onload = async () => {
       try {
-        const imageDataUri = reader.result as string;
+        let imageDataUri = reader.result as string;
+
+        if (file.type.startsWith('image/')) {
+            try {
+                imageDataUri = await compressAndResizeImage(
+                    imageDataUri,
+                    settings?.imageUploadQuality || 80,
+                    settings?.imageMaxWidth || 1920
+                );
+            } catch (optError) {
+                console.error("Optimization failed:", optError);
+            }
+        }
+
         const result = await uploadImage({ imageDataUri, storeId: currentStoreId });
         form.setValue('stockDocumentUrl', result.display_url, { shouldValidate: true });
         toast({ title: "Document Uploaded", description: "Stock document/receipt has been saved." });
@@ -580,7 +615,6 @@ export function ProductForm({
         setIsUploadingStockDoc(false);
     };
   };
-
   const handleNewCategorySubmit = async (categoryValues: CategoryFormValues) => {
     if (!firestore) return;
     setIsSubmittingCategory(true);

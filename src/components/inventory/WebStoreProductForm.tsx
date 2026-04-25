@@ -480,8 +480,19 @@ export function WebStoreProductForm() {
     reader.readAsDataURL(file);
     reader.onload = async () => {
       try {
-        const imageDataUri = reader.result as string;
-        const result = await uploadImage({ imageDataUri, storeId: store?.id });
+        let imageDataUri = reader.result as string;
+
+        try {
+            imageDataUri = await compressAndResizeImage(
+                imageDataUri,
+                settings?.imageUploadQuality || 80,
+                settings?.imageMaxWidth || 1920
+            );
+        } catch (optError) {
+            console.error("Optimization failed:", optError);
+        }
+
+        const result = await uploadImage({ imageDataUri, storeId: currentStoreId });
         form.setValue(field, result.display_url, { shouldValidate: true });
         toast({ title: "Asset Uploaded", description: "Product video poster updated." });
       } catch (error: any) {
@@ -515,10 +526,21 @@ export function WebStoreProductForm() {
     reader.readAsDataURL(file);
     reader.onload = async () => {
       try {
-        const imageDataUri = reader.result as string;
-        // For PDFs we might want a different upload flow if not using imgbb, 
-        // but the current uploadImage seems to handle dataURIs.
-        const result = await uploadImage({ imageDataUri, storeId: store?.id });
+        let imageDataUri = reader.result as string;
+        
+        if (isImage) {
+            try {
+                imageDataUri = await compressAndResizeImage(
+                    imageDataUri,
+                    settings?.imageUploadQuality || 80,
+                    settings?.imageMaxWidth || 1920
+                );
+            } catch (optError) {
+                console.error("Optimization failed:", optError);
+            }
+        }
+
+        const result = await uploadImage({ imageDataUri, storeId: currentStoreId });
         form.setValue('stockDocumentUrl', result.display_url, { shouldValidate: true });
         toast({ title: "Receipt Uploaded", description: "Stock document has been saved." });
       } catch (error: any) {
@@ -541,8 +563,19 @@ export function WebStoreProductForm() {
     reader.readAsDataURL(file);
     reader.onload = async () => {
       try {
-        const imageDataUri = reader.result as string;
-        const result = await uploadImage({ imageDataUri, storeId: store?.id });
+        let imageDataUri = reader.result as string;
+
+        try {
+            imageDataUri = await compressAndResizeImage(
+                imageDataUri,
+                settings?.imageUploadQuality || 80,
+                settings?.imageMaxWidth || 1920
+            );
+        } catch (optError) {
+            console.error("Optimization failed:", optError);
+        }
+
+        const result = await uploadImage({ imageDataUri, storeId: currentStoreId });
         form.setValue('sizeGuideImageUrl', result.display_url, { shouldValidate: true });
         toast({ title: "Size Guide Uploaded", description: "Your sizing chart has been saved." });
       } catch (error: any) {
@@ -552,7 +585,6 @@ export function WebStoreProductForm() {
       }
     };
   };
-
   const handleCreateCategory = async (values: CategoryFormValues) => {
     if (!firestore || !currentStoreId) return;
     setIsSubmittingCategory(true);

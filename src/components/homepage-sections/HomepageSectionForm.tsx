@@ -73,6 +73,7 @@ import { cn, convertToDateSafely } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { uploadImage } from '@/ai/flows/image-upload-flow';
+import { compressAndResizeImage } from "@/lib/image-utils";
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 
@@ -376,7 +377,19 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
         reader.readAsDataURL(file);
         reader.onload = async () => {
           try {
-            const result = await uploadImage({ imageDataUri: reader.result as string, storeId: store?.id });
+            let imageDataUri = reader.result as string;
+
+            try {
+                imageDataUri = await compressAndResizeImage(
+                    imageDataUri,
+                    settings?.imageUploadQuality || 80,
+                    settings?.imageMaxWidth || 1920
+                );
+            } catch (optError) {
+                console.error("Optimization failed:", optError);
+            }
+
+            const result = await uploadImage({ imageDataUri, storeId: store?.id });
             form.setValue('imageUrl', result.display_url, { shouldValidate: true });
             toast({ title: "Asset Uploaded", description: "Design image is ready." });
           } catch (error: any) {
@@ -386,7 +399,6 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
           }
         };
     };
-
     const handleNewCategorySubmit = async (categoryValues: CategoryFormValues) => {
         if (!firestore || !currentStoreId) return;
         setIsSubmittingNewCategory(true);
