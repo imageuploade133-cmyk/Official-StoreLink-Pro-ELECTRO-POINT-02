@@ -112,7 +112,7 @@ const iconMap = {
   Send,
 };
 
-function IndividualTrackPlayer({ track, branding }: { track: any, branding: any }) {
+function IndividualTrackPlayer({ track, branding }: { track: any, branding: any, key?: any }) {
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
@@ -277,6 +277,63 @@ export default function ProductDetailsPage() {
 
   const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: string }>({});
 
+  const isOptionValueAvailable = (optionName: string, value: string) => {
+    if (!product?.variants || !product.variantOptions) return true;
+
+    const optionIndex = product.variantOptions.findIndex(o => o.name === optionName);
+    const previousOptions = product.variantOptions.slice(0, optionIndex);
+    
+    return product.variants.some(v => 
+      v.isActive && 
+      v.stock > 0 &&
+      previousOptions.every(opt => v.options[opt.name] === selectedOptions[opt.name]) &&
+      v.options[optionName] === value
+    );
+  };
+
+  const handleOptionChange = (optionName: string, value: string) => {
+    if (!product?.variantOptions || !product.variants) return;
+
+    const newOptions = { ...selectedOptions, [optionName]: value };
+    const optionIndex = product.variantOptions.findIndex(o => o.name === optionName);
+    
+    // For all subsequent options, we check if they are still valid/in-stock
+    let currentOptions = { ...newOptions };
+    for (let i = optionIndex + 1; i < product.variantOptions.length; i++) {
+        const nextOpt = product.variantOptions[i];
+        const currentVal = currentOptions[nextOpt.name];
+        
+        // Check if currentVal is still available given current choices for previous options
+        const isStillAvailable = product.variants.some(v => 
+            v.isActive && 
+            v.stock > 0 &&
+            product.variantOptions!.slice(0, i).every(opt => v.options[opt.name] === currentOptions[opt.name]) &&
+            v.options[nextOpt.name] === currentVal
+        );
+
+        if (!isStillAvailable) {
+            // Find first available value for this option
+            const firstAvailable = nextOpt.values.find(vVal => 
+                product.variants!.some(v => 
+                    v.isActive && 
+                    v.stock > 0 &&
+                    product.variantOptions!.slice(0, i).every(opt => v.options[opt.name] === currentOptions[opt.name]) &&
+                    v.options[nextOpt.name] === vVal
+                )
+            );
+            
+            if (firstAvailable) {
+                currentOptions[nextOpt.name] = firstAvailable;
+            } else {
+                // If nothing in stock, just keep first value
+                currentOptions[nextOpt.name] = nextOpt.values[0];
+            }
+        }
+    }
+
+    setSelectedOptions(currentOptions);
+  };
+
   // Fetch Product
   const productRef = useMemo(() => firestore ? doc(firestore, 'products', productId) : null, [firestore, productId]);
   const { data: product, isLoading: isLoadingProduct } = useDoc<Product>(productRef);
@@ -384,17 +441,31 @@ export default function ProductDetailsPage() {
   }, [selectedVariant]);
 
   // Initial selection
+  const initializedRef = useRef(false);
   useEffect(() => {
-    if (product?.hasVariants && product.variantOptions) {
-      const initial: { [key: string]: string } = {};
-      product.variantOptions.forEach(opt => {
-        if (opt.values.length > 0) {
-          initial[opt.name] = opt.values[0];
+    if (product && !initializedRef.current) {
+        if (product.hasVariants && product.variantOptions) {
+            const firstInStock = product.variants?.find(v => v.isActive && v.stock > 0);
+            if (firstInStock) {
+                setSelectedOptions(firstInStock.options);
+            } else {
+                const initial: { [key: string]: string } = {};
+                product.variantOptions.forEach(opt => {
+                    if (opt.values.length > 0) initial[opt.name] = opt.values[0];
+                });
+                setSelectedOptions(initial);
+            }
         }
-      });
-      setSelectedOptions(initial);
+        initializedRef.current = true;
     }
   }, [product]);
+
+  // Adjust quantity if it exceeds stock
+  useEffect(() => {
+    if (currentStock > 0 && quantity > currentStock) {
+      setQuantity(currentStock);
+    }
+  }, [currentStock, quantity]);
 
   const filteredPaymentMethods = useMemo(() => {
     return availablePaymentMethods.filter(method => {
@@ -921,36 +992,44 @@ export default function ProductDetailsPage() {
               <div className="space-y-3 md:space-y-4 p-4 md:p-5 bg-[#f5f5f7] dark:bg-[#1d1d1f] rounded-3xl transition-all duration-500 shadow-sm border-2 border-black/10 dark:border-white/20">
                 {product.hasVariants && product.variantOptions && (
                   <div className="space-y-6 mb-6">
-                    {product.variantOptions.map((option) => (
+                    {product.variantOptions.map((option, idx) => (
                       <div key={option.name} className="space-y-3">
                         <div className="flex justify-between items-center">
                           <label className="text-[11px] font-black uppercase tracking-[0.2em] text-[#86868b]">
-                            Select {option.name}
+                            {option.name}
                           </label>
                           <span className="text-[11px] font-bold text-primary">
-                            {selectedOptions[option.name]}
+                            {selectedOptions[option.name] || 'Select'}
                           </span>
                         </div>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap gap-2 md:gap-3">
                           {option.values.map((value) => {
                             const isSelected = selectedOptions[option.name] === value;
+                            const isAvailable = isOptionValueAvailable(option.name, value);
                             const isColor = option.name.toLowerCase().includes('color');
                             
                             if (isColor) {
                               return (
                                 <button
                                   key={value}
-                                  onClick={() => setSelectedOptions(prev => ({ ...prev, [option.name]: value }))}
+                                  onClick={() => handleOptionChange(option.name, value)}
                                   className={cn(
-                                    "w-10 h-10 rounded-full border-2 transition-all p-1",
-                                    isSelected ? "border-primary scale-110 shadow-md" : "border-transparent hover:scale-105"
+                                    "w-12 h-12 rounded-full border-2 transition-all p-1 relative",
+                                    isSelected ? "border-primary scale-110 shadow-md ring-2 ring-primary/20" : "border-transparent hover:scale-105",
+                                    !isAvailable && "opacity-40"
                                   )}
-                                  title={value}
+                                  title={value + (!isAvailable ? " (Out of Stock)" : "")}
                                 >
                                   <div 
-                                    className="w-full h-full rounded-full border border-black/10" 
+                                    className="w-full h-full rounded-full border border-black/10 flex items-center justify-center overflow-hidden" 
                                     style={{ backgroundColor: value.toLowerCase() }}
-                                  />
+                                  >
+                                    {!isAvailable && (
+                                      <div className="absolute inset-0 flex items-center justify-center">
+                                        <div className="w-full h-[2px] bg-rose-500/80 rotate-45" />
+                                      </div>
+                                    )}
+                                  </div>
                                 </button>
                               );
                             }
@@ -958,15 +1037,19 @@ export default function ProductDetailsPage() {
                             return (
                               <button
                                 key={value}
-                                onClick={() => setSelectedOptions(prev => ({ ...prev, [option.name]: value }))}
+                                onClick={() => handleOptionChange(option.name, value)}
                                 className={cn(
-                                  "px-4 py-2 rounded-xl border-2 text-xs font-bold transition-all",
+                                  "relative px-5 py-3 rounded-xl border-2 text-xs font-bold transition-all min-w-[3.5rem] flex flex-col items-center justify-center gap-0.5",
                                   isSelected 
                                     ? "border-primary bg-primary text-white shadow-md scale-105" 
-                                    : "border-black/5 bg-white dark:bg-black text-[#1d1d1f] dark:text-white hover:border-primary/50"
+                                    : "border-black/5 bg-white dark:bg-black text-[#1d1d1f] dark:text-white hover:border-primary/50",
+                                  !isAvailable && "opacity-60 grayscale border-dashed"
                                 )}
                               >
-                                {value}
+                                <span>{value}</span>
+                                {!isAvailable && (
+                                  <span className="text-[7px] leading-none uppercase font-black text-rose-500 opacity-80">Out of Stock</span>
+                                )}
                               </button>
                             );
                           })}
@@ -1002,8 +1085,8 @@ export default function ProductDetailsPage() {
                       </div>
                     )}
                   </div>
-                  {product.stock <= 5 && product.stock > 0 && (
-                    <span className="text-[10px] font-bold text-[#e11d48] animate-pulse">Only {product.stock} left!</span>
+                  {currentStock <= 5 && currentStock > 0 && (
+                    <span className="text-[10px] font-bold text-[#e11d48] animate-pulse">Only {currentStock} left!</span>
                   )}
                 </div>
                 <div className="flex items-center gap-3 md:gap-4">
@@ -1021,7 +1104,7 @@ export default function ProductDetailsPage() {
                       variant="ghost" 
                       size="icon" 
                       className="h-10 md:h-12 w-10 md:w-12 rounded-[14px] bg-gradient-to-br from-emerald-500 to-green-600 dark:from-emerald-600 dark:to-green-700 text-white hover:shadow-lg dark:hover:shadow-emerald-500/50 active:scale-95 transition-all font-bold" 
-                      onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                      onClick={() => setQuantity(Math.min(currentStock, quantity + 1))}
                     >
                       <Plus className="h-4 md:h-5 w-4 md:w-5" />
                     </Button>
@@ -1039,7 +1122,7 @@ export default function ProductDetailsPage() {
                   </Button>
                 </div>
 
-                <StockBar stock={product.stock} lowStockThreshold={lowStockThreshold} className="mt-4" />
+                <StockBar stock={currentStock} lowStockThreshold={lowStockThreshold} className="mt-4" />
                 
                 {filteredPaymentMethods.find(m => m.id === 'fast_checkout')?.config?.enableQuickPayButtons && !isOutOfStock && (
                   <div className="pt-6 border-t border-black/[0.05] dark:border-white/[0.1]">
