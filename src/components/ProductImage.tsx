@@ -87,10 +87,10 @@ export function ProductImage({
 
         <div className="space-y-1">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 leading-none">
-            Generated
+            GENERATED
           </p>
           <p className="text-[12px] font-black uppercase tracking-[0.3em] text-primary leading-none">
-            Variants
+            VARIANTS
           </p>
         </div>
         

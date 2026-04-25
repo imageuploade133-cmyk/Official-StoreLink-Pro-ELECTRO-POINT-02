@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Barcode } from 'lucide-react';
 import type { Category, DisplayProduct } from '@/lib/types';
-import Image from 'next/image';
+import { ProductImage } from '../ProductImage';
 import { formatCurrency } from '@/lib/formatUtils';
 import { Badge } from '@/components/ui/badge';
 import { calculateEffectivePrice } from '@/lib/pos-utils';
@@ -98,15 +98,16 @@ export function ProductSearchBar({
                           className="flex items-center p-2.5 hover:bg-accent cursor-pointer gap-3 border-b last:border-b-0"
                           onClick={() => onSearchResultClick(product)}
                         >
-                          <Image
-                            src={product.imageUrl || 'https://placehold.co/40x40.png'}
-                            alt={product.name}
-                            width={40}
-                            height={40}
-                            className="rounded-md object-cover flex-shrink-0"
-                            data-ai-hint={product.dataAiHint || product.name.toLowerCase().split(' ').slice(0, 2).join(' ')}
-                            unoptimized
-                          />
+                          <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md bg-muted">
+                            <ProductImage
+                              src={product.imageUrl}
+                              alt={product.name}
+                              fill
+                              className="object-cover"
+                              unoptimized
+                              minimal
+                            />
+                          </div>
                           <div className="flex-grow min-w-0">
                             <p className="text-sm font-medium truncate" title={product.name}>{product.name}</p>
                             <p className="text-xs text-primary font-semibold">{formatCurrency(effectivePrice, currencySymbol)}</p>

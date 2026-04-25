@@ -14,6 +14,7 @@ import {
   type DocumentData
 } from 'firebase/firestore';
 import type { Product, Category } from '@/lib/types';
+import { ProductImage } from '@/components/ProductImage';
 import { ProductCard } from '@/components/store/ProductCard';
 import { useSettings } from '@/contexts/settings-context';
 import { Button } from '@/components/ui/button';
@@ -429,10 +430,8 @@ function ShopPageContent() {
                                                             }}
                                                             className="w-full p-3 text-left hover:bg-blue-500/5 dark:hover:bg-blue-500/10 rounded-2xl transition-all flex items-center gap-4 group border border-transparent hover:border-blue-500/10"
                                                         >
-                                                            <div className="h-12 w-12 rounded-xl bg-black/5 dark:bg-white/5 overflow-hidden flex-shrink-0">
-                                                                {product.imageUrl && (
-                                                                    <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                                                )}
+                                                            <div className="h-12 w-12 rounded-xl bg-black/5 dark:bg-white/5 overflow-hidden flex-shrink-0 relative">
+                                                                <ProductImage src={product.imageUrl} alt={product.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" unoptimized minimal />
                                                             </div>
                                                             <div className="flex-1 min-w-0">
                                                                 <p className="text-sm font-bold text-black dark:text-white truncate group-hover:text-blue-500 transition-colors">

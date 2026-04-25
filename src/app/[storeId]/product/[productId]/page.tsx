@@ -14,6 +14,7 @@ import { useSettings } from '@/contexts/settings-context';
 import { formatCurrency } from '@/lib/formatUtils';
 import { calculateEffectivePrice } from '@/lib/pos-utils';
 import type { Product, Category, ProductReview, HomepageSection, VoiceSignature } from '@/lib/types';
+import { ProductImage } from '@/components/ProductImage';
 import { 
   Star, 
   Heart, 
@@ -912,7 +913,7 @@ export default function ProductDetailsPage() {
                         </Button>
                     </div>
                 ) : (
-                    <Image src={activeImage || product.imageUrl || defaultImageUrl} alt={product.name} fill priority className={cn("object-cover transition-all duration-700 ease-in-out", isEntireProductOutOfStock && "opacity-50 grayscale")} unoptimized />
+                    <ProductImage src={activeImage || product.imageUrl} alt={product.name} fill priority className={cn("object-cover transition-all duration-700 ease-in-out", isEntireProductOutOfStock && "opacity-50 grayscale")} unoptimized />
                 )}
                 <div className="absolute top-8 left-8 flex flex-col gap-3">
                     {product.isOfficialBrand && (
@@ -931,7 +932,7 @@ export default function ProductDetailsPage() {
               <div className="flex flex-wrap gap-2 md:gap-3 lg:gap-4 justify-center md:justify-start overflow-x-auto pb-2">
                 {galleryImages.map((url, idx) => (
                 <button key={url + idx} onClick={() => { setActiveImage(url); setShowVideo(false); }} className={cn("relative w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg md:rounded-2xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 active:scale-95", !showVideo && activeImage === url ? "border-primary shadow-lg ring-2 ring-primary/20 scale-110" : "border-slate-200 dark:border-slate-800 opacity-60 hover:opacity-100")}>
-                    <Image src={url} alt={`View ${idx + 1}`} fill className="object-cover" unoptimized />
+                    <ProductImage src={url} alt={`View ${idx + 1}`} fill className="object-cover" unoptimized minimal />
                 </button>
                 ))}
                 {product.videoEnabled && product.videoUrl && (

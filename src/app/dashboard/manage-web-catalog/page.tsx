@@ -25,6 +25,7 @@ import {
   type DocumentData
 } from 'firebase/firestore';
 import type { Product, Category } from '@/lib/types';
+import { ProductImage } from '@/components/ProductImage';
 import { useAuth } from '@/contexts/auth-context';
 import { useSettings } from '@/contexts/settings-context';
 import { PageHeader } from '@/components/PageHeader';
@@ -552,12 +553,13 @@ export default function ManageWebCatalogPage() {
                       <TableRow key={product.id} className="group transition-colors hover:bg-muted/30">
                         <TableCell className="pl-6">
                           <div className="relative w-12 h-12 rounded-xl overflow-hidden border-2 border-white shadow-md bg-white">
-                              <Image 
-                                  src={product.imageUrl || defaultProductImageUrl} 
+                              <ProductImage 
+                                  src={product.imageUrl} 
                                   alt={product.name} 
                                   fill 
                                   className="object-cover" 
                                   unoptimized
+                                  minimal
                               />
                           </div>
                         </TableCell>

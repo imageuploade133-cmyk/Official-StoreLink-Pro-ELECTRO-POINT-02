@@ -911,7 +911,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                                 <div className="flex flex-wrap gap-2">
                                   {variant.additionalImageUrls?.map((url: string, imgIdx: number) => (
                                     <div key={imgIdx} className="relative w-12 h-12 rounded-xl overflow-hidden border bg-muted">
-                                      <Image src={url} alt="" fill className="object-cover" unoptimized />
+                                      <ProductImage src={url} alt="" fill className="object-cover" unoptimized minimal />
                                       <button 
                                         type="button"
                                         className="absolute top-0 right-0 bg-destructive/80 text-white p-0.5 rounded-bl-lg hover:bg-destructive transition-colors"
