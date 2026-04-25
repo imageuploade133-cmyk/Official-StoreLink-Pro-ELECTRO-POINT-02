@@ -325,7 +325,14 @@ export default function CartPage() {
                                                   {item.selectedOptions && (
                                                       <div className="flex flex-wrap gap-2 mt-1">
                                                           {Object.entries(item.selectedOptions).map(([key, val]) => (
-                                                              <Badge key={key} variant="outline" className="text-[10px] uppercase font-bold px-2 py-0">
+                                                              <Badge 
+                                                                  key={key} 
+                                                                  variant="outline" 
+                                                                  className={cn(
+                                                                      "text-[10px] uppercase font-bold px-2 py-0",
+                                                                      key.toLowerCase().includes('size') ? "bg-white text-black border-black/10" : ""
+                                                                  )}
+                                                              >
                                                                   {key}: {val}
                                                               </Badge>
                                                           ))}
