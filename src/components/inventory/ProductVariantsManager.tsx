@@ -43,6 +43,7 @@ import { cn } from '@/lib/utils';
 import { compressAndResizeImage } from '@/lib/image-utils';
 import { useSettings } from '@/contexts/settings-context';
 import Image from 'next/image';
+import { ConfirmationModal } from '../dialogs/ConfirmationModal';
 
 const SUGGESTIONS = {
   color: [
@@ -73,6 +74,17 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
   const [isProcessingAi, setIsProcessingAi] = useState<string | null>(null);
   const [showAdvancedDetails, setShowAdvancedDetails] = useState(false);
   const [isManualMode, setIsManualMode] = useState(false);
+  const [confirmConfig, setConfirmConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    onConfirm: () => void;
+  }>({
+    isOpen: false,
+    title: '',
+    description: '',
+    onConfirm: () => {},
+  });
 
   const hasVariants = watch('hasVariants');
   const variantOptions = watch('variantOptions') || [];
@@ -467,14 +479,21 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                           size="icon" 
                           className="absolute top-4 right-4 h-8 w-8 rounded-full bg-destructive/10 text-destructive hover:bg-destructive hover:text-white transition-all opacity-0 group-hover:opacity-100"
                           onClick={() => {
-                            removeOption(index);
-                            if (optionFields.length === 1) {
-                              const currentVariants = getValues('variants') || [];
-                              const hasManualVariants = currentVariants.some((v: any) => v.isManual);
-                              if (!hasManualVariants) {
-                                setValue('hasVariants', false, { shouldDirty: true });
+                            setConfirmConfig({
+                              isOpen: true,
+                              title: 'Remove Option?',
+                              description: `Removing the "${variantOptions[index]?.name || 'Option'}" will delete all associated variants. Are you sure?`,
+                              onConfirm: () => {
+                                removeOption(index);
+                                if (optionFields.length === 1) {
+                                  const currentVariants = getValues('variants') || [];
+                                  const hasManualVariants = currentVariants.some((v: any) => v.isManual);
+                                  if (!hasManualVariants) {
+                                    setValue('hasVariants', false, { shouldDirty: true });
+                                  }
+                                }
                               }
-                            }
+                            });
                           }}
                         >
                           <X className="h-4 w-4" />
@@ -733,7 +752,14 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                               variant="destructive"
                               size="sm"
                               className="h-9 gap-2 text-[10px] font-black uppercase rounded-xl shadow-sm col-span-2"
-                              onClick={() => handleRemoveVariantImage(index)}
+                              onClick={() => {
+                                setConfirmConfig({
+                                  isOpen: true,
+                                  title: 'Remove Image?',
+                                  description: 'Are you sure you want to remove the image from this variant?',
+                                  onConfirm: () => handleRemoveVariantImage(index)
+                                });
+                              }}
                             >
                               <Trash2 className="h-3.5 w-3.5" /> Remove Image
                             </Button>
@@ -753,7 +779,14 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                           variant="ghost" 
                           size="icon" 
                           className="h-8 w-8 rounded-full bg-destructive text-white hover:bg-destructive/90 transition-all shadow-sm"
-                          onClick={() => handleRemoveVariant(index)}
+                          onClick={() => {
+                            setConfirmConfig({
+                              isOpen: true,
+                              title: 'Delete Variant?',
+                              description: `Are you sure you want to delete "${variant.name}"? This will return ${Number(variant.stock) || 0} units to main stock.`,
+                              onConfirm: () => handleRemoveVariant(index)
+                            });
+                          }}
                           disabled={isUploading === variant.id || isProcessingAi === variant.id}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -909,6 +942,14 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
           )}
         </div>
       )}
+      
+      <ConfirmationModal 
+        isOpen={confirmConfig.isOpen}
+        onOpenChange={(open) => setConfirmConfig(prev => ({ ...prev, isOpen: open }))}
+        onConfirm={confirmConfig.onConfirm}
+        title={confirmConfig.title}
+        description={confirmConfig.description}
+      />
     </div>
   );
 }
