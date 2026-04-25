@@ -24,6 +24,8 @@ const RemoveBackgroundOutputSchema = z.object({
 });
 export type RemoveBackgroundOutput = z.infer<typeof RemoveBackgroundOutputSchema>;
 
+export const maxDuration = 60;
+
 export async function removeBackground(input: RemoveBackgroundInput): Promise<RemoveBackgroundOutput> {
   return removeBackgroundFlow(input);
 }

@@ -23,6 +23,8 @@ const MarketingOutputSchema = z.object({
 });
 export type MarketingOutput = z.infer<typeof MarketingOutputSchema>;
 
+export const maxDuration = 60;
+
 export async function generateMarketingContent(input: MarketingInput): Promise<MarketingOutput> {
   return productMarketingFlow(input);
 }
