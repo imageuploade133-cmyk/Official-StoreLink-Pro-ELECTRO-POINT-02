@@ -35,7 +35,9 @@ import {
   PackageSearch,
   Eye,
   Upload,
-  X
+  X,
+  ClipboardList,
+  ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,7 +46,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { BarcodeScannerField } from '@/components/inventory/BarcodeScannerField';
 import { BarcodeScanner } from '@/components/inventory/BarcodeScanner';
 import { useBarcodeScanner } from '@/hooks/use-barcode-scanner';
-import type { Product, SaleTransaction, RestockEntry } from '@/lib/types';
+import type { Product, SaleTransaction, RestockEntry, StockAuditEntry } from '@/lib/types';
 import { formatCurrency } from '@/lib/formatUtils';
 import { format } from 'date-fns';
 import { cn, convertToDateSafely } from '@/lib/utils';
@@ -52,6 +54,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import AccessDenied from '@/components/staff-management/AccessDenied';
+import { Badge } from '@/components/ui/badge';
 
 export default function RestockNowPage() {
   const { user, permissions, isLoading: authLoading, store, staffMember } = useAuth();
@@ -82,6 +85,54 @@ export default function RestockNowPage() {
 
   const [productSales, setProductSales] = useState<any[]>([]);
   const [isLoadingSales, setIsLoadingSales] = useState(false);
+
+  const [recentAudits, setRecentAudits] = useState<StockAuditEntry[]>([]);
+  const [isLoadingAudits, setIsLoadingAudits] = useState(false);
+
+  const fetchRecentAudits = useCallback(async (productId?: string) => {
+    if (!firestore || !currentStoreId) return;
+    setIsLoadingAudits(true);
+    try {
+      let q;
+      if (productId) {
+        q = query(
+          collection(firestore, 'stockAudit'),
+          where('store_id', '==', currentStoreId),
+          where('productId', '==', productId),
+          orderBy('timestamp', 'desc'),
+          limit(20)
+        );
+      } else {
+        q = query(
+          collection(firestore, 'stockAudit'),
+          where('store_id', '==', currentStoreId),
+          orderBy('timestamp', 'desc'),
+          limit(20)
+        );
+      }
+
+      const snapshot = await getDocs(q);
+      const audits = snapshot.docs.map(d => {
+        const data = d.data() as any;
+        return {
+          id: d.id,
+          ...data,
+          timestamp: data.timestamp
+        } as StockAuditEntry;
+      });
+      setRecentAudits(audits);
+    } catch (error) {
+      console.error('Error fetching audits:', error);
+    } finally {
+      setIsLoadingAudits(false);
+    }
+  }, [firestore, currentStoreId]);
+
+  useEffect(() => {
+    if (currentStoreId) {
+      fetchRecentAudits(selectedProduct?.id);
+    }
+  }, [currentStoreId, selectedProduct?.id, fetchRecentAudits]);
 
   const searchProducts = useCallback(async (term: string) => {
     if (!firestore || !currentStoreId || !term.trim()) return;
@@ -166,15 +217,6 @@ export default function RestockNowPage() {
     setSelectedProduct(product);
     setSelectedVariantId(variantId);
     
-    // If a variant is selected, use its selling price if available
-    let price = product.purchasePrice || 0;
-    if (variantId && product.variants) {
-      const variant = product.variants.find(v => v.id === variantId);
-      if (variant && variant.sellingPrice) {
-        // We use purchasePrice for costPrice state usually, but let's stay consistent with what the user expects
-      }
-    }
-    
     setCostPrice(product.purchasePrice || 0);
     setFoundProducts([]);
     setSearchTerm('');
@@ -189,7 +231,7 @@ export default function RestockNowPage() {
         collection(firestore, 'saleTransactions'),
         where('store_id', '==', currentStoreId),
         orderBy('createdAt', 'desc'),
-        limit(50) // Fetch recent transactions to find sales for this product
+        limit(50)
       );
       const snapshot = await getDocs(q);
       const sales: any[] = [];
@@ -223,7 +265,6 @@ export default function RestockNowPage() {
     const file = event.target.files?.[0];
     if (!file) return;
     
-    // Check file type
     const isImage = file.type.startsWith('image/');
     const isPdf = file.type === 'application/pdf';
     
@@ -284,7 +325,6 @@ export default function RestockNowPage() {
             variants[variantIndex] = variant;
             variantName = ` (${variant.name})`;
 
-            // Recalculate total stock from all variants to stay perfectly in sync
             const totalStock = variants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
 
             transaction.update(productRef, {
@@ -294,10 +334,8 @@ export default function RestockNowPage() {
               updatedAt: serverTimestamp()
             });
             
-            // Update local calculation for audit and state
             currentCalculatedNewStock = totalStock;
           } else {
-            // Fallback if variant not found but was selected (should not happen)
             transaction.update(productRef, {
               stock: newStock,
               purchasePrice: Number(costPrice) || 0,
@@ -305,7 +343,6 @@ export default function RestockNowPage() {
             });
           }
         } else {
-          // Update product stock directly
           transaction.update(productRef, {
             stock: newStock,
             purchasePrice: Number(costPrice) || 0,
@@ -313,7 +350,6 @@ export default function RestockNowPage() {
           });
         }
         
-        // Create restock entry
         const restockData: RestockEntry = {
           id: restockRef.id,
           store_id: currentStoreId,
@@ -334,7 +370,6 @@ export default function RestockNowPage() {
         };
         transaction.set(restockRef, restockData);
 
-        // Create audit log
         transaction.set(auditRef, {
           store_id: currentStoreId,
           productId: selectedProduct.id,
@@ -355,7 +390,6 @@ export default function RestockNowPage() {
 
       toast({ title: 'Stock Updated', description: `Successfully added ${restockQuantity} units to "${selectedProduct.name}".` });
 
-      // Refresh product data
       if (selectedProduct) {
         const restockQtyNum = Number(restockQuantity) || 0;
         const updatedProduct = { ...selectedProduct };
@@ -379,6 +413,7 @@ export default function RestockNowPage() {
       setSupplierLocation('');
       setStockDocumentUrl('');
       setNotes('');
+      fetchRecentAudits(selectedProduct?.id);
     } catch (error: any) {
       console.error('Restock error:', error);
       toast({ variant: 'destructive', title: 'Restock Failed', description: error.message || 'Failed to update stock.' });
@@ -782,6 +817,103 @@ export default function RestockNowPage() {
           )}
         </div>
       </div>
+
+      {/* Audit Section */}
+      <Card className="shadow-lg border-none ring-1 ring-border overflow-hidden">
+        <CardHeader className="bg-primary/5 border-b">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <ClipboardList className="h-5 w-5 text-primary" />
+                Restock Audit Logs
+              </CardTitle>
+              <CardDescription>
+                Detailed "Before" and "After" stock levels for transparency.
+                {selectedProduct && <span className="ml-1 font-bold text-primary">Filtered for: {selectedProduct.name}</span>}
+              </CardDescription>
+            </div>
+            {selectedProduct && (
+              <Button variant="outline" size="sm" onClick={() => fetchRecentAudits()}>
+                Show All Logs
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          {isLoadingAudits ? (
+            <div className="p-6 space-y-2">
+              {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
+            </div>
+          ) : recentAudits.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center px-4">
+              <Info className="h-12 w-12 text-muted-foreground mb-4 opacity-20" />
+              <h3 className="text-lg font-semibold">No Audit Logs Found</h3>
+              <p className="text-sm text-muted-foreground max-w-[250px]">Perform a restock to see audit logs here.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader className="bg-muted/50">
+                  <TableRow>
+                    <TableHead className="w-[150px]">Timestamp</TableHead>
+                    {!selectedProduct && <TableHead>Product</TableHead>}
+                    <TableHead className="text-center">Stock Movement (Before → After)</TableHead>
+                    <TableHead className="text-center">Change</TableHead>
+                    <TableHead>Staff</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {recentAudits.map((audit) => (
+                    <TableRow key={audit.id} className="group hover:bg-muted/30 transition-colors">
+                      <TableCell className="text-[10px] font-bold uppercase text-muted-foreground">
+                        {audit.timestamp ? format(convertToDateSafely(audit.timestamp), 'MMM dd, p') : 'N/A'}
+                      </TableCell>
+                      {!selectedProduct && (
+                        <TableCell className="font-medium max-w-[200px] truncate">
+                          {audit.productName}
+                        </TableCell>
+                      )}
+                      <TableCell className="text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          <Badge variant="outline" className="font-mono">{audit.beforeStock}</Badge>
+                          <ArrowRight className="h-3 w-3 text-muted-foreground" />
+                          <Badge variant="default" className="bg-primary/20 text-primary hover:bg-primary/30 border-primary/20 font-black font-mono">
+                            {audit.afterStock}
+                          </Badge>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          {audit.change > 0 ? (
+                            <TrendingUp className="h-4 w-4 text-green-600" />
+                          ) : (
+                            <TrendingDown className="h-4 w-4 text-red-600" />
+                          )}
+                          <span className={cn(
+                            "font-black text-sm",
+                            audit.change > 0 ? "text-green-600" : "text-red-600"
+                          )}>
+                            {audit.change > 0 ? '+' : ''}{audit.change}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-[10px] font-black uppercase text-muted-foreground truncate max-w-[100px]">
+                        {audit.staffName}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+        <CardFooter className="py-3 bg-muted/5 border-t">
+          <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest flex items-center gap-2">
+            <Info className="h-3 w-3" />
+            Showing recent stock movements for this store
+          </p>
+        </CardFooter>
+      </Card>
 
       <BarcodeScanner 
         isOpen={isScannerOpen}
