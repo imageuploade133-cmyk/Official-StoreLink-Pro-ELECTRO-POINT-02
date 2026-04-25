@@ -431,6 +431,13 @@ export default function ProductDetailsPage() {
 
   const currentStock = selectedVariant ? selectedVariant.stock : (product?.stock || 0);
   const isCurrentlyOutOfStock = currentStock <= 0;
+  const isEntireProductOutOfStock = useMemo(() => {
+    if (!product) return true;
+    if (product.hasVariants && product.variants) {
+      return !product.variants.some(v => v.isActive && v.stock > 0);
+    }
+    return product.stock <= 0;
+  }, [product]);
 
   // Update active image when selected variant changes
   useEffect(() => {
@@ -892,7 +899,7 @@ export default function ProductDetailsPage() {
                         </Button>
                     </div>
                 ) : (
-                    <Image src={activeImage || product.imageUrl || defaultImageUrl} alt={product.name} fill priority className={cn("object-cover transition-all duration-700 ease-in-out", isOutOfStock && "opacity-50 grayscale")} unoptimized />
+                    <Image src={activeImage || product.imageUrl || defaultImageUrl} alt={product.name} fill priority className={cn("object-cover transition-all duration-700 ease-in-out", isEntireProductOutOfStock && "opacity-50 grayscale")} unoptimized />
                 )}
                 <div className="absolute top-8 left-8 flex flex-col gap-3">
                     {product.isOfficialBrand && (
@@ -900,7 +907,7 @@ export default function ProductDetailsPage() {
                             <CheckCircle2 className="h-3.5 w-3.5 mr-2 fill-current" /> Official Brand
                         </Badge>
                     )}
-                    {isDiscounted && !isOutOfStock && today && (
+                    {isDiscounted && !isEntireProductOutOfStock && today && (
                         <Badge className="text-white font-black text-[10px] uppercase tracking-[0.2em] px-3 py-1.5 shadow-xl border-none animate-pulse" style={{ backgroundColor: settings?.flashHubColor || '#e11d48' }}>
                             <Zap className="h-3.5 w-3.5 mr-2 fill-current" style={{ color: settings?.flashHubIconColor || '#fbbf24' }}/> 
                             Flash Sale Live
@@ -988,181 +995,189 @@ export default function ProductDetailsPage() {
                 </div>
             )}
 
-            {!isOutOfStock && (
-              <div className="space-y-3 md:space-y-4 p-4 md:p-5 bg-[#f5f5f7] dark:bg-[#1d1d1f] rounded-3xl transition-all duration-500 shadow-sm border-2 border-black/10 dark:border-white/20">
-                {product.hasVariants && product.variantOptions && (
-                  <div className="space-y-6 mb-6">
-                    {product.variantOptions.map((option, idx) => (
-                      <div key={option.name} className="space-y-3">
-                        <div className="flex justify-between items-center">
-                          <label className="text-[11px] font-black uppercase tracking-[0.2em] text-[#86868b]">
-                            {option.name}
-                          </label>
-                          <span className="text-[11px] font-bold text-primary">
-                            {selectedOptions[option.name] || 'Select'}
-                          </span>
-                        </div>
-                        <div className="flex flex-wrap gap-2 md:gap-3">
-                          {option.values.map((value) => {
-                            const isSelected = selectedOptions[option.name] === value;
-                            const isAvailable = isOptionValueAvailable(option.name, value);
-                            const isColor = option.name.toLowerCase().includes('color');
-                            
-                            if (isColor) {
-                              return (
-                                <button
-                                  key={value}
-                                  onClick={() => handleOptionChange(option.name, value)}
-                                  className={cn(
-                                    "w-12 h-12 rounded-full border-2 transition-all p-1 relative",
-                                    isSelected ? "border-primary scale-110 shadow-md ring-2 ring-primary/20" : "border-transparent hover:scale-105",
-                                    !isAvailable && "opacity-40"
-                                  )}
-                                  title={value + (!isAvailable ? " (Out of Stock)" : "")}
-                                >
-                                  <div 
-                                    className="w-full h-full rounded-full border border-black/10 flex items-center justify-center overflow-hidden" 
-                                    style={{ backgroundColor: value.toLowerCase() }}
-                                  >
-                                    {!isAvailable && (
-                                      <div className="absolute inset-0 flex items-center justify-center">
-                                        <div className="w-full h-[2px] bg-rose-500/80 rotate-45" />
-                                      </div>
-                                    )}
-                                  </div>
-                                </button>
-                              );
-                            }
-                            
+            <div className="space-y-3 md:space-y-4 p-4 md:p-5 bg-[#f5f5f7] dark:bg-[#1d1d1f] rounded-3xl transition-all duration-500 shadow-sm border-2 border-black/10 dark:border-white/20">
+              {product.hasVariants && product.variantOptions && (
+                <div className="space-y-6 mb-6">
+                  {product.variantOptions.map((option, idx) => (
+                    <div key={option.name} className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <label className="text-[11px] font-black uppercase tracking-[0.2em] text-[#86868b]">
+                          {option.name}
+                        </label>
+                        <span className="text-[11px] font-bold text-primary">
+                          {selectedOptions[option.name] || 'Select'}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-2 md:gap-3">
+                        {option.values.map((value) => {
+                          const isSelected = selectedOptions[option.name] === value;
+                          const isAvailable = isOptionValueAvailable(option.name, value);
+                          const isColor = option.name.toLowerCase().includes('color');
+                          
+                          if (isColor) {
                             return (
                               <button
                                 key={value}
                                 onClick={() => handleOptionChange(option.name, value)}
                                 className={cn(
-                                  "relative px-5 py-3 rounded-xl border-2 text-xs font-bold transition-all min-w-[3.5rem] flex flex-col items-center justify-center gap-0.5",
-                                  isSelected 
-                                    ? "border-primary bg-primary text-white shadow-md scale-105" 
-                                    : "border-black/5 bg-white dark:bg-black text-[#1d1d1f] dark:text-white hover:border-primary/50",
-                                  !isAvailable && "opacity-60 grayscale border-dashed"
+                                  "w-12 h-12 rounded-full border-2 transition-all p-1 relative flex items-center justify-center",
+                                  isSelected
+                                    ? "border-primary scale-110 shadow-md ring-2 ring-primary/20"
+                                    : "border-slate-200 dark:border-slate-800 hover:border-primary/50",
+                                  !isAvailable && "opacity-40"
                                 )}
-                              >
-                                <span>{value}</span>
-                                {!isAvailable && (
-                                  <span className="text-[7px] leading-none uppercase font-black text-rose-500 opacity-80">Out of Stock</span>
-                                )}
-                              </button>
+                                title={value + (!isAvailable ? " (Out of Stock)" : "")}
+                                >
+                                <div
+                                  className="w-full h-full rounded-full border border-black/10 flex items-center justify-center overflow-hidden"
+                                  style={{ backgroundColor: value.toLowerCase() }}
+                                >
+                                  {!isAvailable && (
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                      <div className="w-full h-[1px] bg-rose-500 rotate-45" />
+                                    </div>
+                                  )}
+                                </div>
+                                </button>
                             );
-                          })}
-                        </div>
+                          }
+                          
+                          return (
+                            <button
+                              key={value}
+                              onClick={() => handleOptionChange(option.name, value)}
+                              disabled={false} // Allow selecting out of stock to see it's out of stock
+                              className={cn(
+                                "relative px-4 py-3 rounded-xl border-2 text-sm font-bold transition-all min-w-[4.5rem] h-14 flex flex-col items-center justify-center gap-0.5 overflow-hidden",
+                                isSelected 
+                                  ? "border-primary bg-primary text-white shadow-md z-10" 
+                                  : "border-slate-200 dark:border-slate-800 bg-white dark:bg-black text-[#1d1d1f] dark:text-white hover:border-primary/50",
+                                !isAvailable && "opacity-60"
+                              )}
+                            >
+                              <span className="relative z-10">{value}</span>
+                              {!isAvailable && (
+                                <>
+                                  <span className="relative z-10 text-[7px] leading-none uppercase font-black text-rose-500">Sold Out</span>
+                                  <div className="absolute inset-0 z-0">
+                                    <div className="absolute top-1/2 left-0 w-full h-[1px] bg-rose-500/20 -rotate-45" />
+                                  </div>
+                                </>
+                              )}
+                            </button>
+                          );
+                        })}
                       </div>
-                    ))}
-                  </div>
-                )}
-                {selectedVariant?.description && (
-                  <div className="mb-6 p-4 rounded-2xl bg-primary/5 border border-primary/10 animate-in fade-in slide-in-from-top-2 duration-500">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <Sparkles className="h-3.5 w-3.5 text-primary" />
-                      <span className="text-[10px] font-black uppercase tracking-wider text-primary">Variant Details</span>
                     </div>
-                    <p className="text-xs font-medium text-[#1d1d1f] dark:text-[#f5f5f7] leading-relaxed">
-                      {selectedVariant.description}
-                    </p>
+                  ))}
+                </div>
+              )}
+              {selectedVariant?.description && (
+                <div className="mb-6 p-4 rounded-2xl bg-primary/5 border border-primary/10 animate-in fade-in slide-in-from-top-2 duration-500">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <Sparkles className="h-3.5 w-3.5 text-primary" />
+                    <span className="text-[10px] font-black uppercase tracking-wider text-primary">Variant Details</span>
                   </div>
-                )}
-                {(activeSectionPromo?.endDate || (isDiscounted && product.promo?.endDate)) && (
-                  <PromoCountdown endDate={activeSectionPromo?.endDate || convertToDateSafely(product.promo!.endDate)!} />
-                )}
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[11px] font-black uppercase tracking-[0.2em] text-primary dark:text-primary bg-gradient-to-r from-primary/20 to-transparent px-2.5 py-1 rounded-lg inline-w-max w-fit">Select Quantity</label>
-                    {isDiscounted && !isOutOfStock && today && (
-                      <div 
-                        className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider animate-pulse"
-                        style={{ color: settings?.flashHubColor || '#e11d48' }}
-                      >
-                        <Zap className="h-3 w-3 fill-current" />
-                        Flash Sale Live
-                      </div>
-                    )}
-                  </div>
-                  {currentStock <= 5 && currentStock > 0 && (
-                    <span className="text-[10px] font-bold text-[#e11d48] animate-pulse">Only {currentStock} left!</span>
+                  <p className="text-xs font-medium text-[#1d1d1f] dark:text-[#f5f5f7] leading-relaxed">
+                    {selectedVariant.description}
+                  </p>
+                </div>
+              )}
+              {(activeSectionPromo?.endDate || (isDiscounted && product.promo?.endDate)) && (
+                <PromoCountdown endDate={activeSectionPromo?.endDate || convertToDateSafely(product.promo!.endDate)!} />
+              )}
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[11px] font-black uppercase tracking-[0.2em] text-primary dark:text-primary bg-gradient-to-r from-primary/20 to-transparent px-2.5 py-1 rounded-lg inline-w-max w-fit">Select Quantity</label>
+                  {isDiscounted && !isOutOfStock && today && (
+                    <div 
+                      className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider animate-pulse"
+                      style={{ color: settings?.flashHubColor || '#e11d48' }}
+                    >
+                      <Zap className="h-3 w-3 fill-current" />
+                      Flash Sale Live
+                    </div>
                   )}
                 </div>
-                <div className="flex items-center gap-3 md:gap-4">
-                  <div className="flex items-center bg-gradient-to-r from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/15 border-2 border-primary/30 dark:border-primary/40 rounded-[18px] p-1.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.01)] dark:shadow-[inset_0_1px_2px_rgba(255,255,255,0.05)] gap-2">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-10 md:h-12 w-10 md:w-12 rounded-[14px] bg-gradient-to-br from-rose-500 to-red-600 dark:from-rose-600 dark:to-red-700 text-white hover:shadow-lg dark:hover:shadow-rose-500/50 active:scale-95 transition-all font-bold" 
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    >
-                      <Minus className="h-4 md:h-5 w-4 md:w-5" />
-                    </Button>
-                    <span className="w-10 md:w-12 text-center text-lg font-black tabular-nums tracking-tight text-primary dark:text-primary">{quantity}</span>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-10 md:h-12 w-10 md:w-12 rounded-[14px] bg-gradient-to-br from-emerald-500 to-green-600 dark:from-emerald-600 dark:to-green-700 text-white hover:shadow-lg dark:hover:shadow-emerald-500/50 active:scale-95 transition-all font-bold" 
-                      onClick={() => setQuantity(Math.min(currentStock, quantity + 1))}
-                    >
-                      <Plus className="h-4 md:h-5 w-4 md:w-5" />
-                    </Button>
-                  </div>
-                  <Button 
-                    onClick={isOutOfStock ? () => setIsOutOfDataDrawerOpen(true) : handleAddToCart} 
-                    style={isOutOfStock ? { backgroundColor: '#e2e8f0', color: '#94a3b8' } : buttonStyle}
-                    className={cn(
-                        "flex-1 font-semibold tracking-tight shadow-sm transition-all active:scale-[0.98] group", 
-                        buttonClasses,
-                        isOutOfStock && "cursor-pointer"
-                    )}
-                  >
-                    <AddToCartIcon className="mr-2 md:mr-3 h-4 md:h-5 w-4 md:w-5" /> {isOutOfStock ? "Out of Stock" : addToCartText}
-                  </Button>
-                </div>
-
-                <StockBar stock={currentStock} lowStockThreshold={lowStockThreshold} className="mt-4" />
-                
-                {filteredPaymentMethods.find(m => m.id === 'fast_checkout')?.config?.enableQuickPayButtons && !isOutOfStock && (
-                  <div className="pt-6 border-t border-black/[0.05] dark:border-white/[0.1]">
-                    <FastCheckoutButtons 
-                      storeId={storeId}
-                      amount={currentPrice * quantity}
-                      currency={settings?.currency || 'NGN'}
-                      availableMethods={filteredPaymentMethods}
-                      onSuccess={(orderId) => {}}
-                      onBeforeCheckout={async () => {
-                        try {
-                          const result = await fetch('/api/internal/create-express-order', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                              storeId,
-                              items: [{
-                                productId: product.id,
-                                quantity,
-                                price: currentPrice,
-                                variantId: selectedVariant?.id,
-                                selectedOptions: product.hasVariants ? selectedOptions : undefined,
-                              }],
-                              totalAmount: currentPrice * quantity,
-                              totalCost: (product.purchasePrice || 0) * quantity,
-                            })
-                          }).then(r => r.json());
-                          
-                          if (result.success) return result.orderId;
-                          throw new Error(result.error);
-                        } catch (e: any) {
-                          toast({ variant: 'destructive', title: 'Order Failed', description: e.message });
-                          return null;
-                        }
-                      }}
-                    />
-                  </div>
+                {currentStock <= 5 && currentStock > 0 && (
+                  <span className="text-[10px] font-bold text-[#e11d48] animate-pulse">Only {currentStock} left!</span>
                 )}
               </div>
-            )}
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="flex items-center bg-gradient-to-r from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/15 border-2 border-primary/30 dark:border-primary/40 rounded-[18px] p-1.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.01)] dark:shadow-[inset_0_1px_2px_rgba(255,255,255,0.05)] gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-10 md:h-12 w-10 md:w-12 rounded-[14px] bg-gradient-to-br from-rose-500 to-red-600 dark:from-rose-600 dark:to-red-700 text-white hover:shadow-lg dark:hover:shadow-rose-500/50 active:scale-95 transition-all font-bold disabled:opacity-30" 
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    disabled={isOutOfStock}
+                  >
+                    <Minus className="h-4 md:h-5 w-4 md:w-5" />
+                  </Button>
+                  <span className={cn("w-10 md:w-12 text-center text-lg font-black tabular-nums tracking-tight text-primary dark:text-primary", isOutOfStock && "opacity-30")}>{isOutOfStock ? 0 : quantity}</span>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-10 md:h-12 w-10 md:w-12 rounded-[14px] bg-gradient-to-br from-emerald-500 to-green-600 dark:from-emerald-600 dark:to-green-700 text-white hover:shadow-lg dark:hover:shadow-emerald-500/50 active:scale-95 transition-all font-bold disabled:opacity-30" 
+                    onClick={() => setQuantity(Math.min(currentStock, quantity + 1))}
+                    disabled={isOutOfStock}
+                  >
+                    <Plus className="h-4 md:h-5 w-4 md:w-5" />
+                  </Button>
+                </div>
+                <Button 
+                  onClick={isOutOfStock ? () => setIsOutOfDataDrawerOpen(true) : handleAddToCart} 
+                  style={isOutOfStock ? { backgroundColor: '#e2e8f0', color: '#94a3b8' } : buttonStyle}
+                  className={cn(
+                      "flex-1 font-semibold tracking-tight shadow-sm transition-all active:scale-[0.98] group", 
+                      buttonClasses,
+                      isOutOfStock && "cursor-pointer"
+                  )}
+                >
+                  <AddToCartIcon className="mr-2 md:mr-3 h-4 md:h-5 w-4 md:w-5" /> {isOutOfStock ? "Out of Stock" : addToCartText}
+                </Button>
+              </div>
+
+              <StockBar stock={currentStock} lowStockThreshold={lowStockThreshold} className="mt-4" />
+              
+              {filteredPaymentMethods.find(m => m.id === 'fast_checkout')?.config?.enableQuickPayButtons && !isOutOfStock && (
+                <div className="pt-6 border-t border-black/[0.05] dark:border-white/[0.1]">
+                  <FastCheckoutButtons 
+                    storeId={storeId}
+                    amount={currentPrice * quantity}
+                    currency={settings?.currency || 'NGN'}
+                    availableMethods={filteredPaymentMethods}
+                    onSuccess={(orderId) => {}}
+                    onBeforeCheckout={async () => {
+                      try {
+                        const result = await fetch('/api/internal/create-express-order', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            storeId,
+                            items: [{
+                              productId: product.id,
+                              quantity,
+                              price: currentPrice,
+                              variantId: selectedVariant?.id,
+                              selectedOptions: product.hasVariants ? selectedOptions : undefined,
+                            }],
+                            totalAmount: currentPrice * quantity,
+                            totalCost: (product.purchasePrice || 0) * quantity,
+                          })
+                        }).then(r => r.json());
+                        
+                        if (result.success) return result.orderId;
+                        throw new Error(result.error);
+                      } catch (e: any) {
+                        toast({ variant: 'destructive', title: 'Order Failed', description: e.message });
+                        return null;
+                      }
+                    }}
+                  />
+                </div>
+              )}
+            </div>
 
             <div className="flex gap-2 md:gap-4">
               <Button variant="outline" size="lg" className={cn("flex-1 h-12 md:h-14 rounded-full font-semibold tracking-tight transition-all", isInWishlist && "text-rose-500 border-rose-200 bg-rose-50 dark:bg-rose-950/20")} onClick={handleToggleWishlist}>
