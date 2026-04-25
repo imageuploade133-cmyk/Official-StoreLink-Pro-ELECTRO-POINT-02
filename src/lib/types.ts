@@ -653,6 +653,7 @@ export interface ProductVariant {
   stock: number;
   description?: string;
   imageUrl?: string;
+  additionalImageUrls?: string[];
   isActive: boolean;
 }
 

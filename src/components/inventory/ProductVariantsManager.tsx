@@ -70,6 +70,8 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
   const { settings } = useSettings();
   const [isUploading, setIsUploading] = useState<string | null>(null);
   const [isProcessingAi, setIsProcessingAi] = useState<string | null>(null);
+  const [showAdvancedDetails, setShowAdvancedDetails] = useState(false);
+  const [isManualMode, setIsManualMode] = useState(false);
 
   const hasVariants = watch('hasVariants');
   const variantOptions = watch('variantOptions') || [];
@@ -82,23 +84,29 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
   });
 
   const generateVariants = useCallback(() => {
+    if (isManualMode) return;
+
     const currentOptions = getValues('variantOptions') || [];
     const currentVariants = getValues('variants') || [];
     const baseSellingPrice = getValues('sellingPrice');
 
     if (currentOptions.length === 0) {
-      if (currentVariants.length > 0) setValue('variants', []);
+      const manualVariants = currentVariants.filter((v: any) => v.isManual);
+      if (JSON.stringify(manualVariants) !== JSON.stringify(currentVariants)) {
+        setValue('variants', manualVariants);
+      }
       return;
     }
 
-    // Check if all options have at least one value
     const validOptions = currentOptions.filter((opt: any) => opt.name && opt.values && opt.values.length > 0);
     if (validOptions.length === 0) {
-      if (currentVariants.length > 0) setValue('variants', []);
+      const manualVariants = currentVariants.filter((v: any) => v.isManual);
+      if (JSON.stringify(manualVariants) !== JSON.stringify(currentVariants)) {
+        setValue('variants', manualVariants);
+      }
       return;
     }
 
-    // Helper to generate combinations
     const combinations = (options: any[]): any[] => {
       if (options.length === 0) return [{}];
       const [first, ...rest] = options;
@@ -114,12 +122,13 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
 
     const newCombos = combinations(validOptions);
 
-    const newVariants = newCombos.map((combo) => {
+    const generatedVariants = newCombos.map((combo) => {
       const name = Object.entries(combo)
         .map(([key, val]) => val)
         .join(' / ');
       
       const existing = currentVariants.find((v: any) => {
+        if (v.isManual) return false;
         return Object.entries(combo).every(([key, val]) => v.options[key] === val) &&
                Object.keys(v.options).length === Object.keys(combo).length;
       });
@@ -134,17 +143,19 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
         sellingPrice: baseSellingPrice,
         stock: 0,
         imageUrl: '',
-        isActive: true
+        isActive: true,
+        isManual: false
       };
     });
 
-    // Only set value if it's different to avoid unnecessary re-renders
+    const manualVariants = currentVariants.filter((v: any) => v.isManual);
+    const newVariants = [...generatedVariants, ...manualVariants];
+
     if (JSON.stringify(newVariants) !== JSON.stringify(currentVariants)) {
       setValue('variants', newVariants);
     }
-  }, [setValue, getValues]);
+  }, [setValue, getValues, isManualMode]);
 
-  // Auto-generate variants when options change
   const optionsString = JSON.stringify(variantOptions);
   useEffect(() => {
     if (hasVariants) {
@@ -196,7 +207,6 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
         reader.readAsDataURL(file);
       });
 
-      // Optimize image before upload
       let optimizedDataUri = imageDataUri;
       try {
         optimizedDataUri = await compressAndResizeImage(
@@ -231,7 +241,6 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
     setIsProcessingAi(variantId);
 
     try {
-      // Convert image URL to data URI
       const response = await fetch(imageUrl);
       const blob = await response.blob();
       const imageDataUri = await new Promise<string>((resolve, reject) => {
@@ -241,10 +250,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
         reader.readAsDataURL(blob);
       });
 
-      // Remove background
       const result = await removeBackground({ imageDataUri });
-
-      // Upload the background-removed image to store it permanently
       const uploadResult = await uploadImage({ imageDataUri: result.display_url, storeId });
 
       setValue(`variants.${variantIndex}.imageUrl`, uploadResult.display_url);
@@ -283,6 +289,54 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
     });
   };
 
+  const handleAdditionalImageUpload = async (variantIndex: number, event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const variantId = variants[variantIndex]?.id;
+    if (!variantId) return;
+
+    setIsUploading(variantId);
+
+    try {
+      const newUrls = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        const reader = new FileReader();
+        const imageDataUri = await new Promise<string>((resolve, reject) => {
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+
+        let optimizedDataUri = imageDataUri;
+        try {
+          optimizedDataUri = await compressAndResizeImage(
+            imageDataUri, 
+            settings?.imageUploadQuality || 80, 
+            settings?.imageMaxWidth || 1920
+          );
+        } catch (optError) {
+          console.error("Optimization failed:", optError);
+        }
+
+        const result = await uploadImage({ imageDataUri: optimizedDataUri, storeId });
+        newUrls.push(result.display_url);
+      }
+      
+      const currentUrls = getValues(`variants.${variantIndex}.additionalImageUrls`) || [];
+      setValue(`variants.${variantIndex}.additionalImageUrls`, [...currentUrls, ...newUrls], { shouldDirty: true });
+      toast({ title: "Images Uploaded", description: `Added ${newUrls.length} images to variant gallery.` });
+    } catch (error: any) {
+      console.error("Upload failed:", error);
+      toast({ variant: "destructive", title: "Upload Failed", description: error.message || "Could not upload images." });
+    } finally {
+      setIsUploading(null);
+      if (event.target) event.target.value = '';
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card className={cn("border-none shadow-lg ring-1 ring-border transition-all", hasVariants && "ring-primary/20 bg-primary/5")}>
@@ -296,15 +350,33 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                 <SlidersHorizontal className="h-6 w-6" />
               </div>
               <div className="space-y-0.5">
-                <Label className="text-lg font-bold leading-none">Product Variants</Label>
+                <div className="flex items-center gap-2">
+                  <Label className="text-lg font-bold leading-none">Product Variants</Label>
+                  {hasVariants && (
+                    <Badge variant="outline" className="text-[10px] uppercase font-black px-2 py-0 h-5 bg-primary/5 border-primary/20 text-primary">Active</Badge>
+                  )}
+                </div>
                 <p className="text-sm text-muted-foreground">Enable this if the product comes in different sizes, colors, etc.</p>
               </div>
             </div>
-            <Switch 
-              checked={hasVariants} 
-              onCheckedChange={(checked) => setValue('hasVariants', checked)} 
-              className="data-[state=checked]:bg-primary"
-            />
+            <div className="flex items-center gap-4">
+              {hasVariants && (
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-xl border border-dashed mr-2">
+                  <Label htmlFor="manual-mode" className="text-[10px] font-black uppercase tracking-widest cursor-pointer">Manual Mode</Label>
+                  <Switch 
+                    id="manual-mode"
+                    checked={isManualMode} 
+                    onCheckedChange={setIsManualMode} 
+                    className="scale-75 data-[state=checked]:bg-primary"
+                  />
+                </div>
+              )}
+              <Switch 
+                checked={hasVariants} 
+                onCheckedChange={(checked) => setValue('hasVariants', checked)} 
+                className="data-[state=checked]:bg-primary"
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -372,7 +444,6 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                             
                             <div className="flex flex-wrap gap-2 min-h-[3rem] p-3 bg-muted/30 rounded-2xl border border-transparent focus-within:border-primary/20 transition-all">
                               {variantOptions[index]?.values?.map((val: string, valIndex: number) => {
-                                // Try to find if it's a color from suggestions
                                 const colorSuggestion = isColor ? SUGGESTIONS.color.find(c => c.name.toLowerCase() === val.toLowerCase()) : null;
                                 
                                 return (
@@ -399,20 +470,38 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                                 );
                               })}
                               
-                              <Input 
-                                placeholder="Add value..." 
-                                className="flex-1 min-w-[120px] h-8 bg-transparent border-none focus-visible:ring-0 p-0 text-sm"
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') {
-                                    e.preventDefault();
-                                    handleAddOptionValue(index, e.currentTarget.value);
-                                    e.currentTarget.value = '';
-                                  }
-                                }}
-                              />
+                              <div className="flex-1 flex items-center gap-2 group/input">
+                                <Input 
+                                  placeholder="Add value..." 
+                                  className="flex-1 min-w-[120px] h-8 bg-transparent border-none focus-visible:ring-0 p-0 text-sm"
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                      e.preventDefault();
+                                      handleAddOptionValue(index, e.currentTarget.value);
+                                      e.currentTarget.value = '';
+                                    }
+                                  }}
+                                  id={`option-input-${index}`}
+                                />
+                                <Button
+                                  type="button"
+                                  variant="secondary"
+                                  size="sm"
+                                  className="h-7 px-2 text-[10px] font-bold gap-1 opacity-0 group-focus-within/input:opacity-100 transition-opacity bg-primary/10 text-primary hover:bg-primary/20"
+                                  onClick={(e) => {
+                                    const input = document.getElementById(`option-input-${index}`) as HTMLInputElement;
+                                    if (input && input.value.trim()) {
+                                      handleAddOptionValue(index, input.value);
+                                      input.value = '';
+                                      input.focus();
+                                    }
+                                  }}
+                                >
+                                  <Plus className="h-3 w-3" /> Add
+                                </Button>
+                              </div>
                             </div>
 
-                            {/* Suggestions */}
                             {(isColor || isSize || isMaterial) && (
                               <div className="space-y-2">
                                 <p className="text-[10px] font-black uppercase tracking-tighter text-muted-foreground/60 px-1">Suggested {optionName}:</p>
@@ -470,16 +559,51 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                     <CheckCircle2 className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-black uppercase tracking-wider">Generated Variants</h3>
-                    <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-tight">{variants.length} unique combinations created</p>
+                    <h3 className="text-sm font-black uppercase tracking-wider">{isManualMode ? 'Custom' : 'Generated'} Variants</h3>
+                    <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-tight">{variants.length} unique items</p>
                   </div>
                 </div>
-                <div className="text-[10px] font-black uppercase text-primary/60 flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border shadow-sm">
-                  <AlertCircle className="h-3 w-3" />
-                  Prices synced with base product
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-xl border shadow-sm">
+                    <Label className="text-[10px] font-black uppercase text-muted-foreground cursor-pointer" htmlFor="show-advanced">Advanced Details</Label>
+                    <Switch id="show-advanced" checked={showAdvancedDetails} onCheckedChange={setShowAdvancedDetails} className="scale-75" />
+                  </div>
+
+                  {isManualMode && (
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        const currentVariants = getValues('variants') || [];
+                        const baseSellingPrice = getValues('sellingPrice');
+                        const newVariant = {
+                          id: crypto.randomUUID(),
+                          name: 'New Variant',
+                          options: {},
+                          sku: '',
+                          sellingPrice: baseSellingPrice,
+                          stock: 0,
+                          imageUrl: '',
+                          isActive: true,
+                          isManual: true
+                        };
+                        setValue('variants', [...currentVariants, newVariant], { shouldDirty: true });
+                        toast({ title: "Variant Added", description: "You can now configure its details." });
+                      }}
+                      className="h-9 gap-2 bg-primary text-white hover:bg-primary/90 rounded-xl"
+                    >
+                      <Plus className="h-4 w-4" /> Add Variant
+                    </Button>
+                  )}
+
+                  {!isManualMode && (
+                    <div className="text-[10px] font-black uppercase text-primary/60 flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border shadow-sm">
+                      <AlertCircle className="h-3 w-3" />
+                      Prices synced
+                    </div>
+                  )}
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {variants.map((variant: any, index: number) => (
                   <Card key={variant.id} className={cn(
@@ -589,9 +713,17 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
 
                     <CardContent className="p-5 space-y-4">
                       <div className="space-y-1">
-                        <h4 className="font-black text-base truncate leading-tight" title={variant.name}>{variant.name}</h4>
+                        {isManualMode || showAdvancedDetails ? (
+                          <Input 
+                            className="font-black text-base truncate leading-tight border-none p-0 h-auto bg-transparent focus-visible:ring-0"
+                            {...control.register(`variants.${index}.name` as const)}
+                          />
+                        ) : (
+                          <h4 className="font-black text-base truncate leading-tight" title={variant.name}>{variant.name}</h4>
+                        )}
+                        
                         <div className="flex flex-wrap gap-1">
-                          {Object.entries(variant.options).map(([key, val]: [string, any]) => (
+                          {Object.entries(variant.options || {}).map(([key, val]: [string, any]) => (
                             <span key={key} className="text-[10px] font-bold text-muted-foreground/60 uppercase">
                               {val}{' '}
                             </span>
@@ -620,6 +752,71 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                             />
                           </div>
                         </div>
+                        
+                        {showAdvancedDetails && (
+                          <div className="col-span-2 space-y-3 pt-2 animate-in fade-in slide-in-from-top-2">
+                            <Separator className="bg-muted/50" />
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="space-y-1">
+                                <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Color Attribute</Label>
+                                <Input 
+                                  placeholder="e.g. Red" 
+                                  className="h-10 text-xs bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl font-bold"
+                                  {...control.register(`variants.${index}.options.Color` as const)}
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Size Attribute</Label>
+                                <Input 
+                                  placeholder="e.g. XL" 
+                                  className="h-10 text-xs bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl font-bold"
+                                  {...control.register(`variants.${index}.options.Size` as const)}
+                                />
+                              </div>
+                              <div className="col-span-2 space-y-1">
+                                <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Internal Notes / Description</Label>
+                                <textarea 
+                                  placeholder="Extra details for this variant..." 
+                                  className="w-full min-h-[60px] p-3 text-xs bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl resize-none font-medium"
+                                  {...control.register(`variants.${index}.description` as const)}
+                                />
+                              </div>
+                              <div className="col-span-2 space-y-2">
+                                <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Additional Gallery Images</Label>
+                                <div className="flex flex-wrap gap-2">
+                                  {variant.additionalImageUrls?.map((url: string, imgIdx: number) => (
+                                    <div key={imgIdx} className="relative w-12 h-12 rounded-xl overflow-hidden border bg-muted">
+                                      <Image src={url} alt="" fill className="object-cover" unoptimized />
+                                      <button 
+                                        type="button"
+                                        className="absolute top-0 right-0 bg-destructive/80 text-white p-0.5 rounded-bl-lg hover:bg-destructive transition-colors"
+                                        onClick={() => {
+                                          const current = getValues(`variants.${index}.additionalImageUrls`) || [];
+                                          setValue(`variants.${index}.additionalImageUrls`, current.filter((_: any, i: number) => i !== imgIdx), { shouldDirty: true });
+                                        }}
+                                      >
+                                        <X className="h-2.5 w-2.5" />
+                                      </button>
+                                    </div>
+                                  ))}
+                                  <label className="w-12 h-12 flex flex-col items-center justify-center border-2 border-dashed border-muted-foreground/20 rounded-xl cursor-pointer hover:bg-primary/5 hover:border-primary/20 transition-all text-muted-foreground hover:text-primary">
+                                    <Plus className="h-4 w-4" />
+                                    <span className="text-[7px] font-black uppercase">Add</span>
+                                    <input 
+                                      type="file" 
+                                      multiple 
+                                      accept="image/*" 
+                                      className="hidden" 
+                                      onChange={(e) => handleAdditionalImageUpload(index, e)} 
+                                      disabled={isUploading === variant.id}
+                                    />
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
                         <div className="space-y-1">
                           <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Stock</Label>
                           <Input 
