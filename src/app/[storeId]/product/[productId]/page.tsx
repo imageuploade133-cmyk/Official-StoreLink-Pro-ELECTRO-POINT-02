@@ -287,7 +287,7 @@ export default function ProductDetailsPage() {
     return product.variants.some(v => 
       v.isActive && 
       v.stock > 0 &&
-      previousOptions.every(opt => v.options[opt.name] === selectedOptions[opt.name]) &&
+      previousOptions.every(opt => !selectedOptions[opt.name] || v.options[opt.name] === selectedOptions[opt.name]) &&
       v.options[optionName] === value
     );
   };
@@ -295,7 +295,19 @@ export default function ProductDetailsPage() {
   const handleOptionChange = (optionName: string, value: string) => {
     if (!product?.variantOptions || !product.variants) return;
 
-    const newOptions = { ...selectedOptions, [optionName]: value };
+    const isDeselecting = selectedOptions[optionName] === value;
+    const newOptions = { ...selectedOptions };
+    if (isDeselecting) {
+        delete newOptions[optionName];
+    } else {
+        newOptions[optionName] = value;
+    }
+
+    if (isDeselecting) {
+        setSelectedOptions(newOptions);
+        return;
+    }
+
     const optionIndex = product.variantOptions.findIndex(o => o.name === optionName);
     
     // For all subsequent options, we check if they are still valid/in-stock
@@ -304,11 +316,13 @@ export default function ProductDetailsPage() {
         const nextOpt = product.variantOptions[i];
         const currentVal = currentOptions[nextOpt.name];
         
+        if (!currentVal) continue; // Skip if not selected
+
         // Check if currentVal is still available given current choices for previous options
         const isStillAvailable = product.variants.some(v => 
             v.isActive && 
             v.stock > 0 &&
-            product.variantOptions!.slice(0, i).every(opt => v.options[opt.name] === currentOptions[opt.name]) &&
+            product.variantOptions!.slice(0, i).every(opt => !currentOptions[opt.name] || v.options[opt.name] === currentOptions[opt.name]) &&
             v.options[nextOpt.name] === currentVal
         );
 
@@ -318,7 +332,7 @@ export default function ProductDetailsPage() {
                 product.variants!.some(v => 
                     v.isActive && 
                     v.stock > 0 &&
-                    product.variantOptions!.slice(0, i).every(opt => v.options[opt.name] === currentOptions[opt.name]) &&
+                    product.variantOptions!.slice(0, i).every(opt => !currentOptions[opt.name] || v.options[opt.name] === currentOptions[opt.name]) &&
                     v.options[nextOpt.name] === vVal
                 )
             );
@@ -326,8 +340,8 @@ export default function ProductDetailsPage() {
             if (firstAvailable) {
                 currentOptions[nextOpt.name] = firstAvailable;
             } else {
-                // If nothing in stock, just keep first value
-                currentOptions[nextOpt.name] = nextOpt.values[0];
+                // If nothing in stock, we could deselect it
+                delete currentOptions[nextOpt.name];
             }
         }
     }
@@ -430,14 +444,22 @@ export default function ProductDetailsPage() {
     return effectivePrice;
   }, [selectedVariant, effectivePrice, product, today, category]);
 
-  const currentStock = selectedVariant ? selectedVariant.stock : (product?.stock || 0);
+  const currentStock = useMemo(() => {
+    if (selectedVariant) return selectedVariant.stock;
+    if (!product) return 0;
+    if (!product.hasVariants || !product.variants) return product.stock || 0;
+    
+    // If variants exist but none selected, show "unassigned" stock
+    const totalVariantStock = product.variants
+        .filter(v => v.isActive)
+        .reduce((acc, v) => acc + (Number(v.stock) || 0), 0);
+    return Math.max(0, (product.stock || 0) - totalVariantStock);
+  }, [product, selectedVariant]);
+
   const isCurrentlyOutOfStock = currentStock <= 0;
   const isEntireProductOutOfStock = useMemo(() => {
     if (!product) return true;
-    if (product.hasVariants && product.variants) {
-      return !product.variants.some(v => v.isActive && v.stock > 0);
-    }
-    return product.stock <= 0;
+    return (product.stock || 0) <= 0;
   }, [product]);
 
   // Update active image when selected variant changes
@@ -448,22 +470,12 @@ export default function ProductDetailsPage() {
     }
   }, [selectedVariant]);
 
-  // Initial selection
+  // Initial selection - DEACTIVATED to allow "Standard" product view by default
   const initializedRef = useRef(false);
   useEffect(() => {
     if (product && !initializedRef.current) {
-        if (product.hasVariants && product.variantOptions) {
-            const firstInStock = product.variants?.find(v => v.isActive && v.stock > 0);
-            if (firstInStock) {
-                setSelectedOptions(firstInStock.options);
-            } else {
-                const initial: { [key: string]: string } = {};
-                product.variantOptions.forEach(opt => {
-                    if (opt.values.length > 0) initial[opt.name] = opt.values[0];
-                });
-                setSelectedOptions(initial);
-            }
-        }
+        // We no longer auto-select a variant to allow the base/standard product to be shown first.
+        // This makes variants optional as requested.
         initializedRef.current = true;
     }
   }, [product]);
