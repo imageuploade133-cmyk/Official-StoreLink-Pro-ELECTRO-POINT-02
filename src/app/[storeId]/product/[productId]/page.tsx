@@ -999,27 +999,31 @@ export default function ProductDetailsPage() {
             <div className="space-y-3 md:space-y-4 p-4 md:p-5 bg-[#f5f5f7] dark:bg-[#1d1d1f] rounded-3xl transition-all duration-500 shadow-sm border-2 border-black/10 dark:border-white/20">
               {product.hasVariants && product.variantOptions && (
                 <div className="space-y-6 mb-6">
-                  {product.variantOptions.map((option, idx) => (
-                    <div key={option.name} className="space-y-3">
-                      <div className="flex justify-between items-center">
-                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#86868b] flex items-center gap-2">
-                          {option.name}
-                        </label>
-                        {selectedOptions[option.name] && (
-                          <Badge 
-                            variant="secondary" 
-                            className="h-6 px-3 rounded-full bg-primary/10 text-primary border-none text-[10px] font-black uppercase tracking-wider animate-in fade-in zoom-in duration-500"
-                          >
-                            {selectedOptions[option.name]}
-                          </Badge>
-                        )}
-                      </div>
+                  {product.variantOptions.map((option, idx) => {
+                    const isColor = option.name.toLowerCase().includes('color');
+                    const isSize = option.name.toLowerCase().includes('size');
+                    return (
+                      <div key={option.name} className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#86868b] flex items-center gap-2">
+                            {option.name}
+                          </label>
+                          {selectedOptions[option.name] && (
+                            <Badge 
+                              variant="secondary" 
+                              className={cn(
+                                "h-6 px-3 rounded-full border-none text-[10px] font-black uppercase tracking-wider animate-in fade-in zoom-in duration-500",
+                                (isSize && !isColor) ? "bg-white text-black shadow-sm" : "bg-primary/10 text-primary"
+                              )}
+                            >
+                              {selectedOptions[option.name]}
+                            </Badge>
+                          )}
+                        </div>
                       <div className="flex flex-wrap gap-2 md:gap-3">
                         {option.values.map((value) => {
                           const isSelected = selectedOptions[option.name] === value;
                           const isAvailable = isOptionValueAvailable(option.name, value);
-                          const isColor = option.name.toLowerCase().includes('color');
-                          const isSize = option.name.toLowerCase().includes('size');
                           const useRound = isColor || isSize;
                           
                           // Shorten text if too long (Robust truncation)
@@ -1047,7 +1051,7 @@ export default function ProductDetailsPage() {
                                 <div
                                   className={cn(
                                     "w-full h-full rounded-full border border-black/5 flex flex-col items-center justify-center overflow-hidden relative px-2.5 transition-all duration-300",
-                                    !isColor && (isSelected ? "bg-primary" : "bg-white dark:bg-black/40")
+                                    !isColor && (isSelected ? (isSize ? "bg-white shadow-inner" : "bg-primary") : (isSize ? "bg-white" : "bg-white dark:bg-black/40"))
                                   )}
                                   style={{ 
                                     backgroundColor: isColor ? colorValue : undefined,
@@ -1055,9 +1059,9 @@ export default function ProductDetailsPage() {
                                 >
                                   <span className={cn(
                                     "text-[9px] font-black uppercase tracking-tight truncate relative z-10 transition-colors duration-300",
-                                    !isColor && (isSelected ? "" : "text-black dark:text-white")
+                                    !isColor && (isSelected ? (isSize ? "text-black" : "") : (isSize ? "text-black" : "text-black dark:text-white"))
                                   )}
-                                  style={{ color: (isColor || isSelected) ? textColor : undefined }}
+                                  style={{ color: (isColor) ? textColor : (isSize ? "black" : (isSelected ? textColor : undefined)) }}
                                   >
                                     {displayValue}
                                   </span>
@@ -1102,8 +1106,9 @@ export default function ProductDetailsPage() {
                         })}
                       </div>
                     </div>
-                  ))}
-                </div>
+                  );
+                })}
+              </div>
               )}
               {selectedVariant?.description && (
                 <div className="mb-6 p-4 rounded-2xl bg-primary/5 border border-primary/10 animate-in fade-in slide-in-from-top-2 duration-500">

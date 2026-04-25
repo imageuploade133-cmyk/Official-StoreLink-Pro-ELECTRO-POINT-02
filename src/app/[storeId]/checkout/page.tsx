@@ -804,7 +804,13 @@ export default function CheckoutPage() {
                           {item.selectedOptions && (
                             <div className="flex flex-wrap gap-1 mt-0.5">
                               {Object.entries(item.selectedOptions).map(([key, val]) => (
-                                <span key={key} className="text-[9px] uppercase font-bold text-muted-foreground border rounded px-1">
+                                <span 
+                                  key={key} 
+                                  className={cn(
+                                    "text-[9px] uppercase font-bold px-1 border rounded",
+                                    key.toLowerCase().includes('size') ? "bg-white text-black border-black/10 shadow-sm" : "text-muted-foreground"
+                                  )}
+                                >
                                   {key}: {val}
                                 </span>
                               ))}
