@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import * as React from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -74,7 +75,7 @@ export function ProductImageGallery({
     setIsUploading(true);
     
     // Create local previews for immediate feedback
-    const newPending = Array.from(files).map((file, idx) => ({
+    const newPending = Array.from(files).map((file: File, idx) => ({
       id: `pending-${Date.now()}-${idx}`,
       url: URL.createObjectURL(file),
       file
@@ -254,6 +255,24 @@ export function ProductImageGallery({
             </p>
         </div>
         <div className="flex gap-2">
+          {allImages.length > 0 && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="rounded-full h-10 px-4 font-bold gap-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
+              onClick={() => {
+                if (window.confirm('Clear all images from this product?')) {
+                  onPrimaryChange('');
+                  onAdditionalChange([]);
+                }
+              }}
+              disabled={disabled || isUploading}
+            >
+              <Trash2 className="h-4 w-4" />
+              <span className="hidden sm:inline">Clear All</span>
+            </Button>
+          )}
           <Button asChild variant="outline" size="sm" className="rounded-full h-10 px-6 font-bold gap-2 flex-1" disabled={disabled || isUploading}>
             <label className="cursor-pointer w-full">
               {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
@@ -317,8 +336,8 @@ export function ProductImageGallery({
           <div 
             key={item.url + index} 
             className={cn(
-                "group relative aspect-square rounded-[1.5rem] overflow-hidden border-2 transition-all duration-300 shadow-lg",
-                item.isPrimary ? "border-primary scale-105 z-10 ring-4 ring-primary/10" : "border-muted bg-muted grayscale-[0.2] hover:grayscale-0"
+                "group relative aspect-square rounded-[2rem] overflow-hidden border-2 transition-all duration-500 shadow-xl",
+                item.isPrimary ? "border-primary scale-105 z-10 ring-8 ring-primary/10" : "border-transparent bg-muted hover:border-primary/50"
             )}
           >
             <Image 
@@ -338,43 +357,43 @@ export function ProductImageGallery({
                     {item.isPrimary ? 'Primary' : 'Gallery'}
                 </Badge>
 
-                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex gap-1 transition-opacity">
                     <Button
                         type="button"
                         variant="secondary"
                         size="icon"
-                        className="h-6 w-6 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600"
+                        className="h-7 w-7 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 shadow-sm border border-white/20"
                         onClick={() => handleRemoveBackground(item.url, index)}
                         disabled={disabled || isUploading}
                         title="Remove Background (Make Mockup)"
                     >
-                        <Wand2 className="h-3 w-3" />
+                        <Wand2 className="h-3.5 w-3.5" />
                     </Button>
                     <Button
                         type="button"
                         variant="secondary"
                         size="icon"
-                        className="h-6 w-6 rounded-full bg-white/90 text-black hover:bg-white"
+                        className="h-7 w-7 rounded-full bg-white/90 text-black hover:bg-white shadow-sm border border-black/5"
                         onClick={() => setPreviewUrl(item.url)}
                         title="Preview"
                     >
-                        <Maximize2 className="h-3 w-3" />
+                        <Maximize2 className="h-3.5 w-3.5" />
                     </Button>
                     <Button
                         type="button"
                         variant="destructive"
                         size="icon"
-                        className="h-6 w-6 rounded-full"
+                        className="h-7 w-7 rounded-full shadow-lg border border-white/20"
                         onClick={() => removeImage(index)}
                         disabled={disabled || isUploading}
                         title="Remove"
                     >
-                        <Trash2 className="h-3 w-3" />
+                        <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                 </div>
             </div>
 
-            <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-between gap-1">
+            <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/90 via-black/40 to-transparent transition-opacity flex items-center justify-between gap-1">
                 <div className="flex gap-1">
                     <Button 
                         type="button" 

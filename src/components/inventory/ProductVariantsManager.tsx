@@ -523,7 +523,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                                     <button 
                                       type="button" 
                                       onClick={() => handleRemoveOptionValue(index, valIndex)}
-                                      className="hover:bg-destructive/10 hover:text-destructive rounded-full p-0.5 transition-colors"
+                                      className="text-destructive hover:bg-destructive/10 rounded-full p-0.5 transition-colors"
                                     >
                                       <X className="h-3 w-3" />
                                     </button>
@@ -752,7 +752,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                           type="button" 
                           variant="ghost" 
                           size="icon" 
-                          className="h-8 w-8 rounded-full bg-white/20 backdrop-blur-md text-white hover:bg-destructive hover:text-white transition-all shadow-sm"
+                          className="h-8 w-8 rounded-full bg-destructive text-white hover:bg-destructive/90 transition-all shadow-sm"
                           onClick={() => handleRemoveVariant(index)}
                           disabled={isUploading === variant.id || isProcessingAi === variant.id}
                         >
