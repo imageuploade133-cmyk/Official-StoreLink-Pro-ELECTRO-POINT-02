@@ -246,8 +246,10 @@ export default function RestockNowPage() {
         const productDoc = await transaction.get(productRef);
         if (!productDoc.exists()) throw new Error('Product not found');
         
-        const currentStock = productDoc.data().stock || 0;
-        const newStock = currentStock + restockQuantity;
+        const restockQtyNum = Number(restockQuantity) || 0;
+        const currentStock = Number(productDoc.data().stock) || 0;
+        const newStock = currentStock + restockQtyNum;
+        let currentCalculatedNewStock = newStock;
 
         let variantName = '';
         if (selectedVariantId && productDoc.data().hasVariants && productDoc.data().variants) {
@@ -255,29 +257,35 @@ export default function RestockNowPage() {
           const variantIndex = variants.findIndex((v: any) => v.id === selectedVariantId);
           if (variantIndex !== -1) {
             const variant = { ...variants[variantIndex] };
-            variant.stock += restockQuantity;
-            if (costPrice > 0) variant.sellingPrice = variant.sellingPrice; // Keep current price or update? usually keep.
+            variant.stock = (Number(variant.stock) || 0) + restockQtyNum;
             variants[variantIndex] = variant;
             variantName = ` (${variant.name})`;
 
+            // Recalculate total stock from all variants to stay perfectly in sync
+            const totalStock = variants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
+
             transaction.update(productRef, {
               variants,
-              stock: newStock,
-              purchasePrice: costPrice,
+              stock: totalStock,
+              purchasePrice: Number(costPrice) || 0,
               updatedAt: serverTimestamp()
             });
+            
+            // Update local calculation for audit and state
+            currentCalculatedNewStock = totalStock;
           } else {
+            // Fallback if variant not found but was selected (should not happen)
             transaction.update(productRef, {
               stock: newStock,
-              purchasePrice: costPrice,
+              purchasePrice: Number(costPrice) || 0,
               updatedAt: serverTimestamp()
             });
           }
         } else {
-          // Update product stock
+          // Update product stock directly
           transaction.update(productRef, {
             stock: newStock,
-            purchasePrice: costPrice, // Update last purchase price
+            purchasePrice: Number(costPrice) || 0,
             updatedAt: serverTimestamp()
           });
         }
@@ -288,9 +296,9 @@ export default function RestockNowPage() {
           store_id: currentStoreId,
           productId: selectedProduct.id,
           productName: selectedProduct.name + variantName,
-          quantity: restockQuantity,
-          costPricePerUnit: costPrice,
-          totalCost: restockQuantity * costPrice,
+          quantity: restockQtyNum,
+          costPricePerUnit: Number(costPrice) || 0,
+          totalCost: restockQtyNum * (Number(costPrice) || 0),
           supplierName: supplierName || null,
           supplierContactName: supplierContactName || null,
           supplierPhone: supplierPhone || null,
@@ -312,18 +320,22 @@ export default function RestockNowPage() {
           type: 'RESTOCK',
           referenceId: restockRef.id,
           beforeStock: currentStock,
-          afterStock: newStock,
-          change: restockQuantity,
+          afterStock: currentCalculatedNewStock,
+          change: restockQtyNum,
           staffId: user.uid,
           staffName: user.displayName || user.email || 'Staff',
           timestamp: serverTimestamp()
         });
-        });
+      });
 
-        toast({ title: 'Stock Updated', description: `Successfully added ${restockQuantity} units to "${selectedProduct.name}".` });
+      toast({ title: 'Stock Updated', description: `Successfully added ${restockQuantity} units to "${selectedProduct.name}".` });
 
       // Refresh product data
-      setSelectedProduct({ ...selectedProduct, stock: (selectedProduct.stock || 0) + restockQuantity, purchasePrice: costPrice });
+      setSelectedProduct({ 
+        ...selectedProduct, 
+        stock: currentCalculatedNewStock, 
+        purchasePrice: Number(costPrice) || 0 
+      });
       setRestockQuantity(1);
       setSupplierName('');
       setSupplierContactName('');
