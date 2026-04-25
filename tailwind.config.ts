@@ -131,6 +131,10 @@ export default {
           from: { width: '100%' },
           to: { width: '0%' },
         },
+        'blink': {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -140,6 +144,7 @@ export default {
         'spin-slow': 'spin 3s linear infinite',
         'scan-move': 'scan-move 2s ease-in-out infinite',
         'shrink': 'shrink linear forwards',
+        'blink': 'blink 1s step-start infinite',
       },
     },
   },
