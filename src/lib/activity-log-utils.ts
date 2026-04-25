@@ -1,5 +1,5 @@
 import { addDoc, collection, serverTimestamp, type Firestore } from 'firebase/firestore';
-import type { ActivityLog } from './types';
+import type { ActivityLog } from './types'; 
 
 interface LogActivityParams {
     user: { uid: string; displayName: string | null; email?: string | null };
