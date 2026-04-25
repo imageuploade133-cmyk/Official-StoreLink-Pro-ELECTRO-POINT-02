@@ -465,7 +465,16 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                           variant="ghost" 
                           size="icon" 
                           className="absolute top-4 right-4 h-8 w-8 rounded-full bg-destructive/10 text-destructive hover:bg-destructive hover:text-white transition-all opacity-0 group-hover:opacity-100"
-                          onClick={() => removeOption(index)}
+                          onClick={() => {
+                            removeOption(index);
+                            if (optionFields.length === 1) {
+                              const currentVariants = getValues('variants') || [];
+                              const hasManualVariants = currentVariants.some((v: any) => v.isManual);
+                              if (!hasManualVariants) {
+                                setValue('hasVariants', false, { shouldDirty: true });
+                              }
+                            }
+                          }}
                         >
                           <X className="h-4 w-4" />
                         </Button>
