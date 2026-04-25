@@ -482,7 +482,7 @@ export function ProductForm({
 
   // Sync total stock if variants exist
   useEffect(() => {
-    if (watchHasVariants) {
+    if (watchHasVariants && watchVariants.length > 0) {
       const totalStock = watchVariants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
       const currentStock = form.getValues("stock");
       if (totalStock !== currentStock) {
