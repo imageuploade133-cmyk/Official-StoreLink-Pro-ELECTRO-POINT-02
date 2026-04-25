@@ -8,7 +8,19 @@ import { doc, getDoc, addDoc, collection, serverTimestamp } from 'firebase/fires
 
 const GLOBAL_IMGBB_API_KEY = '0d1a390cb385b632d952db08a3479005';
 
+// Server-side cache for upload configs to reduce Firestore reads
+const configCache: Record<string, { apiKey: string; storeName: string; timestamp: number }> = {};
+const databaseIdCache: Record<string, { databaseId: string; timestamp: number }> = {};
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
 export async function getUploadConfig(storeId?: string) {
+    const cacheKey = storeId || 'GLOBAL';
+    const now = Date.now();
+
+    if (configCache[cacheKey] && (now - configCache[cacheKey].timestamp < CACHE_TTL)) {
+        return configCache[cacheKey];
+    }
+
     const { firestore } = initializeFirebase();
     let apiKey = GLOBAL_IMGBB_API_KEY;
     let storeName = 'Default Store';
@@ -55,7 +67,9 @@ export async function getUploadConfig(storeId?: string) {
         console.warn('Error during Firestore lookups in getUploadConfig:', error);
     }
 
-    return { apiKey, storeName };
+    const result = { apiKey, storeName };
+    configCache[cacheKey] = { ...result, timestamp: now };
+    return result;
 }
 
 export async function logUploadMetadata(data: {
@@ -70,14 +84,23 @@ export async function logUploadMetadata(data: {
     try {
         // If we need to check for a separate database
         if (data.storeId && data.storeId !== 'GLOBAL') {
-            const storeRef = doc(firestore, 'stores', data.storeId);
-            const storeSnap = await getDoc(storeRef);
-            if (storeSnap.exists()) {
-                const databaseId = storeSnap.data()?.databaseId;
-                if (databaseId && databaseId !== '(default)') {
-                    const { getFirestore } = await import('firebase/firestore');
-                    targetFirestore = getFirestore(firebaseApp, databaseId);
+            const now = Date.now();
+            let databaseId = null;
+
+            if (databaseIdCache[data.storeId] && (now - databaseIdCache[data.storeId].timestamp < CACHE_TTL)) {
+                databaseId = databaseIdCache[data.storeId].databaseId;
+            } else {
+                const storeRef = doc(firestore, 'stores', data.storeId);
+                const storeSnap = await getDoc(storeRef);
+                if (storeSnap.exists()) {
+                    databaseId = storeSnap.data()?.databaseId || '(default)';
+                    databaseIdCache[data.storeId] = { databaseId, timestamp: now };
                 }
+            }
+
+            if (databaseId && databaseId !== '(default)') {
+                const { getFirestore } = await import('firebase/firestore');
+                targetFirestore = getFirestore(firebaseApp, databaseId);
             }
         }
 
