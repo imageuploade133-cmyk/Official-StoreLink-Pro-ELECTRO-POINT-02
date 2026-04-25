@@ -55,7 +55,7 @@ import AccessDenied from '@/components/staff-management/AccessDenied';
 
 export default function RestockNowPage() {
   const { user, permissions, isLoading: authLoading, store, staffMember } = useAuth();
-  const { settings, isLoading: settingsLoading } = useSettings();
+  const { settings, isLoadingSettings: settingsLoading } = useSettings();
   const { toast } = useToast();
   const firestore = useFirestore();
 
@@ -89,6 +89,7 @@ export default function RestockNowPage() {
     try {
       const trimmedTerm = term.trim();
       const lowerTerm = trimmedTerm.toLowerCase();
+      let autoSelectVariantId: string | null = null;
 
       // Try exact barcode match first
       const barcodeQ = query(
@@ -118,18 +119,30 @@ export default function RestockNowPage() {
       // Also search within variants for barcode/SKU match
       const allProductsQ = query(
         collection(firestore, 'products'),
-        where('store_id', '==', currentStoreId)
+        where('store_id', '==', currentStoreId),
+        where('hasVariants', '==', true)
       );
       const allProductsSnap = await getDocs(allProductsQ);
       allProductsSnap.docs.forEach(d => {
         const p = { id: d.id, ...d.data() } as Product;
         if (p.hasVariants && p.variants) {
-          const match = p.variants.some(v => 
+          const matchingVariant = p.variants.find(v => 
             v.barcode === trimmedTerm || 
-            v.sku?.toLowerCase() === lowerTerm ||
-            v.name.toLowerCase().includes(lowerTerm)
+            v.sku?.toLowerCase() === lowerTerm
           );
-          if (match) productsMap.set(p.id, p);
+          
+          if (matchingVariant) {
+            productsMap.set(p.id, p);
+            // If this is the only product so far, we can track the variant
+            if (productsMap.size === 1) {
+              autoSelectVariantId = matchingVariant.id;
+            } else {
+              autoSelectVariantId = null;
+            }
+          } else {
+            const partialMatch = p.variants.some(v => v.name.toLowerCase().includes(lowerTerm));
+            if (partialMatch) productsMap.set(p.id, p);
+          }
         }
       });
 
@@ -137,7 +150,7 @@ export default function RestockNowPage() {
       setFoundProducts(products);
       
       if (products.length === 1) {
-        handleSelectProduct(products[0]);
+        handleSelectProduct(products[0], autoSelectVariantId);
       } else if (products.length === 0) {
         toast({ title: 'No Products Found', description: `Could not find any product matching "${trimmedTerm}".` });
       }
@@ -149,9 +162,19 @@ export default function RestockNowPage() {
     }
   }, [firestore, currentStoreId, toast]);
 
-  const handleSelectProduct = (product: Product) => {
+  const handleSelectProduct = (product: Product, variantId: string | null = null) => {
     setSelectedProduct(product);
-    setSelectedVariantId(null);
+    setSelectedVariantId(variantId);
+    
+    // If a variant is selected, use its selling price if available
+    let price = product.purchasePrice || 0;
+    if (variantId && product.variants) {
+      const variant = product.variants.find(v => v.id === variantId);
+      if (variant && variant.sellingPrice) {
+        // We use purchasePrice for costPrice state usually, but let's stay consistent with what the user expects
+      }
+    }
+    
     setCostPrice(product.purchasePrice || 0);
     setFoundProducts([]);
     setSearchTerm('');
@@ -242,7 +265,7 @@ export default function RestockNowPage() {
       const restockRef = doc(collection(firestore, 'restockEntries'));
       const auditRef = doc(collection(firestore, 'stockAudit'));
       
-      await runTransaction(firestore, async (transaction) => {
+      const finalNewStock = await runTransaction(firestore, async (transaction) => {
         const productDoc = await transaction.get(productRef);
         if (!productDoc.exists()) throw new Error('Product not found');
         
@@ -289,7 +312,7 @@ export default function RestockNowPage() {
             updatedAt: serverTimestamp()
           });
         }
-
+        
         // Create restock entry
         const restockData: RestockEntry = {
           id: restockRef.id,
@@ -326,16 +349,29 @@ export default function RestockNowPage() {
           staffName: user.displayName || user.email || 'Staff',
           timestamp: serverTimestamp()
         });
+
+        return currentCalculatedNewStock;
       });
 
       toast({ title: 'Stock Updated', description: `Successfully added ${restockQuantity} units to "${selectedProduct.name}".` });
 
       // Refresh product data
-      setSelectedProduct({ 
-        ...selectedProduct, 
-        stock: currentCalculatedNewStock, 
-        purchasePrice: Number(costPrice) || 0 
-      });
+      if (selectedProduct) {
+        const restockQtyNum = Number(restockQuantity) || 0;
+        const updatedProduct = { ...selectedProduct };
+        updatedProduct.stock = finalNewStock;
+        updatedProduct.purchasePrice = Number(costPrice) || 0;
+        
+        if (selectedVariantId && updatedProduct.variants) {
+          updatedProduct.variants = updatedProduct.variants.map(v => {
+            if (v.id === selectedVariantId) {
+              return { ...v, stock: (Number(v.stock) || 0) + restockQtyNum };
+            }
+            return v;
+          });
+        }
+        setSelectedProduct(updatedProduct);
+      }
       setRestockQuantity(1);
       setSupplierName('');
       setSupplierContactName('');

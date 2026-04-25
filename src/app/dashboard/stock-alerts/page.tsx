@@ -49,7 +49,7 @@ export default function StockAlertsPage() {
   const { permissions, isLoading: authLoading, user, store, staffMember } = useAuth();
   const firestore = useFirestore();
   const { toast } = useToast();
-  const { settings, isLoading: isLoadingSettings } = useSettings();
+  const { settings, isLoadingSettings } = useSettings();
 
   const currentStoreId = React.useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
@@ -258,30 +258,53 @@ export default function StockAlertsPage() {
           if (!productDoc.exists()) throw new Error("Product document does not exist!");
           
           const currentProductData = productDoc.data() as Product;
-          const newStockLevel = (currentProductData.stock || 0) + values.quantity;
+          const restockQtyNum = Number(values.quantity) || 0;
+          let newStockLevel = (currentProductData.stock || 0) + restockQtyNum;
           
-          if (newStockLevel < 0 && values.quantity < 0) {
-            throw new Error(`Cannot deduct ${-values.quantity} units. Current stock is only ${currentProductData.stock}.`);
+          if (newStockLevel < 0 && restockQtyNum < 0) {
+            throw new Error(`Cannot deduct ${-restockQtyNum} units. Current stock is only ${currentProductData.stock}.`);
           }
 
           const restockRef = doc(collection(firestore, 'restockEntries'));
           const auditRef = doc(collection(firestore, 'stockAudit'));
 
-          transaction.update(productRef, {
-            stock: newStockLevel,
+          let variantName = '';
+          const updateData: any = {
             updatedAt: Timestamp.now(),
             purchasePrice: (typeof values.newPurchasePrice === 'number' && values.newPurchasePrice >= 0) ? values.newPurchasePrice : currentProductData.purchasePrice,
             sellingPrice: (typeof values.newSellingPrice === 'number' && values.newSellingPrice >= 0) ? values.newSellingPrice : currentProductData.sellingPrice,
-          });
+          };
+
+          if (values.variantId && currentProductData.hasVariants && currentProductData.variants) {
+            const variants = [...currentProductData.variants];
+            const variantIndex = variants.findIndex((v: any) => v.id === values.variantId);
+            if (variantIndex !== -1) {
+              const variant = { ...variants[variantIndex] };
+              variant.stock = (Number(variant.stock) || 0) + restockQtyNum;
+              variants[variantIndex] = variant;
+              variantName = ` (${variant.name})`;
+              
+              // Recalculate total stock from all variants
+              newStockLevel = variants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
+              
+              updateData.variants = variants;
+              updateData.stock = newStockLevel;
+            } else {
+              updateData.stock = newStockLevel;
+            }
+          } else {
+            updateData.stock = newStockLevel;
+          }
+
+          transaction.update(productRef, updateData);
 
           transaction.set(restockRef, {
             productId: values.productId,
-            productName: currentProductData.name,
-            quantity: values.quantity,
+            productName: currentProductData.name + variantName,
+            quantity: restockQtyNum,
             costPricePerUnit: values.costPricePerUnit,
-            totalCost: values.quantity > 0 ? values.quantity * values.costPricePerUnit : 0,
+            totalCost: restockQtyNum > 0 ? restockQtyNum * values.costPricePerUnit : 0,
             supplierName: values.supplierName || null,
-            supplierBusinessName: values.supplierBusinessName || null,
             supplierContactName: values.supplierContactName || null,
             supplierPhone: values.supplierPhone || null,
             supplierLocation: values.supplierLocation || null,
@@ -296,12 +319,13 @@ export default function StockAlertsPage() {
 
           transaction.set(auditRef, {
             productId: values.productId,
-            productName: currentProductData.name,
+            productName: currentProductData.name + variantName,
+            variantId: values.variantId || null,
             type: 'RESTOCK',
             referenceId: restockRef.id,
             beforeStock: currentProductData.stock || 0,
             afterStock: newStockLevel,
-            change: values.quantity,
+            change: restockQtyNum,
             staffId: user.uid,
             staffName: user.displayName || user.email || 'Staff',
             timestamp: serverTimestamp(),
