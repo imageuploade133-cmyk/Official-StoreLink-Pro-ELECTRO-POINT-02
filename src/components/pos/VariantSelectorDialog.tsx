@@ -148,7 +148,7 @@ export function VariantSelectorDialog({
                 
                 if (useRound) {
                   const colorValue = value.toLowerCase();
-                  const textColor = isColor ? getContrastColor(colorValue) : (isSelected ? 'white' : undefined);
+                  const textColor = isColor ? getContrastColor(colorValue) : (isSelected ? 'white' : 'black');
 
                   return (
                     <button
@@ -169,7 +169,7 @@ export function VariantSelectorDialog({
                       >
                          <span className={cn(
                            "text-[8px] font-black uppercase truncate relative z-10",
-                           !isColor && (isSelected ? "text-white" : "text-foreground")
+                           !isColor && (isSelected ? "text-white" : "text-black dark:text-white")
                          )}
                          style={{ color: isColor ? textColor : undefined }}
                          >
