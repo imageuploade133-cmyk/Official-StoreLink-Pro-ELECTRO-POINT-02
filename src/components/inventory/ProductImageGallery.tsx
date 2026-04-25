@@ -265,7 +265,7 @@ export function ProductImageGallery({
       <div className="flex items-center justify-between">
         <div>
             <Label className="text-sm font-black uppercase tracking-widest text-primary flex items-center gap-2">
-            <ImageIcon className="h-4 w-4" /> Visual Catalog Management
+            <ImageIcon className="h-4 w-4" /> Visual Catalog Management <span className="text-destructive">*</span>
             </Label>
             <p className="text-[10px] text-muted-foreground font-bold mt-1 uppercase tracking-tighter">
                 First image is your Hero. Max size: {settings?.imageMaxFileSizeMb || 5}MB.
