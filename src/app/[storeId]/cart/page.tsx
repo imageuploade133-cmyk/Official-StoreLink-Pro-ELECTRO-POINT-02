@@ -25,6 +25,7 @@ import { cn, convertToDateSafely } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { safeSessionStorage } from '@/lib/storage-utils';
 import { useAds } from '@/contexts/ad-context';
+import { ProductImage } from '@/components/ProductImage';
 
 import { FastCheckoutButtons } from '@/components/store/FastCheckoutButtons';
 
@@ -313,11 +314,10 @@ export default function CartPage() {
                                       {realTimeCartItems.map(item => (
                                           <div key={item.id} className={cn("flex flex-col sm:flex-row sm:items-center p-6 gap-6", (item.isUnavailable || item.isOutOfStock) && "bg-destructive/5")}>
                                               <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 border">
-                                                  <Image
-                                                      src={item.imageUrl || `https://placehold.co/100x100?text=${item.name.charAt(0)}`}
+                                                  <ProductImage
+                                                      src={item.imageUrl}
                                                       alt={item.name}
-                                                      fill
-                                                      className="object-cover"
+                                                      minimal
                                                   />
                                               </div>
                                               <div className="flex-grow space-y-1">

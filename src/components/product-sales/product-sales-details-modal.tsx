@@ -1,11 +1,10 @@
 "use client"
-
 import React from "react"
-import Image from "next/image"
 import { format } from "date-fns"
 import { Eye, X, Package, Info, CalendarDays, UserCircle, DollarSign, Hash, TrendingUp, Boxes } from "lucide-react"
 
 import type { SaleTransaction, StaffMember, AggregatedProductSale as AggregatedProductSaleType } from "@/lib/types"
+import { ProductImage } from "@/components/ProductImage"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -108,13 +107,10 @@ export function ProductSalesDetailsModal({
             <Card>
                 <CardContent className="pt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="flex flex-col items-center md:items-start md:col-span-1">
-                         <Image
-                            src={product.imageUrl || defaultProductImageUrl}
+                         <ProductImage
+                            src={product.imageUrl}
                             alt={product.name}
-                            width={120}
-                            height={120}
-                            className="rounded-lg object-cover aspect-square border-2 shadow-sm"
-                            data-ai-hint={product.dataAiHint || product.name.toLowerCase().split(' ').slice(0,2).join(' ')}
+                            containerClassName="w-[120px] h-[120px] rounded-lg border-2 shadow-sm"
                         />
                         <div className="text-sm mt-4 text-center md:text-left">
                             {product.sku && <p><span className="font-medium text-muted-foreground">SKU:</span> {product.sku}</p>}

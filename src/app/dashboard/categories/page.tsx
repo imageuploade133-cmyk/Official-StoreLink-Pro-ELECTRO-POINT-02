@@ -27,6 +27,7 @@ import { useDoc, useFirestore } from '@/firebase';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { useAuth } from '@/contexts/auth-context';
 import type { Settings, Product, Category } from '@/lib/types';
+import { ProductImage } from '@/components/ProductImage';
 import { formatCurrency } from '@/lib/formatUtils';
 
 // --- UI Components ---
@@ -357,7 +358,14 @@ export default function CategoriesPage() {
                                         <TableBody>
                                             {category.products.map((product) => (
                                                 <TableRow key={product.id}>
-                                                    <TableCell><Image src={product.imageUrl || defaultProductImageUrl} alt={product.name} width={40} height={40} className="rounded-md object-cover aspect-square" unoptimized/></TableCell>
+                                                    <TableCell>
+                                                        <ProductImage
+                                                            src={product.imageUrl}
+                                                            alt={product.name}
+                                                            minimal
+                                                            containerClassName="w-10 h-10 rounded-md"
+                                                        />
+                                                    </TableCell>
                                                     <TableCell className="font-medium">{product.name}{product.sku && <span className="block text-xs text-muted-foreground">SKU: {product.sku}</span>}</TableCell>
                                                     <TableCell className={cn("text-right font-mono", product.stock <= 0 ? 'text-red-600' : product.stock <= (product.lowStockThreshold ?? 10) ? 'text-orange-500' : '')}>{product.stock}</TableCell>
                                                     <TableCell className="text-right font-mono">{formatCurrency(product.sellingPrice, currencySymbol)}</TableCell>

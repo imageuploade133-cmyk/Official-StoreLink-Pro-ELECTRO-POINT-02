@@ -8,7 +8,7 @@ import { AlertTriangle, PackageSearch, Truck } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Product } from '@/lib/types';
 import { useSettings } from '@/contexts/settings-context';
-import Image from 'next/image';
+import { ProductImage } from '@/components/ProductImage';
 
 interface StockAlertsTableProps {
   products: Product[];
@@ -69,13 +69,11 @@ export function StockAlertsTable({ products, isLoading, onRestock }: StockAlerts
                         products.map(product => (
                             <TableRow key={product.id} className={product.stock <= 0 ? 'bg-red-50 dark:bg-red-900/20' : 'bg-orange-50 dark:bg-orange-900/20'}>
                                 <TableCell>
-                                     <Image
-                                        src={product.imageUrl || defaultImageUrl}
+                                     <ProductImage
+                                        src={product.imageUrl}
                                         alt={product.name}
-                                        width={40}
-                                        height={40}
-                                        className="rounded-md object-cover aspect-square"
-                                        data-ai-hint={product.dataAiHint || product.name.toLowerCase().split(' ').slice(0,2).join(' ')}
+                                        minimal
+                                        containerClassName="w-10 h-10 rounded-md"
                                     />
                                 </TableCell>
                                 <TableCell className="font-medium">{product.name}</TableCell>

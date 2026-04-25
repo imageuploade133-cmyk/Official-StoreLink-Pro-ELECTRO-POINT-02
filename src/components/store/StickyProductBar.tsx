@@ -6,6 +6,7 @@ import { Heart, ShoppingCart, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useSettings } from '@/contexts/settings-context';
+import { ProductImage } from '@/components/ProductImage';
 
 interface StickyProductBarProps {
   productName: string;
@@ -190,18 +191,13 @@ export function StickyProductBar({
         {/* Product Info with Image */}
         <div className="flex items-center gap-3 flex-1 min-w-0">
           {/* Product Image */}
-          {productImage && (
-            <div className="relative w-14 h-14 sm:w-16 sm:h-16 flex-shrink-0 rounded-xl overflow-hidden border-2 border-primary/20 dark:border-primary/30 bg-gradient-to-br from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-900 shadow-sm hover:shadow-md transition-shadow">
-              <Image
-                src={productImage}
-                alt={productName}
-                fill
-                className="object-cover"
-                sizes="(max-width: 640px) 56px, 64px"
-                priority
-              />
-            </div>
-          )}
+          <div className="relative w-14 h-14 sm:w-16 sm:h-16 flex-shrink-0 rounded-xl overflow-hidden border-2 border-primary/20 dark:border-primary/30 bg-gradient-to-br from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-900 shadow-sm hover:shadow-md transition-shadow">
+            <ProductImage
+              src={productImage}
+              alt={productName}
+              minimal
+            />
+          </div>
           {/* Product Details */}
           <div className="min-w-0 flex-1">
             <p className="text-[10px] sm:text-[11px] font-semibold text-[#86868b] truncate uppercase tracking-widest">

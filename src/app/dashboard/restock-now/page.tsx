@@ -48,6 +48,7 @@ import type { Product, SaleTransaction, RestockEntry } from '@/lib/types';
 import { formatCurrency } from '@/lib/formatUtils';
 import { format } from 'date-fns';
 import { cn, convertToDateSafely } from '@/lib/utils';
+import { ProductImage } from '@/components/ProductImage';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
@@ -415,11 +416,11 @@ export default function RestockNowPage() {
                       onClick={() => handleSelectProduct(p)}
                     >
                       <div className="relative h-10 w-10 rounded border overflow-hidden shrink-0 bg-muted flex items-center justify-center">
-                        {p.imageUrl ? (
-                          <Image src={p.imageUrl} alt={p.name} fill className="object-cover" unoptimized />
-                        ) : (
-                          <PackageSearch className="h-5 w-5 text-muted-foreground" />
-                        )}
+                        <ProductImage
+                          src={p.imageUrl}
+                          alt={p.name}
+                          minimal
+                        />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="font-medium truncate">{p.name}</div>
@@ -434,15 +435,13 @@ export default function RestockNowPage() {
               {selectedProduct && (
                 <div className="pt-4 border-t space-y-4">
                   <div className="flex items-center gap-4">
-                    {selectedProduct.imageUrl ? (
-                        <div className="relative h-16 w-16 rounded-lg border overflow-hidden shrink-0">
-                            <Image src={selectedProduct.imageUrl} alt={selectedProduct.name} fill className="object-cover" unoptimized />
-                        </div>
-                    ) : (
-                        <div className="h-16 w-16 rounded-lg border bg-muted flex items-center justify-center shrink-0">
-                            <PackageSearch className="h-8 w-8 text-muted-foreground" />
-                        </div>
-                    )}
+                    <div className="relative h-16 w-16 rounded-lg border overflow-hidden shrink-0">
+                        <ProductImage
+                            src={selectedProduct.imageUrl}
+                            alt={selectedProduct.name}
+                            minimal
+                        />
+                    </div>
                     <div className="min-w-0">
                       <h3 className="font-bold text-lg leading-tight truncate" title={selectedProduct.name}>{selectedProduct.name}</h3>
                       <p className="text-sm text-muted-foreground">Stock: <span className={cn("font-bold", selectedProduct.stock <= (selectedProduct.lowStockThreshold || 10) ? "text-destructive" : "text-green-600")}>{selectedProduct.stock} units</span></p>
@@ -484,11 +483,13 @@ export default function RestockNowPage() {
                             )}
                           >
                             <div className="flex items-center gap-2">
-                              {variant.imageUrl && (
-                                <div className="relative h-8 w-8 rounded overflow-hidden border">
-                                  <Image src={variant.imageUrl} alt={variant.name} fill className="object-cover" unoptimized />
-                                </div>
-                              )}
+                              <div className="relative h-8 w-8 rounded overflow-hidden border">
+                                <ProductImage
+                                  src={variant.imageUrl}
+                                  alt={variant.name}
+                                  minimal
+                                />
+                              </div>
                               <div>
                                 <p className="text-sm font-bold">{variant.name}</p>
                                 <p className="text-[10px] text-muted-foreground uppercase">SKU: {variant.sku || 'N/A'}</p>

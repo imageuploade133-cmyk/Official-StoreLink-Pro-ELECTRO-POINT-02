@@ -26,6 +26,7 @@ import { useWishlist } from '@/contexts/wishlist-context';
 import { formatCurrency } from '@/lib/formatUtils';
 import { calculateEffectivePrice } from '@/lib/pos-utils';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
+import { ProductImage } from '@/components/ProductImage';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -166,19 +167,18 @@ export function RecentlyViewedView({ onClose, onSelectProduct }: RecentlyViewedV
                                     key={product.id}
                                     className="group relative flex flex-col gap-3 animate-in fade-in slide-in-from-bottom-2 duration-500"
                                 >
-                                    <div 
+                                    <div
                                         className="relative w-full aspect-[4/5] overflow-hidden rounded-[2rem] bg-white dark:bg-slate-800 shadow-lg border border-slate-100 dark:border-slate-800 active:scale-[0.98] transition-all"
                                         onClick={() => onSelectProduct(product.id)}
                                     >
-                                        <Image 
-                                            src={product.imageUrl || defaultImageUrl} 
-                                            alt={product.name} 
-                                            fill 
+                                        <ProductImage
+                                            src={product.imageUrl}
+                                            alt={product.name}
+                                            fill
                                             className={cn(
                                                 "object-cover transition-transform duration-1000",
                                                 settings?.enableHoverZoom !== false && "group-hover:scale-110"
                                             )}
-                                            unoptimized 
                                         />
                                         <div className="absolute inset-0 bg-black/0 group-hover:bg-primary/5 transition-colors duration-500" />
                                         

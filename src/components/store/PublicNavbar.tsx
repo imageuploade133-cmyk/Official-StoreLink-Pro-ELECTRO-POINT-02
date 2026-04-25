@@ -54,6 +54,7 @@ import { formatCurrency } from '@/lib/formatUtils';
 import { calculateEffectivePrice } from '@/lib/pos-utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useStoreUrl } from '@/hooks/use-store-url';
+import { ProductImage } from '@/components/ProductImage';
 
 export function PublicNavbar() {
     const { settings } = useSettings();
@@ -615,15 +616,14 @@ export function PublicNavbar() {
                                                             onClick={() => setIsSearchFocused(false)}
                                                         >
                                                             <div className="relative h-20 w-20 md:h-24 md:w-24 rounded-2xl overflow-hidden border bg-white flex-shrink-0 shadow-sm">
-                                                                <Image 
-                                                                    src={product.imageUrl || 'https://placehold.co/200x200.png'} 
-                                                                    alt={product.name} 
-                                                                    fill 
+                                                                <ProductImage
+                                                                    src={product.imageUrl}
+                                                                    alt={product.name}
+                                                                    fill
                                                                     className={cn(
                                                                         "object-cover transition-transform duration-700",
                                                                         settings?.enableHoverZoom !== false && "group-hover:scale-110"
                                                                     )}
-                                                                    unoptimized
                                                                 />
                                                             </div>
                                                             <div className="flex-1 min-w-0 space-y-1">

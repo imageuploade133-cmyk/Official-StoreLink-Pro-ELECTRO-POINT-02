@@ -9,6 +9,7 @@ import { Eye, PackageSearch } from 'lucide-react';
 import type { AggregatedProductSale } from '@/lib/types';
 import { formatCurrency } from '@/lib/formatUtils';
 import { useSettings } from '@/contexts/settings-context';
+import { ProductImage } from '@/components/ProductImage';
 
 interface ProductSalesTableProps {
   products: AggregatedProductSale[];
@@ -47,13 +48,11 @@ export function ProductSalesTable({ products, onViewDetails, currencySymbol }: P
         {products.map((product) => (
           <TableRow key={product.id}>
             <TableCell>
-              <Image
-                src={product.imageUrl || defaultProductImageUrl}
+              <ProductImage
+                src={product.imageUrl}
                 alt={product.name}
-                width={40}
-                height={40}
-                className="rounded-md object-cover"
-                data-ai-hint={product.dataAiHint || product.name.toLowerCase().split(' ').slice(0,2).join(' ')}
+                minimal
+                containerClassName="w-10 h-10 rounded-md"
               />
             </TableCell>
             <TableCell>

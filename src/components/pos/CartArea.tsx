@@ -34,6 +34,7 @@ import { Badge } from '@/components/ui/badge';
 import type { CartItem, Customer } from '@/lib/types';
 import { formatCurrency } from '@/lib/formatUtils';
 import { useSettings } from '@/contexts/settings-context';
+import { ProductImage } from '@/components/ProductImage';
 
 interface CartAreaProps {
   cartItems: CartItem[];
@@ -177,7 +178,13 @@ export function CartArea({
                     <ul className="divide-y divide-border">
                         {cartItems.map((item) => (
                             <li key={`${item.id}-${item.selectedVariantId || 'base'}`} className="flex items-center py-3 space-x-3">
-                                <div className="relative w-12 h-12 rounded overflow-hidden shrink-0"><Image src={item.imageUrl || defaultProductImageUrl} alt={item.name} fill sizes="48px" className="object-cover" data-ai-hint={item.dataAiHint || item.name.toLowerCase().split(' ').slice(0, 2).join(' ')}/></div>
+                                <div className="relative w-12 h-12 rounded overflow-hidden shrink-0">
+                                    <ProductImage
+                                        src={item.imageUrl}
+                                        alt={item.name}
+                                        minimal
+                                    />
+                                </div>
                                 <div className="flex-grow min-w-0">
                                     <p className="text-sm font-medium" title={item.name} style={{ overflow: 'hidden', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2 }}>{item.name}</p>
                                     {item.selectedOptions && (

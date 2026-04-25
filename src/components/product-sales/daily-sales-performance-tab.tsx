@@ -17,7 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { SaleTransaction, Product } from '@/lib/types';
-import Image from 'next/image';
+import { ProductImage } from '@/components/ProductImage';
 import { formatCurrency } from '@/lib/formatUtils';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -239,13 +239,11 @@ export function DailySalesPerformanceTab({ transactions, products, currencySymbo
                       {soldItemsListData.map((item) => (
                         <TableRow key={item.id}>
                           <TableCell className="px-4">
-                            <Image
-                              src={item.imageUrl || defaultImageUrl}
+                            <ProductImage
+                              src={item.imageUrl}
                               alt={item.name}
-                              width={40}
-                              height={40}
-                              className="rounded-md object-cover aspect-square"
-                              data-ai-hint={item.dataAiHint || item.name.toLowerCase().split(' ').slice(0,2).join(' ')}
+                              minimal
+                              containerClassName="w-10 h-10 rounded-md"
                             />
                           </TableCell>
                           <TableCell className="font-medium px-4">{item.name}</TableCell>
