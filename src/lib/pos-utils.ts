@@ -21,7 +21,7 @@ export const calculateEffectivePrice = (
   category?: Category | null
 ): number => {
   const baseSellingPrice = ensureNumber(product.sellingPrice, 0);
-  const manualNewPrice = product.newPrice != null ? ensureNumber(product.newPrice, null) : null;
+  const manualNewPrice = product.newPrice != null ? ensureNumber(product.newPrice, 0) : null;
 
   // --- Step 0: Check for Manual New Price (Direct Discount) ---
   // If manual newPrice is set and is less than base price, use it
