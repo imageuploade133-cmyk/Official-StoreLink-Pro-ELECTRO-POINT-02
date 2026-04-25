@@ -31,6 +31,8 @@ const UploadImageOutputSchema = z.object({
 });
 export type UploadImageOutput = z.infer<typeof UploadImageOutputSchema>;
 
+export const maxDuration = 60;
+
 export async function uploadImage(input: UploadImageInput): Promise<UploadImageOutput> {
   return uploadImageFlow(input);
 }
@@ -50,62 +52,66 @@ const uploadImageFlow = ai.defineFlow(
     // Start with the hardcoded global API key
     let apiKey = GLOBAL_IMGBB_API_KEY;
 
-    // Try to get the global API key from Firestore if it exists
-    try {
-      const globalSettingsRef = doc(firestore, 'settings', 'global');
-      const globalSettingsSnap = await getDoc(globalSettingsRef);
-      if (globalSettingsSnap.exists() && globalSettingsSnap.data().imgbbApiKey) {
-        apiKey = globalSettingsSnap.data().imgbbApiKey;
-      }
-    } catch (error) {
-      console.warn('Failed to fetch global API key from Firestore, using hardcoded default:', error);
-    }
-
     let storeName = 'Default Store';
     let storeId = input.storeId || 'GLOBAL';
 
-    // Fetch store name and check for store-specific API key if storeId is provided
-    if (input.storeId) {
-      try {
-        // 1. Check current store settings path
-        const settingsRef = doc(firestore, 'stores', input.storeId, 'settings', 'config');
-        const settingsSnap = await getDoc(settingsRef);
-        
-        if (settingsSnap.exists() && settingsSnap.data().imgbbApiKey) {
-          apiKey = settingsSnap.data().imgbbApiKey;
-        } else {
-          // 2. Check old store settings path for backward compatibility
-          const oldSettingsRef = doc(firestore, 'settings', input.storeId);
-          const oldSettingsSnap = await getDoc(oldSettingsRef);
-          if (oldSettingsSnap.exists() && oldSettingsSnap.data().imgbbApiKey) {
-            apiKey = oldSettingsSnap.data().imgbbApiKey;
-          }
-        }
-      } catch (error) {
-        console.warn('Failed to fetch store-specific API key, falling back to global:', error);
-      }
+    // Parallelize Firestore lookups to save time
+    const lookups = [];
+    
+    // 1. Global settings lookup
+    const globalSettingsRef = doc(firestore, 'settings', 'global');
+    lookups.push(getDoc(globalSettingsRef));
 
-      try {
+    // 2. Store-specific lookups if storeId is provided
+    if (input.storeId) {
+        const settingsRef = doc(firestore, 'stores', input.storeId, 'settings', 'config');
+        lookups.push(getDoc(settingsRef));
+        
+        const oldSettingsRef = doc(firestore, 'settings', input.storeId);
+        lookups.push(getDoc(oldSettingsRef));
+        
         const storeRef = doc(firestore, 'stores', input.storeId);
-        const storeSnap = await getDoc(storeRef);
-        if (storeSnap.exists()) {
-          const storeData = storeSnap.data();
-          storeName = storeData.name || 'Unnamed Store';
-          
-          // If the store uses a separate database, we should save the metadata there
-          const databaseId = storeData.databaseId;
-          if (databaseId && databaseId !== '(default)') {
-            try {
-              const { getFirestore } = await import('firebase/firestore');
-              targetFirestore = getFirestore(firebaseApp, databaseId);
-            } catch (dbError) {
-              console.warn('Failed to initialize separate database firestore, falling back to default:', dbError);
-            }
-          }
+        lookups.push(getDoc(storeRef));
+    }
+
+    try {
+        const results = await Promise.all(lookups);
+        const globalSettingsSnap = results[0];
+        
+        if (globalSettingsSnap && globalSettingsSnap.exists() && globalSettingsSnap.data()?.imgbbApiKey) {
+            apiKey = globalSettingsSnap.data()?.imgbbApiKey;
         }
-      } catch (error) {
-        console.warn('Failed to fetch store info:', error);
-      }
+
+        if (input.storeId && results.length >= 4) {
+            const settingsSnap = results[1];
+            const oldSettingsSnap = results[2];
+            const storeSnap = results[3];
+
+            if (settingsSnap && settingsSnap.exists() && settingsSnap.data()?.imgbbApiKey) {
+                apiKey = settingsSnap.data()?.imgbbApiKey;
+            } else if (oldSettingsSnap && oldSettingsSnap.exists() && oldSettingsSnap.data()?.imgbbApiKey) {
+                apiKey = oldSettingsSnap.data()?.imgbbApiKey;
+            }
+
+            if (storeSnap && storeSnap.exists()) {
+                const storeData = storeSnap.data();
+                if (storeData) {
+                    storeName = storeData.name || 'Unnamed Store';
+                    
+                    const databaseId = storeData.databaseId;
+                    if (databaseId && databaseId !== '(default)') {
+                        try {
+                            const { getFirestore } = await import('firebase/firestore');
+                            targetFirestore = getFirestore(firebaseApp, databaseId);
+                        } catch (dbError) {
+                            console.warn('Failed to initialize separate database firestore:', dbError);
+                        }
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.warn('Error during Firestore lookups in uploadImageFlow:', error);
     }
 
     // The API expects the base64 data without the data URI prefix.
@@ -114,16 +120,14 @@ const uploadImageFlow = ai.defineFlow(
     // Generate a descriptive unique name using store info to organize images on ImgBB
     const uniqueName = `${storeName} - ${storeId} - ${Date.now()}`;
 
-    const body = new URLSearchParams();
-    body.append('image', base64Data);
-    body.append('name', uniqueName); // Add the unique name to the request
+    // Use FormData for more efficient upload than URLSearchParams
+    const formData = new FormData();
+    formData.append('image', base64Data);
+    formData.append('name', uniqueName);
 
     const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: body.toString(),
+      body: formData,
     });
 
     if (!response.ok) {
