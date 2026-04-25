@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo, type ReactNode } from 'react';
 import Image from 'next/image';
+import { ProductImage } from '@/components/ProductImage';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -126,13 +127,12 @@ export const ProductCard = React.memo(({ product, onAddToCart, priority, currenc
             "relative w-full overflow-hidden bg-muted/20",
             isSmallMode ? "aspect-square" : "aspect-[4/3]"
         )}>
-            <Image
-            src={product.imageUrl || defaultImageUrl}
+            <ProductImage
+            src={product.imageUrl}
             alt={product.name}
             fill
             sizes="(max-width: 767px) 50vw, (max-width: 1023px) 50vw, 40vw"
             className="object-cover group-hover:scale-105 transition-transform duration-300"
-            data-ai-hint={product.dataAiHint || product.name.toLowerCase().split(' ').slice(0,2).join(' ')}
             priority={priority}
             unoptimized
             />

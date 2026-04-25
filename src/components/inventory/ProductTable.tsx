@@ -1,6 +1,7 @@
 'use client';
 import { useState, useMemo } from 'react';
 import Image from 'next/image';
+import { ProductImage } from '@/components/ProductImage';
 import {
   Table,
   TableBody,
@@ -179,8 +180,8 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
               >
                 <TableCell>
                     <div className="relative w-12 h-12 rounded-lg overflow-hidden border-2 border-background shadow-sm bg-muted flex items-center justify-center shrink-0">
-                        <Image
-                            src={(product.imageUrl && product.imageUrl.trim() !== "") ? product.imageUrl : defaultProductImageUrl}
+                        <ProductImage
+                            src={product.imageUrl}
                             alt={product.name}
                             fill
                             className="object-cover transition-transform group-hover:scale-110 duration-300"

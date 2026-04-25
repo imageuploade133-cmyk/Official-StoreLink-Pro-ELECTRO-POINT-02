@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import { ProductImage } from '@/components/ProductImage';
 import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, where, orderBy, limit } from 'firebase/firestore';
 import type { Category, Product, SlideShow, HomepageSection } from '@/lib/types';
@@ -641,13 +642,13 @@ export function HomeView({ onSelectProduct, onViewAllCollections }: HomeViewProp
                         className="block w-full text-left cursor-pointer"
                     >
                         <div className="relative aspect-[3/4] rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-800 mb-5 border-2 border-slate-200 dark:border-slate-700 shadow-2xl transition-all active:scale-[0.98] hover:border-primary/20">
-                            <Image 
+                            <ProductImage 
                                 alt={product.name}  
                                 className={cn(
                                     "w-full h-full object-cover transition-transform duration-1000",
                                     settings?.enableHoverZoom !== false && "group-hover:scale-110"
                                 )}
-                                src={product.imageUrl || 'https://placehold.co/400x600.png'}
+                                src={product.imageUrl}
                                 fill
                                 unoptimized
                             />

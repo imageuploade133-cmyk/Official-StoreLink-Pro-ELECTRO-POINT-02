@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState, useEffect } from 'react';
 import Image from 'next/image';
+import { ProductImage } from '@/components/ProductImage';
 import { useWishlist } from '@/contexts/wishlist-context';
 import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, where, documentId, orderBy } from 'firebase/firestore';
@@ -237,8 +238,8 @@ export function WishlistView({ onClose, onSelectProduct }: WishlistViewProps) {
                                         className="relative w-full aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-800 active:scale-[0.98] transition-all"
                                         onClick={() => onSelectProduct(product.id)}
                                     >
-                                        <Image 
-                                            src={product.imageUrl || defaultImageUrl} 
+                                        <ProductImage 
+                                            src={product.imageUrl} 
                                             alt={product.name} 
                                             fill 
                                             className={cn(

@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ProductImage } from '@/components/ProductImage';
 import { useFirestore, useDoc, useCollection } from '@/firebase';
 import { doc, query, collection, where, limit, orderBy } from 'firebase/firestore';
 import { useCart } from '@/contexts/cart-context';
@@ -393,8 +394,8 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                 {showVideo && product.videoUrl ? (
                     <video ref={videoRef} src={product.videoUrl} autoPlay loop muted playsInline className="w-full h-full object-cover" />
                 ) : (
-                    <Image 
-                        src={activeImage || product.imageUrl || defaultImageUrl} 
+                    <ProductImage 
+                        src={activeImage || product.imageUrl} 
                         alt={product.name} 
                         fill 
                         className="object-cover" 
@@ -421,7 +422,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                             !showVideo && activeImage === url ? "border-primary scale-110 z-10 ring-4 ring-primary/10" : "border-white dark:border-slate-800 opacity-90 hover:opacity-100"
                         )}
                     >
-                        <Image src={url} alt={`View ${idx + 1}`} fill className="object-cover" unoptimized />
+                        <ProductImage src={url} alt={`View ${idx + 1}`} fill className="object-cover" unoptimized minimal />
                     </button>
                 ))}
                 {product.videoEnabled && product.videoUrl && (
@@ -662,8 +663,8 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                             {relatedProducts.filter(p => p.id !== id).slice(0, 4).map(p => (
                                 <div key={p.id} className="bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-lg p-3 group active:scale-95 transition-all">
                                     <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted mb-3">
-                                        <Image 
-                                            src={p.imageUrl || 'https://placehold.co/200x200.png'} 
+                                        <ProductImage 
+                                            src={p.imageUrl} 
                                             alt={p.name} 
                                             fill 
                                             className={cn(

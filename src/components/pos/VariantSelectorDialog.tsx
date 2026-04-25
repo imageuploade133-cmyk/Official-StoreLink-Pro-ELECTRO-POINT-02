@@ -16,6 +16,7 @@ import {
   DrawerTitle,
   DrawerFooter,
 } from "../ui/drawer";
+import { ProductImage } from '../ProductImage';
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { ScrollArea } from "../ui/scroll-area";
@@ -77,12 +78,13 @@ export function VariantSelectorDialog({
   const ProductInfo = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 py-4">
       <div className="relative aspect-square md:aspect-square w-full max-w-[200px] md:max-w-none mx-auto md:mx-0 rounded-xl overflow-hidden bg-muted">
-        <Image
-          src={selectedVariant?.imageUrl || product.imageUrl || 'https://placehold.co/400x400.png'}
+        <ProductImage
+          src={selectedVariant?.imageUrl || product.imageUrl}
           alt={product.name}
           fill
           className="object-cover"
           unoptimized
+          minimal
         />
       </div>
       

@@ -9,6 +9,7 @@ import {
   Plus,
   Star
 } from 'lucide-react';
+import { ProductImage } from '@/components/ProductImage';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -331,8 +332,8 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
                 imageRatioMap[imageRatio] || imageRatioMap.portrait
             )}
           >
-            <Image
-              src={product.imageUrl || settings?.defaultProductImageUrl || 'https://placehold.co/600x600.png'}
+            <ProductImage
+              src={product.imageUrl}
               alt={product.name}
               fill
               className={cn(

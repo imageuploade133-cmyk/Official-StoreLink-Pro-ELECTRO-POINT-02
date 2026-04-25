@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
+import { ProductImage } from '@/components/ProductImage';
 import { useFirestore, useCollection } from '@/firebase';
 import { 
   collection, 
@@ -219,8 +220,8 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                                     className="flex items-center gap-4 p-3 bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800/50 transition-all active:scale-[0.98] w-full text-left group cursor-pointer"
                                 >
                                     <div className="relative h-16 w-16 rounded-xl overflow-hidden shrink-0 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800">
-                                        <Image 
-                                            src={p.imageUrl || 'https://placehold.co/200x200.png'} 
+                                        <ProductImage 
+                                            src={p.imageUrl} 
                                             alt={p.name} 
                                             fill 
                                             className={cn(
@@ -228,6 +229,7 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                                                 settings?.enableHoverZoom !== false && "group-hover:scale-105"
                                             )}
                                             unoptimized 
+                                            minimal
                                         />
                                     </div>
                                     <div className="flex-1 min-w-0">

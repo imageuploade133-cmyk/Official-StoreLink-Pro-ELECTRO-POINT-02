@@ -33,6 +33,7 @@ import {
   FormMessage,
   FormDescription
 } from '@/components/ui/form';
+import { ProductImage } from '@/components/ProductImage';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -728,22 +729,15 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                     !variant.isActive && "opacity-60 grayscale bg-muted/30"
                   )}>
                     <div className="aspect-[4/3] relative bg-muted overflow-hidden">
-                      {variant.imageUrl ? (
-                        <Image 
-                          src={variant.imageUrl} 
-                          alt={variant.name} 
-                          fill 
-                          className="object-cover transition-transform duration-700 group-hover:scale-110"
-                          unoptimized
-                        />
-                      ) : (
-                        <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground gap-2 p-4 text-center">
-                          <ImageIcon className="h-10 w-10 opacity-10" />
-                          <span className="text-[10px] font-black uppercase tracking-widest opacity-40">No Image</span>
-                        </div>
-                      )}
+                      <ProductImage
+                        src={variant.imageUrl}
+                        alt={variant.name}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                        unoptimized
+                      />
                       
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-4">
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-4 z-20">
                         <div className="grid grid-cols-2 gap-2 w-full">
                           <label className="flex">
                             <div className={cn(

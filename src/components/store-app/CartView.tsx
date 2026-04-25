@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
+import { ProductImage } from '@/components/ProductImage';
 import { useCart } from '@/contexts/cart-context';
 import { useSettings } from '@/contexts/settings-context';
 import { Button } from '@/components/ui/button';
@@ -236,7 +237,7 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
                                         (item.isUnavailable || item.isOutOfStock) && "opacity-60 grayscale-[0.5]"
                                     )}>
                                         <div className="relative h-24 w-24 rounded-2xl overflow-hidden shrink-0 bg-muted border shadow-sm">
-                                            <Image src={item.imageUrl || defaultImageUrl} alt={item.name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" unoptimized />
+                                            <ProductImage src={item.imageUrl} alt={item.name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" unoptimized minimal />
                                         </div>
                                         <div className="flex-1 min-w-0 space-y-2">
                                             <div className="flex justify-between items-start">
