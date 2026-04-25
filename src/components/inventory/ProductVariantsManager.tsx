@@ -83,12 +83,23 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
     name: "variantOptions"
   });
 
+  const handleToggleHasVariants = (checked: boolean) => {
+    if (!checked) {
+      // Before turning off, we might want to ensure the stock is preserved
+      // The main stock is already synced with the sum of variants due to ProductForm's effect
+      setValue('hasVariants', false, { shouldDirty: true });
+    } else {
+      setValue('hasVariants', true, { shouldDirty: true });
+    }
+  };
+
   const generateVariants = useCallback(() => {
     if (isManualMode) return;
 
     const currentOptions = getValues('variantOptions') || [];
     const currentVariants = getValues('variants') || [];
     const baseSellingPrice = getValues('sellingPrice');
+    const currentMainStock = getValues('stock') || 0;
 
     if (currentOptions.length === 0) {
       const manualVariants = currentVariants.filter((v: any) => v.isManual);
@@ -150,6 +161,23 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
 
     const manualVariants = currentVariants.filter((v: any) => v.isManual);
     const newVariants = [...generatedVariants, ...manualVariants];
+
+    // Redistribution logic to avoid "Manual stock reduction" error
+    const totalOldStock = currentVariants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
+    const totalNewStock = newVariants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
+    
+    // If total stock is decreasing (meaning some variants were removed), or if turning on variants (old stock 0)
+    // and main stock > 0, we redistribute the missing units to the first variant.
+    const stockToDistribute = Math.max(totalOldStock, currentMainStock) - totalNewStock;
+
+    if (stockToDistribute > 0 && newVariants.length > 0) {
+      const targetIdx = newVariants.findIndex(v => v.isActive);
+      const finalTargetIdx = targetIdx !== -1 ? targetIdx : 0;
+      newVariants[finalTargetIdx] = {
+        ...newVariants[finalTargetIdx],
+        stock: (Number(newVariants[finalTargetIdx].stock) || 0) + stockToDistribute
+      };
+    }
 
     if (JSON.stringify(newVariants) !== JSON.stringify(currentVariants)) {
       setValue('variants', newVariants);
@@ -273,11 +301,29 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
   };
 
   const handleRemoveVariant = (index: number) => {
+    const variantToRemove = variants[index];
+    const removedStock = Number(variantToRemove.stock) || 0;
     const updatedVariants = variants.filter((_: any, i: number) => i !== index);
-    setValue('variants', updatedVariants, { shouldDirty: true });
+    
+    if (updatedVariants.length > 0) {
+      if (removedStock > 0) {
+        const firstVariant = { ...updatedVariants[0] };
+        firstVariant.stock = (Number(firstVariant.stock) || 0) + removedStock;
+        updatedVariants[0] = firstVariant;
+        setValue('variants', updatedVariants, { shouldDirty: true });
+      } else {
+        setValue('variants', updatedVariants, { shouldDirty: true });
+      }
+    } else {
+      setValue('variants', [], { shouldDirty: true });
+      setValue('hasVariants', false, { shouldDirty: true });
+    }
+
     toast({ 
       title: "Variant Removed", 
-      description: "The variant has been removed from this product." 
+      description: removedStock > 0 
+        ? `Variant removed. ${removedStock} units returned to main stock.` 
+        : "The variant has been removed from this product." 
     });
   };
 
@@ -373,7 +419,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
               )}
               <Switch 
                 checked={hasVariants} 
-                onCheckedChange={(checked) => setValue('hasVariants', checked)} 
+                onCheckedChange={handleToggleHasVariants} 
                 className="data-[state=checked]:bg-primary"
               />
             </div>
