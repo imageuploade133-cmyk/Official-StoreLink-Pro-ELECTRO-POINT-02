@@ -1027,7 +1027,9 @@ export default function ProductDetailsPage() {
                           
                           if (useRound) {
                             const colorValue = value.toLowerCase();
-                            const textColor = isColor ? getContrastColor(colorValue) : (isSelected ? 'white' : undefined);
+                            const textColor = isColor 
+                              ? getContrastColor(colorValue) 
+                              : (isSelected ? getContrastColor(settings?.storeAddToCartColor || '#3b82f6') : undefined);
 
                             return (
                               <button
@@ -1053,9 +1055,9 @@ export default function ProductDetailsPage() {
                                 >
                                   <span className={cn(
                                     "text-[9px] font-black uppercase tracking-tight truncate relative z-10 transition-colors duration-300",
-                                    !isColor && (isSelected ? "text-white" : "text-[#1d1d1f] dark:text-[#f5f5f7]")
+                                    !isColor && (isSelected ? "" : "text-black dark:text-white")
                                   )}
-                                  style={{ color: isColor ? textColor : undefined }}
+                                  style={{ color: (isColor || isSelected) ? textColor : undefined }}
                                   >
                                     {displayValue}
                                   </span>
