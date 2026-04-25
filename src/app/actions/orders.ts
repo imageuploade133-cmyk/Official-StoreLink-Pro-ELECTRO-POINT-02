@@ -263,6 +263,35 @@ export async function placeOrderAction({
       
       transaction.set(orderRef, orderData);
 
+      // 3.5 Create a corresponding sale transaction to track online order as a sale
+      const saleRef = adminDb.collection('saleTransactions').doc();
+      const saleData = {
+        orderId: orderRef.id, // Link to the order
+        store_id: storeId,
+        staffId: userId || 'customer',
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        grandTotal: finalTotalAmount,
+        subtotal: finalTotalAmount - finalTaxAmountCalculated,
+        items: enrichedItems.map(item => ({
+            productId: item.productId,
+            productName: item.productName,
+            quantity: item.quantity,
+            unitPrice: item.price,
+            totalPrice: item.price * item.quantity,
+            variantId: item.variantId || null,
+            selectedOptions: item.selectedOptions || null
+        })),
+        paymentMethod: paymentMethod,
+        isPaid: false,
+        customerName: guestInfo?.name || 'Online Customer',
+        discountAmountCalculated: 0, 
+        taxRate: finalTaxRate,
+        taxAmountCalculated: finalTaxAmountCalculated,
+        reprintCount: 0
+      };
+      transaction.set(saleRef, saleData);
+
       // Prepare data for non-blocking notifications
       resultOrderId = orderRef.id;
       orderDataForNotification = { 
@@ -316,28 +345,144 @@ export async function placeOrderAction({
 export async function updateOrderStatusAction(orderId: string, storeId: string, newStatus: OrderStatus, staffId: string, staffName: string, staffEmail: string) {
     try {
         const orderRef = adminDb.collection('orders').doc(orderId);
-        const orderSnap = await orderRef.get();
-        if (!orderSnap.exists) throw new Error('Order not found');
-        
-        const orderData = orderSnap.data();
-        const oldStatus = orderData?.status;
-        
-        await orderRef.update({ 
-            status: newStatus,
-            isRead: true,
-            updatedAt: admin.firestore.FieldValue.serverTimestamp()
-        });
 
-        // Create Audit Log
-        await adminDb.collection('orderAudit').add({
-            orderId,
-            oldStatus,
-            newStatus,
-            timestamp: admin.firestore.FieldValue.serverTimestamp(),
-            staffId,
-            staffName,
-            staffEmail,
-            store_id: storeId
+        let orderDataForWhatsApp: any = null;
+
+        await adminDb.runTransaction(async (transaction) => {
+            const orderSnap = await transaction.get(orderRef);
+            if (!orderSnap.exists) throw new Error('Order not found');
+
+            const orderData = orderSnap.data() as any;
+            const oldStatus = orderData?.status;
+
+            if (oldStatus === newStatus) return;
+
+            transaction.update(orderRef, {
+                status: newStatus,
+                isRead: true,
+                updatedAt: admin.firestore.FieldValue.serverTimestamp()
+            });
+
+            // Handle Cancellation: Return Stock and Void Sale
+            if (newStatus === 'cancelled' && oldStatus !== 'cancelled') {
+                // 1. Return Stock
+                if (orderData.items && Array.isArray(orderData.items)) {
+                    for (const item of orderData.items) {
+                        const productRef = adminDb.collection('products').doc(item.productId);
+                        const productSnap = await transaction.get(productRef);
+                        if (productSnap.exists) {
+                            const productData = productSnap.data() as any;
+                            let currentTotalStock = Number(productData.stock || 0);
+                            const quantityToReturn = Number(item.quantity || 0);
+
+                            if (item.variantId && productData.hasVariants && productData.variants) {
+                                const variants = [...productData.variants];
+                                const variantIndex = variants.findIndex((v: any) => v.id === item.variantId);
+                                if (variantIndex !== -1) {
+                                    const variant = { ...variants[variantIndex] };
+                                    variant.stock = (Number(variant.stock) || 0) + quantityToReturn;
+                                    variants[variantIndex] = variant;
+                                    currentTotalStock += quantityToReturn;
+                                    transaction.update(productRef, { variants, stock: currentTotalStock });
+
+                                    // Log Stock Audit
+                                    const auditRef = adminDb.collection('stockAudit').doc();
+                                    transaction.set(auditRef, {
+                                        productId: item.productId,
+                                        productName: (productData.name || 'Product') + ` (${variant.name})`,
+                                        variantId: item.variantId,
+                                        selectedOptions: item.selectedOptions || null,
+                                        store_id: storeId,
+                                        type: 'RETURN',
+                                        referenceId: `CANCELLED-ORDER-${orderId}`,
+                                        beforeStock: currentTotalStock - quantityToReturn,
+                                        afterStock: currentTotalStock,
+                                        change: quantityToReturn,
+                                        staffId: staffId,
+                                        staffName: staffName,
+                                        timestamp: admin.firestore.FieldValue.serverTimestamp()
+                                    });
+                                } else {
+                                    // Fallback if variant not found
+                                    currentTotalStock += quantityToReturn;
+                                    transaction.update(productRef, { stock: currentTotalStock });
+                                }
+                            } else {
+                                currentTotalStock += quantityToReturn;
+                                transaction.update(productRef, { stock: currentTotalStock });
+
+                                // Log Stock Audit
+                                const auditRef = adminDb.collection('stockAudit').doc();
+                                transaction.set(auditRef, {
+                                    productId: item.productId,
+                                    productName: productData.name || 'Product',
+                                    store_id: storeId,
+                                    type: 'RETURN',
+                                    referenceId: `CANCELLED-ORDER-${orderId}`,
+                                    beforeStock: currentTotalStock - quantityToReturn,
+                                    afterStock: currentTotalStock,
+                                    change: quantityToReturn,
+                                    staffId: staffId,
+                                    staffName: staffName,
+                                    timestamp: admin.firestore.FieldValue.serverTimestamp()
+                                });
+                            }
+                        }
+                    }
+                }
+
+                // 2. Void Sale Transaction
+                const salesQuery = adminDb.collection('saleTransactions').where('orderId', '==', orderId).limit(1);
+                const salesSnapshot = await transaction.get(salesQuery);
+                if (!salesSnapshot.empty) {
+                    const saleDoc = salesSnapshot.docs[0];
+                    const saleData = saleDoc.data();
+
+                    transaction.update(saleDoc.ref, {
+                        returnedAmount: saleData.grandTotal || 0,
+                        returnStatus: 'fullyReturned',
+                        returns: [{
+                            returnedAt: admin.firestore.FieldValue.serverTimestamp(),
+                            staffId: staffId,
+                            staffEmail: staffEmail,
+                            reason: 'Order Cancelled',
+                            items: saleData.items || [],
+                            totalReturnedAmount: saleData.grandTotal || 0
+                        }],
+                        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+
+                // 3. Update customer totalSpent if paid
+                if (orderData.user_id && orderData.user_id !== 'GUEST' && orderData.isPaid) {
+                    const customerQuery = adminDb.collection('customers')
+                        .where('uid', '==', orderData.user_id)
+                        .where('store_id', '==', storeId)
+                        .limit(1);
+                    const customerSnap = await transaction.get(customerQuery);
+                    if (!customerSnap.empty) {
+                        transaction.update(customerSnap.docs[0].ref, {
+                            totalSpent: admin.firestore.FieldValue.increment(-(orderData.totalAmount || 0)),
+                            updatedAt: admin.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+                }
+            }
+
+            // Create Audit Log
+            const auditLogRef = adminDb.collection('orderAudit').doc();
+            transaction.set(auditLogRef, {
+                orderId,
+                oldStatus,
+                newStatus,
+                timestamp: admin.firestore.FieldValue.serverTimestamp(),
+                staffId,
+                staffName,
+                staffEmail,
+                store_id: storeId
+            });
+
+            orderDataForWhatsApp = orderData;
         });
 
         // Fetch settings for notifications
@@ -346,9 +491,9 @@ export async function updateOrderStatusAction(orderId: string, storeId: string, 
         // Send WhatsApp Notification if status changed to important states
         if (whatsappAlertSettings && whatsappAlertSettings.enabled) {
             let message = '';
-            const customerName = orderData?.guestInfo?.name || 'Customer';
+            const customerName = orderDataForWhatsApp?.guestInfo?.name || 'Customer';
             const shortOrderId = orderId.substring(0, 8).toUpperCase();
-            const amount = orderData?.totalAmount?.toLocaleString() || '0';
+            const amount = orderDataForWhatsApp?.totalAmount?.toLocaleString() || '0';
 
             // Get currency
             const globalSettingsDoc = await adminDb.collection('settings').doc('global').get();
@@ -360,32 +505,32 @@ export async function updateOrderStatusAction(orderId: string, storeId: string, 
                 amount,
                 currency,
                 status: newStatus,
-                paymentMethod: orderData?.paymentMethod || 'N/A',
-                storeName: orderData?.storeName || 'Admin'
+                paymentMethod: orderDataForWhatsApp?.paymentMethod || 'N/A',
+                storeName: orderDataForWhatsApp?.storeName || 'Admin'
             };
             
             if (newStatus === 'processing') {
                 message = whatsappAlertSettings.orderProcessingTemplate 
                     ? formatWhatsAppMessage(whatsappAlertSettings.orderProcessingTemplate, templateData)
-                    : `*Hello ${orderData?.storeName || 'Admin'},*\n*Order #${shortOrderId} for ${customerName} is now being processed.*`;
+                    : `*Hello ${orderDataForWhatsApp?.storeName || 'Admin'},*\n*Order #${shortOrderId} for ${customerName} is now being processed.*`;
             } else if (newStatus === 'shipped') {
                 message = whatsappAlertSettings.orderShippedTemplate
                     ? formatWhatsAppMessage(whatsappAlertSettings.orderShippedTemplate, templateData)
-                    : `*Hello ${orderData?.storeName || 'Admin'},*\n*Order #${shortOrderId} for ${customerName} has been shipped.*`;
+                    : `*Hello ${orderDataForWhatsApp?.storeName || 'Admin'},*\n*Order #${shortOrderId} for ${customerName} has been shipped.*`;
             } else if (newStatus === 'cancelled') {
                 message = whatsappAlertSettings.orderCancelledTemplate
                     ? formatWhatsAppMessage(whatsappAlertSettings.orderCancelledTemplate, templateData)
-                    : `*Hello ${orderData?.storeName || 'Admin'},*\n*Order #${shortOrderId} for ${customerName} has been cancelled.*`;
+                    : `*Hello ${orderDataForWhatsApp?.storeName || 'Admin'},*\n*Order #${shortOrderId} for ${customerName} has been cancelled.*`;
             } else if (newStatus === 'delivered') {
                 message = whatsappAlertSettings.orderDeliveredTemplate
                     ? formatWhatsAppMessage(whatsappAlertSettings.orderDeliveredTemplate, templateData)
-                    : `*Hello ${orderData?.storeName || 'Admin'},*\n*Order #${shortOrderId} for ${customerName} has been delivered successfully.*`;
+                    : `*Hello ${orderDataForWhatsApp?.storeName || 'Admin'},*\n*Order #${shortOrderId} for ${customerName} has been delivered successfully.*`;
             }
 
-            const adminRecipients = [];
+            const adminRecipients: string[] = [];
             if (whatsappAlertSettings.senderNumber) adminRecipients.push(whatsappAlertSettings.senderNumber);
             if (whatsappAlertSettings.orderNotificationNumbers && Array.isArray(whatsappAlertSettings.orderNotificationNumbers)) {
-                whatsappAlertSettings.orderNotificationNumbers.forEach(num => {
+                whatsappAlertSettings.orderNotificationNumbers.forEach((num: string) => {
                     if (num && !adminRecipients.includes(num)) {
                         adminRecipients.push(num);
                     }
@@ -825,10 +970,10 @@ export async function sendWhatsAppOrderAlert(order: any, settings: WhatsAppAlert
     };
 
     // 1. Send to Admin
-    const adminRecipients = [];
+    const adminRecipients: string[] = [];
     if (settings.senderNumber) adminRecipients.push(settings.senderNumber);
     if (settings.orderNotificationNumbers && Array.isArray(settings.orderNotificationNumbers)) {
-        settings.orderNotificationNumbers.forEach(num => {
+        settings.orderNotificationNumbers.forEach((num: string) => {
             if (num && !adminRecipients.includes(num)) {
                 adminRecipients.push(num);
             }
