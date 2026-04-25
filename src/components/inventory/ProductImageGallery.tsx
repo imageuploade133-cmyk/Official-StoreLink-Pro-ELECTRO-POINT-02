@@ -35,6 +35,7 @@ import {
   DialogDescription
 } from "@/components/ui/dialog";
 import { CameraCaptureModal } from '@/components/media/CameraCaptureModal';
+import { ConfirmationModal } from '../dialogs/ConfirmationModal';
 
 interface ProductImageGalleryProps {
   primaryUrl: string;
@@ -55,6 +56,17 @@ export function ProductImageGallery({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isPhotoCaptureOpen, setIsPhotoCaptureOpen] = useState(false);
   const [pendingImages, setPendingImages] = useState<{ id: string; url: string }[]>([]);
+  const [confirmConfig, setConfirmConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    onConfirm: () => void;
+  }>({
+    isOpen: false,
+    title: '',
+    description: '',
+    onConfirm: () => {},
+  });
   const { toast } = useToast();
   const { settings, store } = useSettings();
 
@@ -262,10 +274,16 @@ export function ProductImageGallery({
               size="sm"
               className="rounded-full h-10 px-4 font-bold gap-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
               onClick={() => {
-                if (window.confirm('Clear all images from this product?')) {
-                  onPrimaryChange('');
-                  onAdditionalChange([]);
-                }
+                setConfirmConfig({
+                  isOpen: true,
+                  title: 'Clear All Media?',
+                  description: 'This will remove all images from this product. This action cannot be undone.',
+                  onConfirm: () => {
+                    onPrimaryChange('');
+                    onAdditionalChange([]);
+                    toast({ title: "Gallery Cleared", description: "All images have been removed." });
+                  }
+                });
               }}
               disabled={disabled || isUploading}
             >
@@ -384,7 +402,14 @@ export function ProductImageGallery({
                         variant="destructive"
                         size="icon"
                         className="h-7 w-7 rounded-full shadow-lg border border-white/20"
-                        onClick={() => removeImage(index)}
+                        onClick={() => {
+                            setConfirmConfig({
+                                isOpen: true,
+                                title: 'Remove Image?',
+                                description: 'Are you sure you want to remove this image from the gallery?',
+                                onConfirm: () => removeImage(index)
+                            });
+                        }}
                         disabled={disabled || isUploading}
                         title="Remove"
                     >
@@ -489,6 +514,14 @@ export function ProductImageGallery({
           </div>
         </DialogContent>
       </Dialog>
+
+      <ConfirmationModal 
+        isOpen={confirmConfig.isOpen}
+        onOpenChange={(open) => setConfirmConfig(prev => ({ ...prev, isOpen: open }))}
+        onConfirm={confirmConfig.onConfirm}
+        title={confirmConfig.title}
+        description={confirmConfig.description}
+      />
     </div>
   );
 }
