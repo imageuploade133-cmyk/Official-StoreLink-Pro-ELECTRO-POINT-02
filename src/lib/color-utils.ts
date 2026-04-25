@@ -84,3 +84,72 @@ export function hexToHslString(hex?: string | null): string {
 
   return `${h} ${s}% ${l}%`;
 }
+
+/**
+ * Determines whether black or white text should be used on a given background color.
+ */
+export function getContrastColor(backgroundColor?: string | null): 'black' | 'white' {
+  if (!backgroundColor) return 'black';
+
+  // Handle named colors by creating a temporary mapping for common ones
+  // or default to a safe value. For a more robust solution, we'd need a full list.
+  const namedColors: Record<string, string> = {
+    'white': '#ffffff',
+    'black': '#000000',
+    'red': '#ff0000',
+    'green': '#00ff00',
+    'blue': '#0000ff',
+    'yellow': '#ffff00',
+    'cyan': '#00ffff',
+    'magenta': '#ff00ff',
+    'silver': '#c0c0c0',
+    'gray': '#808080',
+    'maroon': '#800000',
+    'olive': '#808000',
+    'purple': '#800080',
+    'teal': '#008080',
+    'navy': '#000080',
+    'orange': '#ffa500',
+    'pink': '#ffc0cb',
+    'gold': '#ffd700',
+    'brown': '#a52a2a',
+    'lime': '#00ff00',
+  };
+
+  let hex = backgroundColor.toLowerCase();
+  if (namedColors[hex]) {
+    hex = namedColors[hex];
+  }
+
+  // If it's not a hex color, try to see if it's already hex
+  if (!hex.startsWith('#')) {
+    // If it's 3 or 6 hex chars without #
+    if (/^[0-9a-fA-F]{3}$|^[0-9a-fA-F]{6}$/.test(hex)) {
+      hex = '#' + hex;
+    } else {
+      // If it's still not hex, we can't easily determine
+      // Default to black for light-ish colors, but here we'll just return black if unsure
+      // or assume it might be a dark color if it's not white.
+      return hex === 'white' ? 'black' : (hex === 'transparent' ? 'black' : 'white');
+    }
+  }
+
+  hex = hex.replace('#', '');
+  
+  let r, g, b;
+  if (hex.length === 3) {
+    r = parseInt(hex[0] + hex[0], 16);
+    g = parseInt(hex[1] + hex[1], 16);
+    b = parseInt(hex[2] + hex[2], 16);
+  } else if (hex.length === 6) {
+    r = parseInt(hex.substring(0, 2), 16);
+    g = parseInt(hex.substring(2, 4), 16);
+    b = parseInt(hex.substring(4, 6), 16);
+  } else {
+    return 'black';
+  }
+
+  // Using the YIQ formula which is often preferred for contrast
+  const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+  return (yiq >= 128) ? 'black' : 'white';
+}
