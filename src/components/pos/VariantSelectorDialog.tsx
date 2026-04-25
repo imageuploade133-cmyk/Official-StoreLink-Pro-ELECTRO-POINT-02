@@ -132,22 +132,34 @@ export function VariantSelectorDialog({
               {option.values.map((value) => {
                 const isSelected = selectedOptions[option.name] === value;
                 const isColor = option.name.toLowerCase().includes('color');
+                const isSize = option.name.toLowerCase().includes('size');
+                const useRound = isColor || isSize;
                 
-                if (isColor) {
+                if (useRound) {
                   return (
                     <button
                       key={value}
                       onClick={() => setSelectedOptions(prev => ({ ...prev, [option.name]: value }))}
                       className={cn(
-                        "w-10 h-10 rounded-full border-2 transition-all p-0.5",
+                        "w-10 h-10 rounded-full border-2 transition-all p-0.5 relative flex items-center justify-center",
                         isSelected ? "border-primary scale-110 shadow-md" : "border-transparent hover:scale-105"
                       )}
                       title={value}
                     >
                       <div 
-                        className="w-full h-full rounded-full border border-black/10" 
-                        style={{ backgroundColor: value.toLowerCase() }}
-                      />
+                        className={cn(
+                          "w-full h-full rounded-full border border-black/10 flex items-center justify-center overflow-hidden",
+                          isSelected && !isColor && "bg-primary text-white"
+                        )}
+                        style={{ backgroundColor: isColor ? value.toLowerCase() : undefined }}
+                      >
+                         <span className={cn(
+                           "text-[8px] font-black uppercase truncate px-0.5",
+                           isColor ? "text-white [text-shadow:0_1px_1px_rgba(0,0,0,0.4)]" : (isSelected ? "text-white" : "text-foreground")
+                         )}>
+                           {value}
+                         </span>
+                      </div>
                     </button>
                   );
                 }

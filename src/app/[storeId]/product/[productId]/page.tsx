@@ -1013,8 +1013,10 @@ export default function ProductDetailsPage() {
                           const isSelected = selectedOptions[option.name] === value;
                           const isAvailable = isOptionValueAvailable(option.name, value);
                           const isColor = option.name.toLowerCase().includes('color');
+                          const isSize = option.name.toLowerCase().includes('size');
+                          const useRound = isColor || isSize;
                           
-                          if (isColor) {
+                          if (useRound) {
                             return (
                               <button
                                 key={value}
@@ -1029,12 +1031,21 @@ export default function ProductDetailsPage() {
                                 title={value + (!isAvailable ? " (Out of Stock)" : "")}
                                 >
                                 <div
-                                  className="w-full h-full rounded-full border border-black/10 flex items-center justify-center overflow-hidden"
-                                  style={{ backgroundColor: value.toLowerCase() }}
+                                  className={cn(
+                                    "w-full h-full rounded-full border border-black/10 flex flex-col items-center justify-center overflow-hidden relative",
+                                    isSelected && !isColor && "bg-primary text-white"
+                                  )}
+                                  style={{ backgroundColor: isColor ? value.toLowerCase() : undefined }}
                                 >
+                                  <span className={cn(
+                                    "text-[10px] font-black uppercase tracking-tighter truncate px-0.5 relative z-10",
+                                    isColor ? "text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.4)]" : (isSelected ? "text-white" : "text-[#1d1d1f] dark:text-[#f5f5f7]")
+                                  )}>
+                                    {value}
+                                  </span>
                                   {!isAvailable && (
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                      <div className="w-full h-[1px] bg-rose-500 rotate-45" />
+                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+                                      <div className="w-full h-[1.5px] bg-rose-500/80 rotate-45" />
                                     </div>
                                   )}
                                 </div>
