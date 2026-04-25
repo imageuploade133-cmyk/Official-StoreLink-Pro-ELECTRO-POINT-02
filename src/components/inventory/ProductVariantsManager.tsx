@@ -98,9 +98,21 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
 
   const handleToggleHasVariants = (checked: boolean) => {
     if (!checked) {
-      // Before turning off, we might want to ensure the stock is preserved
-      // The main stock is already synced with the sum of variants due to ProductForm's effect
-      setValue('hasVariants', false, { shouldDirty: true });
+      if (variants.length > 0 || variantOptions.length > 0) {
+        setConfirmConfig({
+          isOpen: true,
+          title: 'Disable Variants?',
+          description: 'This will remove all configured options and variants. This action cannot be undone.',
+          onConfirm: () => {
+            setValue('hasVariants', false, { shouldDirty: true });
+            setValue('variants', [], { shouldDirty: true });
+            setValue('variantOptions', [], { shouldDirty: true });
+            toast({ title: "Variants Disabled", description: "All variant data has been cleared." });
+          }
+        });
+      } else {
+        setValue('hasVariants', false, { shouldDirty: true });
+      }
     } else {
       setValue('hasVariants', true, { shouldDirty: true });
     }
@@ -644,6 +656,31 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
+                  {variants.length > 0 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="rounded-full h-9 px-4 font-bold gap-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      onClick={() => {
+                        setConfirmConfig({
+                          isOpen: true,
+                          title: 'Clear All Variants?',
+                          description: 'This will remove all generated and custom variants. This action cannot be undone.',
+                          onConfirm: () => {
+                            setValue('variants', [], { shouldDirty: true });
+                            setValue('variantOptions', [], { shouldDirty: true });
+                            setValue('hasVariants', false, { shouldDirty: true });
+                            toast({ title: "Variants Cleared", description: "All variants have been removed." });
+                          }
+                        });
+                      }}
+                      disabled={!!isUploading || !!isProcessingAi}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span className="hidden sm:inline">Clear All</span>
+                    </Button>
+                  )}
                   <div className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-xl border shadow-sm">
                     <Label className="text-[10px] font-black uppercase text-muted-foreground cursor-pointer" htmlFor="show-advanced">Advanced Details</Label>
                     <Switch id="show-advanced" checked={showAdvancedDetails} onCheckedChange={setShowAdvancedDetails} className="scale-75" />
@@ -885,8 +922,16 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                                         type="button"
                                         className="absolute top-0 right-0 bg-destructive/80 text-white p-0.5 rounded-bl-lg hover:bg-destructive transition-colors"
                                         onClick={() => {
-                                          const current = getValues(`variants.${index}.additionalImageUrls`) || [];
-                                          setValue(`variants.${index}.additionalImageUrls`, current.filter((_: any, i: number) => i !== imgIdx), { shouldDirty: true });
+                                          setConfirmConfig({
+                                            isOpen: true,
+                                            title: 'Remove Image?',
+                                            description: 'Are you sure you want to remove this image from the variant gallery?',
+                                            onConfirm: () => {
+                                              const current = getValues(`variants.${index}.additionalImageUrls`) || [];
+                                              setValue(`variants.${index}.additionalImageUrls`, current.filter((_: any, i: number) => i !== imgIdx), { shouldDirty: true });
+                                              toast({ title: "Image Removed", description: "Variant gallery updated." });
+                                            }
+                                          });
                                         }}
                                       >
                                         <X className="h-2.5 w-2.5" />
