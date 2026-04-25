@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import * as React from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useFormContext, useFieldArray } from 'react-hook-form';
 import { 
   Plus, 
@@ -486,6 +487,11 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                                 {isColor ? <Palette className="h-4 w-4" /> : isSize ? <TypeIcon className="h-4 w-4" /> : <SlidersHorizontal className="h-4 w-4" />}
                               </div>
                               <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Option Name</Label>
+                              {!variantOptions[index]?.name && (
+                                <span className="text-[10px] text-destructive animate-blink font-black uppercase ml-auto">
+                                  Type here (e.g. Color, Size)
+                                </span>
+                              )}
                             </div>
                             <Input 
                               placeholder="e.g. Color, Size" 
