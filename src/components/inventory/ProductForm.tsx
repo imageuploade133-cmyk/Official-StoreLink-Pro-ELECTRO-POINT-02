@@ -478,6 +478,18 @@ export function ProductForm({
   const watchVideoEnabled = form.watch('videoEnabled');
   const watchVoiceEnabled = form.watch('voiceEnabled');
   const watchHasVariants = form.watch('hasVariants');
+  const watchVariants = form.watch("variants") || [];
+
+  // Sync total stock if variants exist
+  useEffect(() => {
+    if (watchHasVariants) {
+      const totalStock = watchVariants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
+      const currentStock = form.getValues("stock");
+      if (totalStock !== currentStock) {
+        form.setValue("stock", totalStock, { shouldValidate: true, shouldDirty: true });
+      }
+    }
+  }, [watchVariants, watchHasVariants, form]);
   const watchVideoPoster = form.watch('videoPosterUrl');
 
   const handleAiAssist = async () => {
@@ -825,17 +837,24 @@ export function ProductForm({
                               type="number" 
                               {...field} 
                               value={field.value ?? ''} 
+                              readOnly={watchHasVariants}
                               className={cn(
                                 "pr-10",
-                                settings?.preventManualStockReduction && "border-orange-100 focus-visible:ring-orange-200"
-                              )} 
+                                (settings?.preventManualStockReduction || watchHasVariants) && "border-orange-100 focus-visible:ring-orange-200",
+                                watchHasVariants && "bg-muted cursor-not-allowed"
+                              )}
                             />
                             <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                              <Boxes className={cn("h-4 w-4", settings?.preventManualStockReduction ? "text-orange-400" : "text-muted-foreground")} />
+                              <Boxes className={cn("h-4 w-4", (settings?.preventManualStockReduction || watchHasVariants) ? "text-orange-400" : "text-muted-foreground")} />
                             </div>
                           </div>
                         </FormControl>
-                        {settings?.preventManualStockReduction && (
+                        {watchHasVariants && (
+                          <FormDescription className="text-[10px] text-primary font-medium">
+                            Total stock is automatically calculated from variants below.
+                          </FormDescription>
+                        )}
+                        {!watchHasVariants && settings?.preventManualStockReduction && (
                           <FormDescription className="text-[10px] text-orange-600 font-medium">
                             Manual reduction is disabled in settings. You can only increase stock here.
                           </FormDescription>

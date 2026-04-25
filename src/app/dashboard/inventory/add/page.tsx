@@ -57,8 +57,11 @@ export default function AddProductPage() {
         isVisibleOnWeb: restValues.isVisibleOnWeb ?? true,
       };
 
+      // Calculate total stock if variants exist
       if (values.hasVariants && values.variants && values.variants.length > 0) {
         productData.stock = values.variants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
+      } else {
+        productData.stock = Number(values.stock) || 0;
       }
 
       if (isPromo && promoType && promoValue !== undefined) {
@@ -79,7 +82,7 @@ export default function AddProductPage() {
       batch.set(productRef, productData);
 
       // --- 3. LOG INITIAL STOCK AUDIT ---
-      if (values.stock > 0) {
+      if (productData.stock > 0) {
           const auditRef = doc(collection(firestore, 'stockAudit'));
           batch.set(auditRef, {
               productId: productRef.id,
@@ -87,8 +90,8 @@ export default function AddProductPage() {
               type: 'ADJUSTMENT',
               referenceId: 'INITIAL-' + productRef.id.substring(0, 8).toUpperCase(),
               beforeStock: 0,
-              afterStock: values.stock,
-              change: values.stock,
+              afterStock: productData.stock,
+              change: productData.stock,
               staffId: user.uid,
               staffName: user.displayName || user.email || 'Staff',
               store_id: currentStoreId,

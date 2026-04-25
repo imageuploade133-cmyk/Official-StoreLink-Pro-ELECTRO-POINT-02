@@ -246,7 +246,7 @@ export default function RestockNowPage() {
         const productDoc = await transaction.get(productRef);
         if (!productDoc.exists()) throw new Error('Product not found');
         
-        const currentStock = productDoc.data().stock || 0;
+        const currentStock = Number(productDoc.data().stock) || 0;
         const newStock = currentStock + restockQuantity;
 
         let variantName = '';
@@ -255,7 +255,7 @@ export default function RestockNowPage() {
           const variantIndex = variants.findIndex((v: any) => v.id === selectedVariantId);
           if (variantIndex !== -1) {
             const variant = { ...variants[variantIndex] };
-            variant.stock += restockQuantity;
+            variant.stock = (Number(variant.stock) || 0) + restockQuantity;
             if (costPrice > 0) variant.sellingPrice = variant.sellingPrice; // Keep current price or update? usually keep.
             variants[variantIndex] = variant;
             variantName = ` (${variant.name})`;
