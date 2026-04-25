@@ -277,6 +277,84 @@ export default function ProductDetailsPage() {
 
   const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: string }>({});
 
+  // Fetch Product
+  const productRef = useMemo(() => firestore ? doc(firestore, 'products', productId) : null, [firestore, productId]);
+  const { data: product, isLoading: isLoadingProduct } = useDoc<Product>(productRef);
+
+  // Fetch Category info
+  const categoryRef = useMemo(() => (firestore && product?.categoryId) ? doc(firestore, 'categories', product.categoryId) : null, [firestore, product?.categoryId]);
+  const { data: category } = useDoc<Category>(categoryRef);
+
+  // Fetch active flash sale sections
+  const sectionsQuery = useMemo(() => {
+    if (!firestore || !storeId) return null;
+    return query(
+      collection(firestore, 'homepageSections'), 
+      where('store_id', '==', storeId),
+      where('isFlashSale', '==', true),
+      where('published', '==', true)
+    );
+  }, [firestore, storeId]);
+  const { data: flashSections } = useCollection<HomepageSection>(sectionsQuery);
+
+  const activeSectionPromo = useMemo(() => {
+    if (!flashSections || !product || !today) return null;
+    
+    const activeSection = flashSections.find(s => {
+        const start = convertToDateSafely(s.flashSaleStartDate);
+        const end = convertToDateSafely(s.flashSaleEndDate);
+        if (start && today < start) return false;
+        if (end && today > end) return false;
+        
+        if (s.selectionType === 'category' && s.categoryId === product.categoryId) return true;
+        if (s.selectionType === 'manual' && s.productIds?.includes(product.id)) return true;
+        if (s.selectionType === 'all') return true;
+        
+        return false;
+    });
+
+    if (!activeSection) return null;
+
+    return {
+        type: activeSection.flashSaleDiscountType || 'percentage',
+        value: activeSection.flashSaleDiscountValue || 0,
+        endDate: convertToDateSafely(activeSection.flashSaleEndDate)
+    };
+  }, [flashSections, product, today]);
+
+  const activeRewardAd = useMemo(() => {
+    const ad = activeAds.find(ad => ad.adType === 'reward' && ad.placement === 'reward_button');
+    if (!ad) return null;
+
+    if (typeof window !== 'undefined') {
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (ad.deviceTargeting === 'mobile_only' && !isMobile) return null;
+      if (ad.deviceTargeting === 'desktop_only' && isMobile) return null;
+    }
+
+    return ad;
+  }, [activeAds]);
+
+  const effectivePrice = useMemo(() => {
+    if (!product) return 0;
+    let price = calculateEffectivePrice(product as any, today, category);
+
+    if (activeSectionPromo) {
+        const base = Number(product.sellingPrice) || 0;
+        if (activeSectionPromo.type === 'percentage') {
+            price = base * (1 - activeSectionPromo.value / 100);
+        } else {
+            price = Math.max(0, base - activeSectionPromo.value);
+        }
+    }
+
+    if (rewardAdClicked && activeRewardAd && product.rewardAdsEnabled) {
+      price = applyRewardDiscount(price, activeRewardAd);
+    }
+
+    return price;
+  }, [product, today, category, activeSectionPromo, rewardAdClicked, activeRewardAd, applyRewardDiscount]);
+
   const selectedVariant = useMemo(() => {
     if (!product?.hasVariants || !product.variants) return null;
     if (Object.keys(selectedOptions).length === 0) return null;
@@ -360,10 +438,6 @@ export default function ProductDetailsPage() {
     }
   }, [productId, addViewedProduct]);
 
-  // Fetch Product
-  const productRef = useMemo(() => firestore ? doc(firestore, 'products', productId) : null, [firestore, productId]);
-  const { data: product, isLoading: isLoadingProduct } = useDoc<Product>(productRef);
-
   // Set initial active image when product loads
   useEffect(() => {
     if (product?.imageUrl) {
@@ -374,53 +448,12 @@ export default function ProductDetailsPage() {
   // Verify product belongs to store
   const isProductInCorrectStore = product && product.store_id === storeId;
 
-  // Fetch Category info
-  const categoryRef = useMemo(() => (firestore && product?.categoryId) ? doc(firestore, 'categories', product.categoryId) : null, [firestore, product?.categoryId]);
-  const { data: category } = useDoc<Category>(categoryRef);
-
   // Fetch distributed voice signatures from sub-collection
   const voicesQuery = useMemo(() => {
       if (!firestore || !productId) return null;
       return query(collection(firestore, 'products', productId, 'voiceSignatures'));
   }, [firestore, productId]);
   const { data: distributedVoices } = useCollection<VoiceSignature>(voicesQuery);
-
-  // Fetch active flash sale sections
-  const sectionsQuery = useMemo(() => {
-    if (!firestore || !storeId) return null;
-    return query(
-      collection(firestore, 'homepageSections'), 
-      where('store_id', '==', storeId),
-      where('isFlashSale', '==', true),
-      where('published', '==', true)
-    );
-  }, [firestore, storeId]);
-  const { data: flashSections } = useCollection<HomepageSection>(sectionsQuery);
-
-  const activeSectionPromo = useMemo(() => {
-    if (!flashSections || !product || !today) return null;
-    
-    const activeSection = flashSections.find(s => {
-        const start = convertToDateSafely(s.flashSaleStartDate);
-        const end = convertToDateSafely(s.flashSaleEndDate);
-        if (start && today < start) return false;
-        if (end && today > end) return false;
-        
-        if (s.selectionType === 'category' && s.categoryId === product.categoryId) return true;
-        if (s.selectionType === 'manual' && s.productIds?.includes(product.id)) return true;
-        if (s.selectionType === 'all') return true;
-        
-        return false;
-    });
-
-    if (!activeSection) return null;
-
-    return {
-        type: activeSection.flashSaleDiscountType || 'percentage',
-        value: activeSection.flashSaleDiscountValue || 0,
-        endDate: convertToDateSafely(activeSection.flashSaleEndDate)
-    };
-  }, [flashSections, product, today]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -532,39 +565,6 @@ export default function ProductDetailsPage() {
   const recommendationsBg = settings?.relatedProductsBackgroundColor || 'transparent';
   const recommendationsTitle = settings?.relatedProductsTitle || 'You Might Also Like';
   const recommendationsDescription = settings?.relatedProductsDescription || 'Specially curated items from the same collection.';
-
-  const activeRewardAd = useMemo(() => {
-    const ad = activeAds.find(ad => ad.adType === 'reward' && ad.placement === 'reward_button');
-    if (!ad) return null;
-
-    if (typeof window !== 'undefined') {
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      if (ad.deviceTargeting === 'mobile_only' && !isMobile) return null;
-      if (ad.deviceTargeting === 'desktop_only' && isMobile) return null;
-    }
-
-    return ad;
-  }, [activeAds]);
-
-  const effectivePrice = useMemo(() => {
-    if (!product) return 0;
-    let price = calculateEffectivePrice(product as any, today, category);
-
-    if (activeSectionPromo) {
-        const base = Number(product.sellingPrice) || 0;
-        if (activeSectionPromo.type === 'percentage') {
-            price = base * (1 - activeSectionPromo.value / 100);
-        } else {
-            price = Math.max(0, base - activeSectionPromo.value);
-        }
-    }
-
-    if (rewardAdClicked && activeRewardAd && product.rewardAdsEnabled) {
-      price = applyRewardDiscount(price, activeRewardAd);
-    }
-
-    return price;
-  }, [product, today, category, activeSectionPromo, rewardAdClicked, activeRewardAd, applyRewardDiscount]);
 
   const isDiscounted = product ? (effectivePrice < product.sellingPrice) : false;
   const isOutOfStock = product ? (product.hasVariants ? isCurrentlyOutOfStock : product.stock <= 0) : false;
