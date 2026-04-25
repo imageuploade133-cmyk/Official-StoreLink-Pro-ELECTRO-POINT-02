@@ -238,9 +238,12 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
     .refine(
       (data) => !data.newPrice || data.newPrice < data.sellingPrice,
       { message: 'New price must be less than the original selling price.', path: ['newPrice'] }
+    )
+    .refine(
+      (data) => !!data.imageUrl || (data.variants && data.variants.some(v => !!v.imageUrl)),
+      { message: "Product image is required. Please upload an image or ensure at least one variant has an image.", path: ["imageUrl"] }
     );
 };
-
 export interface ProductFormProps {
   onSubmit: (values: any) => Promise<void>;
   categories: Category[];
@@ -473,12 +476,16 @@ export function ProductForm({
 
   const watchName = form.watch('name');
   const watchCategory = form.watch('categoryId');
-  const watchImageUrl = form.watch('imageUrl');
   const watchAdditionalUrls = form.watch('additionalImageUrls') || [];
   const watchVideoEnabled = form.watch('videoEnabled');
   const watchVoiceEnabled = form.watch('voiceEnabled');
   const watchHasVariants = form.watch('hasVariants');
   const watchVariants = form.watch("variants") || [];
+  const availableVariantImages = useMemo(() => {
+    return (watchVariants as any[])
+      .filter((v) => v.imageUrl)
+      .map((v) => ({ url: v.imageUrl, name: v.name }));
+  }, [watchVariants]);
 
   // Sync total stock if variants exist
 //  useEffect(() => {
@@ -764,10 +771,28 @@ export function ProductForm({
     </div>
   );
 
+  const handleFormSubmit = async (values: ProductFormValues) => {
+    const finalValues = { ...values };
+    
+    // Auto-select primary image from variants if missing
+    if (!finalValues.imageUrl) {
+      const variantWithImage = finalValues.variants?.find(v => v.imageUrl);
+      if (variantWithImage) {
+        finalValues.imageUrl = variantWithImage.imageUrl;
+        toast({ 
+          title: "Auto-selected Image", 
+          description: "Used image from variant as primary product image." 
+        });
+      }
+    }
+    
+    await onSubmit(finalValues);
+  };
+
   return (
     <>
     <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-primary/5 border border-primary/10 p-3 rounded-xl flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-primary animate-in fade-in slide-in-from-top-2">
@@ -1272,12 +1297,24 @@ export function ProductForm({
               </div>
             </CardHeader>
             <CardContent className="pt-6 space-y-8">
-              <ProductImageGallery 
-                primaryUrl={watchImageUrl}
-                additionalUrls={watchAdditionalUrls}
-                onPrimaryChange={(url) => form.setValue('imageUrl', url)}
-                onAdditionalChange={(urls) => form.setValue('additionalImageUrls', urls)}
-                disabled={isSubmitting}
+              <FormField
+                control={form.control}
+                name="imageUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <ProductImageGallery 
+                        primaryUrl={field.value || ''}
+                        additionalUrls={watchAdditionalUrls}
+                        onPrimaryChange={(url) => field.onChange(url)}
+                        onAdditionalChange={(urls) => form.setValue('additionalImageUrls', urls)}
+                        disabled={isSubmitting}
+                        variantImages={availableVariantImages}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
 
               <Separator className="border-dashed" />

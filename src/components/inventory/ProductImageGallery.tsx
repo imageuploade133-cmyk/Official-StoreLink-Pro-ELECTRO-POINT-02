@@ -18,7 +18,8 @@ import {
   Maximize2,
   X,
   Camera,
-  Wand2
+  Wand2,
+  Sparkles
 } from 'lucide-react';
 import { uploadImage } from '@/ai/flows/image-upload-flow';
 import { removeBackground } from '@/ai/flows/background-removal-flow';
@@ -36,6 +37,7 @@ import {
 } from "@/components/ui/dialog";
 import { CameraCaptureModal } from '@/components/media/CameraCaptureModal';
 import { ConfirmationModal } from '../dialogs/ConfirmationModal';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface ProductImageGalleryProps {
   primaryUrl: string;
@@ -43,6 +45,7 @@ interface ProductImageGalleryProps {
   onPrimaryChange: (url: string) => void;
   onAdditionalChange: (urls: string[]) => void;
   disabled?: boolean;
+  variantImages?: { url: string; name: string }[];
 }
 
 export function ProductImageGallery({ 
@@ -50,11 +53,13 @@ export function ProductImageGallery({
   additionalUrls, 
   onPrimaryChange, 
   onAdditionalChange, 
-  disabled 
+  disabled,
+  variantImages = []
 }: ProductImageGalleryProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isPhotoCaptureOpen, setIsPhotoCaptureOpen] = useState(false);
+  const [isVariantSelectionOpen, setIsVariantSelectionOpen] = useState(false);
   const [pendingImages, setPendingImages] = useState<{ id: string; url: string }[]>([]);
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
@@ -260,13 +265,26 @@ export function ProductImageGallery({
       <div className="flex items-center justify-between">
         <div>
             <Label className="text-sm font-black uppercase tracking-widest text-primary flex items-center gap-2">
-            <ImageIcon className="h-4 w-4" /> Visual Catalog Management
+            <ImageIcon className="h-4 w-4" /> Visual Catalog Management <span className="text-destructive">*</span>
             </Label>
             <p className="text-[10px] text-muted-foreground font-bold mt-1 uppercase tracking-tighter">
                 First image is your Hero. Max size: {settings?.imageMaxFileSizeMb || 5}MB.
             </p>
         </div>
         <div className="flex gap-2">
+          {variantImages.length > 0 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="rounded-full h-10 px-4 font-bold gap-2 border-primary/30 text-primary hover:bg-primary/5"
+              onClick={() => setIsVariantSelectionOpen(true)}
+              disabled={disabled || isUploading}
+            >
+              <Sparkles className="h-4 w-4" />
+              <span className="hidden sm:inline">Use Variant Image</span>
+            </Button>
+          )}
           {allImages.length > 0 && (
             <Button
               type="button"
@@ -522,6 +540,44 @@ export function ProductImageGallery({
         title={confirmConfig.title}
         description={confirmConfig.description}
       />
+
+      <Dialog open={isVariantSelectionOpen} onOpenChange={setIsVariantSelectionOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Select from Variant Images</DialogTitle>
+            <DialogDescription>
+              Pick one of your generated variant images to use as the primary product image.
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="h-[400px] mt-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 p-1">
+              {variantImages.map((variant, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  className="group relative aspect-square rounded-xl overflow-hidden border-2 hover:border-primary transition-all bg-muted"
+                  onClick={() => {
+                    onPrimaryChange(variant.url);
+                    setIsVariantSelectionOpen(false);
+                    toast({ title: "Primary Image Updated", description: `Using image from variant: ${variant.name}` });
+                  }}
+                >
+                  <Image 
+                    src={variant.url} 
+                    alt={variant.name} 
+                    fill 
+                    className="object-cover transition-transform group-hover:scale-110" 
+                    unoptimized
+                  />
+                  <div className="absolute inset-x-0 bottom-0 p-2 bg-black/60 text-white text-[10px] font-bold truncate">
+                    {variant.name}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
