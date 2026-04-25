@@ -81,6 +81,7 @@ export default function ManageWebCatalogPage() {
   const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [stockFilter, setStockFilter] = useState<'all' | 'variant'>('all');
   const [isToggling, setIsToggling] = useState<string | null>(null);
   const [today, setToday] = useState<Date | null>(null);
 
@@ -101,6 +102,7 @@ export default function ManageWebCatalogPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLastPage, setIsLastPage] = useState(false);
   const [totalRegistryCount, setTotalRegistryCount] = useState(0);
+  const [variantRegistryCount, setVariantRegistryCount] = useState(0);
 
   // Stable cursors using refs to avoid infinite loops
   const firstDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
@@ -131,14 +133,29 @@ export default function ManageWebCatalogPage() {
       let q = query(
         collection(firestore, 'products'), 
         where('store_id', '==', currentStoreId),
-        where('isVisibleOnWeb', '==', true),
-        orderBy('name', 'asc')
+        where('isVisibleOnWeb', '==', true)
       );
+
+      if (stockFilter === 'variant') {
+        q = query(q, where('hasVariants', '==', true));
+      }
+
+      q = query(q, orderBy('name', 'asc'));
 
       // 1. Initial count (Cost Efficient)
       if (direction === 'initial') {
         const countSnap = await getCountFromServer(q);
         setTotalRegistryCount(countSnap.data().count);
+
+        // Fetch variant count
+        const variantQ = query(
+          collection(firestore, 'products'), 
+          where('store_id', '==', currentStoreId),
+          where('isVisibleOnWeb', '==', true),
+          where('hasVariants', '==', true)
+        );
+        const variantSnap = await getCountFromServer(variantQ);
+        setVariantRegistryCount(variantSnap.data().count);
       }
 
       // 2. Apply Cursors
@@ -177,7 +194,7 @@ export default function ManageWebCatalogPage() {
     } finally {
       setIsLoadingProducts(false);
     }
-  }, [firestore, toast, currentStoreId]);
+  }, [firestore, toast, currentStoreId, stockFilter]);
 
   useEffect(() => {
     if (firestore && !isAuthLoading && permissions.manage_website_content && currentStoreId) {
@@ -209,6 +226,13 @@ export default function ManageWebCatalogPage() {
     } finally {
       setIsToggling(null);
     }
+  };
+
+  const handleStockFilterChange = (filter: 'all' | 'variant') => {
+    setStockFilter(filter);
+    setCurrentPage(1);
+    firstDocRef.current = null;
+    lastDocRef.current = null;
   };
 
   const handleOpenActions = (product: Product) => {
@@ -386,7 +410,7 @@ export default function ManageWebCatalogPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="bg-primary/5 border-primary/10 shadow-none">
           <CardHeader className="pb-2">
             <CardTitle className="text-[10px] font-black uppercase tracking-widest text-primary">Registry Capacity</CardTitle>
@@ -394,6 +418,15 @@ export default function ManageWebCatalogPage() {
           <CardContent>
             {isLoadingProducts && totalRegistryCount === 0 ? <Skeleton className="h-8 w-16" /> : <div className="text-3xl font-black">{totalRegistryCount.toLocaleString()}</div>}
             <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Total Products in Web Store</p>
+          </CardContent>
+        </Card>
+        <Card className="shadow-none bg-indigo-50/50">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-indigo-600">Variant Stock</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoadingProducts && variantRegistryCount === 0 ? <Skeleton className="h-8 w-16" /> : <div className="text-3xl font-black text-indigo-700">{variantRegistryCount.toLocaleString()}</div>}
+            <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Web Products with Variants</p>
           </CardContent>
         </Card>
         <Card className="shadow-none bg-green-50/50">
@@ -416,6 +449,26 @@ export default function ManageWebCatalogPage() {
             <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Media completion in batch</p>
           </CardContent>
         </Card>
+      </div>
+
+      <div className="flex items-center gap-2 bg-muted/30 p-1 rounded-xl w-fit border">
+        <Button 
+          variant={stockFilter === 'all' ? 'default' : 'ghost'} 
+          size="sm" 
+          onClick={() => handleStockFilterChange('all')}
+          className="rounded-lg h-8 px-4 font-bold text-xs uppercase tracking-wider"
+        >
+          All Web Products
+        </Button>
+        <Button 
+          variant={stockFilter === 'variant' ? 'default' : 'ghost'} 
+          size="sm" 
+          onClick={() => handleStockFilterChange('variant')}
+          className="rounded-lg h-8 px-4 font-bold text-xs uppercase tracking-wider"
+        >
+          <LayoutGrid className="mr-2 h-3 w-3" />
+          Variant Stock
+        </Button>
       </div>
 
       <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
@@ -518,6 +571,11 @@ export default function ManageWebCatalogPage() {
                                 {hasVoice && (
                                     <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 text-[8px] h-4 px-1.5 uppercase font-black tracking-tighter">
                                         <Mic className="h-2 w-2 mr-1" /> Voice
+                                    </Badge>
+                                )}
+                                {product.hasVariants && (
+                                    <Badge variant="outline" className="bg-indigo-50 text-indigo-600 border-indigo-200 text-[8px] h-4 px-1.5 uppercase font-black tracking-tighter">
+                                        <LayoutGrid className="h-2 w-2 mr-1" /> Variant
                                     </Badge>
                                 )}
                                 {isSaleActive && (

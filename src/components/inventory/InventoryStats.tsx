@@ -1,7 +1,7 @@
 'use client';
 
 import { StatCard } from '@/components/StatCard';
-import { Boxes, Warehouse, TrendingUp } from 'lucide-react';
+import { Boxes, Warehouse, TrendingUp, LayoutGrid } from 'lucide-react';
 import { formatCurrency } from '@/lib/formatUtils';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -13,6 +13,7 @@ interface InventoryStatsProps {
   currencySymbol: string;
   lowStockCount?: number;
   outOfStockCount?: number;
+  variantStockCount?: number;
 }
 
 export function InventoryStats({
@@ -23,6 +24,7 @@ export function InventoryStats({
   currencySymbol,
   lowStockCount = 0,
   outOfStockCount = 0,
+  variantStockCount = 0,
 }: InventoryStatsProps) {
   if (isLoading) {
     return (
@@ -35,7 +37,7 @@ export function InventoryStats({
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
       <StatCard
         title="Total Stock Units"
         value={totalStock.toLocaleString()}
@@ -65,6 +67,16 @@ export function InventoryStats({
         titleClassName="text-green-600 dark:text-green-400"
         iconClassName="text-green-500 bg-green-100 dark:bg-green-900/50"
         valueClassName="text-green-700 dark:text-green-300"
+      />
+      <StatCard
+        title="Variant Stock"
+        value={variantStockCount.toLocaleString()}
+        description="Products with multiple variants."
+        icon={LayoutGrid}
+        className="bg-gradient-to-br from-indigo-50/50 to-white dark:from-indigo-950/20 dark:to-background border border-indigo-100/50 dark:border-indigo-900/30"
+        titleClassName="text-indigo-600 dark:text-indigo-400"
+        iconClassName="text-indigo-500 bg-indigo-100 dark:bg-indigo-900/50"
+        valueClassName="text-indigo-700 dark:text-indigo-300"
       />
       <div className="flex flex-col gap-2">
         <div className="flex-1 bg-gradient-to-br from-red-50 to-white dark:from-red-950/20 dark:to-background border border-red-100 dark:border-red-900/30 rounded-2xl p-4 flex items-center justify-between shadow-sm">
