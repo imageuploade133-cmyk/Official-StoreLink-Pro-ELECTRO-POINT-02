@@ -65,6 +65,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn, convertToDateSafely } from '@/lib/utils';
+import { getContrastColor } from '@/lib/color-utils';
 import { ProductCard } from '@/components/store/ProductCard';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
@@ -1001,12 +1002,17 @@ export default function ProductDetailsPage() {
                   {product.variantOptions.map((option, idx) => (
                     <div key={option.name} className="space-y-3">
                       <div className="flex justify-between items-center">
-                        <label className="text-[11px] font-black uppercase tracking-[0.2em] text-[#86868b]">
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#86868b] flex items-center gap-2">
                           {option.name}
                         </label>
-                        <span className="text-[11px] font-bold text-primary">
-                          {selectedOptions[option.name] || 'Select'}
-                        </span>
+                        {selectedOptions[option.name] && (
+                          <Badge 
+                            variant="secondary" 
+                            className="h-6 px-3 rounded-full bg-primary/10 text-primary border-none text-[10px] font-black uppercase tracking-wider animate-in fade-in zoom-in duration-500"
+                          >
+                            {selectedOptions[option.name]}
+                          </Badge>
+                        )}
                       </div>
                       <div className="flex flex-wrap gap-2 md:gap-3">
                         {option.values.map((value) => {
@@ -1016,37 +1022,50 @@ export default function ProductDetailsPage() {
                           const isSize = option.name.toLowerCase().includes('size');
                           const useRound = isColor || isSize;
                           
+                          // Shorten text if too long (Robust truncation)
+                          const displayValue = value.length > 8 ? value.substring(0, 6).trim() + '..' : value;
+                          
                           if (useRound) {
+                            const colorValue = value.toLowerCase();
+                            const textColor = isColor ? getContrastColor(colorValue) : (isSelected ? 'white' : undefined);
+
                             return (
                               <button
                                 key={value}
                                 onClick={() => handleOptionChange(option.name, value)}
                                 className={cn(
-                                  "w-12 h-12 rounded-full border-2 transition-all p-1 relative flex items-center justify-center",
+                                  "min-w-[3rem] h-12 rounded-full border-2 transition-all p-1 relative flex items-center justify-center group active:scale-95",
                                   isSelected
-                                    ? "border-primary scale-110 shadow-md ring-2 ring-primary/20"
-                                    : "border-slate-200 dark:border-slate-800 hover:border-primary/50",
+                                    ? "border-primary scale-110 shadow-lg ring-4 ring-primary/10 z-10"
+                                    : "border-slate-200 dark:border-slate-800 hover:border-primary/40 hover:scale-105",
                                   !isAvailable && "opacity-40"
                                 )}
                                 title={value + (!isAvailable ? " (Out of Stock)" : "")}
                                 >
                                 <div
                                   className={cn(
-                                    "w-full h-full rounded-full border border-black/10 flex flex-col items-center justify-center overflow-hidden relative",
-                                    isSelected && !isColor && "bg-primary text-white"
+                                    "w-full h-full rounded-full border border-black/5 flex flex-col items-center justify-center overflow-hidden relative px-2.5 transition-all duration-300",
+                                    !isColor && (isSelected ? "bg-primary" : "bg-white dark:bg-black/40")
                                   )}
-                                  style={{ backgroundColor: isColor ? value.toLowerCase() : undefined }}
+                                  style={{ 
+                                    backgroundColor: isColor ? colorValue : undefined,
+                                  }}
                                 >
                                   <span className={cn(
-                                    "text-[10px] font-black uppercase tracking-tighter truncate px-0.5 relative z-10",
-                                    isColor ? "text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.4)]" : (isSelected ? "text-white" : "text-[#1d1d1f] dark:text-[#f5f5f7]")
-                                  )}>
-                                    {value}
+                                    "text-[9px] font-black uppercase tracking-tight truncate relative z-10 transition-colors duration-300",
+                                    !isColor && (isSelected ? "text-white" : "text-[#1d1d1f] dark:text-[#f5f5f7]")
+                                  )}
+                                  style={{ color: isColor ? textColor : undefined }}
+                                  >
+                                    {displayValue}
                                   </span>
                                   {!isAvailable && (
                                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-                                      <div className="w-full h-[1.5px] bg-rose-500/80 rotate-45" />
+                                      <div className="w-full h-[1.5px] bg-rose-500/80 rotate-45 shadow-sm" />
                                     </div>
+                                  )}
+                                  {isSelected && (
+                                    <div className="absolute inset-0 bg-white/10 dark:bg-black/10 animate-pulse" />
                                   )}
                                 </div>
                                 </button>
@@ -1059,14 +1078,15 @@ export default function ProductDetailsPage() {
                               onClick={() => handleOptionChange(option.name, value)}
                               disabled={false} // Allow selecting out of stock to see it's out of stock
                               className={cn(
-                                "relative px-4 py-3 rounded-xl border-2 text-sm font-bold transition-all min-w-[4.5rem] h-14 flex flex-col items-center justify-center gap-0.5 overflow-hidden",
+                                "relative px-4 py-3 rounded-2xl border-2 text-sm font-bold transition-all min-w-[5rem] h-14 flex flex-col items-center justify-center gap-0.5 overflow-hidden active:scale-95",
                                 isSelected 
-                                  ? "border-primary bg-primary text-white shadow-md z-10" 
+                                  ? "border-primary bg-primary text-white shadow-lg z-10 scale-105" 
                                   : "border-slate-200 dark:border-slate-800 bg-white dark:bg-black text-[#1d1d1f] dark:text-white hover:border-primary/50",
                                 !isAvailable && "opacity-60"
                               )}
+                              title={value}
                             >
-                              <span className="relative z-10">{value}</span>
+                              <span className="relative z-10 truncate w-full px-1">{displayValue}</span>
                               {!isAvailable && (
                                 <>
                                   <span className="relative z-10 text-[7px] leading-none uppercase font-black text-rose-500">Sold Out</span>

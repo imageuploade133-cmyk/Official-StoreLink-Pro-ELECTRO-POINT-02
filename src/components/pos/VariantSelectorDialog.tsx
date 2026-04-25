@@ -20,6 +20,7 @@ import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { ScrollArea } from "../ui/scroll-area";
 import { cn } from "../../lib/utils";
+import { getContrastColor } from "../../lib/color-utils";
 import { formatCurrency } from "../../lib/formatUtils";
 import type { DisplayProduct, ProductVariant } from "../../lib/types";
 import Image from 'next/image';
@@ -125,39 +126,54 @@ export function VariantSelectorDialog({
       <div className="space-y-6 pb-4">
         {product.variantOptions?.map((option) => (
           <div key={option.name} className="space-y-3">
-            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">
-              {option.name}
-            </label>
+            <div className="flex justify-between items-center">
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                {option.name}
+              </label>
+              {selectedOptions[option.name] && (
+                <Badge variant="secondary" className="h-5 px-2 rounded-full bg-primary/10 text-primary border-none text-[9px] font-black uppercase tracking-wider">
+                  {selectedOptions[option.name]}
+                </Badge>
+              )}
+            </div>
             <div className="flex flex-wrap gap-2">
               {option.values.map((value) => {
                 const isSelected = selectedOptions[option.name] === value;
                 const isColor = option.name.toLowerCase().includes('color');
                 const isSize = option.name.toLowerCase().includes('size');
                 const useRound = isColor || isSize;
+
+                // Shorten text if too long
+                const displayValue = value.length > 8 ? value.substring(0, 6).trim() + '..' : value;
                 
                 if (useRound) {
+                  const colorValue = value.toLowerCase();
+                  const textColor = isColor ? getContrastColor(colorValue) : (isSelected ? 'white' : undefined);
+
                   return (
                     <button
                       key={value}
                       onClick={() => setSelectedOptions(prev => ({ ...prev, [option.name]: value }))}
                       className={cn(
-                        "w-10 h-10 rounded-full border-2 transition-all p-0.5 relative flex items-center justify-center",
-                        isSelected ? "border-primary scale-110 shadow-md" : "border-transparent hover:scale-105"
+                        "min-w-[2.5rem] h-10 rounded-full border-2 transition-all p-0.5 relative flex items-center justify-center group active:scale-95",
+                        isSelected ? "border-primary scale-110 shadow-md z-10" : "border-slate-200 dark:border-slate-800 hover:border-primary/40 hover:scale-105"
                       )}
                       title={value}
                     >
                       <div 
                         className={cn(
-                          "w-full h-full rounded-full border border-black/10 flex items-center justify-center overflow-hidden",
-                          isSelected && !isColor && "bg-primary text-white"
+                          "w-full h-full rounded-full border border-black/5 flex items-center justify-center overflow-hidden px-2 transition-all duration-300",
+                          !isColor && (isSelected ? "bg-primary" : "bg-background")
                         )}
-                        style={{ backgroundColor: isColor ? value.toLowerCase() : undefined }}
+                        style={{ backgroundColor: isColor ? colorValue : undefined }}
                       >
                          <span className={cn(
-                           "text-[8px] font-black uppercase truncate px-0.5",
-                           isColor ? "text-white [text-shadow:0_1px_1px_rgba(0,0,0,0.4)]" : (isSelected ? "text-white" : "text-foreground")
-                         )}>
-                           {value}
+                           "text-[8px] font-black uppercase truncate relative z-10",
+                           !isColor && (isSelected ? "text-white" : "text-foreground")
+                         )}
+                         style={{ color: isColor ? textColor : undefined }}
+                         >
+                           {displayValue}
                          </span>
                       </div>
                     </button>
@@ -169,13 +185,13 @@ export function VariantSelectorDialog({
                     key={value}
                     onClick={() => setSelectedOptions(prev => ({ ...prev, [option.name]: value }))}
                     className={cn(
-                      "px-4 py-2 rounded-md border-2 text-sm font-bold transition-all",
+                      "px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all min-w-[4rem] active:scale-95",
                       isSelected 
-                        ? "border-primary bg-primary text-white shadow-sm" 
+                        ? "border-primary bg-primary text-white shadow-md scale-105" 
                         : "border-muted bg-background text-foreground hover:border-primary/50"
                     )}
                   >
-                    {value}
+                    <span className="truncate block">{displayValue}</span>
                   </button>
                 );
               })}
