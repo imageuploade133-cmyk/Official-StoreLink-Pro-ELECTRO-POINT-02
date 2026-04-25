@@ -67,6 +67,7 @@ import { generateMarketingContent } from '@/ai/flows/product-marketing-flow';
 import { uploadImage } from '@/ai/flows/image-upload-flow';
 import { compressAndResizeImage } from "@/lib/image-utils";
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -816,8 +817,28 @@ export function ProductForm({
                   name="stock"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="font-bold">Current Stock <span className="text-destructive">*</span></FormLabel>
-                      <FormControl><Input type="number" {...field} value={field.value ?? ''} /></FormControl>
+                      <FormLabel className="font-bold flex items-center justify-between"><span>Current Stock <span className="text-destructive">*</span></span>{settings?.preventManualStockReduction && (<Badge variant="outline" className="text-[9px] uppercase border-orange-200 text-orange-600 bg-orange-50">Reduction Restricted</Badge>)}</FormLabel>
+                      <FormControl>
+                          <div className="relative group">
+                            <Input 
+                              type="number" 
+                              {...field} 
+                              value={field.value ?? ''} 
+                              className={cn(
+                                "pr-10",
+                                settings?.preventManualStockReduction && "border-orange-100 focus-visible:ring-orange-200"
+                              )} 
+                            />
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                              <Boxes className={cn("h-4 w-4", settings?.preventManualStockReduction ? "text-orange-400" : "text-muted-foreground")} />
+                            </div>
+                          </div>
+                        </FormControl>
+                        {settings?.preventManualStockReduction && (
+                          <FormDescription className="text-[10px] text-orange-600 font-medium">
+                            Manual reduction is disabled in settings. You can only increase stock here.
+                          </FormDescription>
+                        )}
                       <FormMessage />
                     </FormItem>
                   )}

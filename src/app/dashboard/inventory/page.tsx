@@ -72,6 +72,7 @@ export default function InventoryPage() {
   const [isCloning, setIsCloning] = useState(false);
   const [isUpdatingSettings, setIsUpdatingSettings] = useState(false);
   const [isBarcodeScannerOpen, setIsBarcodeScannerOpen] = useState(false);
+  const [stockFilter, setStockFilter] = useState<'all' | 'low' | 'out'>('all');
 
   const firestore = useFirestore();
   const { user, store, staffMember } = useAuth();
@@ -88,6 +89,8 @@ export default function InventoryPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLastPage, setIsLastPage] = useState(false);
   const [totalProductCount, setTotalProductCount] = useState(0);
+  const [lowStockCount, setLowStockCount] = useState(0);
+  const [outOfStockCount, setOutOfStockCount] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(15);
 
   // Stable cursors using refs to avoid infinite loops in useEffect
@@ -108,12 +111,33 @@ export default function InventoryPage() {
     setIsLoadingProducts(true);
 
     try {
-      let q = query(collection(firestore, 'products'), where('store_id', '==', currentStoreId), orderBy('name', 'asc'));
+      let q = query(collection(firestore, 'products'), where('store_id', '==', currentStoreId));
+
+      if (stockFilter === 'out') {
+        q = query(q, where('stock', '<=', 0));
+      } else if (stockFilter === 'low') {
+        q = query(q, where('stock', '<=', globalLowStockThreshold), where('stock', '>', 0));
+      }
+      
+      q = query(q, orderBy('name', 'asc'));
 
       // 1. Initial count (Cost Efficient)
       if (direction === 'initial') {
         const countSnap = await getCountFromServer(q);
         setTotalProductCount(countSnap.data().count);
+
+        // Fetch low and out of stock counts globally (not filtered by current view)
+        const baseQ = query(collection(firestore, 'products'), where('store_id', '==', currentStoreId));
+        const outQ = query(baseQ, where('stock', '<=', 0));
+        const lowQ = query(baseQ, where('stock', '<=', globalLowStockThreshold), where('stock', '>', 0));
+
+        const [outSnap, lowSnap] = await Promise.all([
+          getCountFromServer(outQ),
+          getCountFromServer(lowQ)
+        ]);
+
+        setOutOfStockCount(outSnap.data().count);
+        setLowStockCount(lowSnap.data().count);
       }
 
       // 2. Apply cursors from refs
@@ -155,7 +179,7 @@ export default function InventoryPage() {
     } finally {
       setIsLoadingProducts(false);
     }
-  }, [firestore, currentStoreId, toast, itemsPerPage]);
+  }, [firestore, currentStoreId, toast, itemsPerPage, stockFilter, globalLowStockThreshold]);
 
   useEffect(() => {
     if (firestore && !isLoadingSettings && currentStoreId) {
@@ -422,6 +446,14 @@ export default function InventoryPage() {
     lastDocRef.current = null;
   };
 
+  const handleStockFilterChange = (filter: 'all' | 'low' | 'out') => {
+    setStockFilter(filter);
+    setCurrentPage(1);
+    firstDocRef.current = null;
+    lastDocRef.current = null;
+    // We'll need to update fetchProducts to account for this
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -492,7 +524,36 @@ export default function InventoryPage() {
         totalStockValue={totalStockValue}
         totalStockProfit={totalStockProfit}
         currencySymbol={currencySymbol}
+        lowStockCount={lowStockCount}
+        outOfStockCount={outOfStockCount}
       />
+
+      <div className="flex items-center gap-2 bg-muted/30 p-1 rounded-xl w-fit border">
+        <Button 
+          variant={stockFilter === 'all' ? 'default' : 'ghost'} 
+          size="sm" 
+          onClick={() => handleStockFilterChange('all')}
+          className="rounded-lg h-8 px-4 font-bold text-xs uppercase tracking-wider"
+        >
+          All Products
+        </Button>
+        <Button 
+          variant={stockFilter === 'low' ? 'default' : 'ghost'} 
+          size="sm" 
+          onClick={() => handleStockFilterChange('low')}
+          className="rounded-lg h-8 px-4 font-bold text-xs uppercase tracking-wider"
+        >
+          Low Stock
+        </Button>
+        <Button 
+          variant={stockFilter === 'out' ? 'default' : 'ghost'} 
+          size="sm" 
+          onClick={() => handleStockFilterChange('out')}
+          className="rounded-lg h-8 px-4 font-bold text-xs uppercase tracking-wider"
+        >
+          Out of Stock
+        </Button>
+      </div>
 
       <Card className="shadow-xl border-none ring-1 ring-border overflow-hidden">
         <CardContent className="p-0">
