@@ -50,9 +50,10 @@ import {
   Camera,
   Barcode,
   ListChecks,
-  Star
+  Star,
+  Eye,
+  Boxes
 } from 'lucide-react';
-import { Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { Timestamp, addDoc, collection, doc, updateDoc, where, query, getDocs } from 'firebase/firestore';
 
