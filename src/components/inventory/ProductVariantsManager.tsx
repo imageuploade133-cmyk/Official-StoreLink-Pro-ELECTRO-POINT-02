@@ -242,7 +242,8 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
       if (existing) {
         return {
           ...existing,
-          name // Update name in case order or separator changed
+          name, // Update name in case order or separator changed
+          additionalImageUrls: existing.additionalImageUrls || []
         };
       }
 
@@ -254,6 +255,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
         sellingPrice: baseSellingPrice,
         stock: 0,
         imageUrl: '',
+        additionalImageUrls: [],
         isActive: true,
         isManual: false
       };
@@ -886,6 +888,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                           sellingPrice: baseSellingPrice,
                           stock: 0,
                           imageUrl: '',
+                          additionalImageUrls: [],
                           isActive: true,
                           isManual: true
                         };
