@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, useFieldArray, FormProvider } from 'react-hook-form';
+import { useForm, useFieldArray, FormProvider, useWatch } from 'react-hook-form';
 import Image from 'next/image';
 import { 
   Loader2, 
@@ -400,7 +400,7 @@ export function ProductForm({
   });
 
   useEffect(() => {
-    if (categories.length > 0) {
+    if (defaultValues) {
       const currentId = (defaultValues as any)?.id;
       if (!hasInitialReset || (currentId && currentId !== lastResetId.current)) {
         form.reset({
@@ -468,7 +468,7 @@ export function ProductForm({
           rewardAdsEnabled: defaultValues?.rewardAdsEnabled ?? false,
           hasVariants: defaultValues?.hasVariants ?? false,
           advancedDetailsEnabled: defaultValues?.advancedDetailsEnabled ?? false,
-          variantStockTotal: defaultValues?.variantStockTotal ?? 0,
+          variantStockTotal: defaultValues?.variantStockTotal ?? (defaultValues?.hasVariants ? defaultValues?.variants?.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0) : 0),
           variantOptions: defaultValues?.variantOptions || [],
           variants: defaultValues?.variants || [],
         });
@@ -488,7 +488,7 @@ export function ProductForm({
   const watchVideoEnabled = form.watch('videoEnabled');
   const watchVoiceEnabled = form.watch('voiceEnabled');
   const watchHasVariants = form.watch('hasVariants');
-  const watchVariants = form.watch("variants") || [];
+  const watchVariants = useWatch({ control: form.control, name: "variants" }) || [];
   const availableVariantImages = useMemo(() => {
     return (watchVariants as any[])
       .filter((v) => v.imageUrl)

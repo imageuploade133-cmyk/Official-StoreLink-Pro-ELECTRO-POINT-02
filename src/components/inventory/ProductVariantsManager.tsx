@@ -224,14 +224,17 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
         if (v.isManual) return false;
         if (!v.options) return false;
         
-        const existingKeys = Object.keys(v.options);
         const comboKeys = Object.keys(combo);
+        const existingKeys = Object.keys(v.options);
         
-        if (existingKeys.length !== comboKeys.length) return false;
+        if (comboKeys.length === 0 || existingKeys.length !== comboKeys.length) return false;
         
+        // Check if all combo keys match an option in the variant
         return comboKeys.every(key => {
           const comboVal = String(combo[key]).toLowerCase().trim();
-          const existingVal = String(v.options[key] || v.options[key.toLowerCase()] || '').toLowerCase().trim();
+          const actualKey = Object.keys(v.options).find(k => k.toLowerCase() === key.toLowerCase());
+          if (!actualKey) return false;
+          const existingVal = String(v.options[actualKey]).toLowerCase().trim();
           return comboVal === existingVal;
         });
       });
@@ -1143,11 +1146,13 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                           <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Stock</Label>
                           <Input 
                             type="number" 
-                            readOnly
-                            className="h-10 text-xs font-black bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl cursor-not-allowed opacity-70"
+                            className="h-10 text-xs font-black bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl"
                             {...control.register(`variants.${index}.stock` as const)}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value) || 0;
+                              setValue(`variants.${index}.stock`, val, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
+                            }}
                           />
-                          <p className="text-[8px] text-primary font-bold">Edit in 'Current Stock' above</p>
                         </div>
                         <div className="space-y-1">
                           <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Status</Label>
