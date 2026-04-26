@@ -279,16 +279,26 @@ export default function ProductDetailsPage() {
   const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: string }>({});
   const [isChangingVariant, setIsChangingVariant] = useState(false);
 
+  const matchesVariant = (variant: any, options: { [key: string]: string }, skipOption?: string) => {
+    if (!variant.options) return false;
+    return Object.entries(options).every(([key, value]) => {
+      if (skipOption && key === skipOption) return true;
+      const actualKey = Object.keys(variant.options).find(k => k.toLowerCase() === key.toLowerCase());
+      if (!actualKey) return false;
+      return String(variant.options[actualKey]).toLowerCase().trim() === String(value).toLowerCase().trim();
+    });
+  };
+
   const isOptionValueAvailable = (optionName: string, value: string) => {
     if (!product?.variants || !product.variantOptions) return true;
 
     return product.variants.some(v => 
       v.isActive && 
-      v.stock > 0 &&
-      Object.entries(selectedOptions).every(([optName, optVal]) => 
-        optName === optionName || v.options[optName] === optVal
-      ) &&
-      v.options[optionName] === value
+      (Number(v.stock) || 0) > 0 &&
+      matchesVariant(v, selectedOptions, optionName) &&
+      v.options && 
+      Object.keys(v.options).find(k => k.toLowerCase() === optionName.toLowerCase()) &&
+      String(v.options[Object.keys(v.options).find(k => k.toLowerCase() === optionName.toLowerCase())!]).toLowerCase().trim() === String(value).toLowerCase().trim()
     );
   };
 
@@ -391,8 +401,7 @@ export default function ProductDetailsPage() {
     if (!product?.hasVariants || !product.variants) return null;
     if (Object.keys(selectedOptions).length === 0) return null;
     return product.variants.find(v => 
-      v.isActive && 
-      Object.entries(selectedOptions).every(([key, value]) => v.options[key] === value)
+      v.isActive && matchesVariant(v, selectedOptions)
     );
   }, [product, selectedOptions]);
 
@@ -401,8 +410,7 @@ export default function ProductDetailsPage() {
     // Only return a specific variant when ALL options are selected
     if (Object.keys(selectedOptions).length !== product.variantOptions.length) return null;
     return product.variants.find(v => 
-      v.isActive && 
-      Object.entries(selectedOptions).every(([key, value]) => v.options[key] === value)
+      v.isActive && matchesVariant(v, selectedOptions)
     );
   }, [product, selectedOptions]);
 
@@ -418,14 +426,13 @@ export default function ProductDetailsPage() {
 
   const currentStock = useMemo(() => {
     if (!product) return 0;
-    if (!product.hasVariants || !product.variants) return product.stock || 0;
+    if (!product.hasVariants || !product.variants || product.variants.length === 0) return Number(product.stock) || 0;
     
-    if (selectedVariant) return selectedVariant.stock;
+    if (selectedVariant) return Number(selectedVariant.stock) || 0;
     
     // If variants exist but none/partially selected, show total stock of matching variants
     const matchingVariants = product.variants.filter(v => 
-        v.isActive && 
-        Object.entries(selectedOptions).every(([key, value]) => v.options[key] === value)
+        v.isActive && matchesVariant(v, selectedOptions)
     );
     
     return matchingVariants.reduce((acc, v) => acc + (Number(v.stock) || 0), 0);
