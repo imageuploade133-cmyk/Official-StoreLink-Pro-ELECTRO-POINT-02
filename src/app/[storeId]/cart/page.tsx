@@ -117,7 +117,7 @@ export default function CartPage() {
 
       let salePrice = calculateEffectivePrice(dbProduct as any, today);
       let stock = dbProduct.stock;
-      let variantImageUrl = dbProduct.imageUrl;
+      let variantImageUrl = null;
       
       if (cartItem.selectedVariantId && dbProduct.hasVariants && dbProduct.variants) {
         const variant = dbProduct.variants.find(v => v.id === cartItem.selectedVariantId);
@@ -126,14 +126,14 @@ export default function CartPage() {
             salePrice = calculateEffectivePrice({ ...dbProduct, sellingPrice: variant.sellingPrice } as any, today);
           }
           stock = variant.stock;
-          if (variant.imageUrl) variantImageUrl = variant.imageUrl;
+          variantImageUrl = variant.imageUrl;
         }
       }
       
       return {
         ...cartItem,
         ...dbProduct,
-        imageUrl: variantImageUrl,
+        imageUrl: variantImageUrl || cartItem.imageUrl || dbProduct.imageUrl,
         salePrice,
         stock,
         isUnavailable: dbProduct.isVisibleInPOS === false,

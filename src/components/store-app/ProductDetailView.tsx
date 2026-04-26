@@ -707,7 +707,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                             </div>
                             <Button
                                 onClick={() => {
-                                    for(let i=0; i<detailQty; i++) addToCart(product, effectivePrice);
+                                    for(let i=0; i<detailQty; i++) addToCart({ ...product, imageUrl: activeImage || product.imageUrl }, effectivePrice);
                                     onNavigateToCart();
                                 }}
                                 style={addToCartButtonStyle}
