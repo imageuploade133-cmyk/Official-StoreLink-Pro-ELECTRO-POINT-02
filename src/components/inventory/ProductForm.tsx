@@ -222,7 +222,9 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
       barcode: z.string().optional().or(z.literal("")),
       description: z.string().optional().or(z.literal("")),
       imageUrl: z.string().url().optional().or(z.literal("")),
+      additionalImageUrls: z.array(z.string().url()).optional().default([]),
       isActive: z.boolean().default(true),
+      isManual: z.boolean().optional().default(false),
     })).optional().default([]),
   });
 
