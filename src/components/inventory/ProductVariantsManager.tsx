@@ -19,7 +19,9 @@ import {
   Sparkles,
   Star,
   Palette,
-  Type as TypeIcon
+  Type as TypeIcon,
+  ChevronDown,
+  ShoppingBag
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,6 +35,13 @@ import {
   FormMessage,
   FormDescription
 } from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -45,22 +54,69 @@ import { useSettings } from '@/contexts/settings-context';
 import Image from 'next/image';
 import { ConfirmationModal } from '../dialogs/ConfirmationModal';
 
-const SUGGESTIONS = {
-  color: [
-    { name: 'Red', hex: '#FF0000' },
-    { name: 'Black', hex: '#000000' },
-    { name: 'White', hex: '#FFFFFF' },
-    { name: 'Blue', hex: '#0000FF' },
-    { name: 'Green', hex: '#008000' },
-    { name: 'Yellow', hex: '#FFFF00' },
-    { name: 'Pink', hex: '#FFC0CB' },
-    { name: 'Purple', hex: '#800080' },
-    { name: 'Gray', hex: '#808080' },
-    { name: 'Brown', hex: '#A52A2A' },
-  ],
-  size: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
-  material: ['Cotton', 'Silk', 'Leather', 'Polyester', 'Nylon', 'Wool', 'Linen', 'Denim'],
-};
+const PRESET_OPTIONS = [
+  { 
+    name: 'Color', 
+    placeholder: 'Enter values like Red, Blue, Black', 
+    suggestions: [
+      { name: 'Red', hex: '#FF0000' },
+      { name: 'Black', hex: '#000000' },
+      { name: 'White', hex: '#FFFFFF' },
+      { name: 'Blue', hex: '#0000FF' },
+      { name: 'Green', hex: '#008000' },
+      { name: 'Yellow', hex: '#FFFF00' },
+      { name: 'Pink', hex: '#FFC0CB' },
+      { name: 'Purple', hex: '#800080' },
+      { name: 'Gray', hex: '#808080' },
+      { name: 'Brown', hex: '#A52A2A' },
+    ] 
+  },
+  { 
+    name: 'Size', 
+    placeholder: 'Enter values like S, M, L, XL', 
+    suggestions: ['S', 'M', 'L', 'XL', 'XXL'] 
+  },
+  { 
+    name: 'Material', 
+    placeholder: 'Cotton, Leather, Wood', 
+    suggestions: ['Cotton', 'Leather', 'Wood', 'Silk', 'Polyester', 'Denim', 'Linen', 'Wool'] 
+  },
+  { 
+    name: 'Style', 
+    placeholder: 'Modern, Classic, Minimalist', 
+    suggestions: ['Modern', 'Classic', 'Minimalist', 'Vintage', 'Contemporary'] 
+  },
+  { 
+    name: 'Storage', 
+    placeholder: '64GB, 128GB, 256GB', 
+    suggestions: ['64GB', '128GB', '256GB', '512GB', '1TB'] 
+  },
+  { 
+    name: 'Length', 
+    placeholder: 'Enter values like 10cm, 20cm, 30cm', 
+    suggestions: ['10cm', '20cm', '30cm', '1m', '2m'] 
+  },
+  { 
+    name: 'Weight', 
+    placeholder: 'Enter values like 1kg, 2kg, 5kg', 
+    suggestions: ['500g', '1kg', '2kg', '5kg', '10kg'] 
+  },
+  { 
+    name: 'Flavor', 
+    placeholder: 'Enter values like Vanilla, Chocolate, Strawberry', 
+    suggestions: ['Vanilla', 'Chocolate', 'Strawberry', 'Mint', 'Mango', 'Orange', 'Lemon'] 
+  },
+  { 
+    name: 'Pack Size', 
+    placeholder: 'Pack of 2, Pack of 6, Pack of 12', 
+    suggestions: ['Single', 'Pack of 2', 'Pack of 4', 'Pack of 6', 'Pack of 12', 'Pack of 24'] 
+  },
+  { 
+    name: 'Model', 
+    placeholder: '2023, 2024, Pro, Lite', 
+    suggestions: ['2023', '2024', 'Pro', 'Lite', 'Max', 'Plus', 'Ultra'] 
+  },
+];
 
 interface ProductVariantsManagerProps {
   storeId?: string;
@@ -466,7 +522,18 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                 variant="outline" 
                 size="sm" 
                 className="h-8 gap-2 bg-background border-primary/20 text-primary hover:bg-primary/5"
-                onClick={() => appendOption({ name: '', values: [] })}
+                onClick={() => {
+                  if (optionFields.length < 3) {
+                    appendOption({ name: '', values: [], optionType: 'preset', optionName: '' });
+                  } else {
+                    toast({
+                      title: "Limit Reached",
+                      description: "You can only add up to 3 variant options.",
+                      variant: "destructive"
+                    });
+                  }
+                }}
+                disabled={optionFields.length >= 3}
               >
                 <Plus className="h-3.5 w-3.5" /> Add Option
               </Button>
@@ -479,10 +546,16 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
               ) : (
                 <div className="space-y-6">
                   {optionFields.map((field, index) => {
-                    const optionName = variantOptions[index]?.name?.toLowerCase() || '';
-                    const isColor = optionName.includes('color');
-                    const isSize = optionName.includes('size');
-                    const isMaterial = optionName.includes('material');
+                    const currentOption = variantOptions[index] || {};
+                    const optionName = currentOption.name || '';
+                    // Determine if it's a preset or custom based on current name if optionType is missing
+                    const isPreset = PRESET_OPTIONS.some(p => p.name.toLowerCase() === optionName.toLowerCase());
+                    const optionType = currentOption.optionType || (optionName ? (isPreset ? 'preset' : 'custom') : 'preset');
+                    
+                    const selectedPreset = PRESET_OPTIONS.find(p => p.name.toLowerCase() === optionName.toLowerCase());
+                    const isColor = optionName.toLowerCase().includes('color');
+                    const isSize = optionName.toLowerCase().includes('size');
+                    const isMaterial = optionName.toLowerCase().includes('material');
 
                     return (
                       <div key={field.id} className="relative group p-6 rounded-3xl bg-background border shadow-sm hover:shadow-md transition-all">
@@ -518,18 +591,72 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                               <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
                                 {isColor ? <Palette className="h-4 w-4" /> : isSize ? <TypeIcon className="h-4 w-4" /> : <SlidersHorizontal className="h-4 w-4" />}
                               </div>
-                              <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Option Name</Label>
-                              {!variantOptions[index]?.name && (
-                                <span className="text-[10px] text-destructive animate-blink font-black uppercase ml-auto">
-                                  Type here (e.g. Color, Size)
-                                </span>
-                              )}
+                              <div className="flex flex-col">
+                                <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Option Name</Label>
+                                {optionType === 'custom' && (
+                                  <span className="text-[10px] text-primary font-bold uppercase">Custom Mode</span>
+                                )}
+                              </div>
                             </div>
-                            <Input 
-                              placeholder="e.g. Color, Size" 
-                              className="h-12 bg-muted/30 border-none focus-visible:ring-2 focus-visible:ring-primary/20 font-bold"
-                              {...control.register(`variantOptions.${index}.name` as const)}
-                            />
+                            
+                            <Select 
+                              value={optionType === 'custom' ? 'Custom' : optionName} 
+                              onValueChange={(val) => {
+                                if (val === 'Custom') {
+                                  setValue(`variantOptions.${index}.optionType`, 'custom', { shouldDirty: true });
+                                  setValue(`variantOptions.${index}.name`, '', { shouldDirty: true });
+                                  setValue(`variantOptions.${index}.optionName`, '', { shouldDirty: true });
+                                } else {
+                                  setValue(`variantOptions.${index}.optionType`, 'preset', { shouldDirty: true });
+                                  setValue(`variantOptions.${index}.name`, val, { shouldDirty: true });
+                                  setValue(`variantOptions.${index}.optionName`, val, { shouldDirty: true });
+                                }
+                              }}
+                            >
+                              <SelectTrigger className="h-12 bg-muted/30 border-none focus:ring-2 focus:ring-primary/20 font-bold">
+                                <SelectValue placeholder="Choose type..." />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {PRESET_OPTIONS.map((opt) => (
+                                  <SelectItem 
+                                    key={opt.name} 
+                                    value={opt.name}
+                                    disabled={variantOptions.some((o: any, i: number) => i !== index && o.name === opt.name)}
+                                  >
+                                    {opt.name}
+                                  </SelectItem>
+                                ))}
+                                <SelectItem value="Custom">Custom Option</SelectItem>
+                              </SelectContent>
+                            </Select>
+
+                            {optionType === 'custom' && (
+                              <div className="pt-1 animate-in fade-in slide-in-from-top-1">
+                                <Input 
+                                  placeholder="e.g. Fabric Type, RAM" 
+                                  className="h-10 bg-muted/30 border-none focus-visible:ring-2 focus-visible:ring-primary/20 font-bold"
+                                  value={optionName}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    // Check for duplicate names
+                                    const isDuplicate = variantOptions.some((o: any, i: number) => i !== index && o.name?.toLowerCase() === val.toLowerCase());
+                                    if (!isDuplicate) {
+                                      setValue(`variantOptions.${index}.name`, val, { shouldDirty: true });
+                                      setValue(`variantOptions.${index}.optionName`, val, { shouldDirty: true });
+                                    } else {
+                                      toast({
+                                        title: "Duplicate Name",
+                                        description: `An option named "${val}" already exists.`,
+                                        variant: "destructive"
+                                      });
+                                    }
+                                  }}
+                                />
+                                <div className="mt-1 flex flex-col gap-0.5">
+                                  <p className="text-[9px] text-muted-foreground px-1 font-medium">Examples: Fabric Type, RAM, Shoe Width, Occasion</p>
+                                </div>
+                              </div>
+                            )}
                           </div>
                           
                           <div className="md:col-span-8 space-y-3">
@@ -537,7 +664,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                             
                             <div className="flex flex-wrap gap-2 min-h-[3rem] p-3 bg-muted/30 rounded-2xl border border-transparent focus-within:border-primary/20 transition-all">
                               {variantOptions[index]?.values?.map((val: string, valIndex: number) => {
-                                const colorSuggestion = isColor ? SUGGESTIONS.color.find(c => c.name.toLowerCase() === val.toLowerCase()) : null;
+                                const colorSuggestion = isColor ? PRESET_OPTIONS[0].suggestions.find((c: any) => typeof c === 'object' && c.name.toLowerCase() === val.toLowerCase()) : null;
                                 
                                 return (
                                   <Badge 
@@ -548,7 +675,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                                     {isColor && (
                                       <div 
                                         className="w-3 h-3 rounded-full border border-black/10" 
-                                        style={{ backgroundColor: colorSuggestion?.hex || val.toLowerCase() }} 
+                                        style={{ backgroundColor: (colorSuggestion as any)?.hex || val.toLowerCase() }} 
                                       />
                                     )}
                                     {val}
@@ -565,7 +692,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                               
                               <div className="flex-1 flex items-center gap-2 group/input">
                                 <Input 
-                                  placeholder="Add value..." 
+                                  placeholder={selectedPreset?.placeholder || "Add value..."}
                                   className="flex-1 min-w-[120px] h-8 bg-transparent border-none focus-visible:ring-0 p-0 text-sm"
                                   onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
@@ -595,42 +722,27 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                               </div>
                             </div>
 
-                            {(isColor || isSize || isMaterial) && (
+                            {selectedPreset && selectedPreset.suggestions.length > 0 && (
                               <div className="space-y-2">
                                 <p className="text-[10px] font-black uppercase tracking-tighter text-muted-foreground/60 px-1">Suggested {optionName}:</p>
                                 <div className="flex flex-wrap gap-1.5">
-                                  {isColor && SUGGESTIONS.color.map((c) => (
-                                    <button
-                                      key={c.name}
-                                      type="button"
-                                      onClick={() => handleAddOptionValue(index, c.name)}
-                                      className="group flex items-center gap-1.5 px-2 py-1 rounded-lg border bg-background hover:border-primary/40 hover:bg-primary/5 transition-all"
-                                      title={c.name}
-                                    >
-                                      <div className="w-3 h-3 rounded-full border border-black/10" style={{ backgroundColor: c.hex }} />
-                                      <span className="text-[10px] font-bold">{c.name}</span>
-                                    </button>
-                                  ))}
-                                  {isSize && SUGGESTIONS.size.map((s) => (
-                                    <button
-                                      key={s}
-                                      type="button"
-                                      onClick={() => handleAddOptionValue(index, s)}
-                                      className="px-2.5 py-1 rounded-lg border bg-background hover:border-primary/40 hover:bg-primary/5 transition-all text-[10px] font-bold"
-                                    >
-                                      {s}
-                                    </button>
-                                  ))}
-                                  {isMaterial && SUGGESTIONS.material.map((m) => (
-                                    <button
-                                      key={m}
-                                      type="button"
-                                      onClick={() => handleAddOptionValue(index, m)}
-                                      className="px-2.5 py-1 rounded-lg border bg-background hover:border-primary/40 hover:bg-primary/5 transition-all text-[10px] font-bold"
-                                    >
-                                      {m}
-                                    </button>
-                                  ))}
+                                  {selectedPreset.suggestions.map((s: any) => {
+                                    const sName = typeof s === 'string' ? s : s.name;
+                                    const sHex = typeof s === 'object' ? s.hex : null;
+                                    
+                                    return (
+                                      <button
+                                        key={sName}
+                                        type="button"
+                                        onClick={() => handleAddOptionValue(index, sName)}
+                                        className="group flex items-center gap-1.5 px-2 py-1 rounded-lg border bg-background hover:border-primary/40 hover:bg-primary/5 transition-all"
+                                        title={sName}
+                                      >
+                                        {sHex && <div className="w-3 h-3 rounded-full border border-black/10" style={{ backgroundColor: sHex }} />}
+                                        <span className="text-[10px] font-bold">{sName}</span>
+                                      </button>
+                                    );
+                                  })}
                                 </div>
                               </div>
                             )}

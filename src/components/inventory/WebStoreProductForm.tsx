@@ -207,6 +207,8 @@ const storeProductSchema = z.object({
   variantOptions: z.array(z.object({
     name: z.string().min(1, 'Option name is required'),
     values: z.array(z.string().min(1, 'Value is required')).min(1, 'At least one value is required'),
+    optionType: z.enum(['preset', 'custom']).optional().default('preset'),
+    optionName: z.string().optional(),
   })).optional().default([]),
   variants: z.array(z.object({
     id: z.string(),

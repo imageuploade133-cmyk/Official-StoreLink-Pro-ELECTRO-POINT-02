@@ -660,6 +660,8 @@ export interface ProductVariant {
 export interface ProductOption {
   name: string; // e.g., "Color"
   values: string[]; // e.g., ["Red", "Black"]
+  optionType?: 'preset' | 'custom';
+  optionName?: string;
 }
 
 export interface Product {
