@@ -1184,7 +1184,7 @@ export default function ProductDetailsPage() {
                                   >
                                     {displayValue}
                                   </span>
-                                  {!isAvailable && (
+                                  {!isAvailable && !(isColor && isOutOfStock) && (
                                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
                                       <div className="w-full h-[1.5px] bg-rose-500/80 rotate-45 shadow-sm" />
                                     </div>
