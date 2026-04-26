@@ -319,7 +319,7 @@ export function ProductForm({
       sku: '',
       barcode: '',
       categoryId: '',
-      stock: 0,
+      stock: Number(defaultValues?.stock) || 0,
       purchasePrice: 0,
       sellingPrice: 0,
       lowStockThreshold: null,
@@ -376,11 +376,11 @@ export function ProductForm({
       showLogisticsInfo: true,
       showVerifiedReviews: true,
       rewardAdsEnabled: false,
-      hasVariants: false,
+      hasVariants: defaultValues?.hasVariants ?? false,
       advancedDetailsEnabled: false,
       variantStockTotal: 0,
       variantOptions: [],
-      variants: [],
+      variants: defaultValues?.variants || [],
     },
   });
 
@@ -408,9 +408,9 @@ export function ProductForm({
           sku: defaultValues?.sku || '',
           barcode: defaultValues?.barcode || '',
           categoryId: defaultValues?.categoryId ?? '',
-          stock: defaultValues?.stock ?? 0,
-          purchasePrice: defaultValues?.purchasePrice ?? 0,
-          sellingPrice: defaultValues?.sellingPrice ?? 0,
+          stock: Number(defaultValues?.stock) || 0,
+          purchasePrice: Number(defaultValues?.purchasePrice) || 0,
+          sellingPrice: Number(defaultValues?.sellingPrice) || 0,
           newPrice: defaultValues?.newPrice ?? null,
           lowStockThreshold: defaultValues?.lowStockThreshold ?? null,
           supplierName: defaultValues?.supplierName ?? '',
@@ -500,7 +500,7 @@ export function ProductForm({
     if (watchHasVariants) {
       const totalStock = watchVariants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
       const currentStock = form.getValues("stock");
-      if (totalStock !== currentStock) {
+      if (watchVariants && watchVariants.length > 0 && totalStock !== currentStock) {
         form.setValue("stock", totalStock, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
         form.setValue("variantStockTotal", totalStock, { shouldValidate: true, shouldDirty: true });
       }
