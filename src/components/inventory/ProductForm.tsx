@@ -128,7 +128,7 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
     sku: z.string().optional().or(z.literal('')),
     barcode: z.string().optional().or(z.literal('')),
     categoryId: z.string().min(1, 'Please select a category.'),
-    stock: z.coerce.number().int().min(0, 'Stock cannot be negative.'),
+    stock: z.coerce.number().int().min(1, 'Please add stock quantity (at least 1).'),
     purchasePrice: z.coerce.number().min(0, 'Purchase price cannot be negative.'),
     sellingPrice: z.coerce.number().min(0.01, 'Selling price must be greater than 0.'),
     newPrice: z.preprocess((val) => (val === '' ? null : val), z.coerce.number().min(0.01, 'Discount price must be greater than 0.').optional().nullable()),
@@ -780,6 +780,20 @@ export function ProductForm({
     </div>
   );
 
+  const onFormError = (errors: any) => {
+    if (errors.stock || errors.variants || errors.variantOptions) {
+      const element = document.getElementById('inventory-stock-section');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        toast({
+          variant: 'destructive',
+          title: 'Inventory Stock Required',
+          description: 'Please enter the product stock quantity before saving.',
+        });
+      }
+    }
+  };
+
   const handleFormSubmit = async (values: ProductFormValues) => {
     const finalValues = { ...values };
     
@@ -801,7 +815,7 @@ export function ProductForm({
   return (
     <>
     <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <form onSubmit={form.handleSubmit(handleFormSubmit, onFormError)} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-primary/5 border border-primary/10 p-3 rounded-xl flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-primary animate-in fade-in slide-in-from-top-2">
@@ -809,7 +823,7 @@ export function ProductForm({
             Note: Fields marked with an asterisk (*) are mandatory for catalog integrity.
           </div>
 
-          <Card className="shadow-xl border-none ring-1 ring-border">
+          <Card className="shadow-xl border-none ring-1 ring-border" id="inventory-stock-section">
             <CardHeader className="bg-muted/30">
               <CardTitle>Inventory Master Details</CardTitle>
               <CardDescription>Fundamental tracking and identification attributes.</CardDescription>
