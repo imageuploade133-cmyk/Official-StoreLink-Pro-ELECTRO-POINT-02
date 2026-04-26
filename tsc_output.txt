@@ -86,6 +86,8 @@ src/app/dashboard/public-web-settings/page.tsx(78,43): error TS2322: Type 'Setti
 src/app/dashboard/restock-history/page.tsx(87,21): error TS2339: Property 'isLoading' does not exist on type 'SettingsContextType'.
 src/app/dashboard/restock-history/page.tsx(178,40): error TS2352: Conversion of type '{ restockDate: Date | null; createdAt: Date | null; id: string; }' to type 'RestockEntry' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
   Type '{ restockDate: Date | null; createdAt: Date | null; id: string; }' is missing the following properties from type 'RestockEntry': productId, productName, quantity, costPricePerUnit, and 2 more.
+src/app/dashboard/restock-now/page.tsx(869,51): error TS2345: Argument of type 'Date | null' is not assignable to parameter of type 'string | number | Date'.
+  Type 'null' is not assignable to type 'string | number | Date'.
 src/app/dashboard/returns/page.tsx(40,21): error TS2339: Property 'isLoading' does not exist on type 'SettingsContextType'.
 src/app/dashboard/returns/page.tsx(121,37): error TS2352: Conversion of type '{ updatedAt: Date | null; createdAt: Date | null; id: string; }' to type 'SaleTransaction' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
   Type '{ updatedAt: Date | null; createdAt: Date | null; id: string; }' is missing the following properties from type 'SaleTransaction': staffId, grandTotal, items, subtotal, and 3 more.

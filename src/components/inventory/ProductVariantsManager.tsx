@@ -72,7 +72,8 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
   const { settings } = useSettings();
   const [isUploading, setIsUploading] = useState<string | null>(null);
   const [isProcessingAi, setIsProcessingAi] = useState<string | null>(null);
-  const [showAdvancedDetails, setShowAdvancedDetails] = useState(false);
+  const showAdvancedDetails = watch('advancedDetailsEnabled');
+  const setShowAdvancedDetails = (val: boolean) => setValue('advancedDetailsEnabled', val, { shouldDirty: true });
   const [isManualMode, setIsManualMode] = useState(false);
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;

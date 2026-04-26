@@ -204,6 +204,8 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
     showVerifiedReviews: z.boolean().default(true),
     rewardAdsEnabled: z.boolean().default(false),
     hasVariants: z.boolean().default(false),
+    advancedDetailsEnabled: z.boolean().default(false),
+    variantStockTotal: z.coerce.number().optional(),
     variantOptions: z.array(z.object({
       name: z.string().min(1, "Option name is required"),
       values: z.array(z.string().min(1, "Value is required")).min(1, "At least one value is required"),
@@ -373,6 +375,8 @@ export function ProductForm({
       showVerifiedReviews: true,
       rewardAdsEnabled: false,
       hasVariants: false,
+      advancedDetailsEnabled: false,
+      variantStockTotal: 0,
       variantOptions: [],
       variants: [],
     },
@@ -461,6 +465,8 @@ export function ProductForm({
           showVerifiedReviews: defaultValues?.showVerifiedReviews ?? true,
           rewardAdsEnabled: defaultValues?.rewardAdsEnabled ?? false,
           hasVariants: defaultValues?.hasVariants ?? false,
+          advancedDetailsEnabled: defaultValues?.advancedDetailsEnabled ?? false,
+          variantStockTotal: defaultValues?.variantStockTotal ?? 0,
           variantOptions: defaultValues?.variantOptions || [],
           variants: defaultValues?.variants || [],
         });
@@ -488,15 +494,16 @@ export function ProductForm({
   }, [watchVariants]);
 
   // Sync total stock if variants exist
-//  useEffect(() => {
-//    if (watchHasVariants && watchVariants.length > 0) {
-//      const totalStock = watchVariants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
-//      const currentStock = form.getValues("stock");
-//      if (totalStock !== currentStock) {
-//        form.setValue("stock", totalStock, { shouldValidate: true, shouldDirty: true });
-//      }
-//    }
-//  }, [watchVariants, watchHasVariants, form]);
+  useEffect(() => {
+    if (watchHasVariants && watchVariants.length > 0) {
+      const totalStock = watchVariants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
+      const currentStock = form.getValues("stock");
+      if (totalStock !== currentStock) {
+        form.setValue("stock", totalStock, { shouldValidate: true, shouldDirty: true });
+        form.setValue("variantStockTotal", totalStock, { shouldValidate: true, shouldDirty: true });
+      }
+    }
+  }, [watchVariants, watchHasVariants, form]);
   const watchVideoPoster = form.watch('videoPosterUrl');
 
   const handleAiAssist = async () => {
@@ -857,6 +864,9 @@ export function ProductForm({
                     <FormItem className={cn(watchHasVariants ? "md:col-span-4" : "md:col-span-1")}>
                       <FormLabel className="font-bold flex items-center justify-between">
                         <span>Current Stock <span className="text-destructive">*</span></span>
+                        {watchHasVariants && (
+                          <Badge variant="outline" className="text-[9px] uppercase border-blue-200 text-blue-600 bg-blue-50">Auto Calculated Stock</Badge>
+                        )}
                         {settings?.preventManualStockReduction && (
                           <Badge variant="outline" className="text-[9px] uppercase border-orange-200 text-orange-600 bg-orange-50">Reduction Restricted</Badge>
                         )}
@@ -867,7 +877,7 @@ export function ProductForm({
                             type="number" 
                             {...field} 
                             value={field.value ?? ''} 
-                            readOnly={false}
+                            readOnly={watchHasVariants}
                             onChange={(e) => {
                               const val = parseInt(e.target.value) || 0;
                               const originalVal = defaultValues?.stock ?? 0;

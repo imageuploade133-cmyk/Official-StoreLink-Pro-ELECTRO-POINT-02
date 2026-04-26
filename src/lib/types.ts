@@ -734,6 +734,8 @@ export interface Product {
   hasVariants?: boolean;
   variants?: ProductVariant[];
   variantOptions?: ProductOption[];
+  advancedDetailsEnabled?: boolean;
+  variantStockTotal?: number;
 }
 
 export interface DisplayProduct extends Product {
