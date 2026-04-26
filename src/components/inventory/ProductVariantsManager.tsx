@@ -1074,22 +1074,16 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                           <div className="col-span-2 space-y-3 pt-2 animate-in fade-in slide-in-from-top-2">
                             <Separator className="bg-muted/50" />
                             <div className="grid grid-cols-2 gap-3">
-                              <div className="space-y-1">
-                                <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Color Attribute</Label>
-                                <Input 
-                                  placeholder="e.g. Red" 
-                                  className="h-10 text-xs bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl font-bold"
-                                  {...control.register(`variants.${index}.options.Color` as const)}
-                                />
-                              </div>
-                              <div className="space-y-1">
-                                <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Size Attribute</Label>
-                                <Input 
-                                  placeholder="e.g. XL" 
-                                  className="h-10 text-xs bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl font-bold"
-                                  {...control.register(`variants.${index}.options.Size` as const)}
-                                />
-                              </div>
+                              {variantOptions.map((opt: any) => (
+                                <div key={opt.name} className="space-y-1">
+                                  <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">{opt.name} Attribute</Label>
+                                  <Input 
+                                    placeholder={`e.g. ${opt.values?.[0] || ''}`}
+                                    className="h-10 text-xs bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl font-bold"
+                                    {...control.register(`variants.${index}.options.${opt.name}` as const)}
+                                  />
+                                </div>
+                              ))}
                               <div className="col-span-2 space-y-1">
                                 <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Internal Notes / Description</Label>
                                 <textarea 

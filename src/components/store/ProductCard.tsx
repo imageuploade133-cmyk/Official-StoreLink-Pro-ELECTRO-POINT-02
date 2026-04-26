@@ -61,7 +61,21 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
   );
 
   const isDiscounted = effectivePrice < product.sellingPrice;
-  const isOutOfStock = product.stock <= 0;
+  const isOutOfStock = useMemo(() => {
+    if (product.hasVariants && product.variants && product.variants.length > 0) {
+      const activeVariants = product.variants.filter(v => v.isActive !== false);
+      if (activeVariants.length === 0) return true;
+      return activeVariants.every(v => (Number(v.stock) || 0) <= 0);
+    }
+    return (Number(product.stock) || 0) <= 0;
+  }, [product]);
+
+  const stockValue = useMemo(() => {
+    if (product.hasVariants && product.variants && product.variants.length > 0) {
+      return product.variants.reduce((acc, v) => acc + (v.isActive !== false ? (Number(v.stock) || 0) : 0), 0);
+    }
+    return Number(product.stock) || 0;
+  }, [product]);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -148,9 +162,9 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
       .replace(/\{\{product\.originalPrice\}\}/g, product.sellingPrice.toFixed(2))
       .replace(/\{\{product\.imageUrl\}\}/g, product.imageUrl || '')
       .replace(/\{\{product\.category\}\}/g, category?.name || product.categoryName || 'General')
-      .replace(/\{\{product\.stock\}\}/g, product.stock.toString())
-      .replace(/\{\{product\.stockPercentage\}\}/g, Math.min((product.stock / 50) * 100, 100).toString())
-      .replace(/\{\{product\.stockLabel\}\}/g, product.stock > 0 ? `In Stock (${product.stock})` : 'Out of Stock')
+      .replace(/\{\{product\.stock\}\}/g, stockValue.toString())
+      .replace(/\{\{product\.stockPercentage\}\}/g, Math.min((stockValue / 50) * 100, 100).toString())
+      .replace(/\{\{product\.stockLabel\}\}/g, stockValue > 0 ? `In Stock (${stockValue})` : 'Out of Stock')
       .replace(/\{\{product\.reviewCount\}\}/g, ratingStats.totalReviews.toString())
       .replace(/\{\{product\.isNew\}\}/g, product.isNewArrival ? 'true' : 'false')
       .replace(/\{\{product\.isPopular\}\}/g, product.isPopular ? 'true' : 'false')
@@ -427,7 +441,7 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
           <div className="space-y-3">
             {settings?.productCardShowStockBar !== false && (
                 <StockBar
-                    stock={product.stock}
+                    stock={stockValue}
                     lowStockThreshold={product.lowStockThreshold || 10}
                 />
             )}
