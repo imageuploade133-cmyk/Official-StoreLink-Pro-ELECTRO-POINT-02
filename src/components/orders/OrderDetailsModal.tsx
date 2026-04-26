@@ -84,8 +84,10 @@ export function OrderDetailsModal({
       return {
         ...item,
         exists: !!product,
-        productName: product?.name || 'Unknown Product',
+        productName: item.productName || product?.name || 'Unknown Product',
         isAvailable: product ? product.isVisibleInPOS !== false : false,
+        selectedOptions: item.selectedOptions || null,
+        variantId: item.variantId || null,
       };
     });
   }, [order.items, productMap]);
@@ -379,6 +381,15 @@ export function OrderDetailsModal({
                             <span className={cn("font-bold text-gray-900", !item.exists && "line-through text-gray-400")}>
                                 {item.productName}
                             </span>
+                            {item.selectedOptions && (
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {Object.entries(item.selectedOptions).map(([key, val]) => (
+                                  <Badge key={key} variant="outline" className="text-[9px] px-1 py-0 h-4 bg-primary/5 text-primary border-primary/20">
+                                    {key}: {val}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
                             {!item.exists && (
                                 <Badge variant="destructive" className="w-fit mt-1 text-[9px] h-4 uppercase font-black">Order not Available</Badge>
                             )}
@@ -462,9 +473,13 @@ export function OrderDetailsModal({
                     <tbody>
                         {order.items.map((item, idx) => {
                             const p = productMap.get(item.productId);
+                            const options = item.selectedOptions ? Object.entries(item.selectedOptions).map(([k, v]) => `${k}: ${v}`).join(', ') : '';
                             return (
                                 <tr key={idx}>
-                                    <td>{p?.name || 'Unknown Product'}</td>
+                                    <td>
+                                        <div>{item.productName || p?.name || 'Unknown Product'}</div>
+                                        {options && <div style={{ fontSize: '10px', color: '#666', marginTop: '2px' }}>{options}</div>}
+                                    </td>
                                     <td className="center">{item.quantity}</td>
                                     <td className="right">{formatCurrency(item.price, currencySymbol)}</td>
                                     <td className="right">{formatCurrency(item.price * item.quantity, currencySymbol)}</td>

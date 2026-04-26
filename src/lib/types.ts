@@ -1113,6 +1113,9 @@ export interface Order {
     productId: string;
     quantity: number;
     price: number;
+    productName?: string;
+    variantId?: string;
+    selectedOptions?: { [key: string]: string };
   }[];
   totalAmount: number;
   totalCost: number;
