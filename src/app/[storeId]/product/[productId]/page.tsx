@@ -315,7 +315,44 @@ export default function ProductDetailsPage() {
         newOptions[optionName] = value;
     }
 
-    setSelectedOptions(newOptions);
+    // Robustness: If the new combination doesn't exist, find the best matching valid variant
+    const combinationExists = product.variants.some(v => v.isActive && matchesVariant(v, newOptions));
+    
+    if (!combinationExists && !isDeselecting) {
+      // Find a variant that matches the new option value
+      const matchingVariants = product.variants.filter(v => 
+        v.isActive && 
+        v.options && 
+        Object.keys(v.options).find(k => k.toLowerCase() === optionName.toLowerCase()) &&
+        String(v.options[Object.keys(v.options).find(k => k.toLowerCase() === optionName.toLowerCase())!]).toLowerCase().trim() === String(value).toLowerCase().trim()
+      );
+
+      if (matchingVariants.length > 0) {
+        // Pick the variant that matches the most other previously selected options
+        let bestMatch = matchingVariants[0];
+        let maxMatches = -1;
+
+        matchingVariants.forEach(v => {
+          let currentMatches = 0;
+          Object.entries(selectedOptions).forEach(([k, val]) => {
+            if (k !== optionName && v.options[k] === val) currentMatches++;
+          });
+          
+          if (currentMatches > maxMatches) {
+            maxMatches = currentMatches;
+            bestMatch = v;
+          } else if (currentMatches === maxMatches) {
+            if ((v.stock || 0) > (bestMatch.stock || 0)) bestMatch = v;
+          }
+        });
+        setSelectedOptions(bestMatch.options);
+      } else {
+        setSelectedOptions(newOptions);
+      }
+    } else {
+      setSelectedOptions(newOptions);
+    }
+
     setTimeout(() => setIsChangingVariant(false), 400);
   };
 
@@ -444,13 +481,23 @@ export default function ProductDetailsPage() {
     return (product.stock || 0) <= 0;
   }, [product]);
 
-  // Update active image when preview variant changes
+  // Update active image when preview variant or selected options change
   useEffect(() => {
     if (previewVariant?.imageUrl) {
       setActiveImage(previewVariant.imageUrl);
       setShowVideo(false);
+    } else if (product?.variants && Object.keys(selectedOptions).length > 0) {
+      // Robust fallback: if exact preview variant doesn't have an image, 
+      // try to find ANY variant matching current selection that has an image
+      const matchWithImage = product.variants.find(v => 
+        v.isActive && matchesVariant(v, selectedOptions) && v.imageUrl
+      );
+      if (matchWithImage?.imageUrl) {
+        setActiveImage(matchWithImage.imageUrl);
+        setShowVideo(false);
+      }
     }
-  }, [previewVariant]);
+  }, [previewVariant, selectedOptions, product]);
 
   // Initial selection - Auto-select best available variant
   const initializedRef = useRef(false);
@@ -889,7 +936,7 @@ export default function ProductDetailsPage() {
         onAddToCart={isOutOfStock ? () => setIsOutOfDataDrawerOpen(true) : handleAddToCart}
         onToggleWishlist={handleToggleWishlist}
         addToCartText={isOutOfStock ? "Out of Stock" : addToCartText}
-        productImage={product.imageUrl}
+        productImage={activeImage || product.imageUrl}
       />
       
       <main className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 md:py-8">
@@ -963,11 +1010,32 @@ export default function ProductDetailsPage() {
                 </div>
               </div>
               <div className="flex flex-wrap gap-2 md:gap-3 lg:gap-4 justify-center md:justify-start overflow-x-auto pb-2">
-                {galleryImages.map((url, idx) => (
-                <button key={url + idx} onClick={() => { setActiveImage(url); setShowVideo(false); }} className={cn("relative w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg md:rounded-2xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 active:scale-95", !showVideo && activeImage === url ? "border-primary shadow-lg ring-2 ring-primary/20 scale-110" : "border-slate-200 dark:border-slate-800 opacity-60 hover:opacity-100")}>
-                    <Image src={url} alt={`View ${idx + 1}`} fill className="object-cover" unoptimized />
-                </button>
-                ))}
+                {galleryImages.map((url, idx) => {
+                    const belongsToVariant = product.variants?.find(v => v.imageUrl === url || v.additionalImageUrls?.includes(url));
+                    return (
+                        <button
+                            key={url + idx}
+                            onClick={() => {
+                                setActiveImage(url);
+                                setShowVideo(false);
+                                if (belongsToVariant && belongsToVariant.options) {
+                                    setSelectedOptions(prev => ({ ...prev, ...belongsToVariant.options }));
+                                }
+                            }}
+                            className={cn(
+                                "relative w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg md:rounded-2xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 active:scale-95",
+                                !showVideo && activeImage === url ? "border-primary shadow-lg ring-2 ring-primary/20 scale-110" : "border-slate-200 dark:border-slate-800 opacity-60 hover:opacity-100"
+                            )}
+                        >
+                            <Image src={url} alt={`View ${idx + 1}`} fill className="object-cover" unoptimized />
+                            {belongsToVariant && (
+                                <div className="absolute top-0 right-0 p-0.5 bg-primary/80 text-white rounded-bl-md">
+                                    <Check className="h-2 w-2" />
+                                </div>
+                            )}
+                        </button>
+                    );
+                })}
                 {product.videoEnabled && product.videoUrl && (
                     <button onClick={() => setShowVideo(true)} className={cn("relative w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg md:rounded-2xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 active:scale-95 bg-slate-900 group", showVideo ? "border-primary shadow-lg ring-2 ring-primary/20 scale-110" : "border-slate-200 dark:border-slate-800 opacity-60 hover:opacity-100")}>
                         {product.videoPosterUrl && <Image src={product.videoPosterUrl} alt="" fill className="object-cover opacity-40" unoptimized />}
