@@ -215,34 +215,59 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
 
     const newCombos = combinations(validOptions);
 
+    const matchedExistingIndices = new Set<number>();
     const generatedVariants = newCombos.map((combo) => {
       const name = Object.entries(combo)
         .map(([key, val]) => val)
         .join(' / ');
       
-      const existing = currentVariants.find((v: any) => {
-        if (v.isManual) return false;
-        if (!v.options) return false;
-        
+      // Try to find an EXACT match first
+      let existingIdx = currentVariants.findIndex((v: any) => {
+        if (v.isManual || !v.options) return false;
         const comboKeys = Object.keys(combo);
         const existingKeys = Object.keys(v.options);
-        
-        if (comboKeys.length === 0 || existingKeys.length !== comboKeys.length) return false;
-        
-        // Check if all combo keys match an option in the variant
-        return comboKeys.every(key => {
-          const comboVal = String(combo[key]).toLowerCase().trim();
-          const actualKey = Object.keys(v.options).find(k => k.toLowerCase() === key.toLowerCase());
-          if (!actualKey) return false;
-          const existingVal = String(v.options[actualKey]).toLowerCase().trim();
-          return comboVal === existingVal;
+        if (comboKeys.length !== existingKeys.length) return false;
+        return comboKeys.every(ck => {
+          const ek = existingKeys.find(k => k.toLowerCase().trim() === ck.toLowerCase().trim());
+          return ek && String(combo[ck]).toLowerCase().trim() === String(v.options[ek]).toLowerCase().trim();
         });
       });
+
+      // If no exact match, look for a partial match (subset/superset)
+      if (existingIdx === -1) {
+        existingIdx = currentVariants.findIndex((v: any) => {
+          if (v.isManual || !v.options) return false;
+          
+          const comboKeys = Object.keys(combo);
+          const existingKeys = Object.keys(v.options);
+          
+          if (comboKeys.length === 0 || existingKeys.length === 0) return false;
+          
+          const vMatchesCombo = existingKeys.every(ek => {
+            const ck = comboKeys.find(k => k.toLowerCase().trim() === ek.toLowerCase().trim());
+            return ck && String(v.options[ek]).toLowerCase().trim() === String(combo[ck]).toLowerCase().trim();
+          });
+
+          const comboMatchesV = comboKeys.every(ck => {
+            const ek = existingKeys.find(k => k.toLowerCase().trim() === ck.toLowerCase().trim());
+            return ek && String(combo[ck]).toLowerCase().trim() === String(v.options[ek]).toLowerCase().trim();
+          });
+
+          return vMatchesCombo || comboMatchesV;
+        });
+      }
       
-      if (existing) {
+      if (existingIdx !== -1) {
+        const existing = currentVariants[existingIdx];
+        const isFirstMatch = !matchedExistingIndices.has(existingIdx);
+        matchedExistingIndices.add(existingIdx);
+
         return {
           ...existing,
-          name, // Update name in case order or separator changed
+          name,
+          // Only copy stock for the first combination that matches an existing variant 
+          // (prevents stock duplication when adding dimensions)
+          stock: isFirstMatch ? (Number(existing.stock) || 0) : 0,
           additionalImageUrls: existing.additionalImageUrls || []
         };
       }
