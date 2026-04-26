@@ -407,12 +407,14 @@ export default function ProductDetailsPage() {
   }, [product, selectedOptions]);
 
   const currentPrice = useMemo(() => {
-    if (selectedVariant && selectedVariant.sellingPrice) {
+    // Use previewVariant for price updates even if all options aren't selected
+    const variantForPrice = selectedVariant || previewVariant;
+    if (variantForPrice && variantForPrice.sellingPrice) {
        // Re-calculate effective price if variant has its own price
-       return calculateEffectivePrice({ ...product, sellingPrice: selectedVariant.sellingPrice } as any, today, category);
+       return calculateEffectivePrice({ ...product, sellingPrice: variantForPrice.sellingPrice } as any, today, category);
     }
     return effectivePrice;
-  }, [selectedVariant, effectivePrice, product, today, category]);
+  }, [selectedVariant, previewVariant, effectivePrice, product, today, category]);
 
   const currentStock = useMemo(() => {
     if (!product) return 0;
@@ -648,8 +650,39 @@ export default function ProductDetailsPage() {
   const galleryImages = useMemo(() => {
     if (!product) return [];
     const all = [product.imageUrl, ...(product.additionalImageUrls || [])].filter(Boolean) as string[];
+    
+    // Priority: Add images from the currently previewed variant
+    if (previewVariant) {
+        if (previewVariant.imageUrl && !all.includes(previewVariant.imageUrl)) {
+            all.push(previewVariant.imageUrl);
+        }
+        if (previewVariant.additionalImageUrls) {
+            previewVariant.additionalImageUrls.forEach(url => {
+                if (url && !all.includes(url)) {
+                    all.push(url);
+                }
+            });
+        }
+    }
+
+    // Add other variant images to ensure all are available in gallery
+    if (product.variants) {
+        product.variants.forEach(v => {
+            if (v.imageUrl && !all.includes(v.imageUrl)) {
+                all.push(v.imageUrl);
+            }
+            if (v.additionalImageUrls) {
+                v.additionalImageUrls.forEach(url => {
+                    if (url && !all.includes(url)) {
+                        all.push(url);
+                    }
+                });
+            }
+        });
+    }
+
     return all;
-  }, [product]);
+  }, [product, previewVariant]);
 
   const reviewStats = useMemo(() => {
     if (!reviews || reviews.length === 0) return { avg: 0, count: 0, distribution: [0, 0, 0, 0, 0] };
@@ -955,6 +988,11 @@ export default function ProductDetailsPage() {
                     <><span className={cn("text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight", isDiscounted ? "text-[#e11d48]" : "text-[#1d1d1f] dark:text-[#f5f5f7]")}>{formatCurrency(currentPrice, currencySymbol)}</span>
                     {isDiscounted && <span className="text-sm md:text-base text-[#86868b] line-through">Was: {formatCurrency(product.sellingPrice, currencySymbol)}</span>}</>
                   )}
+                  {(selectedVariant?.sku || previewVariant?.sku || product.sku) && (
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <Badge variant="outline" className="h-5 px-2 rounded-md text-[9px] font-bold border-slate-200 text-[#86868b] bg-slate-50 uppercase tracking-tighter">SKU: {selectedVariant?.sku || previewVariant?.sku || product.sku}</Badge>
+                    </div>
+                  )}
                   <div className="pt-0.5 md:pt-1">
                     <Badge 
                       variant="outline"
@@ -1116,15 +1154,52 @@ export default function ProductDetailsPage() {
                 })}
               </div>
               )}
-              {previewVariant?.description && (
-                <div className="mb-6 p-4 rounded-2xl bg-primary/5 border border-primary/10 animate-in fade-in slide-in-from-top-2 duration-500">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <Sparkles className="h-3.5 w-3.5 text-primary" />
-                    <span className="text-[10px] font-black uppercase tracking-wider text-primary">Variant Details</span>
+              {previewVariant && (previewVariant.description || previewVariant.sku || (previewVariant.options && Object.keys(previewVariant.options).length > 0) || (previewVariant.additionalImageUrls && previewVariant.additionalImageUrls.length > 0)) && (
+                <div className="mb-6 p-5 rounded-2xl bg-primary/5 border border-primary/10 animate-in fade-in slide-in-from-top-2 duration-500 shadow-sm">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-3.5 w-3.5 text-primary" />
+                      <span className="text-[10px] font-black uppercase tracking-wider text-primary">Variant Specification: {previewVariant.name}</span>
+                    </div>
+                    {previewVariant.sku && (
+                      <Badge variant="outline" className="text-[9px] font-bold border-primary/20 text-primary bg-white px-2 py-0.5 rounded-lg">SKU: {previewVariant.sku}</Badge>
+                    )}
                   </div>
-                  <p className="text-xs font-medium text-[#1d1d1f] dark:text-[#f5f5f7] leading-relaxed">
-                    {previewVariant.description}
-                  </p>
+                  
+                  {previewVariant.description && (
+                    <p className="text-xs font-medium text-[#1d1d1f] dark:text-[#f5f5f7] leading-relaxed mb-4 p-3 bg-white/50 dark:bg-black/20 rounded-xl">
+                      {previewVariant.description}
+                    </p>
+                  )}
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {previewVariant.options && Object.entries(previewVariant.options).map(([key, value]) => (
+                      <div key={key} className="flex flex-col gap-0.5">
+                        <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/60">{key}</span>
+                        <span className="text-[11px] font-bold text-[#1d1d1f] dark:text-[#f5f5f7]">{value}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {previewVariant.additionalImageUrls && previewVariant.additionalImageUrls.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-primary/10">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground block mb-2">Extended Gallery</span>
+                      <div className="flex flex-wrap gap-2">
+                        {previewVariant.additionalImageUrls.map((url, i) => (
+                          <button 
+                            key={i} 
+                            onClick={() => { setActiveImage(url); setShowVideo(false); }}
+                            className={cn(
+                              "relative w-12 h-12 rounded-lg overflow-hidden border-2 transition-all hover:scale-105",
+                              activeImage === url ? "border-primary shadow-md scale-110" : "border-transparent opacity-70 hover:opacity-100"
+                            )}
+                          >
+                            <Image src={url} alt="" fill className="object-cover" unoptimized />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
               {(activeSectionPromo?.endDate || (isDiscounted && product.promo?.endDate)) && (
