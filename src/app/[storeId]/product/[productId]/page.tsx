@@ -282,13 +282,12 @@ export default function ProductDetailsPage() {
   const isOptionValueAvailable = (optionName: string, value: string) => {
     if (!product?.variants || !product.variantOptions) return true;
 
-    const optionIndex = product.variantOptions.findIndex(o => o.name === optionName);
-    const previousOptions = product.variantOptions.slice(0, optionIndex);
-    
     return product.variants.some(v => 
       v.isActive && 
       v.stock > 0 &&
-      previousOptions.every(opt => !selectedOptions[opt.name] || v.options[opt.name] === selectedOptions[opt.name]) &&
+      Object.entries(selectedOptions).every(([optName, optVal]) => 
+        optName === optionName || v.options[optName] === optVal
+      ) &&
       v.options[optionName] === value
     );
   };
@@ -306,51 +305,7 @@ export default function ProductDetailsPage() {
         newOptions[optionName] = value;
     }
 
-    if (isDeselecting) {
-        setSelectedOptions(newOptions);
-        setTimeout(() => setIsChangingVariant(false), 400);
-        return;
-    }
-
-    const optionIndex = product.variantOptions.findIndex(o => o.name === optionName);
-    
-    // For all subsequent options, we check if they are still valid/in-stock
-    let currentOptions = { ...newOptions };
-    for (let i = optionIndex + 1; i < product.variantOptions.length; i++) {
-        const nextOpt = product.variantOptions[i];
-        const currentVal = currentOptions[nextOpt.name];
-        
-        if (!currentVal) continue; // Skip if not selected
-
-        // Check if currentVal is still available given current choices for previous options
-        const isStillAvailable = product.variants.some(v => 
-            v.isActive && 
-            v.stock > 0 &&
-            product.variantOptions!.slice(0, i).every(opt => !currentOptions[opt.name] || v.options[opt.name] === currentOptions[opt.name]) &&
-            v.options[nextOpt.name] === currentVal
-        );
-
-        if (!isStillAvailable) {
-            // Find first available value for this option
-            const firstAvailable = nextOpt.values.find(vVal => 
-                product.variants!.some(v => 
-                    v.isActive && 
-                    v.stock > 0 &&
-                    product.variantOptions!.slice(0, i).every(opt => !currentOptions[opt.name] || v.options[opt.name] === currentOptions[opt.name]) &&
-                    v.options[nextOpt.name] === vVal
-                )
-            );
-            
-            if (firstAvailable) {
-                currentOptions[nextOpt.name] = firstAvailable;
-            } else {
-                // If nothing in stock, we could deselect it
-                delete currentOptions[nextOpt.name];
-            }
-        }
-    }
-
-    setSelectedOptions(currentOptions);
+    setSelectedOptions(newOptions);
     setTimeout(() => setIsChangingVariant(false), 400);
   };
 
@@ -432,9 +387,19 @@ export default function ProductDetailsPage() {
     return price;
   }, [product, today, category, activeSectionPromo, rewardAdClicked, activeRewardAd, applyRewardDiscount]);
 
-  const selectedVariant = useMemo(() => {
+  const previewVariant = useMemo(() => {
     if (!product?.hasVariants || !product.variants) return null;
     if (Object.keys(selectedOptions).length === 0) return null;
+    return product.variants.find(v => 
+      v.isActive && 
+      Object.entries(selectedOptions).every(([key, value]) => v.options[key] === value)
+    );
+  }, [product, selectedOptions]);
+
+  const selectedVariant = useMemo(() => {
+    if (!product?.hasVariants || !product.variants || !product.variantOptions) return null;
+    // Only return a specific variant when ALL options are selected
+    if (Object.keys(selectedOptions).length !== product.variantOptions.length) return null;
     return product.variants.find(v => 
       v.isActive && 
       Object.entries(selectedOptions).every(([key, value]) => v.options[key] === value)
@@ -450,16 +415,19 @@ export default function ProductDetailsPage() {
   }, [selectedVariant, effectivePrice, product, today, category]);
 
   const currentStock = useMemo(() => {
-    if (selectedVariant) return selectedVariant.stock;
     if (!product) return 0;
     if (!product.hasVariants || !product.variants) return product.stock || 0;
     
-    // If variants exist but none selected, show "unassigned" stock
-    const totalVariantStock = product.variants
-        .filter(v => v.isActive)
-        .reduce((acc, v) => acc + (Number(v.stock) || 0), 0);
-    return Math.max(0, (product.stock || 0) - totalVariantStock);
-  }, [product, selectedVariant]);
+    if (selectedVariant) return selectedVariant.stock;
+    
+    // If variants exist but none/partially selected, show total stock of matching variants
+    const matchingVariants = product.variants.filter(v => 
+        v.isActive && 
+        Object.entries(selectedOptions).every(([key, value]) => v.options[key] === value)
+    );
+    
+    return matchingVariants.reduce((acc, v) => acc + (Number(v.stock) || 0), 0);
+  }, [product, selectedVariant, selectedOptions]);
 
   const isCurrentlyOutOfStock = currentStock <= 0;
   const isEntireProductOutOfStock = useMemo(() => {
@@ -467,13 +435,13 @@ export default function ProductDetailsPage() {
     return (product.stock || 0) <= 0;
   }, [product]);
 
-  // Update active image when selected variant changes
+  // Update active image when preview variant changes
   useEffect(() => {
-    if (selectedVariant?.imageUrl) {
-      setActiveImage(selectedVariant.imageUrl);
+    if (previewVariant?.imageUrl) {
+      setActiveImage(previewVariant.imageUrl);
       setShowVideo(false);
     }
-  }, [selectedVariant]);
+  }, [previewVariant]);
 
   // Initial selection - Auto-select best available variant
   const initializedRef = useRef(false);
@@ -1148,14 +1116,14 @@ export default function ProductDetailsPage() {
                 })}
               </div>
               )}
-              {selectedVariant?.description && (
+              {previewVariant?.description && (
                 <div className="mb-6 p-4 rounded-2xl bg-primary/5 border border-primary/10 animate-in fade-in slide-in-from-top-2 duration-500">
                   <div className="flex items-center gap-2 mb-1.5">
                     <Sparkles className="h-3.5 w-3.5 text-primary" />
                     <span className="text-[10px] font-black uppercase tracking-wider text-primary">Variant Details</span>
                   </div>
                   <p className="text-xs font-medium text-[#1d1d1f] dark:text-[#f5f5f7] leading-relaxed">
-                    {selectedVariant.description}
+                    {previewVariant.description}
                   </p>
                 </div>
               )}
