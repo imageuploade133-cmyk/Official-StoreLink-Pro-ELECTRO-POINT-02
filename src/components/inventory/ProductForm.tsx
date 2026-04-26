@@ -223,6 +223,7 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
       description: z.string().optional().or(z.literal("")),
       imageUrl: z.string().url().optional().or(z.literal("")),
       isActive: z.boolean().default(true),
+      isManual: z.boolean().optional().default(false),
     })).optional().default([]),
   });
 
@@ -498,11 +499,14 @@ export function ProductForm({
   // Sync total stock if variants exist
   useEffect(() => {
     if (watchHasVariants) {
-      const totalStock = watchVariants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
-      const currentStock = form.getValues("stock");
-      if (totalStock !== currentStock) {
-        form.setValue("stock", totalStock, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
-        form.setValue("variantStockTotal", totalStock, { shouldValidate: true, shouldDirty: true });
+      // Only sync if we have variants; avoiding overwriting loaded stock with 0 during initial render/load
+      if (watchVariants.length > 0) {
+        const totalStock = watchVariants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
+        const currentStock = form.getValues("stock");
+        if (totalStock !== currentStock) {
+          form.setValue("stock", totalStock, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
+          form.setValue("variantStockTotal", totalStock, { shouldValidate: true, shouldDirty: true });
+        }
       }
     } else if (form.getValues("variantStockTotal") !== 0) {
       form.setValue("variantStockTotal", 0);
@@ -959,6 +963,17 @@ export function ProductForm({
                                               return;
                                             }
                                             vField.onChange(val);
+                                            
+                                            // Real-time sync: calculate and update total stock immediately
+                                            const currentVariants = form.getValues("variants") || [];
+                                            // Update the specific variant stock in the values array so reduce uses latest
+                                            const updatedVariants = [...currentVariants];
+                                            if (updatedVariants[index]) {
+                                              updatedVariants[index] = { ...updatedVariants[index], stock: val };
+                                            }
+                                            const total = updatedVariants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
+                                            form.setValue("stock", total, { shouldValidate: true, shouldDirty: true });
+                                            form.setValue("variantStockTotal", total, { shouldValidate: true, shouldDirty: true });
                                           }}
                                         />
                                       </FormControl>

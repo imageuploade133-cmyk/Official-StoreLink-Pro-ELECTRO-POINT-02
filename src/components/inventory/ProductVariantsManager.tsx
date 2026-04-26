@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useFormContext, useFieldArray } from 'react-hook-form';
 import { 
   Plus, 
@@ -131,6 +131,21 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
   const showAdvancedDetails = watch('advancedDetailsEnabled');
   const setShowAdvancedDetails = (val: boolean) => setValue('advancedDetailsEnabled', val, { shouldDirty: true });
   const [isManualMode, setIsManualMode] = useState(false);
+  
+  const hasVariants = watch('hasVariants');
+  const variantOptions = watch('variantOptions') || [];
+  const variants = watch('variants') || [];
+  const mainImageUrl = watch('imageUrl');
+
+  // Set manual mode on load if manual variants exist
+  useEffect(() => {
+    if (variants.length > 0 && variants.some((v: any) => v.isManual)) {
+      setIsManualMode(true);
+    }
+  }, [variants]);
+
+  const initialLoadRef = useRef(true);
+
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
     title: string;
@@ -142,11 +157,6 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
     description: '',
     onConfirm: () => {},
   });
-
-  const hasVariants = watch('hasVariants');
-  const variantOptions = watch('variantOptions') || [];
-  const variants = watch('variants') || [];
-  const mainImageUrl = watch('imageUrl');
 
   const { fields: optionFields, append: appendOption, remove: removeOption } = useFieldArray({
     control,
@@ -181,12 +191,11 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
     const currentOptions = getValues('variantOptions') || [];
     const currentVariants = getValues('variants') || [];
     const baseSellingPrice = getValues('sellingPrice');
-    const currentMainStock = getValues('stock') || 0;
 
     if (currentOptions.length === 0) {
       const manualVariants = currentVariants.filter((v: any) => v.isManual);
       if (JSON.stringify(manualVariants) !== JSON.stringify(currentVariants)) {
-        setValue('variants', manualVariants);
+        setValue('variants', manualVariants, { shouldDirty: true });
       }
       return;
     }
@@ -195,7 +204,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
     if (validOptions.length === 0) {
       const manualVariants = currentVariants.filter((v: any) => v.isManual);
       if (JSON.stringify(manualVariants) !== JSON.stringify(currentVariants)) {
-        setValue('variants', manualVariants);
+        setValue('variants', manualVariants, { shouldDirty: true });
       }
       return;
     }
@@ -231,7 +240,9 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
         
         return comboKeys.every(key => {
           const comboVal = String(combo[key]).toLowerCase().trim();
-          const existingVal = String(v.options[key] || v.options[key.toLowerCase()] || '').toLowerCase().trim();
+          // Case-insensitive key lookup
+          const existingKeyMatch = Object.keys(v.options).find(k => k.toLowerCase() === key.toLowerCase());
+          const existingVal = existingKeyMatch ? String(v.options[existingKeyMatch]).toLowerCase().trim() : '';
           return comboVal === existingVal;
         });
       });
@@ -259,25 +270,22 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
     const manualVariants = currentVariants.filter((v: any) => v.isManual);
     const newVariants = [...generatedVariants, ...manualVariants];
 
-    /* 
-    // Redistribution logic deactivated to allow "Standard" product stock to coexist with variants
-    const totalOldStock = currentVariants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
-    const totalNewStock = newVariants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
-    
-    const stockToDistribute = Math.max(totalOldStock, currentMainStock) - totalNewStock;
+    // Deep compare to avoid unnecessary updates and losing unsaved data
+    const compareVariants = (a: any[], b: any[]) => {
+        if (a.length !== b.length) return false;
+        return a.every((v, i) => {
+            const other = b[i];
+            if (v.id !== other.id) return false;
+            if (v.name !== other.name) return false;
+            if (v.stock !== other.stock) return false;
+            if (v.sellingPrice !== other.sellingPrice) return false;
+            if (JSON.stringify(v.options) !== JSON.stringify(other.options)) return false;
+            return true;
+        });
+    };
 
-    if (stockToDistribute > 0 && newVariants.length > 0) {
-      const targetIdx = newVariants.findIndex(v => v.isActive);
-      const finalTargetIdx = targetIdx !== -1 ? targetIdx : 0;
-      newVariants[finalTargetIdx] = {
-        ...newVariants[finalTargetIdx],
-        stock: (Number(newVariants[finalTargetIdx].stock) || 0) + stockToDistribute
-      };
-    }
-    */
-
-    if (JSON.stringify(newVariants) !== JSON.stringify(currentVariants)) {
-      setValue('variants', newVariants);
+    if (!compareVariants(newVariants, currentVariants)) {
+      setValue('variants', newVariants, { shouldDirty: true });
     }
   }, [setValue, getValues, isManualMode]);
 
@@ -319,7 +327,13 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
 
   useEffect(() => {
     if (hasVariants) {
+      // Avoid running on initial load if we already have variants loaded from Firestore
+      if (initialLoadRef.current && variants.length > 0) {
+          initialLoadRef.current = false;
+          return;
+      }
       generateVariants();
+      initialLoadRef.current = false;
     }
   }, [optionsString, hasVariants, generateVariants]);
 
@@ -329,13 +343,13 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
     if (currentValues.includes(value.trim())) return;
     
     const newValues = [...currentValues, value.trim()];
-    setValue(`variantOptions.${optionIndex}.values`, newValues);
+    setValue(`variantOptions.${optionIndex}.values`, newValues, { shouldDirty: true });
   };
 
   const handleRemoveOptionValue = (optionIndex: number, valueIndex: number) => {
     const currentValues = variantOptions[optionIndex].values || [];
     const newValues = currentValues.filter((_: any, i: number) => i !== valueIndex);
-    setValue(`variantOptions.${optionIndex}.values`, newValues);
+    setValue(`variantOptions.${optionIndex}.values`, newValues, { shouldDirty: true });
   };
 
   const handleImageUpload = async (variantIndex: number, event: React.ChangeEvent<HTMLInputElement>) => {
@@ -413,7 +427,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
       const result = await removeBackground({ imageDataUri });
       const uploadResult = await uploadImage({ imageDataUri: result.display_url, storeId });
 
-      setValue(`variants.${variantIndex}.imageUrl`, uploadResult.display_url);
+      setValue(`variants.${variantIndex}.imageUrl`, uploadResult.display_url, { shouldDirty: true });
       toast({ title: "Background Removed", description: "AI mockup generated successfully." });
     } catch (error: any) {
       console.error('Background removal failed:', error);
@@ -428,7 +442,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
       toast({ variant: "destructive", title: "No Primary Image", description: "Main product image is not set." });
       return;
     }
-    setValue(`variants.${variantIndex}.imageUrl`, mainImageUrl);
+    setValue(`variants.${variantIndex}.imageUrl`, mainImageUrl, { shouldDirty: true });
     toast({ title: "Image Synced", description: "Using primary product image for this variant." });
   };
 
@@ -1155,7 +1169,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                             <span className="text-[10px] font-bold uppercase">{variant.isActive ? 'On' : 'Off'}</span>
                             <Switch 
                               checked={variant.isActive} 
-                              onCheckedChange={(checked) => setValue(`variants.${index}.isActive`, checked)} 
+                              onCheckedChange={(checked) => setValue(`variants.${index}.isActive`, checked, { shouldDirty: true })} 
                               className="scale-75 data-[state=checked]:bg-primary"
                               disabled={isUploading === variant.id || isProcessingAi === variant.id}
                             />

@@ -655,6 +655,7 @@ export interface ProductVariant {
   imageUrl?: string;
   additionalImageUrls?: string[];
   isActive: boolean;
+  isManual?: boolean;
 }
 
 export interface ProductOption {
