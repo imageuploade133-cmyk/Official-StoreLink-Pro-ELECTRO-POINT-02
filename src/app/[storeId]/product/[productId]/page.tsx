@@ -754,12 +754,16 @@ export default function ProductDetailsPage() {
 
   const handleAddToCart = () => {
     if (product) {
+      // Use variant image if available for easy understanding in cart
+      const variantImage = selectedVariant?.imageUrl || previewVariant?.imageUrl || activeImage;
+
       for (let i = 0; i < quantity; i++) {
         const itemWithVariant = {
           ...product,
           stock: currentStock, // Use variant stock
           selectedVariantId: selectedVariant?.id,
           selectedOptions: product.hasVariants ? selectedOptions : undefined,
+          imageUrl: variantImage || product.imageUrl,
         };
         addToCart(itemWithVariant as any, currentPrice);
       }
