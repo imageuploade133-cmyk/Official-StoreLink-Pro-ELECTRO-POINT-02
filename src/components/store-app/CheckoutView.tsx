@@ -326,7 +326,9 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
         items: cartItems.map(item => ({
           productId: item.id,
           quantity: item.quantity,
-          price: item.salePrice
+          price: item.salePrice,
+          variantId: item.selectedVariantId,
+          selectedOptions: item.selectedOptions
         })),
         totalAmount: total,
         totalCost: cartItems.reduce((sum, item) => sum + ((item.purchasePrice || item.salePrice || 0) * item.quantity), 0),
@@ -467,9 +469,20 @@ export function CheckoutView({ onClose }: CheckoutViewProps) {
                             <div className="mt-2 p-6 bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-xl space-y-4 animate-in zoom-in-95 duration-300">
                                 <div className="space-y-3">
                                     {cartItems.map(item => (
-                                        <div key={item.id} className="flex justify-between items-center text-sm">
-                                            <span className="text-slate-500 font-medium truncate pr-4">{item.name} <span className="text-[10px] font-black text-primary/60 ml-1">x{item.quantity}</span></span>
-                                            <span className="font-bold shrink-0">{formatCurrency(item.salePrice * item.quantity, currencySymbol)}</span>
+                                        <div key={item.id + (item.selectedVariantId || '')} className="space-y-1">
+                                            <div className="flex justify-between items-center text-sm">
+                                                <span className="text-slate-500 font-medium truncate pr-4">{item.name} <span className="text-[10px] font-black text-primary/60 ml-1">x{item.quantity}</span></span>
+                                                <span className="font-bold shrink-0">{formatCurrency(item.salePrice * item.quantity, currencySymbol)}</span>
+                                            </div>
+                                            {item.selectedOptions && Object.entries(item.selectedOptions).length > 0 && (
+                                                <div className="flex flex-wrap gap-1">
+                                                    {Object.entries(item.selectedOptions).map(([key, value]) => (
+                                                        <span key={key} className="text-[8px] font-black uppercase tracking-widest text-slate-400 bg-slate-100 dark:bg-slate-900 px-1.5 py-0.5 rounded">
+                                                            {key}: {value}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                     ))}
                                 </div>

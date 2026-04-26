@@ -11,8 +11,8 @@ import { useStoreUrl } from '@/hooks/use-store-url';
 interface CartContextType {
   cartItems: StoreCartItem[];
   addToCart: (product: Product, salePrice: number) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  removeFromCart: (productId: string, variantId?: string) => void;
+  updateQuantity: (productId: string, quantity: number, variantId?: string) => void;
   clearCart: () => void;
   cartCount: number;
 }
@@ -98,26 +98,28 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     });
   }, [toast, triggerAd]);
 
-  const removeFromCart = useCallback((productId: string) => {
-    const itemBeingRemoved = cartItems.find(item => item.id === productId);
-    const newCartItems = cartItems.filter(item => item.id !== productId);
-    setCartItems(newCartItems);
-    
-    if (itemBeingRemoved) {
-        setTimeout(() => {
-            toast({ title: "Item Removed", description: `${itemBeingRemoved.name} has been removed from your cart.` });
-        }, 0);
-    }
-  }, [cartItems, toast]);
+  const removeFromCart = useCallback((productId: string, variantId?: string) => {
+    setCartItems(prevItems => {
+        const itemBeingRemoved = prevItems.find(item => item.id === productId && item.selectedVariantId === variantId);
+        const newCartItems = prevItems.filter(item => !(item.id === productId && item.selectedVariantId === variantId));
+        
+        if (itemBeingRemoved) {
+            setTimeout(() => {
+                toast({ title: "Item Removed", description: `${itemBeingRemoved.name} has been removed from your cart.` });
+            }, 0);
+        }
+        return newCartItems;
+    });
+  }, [toast]);
 
-  const updateQuantity = useCallback((productId: string, quantity: number) => {
+  const updateQuantity = useCallback((productId: string, quantity: number, variantId?: string) => {
     if (quantity < 1) {
-      removeFromCart(productId);
+      removeFromCart(productId, variantId);
       return;
     }
     setCartItems(prevItems =>
       prevItems.map(item => {
-        if (item.id === productId) {
+        if (item.id === productId && item.selectedVariantId === variantId) {
           const itemStock = ensureNumber(item.stock, 0);
           if (quantity > itemStock) {
             setTimeout(() => {
