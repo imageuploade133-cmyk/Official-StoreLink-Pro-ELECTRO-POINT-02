@@ -97,13 +97,31 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
         return cartItems.map(cartItem => {
             const dbProduct = dbProducts.find(p => p.id === cartItem.id);
             if (!dbProduct) return { ...cartItem, isUnavailable: true };
+
+            let salePrice = calculateEffectivePrice(dbProduct as any, today);
+            let stock = dbProduct.stock;
+            let variantImageUrl = dbProduct.imageUrl;
+            
+            if (cartItem.selectedVariantId && dbProduct.hasVariants && dbProduct.variants) {
+                const variant = dbProduct.variants.find(v => v.id === cartItem.selectedVariantId);
+                if (variant) {
+                    if (variant.sellingPrice) {
+                        salePrice = calculateEffectivePrice({ ...dbProduct, sellingPrice: variant.sellingPrice } as any, today);
+                    }
+                    stock = variant.stock;
+                    if (variant.imageUrl) variantImageUrl = variant.imageUrl;
+                }
+            }
+
             return {
                 ...cartItem,
                 ...dbProduct,
-                salePrice: calculateEffectivePrice(dbProduct as any, today),
+                imageUrl: variantImageUrl || cartItem.imageUrl,
+                salePrice,
+                stock,
                 isUnavailable: dbProduct.isVisibleInPOS === false,
-                isOutOfStock: dbProduct.stock <= 0,
-                isLowStock: dbProduct.stock < cartItem.quantity && dbProduct.stock > 0
+                isOutOfStock: stock <= 0,
+                isLowStock: stock < cartItem.quantity && stock > 0
             };
         });
     }, [cartItems, dbProducts, today]);
@@ -231,7 +249,7 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
                         <div className="space-y-10">
                             <div className="space-y-4">
                                 {realTimeCartItems.map((item) => (
-                                    <div key={item.id} className={cn(
+                                    <div key={item.id + (item.selectedVariantId || '')} className={cn(
                                         "flex items-center gap-5 p-5 bg-white dark:bg-slate-800 rounded-[2rem] shadow-xl border border-slate-100 dark:border-slate-800 group relative transition-all active:scale-[0.99]",
                                         (item.isUnavailable || item.isOutOfStock) && "opacity-60 grayscale-[0.5]"
                                     )}>
@@ -242,7 +260,7 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
                                             <div className="flex justify-between items-start">
                                                 <p className="font-black text-sm truncate leading-tight uppercase tracking-tight text-slate-900 dark:text-white">{item.name}</p>
                                                 <button 
-                                                    onClick={() => removeFromCart(item.id)} 
+                                                    onClick={() => removeFromCart(item.id, item.selectedVariantId)} 
                                                     className="text-slate-300 hover:text-destructive transition-all active:scale-90 p-1"
                                                 >
                                                     <X className="h-4 w-4" strokeWidth={3} />
@@ -253,11 +271,20 @@ export function CartView({ onNavigateToHome, onStartCheckout }: CartViewProps) {
                                                 {item.isOutOfStock && <Badge variant="destructive" className="text-[8px] h-4 font-black uppercase">Out of Stock</Badge>}
                                                 {item.isLowStock && <Badge variant="secondary" className="bg-orange-50 text-orange-600 border-orange-100 text-[8px] h-4 font-black uppercase">Critical Stock</Badge>}
                                             </div>
+                                            {item.selectedOptions && Object.entries(item.selectedOptions).length > 0 && (
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {Object.entries(item.selectedOptions).map(([key, value]) => (
+                                                        <Badge key={key} variant="outline" className="text-[9px] h-5 px-2 rounded-md bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-800 font-bold text-slate-500 uppercase tracking-tighter">
+                                                            {key}: {value}
+                                                        </Badge>
+                                                    ))}
+                                                </div>
+                                            )}
                                             <div className="flex items-center justify-between mt-4">
                                                 <div className="flex items-center gap-4 bg-slate-50 dark:bg-slate-900 p-1 rounded-xl border border-slate-100 dark:border-slate-800">
-                                                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-all shadow-sm"><Minus className="h-4 w-4" /></button>
+                                                    <button onClick={() => updateQuantity(item.id, item.quantity - 1, item.selectedVariantId)} className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-all shadow-sm"><Minus className="h-4 w-4" /></button>
                                                     <span className="text-sm font-black w-6 text-center">{item.quantity}</span>
-                                                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-all shadow-sm" disabled={item.quantity >= (item.stock || 0)}><Plus className="h-4 w-4" /></button>
+                                                    <button onClick={() => updateQuantity(item.id, item.quantity + 1, item.selectedVariantId)} className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-all shadow-sm" disabled={item.quantity >= (item.stock || 0)}><Plus className="h-4 w-4" /></button>
                                                 </div>
                                                 <p className="font-black text-base tracking-tighter text-slate-900 dark:text-white">{formatCurrency(item.salePrice * item.quantity, currencySymbol)}</p>
                                             </div>

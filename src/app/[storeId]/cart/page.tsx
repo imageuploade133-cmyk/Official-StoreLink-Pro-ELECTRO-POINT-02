@@ -209,7 +209,7 @@ export default function CartPage() {
 
   const handleConfirmRemove = () => {
     if (itemToRemove) {
-      removeFromCart(itemToRemove.id);
+      removeFromCart(itemToRemove.id, itemToRemove.selectedVariantId);
       setItemToRemove(null);
     }
   };
@@ -311,7 +311,7 @@ export default function CartPage() {
                               <ScrollArea className="h-auto max-h-[600px]">
                                   <div className="divide-y">
                                       {realTimeCartItems.map(item => (
-                                          <div key={item.id} className={cn("flex flex-col sm:flex-row sm:items-center p-6 gap-6", (item.isUnavailable || item.isOutOfStock) && "bg-destructive/5")}>
+                                          <div key={item.id + (item.selectedVariantId || '')} className={cn("flex flex-col sm:flex-row sm:items-center p-6 gap-6", (item.isUnavailable || item.isOutOfStock) && "bg-destructive/5")}>
                                               <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 border">
                                                   <Image
                                                       src={item.imageUrl || `https://placehold.co/100x100?text=${item.name.charAt(0)}`}
@@ -351,7 +351,7 @@ export default function CartPage() {
                                                         variant="ghost" 
                                                         size="icon" 
                                                         className="h-8 w-8 rounded-md" 
-                                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                        onClick={() => updateQuantity(item.id, item.quantity - 1, item.selectedVariantId)}
                                                         disabled={item.isUnavailable}
                                                       >
                                                           <Minus className="h-4 w-4" />
@@ -361,7 +361,7 @@ export default function CartPage() {
                                                         variant="ghost" 
                                                         size="icon" 
                                                         className="h-8 w-8 rounded-md" 
-                                                        onClick={() => updateQuantity(item.id, item.quantity + 1)} 
+                                                        onClick={() => updateQuantity(item.id, item.quantity + 1, item.selectedVariantId)} 
                                                         disabled={item.quantity >= (item.stock || 0) || item.isUnavailable}
                                                       >
                                                           <Plus className="h-4 w-4" />

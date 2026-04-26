@@ -476,7 +476,9 @@ export default function CheckoutPage() {
                             items: cartItems.map(item => ({
                                 productId: item.id,
                                 quantity: item.quantity,
-                                price: item.salePrice
+                                price: item.salePrice,
+                                variantId: item.selectedVariantId,
+                                selectedOptions: item.selectedOptions
                             })),
                             totalAmount: total,
                             totalCost: cartItems.reduce((sum, item) => sum + ((item.purchasePrice || item.salePrice || 0) * item.quantity), 0),
@@ -798,7 +800,7 @@ export default function CheckoutPage() {
                 <ScrollArea className="max-h-[300px]">
                   <div className="p-6 divide-y">
                     {cartItems.map((item, idx) => (
-                      <div key={`${item.id}-${idx}`} className="py-3 flex justify-between gap-4">
+                      <div key={`${item.id}-${item.selectedVariantId || 'base'}-${idx}`} className="py-3 flex justify-between gap-4">
                         <div className="min-w-0">
                           <p className="font-medium text-sm truncate">{item.name}</p>
                           {item.selectedOptions && (
