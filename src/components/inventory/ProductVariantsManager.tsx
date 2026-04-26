@@ -222,11 +222,26 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
       
       const existing = currentVariants.find((v: any) => {
         if (v.isManual) return false;
-        return Object.entries(combo).every(([key, val]) => v.options[key] === val) &&
-               Object.keys(v.options).length === Object.keys(combo).length;
+        if (!v.options) return false;
+        
+        const existingKeys = Object.keys(v.options);
+        const comboKeys = Object.keys(combo);
+        
+        if (existingKeys.length !== comboKeys.length) return false;
+        
+        return comboKeys.every(key => {
+          const comboVal = String(combo[key]).toLowerCase().trim();
+          const existingVal = String(v.options[key] || v.options[key.toLowerCase()] || '').toLowerCase().trim();
+          return comboVal === existingVal;
+        });
       });
       
-      if (existing) return existing;
+      if (existing) {
+        return {
+          ...existing,
+          name // Update name in case order or separator changed
+        };
+      }
 
       return {
         id: crypto.randomUUID(),
@@ -267,6 +282,41 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
   }, [setValue, getValues, isManualMode]);
 
   const optionsString = JSON.stringify(variantOptions);
+
+  const toggleOption = (name: string) => {
+    const index = variantOptions.findIndex((opt: any) => opt.name && opt.name.toLowerCase() === name.toLowerCase());
+    if (index !== -1) {
+      setConfirmConfig({
+        isOpen: true,
+        title: 'Remove Option?',
+        description: `Removing the "${variantOptions[index]?.name || 'Option'}" will delete all associated variants. Are you sure?`,
+        onConfirm: () => {
+          removeOption(index);
+          if (optionFields.length === 1) {
+            const currentVariants = getValues('variants') || [];
+            const hasManualVariants = currentVariants.some((v: any) => v.isManual);
+            if (!hasManualVariants) {
+              setValue('hasVariants', false, { shouldDirty: true });
+            }
+          }
+        }
+      });
+    } else {
+      if (optionFields.length < 3) {
+        appendOption({ name, values: [], optionType: 'preset', optionName: name });
+        if (!hasVariants) {
+          setValue('hasVariants', true, { shouldDirty: true });
+        }
+      } else {
+        toast({
+          title: "Limit Reached",
+          description: "You can only add up to 3 variant options.",
+          variant: "destructive"
+        });
+      }
+    }
+  };
+
   useEffect(() => {
     if (hasVariants) {
       generateVariants();
@@ -512,31 +562,51 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
       {hasVariants && (
         <div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
           <Card className="border-none shadow-md ring-1 ring-border overflow-hidden">
-            <div className="bg-muted/30 px-6 py-4 border-b flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <ListPlus className="h-4 w-4 text-primary" />
-                <h3 className="text-sm font-bold uppercase tracking-wider">Configure Options</h3>
+            <div className="bg-muted/30 px-6 py-4 border-b space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <ListPlus className="h-4 w-4 text-primary" />
+                  <h3 className="text-sm font-bold uppercase tracking-wider">Configure Options</h3>
+                </div>
+                <div className="text-[10px] font-black uppercase text-muted-foreground hidden sm:block">Step 1: Select Dimensions</div>
               </div>
-              <Button 
-                type="button" 
-                variant="outline" 
-                size="sm" 
-                className="h-8 gap-2 bg-background border-primary/20 text-primary hover:bg-primary/5"
-                onClick={() => {
-                  if (optionFields.length < 3) {
-                    appendOption({ name: '', values: [], optionType: 'preset', optionName: '' });
-                  } else {
-                    toast({
-                      title: "Limit Reached",
-                      description: "You can only add up to 3 variant options.",
-                      variant: "destructive"
-                    });
-                  }
-                }}
-                disabled={optionFields.length >= 3}
-              >
-                <Plus className="h-3.5 w-3.5" /> Add Option
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                {PRESET_OPTIONS.map(preset => {
+                  const isActive = variantOptions.some((opt: any) => opt.name && opt.name.toLowerCase() === preset.name.toLowerCase());
+                  return (
+                    <Badge 
+                      key={preset.name}
+                      variant={isActive ? "default" : "outline"}
+                      className={cn(
+                        "cursor-pointer px-3 py-2 text-xs font-bold transition-all rounded-xl border-2",
+                        isActive 
+                          ? "bg-primary text-white border-primary shadow-md scale-105" 
+                          : "bg-background hover:bg-primary/5 hover:border-primary/30 text-muted-foreground hover:text-primary"
+                      )}
+                      onClick={() => toggleOption(preset.name)}
+                    >
+                      {preset.name}
+                      {isActive ? <X className="ml-2 h-3.5 w-3.5" /> : <Plus className="ml-2 h-3.5 w-3.5 opacity-50" />}
+                    </Badge>
+                  )
+                })}
+                <Button 
+                  type="button"
+                  variant="outline" 
+                  size="sm" 
+                  className="h-9 rounded-xl border-dashed border-2 hover:bg-primary/5 hover:text-primary hover:border-primary/30"
+                  onClick={() => {
+                    if (optionFields.length < 3) {
+                      appendOption({ name: '', values: [], optionType: 'custom', optionName: '' });
+                      if (!hasVariants) setValue('hasVariants', true);
+                    } else {
+                      toast({ title: "Limit Reached", description: "Max 3 options.", variant: "destructive" });
+                    }
+                  }}
+                >
+                   <Plus className="mr-1 h-3.5 w-3.5" /> Custom
+                </Button>
+              </div>
             </div>
             <CardContent className="p-6 space-y-4">
               {optionFields.length === 0 ? (
