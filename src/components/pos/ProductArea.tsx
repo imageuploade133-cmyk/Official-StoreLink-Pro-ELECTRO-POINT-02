@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useFirestore } from '@/firebase';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { collection, getDocs, query as firestoreQuery, where, orderBy } from 'firebase/firestore';
-import type { Product as ProductType, Category, DisplayProduct } from '@/lib/types';
+import type { Product as ProductType, Category, DisplayProduct, ProductVariant } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context';
 import { useSettings } from '@/contexts/settings-context';
 import { useToast } from '@/hooks/use-toast';
