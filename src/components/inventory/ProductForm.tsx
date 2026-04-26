@@ -128,7 +128,7 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
     sku: z.string().optional().or(z.literal('')),
     barcode: z.string().optional().or(z.literal('')),
     categoryId: z.string().min(1, 'Please select a category.'),
-    stock: z.coerce.number().int().min(1, 'Please add stock quantity (at least 1).'),
+    stock: z.coerce.number().int().min(0, 'Please add stock quantity.'),
     purchasePrice: z.coerce.number().min(0, 'Purchase price cannot be negative.'),
     sellingPrice: z.coerce.number().min(0.01, 'Selling price must be greater than 0.'),
     newPrice: z.preprocess((val) => (val === '' ? null : val), z.coerce.number().min(0.01, 'Discount price must be greater than 0.').optional().nullable()),
@@ -497,13 +497,15 @@ export function ProductForm({
 
   // Sync total stock if variants exist
   useEffect(() => {
-    if (watchHasVariants && watchVariants.length > 0) {
+    if (watchHasVariants) {
       const totalStock = watchVariants.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0);
       const currentStock = form.getValues("stock");
       if (totalStock !== currentStock) {
-        form.setValue("stock", totalStock, { shouldValidate: true, shouldDirty: true });
+        form.setValue("stock", totalStock, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
         form.setValue("variantStockTotal", totalStock, { shouldValidate: true, shouldDirty: true });
       }
+    } else if (form.getValues("variantStockTotal") !== 0) {
+      form.setValue("variantStockTotal", 0);
     }
   }, [watchVariants, watchHasVariants, form]);
   const watchVideoPoster = form.watch('videoPosterUrl');
@@ -925,8 +927,8 @@ export function ProductForm({
                             <span className="text-[10px] font-black uppercase tracking-widest text-primary">Consolidated Inventory Management</span>
                           </div>
                                                     <p className="text-[10px] font-bold text-muted-foreground mb-4">
-                                                        Total stock includes base product units and all variant units. 
-                                                        Unassigned units will be sold as "Standard" in the store.
+                                                        Total stock is automatically calculated from the variants below.
+                                                        Ensure each variant has its correct stock level assigned.
                                                     </p>
                           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                             {watchVariants.map((variant: any, index: number) => (
@@ -2311,4 +2313,4 @@ export function ProductForm({
     </Drawer>
     </>
   );
-};
+}
