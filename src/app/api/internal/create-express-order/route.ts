@@ -8,31 +8,36 @@ export async function POST(request: Request) {
     const { storeId, items, totalAmount, totalCost, email } = body;
 
     const orderId = await adminDb.runTransaction(async (transaction) => {
-      // 1. Check stock and deduct
+      // 0. Perform all reads first
+      const itemsProductSnaps = [];
       for (const item of items) {
         const productRef = adminDb.collection('products').doc(item.productId);
-        const productSnap = await transaction.get(productRef);
-        
-        if (!productSnap.exists) {
+        const snap = await transaction.get(productRef);
+        if (!snap.exists) {
           throw new Error(`Product ${item.productId} not found`);
         }
-        
-        const data = productSnap.data();
-        let currentStock = data?.stock || 0;
+        itemsProductSnaps.push({ item, snap, ref: productRef });
+      }
+
+      // 1. Process each item (all writes)
+      for (const { item, snap, ref } of itemsProductSnaps) {
+        const data = snap.data();
+        let currentStock = Number(data?.stock || 0);
+        const quantity = Number(item.quantity || 0);
         
         if (item.variantId && data?.hasVariants && data?.variants) {
           const variants = [...data.variants];
           const variantIndex = variants.findIndex((v: any) => v.id === item.variantId);
           if (variantIndex !== -1) {
             const variant = { ...variants[variantIndex] };
-            if (variant.stock < item.quantity) {
+            if (variant.stock < quantity) {
               throw new Error(`Insufficient stock for variant ${variant.name}`);
             }
-            variant.stock -= item.quantity;
+            variant.stock -= quantity;
             variants[variantIndex] = variant;
-            transaction.update(productRef, { 
+            transaction.update(ref, { 
               variants, 
-              stock: currentStock - item.quantity,
+              stock: currentStock - quantity,
               updatedAt: FieldValue.serverTimestamp()
             });
 
@@ -40,59 +45,59 @@ export async function POST(request: Request) {
             const auditRef = adminDb.collection('stockAudit').doc();
             transaction.set(auditRef, {
               productId: item.productId,
-              productName: data?.name + (variant ? ` (${variant.name})` : ''),
+              productName: (data?.name || 'Product') + (variant ? ` (${variant.name})` : ''),
               variantId: item.variantId || null,
               selectedOptions: item.selectedOptions || null,
               store_id: storeId,
               type: 'SALE',
-              referenceId: 'EXPRESS-PENDING', // Will be updated or identified as express
+              referenceId: 'EXPRESS-ORDER',
               beforeStock: currentStock,
-              afterStock: currentStock - item.quantity,
-              change: -item.quantity,
+              afterStock: currentStock - quantity,
+              change: -quantity,
               staffId: 'system',
               staffName: 'Express Checkout',
               timestamp: FieldValue.serverTimestamp()
             });
           } else {
-            transaction.update(productRef, { 
-              stock: currentStock - item.quantity,
+            transaction.update(ref, { 
+              stock: currentStock - quantity,
               updatedAt: FieldValue.serverTimestamp()
             });
 
             const auditRef = adminDb.collection('stockAudit').doc();
             transaction.set(auditRef, {
               productId: item.productId,
-              productName: data?.name,
+              productName: data?.name || 'Product',
               store_id: storeId,
               type: 'SALE',
-              referenceId: 'EXPRESS-PENDING',
+              referenceId: 'EXPRESS-ORDER',
               beforeStock: currentStock,
-              afterStock: currentStock - item.quantity,
-              change: -item.quantity,
+              afterStock: currentStock - quantity,
+              change: -quantity,
               staffId: 'system',
               staffName: 'Express Checkout',
               timestamp: FieldValue.serverTimestamp()
             });
           }
         } else {
-          if (currentStock < item.quantity) {
-            throw new Error(`Insufficient stock for ${data?.name}`);
+          if (currentStock < quantity) {
+            throw new Error(`Insufficient stock for ${data?.name || 'Product'}`);
           }
-          transaction.update(productRef, { 
-            stock: currentStock - item.quantity,
+          transaction.update(ref, { 
+            stock: currentStock - quantity,
             updatedAt: FieldValue.serverTimestamp()
           });
 
           const auditRef = adminDb.collection('stockAudit').doc();
           transaction.set(auditRef, {
             productId: item.productId,
-            productName: data?.name,
+            productName: data?.name || 'Product',
             store_id: storeId,
             type: 'SALE',
-            referenceId: 'EXPRESS-PENDING',
+            referenceId: 'EXPRESS-ORDER',
             beforeStock: currentStock,
-            afterStock: currentStock - item.quantity,
-            change: -item.quantity,
+            afterStock: currentStock - quantity,
+            change: -quantity,
             staffId: 'system',
             staffName: 'Express Checkout',
             timestamp: FieldValue.serverTimestamp()
@@ -102,9 +107,17 @@ export async function POST(request: Request) {
 
       // 2. Create the order
       const orderRef = adminDb.collection('orders').doc();
+      const enrichedItems = itemsProductSnaps.map(({ item, snap }) => {
+        const data = snap.data();
+        return {
+          ...item,
+          productName: data?.name || 'Product'
+        };
+      });
+
       transaction.set(orderRef, {
         store_id: storeId,
-        items,
+        items: enrichedItems,
         totalAmount,
         totalCost,
         status: 'pending',

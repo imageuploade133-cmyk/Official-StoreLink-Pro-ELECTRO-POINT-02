@@ -158,7 +158,16 @@ export default function OrderDetailPage() {
                       <p className="font-bold text-sm sm:text-base">
                         {item.productName || `Product #${item.productId.slice(0, 5)}`}
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      {item.selectedOptions && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {Object.entries(item.selectedOptions).map(([key, val]: [string, any]) => (
+                            <Badge key={key} variant="outline" className="text-[9px] px-1 py-0 h-4 bg-primary/5 text-primary border-primary/20">
+                              {key}: {val}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                      <p className="text-sm text-muted-foreground mt-1">
                         {item.quantity} x {formatCurrency(item.price, currencySymbol)}
                       </p>
                     </div>
