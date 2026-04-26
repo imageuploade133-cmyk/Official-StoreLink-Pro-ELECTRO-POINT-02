@@ -277,6 +277,7 @@ export default function ProductDetailsPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: string }>({});
+  const [isChangingVariant, setIsChangingVariant] = useState(false);
 
   const isOptionValueAvailable = (optionName: string, value: string) => {
     if (!product?.variants || !product.variantOptions) return true;
@@ -293,7 +294,9 @@ export default function ProductDetailsPage() {
   };
 
   const handleOptionChange = (optionName: string, value: string) => {
-    if (!product?.variantOptions || !product.variants) return;
+    if (!product?.variantOptions || !product.variants || isChangingVariant) return;
+
+    setIsChangingVariant(true);
 
     const isDeselecting = selectedOptions[optionName] === value;
     const newOptions = { ...selectedOptions };
@@ -305,6 +308,7 @@ export default function ProductDetailsPage() {
 
     if (isDeselecting) {
         setSelectedOptions(newOptions);
+        setTimeout(() => setIsChangingVariant(false), 400);
         return;
     }
 
@@ -347,6 +351,7 @@ export default function ProductDetailsPage() {
     }
 
     setSelectedOptions(currentOptions);
+    setTimeout(() => setIsChangingVariant(false), 400);
   };
 
   // Fetch Product
@@ -470,12 +475,23 @@ export default function ProductDetailsPage() {
     }
   }, [selectedVariant]);
 
-  // Initial selection - DEACTIVATED to allow "Standard" product view by default
+  // Initial selection - Auto-select best available variant
   const initializedRef = useRef(false);
   useEffect(() => {
     if (product && !initializedRef.current) {
-        // We no longer auto-select a variant to allow the base/standard product to be shown first.
-        // This makes variants optional as requested.
+        if (product.hasVariants && product.variants && product.variants.length > 0) {
+            // Find first in-stock and active variant
+            const firstInStockVariant = product.variants.find(v => v.isActive && (v.stock || 0) > 0);
+            if (firstInStockVariant && firstInStockVariant.options) {
+                setSelectedOptions(firstInStockVariant.options);
+            } else {
+                // If none in stock, pick first active
+                const firstActiveVariant = product.variants.find(v => v.isActive);
+                if (firstActiveVariant && firstActiveVariant.options) {
+                    setSelectedOptions(firstActiveVariant.options);
+                }
+            }
+        }
         initializedRef.current = true;
     }
   }, [product]);
@@ -912,7 +928,17 @@ export default function ProductDetailsPage() {
                         </Button>
                     </div>
                 ) : (
-                    <Image src={activeImage || product.imageUrl || defaultImageUrl} alt={product.name} fill priority className={cn("object-cover transition-all duration-700 ease-in-out", isEntireProductOutOfStock && "opacity-50 grayscale")} unoptimized />
+                    <div className="relative w-full h-full">
+                        <Image src={activeImage || product.imageUrl || defaultImageUrl} alt={product.name} fill priority className={cn("object-cover transition-all duration-700 ease-in-out", (isEntireProductOutOfStock || isChangingVariant) && "opacity-50 grayscale")} unoptimized />
+                        {isChangingVariant && (
+                            <div className="absolute inset-0 bg-white/20 dark:bg-black/20 backdrop-blur-[2px] flex items-center justify-center z-10 animate-in fade-in duration-300">
+                                <div className="flex flex-col items-center gap-3">
+                                    <div className="h-10 w-10 border-4 border-primary border-t-transparent rounded-full animate-spin shadow-lg" />
+                                    <Badge className="bg-primary text-white font-black text-[10px] uppercase tracking-[0.2em] px-3 py-1 shadow-xl border-none">Updating..</Badge>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 )}
                 <div className="absolute top-8 left-8 flex flex-col gap-3">
                     {product.isOfficialBrand && (
@@ -956,7 +982,7 @@ export default function ProductDetailsPage() {
               </div>
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-[#1d1d1f] dark:text-[#f5f5f7] leading-tight">{product.name}</h1>
               <div className="flex items-start gap-3 pt-2">
-                <div className="flex flex-col gap-1 md:gap-1.5">
+                <div className={cn("flex flex-col gap-1 md:gap-1.5 transition-all duration-300", isChangingVariant && "opacity-40 blur-[1px]")}>
                   {!today ? <Skeleton className="h-8 md:h-10 w-32" /> : (
                     <><span className={cn("text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight", isDiscounted ? "text-[#e11d48]" : "text-[#1d1d1f] dark:text-[#f5f5f7]")}>{formatCurrency(currentPrice, currencySymbol)}</span>
                     {isDiscounted && <span className="text-sm md:text-base text-[#86868b] line-through">Was: {formatCurrency(product.sellingPrice, currencySymbol)}</span>}</>
@@ -1153,38 +1179,39 @@ export default function ProductDetailsPage() {
                   <span className="text-[10px] font-bold text-[#e11d48] animate-pulse">Only {currentStock} left!</span>
                 )}
               </div>
-              <div className="flex items-center gap-3 md:gap-4">
+              <div className={cn("flex items-center gap-3 md:gap-4 transition-all duration-300", isChangingVariant && "opacity-50 pointer-events-none")}>
                 <div className="flex items-center bg-gradient-to-r from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/15 border-2 border-primary/30 dark:border-primary/40 rounded-[18px] p-1.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.01)] dark:shadow-[inset_0_1px_2px_rgba(255,255,255,0.05)] gap-2">
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-10 md:h-12 w-10 md:w-12 rounded-[14px] bg-gradient-to-br from-rose-500 to-red-600 dark:from-rose-600 dark:to-red-700 text-white hover:shadow-lg dark:hover:shadow-rose-500/50 active:scale-95 transition-all font-bold disabled:opacity-30" 
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-10 md:h-12 w-10 md:w-12 rounded-[14px] bg-gradient-to-br from-rose-500 to-red-600 dark:from-rose-600 dark:to-red-700 text-white hover:shadow-lg dark:hover:shadow-rose-500/50 active:scale-95 transition-all font-bold disabled:opacity-30"
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    disabled={isOutOfStock}
+                    disabled={isOutOfStock || isChangingVariant}
                   >
                     <Minus className="h-4 md:h-5 w-4 md:w-5" />
                   </Button>
-                  <span className={cn("w-10 md:w-12 text-center text-lg font-black tabular-nums tracking-tight text-primary dark:text-primary", isOutOfStock && "opacity-30")}>{isOutOfStock ? 0 : quantity}</span>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-10 md:h-12 w-10 md:w-12 rounded-[14px] bg-gradient-to-br from-emerald-500 to-green-600 dark:from-emerald-600 dark:to-green-700 text-white hover:shadow-lg dark:hover:shadow-emerald-500/50 active:scale-95 transition-all font-bold disabled:opacity-30" 
+                  <span className={cn("w-10 md:w-12 text-center text-lg font-black tabular-nums tracking-tight text-primary dark:text-primary", (isOutOfStock || isChangingVariant) && "opacity-30")}>{isOutOfStock ? 0 : quantity}</span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-10 md:h-12 w-10 md:w-12 rounded-[14px] bg-gradient-to-br from-emerald-500 to-green-600 dark:from-emerald-600 dark:to-green-700 text-white hover:shadow-lg dark:hover:shadow-emerald-500/50 active:scale-95 transition-all font-bold disabled:opacity-30"
                     onClick={() => setQuantity(Math.min(currentStock, quantity + 1))}
-                    disabled={isOutOfStock}
+                    disabled={isOutOfStock || isChangingVariant}
                   >
                     <Plus className="h-4 md:h-5 w-4 md:w-5" />
                   </Button>
                 </div>
-                <Button 
-                  onClick={isOutOfStock ? () => setIsOutOfDataDrawerOpen(true) : handleAddToCart} 
+                <Button
+                  onClick={isOutOfStock ? () => setIsOutOfDataDrawerOpen(true) : handleAddToCart}
                   style={isOutOfStock ? { backgroundColor: '#e2e8f0', color: '#94a3b8' } : buttonStyle}
+                  disabled={isChangingVariant}
                   className={cn(
-                      "flex-1 font-semibold tracking-tight shadow-sm transition-all active:scale-[0.98] group", 
+                      "flex-1 font-semibold tracking-tight shadow-sm transition-all active:scale-[0.98] group",
                       buttonClasses,
-                      isOutOfStock && "cursor-pointer"
+                      (isOutOfStock || isChangingVariant) && "cursor-pointer"
                   )}
                 >
-                  <AddToCartIcon className="mr-2 md:mr-3 h-4 md:h-5 w-4 md:w-5" /> {isOutOfStock ? "Out of Stock" : addToCartText}
+                  <AddToCartIcon className="mr-2 md:mr-3 h-4 md:h-5 w-4 md:w-5" /> {isOutOfStock ? "Out of Stock" : (isChangingVariant ? "Updating.." : addToCartText)}
                 </Button>
               </div>
 
