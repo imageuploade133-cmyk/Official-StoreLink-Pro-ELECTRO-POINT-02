@@ -547,21 +547,21 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
 
   return (
     <div className="space-y-6">
-      <Card className={cn("border-none shadow-lg ring-1 ring-border transition-all", hasVariants && "ring-primary/20 bg-primary/5")}>
+      <Card className={cn("border-none shadow-lg ring-1 ring-border transition-all", hasVariants && "ring-primary/40 bg-primary/5 border-l-4 border-l-primary rounded-l-none")}>
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className={cn(
                 "p-3 rounded-2xl transition-colors",
-                hasVariants ? "bg-primary text-white" : "bg-muted text-muted-foreground"
+                hasVariants ? "bg-primary text-white shadow-lg shadow-primary/20" : "bg-muted text-muted-foreground"
               )}>
                 <SlidersHorizontal className="h-6 w-6" />
               </div>
               <div className="space-y-0.5">
                 <div className="flex items-center gap-2">
-                  <Label className="text-lg font-bold leading-none">Product Variants</Label>
+                  <Label className="text-lg font-bold leading-none text-primary">Product Variants</Label>
                   {hasVariants && (
-                    <Badge variant="outline" className="text-[10px] uppercase font-black px-2 py-0 h-5 bg-primary/5 border-primary/20 text-primary">Active</Badge>
+                    <Badge variant="outline" className="text-[10px] uppercase font-black px-2 py-0 h-5 bg-primary/10 border-primary/20 text-primary">Active</Badge>
                   )}
                 </div>
                 <p className="text-sm text-muted-foreground">Enable this if the product comes in different sizes, colors, etc.</p>
@@ -591,14 +591,14 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
 
       {hasVariants && (
         <div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
-          <Card className="border-none shadow-md ring-1 ring-border overflow-hidden">
-            <div className="bg-muted/30 px-6 py-4 border-b space-y-4">
+          <Card className="border-none shadow-md ring-1 ring-primary/20 overflow-hidden bg-background border-l-4 border-l-primary/50 rounded-l-none">
+            <div className="bg-primary/5 px-6 py-4 border-b border-primary/10 space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <ListPlus className="h-4 w-4 text-primary" />
-                  <h3 className="text-sm font-bold uppercase tracking-wider">Configure Options</h3>
+                  <h3 className="text-sm font-black uppercase tracking-wider text-primary">Configure Dimensions</h3>
                 </div>
-                <div className="text-[10px] font-black uppercase text-muted-foreground hidden sm:block">Step 1: Select Dimensions</div>
+                <div className="text-[10px] font-black uppercase text-primary/60 hidden sm:block bg-primary/10 px-3 py-1 rounded-full">Step 1: Define Variants</div>
               </div>
               <div className="flex flex-wrap gap-2">
                 {PRESET_OPTIONS.map(preset => {
@@ -713,7 +713,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                                 }
                               }}
                             >
-                              <SelectTrigger className="h-12 bg-muted/30 border-none focus:ring-2 focus:ring-primary/20 font-bold">
+                              <SelectTrigger className="h-12 bg-muted/30 border border-primary/10 focus:ring-2 focus:ring-primary/20 font-bold">
                                 <SelectValue placeholder="Choose type..." />
                               </SelectTrigger>
                               <SelectContent>
@@ -734,7 +734,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                               <div className="pt-1 animate-in fade-in slide-in-from-top-1">
                                 <Input 
                                   placeholder="e.g. Fabric Type, RAM" 
-                                  className="h-10 bg-muted/30 border-none focus-visible:ring-2 focus-visible:ring-primary/20 font-bold"
+                                  className="h-10 bg-muted/30 border border-primary/10 focus-visible:border-primary/30 focus-visible:ring-2 focus-visible:ring-primary/20 font-bold"
                                   value={optionName}
                                   onChange={(e) => {
                                     const val = e.target.value;
@@ -762,7 +762,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                           <div className="md:col-span-8 space-y-3">
                             <Label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Option Values</Label>
                             
-                            <div className="flex flex-wrap gap-2 min-h-[3rem] p-3 bg-muted/30 rounded-2xl border border-transparent focus-within:border-primary/20 transition-all">
+                            <div className="flex flex-wrap gap-2 min-h-[3rem] p-3 bg-muted/30 rounded-2xl border border-primary/10 focus-within:border-primary/30 focus-within:ring-2 focus-within:ring-primary/10 transition-all">
                               {variantOptions[index]?.values?.map((val: string, valIndex: number) => {
                                 const colorSuggestion = isColor ? PRESET_OPTIONS[0].suggestions.find((c: any) => typeof c === 'object' && c.name.toLowerCase() === val.toLowerCase()) : null;
                                 
@@ -858,14 +858,14 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
 
           {variants.length > 0 && (
             <div className="space-y-6 pt-4">
-              <div className="flex items-center justify-between bg-primary/5 p-4 rounded-2xl border border-primary/10">
+              <div className="flex items-center justify-between bg-primary/5 p-5 rounded-2xl border-2 border-primary/30 shadow-md">
                 <div className="flex items-center gap-3">
-                  <div className="bg-primary text-white p-2 rounded-xl shadow-lg shadow-primary/20">
-                    <CheckCircle2 className="h-5 w-5" />
+                  <div className="bg-primary text-white p-2.5 rounded-xl shadow-lg shadow-primary/30">
+                    <CheckCircle2 className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-black uppercase tracking-wider">{isManualMode ? 'Custom' : 'Generated'} Variants</h3>
-                    <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-tight">{variants.length} unique items</p>
+                    <h3 className="text-sm font-black uppercase tracking-wider text-primary">{isManualMode ? 'Custom' : 'Generated'} Product Variants</h3>
+                    <p className="text-[10px] text-primary/60 font-black uppercase tracking-widest bg-primary/10 px-2 py-0.5 rounded mt-0.5">{variants.length} SKU{variants.length !== 1 ? 's' : ''} Created</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -938,7 +938,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {variants.map((variant: any, index: number) => (
                   <Card key={variant.id} className={cn(
-                    "group overflow-hidden border shadow-sm hover:shadow-xl transition-all duration-300 rounded-3xl",
+                    "group overflow-hidden border-2 border-primary/10 shadow-sm hover:shadow-xl hover:border-primary/40 transition-all duration-300 rounded-3xl bg-background",
                     !variant.isActive && "opacity-60 grayscale bg-muted/30"
                   )}>
                     <div className="aspect-[4/3] relative bg-muted overflow-hidden">
@@ -1081,7 +1081,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                           <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">SKU Code</Label>
                           <Input 
                             placeholder="SKU..." 
-                            className="h-10 text-xs font-mono bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl"
+                            className="h-10 text-xs font-mono bg-muted/30 border border-primary/10 focus-visible:border-primary/30 focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl"
                             {...control.register(`variants.${index}.sku` as const)}
                           />
                         </div>
@@ -1092,7 +1092,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                             <Input 
                               type="number" 
                               step="0.01"
-                              className="h-10 text-xs pl-7 font-black bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl"
+                              className="h-10 text-xs pl-7 font-black bg-muted/30 border border-primary/10 focus-visible:border-primary/30 focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl"
                               {...control.register(`variants.${index}.sellingPrice` as const)}
                             />
                           </div>
@@ -1107,7 +1107,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                                   <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">{opt.name} Attribute</Label>
                                   <Input 
                                     placeholder={`e.g. ${opt.values?.[0] || ''}`}
-                                    className="h-10 text-xs bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl font-bold"
+                                    className="h-10 text-xs bg-muted/30 border border-primary/10 focus-visible:border-primary/30 focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl font-bold"
                                     {...control.register(`variants.${index}.options.${opt.name}` as const)}
                                   />
                                 </div>
@@ -1116,7 +1116,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                                 <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Internal Notes / Description</Label>
                                 <textarea 
                                   placeholder="Extra details for this variant..." 
-                                  className="w-full min-h-[60px] p-3 text-xs bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl resize-none font-medium"
+                                  className="w-full min-h-[60px] p-3 text-xs bg-muted/30 border border-primary/10 focus-visible:border-primary/30 focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl resize-none font-medium"
                                   {...control.register(`variants.${index}.description` as const)}
                                 />
                               </div>
@@ -1168,7 +1168,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                           <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Stock</Label>
                           <Input 
                             type="number" 
-                            className="h-10 text-xs font-black bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl"
+                            className="h-10 text-xs font-black bg-muted/30 border border-primary/10 focus-visible:border-primary/30 focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl"
                             {...control.register(`variants.${index}.stock` as const)}
                             onChange={(e) => {
                               const val = parseInt(e.target.value) || 0;
