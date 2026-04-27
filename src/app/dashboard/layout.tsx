@@ -203,6 +203,7 @@ export default function DashboardLayout({
     { href: '/dashboard/manage-web-pages', icon: BookCopy, label: 'Manage Web Pages', perm: 'manage_website_content' },
     { href: '/dashboard/web-slide-show', icon: GalleryHorizontal, label: 'Web Slide Show', perm: 'manage_website_content' },
     { href: '/dashboard/homepage-sections', icon: Columns, label: 'Manage Homepage Sections', perm: 'manage_website_content' },
+    { href: '/dashboard/our-collection', icon: Sparkles, label: 'Manage Our Collection', perm: 'manage_settings' },
     { heading: 'Administration' },
     { href: '/dashboard/settings', icon: Settings, label: 'Settings', perm: 'manage_settings' },
     { href: '/dashboard/permissions', icon: Shield, label: 'Permissions', perm: 'view_permissions' },

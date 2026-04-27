@@ -186,19 +186,20 @@ export default function StoreHomePage() {
       ))}
 
       {/* CATCH-ALL SECTION FOR PRODUCTS NOT IN ANY SPECIFIC CATEGORY SECTION */}
-      {!hasAllProductsSection && (
+      {!hasAllProductsSection && settings?.ourCollectionShow !== false && (
         <ProductSection 
             section={{
                 id: 'catch-all',
-                title: 'Our Collection',
-                description: 'Discover our latest additions and favorite picks',
+                title: settings?.ourCollectionTitle || 'Our Collection',
+                description: settings?.ourCollectionDescription || 'Discover our latest additions and favorite picks',
                 selectionType: 'all',
-                layout: 'grid',
+                layout: settings?.ourCollectionLayout || 'grid',
                 published: true,
                 order: 9999,
                 createdAt: null as any,
                 updatedAt: null as any,
-                alignment: 'center'
+                alignment: settings?.ourCollectionAlignment || 'center',
+                backgroundColor: settings?.ourCollectionBackgroundColor
             }}
             categories={categories || []}
             excludeCategoryIds={coveredCategoryIds}

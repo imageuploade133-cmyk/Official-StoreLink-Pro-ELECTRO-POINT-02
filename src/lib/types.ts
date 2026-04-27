@@ -456,6 +456,13 @@ export interface Settings {
   shopProductsAlignment?: 'left' | 'center';
   shopCollectionTitle?: string;
   shopCollectionDescription?: string;
+  // Our Collection Homepage Section
+  ourCollectionTitle?: string;
+  ourCollectionDescription?: string;
+  ourCollectionLayout?: 'carousel' | 'grid';
+  ourCollectionAlignment?: 'left' | 'center';
+  ourCollectionBackgroundColor?: string;
+  ourCollectionShow?: boolean;
   // Delivery Settings
   enablePickUp?: boolean;
   enableDelivery?: boolean;
