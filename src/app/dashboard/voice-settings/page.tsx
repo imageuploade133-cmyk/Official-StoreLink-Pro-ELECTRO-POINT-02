@@ -28,18 +28,36 @@ import {
   CheckCircle2, 
   Play, 
   Square,
-  Undo2
+  RotateCcw
 } from 'lucide-react';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
 import { uploadImage } from '@/ai/flows/image-upload-flow';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
+const DEFAULT_VOICE_SETTINGS = {
+  voiceExperiencePreTitle: 'Listen to Audio Signature',
+  voiceExperienceTitle: 'Expert Insights & Detailed Pitch',
+  voiceExperienceColor: '#3b82f6',
+  voiceExperienceIconUrl: '',
+};
 
 const voiceSettingsSchema = z.object({
   voiceExperiencePreTitle: z.string().min(2, 'Pre-title is too short.').max(40, 'Pre-title is too long.'),
   voiceExperienceTitle: z.string().min(2, 'Title is too short.').max(60, 'Title is too long.'),
-  voiceExperienceColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default('#3b82f6'),
+  voiceExperienceColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default(DEFAULT_VOICE_SETTINGS.voiceExperienceColor),
   voiceExperienceIconUrl: z.string().url('Must be a valid URL.').optional().or(z.literal('')),
 });
 
@@ -50,7 +68,7 @@ const ColorInput = ({ field, label }: { field: any; label: string }) => (
         <FormLabel className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{label}</FormLabel>
         <div className="relative flex items-center">
              <FormControl>
-                <Input type="color" {...field} value={field.value || '#3b82f6'} className="p-1 h-10 w-12 cursor-pointer rounded-lg border-2" />
+                <Input type="color" {...field} value={field.value || DEFAULT_VOICE_SETTINGS.voiceExperienceColor} className="p-1 h-10 w-12 cursor-pointer rounded-lg border-2" />
             </FormControl>
             <span className="absolute left-14 text-sm text-muted-foreground font-mono">{field.value}</span>
         </div>
@@ -92,24 +110,31 @@ export default function VoiceSettingsPage() {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(voiceSettingsSchema),
-    defaultValues: {
-      voiceExperiencePreTitle: 'Listen to Audio Signature',
-      voiceExperienceTitle: 'Expert Insights & Detailed Pitch',
-      voiceExperienceColor: '#3b82f6',
-      voiceExperienceIconUrl: '',
-    }
+    defaultValues: DEFAULT_VOICE_SETTINGS
   });
 
   useEffect(() => {
     if (settingsData) {
       form.reset({
-        voiceExperiencePreTitle: settingsData.voiceExperiencePreTitle || 'Listen to Audio Signature',
-        voiceExperienceTitle: settingsData.voiceExperienceTitle || 'Expert Insights & Detailed Pitch',
-        voiceExperienceColor: settingsData.voiceExperienceColor || '#3b82f6',
-        voiceExperienceIconUrl: settingsData.voiceExperienceIconUrl || '',
+        voiceExperiencePreTitle: settingsData.voiceExperiencePreTitle || DEFAULT_VOICE_SETTINGS.voiceExperiencePreTitle,
+        voiceExperienceTitle: settingsData.voiceExperienceTitle || DEFAULT_VOICE_SETTINGS.voiceExperienceTitle,
+        voiceExperienceColor: settingsData.voiceExperienceColor || DEFAULT_VOICE_SETTINGS.voiceExperienceColor,
+        voiceExperienceIconUrl: settingsData.voiceExperienceIconUrl || DEFAULT_VOICE_SETTINGS.voiceExperienceIconUrl,
       });
     }
   }, [settingsData, form]);
+
+  const handleReset = () => {
+    form.setValue('voiceExperiencePreTitle', DEFAULT_VOICE_SETTINGS.voiceExperiencePreTitle, { shouldDirty: true, shouldValidate: true });
+    form.setValue('voiceExperienceTitle', DEFAULT_VOICE_SETTINGS.voiceExperienceTitle, { shouldDirty: true, shouldValidate: true });
+    form.setValue('voiceExperienceColor', DEFAULT_VOICE_SETTINGS.voiceExperienceColor, { shouldDirty: true, shouldValidate: true });
+    form.setValue('voiceExperienceIconUrl', DEFAULT_VOICE_SETTINGS.voiceExperienceIconUrl, { shouldDirty: true, shouldValidate: true });
+    
+    toast({
+      title: "Values Reset",
+      description: "Form has been populated with default values. Click sync to save.",
+    });
+  };
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -258,11 +283,48 @@ export default function VoiceSettingsPage() {
                     />
                   </div>
                 </CardContent>
-                <CardFooter className="bg-muted/30 border-t p-6">
-                  <Button type="submit" disabled={isSaving} className="font-black uppercase tracking-widest text-xs h-12 px-8 shadow-xl shadow-primary/20">
-                    {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                    Sync Voice Configuration
-                  </Button>
+                <CardFooter className="bg-muted/30 border-t p-6 flex flex-wrap gap-4 justify-between items-center">
+                  <div className="flex flex-wrap gap-4">
+                    <Button type="submit" disabled={isSaving} className="font-black uppercase tracking-widest text-xs h-12 px-8 shadow-xl shadow-primary/20">
+                      {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                      Sync Voice Configuration
+                    </Button>
+
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button type="button" variant="outline" className="font-black uppercase tracking-widest text-xs h-12 px-8 border-2">
+                                <RotateCcw className="mr-2 h-4 w-4" />
+                                Reset to Default
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="rounded-[2rem] border-none shadow-2xl">
+                            <AlertDialogHeader>
+                                <AlertDialogTitle className="text-xl font-black uppercase tracking-tight">Restore Factory Defaults?</AlertDialogTitle>
+                                <AlertDialogDescription className="font-medium">
+                                    This will reset all voice experience branding fields (labels, colors, and icon) to their original factory defaults. This action cannot be undone once you sync.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter className="mt-4">
+                                <AlertDialogCancel className="rounded-xl font-bold uppercase tracking-widest text-[10px]">Go Back</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleReset} className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90 font-bold uppercase tracking-widest text-[10px]">
+                                    Reset to Default
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+
+                  {form.formState.isDirty && (
+                    <div className="flex items-center gap-2 px-4 py-2 bg-orange-500/10 border border-orange-500/20 rounded-full animate-in fade-in slide-in-from-right-4 duration-500">
+                        <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                        </span>
+                        <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest">
+                            Unsaved Changes Detected
+                        </p>
+                    </div>
+                  )}
                 </CardFooter>
               </Card>
             </form>
