@@ -309,11 +309,13 @@ export function ProductSection({ section, categories, excludeCategoryIds }: Prod
 
   const isHTML = section.uiType === 'html';
   const isVideo = section.uiType === 'video';
+  const isSlideshow = section.uiType === 'slideshow';
   const isCenter = section.alignment === 'center';
   const hasBanner = !!(
     (isHTML && section.htmlContent) ||
     (isVideo && section.videoUrl) ||
-    (!isHTML && !isVideo && section.imageUrl)
+    (isSlideshow && section.slides && section.slides.length > 0) ||
+    (!isHTML && !isVideo && !isSlideshow && section.imageUrl)
   );
 
   const displayProducts = useMemo(() => {
@@ -532,10 +534,71 @@ export function ProductSection({ section, categories, excludeCategoryIds }: Prod
       {hasBanner && (
         <div className={cn("mb-16", section.fullWidth ? "w-full" : "max-w-site-container mx-auto px-4 sm:px-6 lg:px-8")}>
             {isHTML ? (
-                <div 
+                <div
                     className="w-full"
                     dangerouslySetInnerHTML={{ __html: section.htmlContent || '' }}
                 />
+            ) : isSlideshow ? (
+                <Carousel
+                    plugins={[Autoplay({ delay: 5000, stopOnInteraction: false })]}
+                    opts={{ loop: true }}
+                    className="w-full"
+                >
+                    <CarouselContent>
+                        {section.slides?.map((slide, index) => (
+                            <CarouselItem key={index}>
+                                <div className="relative group overflow-hidden rounded-[2rem] md:rounded-[3rem] shadow-2xl mx-auto">
+                                    <div className="relative aspect-video md:aspect-[21/9] w-full overflow-hidden">
+                                        <Image
+                                            src={slide.imageUrl}
+                                            alt={slide.title || section.title}
+                                            fill
+                                            className={cn(
+                                                "object-cover transition-transform duration-700",
+                                                settings?.enableHoverZoom !== false && "group-hover:scale-110"
+                                            )}
+                                            unoptimized
+                                        />
+                                        {(section.showOverlay ?? false) && <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] transition-opacity group-hover:opacity-40" />}
+                                    </div>
+                                    <div className={cn(
+                                        "absolute inset-0 z-10 flex items-center p-6 md:p-20",
+                                        isCenter ? "justify-center text-center" : "justify-start text-left"
+                                    )}>
+                                        <div className="max-w-3xl space-y-3 md:space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+                                            {slide.title && (
+                                                <h2 className="text-2xl md:text-7xl font-black leading-none tracking-tighter uppercase whitespace-pre-line" style={{ color: section.textColor || '#FFFFFF' }}>
+                                                    {slide.title}
+                                                </h2>
+                                            )}
+                                            {slide.subtitle && (
+                                                <p className="text-sm md:text-2xl font-medium leading-relaxed max-w-xl" style={{ color: `${section.textColor || '#FFFFFF'}E6` }}>
+                                                    {slide.subtitle}
+                                                </p>
+                                            )}
+                                            {(slide.buttonText && slide.linkUrl) && (
+                                                <div className="pt-2 md:pt-4">
+                                                    <Button asChild size="lg" className="rounded-full h-10 md:h-16 px-6 md:px-14 font-black uppercase text-[10px] md:text-xs tracking-[0.25em] shadow-2xl shadow-primary/30 group/btn transition-all active:scale-95">
+                                                        <Link href={slide.linkUrl}>
+                                                            {slide.buttonText}
+                                                            <ArrowRight className="ml-2 md:ml-3 h-4 w-4 md:h-5 md:w-5 transition-transform group-hover/btn:translate-x-2" strokeWidth={3} />
+                                                        </Link>
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </CarouselItem>
+                        ))}
+                    </CarouselContent>
+                    {section.slides && section.slides.length > 1 && (
+                        <div className="hidden md:block">
+                            <CarouselPrevious className="left-8 h-12 w-12" />
+                            <CarouselNext className="right-8 h-12 w-12" />
+                        </div>
+                    )}
+                </Carousel>
             ) : (
                 <div className="relative group overflow-hidden rounded-[2rem] md:rounded-[3rem] shadow-2xl mx-auto">
                     {isVideo ? (

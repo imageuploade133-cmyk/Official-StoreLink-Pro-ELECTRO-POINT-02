@@ -199,7 +199,19 @@ export default function StoreHomePage() {
                 createdAt: null as any,
                 updatedAt: null as any,
                 alignment: settings?.ourCollectionAlignment || 'center',
-                backgroundColor: settings?.ourCollectionBackgroundColor
+                backgroundColor: settings?.ourCollectionBackgroundColor,
+                uiType: settings?.ourCollectionMediaType as any,
+                imageUrl: settings?.ourCollectionImageUrl,
+                videoUrl: settings?.ourCollectionVideoUrl,
+                videoPosterUrl: settings?.ourCollectionVideoPosterUrl,
+                overlayTitle: settings?.ourCollectionOverlayTitle,
+                overlaySubtitle: settings?.ourCollectionOverlaySubtitle,
+                buttonText: settings?.ourCollectionButtonText,
+                linkUrl: settings?.ourCollectionLinkUrl,
+                showOverlay: settings?.ourCollectionShowOverlay,
+                textColor: settings?.ourCollectionTextColor,
+                fullWidth: settings?.ourCollectionFullWidth,
+                slides: settings?.ourCollectionSlides,
             }}
             categories={categories || []}
             excludeCategoryIds={coveredCategoryIds}
