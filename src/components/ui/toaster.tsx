@@ -10,7 +10,7 @@ import {
   ToastTitle,
   ToastViewport,
 } from "@/components/ui/toast"
-import { AlertCircle, CheckCircle2, Info, XCircle, AlertTriangle } from "lucide-react"
+import { AlertCircle, CheckCircle2, Info, XCircle, AlertTriangle, X, CircleX, XSquare, Minus } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export function Toaster() {
@@ -89,8 +89,23 @@ export function Toaster() {
                            effectiveVariant === 'success' ? settings.toastSuccessColor :
                            effectiveVariant === 'warning' ? settings.toastWarningColor :
                            effectiveVariant === 'info' ? settings.toastInfoColor :
-                           settings.toastInfoColor || settings.toastTextColor
+                           settings.toastInfoColor || settings.toastTextColor,
+          transform: settings.toastScale ? `scale(${settings.toastScale})` : undefined
         } : undefined;
+
+        const CloseIcon = () => {
+          if (!settings?.toastCloseIconType) return <X className="h-4 w-4" />;
+          const iconProps = { 
+            className: "h-4 w-4", 
+            style: settings.toastCloseIconColor ? { color: settings.toastCloseIconColor } : undefined 
+          };
+          switch (settings.toastCloseIconType) {
+            case 'circle-x': return <CircleX {...iconProps} />;
+            case 'x-square': return <XSquare {...iconProps} />;
+            case 'minus': return <Minus {...iconProps} />;
+            default: return <X {...iconProps} />;
+          }
+        };
 
         return (
           <Toast 
@@ -124,7 +139,9 @@ export function Toaster() {
               </div>
             </div>
             {action}
-            <ToastClose />
+            <ToastClose>
+              <CloseIcon />
+            </ToastClose>
           </Toast>
         )
       })}

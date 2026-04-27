@@ -142,7 +142,7 @@ ToastAction.displayName = ToastPrimitives.Action.displayName
 const ToastClose = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Close>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Close>
->(({ className, ...props }, ref) => (
+>(({ className, children, ...props }, ref) => (
   <ToastPrimitives.Close
     ref={ref}
     className={cn(
@@ -152,7 +152,7 @@ const ToastClose = React.forwardRef<
     toast-close=""
     {...props}
   >
-    <X className="h-3.5 w-3.5" />
+    {children || <X className="h-3.5 w-3.5" />}
   </ToastPrimitives.Close>
 ))
 ToastClose.displayName = ToastPrimitives.Close.displayName
