@@ -421,30 +421,30 @@ export default function ManageWebCatalogPage() {
             <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Total Products in Web Store</p>
           </CardContent>
         </Card>
-        <Card className="shadow-none bg-indigo-50/50">
+        <Card className="shadow-none bg-indigo-50/50 dark:bg-indigo-950/20">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-indigo-600">Variant Stock</CardTitle>
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Variant Stock</CardTitle>
           </CardHeader>
           <CardContent>
-            {isLoadingProducts && variantRegistryCount === 0 ? <Skeleton className="h-8 w-16" /> : <div className="text-3xl font-black text-indigo-700">{variantRegistryCount.toLocaleString()}</div>}
+            {isLoadingProducts && variantRegistryCount === 0 ? <Skeleton className="h-8 w-16" /> : <div className="text-3xl font-black text-indigo-700 dark:text-indigo-300">{variantRegistryCount.toLocaleString()}</div>}
             <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Web Products with Variants</p>
           </CardContent>
         </Card>
-        <Card className="shadow-none bg-green-50/50">
+        <Card className="shadow-none bg-green-50/50 dark:bg-green-950/20">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-green-600">Batch View</CardTitle>
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-green-600 dark:text-green-400">Batch View</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-black text-green-700">{products.length} Items</div>
+            <div className="text-3xl font-black text-green-700 dark:text-green-300">{products.length} Items</div>
             <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Products in current viewport</p>
           </CardContent>
         </Card>
-        <Card className="shadow-none bg-blue-50/50">
+        <Card className="shadow-none bg-blue-50/50 dark:bg-blue-950/20">
           <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-blue-600">Catalog Health</CardTitle>
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">Catalog Health</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-black text-blue-700">
+            <div className="text-3xl font-black text-blue-700 dark:text-blue-300">
               {products.length > 0 ? Math.round((products.filter(p => p.description && p.imageUrl).length / products.length) * 100) : 0}%
             </div>
             <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Media completion in batch</p>
@@ -552,7 +552,7 @@ export default function ManageWebCatalogPage() {
                     return (
                       <TableRow key={product.id} className="group transition-colors hover:bg-muted/30">
                         <TableCell className="pl-6">
-                          <div className="relative w-12 h-12 rounded-xl overflow-hidden border-2 border-white shadow-md bg-white">
+                          <div className="relative w-12 h-12 rounded-xl overflow-hidden border-2 border-white dark:border-slate-800 shadow-md bg-white dark:bg-slate-900">
                               <Image 
                                   src={product.imageUrl || defaultProductImageUrl} 
                                   alt={product.name} 
@@ -564,23 +564,23 @@ export default function ManageWebCatalogPage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-col gap-1">
-                            <div className="font-black text-sm text-gray-900 leading-tight truncate max-w-[200px]" title={product.name}>
+                            <div className="font-black text-sm text-foreground leading-tight truncate max-w-[200px]" title={product.name}>
                                 {product.name}
                             </div>
                             <div className="flex items-center gap-2">
                                 <div className="text-[10px] font-mono text-muted-foreground uppercase">SKU: {product.sku || 'N/A'}</div>
                                 {hasVoice && (
-                                    <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 text-[8px] h-4 px-1.5 uppercase font-black tracking-tighter">
+                                    <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 dark:bg-primary/10 dark:text-primary-foreground text-[8px] h-4 px-1.5 uppercase font-black tracking-tighter">
                                         <Mic className="h-2 w-2 mr-1" /> Voice
                                     </Badge>
                                 )}
                                 {product.hasVariants && (
-                                    <Badge variant="outline" className="bg-indigo-50 text-indigo-600 border-indigo-200 text-[8px] h-4 px-1.5 uppercase font-black tracking-tighter">
+                                    <Badge variant="outline" className="bg-indigo-50 text-indigo-600 border-indigo-200 dark:bg-indigo-950/30 dark:text-indigo-400 dark:border-indigo-900 text-[8px] h-4 px-1.5 uppercase font-black tracking-tighter">
                                         <LayoutGrid className="h-2 w-2 mr-1" /> Variant
                                     </Badge>
                                 )}
                                 {isSaleActive && (
-                                    <Badge variant="outline" className="bg-rose-50 text-rose-600 border-rose-200 text-[8px] h-4 px-1.5 uppercase font-black tracking-tighter">
+                                    <Badge variant="outline" className="bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-900 text-[8px] h-4 px-1.5 uppercase font-black tracking-tighter">
                                         <Zap className="h-2 w-2 mr-1 fill-current" /> Sale
                                     </Badge>
                                 )}
@@ -588,7 +588,7 @@ export default function ManageWebCatalogPage() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className="text-[9px] font-black uppercase tracking-tighter bg-slate-50">
+                          <Badge variant="outline" className="text-[9px] font-black uppercase tracking-tighter bg-slate-50 dark:bg-slate-900/50 dark:text-slate-300">
                               {categoryMap.get(product.categoryId || '') || 'Uncategorized'}
                           </Badge>
                         </TableCell>
@@ -599,7 +599,7 @@ export default function ManageWebCatalogPage() {
                                     <div className="text-[10px] text-muted-foreground line-through decoration-destructive/50 font-bold">
                                         {formatCurrency(product.sellingPrice, currencySymbol)}
                                     </div>
-                                    <div className="font-black text-base tracking-tighter text-green-600">
+                                    <div className="font-black text-base tracking-tighter text-green-600 dark:text-green-500">
                                         {formatCurrency(product.newPrice, currencySymbol)}
                                     </div>
                                 </>
@@ -619,11 +619,11 @@ export default function ManageWebCatalogPage() {
                                   disabled={isToggling === product.id}
                               />
                               {product.isVisibleOnWeb ? (
-                                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-[10px] h-5 uppercase font-black px-2">
+                                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-900 text-[10px] h-5 uppercase font-black px-2">
                                       LIVE
                                   </Badge>
                               ) : (
-                                  <Badge variant="outline" className="bg-slate-100 text-slate-500 border-slate-200 text-[10px] h-5 uppercase font-black px-2">
+                                  <Badge variant="outline" className="bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800 text-[10px] h-5 uppercase font-black px-2">
                                       DRAFT
                                   </Badge>
                               )}
