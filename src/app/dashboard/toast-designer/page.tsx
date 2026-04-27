@@ -4,11 +4,12 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useFirestore, useDoc } from '@/firebase';
+import { useFirestore } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { saveGlobalSettings, saveStoreSettings } from '@/firebase/firestore/settings';
 import type { AppSettings } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context';
+import { useSettings } from '@/contexts/settings-context';
 import { useToast } from '@/hooks/use-toast';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -142,70 +143,42 @@ const DEFAULT_TOAST_SETTINGS: FormValues = {
 export default function ToastDesignerPage() {
   const firestore = useFirestore();
   const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
+  const { settings: settingsData, isLoadingSettings } = useSettings();
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
-  const settingsRef = useMemo(
-    () => {
-        if (!firestore) return null;
-        if (currentStoreId) {
-            return doc(firestore, 'stores', currentStoreId, 'settings', 'config');
-        }
-        return doc(firestore, 'settings', 'global');
-    },
-    [firestore, currentStoreId]
-  );
-
-  const { data: settingsData, isLoading: isLoadingSettings } = useDoc<AppSettings>(settingsRef);
-
   const form = useForm<FormValues>({
     resolver: zodResolver(toastSchema),
-    defaultValues: {
-      toastBackgroundColor: '#ffffff',
-      toastTextColor: '#000000',
-      toastBorderColor: '#e2e8f0',
-      toastBorderRadius: '2xl',
-      toastSuccessColor: '#10b981',
-      toastErrorColor: '#ef4444',
-      toastWarningColor: '#f59e0b',
-      toastInfoColor: '#3b82f6',
-      toastPosition: 'top-center',
-      toastAnimation: 'slide',
-      toastUseGradient: false,
-      toastGradientStartColor: '#ffffff',
-      toastGradientEndColor: '#f8fafc',
-      toastGradientAngle: 135,
-      toastScale: 1,
-      toastCloseIconColor: '#000000',
-      toastCloseIconType: 'x',
-    }
+    defaultValues: DEFAULT_TOAST_SETTINGS
   });
 
   useEffect(() => {
-    if (settingsData) {
+    if (settingsData && !isInitialized) {
       form.reset({
-        toastBackgroundColor: settingsData.toastBackgroundColor || '#ffffff',
-        toastTextColor: settingsData.toastTextColor || '#000000',
-        toastBorderColor: settingsData.toastBorderColor || '#e2e8f0',
-        toastBorderRadius: (settingsData.toastBorderRadius as any) || '2xl',
-        toastSuccessColor: settingsData.toastSuccessColor || '#10b981',
-        toastErrorColor: settingsData.toastErrorColor || '#ef4444',
-        toastWarningColor: settingsData.toastWarningColor || '#f59e0b',
-        toastInfoColor: settingsData.toastInfoColor || '#3b82f6',
-        toastPosition: (settingsData.toastPosition as any) || 'top-center',
-        toastAnimation: (settingsData.toastAnimation as any) || 'slide',
-        toastUseGradient: settingsData.toastUseGradient || false,
-        toastGradientStartColor: settingsData.toastGradientStartColor || '#ffffff',
-        toastGradientEndColor: settingsData.toastGradientEndColor || '#f8fafc',
-        toastGradientAngle: settingsData.toastGradientAngle || 135,
-        toastScale: settingsData.toastScale || 1,
-        toastCloseIconColor: settingsData.toastCloseIconColor || '#000000',
-        toastCloseIconType: (settingsData.toastCloseIconType as any) || 'x',
+        toastBackgroundColor: settingsData.toastBackgroundColor ?? DEFAULT_TOAST_SETTINGS.toastBackgroundColor,
+        toastTextColor: settingsData.toastTextColor ?? DEFAULT_TOAST_SETTINGS.toastTextColor,
+        toastBorderColor: settingsData.toastBorderColor ?? DEFAULT_TOAST_SETTINGS.toastBorderColor,
+        toastBorderRadius: (settingsData.toastBorderRadius as any) ?? DEFAULT_TOAST_SETTINGS.toastBorderRadius,
+        toastSuccessColor: settingsData.toastSuccessColor ?? DEFAULT_TOAST_SETTINGS.toastSuccessColor,
+        toastErrorColor: settingsData.toastErrorColor ?? DEFAULT_TOAST_SETTINGS.toastErrorColor,
+        toastWarningColor: settingsData.toastWarningColor ?? DEFAULT_TOAST_SETTINGS.toastWarningColor,
+        toastInfoColor: settingsData.toastInfoColor ?? DEFAULT_TOAST_SETTINGS.toastInfoColor,
+        toastPosition: (settingsData.toastPosition as any) ?? DEFAULT_TOAST_SETTINGS.toastPosition,
+        toastAnimation: (settingsData.toastAnimation as any) ?? DEFAULT_TOAST_SETTINGS.toastAnimation,
+        toastUseGradient: settingsData.toastUseGradient ?? DEFAULT_TOAST_SETTINGS.toastUseGradient,
+        toastGradientStartColor: settingsData.toastGradientStartColor ?? DEFAULT_TOAST_SETTINGS.toastGradientStartColor,
+        toastGradientEndColor: settingsData.toastGradientEndColor ?? DEFAULT_TOAST_SETTINGS.toastGradientEndColor,
+        toastGradientAngle: settingsData.toastGradientAngle ?? DEFAULT_TOAST_SETTINGS.toastGradientAngle,
+        toastScale: settingsData.toastScale ?? DEFAULT_TOAST_SETTINGS.toastScale,
+        toastCloseIconColor: settingsData.toastCloseIconColor ?? DEFAULT_TOAST_SETTINGS.toastCloseIconColor,
+        toastCloseIconType: (settingsData.toastCloseIconType as any) ?? DEFAULT_TOAST_SETTINGS.toastCloseIconType,
       });
+      setIsInitialized(true);
     }
-  }, [settingsData, form]);
+  }, [settingsData, isInitialized, form]);
 
   const onSubmit = async (data: FormValues) => {
     if (!firestore) return;
