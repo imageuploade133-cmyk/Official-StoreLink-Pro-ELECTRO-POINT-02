@@ -70,6 +70,7 @@ import { ProductCard } from '@/components/store/ProductCard';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
+import { Slider } from '@/components/ui/slider';
 import { OutOfDataDrawer } from '@/components/ui/out-of-data-drawer';
 import { ProductReviewForm } from '@/components/store/ProductReviewForm';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -117,6 +118,8 @@ function IndividualTrackPlayer({ track, branding }: { track: any, branding: any,
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const [dragValue, setDragValue] = useState(0);
     const audioRef = useRef<HTMLAudioElement>(null);
     const audioSource = track.audioDataUri;
 
@@ -137,7 +140,7 @@ function IndividualTrackPlayer({ track, branding }: { track: any, branding: any,
     };
 
     const handleTimeUpdate = () => {
-        if (audioRef.current) {
+        if (audioRef.current && !isDragging) {
             setCurrentTime(audioRef.current.currentTime);
         }
     };
@@ -151,12 +154,17 @@ function IndividualTrackPlayer({ track, branding }: { track: any, branding: any,
         }
     };
 
-    const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const time = parseFloat(e.target.value);
+    const handleValueChange = (vals: number[]) => {
+        setIsDragging(true);
+        setDragValue(vals[0]);
+    };
+
+    const handleValueCommit = (vals: number[]) => {
         if (audioRef.current) {
-            audioRef.current.currentTime = time;
-            setCurrentTime(time);
+            audioRef.current.currentTime = vals[0];
+            setCurrentTime(vals[0]);
         }
+        setIsDragging(false);
     };
 
     const fastForward = (e: React.MouseEvent) => {
@@ -223,17 +231,19 @@ function IndividualTrackPlayer({ track, branding }: { track: any, branding: any,
             </div>
 
             <div className="relative z-10 flex flex-col gap-1.5 px-1">
-                <input 
-                    type="range" 
-                    min="0" 
-                    max={(isNaN(duration) || !isFinite(duration)) ? 0 : duration} 
-                    step="0.1"
-                    value={currentTime} 
-                    onChange={handleSeek}
-                    className="w-full h-1.5 bg-white/20 rounded-full appearance-none cursor-pointer accent-white hover:bg-white/30 transition-all"
+                <Slider
+                    value={[isDragging ? dragValue : currentTime]}
+                    max={(isNaN(duration) || !isFinite(duration)) ? 0 : duration}
+                    step={0.1}
+                    onValueChange={handleValueChange}
+                    onValueCommit={handleValueCommit}
+                    className="w-full"
+                    trackClassName="bg-white/20 h-1.5"
+                    rangeClassName="bg-white"
+                    thumbClassName="h-3 w-3 bg-white border-none shadow-lg"
                 />
                 <div className="flex justify-between text-[10px] font-black font-mono tracking-widest opacity-70">
-                    <span>{formatTime(currentTime)}</span>
+                    <span>{formatTime(isDragging ? dragValue : currentTime)}</span>
                     <span>{formatTime(duration)}</span>
                 </div>
             </div>
@@ -243,7 +253,10 @@ function IndividualTrackPlayer({ track, branding }: { track: any, branding: any,
                 src={audioSource}
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
-                onEnded={() => setIsPlaying(false)}
+                onEnded={() => {
+                    setIsPlaying(false);
+                    setCurrentTime(0);
+                }}
                 onTimeUpdate={handleTimeUpdate}
                 onLoadedMetadata={handleLoadedMetadata}
                 className="hidden"
