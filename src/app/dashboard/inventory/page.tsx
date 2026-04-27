@@ -61,6 +61,7 @@ import { AdvancedPagination } from '@/components/pagination/AdvancedPagination';
 import { Switch } from '@/components/ui/switch';
 import { saveGlobalSettings } from '@/firebase/firestore/settings';
 import { Label } from '@/components/ui/label';
+import { slugify } from '@/lib/utils';
 
 export default function InventoryPage() {
   const router = useRouter();
@@ -277,6 +278,7 @@ export default function InventoryPage() {
         ...originalData,
         // Update fields that should change
         name: `${originalData.name} (Copy)`,
+        slug: slugify(`${originalData.name} (Copy)`),
         stock: 0, // Start with 0 stock
         store_id: currentStoreId,
         // Preserve timestamps (new ones will be set)

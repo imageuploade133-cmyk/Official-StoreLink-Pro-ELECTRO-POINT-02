@@ -16,6 +16,7 @@ import type { Category, Product } from '@/lib/types';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
+import { slugify } from '@/lib/utils';
 
 export default function AddProductPage() {
   const router = useRouter();
@@ -47,6 +48,7 @@ export default function AddProductPage() {
       // 1. Prepare main product data (WITHOUT heavy voices array)
       const productData: any = {
         ...restValues,
+        slug: slugify(values.name),
         store_id: currentStoreId,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),

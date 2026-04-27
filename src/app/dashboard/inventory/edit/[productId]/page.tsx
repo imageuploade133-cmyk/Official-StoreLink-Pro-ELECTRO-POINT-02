@@ -17,6 +17,7 @@ import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
+import { slugify } from '@/lib/utils';
 
 export default function EditProductPage() {
   const router = useRouter();
@@ -70,6 +71,7 @@ export default function EditProductPage() {
 
       const productData: any = {
         ...restValues,
+        slug: slugify(values.name),
         updatedAt: Timestamp.now(),
         promo: null,
       };

@@ -610,7 +610,7 @@ export function PublicNavbar() {
                                                     {searchResults.map(product => (
                                                         <Link 
                                                             key={product.id}
-                                                            href={getStoreUrl(`/store/product/${product.id}`)}
+                                                            href={getStoreUrl(`/store/product/${product.slug || product.id}`)}
                                                             className="flex items-center gap-6 p-6 bg-white dark:bg-slate-900 rounded-[2rem] transition-all border border-slate-100 dark:border-slate-800 hover:border-[#0071e3]/30 group shadow-lg hover:shadow-2xl active:scale-[0.98]"
                                                             onClick={() => setIsSearchFocused(false)}
                                                         >
@@ -666,7 +666,7 @@ export function PublicNavbar() {
                                                     {products?.slice(0, 5).map((p, idx) => (
                                                         <Link 
                                                             key={p.id} 
-                                                            href={getStoreUrl(`/store/product/${p.id}`)}
+                                                            href={getStoreUrl(`/store/product/${p.slug || p.id}`)}
                                                             className="group flex items-center gap-4 text-xl font-bold hover:text-[#0071e3] transition-colors tracking-tight"
                                                             onClick={() => setIsSearchFocused(false)}
                                                         >

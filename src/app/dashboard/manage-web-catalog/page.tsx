@@ -61,7 +61,7 @@ import { formatCurrency } from '@/lib/formatUtils';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
-import { cn, convertToDateSafely } from '@/lib/utils';
+import { cn, convertToDateSafely, slugify } from '@/lib/utils';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { ActionModal } from '@/components/dialogs/ActionModal';
 import { Separator } from '@/components/ui/separator';
@@ -314,6 +314,7 @@ export default function ManageWebCatalogPage() {
         ...originalData,
         // Update fields that should change
         name: `${originalData.name} (Copy)`,
+        slug: slugify(`${originalData.name} (Copy)`),
         sku: originalData.sku ? `${originalData.sku}-COPY` : undefined,
         barcode: undefined, // Remove barcode for clone
         barcodeGenerated: false,
@@ -684,7 +685,7 @@ export default function ManageWebCatalogPage() {
               </Link>
             </Button>
             <Button variant="outline" className="justify-start h-11 font-bold" asChild>
-              <Link href={`/store/product/${selectedProductForActions.id}`} target="_blank">
+              <Link href={`/store/product/${selectedProductForActions.slug || selectedProductForActions.id}`} target="_blank">
                 <ExternalLink className="mr-2 h-4 w-4 text-primary" /> Preview Live Page
               </Link>
             </Button>

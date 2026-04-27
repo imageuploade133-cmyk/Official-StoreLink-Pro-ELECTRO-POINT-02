@@ -28,3 +28,16 @@ export function isWhiteOrTransparent(color?: string): boolean {
   const normalized = color.toLowerCase().trim();
   return normalized === '#ffffff' || normalized === '#fff' || normalized === 'rgb(255,255,255)' || normalized === 'rgba(255,255,255,0)' || normalized === 'transparent';
 }
+
+export function slugify(text: string): string {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')     // Replace spaces with -
+    .replace(/[^\w-]+/g, '')  // Remove all non-word chars
+    .replace(/--+/g, '-')      // Replace multiple - with single -
+    .replace(/^-+/, '')       // Trim - from start of text
+    .replace(/-+$/, '');      // Trim - from end of text
+}
+

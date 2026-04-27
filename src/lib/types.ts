@@ -668,6 +668,7 @@ export interface Product {
   id: string;
   store_id?: string; // Multi-store support
   name: string;
+  slug?: string;
   sellingPrice: number;
   newPrice?: number | null;
   purchasePrice: number;
