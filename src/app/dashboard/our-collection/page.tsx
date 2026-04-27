@@ -33,11 +33,24 @@ import {
   X,
   Plus,
   Maximize,
-  Monitor
+  Monitor,
+  RotateCcw,
+  RefreshCcw
 } from 'lucide-react';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { uploadImage } from '@/ai/flows/image-upload-flow';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -82,6 +95,33 @@ const ourCollectionSchema = z.object({
 
 type FormValues = z.infer<typeof ourCollectionSchema>;
 
+const DEFAULT_VALUES: FormValues = {
+  ourCollectionTitle: 'Our Collection',
+  ourCollectionDescription: 'Discover our latest additions and favorite picks',
+  ourCollectionLayout: 'grid',
+  ourCollectionAlignment: 'center',
+  ourCollectionBackgroundColor: '',
+  ourCollectionBackgroundType: 'solid',
+  ourCollectionGradientStart: '#ffffff',
+  ourCollectionGradientEnd: '#f1f5f9',
+  ourCollectionGradientDirection: 'to bottom',
+  ourCollectionBackgroundImageUrl: '',
+  ourCollectionBackgroundApplyTo: ['collection'],
+  ourCollectionShow: true,
+  ourCollectionMediaType: 'none',
+  ourCollectionImageUrl: '',
+  ourCollectionVideoUrl: '',
+  ourCollectionVideoPosterUrl: '',
+  ourCollectionOverlayTitle: '',
+  ourCollectionOverlaySubtitle: '',
+  ourCollectionButtonText: 'Shop Now',
+  ourCollectionLinkUrl: '',
+  ourCollectionShowOverlay: false,
+  ourCollectionTextColor: '#FFFFFF',
+  ourCollectionFullWidth: false,
+  ourCollectionSlides: [],
+};
+
 export default function OurCollectionSettingsPage() {
   const firestore = useFirestore();
   const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
@@ -106,61 +146,36 @@ export default function OurCollectionSettingsPage() {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(ourCollectionSchema),
-    defaultValues: {
-      ourCollectionTitle: 'Our Collection',
-      ourCollectionDescription: 'Discover our latest additions and favorite picks',
-      ourCollectionLayout: 'grid',
-      ourCollectionAlignment: 'center',
-      ourCollectionBackgroundColor: '',
-      ourCollectionBackgroundType: 'solid',
-      ourCollectionGradientStart: '#ffffff',
-      ourCollectionGradientEnd: '#f1f5f9',
-      ourCollectionGradientDirection: 'to bottom',
-      ourCollectionBackgroundImageUrl: '',
-      ourCollectionBackgroundApplyTo: ['collection'],
-      ourCollectionShow: true,
-      ourCollectionMediaType: 'none',
-      ourCollectionImageUrl: '',
-      ourCollectionVideoUrl: '',
-      ourCollectionVideoPosterUrl: '',
-      ourCollectionOverlayTitle: '',
-      ourCollectionOverlaySubtitle: '',
-      ourCollectionButtonText: 'Shop Now',
-      ourCollectionLinkUrl: '',
-      ourCollectionShowOverlay: false,
-      ourCollectionTextColor: '#FFFFFF',
-      ourCollectionFullWidth: false,
-      ourCollectionSlides: [],
-    }
+    defaultValues: DEFAULT_VALUES
   });
 
   useEffect(() => {
     if (settingsData) {
       form.reset({
-        ourCollectionTitle: settingsData.ourCollectionTitle || 'Our Collection',
-        ourCollectionDescription: settingsData.ourCollectionDescription || 'Discover our latest additions and favorite picks',
-        ourCollectionLayout: settingsData.ourCollectionLayout || 'grid',
-        ourCollectionAlignment: settingsData.ourCollectionAlignment || 'center',
-        ourCollectionBackgroundColor: settingsData.ourCollectionBackgroundColor || '',
-        ourCollectionBackgroundType: settingsData.ourCollectionBackgroundType || 'solid',
-        ourCollectionGradientStart: settingsData.ourCollectionGradientStart || '#ffffff',
-        ourCollectionGradientEnd: settingsData.ourCollectionGradientEnd || '#f1f5f9',
-        ourCollectionGradientDirection: settingsData.ourCollectionGradientDirection || 'to bottom',
-        ourCollectionBackgroundImageUrl: settingsData.ourCollectionBackgroundImageUrl || '',
-        ourCollectionBackgroundApplyTo: settingsData.ourCollectionBackgroundApplyTo || ['collection'],
+        ourCollectionTitle: settingsData.ourCollectionTitle || DEFAULT_VALUES.ourCollectionTitle,
+        ourCollectionDescription: settingsData.ourCollectionDescription || DEFAULT_VALUES.ourCollectionDescription,
+        ourCollectionLayout: settingsData.ourCollectionLayout || DEFAULT_VALUES.ourCollectionLayout,
+        ourCollectionAlignment: settingsData.ourCollectionAlignment || DEFAULT_VALUES.ourCollectionAlignment,
+        ourCollectionBackgroundColor: settingsData.ourCollectionBackgroundColor || DEFAULT_VALUES.ourCollectionBackgroundColor,
+        ourCollectionBackgroundType: settingsData.ourCollectionBackgroundType || DEFAULT_VALUES.ourCollectionBackgroundType,
+        ourCollectionGradientStart: settingsData.ourCollectionGradientStart || DEFAULT_VALUES.ourCollectionGradientStart,
+        ourCollectionGradientEnd: settingsData.ourCollectionGradientEnd || DEFAULT_VALUES.ourCollectionGradientEnd,
+        ourCollectionGradientDirection: settingsData.ourCollectionGradientDirection || DEFAULT_VALUES.ourCollectionGradientDirection,
+        ourCollectionBackgroundImageUrl: settingsData.ourCollectionBackgroundImageUrl || DEFAULT_VALUES.ourCollectionBackgroundImageUrl,
+        ourCollectionBackgroundApplyTo: settingsData.ourCollectionBackgroundApplyTo || DEFAULT_VALUES.ourCollectionBackgroundApplyTo,
         ourCollectionShow: settingsData.ourCollectionShow !== false,
-        ourCollectionMediaType: settingsData.ourCollectionMediaType || 'none',
-        ourCollectionImageUrl: settingsData.ourCollectionImageUrl || '',
-        ourCollectionVideoUrl: settingsData.ourCollectionVideoUrl || '',
-        ourCollectionVideoPosterUrl: settingsData.ourCollectionVideoPosterUrl || '',
-        ourCollectionOverlayTitle: settingsData.ourCollectionOverlayTitle || '',
-        ourCollectionOverlaySubtitle: settingsData.ourCollectionOverlaySubtitle || '',
-        ourCollectionButtonText: settingsData.ourCollectionButtonText || 'Shop Now',
-        ourCollectionLinkUrl: settingsData.ourCollectionLinkUrl || '',
-        ourCollectionShowOverlay: settingsData.ourCollectionShowOverlay || false,
-        ourCollectionTextColor: settingsData.ourCollectionTextColor || '#FFFFFF',
-        ourCollectionFullWidth: settingsData.ourCollectionFullWidth || false,
-        ourCollectionSlides: settingsData.ourCollectionSlides || [],
+        ourCollectionMediaType: settingsData.ourCollectionMediaType || DEFAULT_VALUES.ourCollectionMediaType,
+        ourCollectionImageUrl: settingsData.ourCollectionImageUrl || DEFAULT_VALUES.ourCollectionImageUrl,
+        ourCollectionVideoUrl: settingsData.ourCollectionVideoUrl || DEFAULT_VALUES.ourCollectionVideoUrl,
+        ourCollectionVideoPosterUrl: settingsData.ourCollectionVideoPosterUrl || DEFAULT_VALUES.ourCollectionVideoPosterUrl,
+        ourCollectionOverlayTitle: settingsData.ourCollectionOverlayTitle || DEFAULT_VALUES.ourCollectionOverlayTitle,
+        ourCollectionOverlaySubtitle: settingsData.ourCollectionOverlaySubtitle || DEFAULT_VALUES.ourCollectionOverlaySubtitle,
+        ourCollectionButtonText: settingsData.ourCollectionButtonText || DEFAULT_VALUES.ourCollectionButtonText,
+        ourCollectionLinkUrl: settingsData.ourCollectionLinkUrl || DEFAULT_VALUES.ourCollectionLinkUrl,
+        ourCollectionShowOverlay: settingsData.ourCollectionShowOverlay || DEFAULT_VALUES.ourCollectionShowOverlay,
+        ourCollectionTextColor: settingsData.ourCollectionTextColor || DEFAULT_VALUES.ourCollectionTextColor,
+        ourCollectionFullWidth: settingsData.ourCollectionFullWidth || DEFAULT_VALUES.ourCollectionFullWidth,
+        ourCollectionSlides: settingsData.ourCollectionSlides || DEFAULT_VALUES.ourCollectionSlides,
       });
     }
   }, [settingsData, form]);
@@ -230,6 +245,43 @@ export default function OurCollectionSettingsPage() {
     }
   };
 
+  const resetSectionContent = () => {
+    form.setValue('ourCollectionShow', DEFAULT_VALUES.ourCollectionShow);
+    form.setValue('ourCollectionTitle', DEFAULT_VALUES.ourCollectionTitle);
+    form.setValue('ourCollectionDescription', DEFAULT_VALUES.ourCollectionDescription);
+    form.setValue('ourCollectionLayout', DEFAULT_VALUES.ourCollectionLayout);
+    form.setValue('ourCollectionAlignment', DEFAULT_VALUES.ourCollectionAlignment);
+    form.setValue('ourCollectionBackgroundType', DEFAULT_VALUES.ourCollectionBackgroundType);
+    form.setValue('ourCollectionBackgroundApplyTo', DEFAULT_VALUES.ourCollectionBackgroundApplyTo);
+    form.setValue('ourCollectionBackgroundColor', DEFAULT_VALUES.ourCollectionBackgroundColor);
+    form.setValue('ourCollectionGradientStart', DEFAULT_VALUES.ourCollectionGradientStart);
+    form.setValue('ourCollectionGradientEnd', DEFAULT_VALUES.ourCollectionGradientEnd);
+    form.setValue('ourCollectionGradientDirection', DEFAULT_VALUES.ourCollectionGradientDirection);
+    form.setValue('ourCollectionBackgroundImageUrl', DEFAULT_VALUES.ourCollectionBackgroundImageUrl);
+    toast({ title: "Section Reset", description: "Section content settings have been reset to default." });
+  };
+
+  const resetMediaContent = () => {
+    form.setValue('ourCollectionMediaType', DEFAULT_VALUES.ourCollectionMediaType);
+    form.setValue('ourCollectionImageUrl', DEFAULT_VALUES.ourCollectionImageUrl);
+    form.setValue('ourCollectionVideoUrl', DEFAULT_VALUES.ourCollectionVideoUrl);
+    form.setValue('ourCollectionVideoPosterUrl', DEFAULT_VALUES.ourCollectionVideoPosterUrl);
+    form.setValue('ourCollectionSlides', DEFAULT_VALUES.ourCollectionSlides);
+    form.setValue('ourCollectionOverlayTitle', DEFAULT_VALUES.ourCollectionOverlayTitle);
+    form.setValue('ourCollectionOverlaySubtitle', DEFAULT_VALUES.ourCollectionOverlaySubtitle);
+    form.setValue('ourCollectionButtonText', DEFAULT_VALUES.ourCollectionButtonText);
+    form.setValue('ourCollectionLinkUrl', DEFAULT_VALUES.ourCollectionLinkUrl);
+    form.setValue('ourCollectionTextColor', DEFAULT_VALUES.ourCollectionTextColor);
+    form.setValue('ourCollectionShowOverlay', DEFAULT_VALUES.ourCollectionShowOverlay);
+    form.setValue('ourCollectionFullWidth', DEFAULT_VALUES.ourCollectionFullWidth);
+    toast({ title: "Media Reset", description: "Media settings have been reset to default." });
+  };
+
+  const resetAll = () => {
+    form.reset(DEFAULT_VALUES);
+    toast({ title: "Settings Reset", description: "All settings have been reset to default." });
+  };
+
   const isLoading = isAuthLoading || isLoadingSettings;
 
   if (isLoading) {
@@ -253,7 +305,30 @@ export default function OurCollectionSettingsPage() {
         icon={Sparkles}
         title="Manage Our Collection"
         description="Customize the 'Our Collection' section on your homepage"
-      />
+      >
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20">
+              <RotateCcw className="h-4 w-4" />
+              Reset All to Default
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will reset all settings in this page to their default values. This action cannot be undone unless you have saved your previous settings.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={resetAll} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                Reset Everything
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </PageHeader>
 
       <div className="grid grid-cols-1 gap-6">
         <Card className="border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
@@ -667,7 +742,11 @@ export default function OurCollectionSettingsPage() {
                   )}
                 </div>
 
-                <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800 gap-3">
+                  <Button type="button" variant="outline" size="sm" onClick={resetSectionContent} className="gap-2">
+                    <RotateCcw className="h-4 w-4" />
+                    Reset Section
+                  </Button>
                   <Button type="submit" disabled={isSaving} className="gap-2 min-w-[140px] shadow-lg">
                     {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                     Save Changes
@@ -1034,7 +1113,11 @@ export default function OurCollectionSettingsPage() {
                   </div>
                 )}
 
-                <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800 gap-3">
+                  <Button type="button" variant="outline" size="sm" onClick={resetMediaContent} className="gap-2">
+                    <RotateCcw className="h-4 w-4" />
+                    Reset Media
+                  </Button>
                   <Button type="submit" disabled={isSaving || isUploading} className="gap-2 min-w-[140px] shadow-lg">
                     {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                     Save Media Changes
