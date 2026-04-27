@@ -475,6 +475,11 @@ export interface Settings {
   ourCollectionTextColor?: string;
   ourCollectionFullWidth?: boolean;
   ourCollectionSlides?: { imageUrl: string, title?: string, subtitle?: string, linkUrl?: string, buttonText?: string }[];
+  ourCollectionBackgroundType?: 'solid' | 'gradient' | 'image';
+  ourCollectionGradientStart?: string;
+  ourCollectionGradientEnd?: string;
+  ourCollectionGradientDirection?: string;
+  ourCollectionBackgroundImageUrl?: string;
   // Delivery Settings
   enablePickUp?: boolean;
   enableDelivery?: boolean;
@@ -604,6 +609,12 @@ export interface HomepageSection {
   fullWidth?: boolean;
   height?: number;
   textColor?: string;
+  // Background Extensions
+  backgroundType?: 'solid' | 'gradient' | 'image';
+  gradientStart?: string;
+  gradientEnd?: string;
+  gradientDirection?: string;
+  backgroundImageUrl?: string;
   // Carousel Extensions
   autoScroll?: boolean;
   showOverlay?: boolean;
