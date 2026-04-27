@@ -6,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useFirestore, useDoc, useCollection } from '@/firebase';
-import { doc, query, collection, where, limit, orderBy } from 'firebase/firestore';
+import { doc, query, collection, where, limit, orderBy, getDoc, getDocs } from 'firebase/firestore';
 import { useCart } from '@/contexts/cart-context';
 import { useWishlist } from '@/contexts/wishlist-context';
 import { useRecentlyViewed } from '@/contexts/recently-viewed-context';
@@ -64,7 +64,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
-import { cn, convertToDateSafely } from '@/lib/utils';
+import { cn, convertToDateSafely, slugify } from '@/lib/utils';
 import { getContrastColor } from '@/lib/color-utils';
 import { ProductCard } from '@/components/store/ProductCard';
 import { format } from 'date-fns';
@@ -356,9 +356,56 @@ export default function ProductDetailsPage() {
     setTimeout(() => setIsChangingVariant(false), 400);
   };
 
+  const [resolvedProductId, setResolvedProductId] = useState<string | null>(null);
+  const [isResolving, setIsResolving] = useState(true);
+
+  useEffect(() => {
+    if (!firestore || !productId || !storeId) return;
+
+    const resolve = async () => {
+      setIsResolving(true);
+      try {
+        // 1. Try by ID
+        const docRef = doc(firestore, 'products', productId);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists() && docSnap.data()?.store_id === storeId) {
+          setResolvedProductId(productId);
+        } else {
+          // 2. Try by Slug
+          const q = query(
+            collection(firestore, 'products'), 
+            where('store_id', '==', storeId), 
+            where('slug', '==', productId), 
+            limit(1)
+          );
+          const querySnap = await getDocs(q);
+          if (!querySnap.empty) {
+            setResolvedProductId(querySnap.docs[0].id);
+          } else {
+            // 3. Fallback: Check if name-to-slug matches
+            // This handles existing products that don't have the slug field yet
+            const productsRef = collection(firestore, 'products');
+            const qAll = query(productsRef, where('store_id', '==', storeId));
+            const allSnap = await getDocs(qAll);
+            const match = allSnap.docs.find(d => slugify(d.data().name) === productId);
+            if (match) {
+              setResolvedProductId(match.id);
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Resolution error:", e);
+      } finally {
+        setIsResolving(false);
+      }
+    };
+    resolve();
+  }, [firestore, productId, storeId]);
+
   // Fetch Product
-  const productRef = useMemo(() => firestore ? doc(firestore, 'products', productId) : null, [firestore, productId]);
-  const { data: product, isLoading: isLoadingProduct } = useDoc<Product>(productRef);
+  const productRef = useMemo(() => firestore && resolvedProductId ? doc(firestore, 'products', resolvedProductId) : null, [firestore, resolvedProductId]);
+  const { data: product, isLoading: isLoadingProductFromDoc } = useDoc<Product>(productRef);
+  const isLoadingProduct = isResolving || isLoadingProductFromDoc;
 
   // Fetch Category info
   const categoryRef = useMemo(() => (firestore && product?.categoryId) ? doc(firestore, 'categories', product.categoryId) : null, [firestore, product?.categoryId]);
@@ -786,11 +833,7 @@ export default function ProductDetailsPage() {
         settings?.primaryDomainType
     );
     
-    let path = `/product/${productId}`;
-    // If we're on the free domain, we need to include /store in the path if that's how it's structured
-    // Wait, the public pages are under [storeId]/product/[productId]
-    // The relative URL for shop is /store/shop ? 
-    // Let's check useStoreUrl hook again.
+    let path = `/product/${product?.slug || product?.id || productId}`;
     
     const fullUrl = `${baseUrl}${path}`;
 

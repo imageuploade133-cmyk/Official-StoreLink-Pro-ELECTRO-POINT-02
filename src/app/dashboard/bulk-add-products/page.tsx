@@ -15,6 +15,7 @@ import { BulkUploadCard } from '@/components/bulk-products/BulkUploadCard';
 import { PreviewTable } from '@/components/bulk-products/PreviewTable';
 import { useSettings } from '@/contexts/settings-context';
 import { logActivity } from '@/lib/activity-log-utils';
+import { slugify } from '@/lib/utils';
 
 type ParsedProduct = Omit<Product, 'id'> & { id?: string; action: 'create' | 'update' };
 
@@ -128,7 +129,12 @@ export default function BulkAddProductsPage() {
             const existingProduct = productData.sku ? existingProductsMap.get(productData.sku) : undefined;
             if (existingProduct) {
                 const productRef = doc(firestore, 'products', existingProduct.id);
-                batch.update(productRef, { ...dataToWrite, store_id: currentStoreId, updatedAt: serverTimestamp() });
+                batch.update(productRef, { 
+                    ...dataToWrite, 
+                    slug: slugify(dataToWrite.name),
+                    store_id: currentStoreId, 
+                    updatedAt: serverTimestamp() 
+                });
                 
                 // --- ADD AUDIT IF STOCK CHANGED ---
                 if (existingProduct.stock !== dataToWrite.stock) {
@@ -150,7 +156,13 @@ export default function BulkAddProductsPage() {
                 updatedCount++;
             } else {
                 const newProductRef = doc(collection(firestore, 'products'));
-                batch.set(newProductRef, { ...dataToWrite, store_id: currentStoreId, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+                batch.set(newProductRef, { 
+                    ...dataToWrite, 
+                    slug: slugify(dataToWrite.name),
+                    store_id: currentStoreId, 
+                    createdAt: serverTimestamp(), 
+                    updatedAt: serverTimestamp() 
+                });
                 
                 // --- ADD AUDIT ---
                 const auditRef = doc(collection(firestore, 'stockAudit'));

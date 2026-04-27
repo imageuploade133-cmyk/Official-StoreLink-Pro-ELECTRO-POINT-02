@@ -81,7 +81,7 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
     e.preventDefault();
     e.stopPropagation();
     if (product.hasVariants) {
-      router.push(getStoreUrl(`/store/product/${product.id}`));
+      router.push(getStoreUrl(`/store/product/${product.slug || product.id}`));
       return;
     }
     addToCart(product, effectivePrice);
@@ -158,6 +158,7 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
     return html
       .replace(/\{\{product\.name\}\}/g, product.name)
       .replace(/\{\{product\.id\}\}/g, product.id)
+      .replace(/\{\{product\.slug\}\}/g, product.slug || product.id)
       .replace(/\{\{product\.price\}\}/g, effectivePrice.toFixed(2))
       .replace(/\{\{product\.originalPrice\}\}/g, product.sellingPrice.toFixed(2))
       .replace(/\{\{product\.imageUrl\}\}/g, product.imageUrl || '')
@@ -338,7 +339,7 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
         {/* Media Area */}
         {settings?.productCardShowImage !== false && (
           <Link
-            href={getStoreUrl(`/store/product/${product.id}`)}
+            href={getStoreUrl(`/store/product/${product.slug || product.id}`)}
             onClick={handleProductClick}
             className={cn(
                 "block relative overflow-hidden bg-[#f5f5f7] dark:bg-[#0a0a0a]",

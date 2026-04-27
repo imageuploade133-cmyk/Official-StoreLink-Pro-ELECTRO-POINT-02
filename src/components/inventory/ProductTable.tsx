@@ -65,7 +65,7 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
   const handleShare = (product: Product) => {
     if (!store) {
         const origin = window.location.origin;
-        const url = `${origin}/store/product/${product.id}`;
+        const url = `${origin}/store/product/${product.slug || product.id}`;
         copyToClipboard(url);
         return;
     }
@@ -78,7 +78,7 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
         store.primaryDomainType
     );
     
-    let path = `/product/${product.id}`;
+    let path = `/product/${product.slug || product.id}`;
     const fullUrl = `${baseUrl}${path}`;
     
     if (navigator.share) {

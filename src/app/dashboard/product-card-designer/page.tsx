@@ -621,6 +621,8 @@ export default function ProductCardDesignerPage() {
                         <code>{'{{product.name}}'}</code>
                         <code>{'{{product.price}}'}</code>
                         <code>{'{{product.imageUrl}}'}</code>
+                        <code>{'{{product.id}}'}</code>
+                        <code>{'{{product.slug}}'}</code>
                         <code>{'{{product.category}}'}</code>
                         <code>{'{{product.stock}}'}</code>
                         <code>{'{{product.isNew}}'}</code>
@@ -846,7 +848,7 @@ export default function ProductCardDesignerPage() {
 // Default HTML Template
 const defaultHtmlTemplate = `<div class="group relative flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all duration-500 hover:border-primary/30 overflow-hidden h-full hover:-translate-y-1" style="height: {{cardHeight}}px;">
   <!-- Media Area -->
-  <a href="/store/product/{{product.id}}" class="block relative overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900" style="height: 60%;">
+  <a href="/store/product/{{product.slug}}" class="block relative overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900" style="height: 60%;">
     <img
       src="{{product.imageUrl}}"
       alt="{{product.name}}"
@@ -945,7 +947,7 @@ const defaultHtmlTemplate = `<div class="group relative flex flex-col bg-white d
 
 // Minimal HTML Template
 const minimalHtmlTemplate = `<div class="group relative bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-300" style="height: {{cardHeight}}px;">
-  <a href="/store/product/{{product.id}}" class="block">
+  <a href="/store/product/{{product.slug}}" class="block">
     <div class="aspect-square overflow-hidden bg-slate-100">
       <img
         src="{{product.imageUrl}}"
@@ -980,6 +982,8 @@ function CustomHtmlCardPreview({
     .replace(/\{\{product\.name\}\}/g, product.name)
     .replace(/\{\{product\.price\}\}/g, product.sellingPrice.toString())
     .replace(/\{\{product\.imageUrl\}\}/g, product.imageUrl || '')
+    .replace(/\{\{product\.id\}\}/g, product.id)
+    .replace(/\{\{product\.slug\}\}/g, product.slug || product.id)
     .replace(/\{\{product\.category\}\}/g, category.name)
     .replace(/\{\{product\.stock\}\}/g, product.stock.toString())
     .replace(/\{\{product\.isNew\}\}/g, product.isNewArrival ? 'true' : 'false')
