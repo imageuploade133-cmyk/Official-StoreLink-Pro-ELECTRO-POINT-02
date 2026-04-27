@@ -74,6 +74,7 @@ import { Slider } from '@/components/ui/slider';
 import { OutOfDataDrawer } from '@/components/ui/out-of-data-drawer';
 import { ProductReviewForm } from '@/components/store/ProductReviewForm';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { getCollectionBackgroundStyle } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -986,8 +987,25 @@ export default function ProductDetailsPage() {
 
   const visibleVoices = (distributedVoices || []).filter(v => v.isVisible !== false);
 
+  const productPageBgStyle = useMemo(() => {
+    if (settings?.ourCollectionBackgroundApplyTo?.includes('product') && !settings?.ourCollectionBackgroundApplyTo?.includes('global')) {
+      return getCollectionBackgroundStyle(settings);
+    }
+    return {};
+  }, [settings]);
+
+  const hasPageBg = useMemo(() => {
+    return settings?.ourCollectionBackgroundApplyTo?.includes('product') || settings?.ourCollectionBackgroundApplyTo?.includes('global');
+  }, [settings]);
+
   return (
-    <div className="bg-white dark:bg-black min-h-screen">
+    <div 
+        className={cn(
+            "min-h-screen",
+            !hasPageBg && "bg-white dark:bg-black"
+        )}
+        style={productPageBgStyle}
+    >
       <StickyProductBar
         productName={product.name}
         productPrice={formatCurrency(currentPrice, currencySymbol)}
@@ -1000,7 +1018,7 @@ export default function ProductDetailsPage() {
       />
       
       <main className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 md:py-8">
-        <div className="md:hidden mb-4 sticky top-0 z-40 bg-white dark:bg-black pb-2">
+        <div className={cn("md:hidden mb-4 sticky top-0 z-40 pb-2", !hasPageBg ? "bg-white dark:bg-black" : "bg-transparent")}>
           <Button 
             onClick={() => router.back()}
             variant="ghost" 

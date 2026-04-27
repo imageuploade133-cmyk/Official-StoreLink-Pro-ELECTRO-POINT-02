@@ -425,6 +425,8 @@ export default function CheckoutPage() {
     };
   }, [settings]);
 
+  const isAppliedGlobally = settings?.ourCollectionBackgroundApplyTo?.includes('global');
+
   if (isAuthLoading || isLoadingSettings || isProfileLoading || isLoadingMethods) {
     return (
       <div className="flex h-[60vh] items-center justify-center">
@@ -434,7 +436,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="bg-muted/30 min-h-screen">
+    <div className={cn("min-h-screen", isAppliedGlobally ? "bg-transparent" : "bg-muted/30")}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="flex items-center justify-between mb-8">
           <div>

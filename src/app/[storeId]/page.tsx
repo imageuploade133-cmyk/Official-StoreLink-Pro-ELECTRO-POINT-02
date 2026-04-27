@@ -18,7 +18,7 @@ import { BannerAd } from '@/components/ads/BannerAd';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useParams } from 'next/navigation';
-import { cn, isWhiteOrTransparent } from '@/lib/utils';
+import { cn, isWhiteOrTransparent, getCollectionBackgroundStyle } from '@/lib/utils';
 
 const iconComponents = { Truck, ShieldCheck, Headset, Leaf, Sparkles, Gift };
 const DynamicIcon = ({ name }: { name: string }) => {
@@ -76,31 +76,28 @@ export default function StoreHomePage() {
     Autoplay({ delay: 3000, stopOnInteraction: false, stopOnMouseEnter: true })
   )
 
-  if (isLoadingSettings) {
-    return null; // Layout handles skeleton
-  }
+  const homepageBgStyle = useMemo(() => {
+    if (settings?.ourCollectionBackgroundApplyTo?.includes('homepage') && !settings?.ourCollectionBackgroundApplyTo?.includes('global')) {
+      return getCollectionBackgroundStyle(settings);
+    }
+    return {};
+  }, [settings]);
 
-  if (!store) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
-        <h1 className="text-4xl font-bold mb-4">Store Not Found</h1>
-        <p className="text-muted-foreground mb-8">The store you are looking for does not exist or has been moved.</p>
-        <Button asChild>
-          <Link href="/">Back to Home</Link>
-        </Button>
-      </div>
-    );
-  }
+  const isAppliedGlobally = settings?.ourCollectionBackgroundApplyTo?.includes('global');
+  const isAppliedToHomepage = settings?.ourCollectionBackgroundApplyTo?.includes('homepage');
+  const hasPageBg = isAppliedGlobally || isAppliedToHomepage;
+
+  const showCollectionBg = settings?.ourCollectionBackgroundApplyTo?.includes('collection');
 
   return (
-    <>
+    <div style={homepageBgStyle}>
       <HeroCarousel />
       
       {settings?.showBrandValues !== false && (
         <section 
           className={cn(
               "relative group/values transition-colors duration-500",
-              isWhiteOrTransparent(brandValuesBg) ? "bg-white dark:bg-black" : ""
+              isWhiteOrTransparent(brandValuesBg) ? (hasPageBg ? "bg-transparent" : "bg-white dark:bg-black") : ""
           )} 
           style={{ 
             backgroundColor: !isWhiteOrTransparent(brandValuesBg) ? brandValuesBg : undefined,
@@ -199,12 +196,12 @@ export default function StoreHomePage() {
                 createdAt: null as any,
                 updatedAt: null as any,
                 alignment: settings?.ourCollectionAlignment || 'center',
-                backgroundColor: settings?.ourCollectionBackgroundColor,
-                backgroundType: settings?.ourCollectionBackgroundType,
-                gradientStart: settings?.ourCollectionGradientStart,
-                gradientEnd: settings?.ourCollectionGradientEnd,
-                gradientDirection: settings?.ourCollectionGradientDirection,
-                backgroundImageUrl: settings?.ourCollectionBackgroundImageUrl,
+                backgroundColor: showCollectionBg ? settings?.ourCollectionBackgroundColor : undefined,
+                backgroundType: showCollectionBg ? settings?.ourCollectionBackgroundType : undefined,
+                gradientStart: showCollectionBg ? settings?.ourCollectionGradientStart : undefined,
+                gradientEnd: showCollectionBg ? settings?.ourCollectionGradientEnd : undefined,
+                gradientDirection: showCollectionBg ? settings?.ourCollectionGradientDirection : undefined,
+                backgroundImageUrl: showCollectionBg ? settings?.ourCollectionBackgroundImageUrl : undefined,
                 uiType: settings?.ourCollectionMediaType as any,
                 imageUrl: settings?.ourCollectionImageUrl,
                 videoUrl: settings?.ourCollectionVideoUrl,
@@ -224,6 +221,6 @@ export default function StoreHomePage() {
       )}
 
       <NewsletterSection />
-    </>
+    </div>
   );
 }

@@ -7,7 +7,7 @@ import { useGlobalLoading } from '@/contexts/global-loading-context';
 import { PublicPageSkeleton } from '@/components/store/PublicPageSkeleton';
 import { useSettings } from '@/contexts/settings-context';
 import { BackgroundVideoPlayer } from '@/components/store/BackgroundVideoPlayer';
-import { cn } from "@/lib/utils";
+import { cn, getCollectionBackgroundStyle } from "@/lib/utils";
 import { AdSystem } from '@/components/store/AdSystem';
 import { BannerAd } from '@/components/ads/BannerAd';
 import { useEffect, useMemo } from 'react';
@@ -149,6 +149,15 @@ export default function PublicLayout({
   
   const navbarHeight = settings?.navbarHeight ? (heightMap[settings.navbarHeight as keyof typeof heightMap] || 64) : (logoContainerHeight + (navbarPadding * 2));
   const navbarSticky = settings?.navbarSticky || 'fixed';
+  
+  const globalBgStyle = useMemo(() => {
+    if (settings?.ourCollectionBackgroundApplyTo?.includes('global')) {
+      return getCollectionBackgroundStyle(settings);
+    }
+    return {};
+  }, [settings]);
+
+  const hasGlobalBg = !!(globalBgStyle.backgroundColor || globalBgStyle.backgroundImage || globalBgStyle.background);
 
   if (!isInitialLoadComplete) {
     return <PublicPageSkeleton />;
@@ -164,10 +173,14 @@ export default function PublicLayout({
       
       <main 
         className={cn(
-            "relative z-10 dark:bg-black transition-shadow duration-300",
+            "relative z-10 transition-shadow duration-300",
+            !hasGlobalBg && "dark:bg-black",
             (settings?.enableBackgroundShadow ?? true) && "shadow-[0_0_50px_rgba(0,0,0,0.1)] dark:shadow-[0_0_50px_rgba(255,255,255,0.05)]"
         )} 
-        style={{ paddingTop: navbarSticky !== 'static' ? `${navbarHeight}px` : '0px' }}
+        style={{ 
+          paddingTop: navbarSticky !== 'static' ? `${navbarHeight}px` : '0px',
+          ...globalBgStyle
+        }}
       >
         <BannerAd location="top_of_page" />
         {children}

@@ -356,8 +356,15 @@ export function ProductSection({ section, categories, excludeCategoryIds }: Prod
 
   const showDefaultBg = useMemo(() => {
     if (section.backgroundType === 'gradient' || section.backgroundType === 'image') return false;
+    
+    // Check if there is a page-level background that should show through
+    const hasPageBg = settings?.ourCollectionBackgroundApplyTo?.includes('homepage') || 
+                      settings?.ourCollectionBackgroundApplyTo?.includes('global');
+                      
+    if (hasPageBg && isWhiteOrTransparent(backgroundColor)) return false;
+
     return isWhiteOrTransparent(backgroundColor);
-  }, [section.backgroundType, backgroundColor]);
+  }, [section.backgroundType, backgroundColor, settings]);
 
   const endDate = convertToDateSafely(section.flashSaleEndDate);
   

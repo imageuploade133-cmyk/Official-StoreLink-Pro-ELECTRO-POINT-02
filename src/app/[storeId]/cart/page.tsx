@@ -265,9 +265,11 @@ export default function CartPage() {
     };
   }, [settings]);
 
+  const isAppliedGlobally = settings?.ourCollectionBackgroundApplyTo?.includes('global');
+
   if (cartItems.length === 0) {
     return (
-      <div className="max-w-4xl mx-auto py-24 px-4 text-center">
+      <div className={cn("max-w-4xl mx-auto py-24 px-4 text-center", isAppliedGlobally ? "bg-transparent" : "")}>
         <ShoppingCart className="mx-auto h-24 w-24 text-muted-foreground" />
         <h1 className="mt-8 text-3xl font-bold">Your cart is empty</h1>
         <p className="mt-2 text-lg text-muted-foreground">Looks like you haven't added anything to your cart yet.</p>
@@ -280,7 +282,7 @@ export default function CartPage() {
 
   return (
     <>
-      <div className="bg-muted/30">
+      <div className={cn(isAppliedGlobally ? "bg-transparent" : "bg-muted/30")}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
               <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white mb-4">Shopping Bag</h1>
                <Link href={getStoreUrl('/store/shop')} className="text-sm text-primary hover:underline flex items-center mb-8">

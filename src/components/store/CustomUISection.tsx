@@ -22,11 +22,14 @@ export function CustomUISection({ section }: CustomUISectionProps) {
   const isVideo = section.uiType === 'video';
   const isCenter = section.alignment === 'center';
 
+  const hasPageBg = settings?.ourCollectionBackgroundApplyTo?.includes('homepage') || 
+                    settings?.ourCollectionBackgroundApplyTo?.includes('global');
+
   return (
     <section 
         className={cn(
             "relative overflow-hidden py-12 md:py-24 transition-colors duration-500",
-            isWhiteOrTransparent(section.backgroundColor) ? "bg-white dark:bg-black" : "",
+            isWhiteOrTransparent(section.backgroundColor) ? (hasPageBg ? "bg-transparent" : "bg-white dark:bg-black") : "",
             section.fullWidth ? "w-full" : "max-w-site-container mx-auto px-4 sm:px-6 lg:px-8"
         )}
         style={!isWhiteOrTransparent(section.backgroundColor) ? { backgroundColor: section.backgroundColor } : {}}

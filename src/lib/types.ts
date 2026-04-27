@@ -480,6 +480,7 @@ export interface Settings {
   ourCollectionGradientEnd?: string;
   ourCollectionGradientDirection?: string;
   ourCollectionBackgroundImageUrl?: string;
+  ourCollectionBackgroundApplyTo?: ('homepage' | 'collection' | 'global' | 'product')[];
   // Delivery Settings
   enablePickUp?: boolean;
   enableDelivery?: boolean;

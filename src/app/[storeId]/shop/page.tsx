@@ -23,7 +23,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, ChevronLeft, ChevronRight, RotateCcw, PackageSearch, Loader2, SlidersHorizontal, ArrowUpDown, LayoutGrid } from 'lucide-react';
 import { ProductCardSkeleton } from '@/components/store/ProductCardSkeleton';
-import { cn } from '@/lib/utils';
+import { cn, getCollectionBackgroundStyle } from '@/lib/utils';
 import { useStoreUrl } from '@/hooks/use-store-url';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
@@ -314,8 +314,10 @@ function ShopPageContent() {
         return categories.find(c => c.id === categoryFromUrl);
     }, [categoryFromUrl, categories]);
 
+    const isAppliedGlobally = settings?.ourCollectionBackgroundApplyTo?.includes('global');
+
     return (
-        <div className="bg-white dark:bg-[#000000] min-h-screen">
+        <div className={cn("min-h-screen", !isAppliedGlobally && "bg-white dark:bg-[#000000]")}>
             {/* Category Auto-Switch Notification */}
             {categoryNotification.show && (
                 <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -377,7 +379,7 @@ function ShopPageContent() {
 
             <header className={cn(
                 "sticky top-0 z-40 transition-all duration-500 ease-in-out",
-                "bg-white/80 dark:bg-black/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5",
+                isAppliedGlobally ? "bg-transparent backdrop-blur-xl border-b border-black/5 dark:border-white/5" : "bg-white/80 dark:bg-black/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5",
                 showHeader ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
             )}>
                 <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">

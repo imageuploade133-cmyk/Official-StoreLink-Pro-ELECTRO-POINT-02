@@ -44,6 +44,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import Image from 'next/image';
 
 const ourCollectionSchema = z.object({
@@ -57,6 +58,7 @@ const ourCollectionSchema = z.object({
   ourCollectionGradientEnd: z.string().optional().default('#f1f5f9'),
   ourCollectionGradientDirection: z.string().optional().default('to bottom'),
   ourCollectionBackgroundImageUrl: z.string().optional().default(''),
+  ourCollectionBackgroundApplyTo: z.array(z.enum(['homepage', 'collection', 'global', 'product'])).default(['collection']),
   ourCollectionShow: z.boolean().default(true),
   ourCollectionMediaType: z.enum(['none', 'image', 'video', 'slideshow']).default('none'),
   ourCollectionImageUrl: z.string().optional().default(''),
@@ -115,6 +117,7 @@ export default function OurCollectionSettingsPage() {
       ourCollectionGradientEnd: '#f1f5f9',
       ourCollectionGradientDirection: 'to bottom',
       ourCollectionBackgroundImageUrl: '',
+      ourCollectionBackgroundApplyTo: ['collection'],
       ourCollectionShow: true,
       ourCollectionMediaType: 'none',
       ourCollectionImageUrl: '',
@@ -144,6 +147,7 @@ export default function OurCollectionSettingsPage() {
         ourCollectionGradientEnd: settingsData.ourCollectionGradientEnd || '#f1f5f9',
         ourCollectionGradientDirection: settingsData.ourCollectionGradientDirection || 'to bottom',
         ourCollectionBackgroundImageUrl: settingsData.ourCollectionBackgroundImageUrl || '',
+        ourCollectionBackgroundApplyTo: settingsData.ourCollectionBackgroundApplyTo || ['collection'],
         ourCollectionShow: settingsData.ourCollectionShow !== false,
         ourCollectionMediaType: settingsData.ourCollectionMediaType || 'none',
         ourCollectionImageUrl: settingsData.ourCollectionImageUrl || '',
@@ -483,6 +487,63 @@ export default function OurCollectionSettingsPage() {
                             </div>
                           </RadioGroup>
                         </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="ourCollectionBackgroundApplyTo"
+                    render={() => (
+                      <FormItem className="space-y-4">
+                        <div className="mb-4">
+                          <FormLabel className="text-sm font-semibold">Apply Background To</FormLabel>
+                          <FormDescription>
+                            Select where you want this background to be applied.
+                          </FormDescription>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {[
+                            { id: 'collection', label: 'Collection Section Only' },
+                            { id: 'homepage', label: 'Complete Home Page' },
+                            { id: 'product', label: 'Product Page Only' },
+                            { id: 'global', label: 'Global (All Pages)' },
+                          ].map((item) => (
+                            <FormField
+                              key={item.id}
+                              control={form.control}
+                              name="ourCollectionBackgroundApplyTo"
+                              render={({ field }) => {
+                                return (
+                                  <FormItem
+                                    key={item.id}
+                                    className="flex flex-row items-start space-x-3 space-y-0 p-4 border rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors"
+                                  >
+                                    <FormControl>
+                                      <Checkbox
+                                        checked={field.value?.includes(item.id)}
+                                        onCheckedChange={(checked) => {
+                                          return checked
+                                            ? field.onChange([...(field.value || []), item.id])
+                                            : field.onChange(
+                                                field.value?.filter(
+                                                  (value) => value !== item.id
+                                                )
+                                              )
+                                        }}
+                                      />
+                                    </FormControl>
+                                    <div className="space-y-1 leading-none">
+                                      <FormLabel className="text-sm font-medium cursor-pointer">
+                                        {item.label}
+                                      </FormLabel>
+                                    </div>
+                                  </FormItem>
+                                )
+                              }}
+                            />
+                          ))}
+                        </div>
                       </FormItem>
                     )}
                   />
