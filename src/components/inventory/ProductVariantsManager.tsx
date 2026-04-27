@@ -164,14 +164,20 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
             setValue('hasVariants', false, { shouldDirty: true });
             setValue('variants', [], { shouldDirty: true });
             setValue('variantOptions', [], { shouldDirty: true });
+            setValue('advancedDetailsEnabled', false, { shouldDirty: true });
+            setIsManualMode(false);
             toast({ title: "Variants Disabled", description: "All variant data has been cleared." });
           }
         });
       } else {
         setValue('hasVariants', false, { shouldDirty: true });
+        setValue('advancedDetailsEnabled', false, { shouldDirty: true });
+        setIsManualMode(false);
       }
     } else {
       setValue('hasVariants', true, { shouldDirty: true });
+      setValue('advancedDetailsEnabled', true, { shouldDirty: true });
+      setIsManualMode(false);
     }
   };
 
@@ -316,23 +322,31 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
   const toggleOption = (name: string) => {
     const index = variantOptions.findIndex((opt: any) => opt.name && opt.name.toLowerCase() === name.toLowerCase());
     if (index !== -1) {
-      setConfirmConfig({
-        isOpen: true,
-        title: 'Remove Option?',
-        description: `Removing the "${variantOptions[index]?.name || 'Option'}" will delete all associated variants. Are you sure?`,
-        onConfirm: () => {
-          removeOption(index);
-          if (optionFields.length === 1) {
-            const currentVariants = getValues('variants') || [];
-            const hasManualVariants = currentVariants.some((v: any) => v.isManual);
-            if (!hasManualVariants) {
-              setValue('hasVariants', false, { shouldDirty: true });
-            }
+      const hasValues = variantOptions[index].values && variantOptions[index].values.length > 0;
+      
+      const performRemove = () => {
+        removeOption(index);
+        if (optionFields.length === 1) {
+          const currentVariants = getValues('variants') || [];
+          const hasManualVariants = currentVariants.some((v: any) => v.isManual);
+          if (!hasManualVariants) {
+            setValue('hasVariants', false, { shouldDirty: true });
           }
         }
-      });
+      };
+
+      if (hasValues) {
+        setConfirmConfig({
+          isOpen: true,
+          title: 'Remove Option?',
+          description: `Removing the "${variantOptions[index]?.name || 'Option'}" will delete all associated variants. Are you sure?`,
+          onConfirm: performRemove
+        });
+      } else {
+        performRemove();
+      }
     } else {
-      if (optionFields.length < 3) {
+      if (optionFields.length < 10) {
         appendOption({ name, values: [], optionType: 'preset', optionName: name });
         if (!hasVariants) {
           setValue('hasVariants', true, { shouldDirty: true });
@@ -340,7 +354,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
       } else {
         toast({
           title: "Limit Reached",
-          description: "You can only add up to 3 variant options.",
+          description: "You can only add up to 10 variant options.",
           variant: "destructive"
         });
       }
@@ -626,11 +640,11 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                   size="sm" 
                   className="h-9 rounded-xl border-dashed border-2 hover:bg-primary/5 hover:text-primary hover:border-primary/30"
                   onClick={() => {
-                    if (optionFields.length < 3) {
+                    if (optionFields.length < 10) {
                       appendOption({ name: '', values: [], optionType: 'custom', optionName: '' });
                       if (!hasVariants) setValue('hasVariants', true);
                     } else {
-                      toast({ title: "Limit Reached", description: "Max 3 options.", variant: "destructive" });
+                      toast({ title: "Limit Reached", description: "Max 10 options.", variant: "destructive" });
                     }
                   }}
                 >
@@ -665,21 +679,28 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                           size="icon" 
                           className="absolute top-4 right-4 h-8 w-8 rounded-full bg-destructive/10 text-destructive hover:bg-destructive hover:text-white transition-all opacity-0 group-hover:opacity-100"
                           onClick={() => {
-                            setConfirmConfig({
-                              isOpen: true,
-                              title: 'Remove Option?',
-                              description: `Removing the "${variantOptions[index]?.name || 'Option'}" will delete all associated variants. Are you sure?`,
-                              onConfirm: () => {
-                                removeOption(index);
-                                if (optionFields.length === 1) {
-                                  const currentVariants = getValues('variants') || [];
-                                  const hasManualVariants = currentVariants.some((v: any) => v.isManual);
-                                  if (!hasManualVariants) {
-                                    setValue('hasVariants', false, { shouldDirty: true });
-                                  }
+                            const hasValues = currentOption.values && currentOption.values.length > 0;
+                            const performRemove = () => {
+                              removeOption(index);
+                              if (optionFields.length === 1) {
+                                const currentVariants = getValues('variants') || [];
+                                const hasManualVariants = currentVariants.some((v: any) => v.isManual);
+                                if (!hasManualVariants) {
+                                  setValue('hasVariants', false, { shouldDirty: true });
                                 }
                               }
-                            });
+                            };
+
+                            if (hasValues) {
+                              setConfirmConfig({
+                                isOpen: true,
+                                title: 'Remove Option?',
+                                description: `Removing the "${variantOptions[index]?.name || 'Option'}" will delete all associated variants. Are you sure?`,
+                                onConfirm: performRemove
+                              });
+                            } else {
+                              performRemove();
+                            }
                           }}
                         >
                           <X className="h-4 w-4" />
