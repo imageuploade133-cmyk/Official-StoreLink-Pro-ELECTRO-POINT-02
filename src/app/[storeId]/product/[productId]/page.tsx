@@ -1238,7 +1238,7 @@ export default function ProductDetailsPage() {
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <Sparkles className="h-3.5 w-3.5 text-primary" />
-                      <span className="text-[10px] font-black uppercase tracking-wider text-primary">Variant Specification: {previewVariant.name}</span>
+                      <span className="text-[10px] font-black uppercase tracking-wider text-primary">Specification: {previewVariant.name}</span>
                     </div>
                     {previewVariant.sku && (
                       <Badge variant="outline" className="text-[9px] font-bold border-primary/20 text-primary bg-white px-2 py-0.5 rounded-lg">SKU: {previewVariant.sku}</Badge>
