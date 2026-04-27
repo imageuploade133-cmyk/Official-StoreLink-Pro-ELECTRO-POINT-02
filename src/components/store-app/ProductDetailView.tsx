@@ -61,6 +61,7 @@ import { ProductCard } from '@/components/store/ProductCard';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
+import { Slider } from '@/components/ui/slider';
 import { ProductReviewForm } from '@/components/store/ProductReviewForm';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import ReactMarkdown from 'react-markdown';
@@ -99,6 +100,8 @@ function IndividualTrackPlayer({ track, branding }: { track: any, branding: any 
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const [dragValue, setDragValue] = useState(0);
     const audioRef = useRef<HTMLAudioElement>(null);
 
     const formatTime = (time: number) => {
@@ -112,6 +115,19 @@ function IndividualTrackPlayer({ track, branding }: { track: any, branding: any 
         if (!audioRef.current) return;
         if (isPlaying) audioRef.current.pause();
         else audioRef.current.play();
+    };
+
+    const handleValueChange = (vals: number[]) => {
+        setIsDragging(true);
+        setDragValue(vals[0]);
+    };
+
+    const handleValueCommit = (vals: number[]) => {
+        if (audioRef.current) {
+            audioRef.current.currentTime = vals[0];
+            setCurrentTime(vals[0]);
+        }
+        setIsDragging(false);
     };
 
     return (
@@ -135,20 +151,19 @@ function IndividualTrackPlayer({ track, branding }: { track: any, branding: any 
                 </div>
             </div>
             <div className="relative z-10 flex flex-col gap-1.5 px-1">
-                <input 
-                    type="range" 
-                    min="0" 
-                    max={duration || 0} 
-                    step="0.1"
-                    value={currentTime} 
-                    onChange={(e) => {
-                        const time = parseFloat(e.target.value);
-                        if (audioRef.current) audioRef.current.currentTime = time;
-                    }}
-                    className="w-full h-1.5 bg-white/20 rounded-full appearance-none cursor-pointer accent-white"
+                <Slider
+                    value={[isDragging ? dragValue : currentTime]}
+                    max={duration || 100}
+                    step={0.1}
+                    onValueChange={handleValueChange}
+                    onValueCommit={handleValueCommit}
+                    className="w-full"
+                    trackClassName="bg-white/20 h-1.5"
+                    rangeClassName="bg-white"
+                    thumbClassName="h-3 w-3 bg-white border-none shadow-lg"
                 />
                 <div className="flex justify-between text-[10px] font-black font-mono tracking-widest opacity-70">
-                    <span>{formatTime(currentTime)}</span>
+                    <span>{formatTime(isDragging ? dragValue : currentTime)}</span>
                     <span>{formatTime(duration)}</span>
                 </div>
             </div>
@@ -157,8 +172,15 @@ function IndividualTrackPlayer({ track, branding }: { track: any, branding: any 
                 src={track.audioDataUri}
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
-                onEnded={() => setIsPlaying(false)}
-                onTimeUpdate={() => setCurrentTime(audioRef.current?.currentTime || 0)}
+                onEnded={() => {
+                    setIsPlaying(false);
+                    setCurrentTime(0);
+                }}
+                onTimeUpdate={() => {
+                    if (!isDragging && audioRef.current) {
+                        setCurrentTime(audioRef.current.currentTime);
+                    }
+                }}
                 onLoadedMetadata={() => setDuration(audioRef.current?.duration || 0)}
                 className="hidden"
             />
