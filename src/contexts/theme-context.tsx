@@ -25,12 +25,18 @@ export function useTheme() {
   const { theme, setTheme, systemTheme, resolvedTheme } = useNextTheme();
   
   const toggleTheme = () => {
-    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+    if (theme === 'system') {
+      setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+    } else if (theme === 'light') {
+      setTheme('dark');
+    } else if (theme === 'dark') {
+      setTheme('system');
+    }
   };
 
   return { 
     theme: theme as 'light' | 'dark' | 'system', 
-    resolvedTheme: (theme === 'system' ? systemTheme : theme) as 'light' | 'dark',
+    resolvedTheme: resolvedTheme as 'light' | 'dark',
     toggleTheme, 
     setTheme 
   };

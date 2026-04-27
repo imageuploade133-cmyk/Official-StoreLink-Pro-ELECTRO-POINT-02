@@ -4,7 +4,7 @@
 import React, { useEffect } from 'react';
 import { useSettings } from '@/contexts/settings-context';
 import { hexToHslString } from '@/lib/color-utils';
-import { useTheme } from 'next-themes';
+import { useTheme } from '@/contexts/theme-context';
 import type { Settings } from '@/lib/types';
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
@@ -13,7 +13,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const lastSettingsTheme = React.useRef<string | undefined>(undefined);
 
   useEffect(() => {
-    if (settings?.theme && settings.theme !== lastSettingsTheme.current) {
+    // Check if user has a personal preference already saved in this browser
+    const storedTheme = localStorage.getItem('theme');
+    
+    // Only apply store-level theme settings if the user hasn't explicitly set a preference
+    // OR if we haven't applied the current settings theme yet in this session.
+    if (settings?.theme && settings.theme !== lastSettingsTheme.current && !storedTheme) {
       setTheme(settings.theme);
       lastSettingsTheme.current = settings.theme;
     }
