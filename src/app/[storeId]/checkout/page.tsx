@@ -800,27 +800,40 @@ export default function CheckoutPage() {
                 <ScrollArea className="max-h-[300px]">
                   <div className="p-6 divide-y">
                     {cartItems.map((item, idx) => (
-                      <div key={`${item.id}-${item.selectedVariantId || 'base'}-${idx}`} className="py-3 flex justify-between gap-4">
-                        <div className="min-w-0">
-                          <p className="font-medium text-sm truncate">{item.name}</p>
-                          {item.selectedOptions && (
-                            <div className="flex flex-wrap gap-1 mt-0.5">
-                              {Object.entries(item.selectedOptions).map(([key, val]) => (
-                                <span 
-                                  key={key} 
-                                  className={cn(
-                                    "text-[9px] uppercase font-bold px-1 border rounded",
-                                    key.toLowerCase().includes('size') ? "bg-white text-black border-black/10 shadow-sm" : "text-muted-foreground"
-                                  )}
-                                >
-                                  {key}: {val}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                          <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
+                      <div key={`${item.id}-${item.selectedVariantId || 'base'}-${idx}`} className="py-4 flex gap-4">
+                        <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border bg-muted/50">
+                          <Image
+                            src={item.imageUrl || settings?.defaultProductImageUrl || `https://placehold.co/100x100?text=${item.name.charAt(0)}`}
+                            alt={item.name}
+                            fill
+                            className="object-cover transition-transform hover:scale-110 duration-500"
+                            unoptimized
+                          />
                         </div>
-                        <p className="font-semibold text-sm shrink-0">{formatCurrency(item.salePrice * item.quantity, currencySymbol)}</p>
+                        <div className="flex flex-1 flex-col justify-between min-w-0">
+                          <div>
+                            <p className="font-bold text-sm text-foreground line-clamp-1">{item.name}</p>
+                            {item.selectedOptions && (
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {Object.entries(item.selectedOptions).map(([key, val]) => (
+                                  <span 
+                                    key={key} 
+                                    className={cn(
+                                      "text-[9px] uppercase font-bold px-1.5 py-0.5 border rounded-md bg-background shadow-sm",
+                                      key.toLowerCase().includes('size') ? "text-primary border-primary/20" : "text-muted-foreground"
+                                    )}
+                                  >
+                                    {key}: {val}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex items-center justify-between mt-1">
+                            <p className="text-xs font-medium text-muted-foreground">Qty: {item.quantity}</p>
+                            <p className="font-black text-sm text-primary">{formatCurrency(item.salePrice * item.quantity, currencySymbol)}</p>
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
