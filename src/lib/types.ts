@@ -463,6 +463,18 @@ export interface Settings {
   ourCollectionAlignment?: 'left' | 'center';
   ourCollectionBackgroundColor?: string;
   ourCollectionShow?: boolean;
+  ourCollectionMediaType?: 'none' | 'image' | 'video' | 'slideshow';
+  ourCollectionImageUrl?: string;
+  ourCollectionVideoUrl?: string;
+  ourCollectionVideoPosterUrl?: string;
+  ourCollectionOverlayTitle?: string;
+  ourCollectionOverlaySubtitle?: string;
+  ourCollectionButtonText?: string;
+  ourCollectionLinkUrl?: string;
+  ourCollectionShowOverlay?: boolean;
+  ourCollectionTextColor?: string;
+  ourCollectionFullWidth?: boolean;
+  ourCollectionSlides?: { imageUrl: string, title?: string, subtitle?: string, linkUrl?: string, buttonText?: string }[];
   // Delivery Settings
   enablePickUp?: boolean;
   enableDelivery?: boolean;
@@ -580,7 +592,7 @@ export interface HomepageSection {
   flashSaleStartDate?: Timestamp | null;
   flashSaleEndDate?: Timestamp | null;
   // Custom UI Extensions
-  uiType?: 'image' | 'html' | 'video';
+  uiType?: 'image' | 'html' | 'video' | 'slideshow';
   htmlContent?: string;
   imageUrl?: string;
   videoUrl?: string;
@@ -597,6 +609,7 @@ export interface HomepageSection {
   showOverlay?: boolean;
   slideIcon?: 'chevron' | 'arrow' | 'circle';
   slideStyle?: 'default' | 'rounded' | 'square' | 'outline' | 'ghost';
+  slides?: { imageUrl: string, title?: string, subtitle?: string, linkUrl?: string, buttonText?: string }[];
 }
 
 
