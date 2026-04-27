@@ -8,6 +8,7 @@ import {
   Trash2, 
   GripVertical, 
   X, 
+  RotateCcw,
   Upload, 
   Loader2, 
   Image as ImageIcon,
@@ -123,7 +124,7 @@ interface ProductVariantsManagerProps {
 }
 
 export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps) {
-  const { control, watch, setValue, getValues, formState: { errors } } = useFormContext();
+  const { control, watch, setValue, getValues, formState: { errors, defaultValues } } = useFormContext();
   const { toast } = useToast();
   const { settings } = useSettings();
   const [isUploading, setIsUploading] = useState<string | null>(null);
@@ -152,6 +153,16 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
     control,
     name: "variantOptions"
   });
+
+  const handleResetOption = (index: number) => {
+    const originalOptions = (defaultValues?.variantOptions as any[]) || [];
+    const originalOption = originalOptions[index];
+    
+    if (originalOption) {
+      setValue(`variantOptions.${index}`, { ...originalOption }, { shouldDirty: true, shouldValidate: true });
+      toast({ title: "Option Reset", description: `"${originalOption.name}" has been restored to its original state.` });
+    }
+  };
 
   const handleToggleHasVariants = (checked: boolean) => {
     if (!checked) {
@@ -671,16 +682,49 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                     const isSize = optionName.toLowerCase().includes('size');
                     const isMaterial = optionName.toLowerCase().includes('material');
 
+                    const originalOptions = (defaultValues?.variantOptions as any[]) || [];
+                    const originalOption = originalOptions[index];
+                    const isModified = originalOption && (
+                      originalOption.name !== currentOption.name ||
+                      JSON.stringify(originalOption.values) !== JSON.stringify(currentOption.values) ||
+                      originalOption.optionType !== currentOption.optionType ||
+                      originalOption.optionName !== currentOption.optionName
+                    );
+
                     return (
                       <div key={field.id} className="relative group p-6 rounded-3xl bg-background border shadow-sm hover:shadow-md transition-all">
-                        <Button 
-                          type="button" 
-                          variant="ghost" 
-                          size="icon" 
-                          className="absolute top-4 right-4 h-8 w-8 rounded-full bg-destructive/10 text-destructive hover:bg-destructive hover:text-white transition-all opacity-0 group-hover:opacity-100"
-                          onClick={() => {
-                            const hasValues = currentOption.values && currentOption.values.length > 0;
-                            const performRemove = () => {
+                        {isModified && (
+                          <div className="absolute -top-2 -left-2 z-10">
+                            <Badge className="bg-primary text-white border-white shadow-sm text-[8px] font-black uppercase py-0 px-2 h-5">Modified</Badge>
+                          </div>
+                        )}
+                        <div className="absolute top-4 right-4 flex gap-2">
+                          {isModified && (
+                            <Button 
+                              type="button" 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                              onClick={() => handleResetOption(index)}
+                              title="Reset to original state"
+                            >
+                              <RotateCcw className="h-4 w-4" />
+                            </Button>
+                          )}
+                          <Button 
+                            type="button" 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 rounded-full bg-destructive/10 text-destructive hover:bg-destructive hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                            onClick={() => {
+                              // If modified, reset first instead of removing
+                              if (isModified && originalOption) {
+                                handleResetOption(index);
+                                return;
+                              }
+
+                              const hasValues = currentOption.values && currentOption.values.length > 0;
+                              const performRemove = () => {
                               removeOption(index);
                               if (optionFields.length === 1) {
                                 const currentVariants = getValues('variants') || [];
@@ -705,6 +749,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                         >
                           <X className="h-4 w-4" />
                         </Button>
+                      </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
                           <div className="md:col-span-4 space-y-3">
@@ -1046,23 +1091,73 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                         )}>
                           {variant.isActive ? 'Active' : 'Hidden'}
                         </Badge>
-                        <Button 
-                          type="button" 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8 rounded-full bg-destructive text-white hover:bg-destructive/90 transition-all shadow-sm"
-                          onClick={() => {
-                            setConfirmConfig({
-                              isOpen: true,
-                              title: 'Delete Variant?',
-                              description: `Are you sure you want to delete "${variant.name}"? This will return ${Number(variant.stock) || 0} units to main stock.`,
-                              onConfirm: () => handleRemoveVariant(index)
-                            });
-                          }}
-                          disabled={isUploading === variant.id || isProcessingAi === variant.id}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div className="flex gap-1">
+                          {(() => {
+                            const originalVariants = (defaultValues?.variants as any[]) || [];
+                            const originalVariant = originalVariants.find((v: any) => v.id === variant.id);
+                            const isVariantModified = originalVariant && (
+                              originalVariant.name !== variant.name ||
+                              Number(originalVariant.stock) !== Number(variant.stock) ||
+                              Number(originalVariant.sellingPrice) !== Number(variant.sellingPrice) ||
+                              originalVariant.sku !== variant.sku ||
+                              originalVariant.isActive !== variant.isActive ||
+                              originalVariant.imageUrl !== variant.imageUrl ||
+                              JSON.stringify(originalVariant.options) !== JSON.stringify(variant.options)
+                            );
+                            
+                            return isVariantModified && (
+                              <Button 
+                                type="button" 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-8 w-8 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all shadow-sm"
+                                onClick={() => {
+                                  setValue(`variants.${index}`, { ...originalVariant }, { shouldDirty: true, shouldValidate: true });
+                                  toast({ title: "Variant Reset", description: `"${variant.name}" has been restored to its saved state.` });
+                                }}
+                                title="Reset variant to saved state"
+                              >
+                                <RotateCcw className="h-4 w-4" />
+                              </Button>
+                            );
+                          })()}
+                          <Button 
+                            type="button" 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 rounded-full bg-destructive text-white hover:bg-destructive/90 transition-all shadow-sm"
+                            onClick={() => {
+                              // If modified, reset first instead of removing
+                              const originalVariants = (defaultValues?.variants as any[]) || [];
+                              const originalVariant = originalVariants.find((v: any) => v.id === variant.id);
+                              const isVariantModified = originalVariant && (
+                                originalVariant.name !== variant.name ||
+                                Number(originalVariant.stock) !== Number(variant.stock) ||
+                                Number(originalVariant.sellingPrice) !== Number(variant.sellingPrice) ||
+                                originalVariant.sku !== variant.sku ||
+                                originalVariant.isActive !== variant.isActive ||
+                                originalVariant.imageUrl !== variant.imageUrl ||
+                                JSON.stringify(originalVariant.options) !== JSON.stringify(variant.options)
+                              );
+                              
+                              if (isVariantModified && originalVariant) {
+                                setValue(`variants.${index}`, { ...originalVariant }, { shouldDirty: true, shouldValidate: true });
+                                toast({ title: "Variant Reset", description: `"${variant.name}" has been restored to its saved state.` });
+                                return;
+                              }
+
+                              setConfirmConfig({
+                                isOpen: true,
+                                title: 'Delete Variant?',
+                                description: `Are you sure you want to delete "${variant.name}"? This will return ${Number(variant.stock) || 0} units to main stock.`,
+                                onConfirm: () => handleRemoveVariant(index)
+                              });
+                            }}
+                            disabled={isUploading === variant.id || isProcessingAi === variant.id}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
 
                       {(isUploading === variant.id || isProcessingAi === variant.id) && (
