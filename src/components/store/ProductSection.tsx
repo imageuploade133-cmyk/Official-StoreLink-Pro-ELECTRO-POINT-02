@@ -335,6 +335,30 @@ export function ProductSection({ section, categories, excludeCategoryIds }: Prod
 
   const alignment = section.alignment || 'center';
   const backgroundColor = section.backgroundColor;
+
+  const bgStyle = useMemo(() => {
+    if (section.backgroundType === 'gradient') {
+      return {
+        background: `linear-gradient(${section.gradientDirection || 'to bottom'}, ${section.gradientStart || '#ffffff'}, ${section.gradientEnd || '#000000'})`
+      };
+    } else if (section.backgroundType === 'image' && section.backgroundImageUrl) {
+      return {
+        backgroundImage: `url(${section.backgroundImageUrl})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      };
+    } else if (!isWhiteOrTransparent(backgroundColor)) {
+      return { backgroundColor };
+    }
+    return {};
+  }, [section.backgroundType, section.gradientDirection, section.gradientStart, section.gradientEnd, section.backgroundImageUrl, backgroundColor]);
+
+  const showDefaultBg = useMemo(() => {
+    if (section.backgroundType === 'gradient' || section.backgroundType === 'image') return false;
+    return isWhiteOrTransparent(backgroundColor);
+  }, [section.backgroundType, backgroundColor]);
+
   const endDate = convertToDateSafely(section.flashSaleEndDate);
   
   const hubColor = settings?.flashHubColor || '#e11d48';
@@ -526,9 +550,9 @@ export function ProductSection({ section, categories, excludeCategoryIds }: Prod
         ref={sectionRef} 
         className={cn(
             "py-12 md:py-24 overflow-hidden relative transition-colors duration-500",
-            isWhiteOrTransparent(backgroundColor) ? "bg-white dark:bg-black" : ""
+            showDefaultBg ? "bg-white dark:bg-black" : ""
         )} 
-        style={!isWhiteOrTransparent(backgroundColor) ? { backgroundColor } : {}}
+        style={bgStyle}
     >
       {/* Optional Section Banner */}
       {hasBanner && (
