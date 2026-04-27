@@ -58,6 +58,12 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import Image from 'next/image';
 
 const ourCollectionSchema = z.object({
@@ -515,231 +521,241 @@ export default function OurCollectionSettingsPage() {
                   />
                 </div>
 
-                <div className="space-y-6 p-6 border rounded-xl bg-slate-50/50 dark:bg-slate-900/30">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Palette className="h-5 w-5 text-primary" />
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500">Section Background</h3>
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name="ourCollectionBackgroundType"
-                    render={({ field }) => (
-                      <FormItem className="space-y-3">
-                        <FormLabel className="text-sm font-semibold">Background Type</FormLabel>
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="grid grid-cols-3 gap-4"
-                          >
-                            <div>
-                              <RadioGroupItem value="solid" id="bg-solid" className="peer sr-only" />
-                              <Label
-                                htmlFor="bg-solid"
-                                className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
-                              >
-                                Solid
-                              </Label>
-                            </div>
-                            <div>
-                              <RadioGroupItem value="gradient" id="bg-gradient" className="peer sr-only" />
-                              <Label
-                                htmlFor="bg-gradient"
-                                className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
-                              >
-                                Gradient
-                              </Label>
-                            </div>
-                            <div>
-                              <RadioGroupItem value="image" id="bg-image" className="peer sr-only" />
-                              <Label
-                                htmlFor="bg-image"
-                                className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
-                              >
-                                Image
-                              </Label>
-                            </div>
-                          </RadioGroup>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="ourCollectionBackgroundApplyTo"
-                    render={() => (
-                      <FormItem className="space-y-4">
-                        <div className="mb-4">
-                          <FormLabel className="text-sm font-semibold">Apply Background To</FormLabel>
-                          <FormDescription>
-                            Select where you want this background to be applied.
-                          </FormDescription>
+                <div className="p-4 bg-slate-50 dark:bg-slate-900/30 border rounded-xl">
+                  <Accordion type="single" collapsible defaultValue="background" className="w-full">
+                    <AccordionItem value="background" className="border-none">
+                      <AccordionTrigger className="py-2 hover:no-underline">
+                        <div className="flex items-center gap-2">
+                          <Palette className="h-5 w-5 text-primary" />
+                          <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500">Section Background</h3>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {[
-                            { id: 'collection', label: 'Collection Section Only' },
-                            { id: 'homepage', label: 'Complete Home Page' },
-                            { id: 'product', label: 'Product Page Only' },
-                            { id: 'global', label: 'Global (All Pages)' },
-                          ].map((item) => (
-                            <FormField
-                              key={item.id}
-                              control={form.control}
-                              name="ourCollectionBackgroundApplyTo"
-                              render={({ field }) => {
-                                return (
-                                  <FormItem
+                      </AccordionTrigger>
+                      <AccordionContent className="space-y-6 pt-4">
+                        <FormField
+                          control={form.control}
+                          name="ourCollectionBackgroundType"
+                          render={({ field }) => (
+                            <FormItem className="space-y-3">
+                              <FormLabel className="text-sm font-semibold">Background Type</FormLabel>
+                              <FormControl>
+                                <RadioGroup
+                                  onValueChange={field.onChange}
+                                  defaultValue={field.value}
+                                  className="grid grid-cols-3 gap-4"
+                                >
+                                  <div>
+                                    <RadioGroupItem value="solid" id="bg-solid" className="peer sr-only" />
+                                    <Label
+                                      htmlFor="bg-solid"
+                                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                                    >
+                                      Solid
+                                    </Label>
+                                  </div>
+                                  <div>
+                                    <RadioGroupItem value="gradient" id="bg-gradient" className="peer sr-only" />
+                                    <Label
+                                      htmlFor="bg-gradient"
+                                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                                    >
+                                      Gradient
+                                    </Label>
+                                  </div>
+                                  <div>
+                                    <RadioGroupItem value="image" id="bg-image" className="peer sr-only" />
+                                    <Label
+                                      htmlFor="bg-image"
+                                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                                    >
+                                      Image
+                                    </Label>
+                                  </div>
+                                </RadioGroup>
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="ourCollectionBackgroundApplyTo"
+                          render={() => (
+                            <FormItem className="space-y-4">
+                              <div className="mb-4">
+                                <FormLabel className="text-sm font-semibold">Apply Background To</FormLabel>
+                                <FormDescription>
+                                  Select where you want this background to be applied.
+                                </FormDescription>
+                              </div>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {[
+                                  { id: 'collection', label: 'Collection Section Only' },
+                                  { id: 'homepage', label: 'Complete Home Page' },
+                                  { id: 'product', label: 'Product Page Only' },
+                                  { id: 'global', label: 'Global (All Pages)' },
+                                ].map((item) => (
+                                  <FormField
                                     key={item.id}
-                                    className="flex flex-row items-start space-x-3 space-y-0 p-4 border rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors"
-                                  >
-                                    <FormControl>
-                                      <Checkbox
-                                        checked={field.value?.includes(item.id)}
-                                        onCheckedChange={(checked) => {
-                                          return checked
-                                            ? field.onChange([...(field.value || []), item.id])
-                                            : field.onChange(
-                                                field.value?.filter(
-                                                  (value) => value !== item.id
-                                                )
-                                              )
-                                        }}
-                                      />
-                                    </FormControl>
-                                    <div className="space-y-1 leading-none">
-                                      <FormLabel className="text-sm font-medium cursor-pointer">
-                                        {item.label}
-                                      </FormLabel>
+                                    control={form.control}
+                                    name="ourCollectionBackgroundApplyTo"
+                                    render={({ field }) => {
+                                      return (
+                                        <FormItem
+                                          key={item.id}
+                                          className="flex flex-row items-start space-x-3 space-y-0 p-4 border rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors bg-white dark:bg-slate-900"
+                                        >
+                                          <FormControl>
+                                            <Checkbox
+                                              checked={field.value?.includes(item.id)}
+                                              onCheckedChange={(checked) => {
+                                                return checked
+                                                  ? field.onChange([...(field.value || []), item.id])
+                                                  : field.onChange(
+                                                      field.value?.filter(
+                                                        (value) => value !== item.id
+                                                      )
+                                                    )
+                                              }}
+                                            />
+                                          </FormControl>
+                                          <div className="space-y-1 leading-none">
+                                            <FormLabel className="text-sm font-medium cursor-pointer">
+                                              {item.label}
+                                            </FormLabel>
+                                          </div>
+                                        </FormItem>
+                                      )
+                                    }}
+                                  />
+                                ))}
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+
+                        {backgroundType === 'solid' && (
+                          <FormField
+                            control={form.control}
+                            name="ourCollectionBackgroundColor"
+                            render={({ field }) => (
+                              <FormItem className="animate-in fade-in slide-in-from-top-2">
+                                <FormLabel className="text-sm font-semibold">Background Color</FormLabel>
+                                <div className="flex gap-4 items-center">
+                                  <FormControl>
+                                    <div className="flex-1 flex gap-2">
+                                      <Input type="color" {...field} className="w-12 h-10 p-1 cursor-pointer" />
+                                      <Input placeholder="#ffffff" {...field} className="flex-1" />
                                     </div>
-                                  </FormItem>
-                                )
+                                  </FormControl>
+                                  <div 
+                                    className="h-10 w-10 rounded-lg border shadow-sm" 
+                                    style={{ backgroundColor: field.value || 'white' }}
+                                  />
+                                </div>
+                                <FormDescription>
+                                  Pick a solid color for the section background.
+                                </FormDescription>
+                              </FormItem>
+                            )}
+                          />
+                        )}
+
+                        {backgroundType === 'gradient' && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-top-2">
+                            <FormField
+                              control={form.control}
+                              name="ourCollectionGradientStart"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-sm font-semibold">Start Color</FormLabel>
+                                  <div className="flex gap-3">
+                                    <FormControl><Input type="color" {...field} className="w-12 p-1" /></FormControl>
+                                    <Input {...field} className="flex-1" />
+                                  </div>
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="ourCollectionGradientEnd"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-sm font-semibold">End Color</FormLabel>
+                                  <div className="flex gap-3">
+                                    <FormControl><Input type="color" {...field} className="w-12 p-1" /></FormControl>
+                                    <Input {...field} className="flex-1" />
+                                  </div>
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="ourCollectionGradientDirection"
+                              render={({ field }) => (
+                                <FormItem className="md:col-span-2">
+                                  <FormLabel className="text-sm font-semibold">Direction</FormLabel>
+                                  <Select onValueChange={field.onChange} value={field.value}>
+                                    <FormControl>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Select direction" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value="to bottom">To Bottom</SelectItem>
+                                      <SelectItem value="to top">To Top</SelectItem>
+                                      <SelectItem value="to right">To Right</SelectItem>
+                                      <SelectItem value="to left">To Left</SelectItem>
+                                      <SelectItem value="to bottom right">To Bottom Right</SelectItem>
+                                      <SelectItem value="45deg">45 Degrees</SelectItem>
+                                      <SelectItem value="135deg">135 Degrees</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </FormItem>
+                              )}
+                            />
+                            <div 
+                              className="md:col-span-2 h-20 rounded-xl border shadow-inner" 
+                              style={{ 
+                                background: `linear-gradient(${gradDir}, ${gradStart}, ${gradEnd})` 
                               }}
                             />
-                          ))}
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-
-                  {backgroundType === 'solid' && (
-                    <FormField
-                      control={form.control}
-                      name="ourCollectionBackgroundColor"
-                      render={({ field }) => (
-                        <FormItem className="animate-in fade-in slide-in-from-top-2">
-                          <FormLabel className="text-sm font-semibold">Background Color</FormLabel>
-                          <div className="flex gap-4 items-center">
-                            <FormControl>
-                              <Input placeholder="#ffffff" {...field} className="max-w-[200px]" />
-                            </FormControl>
-                            <div 
-                              className="h-10 w-10 rounded-lg border shadow-sm" 
-                              style={{ backgroundColor: field.value || 'white' }}
-                            />
                           </div>
-                          <FormDescription>
-                            Pick a solid color for the section background.
-                          </FormDescription>
-                        </FormItem>
-                      )}
-                    />
-                  )}
+                        )}
 
-                  {backgroundType === 'gradient' && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-top-2">
-                      <FormField
-                        control={form.control}
-                        name="ourCollectionGradientStart"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-sm font-semibold">Start Color</FormLabel>
-                            <div className="flex gap-3">
-                              <FormControl><Input type="color" {...field} className="w-12 p-1" /></FormControl>
-                              <Input {...field} className="flex-1" />
-                            </div>
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="ourCollectionGradientEnd"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-sm font-semibold">End Color</FormLabel>
-                            <div className="flex gap-3">
-                              <FormControl><Input type="color" {...field} className="w-12 p-1" /></FormControl>
-                              <Input {...field} className="flex-1" />
-                            </div>
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="ourCollectionGradientDirection"
-                        render={({ field }) => (
-                          <FormItem className="md:col-span-2">
-                            <FormLabel className="text-sm font-semibold">Direction</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select direction" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="to bottom">To Bottom</SelectItem>
-                                <SelectItem value="to top">To Top</SelectItem>
-                                <SelectItem value="to right">To Right</SelectItem>
-                                <SelectItem value="to left">To Left</SelectItem>
-                                <SelectItem value="to bottom right">To Bottom Right</SelectItem>
-                                <SelectItem value="45deg">45 Degrees</SelectItem>
-                                <SelectItem value="135deg">135 Degrees</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </FormItem>
-                        )}
-                      />
-                      <div 
-                        className="md:col-span-2 h-20 rounded-xl border shadow-inner" 
-                        style={{ 
-                          background: `linear-gradient(${gradDir}, ${gradStart}, ${gradEnd})` 
-                        }}
-                      />
-                    </div>
-                  )}
-
-                  {backgroundType === 'image' && (
-                    <FormField
-                      control={form.control}
-                      name="ourCollectionBackgroundImageUrl"
-                      render={({ field }) => (
-                        <FormItem className="animate-in fade-in slide-in-from-top-2">
-                          <FormLabel className="text-sm font-semibold">Background Image</FormLabel>
-                          <div className="flex items-start gap-4">
-                            {backgroundImageUrl ? (
-                              <div className="relative w-32 aspect-video rounded-lg overflow-hidden border shadow-sm shrink-0">
-                                <Image src={backgroundImageUrl} alt="Bg" fill className="object-cover" unoptimized />
-                              </div>
-                            ) : (
-                              <div className="w-32 aspect-video rounded-lg border-2 border-dashed flex items-center justify-center bg-muted/20 shrink-0">
-                                <ImageIcon className="h-6 w-6 opacity-20" />
-                              </div>
+                        {backgroundType === 'image' && (
+                          <FormField
+                            control={form.control}
+                            name="ourCollectionBackgroundImageUrl"
+                            render={({ field }) => (
+                              <FormItem className="animate-in fade-in slide-in-from-top-2">
+                                <FormLabel className="text-sm font-semibold">Background Image</FormLabel>
+                                <div className="flex items-start gap-4">
+                                  {backgroundImageUrl ? (
+                                    <div className="relative w-32 aspect-video rounded-lg overflow-hidden border shadow-sm shrink-0">
+                                      <Image src={backgroundImageUrl} alt="Bg" fill className="object-cover" unoptimized />
+                                    </div>
+                                  ) : (
+                                    <div className="w-32 aspect-video rounded-lg border-2 border-dashed flex items-center justify-center bg-muted/20 shrink-0">
+                                      <ImageIcon className="h-6 w-6 opacity-20" />
+                                    </div>
+                                  )}
+                                  <div className="flex-grow space-y-2">
+                                    <FormControl><Input placeholder="Image URL" {...field} /></FormControl>
+                                    <Button asChild variant="outline" size="sm" disabled={isUploading}>
+                                      <label className="cursor-pointer">
+                                        <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'ourCollectionBackgroundImageUrl')} />
+                                        Upload Image
+                                      </label>
+                                    </Button>
+                                  </div>
+                                </div>
+                              </FormItem>
                             )}
-                            <div className="flex-grow space-y-2">
-                              <FormControl><Input placeholder="Image URL" {...field} /></FormControl>
-                              <Button asChild variant="outline" size="sm" disabled={isUploading}>
-                                <label className="cursor-pointer">
-                                  <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'ourCollectionBackgroundImageUrl')} />
-                                  Upload Image
-                                </label>
-                              </Button>
-                            </div>
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-                  )}
+                          />
+                        )}
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
                 </div>
 
                 <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800 gap-3">
