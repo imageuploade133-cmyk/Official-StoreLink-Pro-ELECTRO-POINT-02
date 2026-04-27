@@ -67,6 +67,9 @@ export function NewsletterSection() {
   // OR if we are in dark mode and the custom color is NOT dark (override light custom bg in dark mode)
   const shouldUseThemeBg = isDefaultBg || isWhiteOrTransparent(backgroundColor) || (isDark && !isCustomBgDark);
 
+  const hasPageBg = settings?.ourCollectionBackgroundApplyTo?.includes('homepage') || 
+                    settings?.ourCollectionBackgroundApplyTo?.includes('global');
+
   const textColorClass = isActuallyDark ? 'text-slate-400' : 'text-slate-600';
   const titleColorClass = isActuallyDark ? 'text-white' : 'text-slate-900';
 
@@ -74,7 +77,7 @@ export function NewsletterSection() {
     <section 
         className={cn(
             "py-24 md:py-32 transition-all duration-700 relative overflow-hidden",
-            shouldUseThemeBg ? "bg-[#f8f9fa] dark:bg-black" : ""
+            shouldUseThemeBg ? (hasPageBg ? "bg-transparent" : "bg-[#f8f9fa] dark:bg-black") : ""
         )} 
         style={!shouldUseThemeBg && backgroundColor ? { backgroundColor: backgroundColor } : {}}
     >

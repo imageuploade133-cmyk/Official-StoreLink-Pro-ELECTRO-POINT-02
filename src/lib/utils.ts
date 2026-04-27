@@ -41,3 +41,23 @@ export function slugify(text: string): string {
     .replace(/-+$/, '');      // Trim - from end of text
 }
 
+export function getCollectionBackgroundStyle(settings: any) {
+  if (!settings) return {};
+  
+  if (settings.ourCollectionBackgroundType === 'gradient') {
+    return {
+      background: `linear-gradient(${settings.ourCollectionGradientDirection || 'to bottom'}, ${settings.ourCollectionGradientStart || '#ffffff'}, ${settings.ourCollectionGradientEnd || '#f1f5f9'})`
+    };
+  } else if (settings.ourCollectionBackgroundType === 'image' && settings.ourCollectionBackgroundImageUrl) {
+    return {
+      backgroundImage: `url(${settings.ourCollectionBackgroundImageUrl})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed'
+    };
+  } else if (settings.ourCollectionBackgroundColor && !isWhiteOrTransparent(settings.ourCollectionBackgroundColor)) {
+    return { backgroundColor: settings.ourCollectionBackgroundColor };
+  }
+  return {};
+}
+

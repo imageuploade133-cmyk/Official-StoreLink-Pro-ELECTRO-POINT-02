@@ -120,11 +120,14 @@ export function CategoryGallery() {
   const sectionBgColor = settings?.categorySectionBackgroundColor || '#FFFFFF';
   const sectionTextColor = settings?.categorySectionTextColor || '#000000';
 
+  const hasPageBg = settings?.ourCollectionBackgroundApplyTo?.includes('homepage') || 
+                    settings?.ourCollectionBackgroundApplyTo?.includes('global');
+
   return (
     <section 
         className={cn(
             "py-16 md:py-24 overflow-hidden group/gallery transition-colors duration-500",
-            isWhiteOrTransparent(sectionBgColor) ? "bg-white dark:bg-black" : ""
+            isWhiteOrTransparent(sectionBgColor) ? (hasPageBg ? "bg-transparent" : "bg-white dark:bg-black") : ""
         )} 
         style={!isWhiteOrTransparent(sectionBgColor) ? { backgroundColor: sectionBgColor } : {}}
     >
