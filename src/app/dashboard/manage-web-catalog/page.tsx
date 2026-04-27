@@ -49,7 +49,10 @@ import {
   Zap,
   Trash2,
   MoreHorizontal,
-  Copy
+  Copy,
+  TrendingUp,
+  Package,
+  AlertCircle
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -81,7 +84,7 @@ export default function ManageWebCatalogPage() {
   const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [stockFilter, setStockFilter] = useState<'all' | 'variant'>('all');
+  const [stockFilter, setStockFilter] = useState<'all' | 'variant' | 'out-of-stock' | 'low-stock'>('all');
   const [isToggling, setIsToggling] = useState<string | null>(null);
   const [today, setToday] = useState<Date | null>(null);
 
@@ -91,6 +94,17 @@ export default function ManageWebCatalogPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isCloning, setIsCloning] = useState(false);
+
+  // Stats State
+  const [stats, setStats] = useState({
+    totalInventoryValue: 0,
+    totalStockUnits: 0,
+    potentialProfit: 0,
+    outOfStockCount: 0,
+    lowStockCount: 0,
+    totalProductsCount: 0,
+    isLoading: true
+  });
 
   useEffect(() => {
     setToday(new Date());
@@ -125,9 +139,64 @@ export default function ManageWebCatalogPage() {
     return new Map(categories.map(c => [c.id, c.name]));
   }, [categories]);
 
+  const fetchStats = useCallback(async () => {
+    if (!firestore || !currentStoreId) return;
+    setStats(prev => ({ ...prev, isLoading: true }));
+    try {
+      const q = query(
+        collection(firestore, 'products'),
+        where('store_id', '==', currentStoreId),
+        where('isVisibleOnWeb', '==', true)
+      );
+      const snapshot = await getDocs(q);
+      const productsData = snapshot.docs.map(d => d.data() as Product);
+      
+      let totalValue = 0;
+      let totalStock = 0;
+      let profit = 0;
+      let outOfStock = 0;
+      let lowStock = 0;
+      const defaultThreshold = settings?.lowStockThreshold || 10;
+
+      productsData.forEach(p => {
+        const stock = p.stock || 0;
+        const purchasePrice = p.purchasePrice || 0;
+        const sellingPrice = p.sellingPrice || 0;
+        const threshold = p.lowStockThreshold ?? defaultThreshold;
+
+        totalStock += stock;
+        totalValue += (purchasePrice * stock);
+        profit += ((sellingPrice - purchasePrice) * stock);
+
+        if (stock === 0) {
+          outOfStock++;
+        } else if (stock <= threshold) {
+          lowStock++;
+        }
+      });
+
+      setStats({
+        totalInventoryValue: totalValue,
+        totalStockUnits: totalStock,
+        potentialProfit: profit,
+        outOfStockCount: outOfStock,
+        lowStockCount: lowStock,
+        totalProductsCount: productsData.length,
+        isLoading: false
+      });
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+      setStats(prev => ({ ...prev, isLoading: false }));
+    }
+  }, [firestore, currentStoreId, settings?.lowStockThreshold]);
+
   const fetchWebProducts = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
     if (!firestore || !currentStoreId) return;
     setIsLoadingProducts(true);
+
+    if (direction === 'initial') {
+      fetchStats();
+    }
 
     try {
       let q = query(
@@ -137,10 +206,15 @@ export default function ManageWebCatalogPage() {
       );
 
       if (stockFilter === 'variant') {
-        q = query(q, where('hasVariants', '==', true));
+        q = query(q, where('hasVariants', '==', true), orderBy('name', 'asc'));
+      } else if (stockFilter === 'out-of-stock') {
+        q = query(q, where('stock', '==', 0), orderBy('name', 'asc'));
+      } else if (stockFilter === 'low-stock') {
+        const threshold = settings?.lowStockThreshold || 10;
+        q = query(q, where('stock', '>', 0), where('stock', '<=', threshold), orderBy('stock', 'asc'), orderBy('name', 'asc'));
+      } else {
+        q = query(q, orderBy('name', 'asc'));
       }
-
-      q = query(q, orderBy('name', 'asc'));
 
       // 1. Initial count (Cost Efficient)
       if (direction === 'initial') {
@@ -228,7 +302,7 @@ export default function ManageWebCatalogPage() {
     }
   };
 
-  const handleStockFilterChange = (filter: 'all' | 'variant') => {
+  const handleStockFilterChange = (filter: 'all' | 'variant' | 'out-of-stock' | 'low-stock') => {
     setStockFilter(filter);
     setCurrentPage(1);
     firstDocRef.current = null;
@@ -413,46 +487,50 @@ export default function ManageWebCatalogPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="bg-primary/5 border-primary/10 shadow-none">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-primary">Registry Capacity</CardTitle>
+          <CardHeader className="pb-2 flex flex-row items-center justify-between">
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-primary">Total Inventory</CardTitle>
+            <Package className="h-4 w-4 text-primary opacity-50" />
           </CardHeader>
           <CardContent>
-            {isLoadingProducts && totalRegistryCount === 0 ? <Skeleton className="h-8 w-16" /> : <div className="text-3xl font-black">{totalRegistryCount.toLocaleString()}</div>}
-            <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Total Products in Web Store</p>
+            {stats.isLoading ? <Skeleton className="h-8 w-24" /> : <div className="text-3xl font-black">{stats.totalStockUnits.toLocaleString()} <span className="text-sm font-medium text-muted-foreground">Units</span></div>}
+            <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">
+                {stats.totalProductsCount} Products | Value: {formatCurrency(stats.totalInventoryValue, currencySymbol)}
+            </p>
           </CardContent>
         </Card>
         <Card className="shadow-none bg-indigo-50/50 dark:bg-indigo-950/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Variant Stock</CardTitle>
+          <CardHeader className="pb-2 flex flex-row items-center justify-between">
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Potential Profit</CardTitle>
+            <TrendingUp className="h-4 w-4 text-indigo-600 opacity-50" />
           </CardHeader>
           <CardContent>
-            {isLoadingProducts && variantRegistryCount === 0 ? <Skeleton className="h-8 w-16" /> : <div className="text-3xl font-black text-indigo-700 dark:text-indigo-300">{variantRegistryCount.toLocaleString()}</div>}
-            <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Web Products with Variants</p>
+            {stats.isLoading ? <Skeleton className="h-8 w-24" /> : <div className="text-3xl font-black text-indigo-700 dark:text-indigo-300">{formatCurrency(stats.potentialProfit, currencySymbol)}</div>}
+            <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Estimated Earnings</p>
           </CardContent>
         </Card>
-        <Card className="shadow-none bg-green-50/50 dark:bg-green-950/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-green-600 dark:text-green-400">Batch View</CardTitle>
+        <Card className="shadow-none bg-rose-50/50 dark:bg-rose-950/20 border-rose-100 dark:border-rose-900/30">
+          <CardHeader className="pb-2 flex flex-row items-center justify-between">
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-rose-600 dark:text-rose-400">Out of Stock</CardTitle>
+            <AlertCircle className="h-4 w-4 text-rose-600 opacity-50" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-black text-green-700 dark:text-green-300">{products.length} Items</div>
-            <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Products in current viewport</p>
+            {stats.isLoading ? <Skeleton className="h-8 w-24" /> : <div className="text-3xl font-black text-rose-700 dark:text-rose-300">{stats.outOfStockCount.toLocaleString()}</div>}
+            <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Items with zero stock</p>
           </CardContent>
         </Card>
-        <Card className="shadow-none bg-blue-50/50 dark:bg-blue-950/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">Catalog Health</CardTitle>
+        <Card className="shadow-none bg-amber-50/50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/30">
+          <CardHeader className="pb-2 flex flex-row items-center justify-between">
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400">Low Stock</CardTitle>
+            <Zap className="h-4 w-4 text-amber-600 opacity-50" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-black text-blue-700 dark:text-blue-300">
-              {products.length > 0 ? Math.round((products.filter(p => p.description && p.imageUrl).length / products.length) * 100) : 0}%
-            </div>
-            <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Media completion in batch</p>
+            {stats.isLoading ? <Skeleton className="h-8 w-24" /> : <div className="text-3xl font-black text-amber-700 dark:text-amber-300">{stats.lowStockCount.toLocaleString()}</div>}
+            <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Below warning threshold</p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="flex items-center gap-2 bg-muted/30 p-1 rounded-xl w-fit border">
+      <div className="flex flex-wrap items-center gap-2 bg-muted/30 p-1 rounded-xl w-fit border">
         <Button 
           variant={stockFilter === 'all' ? 'default' : 'ghost'} 
           size="sm" 
@@ -469,6 +547,24 @@ export default function ManageWebCatalogPage() {
         >
           <LayoutGrid className="mr-2 h-3 w-3" />
           Variant Stock
+        </Button>
+        <Button 
+          variant={stockFilter === 'out-of-stock' ? 'default' : 'ghost'} 
+          size="sm" 
+          onClick={() => handleStockFilterChange('out-of-stock')}
+          className="rounded-lg h-8 px-4 font-bold text-xs uppercase tracking-wider text-rose-600 hover:text-rose-700"
+        >
+          <AlertCircle className="mr-2 h-3 w-3" />
+          Out of Stock
+        </Button>
+        <Button 
+          variant={stockFilter === 'low-stock' ? 'default' : 'ghost'} 
+          size="sm" 
+          onClick={() => handleStockFilterChange('low-stock')}
+          className="rounded-lg h-8 px-4 font-bold text-xs uppercase tracking-wider text-amber-600 hover:text-amber-700"
+        >
+          <Zap className="mr-2 h-3 w-3" />
+          Low Stock
         </Button>
       </div>
 
@@ -504,6 +600,7 @@ export default function ManageWebCatalogPage() {
                   <TableHead>Product Identity</TableHead>
                   <TableHead>Collection</TableHead>
                   <TableHead className="text-right">Public Price</TableHead>
+                  <TableHead>Stock Status</TableHead>
                   <TableHead>Fulfillment</TableHead>
                   <TableHead className="text-right pr-6">Action</TableHead>
                 </TableRow>
@@ -610,6 +707,29 @@ export default function ManageWebCatalogPage() {
                                 <Badge className="bg-amber-500 text-white text-[8px] h-4 py-0 font-black border-none px-1.5 mt-1">OFFER ACTIVE</Badge>
                             )}
                           </div>
+                        </TableCell>
+                        <TableCell>
+                          {(() => {
+                             const stock = product.stock || 0;
+                             const threshold = product.lowStockThreshold ?? (settings?.lowStockThreshold || 10);
+                             const isOutOfStock = stock === 0;
+                             const isLowStock = stock > 0 && stock <= threshold;
+
+                             return (
+                               <div className="flex flex-col gap-1">
+                                 <div className="font-bold text-sm">
+                                   {stock.toLocaleString()} Units
+                                 </div>
+                                 {isOutOfStock ? (
+                                   <Badge variant="destructive" className="text-[8px] h-4 px-1.5 uppercase font-black tracking-tighter w-fit">Out of Stock</Badge>
+                                 ) : isLowStock ? (
+                                   <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900 text-[8px] h-4 px-1.5 uppercase font-black tracking-tighter w-fit">Low Stock</Badge>
+                                 ) : (
+                                   <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-900 text-[8px] h-4 px-1.5 uppercase font-black tracking-tighter w-fit">In Stock</Badge>
+                                 )}
+                               </div>
+                             );
+                          })()}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-3">

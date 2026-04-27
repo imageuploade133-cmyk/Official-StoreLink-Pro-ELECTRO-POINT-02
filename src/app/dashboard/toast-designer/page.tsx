@@ -119,6 +119,26 @@ const getContrastingColor = (hex: string) => {
   return '#000000';
 };
 
+const DEFAULT_TOAST_SETTINGS: FormValues = {
+  toastBackgroundColor: '#ffffff',
+  toastTextColor: '#000000',
+  toastBorderColor: '#e2e8f0',
+  toastBorderRadius: '2xl',
+  toastSuccessColor: '#10b981',
+  toastErrorColor: '#ef4444',
+  toastWarningColor: '#f59e0b',
+  toastInfoColor: '#3b82f6',
+  toastPosition: 'top-center',
+  toastAnimation: 'slide',
+  toastUseGradient: false,
+  toastGradientStartColor: '#ffffff',
+  toastGradientEndColor: '#f8fafc',
+  toastGradientAngle: 135,
+  toastScale: 1,
+  toastCloseIconColor: '#000000',
+  toastCloseIconType: 'x',
+};
+
 export default function ToastDesignerPage() {
   const firestore = useFirestore();
   const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
@@ -312,12 +332,19 @@ export default function ToastDesignerPage() {
         />
         <div className="flex gap-3">
            <Button
+              type="button"
               variant="outline"
-              onClick={() => form.reset()}
+              onClick={() => {
+                form.reset(DEFAULT_TOAST_SETTINGS);
+                toast({
+                  title: "Settings Reset",
+                  description: "Form has been reset to factory defaults. Click 'Save Config' to persist changes."
+                });
+              }}
               disabled={isSaving}
               className="gap-2 rounded-xl"
             >
-              <RotateCcw className="h-4 w-4" /> Reset
+              <RotateCcw className="h-4 w-4" /> Reset to Default
             </Button>
             <Button
               onClick={form.handleSubmit(onSubmit)}
