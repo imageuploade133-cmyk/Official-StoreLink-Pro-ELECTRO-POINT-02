@@ -33,6 +33,11 @@ import {
   XCircle,
   Layout,
   ArrowLeftRight,
+  X,
+  CircleX,
+  XSquare,
+  Minus,
+  Maximize,
 } from 'lucide-react';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -53,6 +58,9 @@ const toastSchema = z.object({
   toastGradientStartColor: z.string().regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/i).default('#ffffff'),
   toastGradientEndColor: z.string().regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/i).default('#f8fafc'),
   toastGradientAngle: z.number().min(0).max(360).default(135),
+  toastScale: z.number().min(0.5).max(1.5).default(1),
+  toastCloseIconColor: z.string().regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/i).default('#000000'),
+  toastCloseIconType: z.enum(['x', 'circle-x', 'x-square', 'minus']).default('x'),
 });
 
 type FormValues = z.infer<typeof toastSchema>;
@@ -149,6 +157,9 @@ export default function ToastDesignerPage() {
       toastGradientStartColor: '#ffffff',
       toastGradientEndColor: '#f8fafc',
       toastGradientAngle: 135,
+      toastScale: 1,
+      toastCloseIconColor: '#000000',
+      toastCloseIconType: 'x',
     }
   });
 
@@ -169,6 +180,9 @@ export default function ToastDesignerPage() {
         toastGradientStartColor: settingsData.toastGradientStartColor || '#ffffff',
         toastGradientEndColor: settingsData.toastGradientEndColor || '#f8fafc',
         toastGradientAngle: settingsData.toastGradientAngle || 135,
+        toastScale: settingsData.toastScale || 1,
+        toastCloseIconColor: settingsData.toastCloseIconColor || '#000000',
+        toastCloseIconType: (settingsData.toastCloseIconType as any) || 'x',
       });
     }
   }, [settingsData, form]);
@@ -235,6 +249,15 @@ export default function ToastDesignerPage() {
       accentColor = watchedValues.toastWarningColor;
     }
 
+    const CloseIcon = () => {
+      switch (watchedValues.toastCloseIconType) {
+        case 'circle-x': return <CircleX className="h-4 w-4" style={{ color: watchedValues.toastCloseIconColor }} />;
+        case 'x-square': return <XSquare className="h-4 w-4" style={{ color: watchedValues.toastCloseIconColor }} />;
+        case 'minus': return <Minus className="h-4 w-4" style={{ color: watchedValues.toastCloseIconColor }} />;
+        default: return <X className="h-4 w-4" style={{ color: watchedValues.toastCloseIconColor }} />;
+      }
+    };
+
     return (
       <div 
         className={cn(
@@ -247,6 +270,7 @@ export default function ToastDesignerPage() {
             : watchedValues.toastBackgroundColor,
           color: watchedValues.toastTextColor,
           borderColor: watchedValues.toastBorderColor,
+          transform: `scale(${watchedValues.toastScale})`,
         }}
       >
         <div 
@@ -258,6 +282,10 @@ export default function ToastDesignerPage() {
         <div className="flex-1">
           <h4 className="font-bold text-sm">{title}</h4>
           <p className="text-xs opacity-70">{description}</p>
+        </div>
+        
+        <div className="flex-shrink-0 self-start mt-0.5">
+          <CloseIcon />
         </div>
         
         {/* Progress bar simulation */}
@@ -720,6 +748,96 @@ export default function ToastDesignerPage() {
                               <SelectItem value="zoom">Zoom In</SelectItem>
                             </SelectContent>
                           </Select>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-none shadow-lg bg-gradient-to-br from-background to-muted/20">
+                <CardHeader>
+                  <CardTitle className="text-xl flex items-center gap-2">
+                    <Maximize className="h-5 w-5 text-primary" /> Sizing & Close Icon
+                  </CardTitle>
+                  <CardDescription>Adjust the scale and close button appearance.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="toastScale"
+                    render={({ field }) => (
+                      <FormItem className="space-y-4">
+                        <div className="flex justify-between">
+                          <FormLabel className="font-bold">Toast Scale ({Math.round(field.value * 100)}%)</FormLabel>
+                          <span className="text-xs font-mono text-muted-foreground">{field.value.toFixed(2)}x</span>
+                        </div>
+                        <FormControl>
+                          <Slider
+                            min={0.5}
+                            max={1.5}
+                            step={0.05}
+                            value={[field.value]}
+                            onValueChange={(vals) => field.onChange(vals[0])}
+                            className="py-4"
+                          />
+                        </FormControl>
+                        <FormDescription className="text-xs">
+                          Increase or decrease the overall size of the notification.
+                        </FormDescription>
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-dashed">
+                    <FormField
+                      control={form.control}
+                      name="toastCloseIconType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-bold">Close Icon Style</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="rounded-xl bg-background/50">
+                                <SelectValue placeholder="Select icon" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="x">Standard X</SelectItem>
+                              <SelectItem value="circle-x">Circle X</SelectItem>
+                              <SelectItem value="x-square">Square X</SelectItem>
+                              <SelectItem value="minus">Minimal Minus</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="toastCloseIconColor"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center justify-between">
+                            <FormLabel className="font-bold">Close Icon Color</FormLabel>
+                            <Button 
+                              type="button" 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-6 text-[10px] uppercase font-bold text-primary hover:bg-primary/10"
+                              onClick={() => {
+                                form.setValue('toastCloseIconColor', watchedValues.toastTextColor);
+                              }}
+                            >
+                              Match Text
+                            </Button>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <FormControl>
+                              <Input type="color" {...field} className="p-1 h-10 w-14 cursor-pointer rounded-lg border-2" />
+                            </FormControl>
+                            <Input value={field.value} onChange={field.onChange} className="font-mono bg-background/50" />
+                          </div>
                         </FormItem>
                       )}
                     />

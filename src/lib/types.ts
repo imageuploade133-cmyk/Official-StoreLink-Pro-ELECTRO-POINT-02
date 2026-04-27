@@ -480,6 +480,9 @@ export interface Settings {
   toastGradientStartColor?: string;
   toastGradientEndColor?: string;
   toastGradientAngle?: number;
+  toastScale?: number;
+  toastCloseIconColor?: string;
+  toastCloseIconType?: 'x' | 'circle-x' | 'x-square' | 'minus';
   showLogisticsOnPublicSite?: boolean;
   logisticsFaq?: { question: string; answer: string }[];
   shippingPolicy?: string;
