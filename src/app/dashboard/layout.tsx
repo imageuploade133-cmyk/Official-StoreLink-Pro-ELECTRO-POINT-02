@@ -606,11 +606,11 @@ export default function DashboardLayout({
         </header>
 
         {/* Main Content (ONLY SCROLL HERE) */}
-        <ScrollArea className="flex-1 h-full dark:bg-black" viewportProps={{ style: { scrollBehavior: 'smooth' } }}>
+        <div className="flex-1 overflow-y-auto overflow-x-hidden h-full custom-scrollbar dark:bg-black" style={{ scrollBehavior: 'smooth' }}>
           <main className="p-4 lg:p-6 pb-20 dark:bg-black">
             {children}
           </main>
-        </ScrollArea>
+        </div>
       </div>
     </div>
   );
