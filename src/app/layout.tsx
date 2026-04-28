@@ -42,7 +42,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${spaceGrotesk.variable} h-full`}
+      className={`${inter.variable} ${spaceGrotesk.variable} min-h-screen`}
       suppressHydrationWarning
       data-scroll-behavior="smooth"
     >
@@ -68,7 +68,7 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className="bg-background text-foreground antialiased font-display h-full"
+        className="bg-background text-foreground antialiased font-display min-h-screen overflow-x-hidden"
         suppressHydrationWarning={true}
       >
         <ClientProviders storeId={storeId}>
