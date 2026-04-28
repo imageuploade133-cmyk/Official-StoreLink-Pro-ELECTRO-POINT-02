@@ -774,6 +774,8 @@ export interface Product {
   variantOptions?: ProductOption[];
   advancedDetailsEnabled?: boolean;
   variantStockTotal?: number;
+  // Installment / Pay Small Small
+  installmentPlan?: InstallmentPlan;
 }
 
 export interface DisplayProduct extends Product {
@@ -1259,4 +1261,73 @@ export interface StockTransfer {
   transferDate: Timestamp | Date;
   staffId: string;
   notes?: string;
+}
+
+// Installment / Pay Small Small types
+export type InstallmentInterval = 'daily' | 'weekly' | 'monthly' | 'custom';
+export type InstallmentStatus = 'active' | 'completed' | 'overdue' | 'cancelled';
+
+export interface InstallmentPlan {
+  enabled: boolean;
+  downPaymentPercent: number; // 0-100
+  numberOfPayments: number;
+  interval: InstallmentInterval;
+  customIntervalDays?: number; // For custom interval
+  startDate?: Date | null;
+  lateFee?: number; // Optional late fee amount
+  terms?: string; // Terms and conditions
+}
+
+export interface InstallmentPaymentSchedule {
+  installmentNumber: number;
+  dueDate: Date;
+  amount: number;
+  status: 'pending' | 'paid' | 'overdue';
+  paidDate?: Date | null;
+  paidAmount?: number;
+  paymentMethod?: string;
+}
+
+export interface InstallmentOrder {
+  id: string;
+  store_id: string;
+  customerId: string;
+  customerName: string;
+  customerEmail?: string;
+  customerPhone: string;
+  productId: string;
+  productName: string;
+  productImageUrl?: string;
+  variantId?: string;
+  selectedOptions?: { [key: string]: string };
+  totalAmount: number; // Original product price
+  firstPayment: number; // Down payment amount
+  remainingBalance: number;
+  installmentsPaid: number;
+  installmentsRemaining: number;
+  nextDueDate: Date;
+  lastPaymentDate?: Date | null;
+  status: InstallmentStatus;
+  paymentSchedule: InstallmentPaymentSchedule[];
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  staffId: string;
+  staffName: string;
+  notes?: string;
+  lateFeesApplied: number;
+  totalLateFees: number;
+}
+
+export interface InstallmentPaymentRecord {
+  id: string;
+  installmentOrderId: string;
+  store_id: string;
+  amount: number;
+  installmentNumber: number;
+  paymentDate: Timestamp;
+  paymentMethod: string;
+  staffId: string;
+  staffName: string;
+  notes?: string;
+  createdAt: Timestamp;
 }

@@ -103,6 +103,7 @@ import { BarcodeScanner } from '@/components/inventory/BarcodeScanner';
 import { useBarcodeScanner } from '@/hooks/use-barcode-scanner';
 import { StoreMerchandisingSettings } from './StoreMerchandisingSettings';
 import { ProductVariantsManager } from './ProductVariantsManager';
+import { InstallmentSettings } from './InstallmentSettings';
 
 const badgeIcons = [
   { name: 'Truck', icon: Truck },
@@ -1137,6 +1138,7 @@ export function ProductForm({
             </CardContent>
           </Card>
           <ProductVariantsManager storeId={currentStoreId} />
+          <InstallmentSettings sellingPrice={form.watch('sellingPrice')} productName={form.watch('name')} />
 
           <Card className="shadow-xl border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">

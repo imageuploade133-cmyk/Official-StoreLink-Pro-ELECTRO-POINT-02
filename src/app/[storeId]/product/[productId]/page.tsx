@@ -88,6 +88,7 @@ import { useAds } from '@/contexts/ad-context';
 import { useStoreUrl } from '@/hooks/use-store-url';
 import { FastCheckoutButtons } from '@/components/store/FastCheckoutButtons';
 import { getStoreUrl as getAbsoluteStoreUrl } from '@/lib/domain';
+import { InstallmentSelector } from '@/components/store/InstallmentSelector';
 
 const iconMap = {
   Truck,
@@ -1450,6 +1451,7 @@ export default function ProductDetailsPage() {
                   />
                 </div>
               )}
+              {product.installmentPlan?.enabled && !isOutOfStock && (\n                <InstallmentSelector product={product} />\n              )}
             </div>
 
             <div className="flex gap-2 md:gap-4">
