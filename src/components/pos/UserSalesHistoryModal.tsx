@@ -281,7 +281,7 @@ export function UserSalesHistoryModal({
               </div>
 
               <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as SalesTypeFilter)} className="w-full">
-                <TabsList className="grid w-full grid-cols-4 h-9 sm:h-10">
+                <TabsList className="w-full h-9 sm:h-10">
                     <TabsTrigger value="all" className="text-[10px] sm:text-xs">All</TabsTrigger>
                     <TabsTrigger value="sales" className="text-[10px] sm:text-xs">Paid</TabsTrigger>
                     <TabsTrigger value="credit" className="text-[10px] sm:text-xs">Credit</TabsTrigger>
