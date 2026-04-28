@@ -1,5 +1,6 @@
 'use client';
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import * as React from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -136,24 +137,24 @@ export function SalesHistoryModal({ isOpen, onOpenChange, currencySymbol }: { is
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0">
-          <DialogHeader className="p-6 pb-4 border-b">
-            <DialogTitle className="text-2xl font-bold flex items-center gap-3">
-              <ListChecks className="h-7 w-7 text-primary"/> Sales History
+        <DialogContent className="max-w-4xl w-[95vw] sm:w-[90vw] md:w-[85vw] h-[95vh] sm:h-[90vh] flex flex-col p-0 overflow-hidden">
+          <DialogHeader className="p-4 sm:p-6 pb-2 sm:pb-4 border-b shrink-0">
+            <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-3">
+              <ListChecks className="h-6 w-6 sm:h-7 sm:w-7 text-primary"/> Sales History
             </DialogTitle>
-            <DialogDescription>Review past transactions. You can view details or reprint receipts.</DialogDescription>
+            <DialogDescription className="text-xs sm:text-sm">Review past transactions. View details or reprint receipts.</DialogDescription>
           </DialogHeader>
 
-          <div className="px-6 py-4 border-b flex flex-col md:flex-row gap-4">
-              <div className="relative flex-grow">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b flex flex-col sm:flex-row gap-3 sm:gap-4 shrink-0 bg-muted/5">
+              <div className="relative flex-grow w-full">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search ID, customer, payment method..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" />
+                <Input placeholder="Search ID, customer..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10 h-9 sm:h-10" />
               </div>
               <Popover>
                   <PopoverTrigger asChild>
-                      <Button variant={"outline"} className={cn("w-full md:w-[280px] justify-start text-left font-normal", !dateRange && "text-muted-foreground")}>
+                      <Button variant={"outline"} size="sm" className={cn("w-full sm:w-[240px] justify-start text-left font-normal h-9 sm:h-10 text-xs sm:text-sm", !dateRange && "text-muted-foreground")}>
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          {dateRange?.from ? (dateRange.to ? (<>{format(dateRange.from, "LLL dd, y")} - {format(dateRange.to, "LLL dd, y")}</>) : format(dateRange.from, "LLL dd, y")) : (<span>Pick a date range</span>)}
+                          {dateRange?.from ? (dateRange.to ? (<>{format(dateRange.from, "LLL dd")} - {format(dateRange.to, "LLL dd")}</>) : format(dateRange.from, "LLL dd")) : (<span>Range</span>)}
                       </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="end">
@@ -163,38 +164,46 @@ export function SalesHistoryModal({ isOpen, onOpenChange, currencySymbol }: { is
           </div>
 
           <ScrollArea className="flex-1">
-            <div className="px-6">
+            <div className="px-2 sm:px-6">
                 {isLoading ? (
-                    <div className="space-y-2 py-4">
+                    <div className="space-y-2 py-4 px-2 sm:px-0">
                         {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
                     </div>
                 ) : error ? (
-                    <div className="text-center py-10 text-destructive"><AlertTriangle className="mx-auto h-8 w-8 mb-2"/>{error}</div>
+                    <div className="text-center py-10 text-destructive px-4"><AlertTriangle className="mx-auto h-8 w-8 mb-2"/>{error}</div>
                 ) : paginatedSales.length === 0 ? (
-                    <div className="text-center py-20 text-muted-foreground"><Info className="mx-auto h-12 w-12 mb-4"/>No sales found for the selected criteria.</div>
+                    <div className="text-center py-20 text-muted-foreground px-4"><Info className="mx-auto h-12 w-12 mb-4"/>No sales found.</div>
                 ) : (
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Date</TableHead>
-                                <TableHead>Customer</TableHead>
-                                <TableHead>Total</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
+                                <TableHead className="text-[10px] sm:text-xs uppercase font-black">Date</TableHead>
+                                <TableHead className="text-[10px] sm:text-xs uppercase font-black">Customer</TableHead>
+                                <TableHead className="text-[10px] sm:text-xs uppercase font-black hidden sm:table-cell">Total</TableHead>
+                                <TableHead className="text-[10px] sm:text-xs uppercase font-black">Status</TableHead>
+                                <TableHead className="text-right text-[10px] sm:text-xs uppercase font-black">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                         {paginatedSales.map((sale) => (
-                            <TableRow key={sale.id}>
-                                <TableCell className="font-medium text-xs">{convertToDateSafely(sale.createdAt) ? format(convertToDateSafely(sale.createdAt)!, 'PP p') : 'N/A'}</TableCell>
-                                <TableCell>{sale.customerName || 'Walk-in Customer'}</TableCell>
-                                <TableCell className="font-semibold">{formatCurrency((sale.grandTotal || 0) - (sale.returnedAmount || 0), currencySymbol)}</TableCell>
+                            <TableRow key={sale.id} className="group">
+                                <TableCell className="font-medium text-[10px] sm:text-xs py-3 sm:py-4">
+                                  <div className="font-bold">{convertToDateSafely(sale.createdAt) ? format(convertToDateSafely(sale.createdAt)!, 'MMM dd, yy') : 'N/A'}</div>
+                                  <div className="text-muted-foreground hidden sm:block">{convertToDateSafely(sale.createdAt) ? format(convertToDateSafely(sale.createdAt)!, 'p') : ''}</div>
+                                </TableCell>
+                                <TableCell className="max-w-[100px] sm:max-w-none">
+                                  <div className="truncate font-bold text-xs sm:text-sm">{sale.customerName || 'Walk-in'}</div>
+                                  <div className="text-[9px] sm:hidden font-black text-primary">{formatCurrency((sale.grandTotal || 0) - (sale.returnedAmount || 0), currencySymbol)}</div>
+                                </TableCell>
+                                <TableCell className="font-black text-sm hidden sm:table-cell">{formatCurrency((sale.grandTotal || 0) - (sale.returnedAmount || 0), currencySymbol)}</TableCell>
                                 <TableCell>
-                                  {sale.isCreditSale && !sale.isPaid ? <Badge variant="outline" className="text-orange-600 border-orange-500">Credit</Badge> : <Badge variant="secondary" className="bg-green-100 text-green-800">Paid</Badge>}
+                                  {sale.isCreditSale && !sale.isPaid ? <Badge variant="outline" className="text-[9px] font-black uppercase text-orange-600 border-orange-500">Credit</Badge> : <Badge variant="secondary" className="text-[9px] font-black uppercase bg-green-100 text-green-800">Paid</Badge>}
                                 </TableCell>
                                 <TableCell className="text-right">
-                                    <Button variant="ghost" size="sm" onClick={() => handleViewDetails(sale)}><Eye className="h-4 w-4 mr-1"/> Details</Button>
-                                    <Button variant="ghost" size="sm" onClick={() => handleReprintReceipt(sale)}><Printer className="h-4 w-4 mr-1"/> Reprint</Button>
+                                    <div className="flex justify-end gap-1">
+                                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleViewDetails(sale)}><Eye className="h-4 w-4"/></Button>
+                                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleReprintReceipt(sale)}><Printer className="h-4 w-4"/></Button>
+                                    </div>
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -204,12 +213,12 @@ export function SalesHistoryModal({ isOpen, onOpenChange, currencySymbol }: { is
             </div>
           </ScrollArea>
 
-          <DialogFooter className="p-6 pt-4 border-t flex-row justify-between items-center">
-            <p className="text-sm text-muted-foreground">Showing {paginatedSales.length} of {filteredSales.length} sales</p>
-            <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => Math.max(1, p-1))} disabled={currentPage === 1 || isLoading}><ChevronLeft className="h-4 w-4 mr-1"/> Prev</Button>
-                <span className="text-sm">{currentPage} / {totalPages}</span>
-                <Button variant="outline" size="sm" onClick={() => setCurrentPage(p => Math.min(totalPages, p+1))} disabled={currentPage === totalPages || isLoading}><ChevronRight className="h-4 w-4 ml-1"/> Next</Button>
+          <DialogFooter className="p-4 sm:p-6 py-3 sm:py-4 border-t flex flex-row justify-between items-center shrink-0 bg-background">
+            <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">{filteredSales.length} Records</p>
+            <div className="flex items-center gap-2 sm:gap-3">
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(p => Math.max(1, p-1))} disabled={currentPage === 1 || isLoading}><ChevronLeft className="h-4 w-4"/></Button>
+                <span className="text-xs font-bold">{currentPage} / {totalPages}</span>
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(p => Math.min(totalPages, p+1))} disabled={currentPage === totalPages || isLoading}><ChevronRight className="h-4 w-4"/></Button>
             </div>
           </DialogFooter>
         </DialogContent>

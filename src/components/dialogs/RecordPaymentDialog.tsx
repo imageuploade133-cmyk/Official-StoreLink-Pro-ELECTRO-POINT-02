@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useMemo, useReducer } from 'react';
+import * as React from 'react';
+import { useEffect, useMemo, useReducer } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -391,17 +392,17 @@ export function RecordPaymentDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !state.isSubmitting && !open && onClose()}>
-      <DialogContent className="sm:max-w-md h-full sm:h-auto max-h-[100dvh] sm:max-h-[95vh] flex flex-col p-0 overflow-hidden" onPointerDownOutside={e => e.preventDefault()}>
-        <DialogHeader className="p-6 pb-4 border-b shrink-0 bg-background">
-          <DialogTitle className="text-2xl font-bold flex items-center gap-3">
-            <DollarSign className="h-6 w-6 text-primary" />
+      <DialogContent className="max-w-md w-[95vw] sm:w-full h-[90vh] sm:h-auto max-h-[90dvh] sm:max-h-[95vh] flex flex-col p-0 overflow-hidden" onPointerDownOutside={e => e.preventDefault()}>
+        <DialogHeader className="p-4 sm:p-6 pb-2 sm:pb-4 border-b shrink-0 bg-background">
+          <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-3">
+            <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
             {state.step === 1 ? 'Record Payment' : 'Verify Details'}
           </DialogTitle>
-          <DialogDescription>Apply a payment towards this specific invoice.</DialogDescription>
+          <DialogDescription className="text-xs sm:text-sm">Apply a payment towards this invoice.</DialogDescription>
         </DialogHeader>
 
         <ScrollArea className="flex-1 min-h-0">
-          <div className="p-6 space-y-6">
+          <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
             {state.step === 1 && <SaleSummaryCard sale={sale} remainingDue={remainingDue} currencySymbol={currencySymbol} />}
             {state.step === 1 
               ? <PaymentInputForm state={state} dispatch={dispatch} remainingDue={remainingDue} currencySymbol={currencySymbol} paymentMethods={paymentMethods} />
@@ -410,26 +411,26 @@ export function RecordPaymentDialog({
           </div>
         </ScrollArea>
 
-        <DialogFooter className="p-6 pt-4 border-t flex flex-row justify-between items-center shrink-0 bg-background shadow-[0_-4px_10px_rgba(0,0,0,0.03)] mt-auto">
+        <DialogFooter className="p-4 sm:p-6 pt-2 sm:pt-4 border-t flex flex-row justify-between items-center shrink-0 bg-background shadow-[0_-4px_10px_rgba(0,0,0,0.03)] mt-auto">
           {state.step === 1 ? (
              <DialogClose asChild>
-                <Button variant="outline" disabled={state.isSubmitting} className="h-11">Cancel</Button>
+                <Button variant="outline" disabled={state.isSubmitting} className="h-10 sm:h-11">Cancel</Button>
             </DialogClose>
           ) : (
-             <Button variant="outline" onClick={() => dispatch({ type: 'SET_STEP', step: 1 })} disabled={state.isSubmitting} className="h-11">
+             <Button variant="outline" onClick={() => dispatch({ type: 'SET_STEP', step: 1 })} disabled={state.isSubmitting} className="h-10 sm:h-11">
                 <ChevronLeft className="mr-2 h-4 w-4" /> Back
              </Button>
           )}
 
           {state.step === 1 ? (
-            <Button onClick={handleNextStep} disabled={isNextDisabled} className="h-11 px-8 font-bold">
-              Review Payment <ChevronRight className="ml-2 h-4 w-4" />
+            <Button onClick={handleNextStep} disabled={isNextDisabled} className="h-10 sm:h-11 px-4 sm:px-8 font-bold text-xs sm:text-sm">
+              Review <ChevronRight className="ml-1 sm:ml-2 h-4 w-4" />
             </Button>
           ) : (
             <Button
               onClick={handleConfirmPayment}
               disabled={state.isSubmitting}
-              className="bg-green-600 hover:bg-green-700 text-white font-bold h-11 px-8 shadow-md"
+              className="bg-green-600 hover:bg-green-700 text-white font-bold h-10 sm:h-11 px-4 sm:px-8 shadow-md text-xs sm:text-sm"
             >
               {state.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
               Post Payment

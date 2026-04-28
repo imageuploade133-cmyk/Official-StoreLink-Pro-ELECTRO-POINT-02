@@ -1,7 +1,8 @@
 
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import * as React from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -334,31 +335,31 @@ export function ReceiptModal({ isOpen, onClose, saleTransaction, staffMap }: Rec
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-xl md:max-w-2xl lg:max-w-4xl p-0 h-[90vh] sm:h-[85vh] flex flex-col">
-        <DialogHeader className="p-6 pb-4 border-b no-print">
-          <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+      <DialogContent className="max-w-xl md:max-w-2xl lg:max-w-4xl w-[95vw] sm:w-[90vw] md:w-[85vw] p-0 h-[90vh] sm:h-[85vh] flex flex-col">
+        <DialogHeader className="p-4 sm:p-6 pb-2 sm:pb-4 border-b no-print">
+          <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2">
              Receipt & Invoice
           </DialogTitle>
-          <DialogDescription>
-            Transaction ID: <span className="font-mono">{id?.substring(0, 12)}</span>
+          <DialogDescription className="text-xs sm:text-sm">
+            Transaction ID: <span className="font-mono break-all">{id}</span>
           </DialogDescription>
         </DialogHeader>
 
         <Tabs value={activeFormat} onValueChange={(value) => setActiveFormat(value as 'small' | 'a4')} className="flex-grow flex flex-col min-h-0">
-          <div className="px-6 py-3 border-b no-print">
+          <div className="px-4 sm:px-6 py-2 sm:py-3 border-b no-print">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="small" className="flex items-center gap-2">
-                <Receipt className="h-4 w-4" /> Terminal Receipt
+              <TabsTrigger value="small" className="flex items-center gap-2 text-xs sm:text-sm">
+                <Receipt className="h-3 w-3 sm:h-4 sm:w-4" /> Terminal Receipt
               </TabsTrigger>
-              <TabsTrigger value="a4" className="flex items-center gap-2">
-                <FileText className="h-4 w-4" /> A4 Invoice
+              <TabsTrigger value="a4" className="flex items-center gap-2 text-xs sm:text-sm">
+                <FileText className="h-3 w-3 sm:h-4 sm:w-4" /> A4 Invoice
               </TabsTrigger>
             </TabsList>
           </div>
 
-          <ScrollArea className="flex-1 p-4 md:p-8 bg-muted/30">
+          <ScrollArea className="flex-1 p-2 sm:p-4 md:p-8 bg-muted/30">
             <TabsContent value="small" className="m-0 p-0">
-              <div id="printable-small-receipt" className="terminal-receipt bg-white shadow-xl mx-auto rounded-sm">
+              <div id="printable-small-receipt" className="terminal-receipt bg-white shadow-xl mx-auto rounded-sm scale-90 sm:scale-100 origin-top">
                 <header className="terminal-header">
                   {storeLogoUrl && (
                     <img 
@@ -683,19 +684,19 @@ export function ReceiptModal({ isOpen, onClose, saleTransaction, staffMap }: Rec
             </TabsContent>
           </ScrollArea>
 
-          <DialogFooter className="flex flex-col sm:flex-row sm:justify-end gap-3 p-6 border-t no-print bg-white">
+          <DialogFooter className="flex flex-col sm:flex-row sm:justify-end gap-2 sm:gap-3 p-4 sm:p-6 border-t no-print bg-white">
             <DialogClose asChild>
-              <Button variant="outline" onClick={onClose}>
+              <Button variant="outline" className="w-full sm:w-auto" onClick={onClose}>
                 <X className="mr-2 h-4 w-4" /> Close
               </Button>
             </DialogClose>
 
-            <Button onClick={() => handlePrint(activeFormat)} className="brand-bg hover:brightness-110" disabled={isPrinting}>
+            <Button onClick={() => handlePrint(activeFormat)} className="brand-bg hover:brightness-110 w-full sm:w-auto" disabled={isPrinting}>
               <Printer className="mr-2 h-4 w-4" /> Print {activeFormat === 'small' ? 'Receipt' : 'Invoice'}
             </Button>
 
             {activeFormat === 'a4' && (
-              <Button onClick={handleDownloadPdf} variant="secondary" disabled={isPrinting}>
+              <Button onClick={handleDownloadPdf} variant="secondary" className="w-full sm:w-auto" disabled={isPrinting}>
                 <Download className="mr-2 h-4 w-4" /> Export PDF
               </Button>
             )}
