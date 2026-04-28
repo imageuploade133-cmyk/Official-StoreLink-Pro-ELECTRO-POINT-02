@@ -295,14 +295,21 @@ export function SaleReturnDialog({ isOpen, onOpenChange, saleTransaction, curren
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl w-[95vw] sm:w-full max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0">
-        <DialogHeader className="p-6 pb-2">
-          <DialogTitle className="flex items-center gap-2 text-xl">
-            <Undo2 className="h-6 w-6 text-primary"/>
-            Return Items <span className="text-muted-foreground font-normal">#{saleTransaction.id.substring(0, 8).toUpperCase()}</span>
-          </DialogTitle>
-          <DialogDescription>
-            Select the quantity of each item to return.
+      <DialogContent className="max-w-2xl h-[100dvh] sm:h-auto sm:max-h-[90vh] overflow-hidden flex flex-col p-0 border-none sm:border">
+        <DialogHeader className="p-4 sm:p-6 pb-2 shrink-0 bg-background">
+          <div className="flex items-center justify-between">
+            <DialogTitle className="flex items-center gap-2 text-xl sm:text-2xl font-bold">
+                <Undo2 className="h-6 w-6 text-primary shrink-0"/>
+                Return Items
+            </DialogTitle>
+            <DialogClose asChild className="sm:hidden">
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                    <X className="h-4 w-4" />
+                </Button>
+            </DialogClose>
+          </div>
+          <DialogDescription className="text-xs sm:text-sm">
+            Sale ID: <span className="font-mono text-primary">#{saleTransaction.id.substring(0, 8).toUpperCase()}</span>
           </DialogDescription>
         </DialogHeader>
 

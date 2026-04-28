@@ -183,63 +183,74 @@ export function ConfirmPaymentDialog({
   if (saleData.isCreditSale) {
       return (
         <Dialog open={isOpen} onOpenChange={(open) => { if (!open && !isProcessing) onClose('cancel'); }}>
-            <DialogContent className="sm:max-w-lg p-6 bg-white rounded-lg shadow-xl" onPointerDownOutside={(e) => e.preventDefault()}>
-                <DialogHeader className="mb-6">
-                    <DialogTitle className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                        <AlertTriangle className="text-orange-500 h-6 w-6"/> Confirm Credit Sale
-                    </DialogTitle>
-                    <DialogDescription className="text-lg text-gray-600 mt-2">Review the details for <span className="font-extrabold text-primary">{saleData.customer?.name || 'this credit sale'}</span> before finalizing.</DialogDescription>
+            <DialogContent className="max-w-lg h-[100dvh] sm:h-auto max-h-[100dvh] sm:max-h-[90vh] flex flex-col p-0 overflow-hidden border-none sm:border" onPointerDownOutside={(e) => e.preventDefault()}>
+                <DialogHeader className="p-4 sm:p-6 pb-4 border-b shrink-0 bg-background">
+                    <div className="flex items-center justify-between">
+                        <DialogTitle className="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2">
+                            <AlertTriangle className="text-orange-500 h-6 w-6"/> Confirm Credit Sale
+                        </DialogTitle>
+                        <DialogClose asChild className="sm:hidden">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                                <X className="h-4 w-4" />
+                            </Button>
+                        </DialogClose>
+                    </div>
+                    <DialogDescription className="text-xs sm:text-sm text-gray-600 mt-2 text-left">
+                        Review details for <span className="font-extrabold text-primary">{saleData.customer?.name || 'this sale'}</span> before finalizing.
+                    </DialogDescription>
                 </DialogHeader>
-                <div className="space-y-6 py-4 text-base">
-                    <Card className="border-2 border-green-200 bg-green-50 shadow-sm">
-                        <CardContent className="pt-6 space-y-4">
-                            {saleData.discountAmount && saleData.discountAmount > 0 ? (
-                                <>
-                                <div className="flex justify-between items-center text-gray-700">
-                                    <span className="text-lg font-medium">Subtotal:</span>
-                                    <span className="font-bold text-lg">{formatCurrencyDisplay(saleData.subtotal)}</span>
+                <ScrollArea className="flex-1">
+                    <div className="p-4 sm:p-6 space-y-6">
+                        <Card className="border-2 border-green-200 bg-green-50 shadow-none sm:shadow-sm">
+                            <CardContent className="pt-6 space-y-4">
+                                {saleData.discountAmount && saleData.discountAmount > 0 ? (
+                                    <>
+                                    <div className="flex justify-between items-center text-gray-700">
+                                        <span className="text-sm sm:text-lg font-medium">Subtotal:</span>
+                                        <span className="font-bold text-sm sm:text-lg">{formatCurrencyDisplay(saleData.subtotal)}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-red-600">
+                                        <span className="text-sm sm:text-lg font-medium">Discount:</span>
+                                        <span className="font-bold text-sm sm:text-lg">-{formatCurrencyDisplay(saleData.discountAmount)}</span>
+                                    </div>
+                                    </>
+                                ) : null}
+                                {saleData.taxAmount && saleData.taxAmount > 0 ? (
+                                    <div className="flex justify-between items-center text-blue-600">
+                                        <span className="text-sm sm:text-lg font-medium">{settings?.taxName || 'Tax'} ({saleData.taxRate}%):</span>
+                                        <span className="font-bold text-sm sm:text-lg">+{formatCurrencyDisplay(saleData.taxAmount)}</span>
+                                    </div>
+                                ) : null}
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm sm:text-lg font-medium text-gray-700 flex items-center gap-2"><DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-green-600"/> Total:</span> 
+                                    <span className="font-black text-xl sm:text-2xl text-green-700">{formatCurrencyDisplay(grandTotal)}</span>
                                 </div>
-                                <div className="flex justify-between items-center text-red-600">
-                                    <span className="text-lg font-medium">Discount:</span>
-                                    <span className="font-bold text-lg">-{formatCurrencyDisplay(saleData.discountAmount)}</span>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm sm:text-lg font-medium text-gray-700 flex items-center gap-2"><Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600"/> Paid Now:</span> 
+                                    <span className="font-bold text-lg sm:text-xl text-blue-700">{formatCurrencyDisplay(saleData.initialPaymentAtSale ?? 0)}</span>
                                 </div>
-                                </>
-                            ) : null}
-                            {saleData.taxAmount && saleData.taxAmount > 0 ? (
-                                <div className="flex justify-between items-center text-blue-600">
-                                    <span className="text-lg font-medium">{settings?.taxName || 'Tax'} ({saleData.taxRate}%):</span>
-                                    <span className="font-bold text-lg">+{formatCurrencyDisplay(saleData.taxAmount)}</span>
+                                <Separator className="my-4 bg-gray-200" />
+                                <div className="flex justify-between items-center">
+                                    <span className="font-bold text-lg sm:text-xl text-red-700 flex items-center gap-2"><CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-red-600"/> On Credit:</span>
+                                    <span className="font-black text-xl sm:text-2xl text-red-700">{formatCurrencyDisplay(grandTotal - (saleData.initialPaymentAtSale ?? 0))}</span>
                                 </div>
-                            ) : null}
-                            <div className="flex justify-between items-center">
-                                <span className="text-lg font-medium text-gray-700 flex items-center gap-2"><DollarSign className="h-5 w-5 text-green-600"/> Sale Total:</span> 
-                                <span className="font-extrabold text-2xl text-green-700">{formatCurrencyDisplay(grandTotal)}</span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-lg font-medium text-gray-700 flex items-center gap-2"><Wallet className="h-5 w-5 text-blue-600"/> Initial Payment:</span> 
-                                <span className="font-bold text-xl text-blue-700">{formatCurrencyDisplay(saleData.initialPaymentAtSale ?? 0)}</span>
-                            </div>
-                            <Separator className="my-4 bg-gray-200" />
-                            <div className="flex justify-between items-center">
-                                <span className="font-bold text-xl text-red-700 flex items-center gap-2"><CreditCard className="h-5 w-5 text-red-600"/> Amount on Credit:</span>
-                                <span className="font-extrabold text-2xl text-red-700">{formatCurrencyDisplay(grandTotal - (saleData.initialPaymentAtSale ?? 0))}</span>
-                            </div>
-                        </CardContent>
-                    </Card>
-                     <Card className="border-2 border-gray-200 bg-gray-50 shadow-sm">
-                        <CardContent className="pt-6 space-y-4">
-                            <div className="flex justify-between items-center">
-                                <span className="text-lg font-medium text-gray-700 flex items-center gap-2"><CalendarDays className="h-5 w-5 text-purple-600"/> Payment Due Date:</span> 
-                                <span className="font-bold text-lg">{saleData.dueDate ? format(saleData.dueDate, 'PPP') : 'N/A'}</span>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-                <DialogFooter className="mt-6">
-                    <Button variant="outline" onClick={() => onClose('back')} disabled={isProcessing} className="px-6 py-3 text-base">Back</Button>
-                    <Button onClick={handleConfirm} disabled={isProcessing} className="px-6 py-3 text-base bg-orange-600 hover:bg-orange-700">
+                            </CardContent>
+                        </Card>
+                        <Card className="border-2 border-gray-200 bg-gray-50 shadow-none sm:shadow-sm">
+                            <CardContent className="pt-6 space-y-4">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm sm:text-lg font-medium text-gray-700 flex items-center gap-2"><CalendarDays className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600"/> Due Date:</span> 
+                                    <span className="font-bold text-sm sm:text-lg">{saleData.dueDate ? format(saleData.dueDate, 'PPP') : 'N/A'}</span>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </ScrollArea>
+                <DialogFooter className="p-4 sm:p-6 border-t bg-background shrink-0 flex flex-row justify-end gap-2">
+                    <Button variant="outline" size="sm" onClick={() => onClose('back')} disabled={isProcessing} className="h-10 px-6">Back</Button>
+                    <Button onClick={handleConfirm} size="sm" disabled={isProcessing} className="h-10 px-6 bg-orange-600 hover:bg-orange-700">
                         {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
-                        Confirm Sale
+                        Confirm
                     </Button>
                 </DialogFooter>
             </DialogContent>
@@ -249,62 +260,67 @@ export function ConfirmPaymentDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open && !isProcessing) onClose('cancel'); }}>
-      <DialogContent className="sm:max-w-lg p-0 h-auto max-h-[90vh] flex flex-col" onPointerDownOutside={(e) => e.preventDefault()}>
-        <DialogHeader className="p-6 pb-4 border-b">
-          <DialogTitle className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <DollarSign className="h-6 w-6 text-green-600" /> Finalize Payment
-          </DialogTitle>
-          <DialogDescription className="text-lg text-gray-600 mt-2">
+      <DialogContent className="max-w-lg h-[100dvh] sm:h-auto max-h-[100dvh] sm:max-h-[95vh] flex flex-col p-0 overflow-hidden border-none sm:border" onPointerDownOutside={(e) => e.preventDefault()}>
+        <DialogHeader className="p-4 sm:p-6 pb-4 border-b shrink-0 bg-background">
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2">
+                <DollarSign className="h-6 w-6 text-green-600" /> Finalize Payment
+            </DialogTitle>
+            <DialogClose asChild className="sm:hidden">
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                    <X className="h-4 w-4" />
+                </Button>
+            </DialogClose>
+          </div>
+          <DialogDescription className="text-xs sm:text-sm text-gray-600 mt-2 text-left">
             {saleData.discountAmount && saleData.discountAmount > 0 && (
-                <span className="text-sm block">
+                <span className="block mb-1">
                     Subtotal: {formatCurrencyDisplay(saleData.subtotal)}
                     <span className="text-red-500 ml-2">(-{formatCurrencyDisplay(saleData.discountAmount)})</span>
                 </span>
             )}
-            {saleData.taxAmount && saleData.taxAmount > 0 && (
-                <span className="text-sm block">
-                    {settings?.taxName || 'Tax'} Collected: <span className="text-blue-600">+{formatCurrencyDisplay(saleData.taxAmount)} ({saleData.taxRate}%)</span>
-                </span>
-            )}
-            Total Due: <span className="font-extrabold text-green-600">{formatCurrencyDisplay(grandTotal)}</span>
+            Total Due: <span className="font-black text-green-600 text-lg sm:text-xl">{formatCurrencyDisplay(grandTotal)}</span>
           </DialogDescription>
         </DialogHeader>
         <ScrollArea className="flex-1">
-        <div className="px-6 py-4 space-y-4">
-          <div className="flex items-center space-x-2 rounded-lg border p-3">
+        <div className="p-4 sm:p-6 space-y-6">
+          <div className="flex items-center justify-between rounded-xl border p-4 bg-muted/30">
+              <div className="space-y-0.5">
+                <Label htmlFor="split-payment-toggle" className="text-base font-bold">Split Payment</Label>
+                <p className="text-xs text-muted-foreground">Pay using multiple methods</p>
+              </div>
               <Switch id="split-payment-toggle" checked={useSplitPayment} onCheckedChange={setUseSplitPayment} />
-              <Label htmlFor="split-payment-toggle" className="font-medium">Split Payment</Label>
           </div>
           
           {useSplitPayment ? (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {allowedPaymentMethods.map(method => (
-                <div key={method.id} className="flex items-center gap-3">
-                  <Label htmlFor={`split-${method.name}`} className="w-24 flex items-center text-sm">{getPaymentMethodIcon(method.name)} {method.name}</Label>
+                <div key={method.id} className="flex items-center gap-3 bg-muted/20 p-3 rounded-lg border border-transparent hover:border-primary/20 transition-colors">
+                  <Label htmlFor={`split-${method.name}`} className="flex-1 flex items-center text-sm font-medium">{getPaymentMethodIcon(method.name)} {method.name}</Label>
                   <Input 
                     id={`split-${method.name}`} 
                     type="number" 
                     placeholder="0.00"
                     value={splitPayments[method.name] || ''}
                     onChange={(e) => handleSplitPaymentChange(method.name, e.target.value)}
-                    className="h-9"
+                    className="h-10 w-32 sm:w-40 font-bold"
                   />
                 </div>
               ))}
               <Separator />
-               <div className="text-right space-y-1">
-                  <p className="text-sm">Total Tendered: <span className="font-semibold">{formatCurrencyDisplay(totalSplitAmount)}</span></p>
-                  <p className={`text-sm font-semibold ${remainingToPay > 0 ? 'text-destructive' : 'text-green-600'}`}>
+               <div className="text-right space-y-2 bg-muted/30 p-4 rounded-xl">
+                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Total Tendered: <span className="text-foreground ml-2 font-black">{formatCurrencyDisplay(totalSplitAmount)}</span></p>
+                  <p className={`text-base font-black ${remainingToPay > 0 ? 'text-destructive' : 'text-green-600'}`}>
                     {remainingToPay > 0 ? `Remaining: ${formatCurrencyDisplay(remainingToPay)}` : `Change: ${formatCurrencyDisplay(-remainingToPay)}`}
                   </p>
                </div>
             </div>
           ) : (
-            <div className="space-y-4">
-               <div className="space-y-1.5">
-                  <Label htmlFor="single-payment-method" className="text-base font-medium">Payment Method</Label>
+            <div className="space-y-6">
+               <div className="space-y-2">
+                  <Label htmlFor="single-payment-method" className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Payment Method</Label>
                    <Select value={singlePayment.method} onValueChange={(v) => setSinglePayment(p => ({...p, method: v}))}>
-                      <SelectTrigger id="single-payment-method" className="h-10">
+                      <SelectTrigger id="single-payment-method" className="h-12 text-lg font-medium">
                           <SelectValue placeholder="Select method"/>
                       </SelectTrigger>
                       <SelectContent>
@@ -312,32 +328,35 @@ export function ConfirmPaymentDialog({
                       </SelectContent>
                   </Select>
                </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="single-payment-amount" className="text-base font-medium">Amount Received</Label>
-                <Input
-                  id="single-payment-amount"
-                  type="number"
-                  value={singlePayment.amount || ''}
-                  onChange={(e) => setSinglePayment(p => ({...p, amount: e.target.value}))}
-                  className="h-10 text-lg"
-                />
+              <div className="space-y-2">
+                <Label htmlFor="single-payment-amount" className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Amount Received</Label>
+                <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-black text-muted-foreground">{currencySymbol}</span>
+                    <Input
+                        id="single-payment-amount"
+                        type="number"
+                        value={singlePayment.amount || ''}
+                        onChange={(e) => setSinglePayment(p => ({...p, amount: e.target.value}))}
+                        className="h-14 pl-10 text-2xl font-black"
+                    />
+                </div>
               </div>
               {changeDue > 0 && (
-                <div className="text-right">
-                    <p className="text-sm font-semibold text-blue-600">Change Due: {formatCurrencyDisplay(changeDue)}</p>
+                <div className="text-right bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-900/30">
+                    <p className="text-sm font-bold text-blue-600 dark:text-blue-400">Change Due: <span className="text-2xl ml-2">{formatCurrencyDisplay(changeDue)}</span></p>
                 </div>
               )}
             </div>
           )}
         </div>
         </ScrollArea>
-        <DialogFooter className="p-6 border-t mt-auto">
-          <Button variant="outline" onClick={() => onClose('cancel')} disabled={isProcessing} className="px-6 py-3 text-base">
+        <DialogFooter className="p-4 sm:p-6 border-t mt-auto bg-background shrink-0 flex flex-row justify-end gap-2">
+          <Button variant="outline" size="sm" onClick={() => onClose('cancel')} disabled={isProcessing} className="h-10 px-6 font-bold">
             Cancel
           </Button>
-          <Button onClick={handleConfirm} disabled={isProcessing} className="px-6 py-3 text-base bg-green-600 hover:bg-green-700">
+          <Button onClick={handleConfirm} size="sm" disabled={isProcessing} className="h-10 px-8 font-black bg-green-600 hover:bg-green-700 text-white shadow-lg">
             {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Complete Sale
+            Confirm
           </Button>
         </DialogFooter>
       </DialogContent>

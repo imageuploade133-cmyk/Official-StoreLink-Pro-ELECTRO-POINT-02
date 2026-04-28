@@ -32,7 +32,6 @@ import {
   AlertTriangle, 
   DollarSign, 
   RotateCcw,
-  Clock,
   History,
   CheckCircle2,
   Undo2,
@@ -51,7 +50,6 @@ import { ReceiptModal } from '@/components/dialogs/receipt-modal';
 import { cn, convertToDateSafely } from '@/lib/utils';
 import { formatCurrency } from '@/lib/formatUtils';
 import type { DateRange } from 'react-day-picker';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const ITEMS_PER_PAGE = 15;
 type SalesTypeFilter = 'all' | 'sales' | 'credit' | 'refunds';
@@ -225,83 +223,57 @@ export function UserSalesHistoryModal({
     return { text: "Credit", color: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400" };
   };
 
+  const handleRecordPayment = (sale: SaleTransaction) => {
+    // This is just a placeholder to keep SaleDetailsModal happy
+  };
+
   return (
     <>
       <Dialog open={isOpen} onOpenChange={handleModalClose}>
         <DialogContent 
-          className="max-w-5xl h-[95vh] sm:h-[90vh] flex flex-col p-0 overflow-hidden"
+          className="max-w-5xl h-[100dvh] sm:h-[90vh] flex flex-col p-0 overflow-hidden border-none sm:border"
           onPointerDownOutside={(e) => e.preventDefault()}
         >
-          <DialogHeader className="p-6 pb-4 border-b shrink-0 bg-background">
+          <DialogHeader className="p-4 sm:p-6 pb-4 border-b shrink-0 bg-background">
             <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                    <DialogTitle className="text-2xl font-bold flex items-center gap-3">
-                        <History className="h-7 w-7 text-primary"/> Your POS History
+                <div className="space-y-1 text-left">
+                    <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 sm:gap-3">
+                        <History className="h-6 w-6 sm:h-7 sm:w-7 text-primary shrink-0"/> POS History
                     </DialogTitle>
-                    <DialogDescription>Track performance and manage transactions from this terminal.</DialogDescription>
+                    <DialogDescription className="text-xs sm:text-sm">Manage transactions from this terminal.</DialogDescription>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline" size="icon" onClick={fetchData} disabled={isLoading}>
+                    <Button variant="outline" size="icon" className="h-8 w-8 sm:h-10 sm:w-10" onClick={fetchData} disabled={isLoading}>
                         <RotateCcw className={cn("h-4 w-4", isLoading && "animate-spin")} />
                     </Button>
-                    <DialogClose asChild>
-                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full"><X className="h-5 w-5"/></Button>
+                    <DialogClose asChild className="sm:hidden">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full"><X className="h-4 w-4"/></Button>
                     </DialogClose>
                 </div>
             </div>
           </DialogHeader>
 
           {/* Filters & Inputs */}
-          <div className="px-6 py-4 border-b space-y-4 shrink-0 bg-muted/5">
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
-                  <div className="md:col-span-2 relative">
+          <div className="px-4 sm:px-6 py-4 border-b space-y-4 shrink-0 bg-muted/5">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center">
+                  <div className="relative flex-grow w-full">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input 
-                      placeholder="Search ID, customer or method..." 
+                      placeholder="Search ID, customer..." 
                       value={searchTerm} 
                       onChange={(e) => setSearchTerm(e.target.value)} 
-                      className="pl-10 h-10 border-muted-foreground/20" 
+                      className="pl-9 h-9 sm:h-10 text-sm" 
                     />
                   </div>
-                  <div className="md:col-span-3 flex items-center gap-2">
+                  <div className="w-full sm:w-auto">
                     <Popover>
                         <PopoverTrigger asChild>
-                            <Button variant={"outline"} className={cn("flex-grow justify-start text-left font-normal h-10", !dateRange && "text-muted-foreground")}>
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {dateRange?.from ? (dateRange.to ? (<>{format(dateRange.from, "LLL dd")} - {format(dateRange.to, "LLL dd, y")}</>) : format(dateRange.from, "LLL dd, y")) : (<span>Pick a date range</span>)}
+                            <Button variant={"outline"} className={cn("w-full sm:w-[240px] justify-start text-left font-normal h-9 sm:h-10 text-sm", !dateRange && "text-muted-foreground")}>
+                                <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
+                                <span className="truncate">{dateRange?.from ? (dateRange.to ? (<>{format(dateRange.from, "LLL dd")} - {format(dateRange.to, "LLL dd, y")}</>) : format(dateRange.from, "LLL dd, y")) : (<span>Pick a date range</span>)}</span>
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="end">
-                            <div className="p-3 border-b bg-muted/20">
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div className="space-y-1">
-                                        <Label htmlFor="pos-date-from" className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">From Date</Label>
-                                        <Input
-                                            id="pos-date-from"
-                                            type="date"
-                                            className="h-8 text-xs"
-                                            value={dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : ''}
-                                            onChange={(e) => {
-                                                const d = e.target.value ? new Date(e.target.value + 'T00:00:00') : undefined;
-                                                setDateRange(prev => ({ ...prev, from: d }));
-                                            }}
-                                        />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <Label htmlFor="pos-date-to" className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">To Date</Label>
-                                        <Input
-                                            id="pos-date-to"
-                                            type="date"
-                                            className="h-8 text-xs"
-                                            value={dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : ''}
-                                            onChange={(e) => {
-                                                const d = e.target.value ? new Date(e.target.value + 'T00:00:00') : undefined;
-                                                setDateRange(prev => ({ ...prev, to: d }));
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
                             <Calendar initialFocus mode="range" defaultMonth={dateRange?.from} selected={dateRange} onSelect={setDateRange} numberOfMonths={2} />
                         </PopoverContent>
                     </Popover>
@@ -309,57 +281,50 @@ export function UserSalesHistoryModal({
               </div>
 
               <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as SalesTypeFilter)} className="w-full">
-                <TabsList className="grid w-full grid-cols-4 h-10">
-                    <TabsTrigger value="all" className="flex items-center gap-2"><Filter className="h-3.5 w-3.5" /> All</TabsTrigger>
-                    <TabsTrigger value="sales" className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5" /> Paid</TabsTrigger>
-                    <TabsTrigger value="credit" className="flex items-center gap-2"><CreditCard className="h-3.5 w-3.5" /> Credit</TabsTrigger>
-                    <TabsTrigger value="refunds" className="flex items-center gap-2"><Undo2 className="h-3.5 w-3.5" /> Returns</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-4 h-9 sm:h-10">
+                    <TabsTrigger value="all" className="text-[10px] sm:text-xs">All</TabsTrigger>
+                    <TabsTrigger value="sales" className="text-[10px] sm:text-xs">Paid</TabsTrigger>
+                    <TabsTrigger value="credit" className="text-[10px] sm:text-xs">Credit</TabsTrigger>
+                    <TabsTrigger value="refunds" className="text-[10px] sm:text-xs">Refunds</TabsTrigger>
                 </TabsList>
               </Tabs>
           </div>
           
           {/* Summary Banner */}
-           <div className="px-6 py-4 grid grid-cols-1 md:grid-cols-4 gap-4 bg-primary/5 shrink-0 border-b">
-            <div className="space-y-1">
+           <div className="px-4 sm:px-6 py-3 sm:py-4 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 bg-primary/5 shrink-0 border-b">
+            <div className="space-y-1 text-left">
                  <p className="text-[10px] font-black uppercase text-primary tracking-widest flex items-center gap-1.5">
                     <DollarSign className="h-3 w-3" /> Net Revenue
                  </p>
-                 {isLoading ? <Skeleton className="h-8 w-24" /> : <div className="text-xl font-bold tracking-tight text-primary">{formatCurrency(stats.totalSales, currencySymbol)}</div>}
+                 {isLoading ? <Skeleton className="h-6 sm:h-8 w-24" /> : <div className="text-base sm:text-xl font-bold tracking-tight text-primary font-mono">{formatCurrency(stats.totalSales, currencySymbol)}</div>}
             </div>
-            <div className="space-y-1">
+            <div className="space-y-1 text-left">
                 <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest flex items-center gap-1.5">
                     <ShoppingBag className="h-3 w-3" /> Volume
                 </p>
-                {isLoading ? <Skeleton className="h-8 w-12" /> : <div className="text-xl font-bold">{stats.count}</div>}
+                {isLoading ? <Skeleton className="h-6 sm:h-8 w-12" /> : <div className="text-base sm:text-xl font-bold">{stats.count}</div>}
             </div>
-            <div className="space-y-1">
+            <div className="space-y-1 text-left hidden md:block">
                 <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest flex items-center gap-1.5">
                     <TrendingUp className="h-3 w-3" /> Avg Sale
                 </p>
-                {isLoading ? <Skeleton className="h-8 w-20" /> : <div className="text-xl font-bold">{formatCurrency(stats.count > 0 ? stats.totalSales / stats.count : 0, currencySymbol)}</div>}
+                {isLoading ? <Skeleton className="h-8 w-20" /> : <div className="text-xl font-bold font-mono">{formatCurrency(stats.count > 0 ? stats.totalSales / stats.count : 0, currencySymbol)}</div>}
             </div>
             <div className="space-y-1 text-right">
                 <p className="text-[10px] font-black uppercase text-orange-600 tracking-widest flex items-center justify-end gap-1.5">
                     <Undo2 className="h-3 w-3" /> Refunds
                 </p>
-                {isLoading ? <Skeleton className="h-8 w-20 ml-auto" /> : <div className="text-xl font-bold text-orange-600">{formatCurrency(stats.refunds, currencySymbol)}</div>}
+                {isLoading ? <Skeleton className="h-6 sm:h-8 w-20 ml-auto" /> : <div className="text-base sm:text-xl font-bold text-orange-600 font-mono">{formatCurrency(stats.refunds, currencySymbol)}</div>}
             </div>
           </div>
 
           <div className="flex-1 overflow-hidden flex flex-col relative">
             <ScrollArea className="flex-1">
-                <div className="px-6 min-h-full">
+                <div className="px-4 sm:px-6 min-h-full py-4">
                     {isLoading ? (
-                        <div className="space-y-4 py-6">
+                        <div className="space-y-4">
                             {[...Array(6)].map((_, i) => (
-                                <div key={i} className="flex items-center gap-4 p-4 rounded-lg border bg-muted/10">
-                                    <Skeleton className="h-10 w-10 rounded-full" />
-                                    <div className="flex-grow space-y-2">
-                                        <Skeleton className="h-4 w-1/3" />
-                                        <Skeleton className="h-3 w-1/4" />
-                                    </div>
-                                    <Skeleton className="h-8 w-20" />
-                                </div>
+                                <Skeleton key={i} className="h-24 sm:h-16 w-full rounded-xl" />
                             ))}
                         </div>
                     ) : error ? (
@@ -377,99 +342,109 @@ export function UserSalesHistoryModal({
                             <Search className="h-12 w-12 opacity-20"/>
                           </div>
                           <h3 className="text-xl font-semibold">No transactions found</h3>
-                          <p className="text-sm max-w-xs mt-2">Try adjusting filters or searching for different criteria.</p>
                         </div>
                     ) : (
-                        <Table>
-                            <TableHeader className="sticky top-0 bg-background z-10">
-                                <TableRow className="hover:bg-transparent">
-                                    <TableHead className="w-[120px]">Date</TableHead>
-                                    <TableHead>Customer</TableHead>
-                                    <TableHead className="text-right">Net Total</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                            {paginatedSales.map((sale) => {
-                                const saleDate = convertToDateSafely(sale.createdAt);
-                                const total = (sale.grandTotal || 0) - (sale.returnedAmount || 0);
-                                const status = getSaleStatusInfo(sale);
-                                return (
-                                    <TableRow key={sale.id} className="hover:bg-muted/30 transition-colors group">
-                                        <TableCell className="font-medium text-xs py-4">
-                                          <div className="font-bold">{saleDate ? format(saleDate, 'EEEE - MMM- dd- yyyy') : 'N/A'}</div>
-                                          <div className="text-muted-foreground">{saleDate ? format(saleDate, 'h:mm a') : ''}</div>
-                                        </TableCell>
-                                        <TableCell className="max-w-[180px] py-4">
-                                          <div className="truncate font-semibold" title={sale.customerName || 'Walk-in'}>
-                                            {sale.customerName || 'Walk-in Customer'}
-                                          </div>
-                                          <div className="text-[10px] text-muted-foreground uppercase font-mono">#{sale.id.substring(0, 8)}</div>
-                                        </TableCell>
-                                        <TableCell className="text-right py-4">
-                                          <div className="font-bold text-sm">{formatCurrency(total, currencySymbol)}</div>
-                                          <div className="text-[10px] text-muted-foreground">{sale.paymentMethod}</div>
-                                        </TableCell>
-                                        <TableCell className="py-4">
-                                          <Badge variant="outline" className={cn("text-[9px] font-black uppercase px-2 py-0", status.color)}>
-                                            {status.text}
-                                          </Badge>
-                                          {(sale.returnedAmount || 0) > 0 && (
-                                            <Badge variant="destructive" className="ml-1 text-[8px] px-1 py-0 h-4">RET</Badge>
-                                          )}
-                                        </TableCell>
-                                        <TableCell className="text-right py-4">
-                                            <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-primary/10 hover:text-primary" onClick={() => handleViewDetails(sale)}>
-                                                  <Eye className="h-4 w-4"/>
-                                                </Button>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-primary/10 hover:text-primary" onClick={() => handleReprintReceipt(sale)}>
-                                                  <Printer className="h-4 w-4"/>
-                                                </Button>
+                        <>
+                            {/* Desktop Table */}
+                            <div className="hidden md:block">
+                                <Table>
+                                    <TableHeader className="sticky top-0 bg-background z-10">
+                                        <TableRow className="hover:bg-transparent">
+                                            <TableHead className="w-[120px]">Date</TableHead>
+                                            <TableHead>Customer</TableHead>
+                                            <TableHead className="text-right">Net Total</TableHead>
+                                            <TableHead>Status</TableHead>
+                                            <TableHead className="text-right">Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                    {paginatedSales.map((sale) => {
+                                        const saleDate = convertToDateSafely(sale.createdAt);
+                                        const total = (sale.grandTotal || 0) - (sale.returnedAmount || 0);
+                                        const status = getSaleStatusInfo(sale);
+                                        return (
+                                            <TableRow key={sale.id} className="hover:bg-muted/30 transition-colors group">
+                                                <TableCell className="font-medium text-xs py-4 text-left">
+                                                  <div className="font-bold">{saleDate ? format(saleDate, 'EEE, MMM dd') : 'N/A'}</div>
+                                                  <div className="text-muted-foreground">{saleDate ? format(saleDate, 'h:mm a') : ''}</div>
+                                                </TableCell>
+                                                <TableCell className="max-w-[180px] py-4 text-left">
+                                                  <div className="truncate font-semibold">{sale.customerName || 'Walk-in Customer'}</div>
+                                                  <div className="text-[10px] text-muted-foreground uppercase font-mono">#{sale.id.substring(0, 8)}</div>
+                                                </TableCell>
+                                                <TableCell className="text-right py-4">
+                                                  <div className="font-bold text-sm font-mono">{formatCurrency(total, currencySymbol)}</div>
+                                                  <div className="text-[10px] text-muted-foreground">{sale.paymentMethod}</div>
+                                                </TableCell>
+                                                <TableCell className="py-4 text-left">
+                                                  <Badge variant="outline" className={cn("text-[9px] font-black uppercase px-2 py-0", status.color)}>
+                                                    {status.text}
+                                                  </Badge>
+                                                </TableCell>
+                                                <TableCell className="text-right py-4">
+                                                    <div className="flex items-center justify-end gap-1">
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleViewDetails(sale)}>
+                                                          <Eye className="h-4 w-4"/>
+                                                        </Button>
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleReprintReceipt(sale)}>
+                                                          <Printer className="h-4 w-4"/>
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        )
+                                    })}
+                                    </TableBody>
+                                </Table>
+                            </div>
+
+                            {/* Mobile List */}
+                            <div className="md:hidden space-y-4">
+                                {paginatedSales.map((sale) => {
+                                    const saleDate = convertToDateSafely(sale.createdAt);
+                                    const total = (sale.grandTotal || 0) - (sale.returnedAmount || 0);
+                                    const status = getSaleStatusInfo(sale);
+                                    return (
+                                        <div key={sale.id} className="p-4 rounded-xl border bg-card shadow-sm active:bg-muted/50 transition-colors space-y-3" onClick={() => handleViewDetails(sale)}>
+                                            <div className="flex justify-between items-start">
+                                                <div className="space-y-1 text-left">
+                                                    <p className="text-sm font-bold">{saleDate ? format(saleDate, 'MMM dd, yyyy') : 'N/A'}</p>
+                                                    <p className="text-[10px] text-muted-foreground font-mono">#{sale.id.substring(0, 12)}</p>
+                                                </div>
+                                                <Badge variant="outline" className={cn("text-[9px] font-black uppercase", status.color)}>
+                                                    {status.text}
+                                                </Badge>
                                             </div>
-                                        </TableCell>
-                                    </TableRow>
-                                )
-                            })}
-                            </TableBody>
-                        </Table>
+                                            <div className="flex justify-between items-end">
+                                                <div className="space-y-1 text-left">
+                                                    <p className="text-xs text-muted-foreground uppercase font-medium">Customer</p>
+                                                    <p className="text-sm font-semibold truncate max-w-[150px]">{sale.customerName || 'Walk-in'}</p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-lg font-bold font-mono text-primary">{formatCurrency(total, currencySymbol)}</p>
+                                                </div>
+                                            </div>
+                                            <div className="pt-3 border-t flex gap-2">
+                                                <Button variant="secondary" size="sm" onClick={(e) => { e.stopPropagation(); handleViewDetails(sale); }} className="flex-1 h-8 text-xs">View Details</Button>
+                                                <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleReprintReceipt(sale); }} className="flex-1 h-8 text-xs">Receipt</Button>
+                                            </div>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </>
                     )}
                 </div>
             </ScrollArea>
           </div>
 
           {/* Pagination */}
-          <DialogFooter className="p-6 py-4 border-t flex flex-row justify-between items-center shrink-0 bg-background shadow-[0_-4px_10px_rgba(0,0,0,0.03)]">
+          <DialogFooter className="p-4 sm:p-6 py-3 sm:py-4 border-t flex flex-row justify-between items-center shrink-0 bg-background">
+            <p className="text-xs text-muted-foreground font-medium">{filteredSales.length} Total</p>
             <div className="flex items-center gap-2">
-                <div className="bg-muted p-1 rounded-md text-[10px] font-black uppercase text-muted-foreground px-2">
-                    {filteredSales.length} Records
-                </div>
-            </div>
-            <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1.5">
-                    <Button 
-                      variant="outline" 
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))} 
-                      disabled={currentPage === 1 || isLoading}
-                    >
-                      <ChevronLeft className="h-4 w-4"/>
-                    </Button>
-                    <div className="text-[11px] font-bold tabular-nums min-w-[40px] text-center">
-                        {currentPage} / {totalPages || 1}
-                    </div>
-                    <Button 
-                      variant="outline" 
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => setCurrentPage(p => Math.min(totalPages, p+1))} 
-                      disabled={currentPage >= totalPages || isLoading}
-                    >
-                      <ChevronRight className="h-4 w-4"/>
-                    </Button>
-                </div>
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1 || isLoading}><ChevronLeft className="h-4 w-4"/></Button>
+                <div className="text-[11px] font-bold tabular-nums min-w-[40px] text-center">{currentPage} / {totalPages || 1}</div>
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentPage(p => Math.min(totalPages, p+1))} disabled={currentPage >= totalPages || isLoading}><ChevronRight className="h-4 w-4"/></Button>
             </div>
           </DialogFooter>
         </DialogContent>

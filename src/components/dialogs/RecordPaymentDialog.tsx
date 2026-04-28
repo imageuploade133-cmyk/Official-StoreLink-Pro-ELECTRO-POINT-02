@@ -391,13 +391,20 @@ export function RecordPaymentDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !state.isSubmitting && !open && onClose()}>
-      <DialogContent className="sm:max-w-md h-full sm:h-auto max-h-[100dvh] sm:max-h-[95vh] flex flex-col p-0 overflow-hidden" onPointerDownOutside={e => e.preventDefault()}>
-        <DialogHeader className="p-6 pb-4 border-b shrink-0 bg-background">
-          <DialogTitle className="text-2xl font-bold flex items-center gap-3">
-            <DollarSign className="h-6 w-6 text-primary" />
-            {state.step === 1 ? 'Record Payment' : 'Verify Details'}
-          </DialogTitle>
-          <DialogDescription>Apply a payment towards this specific invoice.</DialogDescription>
+      <DialogContent className="max-w-md h-[100dvh] sm:h-auto max-h-[100dvh] sm:max-h-[95vh] flex flex-col p-0 overflow-hidden border-none sm:border" onPointerDownOutside={e => e.preventDefault()}>
+        <DialogHeader className="p-4 sm:p-6 pb-4 border-b shrink-0 bg-background">
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 sm:gap-3">
+                <DollarSign className="h-6 w-6 text-primary" />
+                {state.step === 1 ? 'Record Payment' : 'Verify Details'}
+            </DialogTitle>
+            <DialogClose asChild className="sm:hidden">
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                    <X className="h-4 w-4" />
+                </Button>
+            </DialogClose>
+          </div>
+          <DialogDescription className="text-xs sm:text-sm">Apply a payment towards this specific invoice.</DialogDescription>
         </DialogHeader>
 
         <ScrollArea className="flex-1 min-h-0">
@@ -410,29 +417,30 @@ export function RecordPaymentDialog({
           </div>
         </ScrollArea>
 
-        <DialogFooter className="p-6 pt-4 border-t flex flex-row justify-between items-center shrink-0 bg-background shadow-[0_-4px_10px_rgba(0,0,0,0.03)] mt-auto">
+        <DialogFooter className="p-4 sm:p-6 border-t flex flex-row justify-between items-center shrink-0 bg-background shadow-[0_-4px_10px_rgba(0,0,0,0.03)] mt-auto">
           {state.step === 1 ? (
              <DialogClose asChild>
-                <Button variant="outline" disabled={state.isSubmitting} className="h-11">Cancel</Button>
+                <Button variant="outline" size="sm" disabled={state.isSubmitting} className="h-10 px-4">Cancel</Button>
             </DialogClose>
           ) : (
-             <Button variant="outline" onClick={() => dispatch({ type: 'SET_STEP', step: 1 })} disabled={state.isSubmitting} className="h-11">
+             <Button variant="outline" size="sm" onClick={() => dispatch({ type: 'SET_STEP', step: 1 })} disabled={state.isSubmitting} className="h-10 px-4">
                 <ChevronLeft className="mr-2 h-4 w-4" /> Back
              </Button>
           )}
 
           {state.step === 1 ? (
-            <Button onClick={handleNextStep} disabled={isNextDisabled} className="h-11 px-8 font-bold">
-              Review Payment <ChevronRight className="ml-2 h-4 w-4" />
+            <Button onClick={handleNextStep} size="sm" disabled={isNextDisabled} className="h-10 px-6 font-bold">
+              Review <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
           ) : (
             <Button
               onClick={handleConfirmPayment}
+              size="sm"
               disabled={state.isSubmitting}
-              className="bg-green-600 hover:bg-green-700 text-white font-bold h-11 px-8 shadow-md"
+              className="bg-green-600 hover:bg-green-700 text-white font-bold h-10 px-6 shadow-md"
             >
               {state.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-              Post Payment
+              Post
             </Button>
           )}
         </DialogFooter>

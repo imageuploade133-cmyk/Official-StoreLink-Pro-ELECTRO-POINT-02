@@ -84,70 +84,72 @@ export function ProductSalesDetailsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0 grid grid-rows-[auto_1fr]">
-        <DialogHeader className="flex flex-row items-start justify-between p-6 pb-4 border-b sticky top-0 bg-background z-10">
-            <div>
-                <DialogTitle className="text-2xl font-bold flex items-center gap-3">
-                    <Package className="h-7 w-7 text-primary" />
-                    {product.name}
-                </DialogTitle>
-                <DialogDescription>
-                    A detailed sales and inventory log for this product.
-                </DialogDescription>
+      <DialogContent className="max-w-4xl h-[100dvh] sm:h-[90vh] flex flex-col p-0 overflow-hidden border-none sm:border">
+        <DialogHeader className="p-4 sm:p-6 pb-4 border-b shrink-0">
+            <div className="flex items-center justify-between w-full">
+                <div>
+                    <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 sm:gap-3 text-left">
+                        <Package className="h-6 w-6 sm:h-7 sm:w-7 text-primary shrink-0" />
+                        <span className="truncate max-w-[200px] sm:max-w-none">{product.name}</span>
+                    </DialogTitle>
+                    <DialogDescription className="text-xs sm:text-sm truncate text-left">
+                        A detailed sales and inventory log for this product.
+                    </DialogDescription>
+                </div>
+                <DialogClose asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9 rounded-full shrink-0">
+                        <X className="h-4 w-4 sm:h-5 sm:w-5" />
+                        <span className="sr-only">Close</span>
+                    </Button>
+                </DialogClose>
             </div>
-            <DialogClose asChild>
-                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full flex-shrink-0">
-                    <X className="h-5 w-5" />
-                    <span className="sr-only">Close</span>
-                </Button>
-            </DialogClose>
         </DialogHeader>
 
         <ScrollArea className="flex-1 bg-muted/20">
-          <div className="p-6 space-y-6">
-            <Card>
-                <CardContent className="pt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="flex flex-col items-center md:items-start md:col-span-1">
+          <div className="p-4 sm:p-6 space-y-6">
+            <Card className="border-none sm:border shadow-none sm:shadow-sm">
+                <CardContent className="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="flex flex-row md:flex-col items-center md:items-start gap-4 md:col-span-1">
                          <Image
                             src={product.imageUrl || defaultProductImageUrl}
                             alt={product.name}
-                            width={120}
-                            height={120}
-                            className="rounded-lg object-cover aspect-square border-2 shadow-sm"
+                            width={100}
+                            height={100}
+                            className="rounded-lg object-cover aspect-square border-2 shadow-sm shrink-0 sm:w-[120px] sm:h-[120px]"
                             data-ai-hint={product.dataAiHint || product.name.toLowerCase().split(' ').slice(0,2).join(' ')}
                         />
-                        <div className="text-sm mt-4 text-center md:text-left">
-                            {product.sku && <p><span className="font-medium text-muted-foreground">SKU:</span> {product.sku}</p>}
-                            {product.barcode && <p><span className="font-medium text-muted-foreground">Barcode:</span> {product.barcode}</p>}
+                        <div className="text-xs sm:text-sm flex-1 min-w-0">
+                            {product.sku && <p className="truncate"><span className="font-medium text-muted-foreground uppercase text-[10px]">SKU:</span> <br className="sm:hidden" /> {product.sku}</p>}
+                            {product.barcode && <p className="truncate mt-1 sm:mt-0"><span className="font-medium text-muted-foreground uppercase text-[10px]">Barcode:</span> <br className="sm:hidden" /> {product.barcode}</p>}
                         </div>
                     </div>
-                    <div className="md:col-span-2 grid grid-cols-3 gap-4 bg-muted/50 p-4 rounded-lg">
-                        <div className="flex flex-col items-center justify-center p-4 rounded-lg text-center bg-green-50 dark:bg-green-950/20">
-                            <DollarSign className="h-6 w-6 mb-2 text-muted-foreground" />
-                            <p className="text-xl font-bold">{formatCurrency(product.totalRevenueGenerated, currencySymbol)}</p>
-                            <p className="text-xs text-muted-foreground">Total Revenue</p>
+                    <div className="md:col-span-2 grid grid-cols-3 gap-2 sm:gap-4 bg-muted/50 p-2 sm:p-4 rounded-xl">
+                        <div className="flex flex-col items-center justify-center p-2 sm:p-4 rounded-lg text-center bg-green-50 dark:bg-green-950/20">
+                            <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 mb-1 text-green-600" />
+                            <p className="text-sm sm:text-xl font-bold font-mono truncate w-full">{formatCurrency(product.totalRevenueGenerated, currencySymbol)}</p>
+                            <p className="text-[10px] text-muted-foreground uppercase font-medium">Revenue</p>
                         </div>
-                        <div className="flex flex-col items-center justify-center p-4 rounded-lg text-center bg-blue-50 dark:bg-blue-950/20">
-                            <TrendingUp className="h-6 w-6 mb-2 text-muted-foreground" />
-                            <p className="text-xl font-bold">{product.totalQuantitySold}</p>
-                            <p className="text-xs text-muted-foreground">Total Units Sold</p>
+                        <div className="flex flex-col items-center justify-center p-2 sm:p-4 rounded-lg text-center bg-blue-50 dark:bg-blue-950/20">
+                            <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 mb-1 text-blue-600" />
+                            <p className="text-sm sm:text-xl font-bold truncate w-full">{product.totalQuantitySold}</p>
+                            <p className="text-[10px] text-muted-foreground uppercase font-medium">Sold</p>
                         </div>
-                        <div className="flex flex-col items-center justify-center p-4 rounded-lg text-center bg-amber-50 dark:bg-amber-950/20">
-                            <Boxes className="h-6 w-6 mb-2 text-muted-foreground" />
-                            <p className="text-xl font-bold">{product.currentStock}</p>
-                            <p className="text-xs text-muted-foreground">Current Stock</p>
+                        <div className="flex flex-col items-center justify-center p-2 sm:p-4 rounded-lg text-center bg-amber-50 dark:bg-amber-950/20">
+                            <Boxes className="h-4 w-4 sm:h-5 sm:w-5 mb-1 text-amber-600" />
+                            <p className="text-sm sm:text-xl font-bold truncate w-full">{product.currentStock}</p>
+                            <p className="text-[10px] text-muted-foreground uppercase font-medium">Stock</p>
                         </div>
                     </div>
                 </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+            <Card className="border-none sm:border shadow-none sm:shadow-sm">
+              <CardHeader className="p-4 sm:p-6 pb-2">
+                <CardTitle className="flex items-center gap-2 text-lg">
                     <Hash className="h-5 w-5 text-primary"/> Individual Sales Log
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-2 sm:p-6">
                 {detailedSalesEntries.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground gap-4">
                         <Info className="h-16 w-16 text-gray-300 dark:text-gray-700" />
@@ -157,42 +159,74 @@ export function ProductSalesDetailsModal({
                         </div>
                     </div>
                 ) : (
-                    <div className="border rounded-lg overflow-hidden">
-                        <Table>
-                            <TableHeader className="bg-muted/50">
-                                <TableRow>
-                                    <TableHead className="w-[180px]"><CalendarDays className="h-4 w-4 inline mr-1.5"/>Date & Time</TableHead>
-                                    <TableHead className="text-right">Qty Sold</TableHead>
-                                    <TableHead className="text-right">Unit Price</TableHead>
-                                    <TableHead><UserCircle className="h-4 w-4 inline mr-1.5"/>Staff Member</TableHead>
-                                    <TableHead className="text-center">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {detailedSalesEntries.map((entry) => (
-                                <TableRow key={entry.saleId + entry.saleDate.toISOString()} className="hover:bg-muted/50">
-                                    <TableCell className="font-medium">{format(entry.saleDate, "EEEE, MMMM do, yyyy 'at' h:mm a")}</TableCell>
-                                    <TableCell className="text-right">
-                                        <Badge variant="secondary" className="font-semibold">{entry.quantitySold}</Badge>
-                                    </TableCell>
-                                    <TableCell className="text-right font-mono">{formatCurrency(entry.unitPrice, currencySymbol)}</TableCell>
-                                    <TableCell className="truncate max-w-[150px]" title={entry.staffName}>{entry.staffName}</TableCell>
-                                    <TableCell className="text-center">
-                                        <Button 
-                                          variant="ghost" 
-                                          size="icon" 
-                                          className="h-8 w-8"
-                                          onClick={() => handleViewSaleDetails(entry.saleId)}
-                                        >
-                                          <Eye className="h-4 w-4" />
-                                          <span className="sr-only">View Sale Details</span>
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </div>
+                    <>
+                        <div className="hidden md:block border rounded-lg overflow-hidden">
+                            <Table>
+                                <TableHeader className="bg-muted/50">
+                                    <TableRow>
+                                        <TableHead className="w-[180px]"><CalendarDays className="h-4 w-4 inline mr-1.5"/>Date & Time</TableHead>
+                                        <TableHead className="text-right">Qty Sold</TableHead>
+                                        <TableHead className="text-right">Unit Price</TableHead>
+                                        <TableHead><UserCircle className="h-4 w-4 inline mr-1.5"/>Staff Member</TableHead>
+                                        <TableHead className="text-center">Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {detailedSalesEntries.map((entry) => (
+                                    <TableRow key={entry.saleId + entry.saleDate.toISOString()} className="hover:bg-muted/50">
+                                        <TableCell className="font-medium text-sm">{format(entry.saleDate, "PP p")}</TableCell>
+                                        <TableCell className="text-right">
+                                            <Badge variant="secondary" className="font-semibold">{entry.quantitySold}</Badge>
+                                        </TableCell>
+                                        <TableCell className="text-right font-mono">{formatCurrency(entry.unitPrice, currencySymbol)}</TableCell>
+                                        <TableCell className="truncate max-w-[150px]" title={entry.staffName}>{entry.staffName}</TableCell>
+                                        <TableCell className="text-center">
+                                            <Button 
+                                            variant="ghost" 
+                                            size="icon" 
+                                            className="h-8 w-8"
+                                            onClick={() => handleViewSaleDetails(entry.saleId)}
+                                            >
+                                            <Eye className="h-4 w-4" />
+                                            <span className="sr-only">View Sale Details</span>
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+
+                        <div className="md:hidden space-y-3">
+                            {detailedSalesEntries.map((entry) => (
+                                <div 
+                                    key={entry.saleId + entry.saleDate.toISOString()} 
+                                    className="p-4 rounded-xl border bg-card shadow-sm active:bg-muted/50 transition-colors"
+                                    onClick={() => handleViewSaleDetails(entry.saleId)}
+                                >
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-bold">{format(entry.saleDate, "MMM dd, yyyy")}</p>
+                                            <p className="text-[10px] text-muted-foreground">{format(entry.saleDate, "h:mm a")}</p>
+                                        </div>
+                                        <Badge variant="secondary" className="font-bold">Qty: {entry.quantitySold}</Badge>
+                                    </div>
+                                    <div className="flex justify-between items-center mt-3 pt-3 border-t">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                                                <UserCircle className="h-3.5 w-3.5 text-primary" />
+                                            </div>
+                                            <span className="text-xs text-muted-foreground truncate max-w-[120px]">{entry.staffName}</span>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-sm font-bold font-mono">{formatCurrency(entry.unitPrice, currencySymbol)}</p>
+                                            <p className="text-[10px] text-muted-foreground uppercase font-medium">Unit Price</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
                 )}
               </CardContent>
             </Card>

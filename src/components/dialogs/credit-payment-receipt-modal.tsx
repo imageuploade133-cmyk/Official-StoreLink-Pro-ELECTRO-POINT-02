@@ -216,12 +216,19 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-xl md:max-w-2xl lg:max-w-4xl p-0 h-[85vh] flex flex-col">
-        <DialogHeader className="p-6 pb-4 border-b no-print">
-          <DialogTitle className="text-2xl font-bold flex items-center gap-2 text-gray-800">
-             Payment Receipt Preview
-          </DialogTitle>
-          <DialogDescription>
+      <DialogContent className="max-w-xl md:max-w-2xl lg:max-w-4xl p-0 h-[100dvh] sm:h-[90vh] flex flex-col border-none sm:border overflow-hidden">
+        <DialogHeader className="p-4 sm:p-6 pb-4 border-b no-print shrink-0">
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2 text-gray-800">
+                Payment Receipt Preview
+            </DialogTitle>
+            <DialogClose asChild className="sm:hidden">
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                    <X className="h-4 w-4" />
+                </Button>
+            </DialogClose>
+          </div>
+          <DialogDescription className="text-xs sm:text-sm">
             Payment ID: <span className="font-mono">{paymentInfo.id.substring(0, 12)}</span>
           </DialogDescription>
         </DialogHeader>
@@ -417,20 +424,20 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
             </TabsContent>
           </ScrollArea>
 
-          <DialogFooter className="flex flex-col sm:flex-row sm:justify-end gap-3 p-6 border-t no-print bg-white">
+          <DialogFooter className="flex flex-row justify-end gap-2 p-4 sm:p-6 border-t no-print bg-white shrink-0">
             <DialogClose asChild>
-              <Button variant="outline" onClick={onClose}>
-                <X className="mr-2 h-4 w-4" /> Close
+              <Button variant="outline" size="sm" onClick={onClose} className="h-9">
+                Close
               </Button>
             </DialogClose>
 
-            <Button onClick={() => handlePrint(activeFormat)} className="brand-bg hover:brightness-110" disabled={isPrinting}>
-              <Printer className="mr-2 h-4 w-4" /> Print {activeFormat === 'small' ? 'Receipt' : 'Invoice'}
+            <Button onClick={() => handlePrint(activeFormat)} size="sm" className="brand-bg hover:brightness-110 h-9" disabled={isPrinting}>
+              <Printer className="mr-2 h-4 w-4" /> {activeFormat === 'small' ? 'Receipt' : 'Invoice'}
             </Button>
 
             {activeFormat === 'a4' && (
-              <Button onClick={() => handlePrint('a4')} variant="secondary" disabled={isPrinting}>
-                <Download className="mr-2 h-4 w-4" /> Export PDF
+              <Button onClick={() => handlePrint('a4')} size="sm" variant="secondary" className="h-9" disabled={isPrinting}>
+                <Download className="mr-2 h-4 w-4" /> PDF
               </Button>
             )}
           </DialogFooter>

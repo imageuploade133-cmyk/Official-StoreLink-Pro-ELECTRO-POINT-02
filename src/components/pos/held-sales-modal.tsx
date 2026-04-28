@@ -57,11 +57,11 @@ const HeldSaleCard = React.memo(({ sale, currencySymbol, onRestore, onDelete }: 
   const itemCount = sale.items.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="hover:shadow-md transition-shadow overflow-hidden border-none sm:border shadow-none sm:shadow-sm">
       <CardContent className="p-4 flex flex-col sm:flex-row gap-4">
-        <div className="flex-grow space-y-2">
-          <div className="flex items-center text-sm font-semibold">
-            <User className="h-4 w-4 mr-2 text-muted-foreground" />
+        <div className="flex-grow space-y-2 min-w-0">
+          <div className="flex items-center text-base font-bold truncate">
+            <User className="h-4 w-4 mr-2 text-primary shrink-0" />
             <span>{sale.customerIdentifier || 'Walk-in Customer'}</span>
           </div>
           <p className="text-xs text-muted-foreground flex items-center">
@@ -69,27 +69,28 @@ const HeldSaleCard = React.memo(({ sale, currencySymbol, onRestore, onDelete }: 
             Held {timeAgo}
           </p>
           {sale.notes && (
-            <p className="text-xs text-muted-foreground italic flex items-start">
+            <p className="text-xs text-muted-foreground italic flex items-start bg-muted/50 p-2 rounded border-l-2 border-primary/20">
               <FileText className="h-3.5 w-3.5 mr-2 mt-0.5 flex-shrink-0" />
-              <span className="break-all">Note: {sale.notes}</span>
+              <span className="line-clamp-2">Note: {sale.notes}</span>
             </p>
           )}
         </div>
-        <div className="flex-shrink-0 sm:text-right space-y-2">
-          <p className="text-lg font-bold text-primary">
+        <div className="flex-shrink-0 flex flex-row sm:flex-col justify-between sm:justify-center items-center sm:items-end gap-3 sm:gap-2 pt-3 sm:pt-0 border-t sm:border-t-0 border-dashed">
+          <p className="text-xl font-black text-primary font-mono">
             {formatAmountWithCurrencySymbol(sale.totalAmount, currencySymbol)}
           </p>
-          <div className="flex items-center justify-end gap-4">
-            <div className="flex items-center text-xs text-muted-foreground">
-              <ShoppingCart className="h-4 w-4 mr-1.5" />
+          <div className="flex items-center gap-2">
+            <div className="hidden xs:flex items-center text-[10px] uppercase font-bold text-muted-foreground mr-2">
+              <ShoppingCart className="h-3 w-3 mr-1" />
               {itemCount} item{itemCount > 1 ? 's' : ''}
             </div>
             <div className="flex gap-2">
-              <Button size="sm" variant="outline" onClick={() => onDelete(sale)}>
-                <Trash2 className="h-4 w-4" />
+              <Button size="sm" variant="outline" className="h-8 w-8 p-0" onClick={() => onDelete(sale)}>
+                <Trash2 className="h-4 w-4 text-destructive" />
+                <span className="sr-only">Delete</span>
               </Button>
-              <Button size="sm" onClick={() => onRestore(sale.id)}>
-                <RotateCcw className="h-4 w-4 mr-2" /> Restore
+              <Button size="sm" className="h-8 text-xs px-3" onClick={() => onRestore(sale.id)}>
+                <RotateCcw className="h-3.5 w-3.5 mr-1.5" /> Restore
               </Button>
             </div>
           </div>
@@ -153,38 +154,45 @@ export function HeldSalesModal({ isOpen, onOpenChange, currencySymbol, onRestore
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent 
-        className="max-w-3xl h-[85vh] flex flex-col p-0"
+        className="max-w-3xl h-[100dvh] sm:h-[85vh] flex flex-col p-0 overflow-hidden border-none sm:border"
         onPointerDownOutside={(e) => e.preventDefault()}
       >
-        <DialogHeader className="p-6 pb-4 border-b">
-          <DialogTitle className="text-2xl font-semibold flex items-center">
-            <Clock className="mr-3 h-7 w-7 text-primary" />
-            Held Sales
-          </DialogTitle>
-          <DialogDescription>
-            Restore a previously held sale to the cart or delete it.
+        <DialogHeader className="p-4 sm:p-6 pb-4 border-b shrink-0">
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center">
+                <Clock className="mr-2 sm:mr-3 h-6 w-6 sm:h-7 sm:w-7 text-primary" />
+                Held Sales
+            </DialogTitle>
+            <DialogClose asChild className="sm:hidden">
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                    <X className="h-4 w-4" />
+                </Button>
+            </DialogClose>
+          </div>
+          <DialogDescription className="text-xs sm:text-sm">
+            Restore a previously held sale or delete it.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="px-6 pt-4">
+        <div className="px-4 sm:px-6 py-4 border-b bg-muted/5 shrink-0">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search by customer name or note..."
+              placeholder="Search customer or note..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-9 h-9 sm:h-10 text-sm"
             />
           </div>
         </div>
 
-        <ScrollArea className="flex-grow p-6 pt-4">
-          <div className="space-y-3">
-            {isLoading && Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-28 w-full rounded-lg" />)}
+        <ScrollArea className="flex-grow">
+          <div className="p-4 sm:p-6 space-y-4">
+            {isLoading && Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-xl" />)}
 
             {!isLoading && error && (
-              <Card className="text-center py-10 text-destructive bg-destructive/5 border-destructive/20">
-                <CardContent>
+              <Card className="text-center py-10 text-destructive bg-destructive/5 border-destructive/20 mx-4">
+                <CardContent className="p-6">
                   <AlertTriangle className="mx-auto h-12 w-12 mb-4" />
                   <p className="font-semibold">{error}</p>
                 </CardContent>
@@ -192,14 +200,12 @@ export function HeldSalesModal({ isOpen, onOpenChange, currencySymbol, onRestore
             )}
 
             {!isLoading && !error && filteredSales.length === 0 && (
-              <Card className="text-center py-10 text-muted-foreground bg-muted/50">
-                <CardContent>
-                  <Info className="mx-auto h-12 w-12 mb-4" />
-                  <p className="font-semibold">
-                    {searchTerm ? `No sales found for "${searchTerm}"` : "There are no held sales."}
+              <div className="text-center py-20 text-muted-foreground">
+                  <Info className="mx-auto h-12 w-12 mb-4 opacity-20" />
+                  <p className="font-medium">
+                    {searchTerm ? `No sales found for "${searchTerm}"` : "No held sales available"}
                   </p>
-                </CardContent>
-              </Card>
+              </div>
             )}
 
             {!isLoading && !error && filteredSales.map(sale => (
@@ -214,9 +220,9 @@ export function HeldSalesModal({ isOpen, onOpenChange, currencySymbol, onRestore
           </div>
         </ScrollArea>
 
-        <DialogFooter className="p-6 border-t mt-auto">
+        <DialogFooter className="p-4 sm:p-6 border-t mt-auto shrink-0 bg-background flex flex-row justify-end">
           <DialogClose asChild>
-            <Button variant="outline"><X className="mr-2 h-4 w-4" />Close</Button>
+            <Button variant="outline" size="sm" className="h-9">Close</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

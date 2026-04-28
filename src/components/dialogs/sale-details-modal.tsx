@@ -51,10 +51,10 @@ const ItemsSection: React.FC<{
   totalReturnedItems: number
 }> = ({ items, subtotal, currencySymbol, totalReturnedItems }) => {
   return (
-    <Card>
-      <CardHeader className="pb-4">
+    <Card className="border-none shadow-none sm:border sm:shadow-sm">
+      <CardHeader className="pb-4 px-0 sm:px-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
             <ShoppingBag className="w-5 h-5 text-blue-600 dark:text-blue-400" />
           </div>
           <div>
@@ -68,29 +68,30 @@ const ItemsSection: React.FC<{
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-0">
+      <CardContent className="pt-0 px-0 sm:px-6">
         <div className="space-y-3">
           {items.map((item, index) => (
             <div
               key={`${item.productId}-${index}`}
-              className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-muted/30 transition-colors"
+              className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-lg border bg-card hover:bg-muted/30 transition-colors gap-3"
             >
               <div className="flex-1 min-w-0">
-                <h3 className="font-medium truncate">{item.productName}</h3>
+                <h3 className="font-medium truncate text-base">{item.productName}</h3>
                 {item.variantName && <p className="text-sm text-muted-foreground">Variant: {item.variantName}</p>}
                 <p className="text-sm text-muted-foreground font-mono">
                   {formatCurrency(item.unitPrice, currencySymbol)} each
                 </p>
               </div>
-              <div className="text-right ml-4">
-                <div className="flex items-center gap-3">
+              <div className="flex items-center justify-between sm:justify-end gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground uppercase font-medium sm:hidden">Qty:</span>
                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                     <span className="text-sm font-semibold text-primary">{item.quantity}</span>
                   </div>
-                  <div className="text-right">
-                    <div className="font-semibold font-mono">
-                      {formatCurrency(item.totalPrice, currencySymbol)}
-                    </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-semibold font-mono text-lg sm:text-base">
+                    {formatCurrency(item.totalPrice, currencySymbol)}
                   </div>
                 </div>
               </div>
@@ -98,7 +99,7 @@ const ItemsSection: React.FC<{
           ))}
         </div>
         <Separator className="my-4" />
-        <div className="flex items-center justify-between text-lg font-semibold">
+        <div className="flex items-center justify-between text-lg font-bold">
           <span>Subtotal</span>
           <span className="font-mono">{formatCurrency(subtotal, currencySymbol)}</span>
         </div>
@@ -122,10 +123,10 @@ const PaymentSection: React.FC<{
 }> = ({ transaction, currencySymbol }) => {
     const hasSplitPayment = transaction.paymentDetails?.methods && transaction.paymentDetails.methods.length > 0;
   return (
-    <Card>
-      <CardHeader className="pb-4">
+    <Card className="border-none shadow-none sm:border sm:shadow-sm">
+      <CardHeader className="pb-4 px-0 sm:px-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
             <Landmark className="w-5 h-5 text-green-600 dark:text-green-400" />
           </div>
           <div>
@@ -134,61 +135,63 @@ const PaymentSection: React.FC<{
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-0 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 rounded-lg bg-muted/30">
+      <CardContent className="pt-0 px-0 sm:px-6 space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="p-4 rounded-lg bg-muted/30 border border-transparent">
             <div className="flex items-center gap-2 mb-2">
-              <CreditCard className="w-4 w-4 text-muted-foreground" />
+              <CreditCard className="w-4 h-4 text-muted-foreground" />
               <span className="text-sm font-medium text-muted-foreground">Payment Method</span>
             </div>
-            <div className="font-semibold">{transaction.paymentMethod}</div>
+            <div className="font-semibold text-base">{transaction.paymentMethod}</div>
           </div>
-          <div className="p-4 rounded-lg bg-muted/30">
+          <div className="p-4 rounded-lg bg-muted/30 border border-transparent">
             <div className="flex items-center gap-2 mb-2">
-              <Calculator className="w-4 w-4 text-muted-foreground" />
+              <Calculator className="w-4 h-4 text-muted-foreground" />
               <span className="text-sm font-medium text-muted-foreground">Subtotal</span>
             </div>
-            <div className="font-semibold font-mono">
+            <div className="font-semibold font-mono text-base">
               {formatCurrency(transaction.subtotal, currencySymbol)}
             </div>
           </div>
           {transaction.taxAmountCalculated && transaction.taxAmountCalculated > 0 && (
-            <div className="p-4 rounded-lg bg-muted/30">
+            <div className="p-4 rounded-lg bg-muted/30 border border-transparent">
               <div className="flex items-center gap-2 mb-2">
-                <Calculator className="w-4 w-4 text-muted-foreground" />
+                <Calculator className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm font-medium text-muted-foreground">Tax Collected</span>
               </div>
-              <div className="font-semibold font-mono text-blue-600">
+              <div className="font-semibold font-mono text-blue-600 text-base">
                 {formatCurrency(transaction.taxAmountCalculated, currencySymbol)} ({transaction.taxRate}%)
               </div>
             </div>
           )}
         </div>
         {transaction.paymentDetails && (
-          <div className="p-4 rounded-lg bg-muted/30 border space-y-2">
+          <div className="p-4 rounded-lg bg-muted/30 border space-y-3">
             {hasSplitPayment ? (
-                <div>
-                    <h4 className="font-medium text-sm mb-2">Split Payment:</h4>
+                <div className="space-y-2">
+                    <h4 className="font-bold text-sm mb-2 uppercase tracking-wider text-muted-foreground">Split Payment Details</h4>
                     {transaction.paymentDetails.methods?.map((p, i) => (
-                        <div key={i} className="flex justify-between items-center text-sm">
-                            <span className="flex items-center gap-2">{getPaymentMethodIcon(p.method)} {p.method}:</span>
-                            <span className="font-mono">{formatCurrency(p.amount, currencySymbol)}</span>
+                        <div key={i} className="flex justify-between items-center text-sm bg-background/50 p-2 rounded">
+                            <span className="flex items-center gap-2 font-medium">{getPaymentMethodIcon(p.method)} {p.method}:</span>
+                            <span className="font-mono font-bold">{formatCurrency(p.amount, currencySymbol)}</span>
                         </div>
                     ))}
                 </div>
             ) : null }
-            {typeof transaction.paymentDetails.amountTendered === 'number' && (
-                <div className="flex justify-between text-sm pt-2 border-t">
-                    <span className="text-muted-foreground">Amount Tendered:</span>
-                    <span className="font-mono">{formatCurrency(transaction.paymentDetails.amountTendered, currencySymbol)}</span>
-                </div>
-            )}
-             {typeof transaction.paymentDetails.changeGiven === 'number' && transaction.paymentDetails.changeGiven > 0 && (
-                <div className="flex justify-between text-sm text-blue-600">
-                    <span className="font-medium">Change Given:</span>
-                    <span className="font-mono font-semibold">{formatCurrency(transaction.paymentDetails.changeGiven, currencySymbol)}</span>
-                </div>
-            )}
+            <div className="space-y-1 pt-2 border-t border-muted">
+                {typeof transaction.paymentDetails.amountTendered === 'number' && (
+                    <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Amount Tendered:</span>
+                        <span className="font-mono">{formatCurrency(transaction.paymentDetails.amountTendered, currencySymbol)}</span>
+                    </div>
+                )}
+                 {typeof transaction.paymentDetails.changeGiven === 'number' && transaction.paymentDetails.changeGiven > 0 && (
+                    <div className="flex justify-between text-sm text-blue-600 font-medium">
+                        <span>Change Given:</span>
+                        <span className="font-mono font-bold">{formatCurrency(transaction.paymentDetails.changeGiven, currencySymbol)}</span>
+                    </div>
+                )}
+            </div>
           </div>
         )}
       </CardContent>
@@ -314,44 +317,48 @@ export function SaleDetailsModal({ isOpen, onOpenChange, saleTransaction, curren
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl p-0 h-[90vh] sm:h-[85vh] flex flex-col">
-        <DialogHeader className="p-6 pb-4 border-b">
-          <DialogTitle className="flex items-center justify-between">
-            <span className="text-2xl font-bold tracking-tight">Transaction Details</span>
-          </DialogTitle>
-          <DialogDescription className="mt-1 text-left">
+      <DialogContent className="max-w-4xl p-0 h-[100dvh] sm:h-[90vh] flex flex-col overflow-hidden border-none sm:border">
+        <DialogHeader className="p-6 pb-4 border-b shrink-0">
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-xl sm:text-2xl font-bold tracking-tight">Transaction Details</DialogTitle>
+          </div>
+          <DialogDescription className="mt-1 text-left text-xs sm:text-sm">
             ID: <span className="font-mono">{saleTransaction.id}</span>
             <br />
-            Date: {saleDate ? format(saleDate, "EEEE, MMMM do, yyyy 'at' h:mm a") : 'Invalid Date'}
+            {saleDate ? format(saleDate, "EEEE, MMMM do, yyyy 'at' h:mm a") : 'Invalid Date'}
           </DialogDescription>
         </DialogHeader>
 
         <ScrollArea className="flex-1">
-          <div className="p-6 space-y-6">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <div className="text-center p-4 rounded-xl bg-muted/30">
-                <DollarSign className="w-5 h-5 text-muted-foreground mx-auto mb-2" />
-                <div className="text-2xl font-bold font-mono">
+          <div className="p-4 sm:p-6 space-y-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-muted/30 border border-transparent">
+                <DollarSign className="w-4 h-4 text-muted-foreground mb-1" />
+                <div className="text-lg sm:text-xl font-bold font-mono truncate w-full text-center">
                   {formatCurrency(netTotal, currencySymbol)}
                 </div>
-                <div className="text-xs text-muted-foreground">Net Total</div>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Net Total</div>
               </div>
-              <div className="text-center p-4 rounded-xl bg-muted/30">
-                <Package className="w-5 h-5 text-muted-foreground mx-auto mb-2" />
-                <div className="text-2xl font-bold">
+              <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-muted/30 border border-transparent">
+                <Package className="w-4 h-4 text-muted-foreground mb-1" />
+                <div className="text-lg sm:text-xl font-bold truncate w-full text-center">
                   {saleTransaction.items.reduce((sum, item) => sum + item.quantity, 0)}
                 </div>
-                <div className="text-xs text-muted-foreground">Items Sold</div>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Items Sold</div>
               </div>
-              <div className="text-center p-4 rounded-xl bg-muted/30">
-                <UserCircle className="w-5 h-5 text-muted-foreground mx-auto mb-2" />
-                <div className="text-sm font-medium truncate">{saleTransaction.customerName || "Walk-in"}</div>
-                <div className="text-xs text-muted-foreground">Customer</div>
+              <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-muted/30 border border-transparent">
+                <UserCircle className="w-4 h-4 text-muted-foreground mb-1" />
+                <div className="text-sm font-bold truncate w-full text-center">
+                  {saleTransaction.customerName || "Walk-in"}
+                </div>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Customer</div>
               </div>
-              <div className="text-center p-4 rounded-xl bg-muted/30">
-                <CreditCard className="w-5 h-5 text-muted-foreground mx-auto mb-2" />
-                <div className="text-sm font-medium">{saleTransaction.paymentMethod}</div>
-                <div className="text-xs text-muted-foreground">Payment</div>
+              <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-muted/30 border border-transparent">
+                <CreditCard className="w-4 h-4 text-muted-foreground mb-1" />
+                <div className="text-sm font-bold truncate w-full text-center">
+                  {saleTransaction.paymentMethod}
+                </div>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Payment</div>
               </div>
             </div>
 
@@ -372,23 +379,22 @@ export function SaleDetailsModal({ isOpen, onOpenChange, saleTransaction, curren
           </div>
         </ScrollArea>
 
-        <DialogFooter className="mt-auto pt-4 p-6 border-t flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div className="flex gap-2">
+        <DialogFooter className="mt-auto p-4 sm:p-6 border-t flex flex-row justify-end items-center gap-2 shrink-0 bg-background">
             {saleTransaction.isCreditSale && !saleTransaction.isPaid && onRecordPayment && (
                 <Button 
                     variant="outline" 
+                    size="sm"
                     className="bg-primary text-white hover:bg-primary/90"
                     onClick={handleRecordPaymentInternal}
                 >
                     <Wallet className="mr-2 h-4 w-4" /> Record Payment
                 </Button>
             )}
-          </div>
-          <DialogClose asChild>
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Close
-            </Button>
-          </DialogClose>
+            <DialogClose asChild>
+                <Button variant="outline" size="sm" onClick={() => onOpenChange(false)}>
+                Close
+                </Button>
+            </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>
