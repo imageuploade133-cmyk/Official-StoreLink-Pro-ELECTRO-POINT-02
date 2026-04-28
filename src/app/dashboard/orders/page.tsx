@@ -548,8 +548,8 @@ export default function WebsiteOrdersPage() {
       </div>
 
       <Tabs value={activeMainTab} onValueChange={setActiveMainTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6 h-12 p-1 bg-muted/50 rounded-2xl border">
-          <TabsTrigger value="registry" className="rounded-xl font-bold uppercase text-[10px] tracking-widest gap-2">
+        <TabsList className="flex w-full justify-start md:justify-center mb-6 h-12 p-1 bg-muted/50 rounded-2xl border overflow-x-auto no-scrollbar">
+          <TabsTrigger value="registry" className="rounded-xl font-bold uppercase text-[10px] tracking-widest gap-2 flex-1">
             <ShoppingBag className="h-3.5 w-3.5" /> Active Registry
           </TabsTrigger>
           <TabsTrigger value="audit" className="rounded-xl font-bold uppercase text-[10px] tracking-widest gap-2">

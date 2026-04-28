@@ -389,11 +389,11 @@ export default function MySalesHistoryPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as SalesTypeFilter)} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-6">
-            <TabsTrigger value="all" className="flex items-center gap-2">All Registry</TabsTrigger>
-            <TabsTrigger value="sales" className="flex items-center gap-2">Standard Sales</TabsTrigger>
-            <TabsTrigger value="credit" className="flex items-center gap-2">Credit Sales</TabsTrigger>
-            <TabsTrigger value="refunds" className="flex items-center gap-2">Return Log</TabsTrigger>
+        <TabsList className="flex w-full justify-start md:justify-center mb-6 overflow-x-auto no-scrollbar">
+            <TabsTrigger value="all" className="flex items-center gap-2 whitespace-nowrap">All Registry</TabsTrigger>
+            <TabsTrigger value="sales" className="flex items-center gap-2 whitespace-nowrap">Standard Sales</TabsTrigger>
+            <TabsTrigger value="credit" className="flex items-center gap-2 whitespace-nowrap">Credit Sales</TabsTrigger>
+            <TabsTrigger value="refunds" className="flex items-center gap-2 whitespace-nowrap">Return Log</TabsTrigger>
         </TabsList>
 
         <Card className="mb-6">

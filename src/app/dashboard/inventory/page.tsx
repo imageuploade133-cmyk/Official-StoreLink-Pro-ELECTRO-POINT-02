@@ -537,7 +537,7 @@ export default function InventoryPage() {
         variantStockCount={variantStockCount}
       />
 
-      <div className="flex items-center gap-2 bg-muted/30 p-1 rounded-xl w-fit border">
+      <div className="flex items-center gap-2 bg-muted/30 p-1 rounded-xl w-full sm:w-fit border overflow-x-auto no-scrollbar">
         <Button 
           variant={stockFilter === 'all' ? 'default' : 'ghost'} 
           size="sm" 

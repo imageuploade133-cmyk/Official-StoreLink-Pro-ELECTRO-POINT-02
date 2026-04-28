@@ -394,12 +394,12 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
                 </div>
 
                 <Tabs defaultValue="orderPlaced" className="w-full">
-                    <TabsList className="grid grid-cols-2 md:grid-cols-5 h-auto p-1 bg-gray-100 rounded-xl">
-                        <TabsTrigger value="orderPlaced" className="py-2 text-xs rounded-lg">Placed</TabsTrigger>
-                        <TabsTrigger value="orderProcessing" className="py-2 text-xs rounded-lg">Processing</TabsTrigger>
-                        <TabsTrigger value="orderShipped" className="py-2 text-xs rounded-lg">Shipped</TabsTrigger>
-                        <TabsTrigger value="orderDelivered" className="py-2 text-xs rounded-lg">Delivered</TabsTrigger>
-                        <TabsTrigger value="orderCancelled" className="py-2 text-xs rounded-lg">Cancelled</TabsTrigger>
+                    <TabsList className="flex w-full justify-start md:justify-center h-auto p-1 bg-gray-100 rounded-xl overflow-x-auto no-scrollbar">
+                        <TabsTrigger value="orderPlaced" className="py-2 text-xs rounded-lg whitespace-nowrap">Placed</TabsTrigger>
+                        <TabsTrigger value="orderProcessing" className="py-2 text-xs rounded-lg whitespace-nowrap">Processing</TabsTrigger>
+                        <TabsTrigger value="orderShipped" className="py-2 text-xs rounded-lg whitespace-nowrap">Shipped</TabsTrigger>
+                        <TabsTrigger value="orderDelivered" className="py-2 text-xs rounded-lg whitespace-nowrap">Delivered</TabsTrigger>
+                        <TabsTrigger value="orderCancelled" className="py-2 text-xs rounded-lg whitespace-nowrap">Cancelled</TabsTrigger>
                     </TabsList>
                     
                     {[

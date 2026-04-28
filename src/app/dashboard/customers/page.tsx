@@ -481,7 +481,7 @@ export default function CustomersPage() {
           </div>
           
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsList className="flex w-full justify-start md:justify-center mb-4 overflow-x-auto no-scrollbar">
                   <TabsTrigger value="customers" disabled={isLoadingCustomers && customers.length === 0}>Customer Directory</TabsTrigger>
                   <TabsTrigger value="history" disabled={isLoadingCustomers && customers.length === 0}>Activity Log</TabsTrigger>
               </TabsList>

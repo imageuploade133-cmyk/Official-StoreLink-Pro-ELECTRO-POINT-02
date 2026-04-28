@@ -505,7 +505,7 @@ function SalesHistoryContent() {
             </div>
             
             <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as SalesFilterTab)} className="w-full">
-                <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto">
+                <TabsList className="flex w-full justify-start md:justify-center h-auto overflow-x-auto no-scrollbar">
                     <TabsTrigger value="all">All</TabsTrigger>
                     <TabsTrigger value="paid">Paid</TabsTrigger>
                     <TabsTrigger value="credit">Credit</TabsTrigger>

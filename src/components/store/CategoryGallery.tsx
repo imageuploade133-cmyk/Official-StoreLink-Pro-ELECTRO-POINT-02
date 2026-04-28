@@ -98,7 +98,7 @@ export function CategoryGallery() {
     return (
       <section className="py-12 bg-white dark:bg-black">
         <div className="max-w-site-container mx-auto px-6">
-          <div className="flex gap-6 overflow-hidden">
+          <div className="flex gap-6 overflow-x-auto no-scrollbar">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="flex-shrink-0 w-32 md:w-44 space-y-3">
                 <Skeleton className="aspect-[4/5] w-full rounded-[2rem]" />

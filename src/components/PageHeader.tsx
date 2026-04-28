@@ -31,7 +31,7 @@ export function PageHeader({
         </div>
       </div>
       {children && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 md:pb-0">
           {children}
         </div>
       )}
