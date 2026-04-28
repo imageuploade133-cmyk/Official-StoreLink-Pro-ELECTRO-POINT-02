@@ -248,6 +248,14 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
     .refine(
       (data) => !!data.imageUrl || (data.variants && data.variants.some(v => !!v.imageUrl)),
       { message: "Product image is required. Please upload an image or ensure at least one variant has an image.", path: ["imageUrl"] }
+    ).refine(
+      (data) => {
+        if (!data.hasVariants || !data.variants || data.variants.length === 0) return true;
+        const barcodes = data.variants.map((v: any) => v.barcode).filter((b: any) => !!b);
+        if (data.barcode) barcodes.push(data.barcode);
+        return new Set(barcodes).size === barcodes.length;
+      },
+      { message: "Duplicate barcodes detected across product and variants.", path: ["variants"] }
     );
 };
 export interface ProductFormProps {

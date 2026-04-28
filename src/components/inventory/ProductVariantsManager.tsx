@@ -22,7 +22,8 @@ import {
   Palette,
   Type as TypeIcon,
   ChevronDown,
-  ShoppingBag
+  ShoppingBag,
+  Barcode
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -54,6 +55,7 @@ import { compressAndResizeImage } from '@/lib/image-utils';
 import { useSettings } from '@/contexts/settings-context';
 import Image from 'next/image';
 import { ConfirmationModal } from '../dialogs/ConfirmationModal';
+import { BarcodeScanner } from '@/components/inventory/BarcodeScanner';
 
 const PRESET_OPTIONS = [
   { 
@@ -132,6 +134,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
   const showAdvancedDetails = watch('advancedDetailsEnabled');
   const setShowAdvancedDetails = (val: boolean) => setValue('advancedDetailsEnabled', val, { shouldDirty: true });
   const [isManualMode, setIsManualMode] = useState(false);
+  const [activeScanningIndex, setActiveScanningIndex] = useState<number | null>(null);
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
     title: string;
@@ -294,6 +297,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
         name,
         options: combo,
         sku: '',
+        barcode: '',
         sellingPrice: baseSellingPrice,
         stock: 0,
         imageUrl: '',
@@ -976,6 +980,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                           name: 'New Variant',
                           options: {},
                           sku: '',
+                          barcode: '',
                           sellingPrice: baseSellingPrice,
                           stock: 0,
                           imageUrl: '',
@@ -1100,6 +1105,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                               Number(originalVariant.stock) !== Number(variant.stock) ||
                               Number(originalVariant.sellingPrice) !== Number(variant.sellingPrice) ||
                               originalVariant.sku !== variant.sku ||
+                              originalVariant.barcode !== variant.barcode ||
                               originalVariant.isActive !== variant.isActive ||
                               originalVariant.imageUrl !== variant.imageUrl ||
                               JSON.stringify(originalVariant.options) !== JSON.stringify(variant.options)
@@ -1135,6 +1141,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                                 Number(originalVariant.stock) !== Number(variant.stock) ||
                                 Number(originalVariant.sellingPrice) !== Number(variant.sellingPrice) ||
                                 originalVariant.sku !== variant.sku ||
+                                originalVariant.barcode !== variant.barcode ||
                                 originalVariant.isActive !== variant.isActive ||
                                 originalVariant.imageUrl !== variant.imageUrl ||
                                 JSON.stringify(originalVariant.options) !== JSON.stringify(variant.options)
@@ -1202,6 +1209,40 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                           />
                         </div>
                         <div className="space-y-1">
+                          <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Barcode</Label>
+                          <div className="flex gap-1.5">
+                            <Input 
+                              placeholder="Barcode..." 
+                              data-barcode-input="true"
+                              className="h-10 text-xs font-mono bg-muted/30 border border-primary/10 focus-visible:border-primary/30 focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl"
+                              {...control.register(`variants.${index}.barcode` as const, {
+                                validate: (value) => {
+                                  if (!value) return true;
+                                  const currentVariants = getValues('variants') || [];
+                                  const isDuplicate = currentVariants.some((v: any, i: number) => i !== index && v.barcode === value);
+                                  const mainBarcode = getValues('barcode');
+                                  if (isDuplicate || mainBarcode === value) return "Duplicate barcode";
+                                  return true;
+                                }
+                              })}
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              className="h-10 w-10 shrink-0 bg-muted/30 border border-primary/10 hover:bg-primary/10 hover:text-primary transition-all rounded-xl"
+                              onClick={() => setActiveScanningIndex(index)}
+                            >
+                              <Barcode className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          {errors.variants?.[index]?.barcode && (
+                            <p className="text-[10px] text-destructive font-black uppercase mt-1 animate-in fade-in slide-in-from-top-1">
+                              {(errors.variants as any)[index].barcode.message}
+                            </p>
+                          )}
+                        </div>
+                        <div className="space-y-1">
                           <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Price</Label>
                           <div className="relative">
                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-[10px] font-bold">$</span>
@@ -1214,6 +1255,19 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                           </div>
                         </div>
                         
+                        <div className="space-y-1">
+                          <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Stock</Label>
+                          <Input 
+                            type="number" 
+                            className="h-10 text-xs font-black bg-muted/30 border border-primary/10 focus-visible:border-primary/30 focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl"
+                            {...control.register(`variants.${index}.stock` as const)}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value) || 0;
+                              setValue(`variants.${index}.stock`, val, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
+                            }}
+                          />
+                        </div>
+
                         {showAdvancedDetails && (
                           <div className="col-span-2 space-y-3 pt-2 animate-in fade-in slide-in-from-top-2">
                             <Separator className="bg-muted/50" />
@@ -1281,18 +1335,6 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                         )}
 
                         <div className="space-y-1">
-                          <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Stock</Label>
-                          <Input 
-                            type="number" 
-                            className="h-10 text-xs font-black bg-muted/30 border border-primary/10 focus-visible:border-primary/30 focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl"
-                            {...control.register(`variants.${index}.stock` as const)}
-                            onChange={(e) => {
-                              const val = parseInt(e.target.value) || 0;
-                              setValue(`variants.${index}.stock`, val, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
-                            }}
-                          />
-                        </div>
-                        <div className="space-y-1">
                           <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Status</Label>
                           <div className="flex items-center justify-between h-10 px-3 bg-muted/30 rounded-xl">
                             <span className="text-[10px] font-bold uppercase">{variant.isActive ? 'On' : 'Off'}</span>
@@ -1314,6 +1356,32 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
         </div>
       )}
       
+      <BarcodeScanner 
+        isOpen={activeScanningIndex !== null}
+        onClose={() => setActiveScanningIndex(null)}
+        onScan={(barcode) => {
+          if (activeScanningIndex !== null) {
+            // Check for duplicate barcodes within variants
+            const currentVariants = getValues('variants') || [];
+            const isDuplicate = currentVariants.some((v: any, i: number) => i !== activeScanningIndex && v.barcode === barcode);
+            const mainBarcode = getValues('barcode');
+            
+            if (isDuplicate || mainBarcode === barcode) {
+              toast({ 
+                variant: "destructive", 
+                title: "Duplicate Barcode", 
+                description: `The barcode "${barcode}" is already assigned to another ${isDuplicate ? 'variant' : 'product'}.` 
+              });
+              return;
+            }
+
+            setValue(`variants.${activeScanningIndex}.barcode`, barcode, { shouldDirty: true, shouldValidate: true });
+            toast({ title: "Barcode Scanned", description: `Assigned to ${variants[activeScanningIndex]?.name || 'variant'}.` });
+            setActiveScanningIndex(null);
+          }
+        }}
+      />
+
       <ConfirmationModal 
         isOpen={confirmConfig.isOpen}
         onOpenChange={(open) => setConfirmConfig(prev => ({ ...prev, isOpen: open }))}

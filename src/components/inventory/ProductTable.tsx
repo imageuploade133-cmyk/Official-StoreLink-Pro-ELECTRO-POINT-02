@@ -111,12 +111,28 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
   }, [products, categories]);
 
   const filteredProducts = useMemo(() => {
-    return productsWithCategoryNames.filter(product =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.categoryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.sku?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.supplierName?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    return productsWithCategoryNames.filter(product => {
+    const searchLower = searchTerm.toLowerCase();
+
+    const matchesMain = product.name.toLowerCase().includes(searchLower) ||
+      product.categoryName.toLowerCase().includes(searchLower) ||
+      product.sku?.toLowerCase().includes(searchLower) ||
+      product.barcode?.toLowerCase().includes(searchLower) ||
+      product.supplierName?.toLowerCase().includes(searchLower);
+
+    if (matchesMain) return true;
+
+    // Search in variants
+    if (product.hasVariants && product.variants) {
+      return product.variants.some(v =>
+        v.name.toLowerCase().includes(searchLower) ||
+        v.sku?.toLowerCase().includes(searchLower) ||
+        v.barcode?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    return false;
+  });
   }, [productsWithCategoryNames, searchTerm]);
 
   if (products.length === 0) {
