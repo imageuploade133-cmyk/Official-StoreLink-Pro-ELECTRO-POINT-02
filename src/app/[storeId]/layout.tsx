@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import * as React from "react";
 
 import { PublicNavbar } from '@/components/store/PublicNavbar';
 import { PublicFooter } from '@/components/store/PublicFooter';
@@ -173,7 +173,7 @@ export default function PublicLayout({
       
       <main 
         className={cn(
-            "relative z-10 transition-shadow duration-300",
+            "relative z-10 transition-shadow duration-300 overflow-x-auto",
             !hasGlobalBg && "dark:bg-black",
             (settings?.enableBackgroundShadow ?? true) && "shadow-[0_0_50px_rgba(0,0,0,0.1)] dark:shadow-[0_0_50px_rgba(255,255,255,0.05)]"
         )} 

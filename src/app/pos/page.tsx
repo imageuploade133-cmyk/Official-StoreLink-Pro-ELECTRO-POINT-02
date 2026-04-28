@@ -794,7 +794,7 @@ export default function POSPage() {
   
   return (
     <TooltipProvider>
-      <div className="min-h-screen lg:h-dvh flex flex-col lg:overflow-hidden bg-muted/30">
+      <div className="min-h-screen lg:h-dvh flex flex-col overflow-x-auto lg:overflow-hidden bg-muted/30">
         <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6">
             <div className="flex items-center gap-3">
                 <div className="p-2 bg-muted rounded-md">

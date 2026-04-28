@@ -68,7 +68,7 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className="bg-background text-foreground antialiased font-display min-h-screen overflow-x-hidden"
+        className="bg-background text-foreground antialiased font-display min-h-screen overflow-x-auto"
         suppressHydrationWarning={true}
       >
         <ClientProviders storeId={storeId}>
