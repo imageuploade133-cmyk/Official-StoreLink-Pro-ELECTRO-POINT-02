@@ -1,11 +1,12 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
+import { ResponsiveModal } from '../ui/responsive-modal';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
 import { Loader2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '../../hooks/use-toast';
 
 interface AdminAuthDialogProps {
   isOpen: boolean;
@@ -43,43 +44,42 @@ export function AdminAuthDialog({ isOpen, onOpenChange, userEmail, onConfirm, is
   }, [isOpen]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{title || 'Admin Authentication Required'}</DialogTitle>
-          <DialogDescription>{description || 'This is a sensitive action. Please re-authenticate to proceed.'}</DialogDescription>
-        </DialogHeader>
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="email-confirmation">Type your email to confirm: <span className="font-bold">{userEmail}</span></Label>
-            <Input
-              id="email-confirmation"
-              value={emailConfirmation}
-              onChange={(e) => setEmailConfirmation(e.target.value)}
-              placeholder="Enter your email"
-              disabled={isProcessing}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password-auth">Password</Label>
-            <Input
-              id="password-auth"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              disabled={isProcessing}
-            />
-          </div>
+    <ResponsiveModal 
+      open={isOpen} 
+      onOpenChange={onOpenChange}
+      title={title || 'Admin Authentication Required'}
+      description={description || 'This is a sensitive action. Please re-authenticate to proceed.'}
+    >
+      <div className="space-y-4 py-4">
+        <div className="space-y-2">
+          <Label htmlFor="email-confirmation">Type your email to confirm: <span className="font-bold">{userEmail}</span></Label>
+          <Input
+            id="email-confirmation"
+            value={emailConfirmation}
+            onChange={(e) => setEmailConfirmation(e.target.value)}
+            placeholder="Enter your email"
+            disabled={isProcessing}
+          />
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isProcessing}>Cancel</Button>
-          <Button onClick={handleConfirm} disabled={isProcessing}>
-            {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {confirmButtonText || 'Confirm Action'}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        <div className="space-y-2">
+          <Label htmlFor="password-auth">Password</Label>
+          <Input
+            id="password-auth"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter your password"
+            disabled={isProcessing}
+          />
+        </div>
+      </div>
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 gap-2 mt-4">
+        <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isProcessing}>Cancel</Button>
+        <Button onClick={handleConfirm} disabled={isProcessing}>
+          {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {confirmButtonText || 'Confirm Action'}
+        </Button>
+      </div>
+    </ResponsiveModal>
   );
 }
