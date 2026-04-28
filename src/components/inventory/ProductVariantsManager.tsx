@@ -20,6 +20,7 @@ import {
   Sparkles,
   Star,
   Palette,
+  Barcode,
   Type as TypeIcon,
   ChevronDown,
   ShoppingBag
@@ -54,6 +55,7 @@ import { compressAndResizeImage } from '@/lib/image-utils';
 import { useSettings } from '@/contexts/settings-context';
 import Image from 'next/image';
 import { ConfirmationModal } from '../dialogs/ConfirmationModal';
+import { BarcodeScanner } from './BarcodeScanner';
 
 const PRESET_OPTIONS = [
   { 
@@ -132,6 +134,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
   const showAdvancedDetails = watch('advancedDetailsEnabled');
   const setShowAdvancedDetails = (val: boolean) => setValue('advancedDetailsEnabled', val, { shouldDirty: true });
   const [isManualMode, setIsManualMode] = useState(false);
+  const [activeScannerVariantIndex, setActiveScannerVariantIndex] = useState<number | null>(null);
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
     title: string;
@@ -294,6 +297,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
         name,
         options: combo,
         sku: '',
+        barcode: '',
         sellingPrice: baseSellingPrice,
         stock: 0,
         imageUrl: '',
@@ -976,6 +980,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                           name: 'New Variant',
                           options: {},
                           sku: '',
+                          barcode: '',
                           sellingPrice: baseSellingPrice,
                           stock: 0,
                           imageUrl: '',
@@ -1100,16 +1105,17 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                               Number(originalVariant.stock) !== Number(variant.stock) ||
                               Number(originalVariant.sellingPrice) !== Number(variant.sellingPrice) ||
                               originalVariant.sku !== variant.sku ||
+                              originalVariant.barcode !== variant.barcode ||
                               originalVariant.isActive !== variant.isActive ||
                               originalVariant.imageUrl !== variant.imageUrl ||
                               JSON.stringify(originalVariant.options) !== JSON.stringify(variant.options)
                             );
-                            
+
                             return isVariantModified && (
-                              <Button 
-                                type="button" 
-                                variant="ghost" 
-                                size="icon" 
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
                                 className="h-8 w-8 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all shadow-sm"
                                 onClick={() => {
                                   setValue(`variants.${index}`, { ...originalVariant }, { shouldDirty: true, shouldValidate: true });
@@ -1121,10 +1127,10 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                               </Button>
                             );
                           })()}
-                          <Button 
-                            type="button" 
-                            variant="ghost" 
-                            size="icon" 
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
                             className="h-8 w-8 rounded-full bg-destructive text-white hover:bg-destructive/90 transition-all shadow-sm"
                             onClick={() => {
                               // If modified, reset first instead of removing
@@ -1135,6 +1141,7 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                                 Number(originalVariant.stock) !== Number(variant.stock) ||
                                 Number(originalVariant.sellingPrice) !== Number(variant.sellingPrice) ||
                                 originalVariant.sku !== variant.sku ||
+                                originalVariant.barcode !== variant.barcode ||
                                 originalVariant.isActive !== variant.isActive ||
                                 originalVariant.imageUrl !== variant.imageUrl ||
                                 JSON.stringify(originalVariant.options) !== JSON.stringify(variant.options)
@@ -1195,11 +1202,31 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
                       <div className="grid grid-cols-2 gap-3">
                         <div className="space-y-1">
                           <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">SKU Code</Label>
-                          <Input 
-                            placeholder="SKU..." 
+                          <Input
+                            placeholder="SKU..."
                             className="h-10 text-xs font-mono bg-muted/30 border border-primary/10 focus-visible:border-primary/30 focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl"
                             {...control.register(`variants.${index}.sku` as const)}
                           />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Barcode</Label>
+                          <div className="flex gap-1.5 items-center">
+                            <Input
+                              placeholder="Barcode..."
+                              className="h-10 text-xs font-mono bg-muted/30 border border-primary/10 focus-visible:border-primary/30 focus-visible:ring-1 focus-visible:ring-primary/20 rounded-xl"
+                              {...control.register(`variants.${index}.barcode` as const)}
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              className="h-10 w-10 shrink-0 rounded-xl border-primary/20 hover:bg-primary/5 hover:text-primary transition-all"
+                              onClick={() => setActiveScannerVariantIndex(index)}
+                              title="Scan barcode"
+                            >
+                              <Barcode className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                         <div className="space-y-1">
                           <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">Price</Label>
@@ -1320,6 +1347,25 @@ export function ProductVariantsManager({ storeId }: ProductVariantsManagerProps)
         onConfirm={confirmConfig.onConfirm}
         title={confirmConfig.title}
         description={confirmConfig.description}
+      />
+      
+      <BarcodeScanner 
+        isOpen={activeScannerVariantIndex !== null}
+        onClose={() => setActiveScannerVariantIndex(null)}
+        onScan={(barcode) => {
+          if (activeScannerVariantIndex !== null) {
+            const isDuplicate = variants.some((v: any, idx: number) => idx !== activeScannerVariantIndex && v.barcode === barcode);
+            if (isDuplicate) {
+              toast({
+                title: "Duplicate Barcode",
+                description: "This barcode is already assigned to another variant of this product.",
+                variant: "destructive"
+              });
+            }
+            setValue(`variants.${activeScannerVariantIndex}.barcode`, barcode, { shouldDirty: true });
+            setActiveScannerVariantIndex(null);
+          }
+        }}
       />
     </div>
   );
