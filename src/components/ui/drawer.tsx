@@ -3,7 +3,8 @@
 import * as React from "react"
 import { Drawer as DrawerPrimitive } from "vaul"
 
-import { cn } from "@/lib/utils"
+import { cn } from "../../lib/utils"
+import { buttonVariants } from "./button"
 
 const Drawer = ({
   shouldScaleBackground = false,
@@ -104,6 +105,30 @@ const DrawerDescription = React.forwardRef<
 ))
 DrawerDescription.displayName = DrawerPrimitive.Description.displayName
 
+const DrawerAction = React.forwardRef<
+  React.ElementRef<typeof DrawerPrimitive.Close>,
+  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Close>
+>(({ className, ...props }, ref) => (
+  <DrawerPrimitive.Close
+    ref={ref}
+    className={cn(buttonVariants(), className)}
+    {...props}
+  />
+))
+DrawerAction.displayName = "DrawerAction"
+
+const DrawerCancel = React.forwardRef<
+  React.ElementRef<typeof DrawerPrimitive.Close>,
+  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Close>
+>(({ className, ...props }, ref) => (
+  <DrawerPrimitive.Close
+    ref={ref}
+    className={cn(buttonVariants({ variant: "outline" }), className)}
+    {...props}
+  />
+))
+DrawerCancel.displayName = "DrawerCancel"
+
 export {
   Drawer,
   DrawerPortal,
@@ -115,4 +140,6 @@ export {
   DrawerFooter,
   DrawerTitle,
   DrawerDescription,
+  DrawerAction,
+  DrawerCancel,
 }
