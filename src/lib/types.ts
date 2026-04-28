@@ -960,8 +960,8 @@ export interface HeldSaleItem {
     stock: number;
     barcode: string | null;
     categoryId: string | null;
-    variantId?: string;
-    selectedOptions?: { [key: string]: string };
+    variantId?: string | null;
+    selectedOptions?: { [key: string]: string } | null;
 }
 
 export interface HeldSale {
@@ -1218,8 +1218,8 @@ export interface SaleTransactionItem {
   unitPrice: number;
   totalPrice: number;
   originalPrice?: number | null;
-  variantId?: string;
-  selectedOptions?: { [key: string]: string };
+  variantId?: string | null;
+  selectedOptions?: { [key: string]: string } | null;
 }
 
 export interface SaleReturn {
