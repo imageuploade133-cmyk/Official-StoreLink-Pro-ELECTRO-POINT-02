@@ -1,7 +1,7 @@
 
 "use client"
 
-import type React from "react"
+import * as React from "react"
 import {
   Dialog,
   DialogContent,
@@ -52,14 +52,14 @@ const ItemsSection: React.FC<{
 }> = ({ items, subtotal, currencySymbol, totalReturnedItems }) => {
   return (
     <Card>
-      <CardHeader className="pb-4">
+      <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-            <ShoppingBag className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
+            <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold">Items Purchased</h2>
-            <p className="text-sm text-muted-foreground">
+            <h2 className="text-base sm:text-lg font-semibold">Items Purchased</h2>
+            <p className="text-xs sm:text-sm text-muted-foreground">
                 {items.length} product types.
                 {totalReturnedItems > 0 && (
                     <span className="ml-2 text-orange-600 dark:text-orange-400 font-medium">({totalReturnedItems} items returned)</span>
@@ -68,37 +68,35 @@ const ItemsSection: React.FC<{
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-0">
-        <div className="space-y-3">
+      <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
+        <div className="space-y-2 sm:space-y-3">
           {items.map((item, index) => (
             <div
               key={`${item.productId}-${index}`}
-              className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-muted/30 transition-colors"
+              className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 rounded-lg border bg-card hover:bg-muted/30 transition-colors gap-2 sm:gap-4"
             >
               <div className="flex-1 min-w-0">
-                <h3 className="font-medium truncate">{item.productName}</h3>
-                {item.variantName && <p className="text-sm text-muted-foreground">Variant: {item.variantName}</p>}
-                <p className="text-sm text-muted-foreground font-mono">
+                <h3 className="font-bold text-sm sm:text-base truncate">{item.productName}</h3>
+                {item.variantName && <p className="text-xs text-muted-foreground">Variant: {item.variantName}</p>}
+                <p className="text-[10px] sm:text-sm text-muted-foreground font-mono">
                   {formatCurrency(item.unitPrice, currencySymbol)} each
                 </p>
               </div>
-              <div className="text-right ml-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <span className="text-sm font-semibold text-primary">{item.quantity}</span>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-semibold font-mono">
-                      {formatCurrency(item.totalPrice, currencySymbol)}
-                    </div>
+              <div className="flex items-center justify-between sm:justify-end gap-3 sm:ml-4">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-xs sm:text-sm font-bold text-primary">{item.quantity}</span>
+                </div>
+                <div className="text-right">
+                  <div className="font-bold sm:font-semibold font-mono text-sm sm:text-base">
+                    {formatCurrency(item.totalPrice, currencySymbol)}
                   </div>
                 </div>
               </div>
             </div>
           ))}
         </div>
-        <Separator className="my-4" />
-        <div className="flex items-center justify-between text-lg font-semibold">
+        <Separator className="my-3 sm:my-4" />
+        <div className="flex items-center justify-between text-base sm:text-lg font-bold sm:font-semibold">
           <span>Subtotal</span>
           <span className="font-mono">{formatCurrency(subtotal, currencySymbol)}</span>
         </div>
@@ -123,70 +121,70 @@ const PaymentSection: React.FC<{
     const hasSplitPayment = transaction.paymentDetails?.methods && transaction.paymentDetails.methods.length > 0;
   return (
     <Card>
-      <CardHeader className="pb-4">
+      <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-            <Landmark className="w-5 h-5 text-green-600 dark:text-green-400" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
+            <Landmark className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 dark:text-green-400" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold">Payment Details</h2>
-            <p className="text-sm text-muted-foreground">Transaction financial information</p>
+            <h2 className="text-base sm:text-lg font-semibold">Payment Details</h2>
+            <p className="text-xs sm:text-sm text-muted-foreground">Transaction financial information</p>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-0 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 rounded-lg bg-muted/30">
-            <div className="flex items-center gap-2 mb-2">
-              <CreditCard className="w-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium text-muted-foreground">Payment Method</span>
+      <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0 space-y-3 sm:space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="p-3 sm:p-4 rounded-lg bg-muted/30">
+            <div className="flex items-center gap-2 mb-1 sm:mb-2">
+              <CreditCard className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground" />
+              <span className="text-[10px] sm:text-sm font-medium text-muted-foreground uppercase">Method</span>
             </div>
-            <div className="font-semibold">{transaction.paymentMethod}</div>
+            <div className="font-bold sm:font-semibold text-sm sm:text-base">{transaction.paymentMethod}</div>
           </div>
-          <div className="p-4 rounded-lg bg-muted/30">
-            <div className="flex items-center gap-2 mb-2">
-              <Calculator className="w-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium text-muted-foreground">Subtotal</span>
+          <div className="p-3 sm:p-4 rounded-lg bg-muted/30">
+            <div className="flex items-center gap-2 mb-1 sm:mb-2">
+              <Calculator className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground" />
+              <span className="text-[10px] sm:text-sm font-medium text-muted-foreground uppercase">Subtotal</span>
             </div>
-            <div className="font-semibold font-mono">
+            <div className="font-bold sm:font-semibold font-mono text-sm sm:text-base">
               {formatCurrency(transaction.subtotal, currencySymbol)}
             </div>
           </div>
           {transaction.taxAmountCalculated && transaction.taxAmountCalculated > 0 && (
-            <div className="p-4 rounded-lg bg-muted/30">
-              <div className="flex items-center gap-2 mb-2">
-                <Calculator className="w-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium text-muted-foreground">Tax Collected</span>
+            <div className="p-3 sm:p-4 rounded-lg bg-muted/30">
+              <div className="flex items-center gap-2 mb-1 sm:mb-2">
+                <Calculator className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground" />
+                <span className="text-[10px] sm:text-sm font-medium text-muted-foreground uppercase">Tax Collected</span>
               </div>
-              <div className="font-semibold font-mono text-blue-600">
+              <div className="font-bold sm:font-semibold font-mono text-blue-600 text-sm sm:text-base">
                 {formatCurrency(transaction.taxAmountCalculated, currencySymbol)} ({transaction.taxRate}%)
               </div>
             </div>
           )}
         </div>
         {transaction.paymentDetails && (
-          <div className="p-4 rounded-lg bg-muted/30 border space-y-2">
+          <div className="p-3 sm:p-4 rounded-lg bg-muted/30 border space-y-2">
             {hasSplitPayment ? (
-                <div>
-                    <h4 className="font-medium text-sm mb-2">Split Payment:</h4>
+                <div className="space-y-2">
+                    <h4 className="font-bold text-[10px] sm:text-xs uppercase text-muted-foreground">Split Payment:</h4>
                     {transaction.paymentDetails.methods?.map((p, i) => (
-                        <div key={i} className="flex justify-between items-center text-sm">
+                        <div key={i} className="flex justify-between items-center text-xs sm:text-sm">
                             <span className="flex items-center gap-2">{getPaymentMethodIcon(p.method)} {p.method}:</span>
-                            <span className="font-mono">{formatCurrency(p.amount, currencySymbol)}</span>
+                            <span className="font-mono font-bold">{formatCurrency(p.amount, currencySymbol)}</span>
                         </div>
                     ))}
                 </div>
             ) : null }
             {typeof transaction.paymentDetails.amountTendered === 'number' && (
-                <div className="flex justify-between text-sm pt-2 border-t">
+                <div className="flex justify-between text-xs sm:text-sm pt-2 border-t">
                     <span className="text-muted-foreground">Amount Tendered:</span>
-                    <span className="font-mono">{formatCurrency(transaction.paymentDetails.amountTendered, currencySymbol)}</span>
+                    <span className="font-mono font-bold">{formatCurrency(transaction.paymentDetails.amountTendered, currencySymbol)}</span>
                 </div>
             )}
              {typeof transaction.paymentDetails.changeGiven === 'number' && transaction.paymentDetails.changeGiven > 0 && (
-                <div className="flex justify-between text-sm text-blue-600">
-                    <span className="font-medium">Change Given:</span>
-                    <span className="font-mono font-semibold">{formatCurrency(transaction.paymentDetails.changeGiven, currencySymbol)}</span>
+                <div className="flex justify-between text-xs sm:text-sm text-blue-600">
+                    <span className="font-bold">Change Given:</span>
+                    <span className="font-mono font-black">{formatCurrency(transaction.paymentDetails.changeGiven, currencySymbol)}</span>
                 </div>
             )}
           </div>
@@ -205,21 +203,21 @@ const StaffSection: React.FC<{
 
   return (
     <Card>
-      <CardHeader className="pb-4">
+      <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
-            <Briefcase className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center shrink-0">
+            <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600 dark:text-indigo-400" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold">Staff Details</h2>
-            <p className="text-sm text-muted-foreground">Staff member who processed the sale</p>
+            <h2 className="text-base sm:text-lg font-semibold">Staff Details</h2>
+            <p className="text-xs sm:text-sm text-muted-foreground">Processed the sale</p>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-0 space-y-2">
-        <div className="p-4 rounded-lg bg-muted/30 border">
-            <p className="text-sm"><span className="font-medium text-muted-foreground">Name:</span> {staffMember?.name || 'Admin / System User'}</p>
-            <p className="text-sm"><span className="font-medium text-muted-foreground">Email:</span> {staffMember?.email || 'N/A'}</p>
+      <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0 space-y-2">
+        <div className="p-3 sm:p-4 rounded-lg bg-muted/30 border">
+            <p className="text-xs sm:text-sm"><span className="font-bold text-muted-foreground uppercase text-[10px] sm:text-xs">Name:</span> {staffMember?.name || 'Admin / System User'}</p>
+            <p className="text-xs sm:text-sm"><span className="font-bold text-muted-foreground uppercase text-[10px] sm:text-xs">Email:</span> {staffMember?.email || 'N/A'}</p>
         </div>
       </CardContent>
     </Card>
@@ -231,20 +229,20 @@ const NotesSection: React.FC<{ notes?: string | null }> = ({ notes }) => {
     if (!notes) return null;
     return (
         <Card>
-            <CardHeader className="pb-4">
+            <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-4">
             <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                <StickyNote className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
+                <StickyNote className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 dark:text-purple-400" />
                 </div>
                 <div>
-                <h2 className="text-lg font-semibold">Additional Notes</h2>
-                <p className="text-sm text-muted-foreground">Transaction notes and comments</p>
+                <h2 className="text-base sm:text-lg font-semibold">Additional Notes</h2>
+                <p className="text-xs sm:text-sm text-muted-foreground">Transaction notes and comments</p>
                 </div>
             </div>
             </CardHeader>
-            <CardContent className="pt-0">
-            <div className="p-4 rounded-lg bg-muted/30 border">
-                <p className="text-sm leading-relaxed whitespace-pre-wrap">{notes}</p>
+            <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
+            <div className="p-3 sm:p-4 rounded-lg bg-muted/30 border">
+                <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap">{notes}</p>
             </div>
             </CardContent>
         </Card>
@@ -255,35 +253,35 @@ const ReturnsSection: React.FC<{ returns?: SaleReturn[]; currencySymbol: string 
     if (!returns || returns.length === 0) return null;
     return (
         <Card>
-            <CardHeader className="pb-4">
+            <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-4">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
-                        <Undo2 className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center shrink-0">
+                        <Undo2 className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600 dark:text-orange-400" />
                     </div>
                     <div>
-                        <h2 className="text-lg font-semibold">Returned Items</h2>
-                        <p className="text-sm text-muted-foreground">Log of all returned items from this sale</p>
+                        <h2 className="text-base sm:text-lg font-semibold">Returned Items</h2>
+                        <p className="text-xs sm:text-sm text-muted-foreground">Log of returned items</p>
                     </div>
                 </div>
             </CardHeader>
-            <CardContent className="pt-0 space-y-4">
+            <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0 space-y-3 sm:space-y-4">
                 {returns.map((ret, index) => {
                   const returnDate = convertToDateSafely(ret.returnedAt);
                   return (
-                    <div key={index} className="p-4 rounded-lg border bg-muted/40">
-                        <div className="flex justify-between items-start mb-2">
+                    <div key={index} className="p-3 sm:p-4 rounded-lg border bg-muted/40">
+                        <div className="flex flex-col sm:flex-row justify-between items-start gap-2 mb-2">
                             <div>
-                                <p className="font-semibold">Return on {returnDate ? format(returnDate, "MMM dd, yyyy 'at' h:mm a") : 'N/A'}</p>
-                                {ret.staffId && <p className="text-xs text-muted-foreground">Staff ID: {ret.staffId.substring(0, 8)}</p>}
+                                <p className="font-bold text-sm">Return on {returnDate ? formatDate(returnDate, "MMM dd, yyyy") : 'N/A'}</p>
+                                {ret.staffId && <p className="text-[10px] text-muted-foreground">Staff ID: {ret.staffId.substring(0, 8)}</p>}
                             </div>
-                            <Badge variant="destructive">Refund: {formatCurrency(ret.totalReturnedAmount, currencySymbol)}</Badge>
+                            <Badge variant="destructive" className="text-[10px] font-black">{formatCurrency(ret.totalReturnedAmount, currencySymbol)}</Badge>
                         </div>
-                        {ret.reason && <p className="text-xs text-muted-foreground italic mb-2">Reason: {ret.reason}</p>}
+                        {ret.reason && <p className="text-[10px] sm:text-xs text-muted-foreground italic mb-2">Reason: {ret.reason}</p>}
                         <div className="space-y-1">
                             {ret.items.map((item, itemIndex) => (
-                                <div key={itemIndex} className="flex justify-between items-center text-sm">
-                                    <span>{item.productName}</span>
-                                    <span>Qty: {item.quantity}</span>
+                                <div key={itemIndex} className="flex justify-between items-center text-[10px] sm:text-sm">
+                                    <span className="font-medium">{item.productName}</span>
+                                    <span className="font-bold">Qty: {item.quantity}</span>
                                 </div>
                             ))}
                         </div>
@@ -314,44 +312,44 @@ export function SaleDetailsModal({ isOpen, onOpenChange, saleTransaction, curren
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl p-0 h-[90vh] sm:h-[85vh] flex flex-col">
-        <DialogHeader className="p-6 pb-4 border-b">
+      <DialogContent className="max-w-4xl w-[95vw] sm:w-[90vw] md:w-[85vw] p-0 h-[90vh] sm:h-[85vh] flex flex-col">
+        <DialogHeader className="p-4 sm:p-6 pb-2 sm:pb-4 border-b">
           <DialogTitle className="flex items-center justify-between">
-            <span className="text-2xl font-bold tracking-tight">Transaction Details</span>
+            <span className="text-xl sm:text-2xl font-bold tracking-tight text-left">Transaction Details</span>
           </DialogTitle>
-          <DialogDescription className="mt-1 text-left">
-            ID: <span className="font-mono">{saleTransaction.id}</span>
+          <DialogDescription className="mt-1 text-left text-xs sm:text-sm">
+            ID: <span className="font-mono break-all">{saleTransaction.id}</span>
             <br />
-            Date: {saleDate ? format(saleDate, "EEEE, MMMM do, yyyy 'at' h:mm a") : 'Invalid Date'}
+            Date: {saleDate ? format(saleDate, "EEEE, MMM do, yyyy 'at' h:mm a") : 'Invalid Date'}
           </DialogDescription>
         </DialogHeader>
 
         <ScrollArea className="flex-1">
-          <div className="p-6 space-y-6">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <div className="text-center p-4 rounded-xl bg-muted/30">
-                <DollarSign className="w-5 h-5 text-muted-foreground mx-auto mb-2" />
-                <div className="text-2xl font-bold font-mono">
+          <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
+              <div className="text-center p-3 sm:p-4 rounded-xl bg-muted/30">
+                <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground mx-auto mb-1 sm:mb-2" />
+                <div className="text-lg sm:text-2xl font-bold font-mono">
                   {formatCurrency(netTotal, currencySymbol)}
                 </div>
-                <div className="text-xs text-muted-foreground">Net Total</div>
+                <div className="text-[10px] sm:text-xs text-muted-foreground uppercase">Net Total</div>
               </div>
-              <div className="text-center p-4 rounded-xl bg-muted/30">
-                <Package className="w-5 h-5 text-muted-foreground mx-auto mb-2" />
-                <div className="text-2xl font-bold">
+              <div className="text-center p-3 sm:p-4 rounded-xl bg-muted/30">
+                <Package className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground mx-auto mb-1 sm:mb-2" />
+                <div className="text-lg sm:text-2xl font-bold">
                   {saleTransaction.items.reduce((sum, item) => sum + item.quantity, 0)}
                 </div>
-                <div className="text-xs text-muted-foreground">Items Sold</div>
+                <div className="text-[10px] sm:text-xs text-muted-foreground uppercase">Items Sold</div>
               </div>
-              <div className="text-center p-4 rounded-xl bg-muted/30">
-                <UserCircle className="w-5 h-5 text-muted-foreground mx-auto mb-2" />
-                <div className="text-sm font-medium truncate">{saleTransaction.customerName || "Walk-in"}</div>
-                <div className="text-xs text-muted-foreground">Customer</div>
+              <div className="text-center p-3 sm:p-4 rounded-xl bg-muted/30">
+                <UserCircle className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground mx-auto mb-1 sm:mb-2" />
+                <div className="text-xs sm:text-sm font-medium truncate">{saleTransaction.customerName || "Walk-in"}</div>
+                <div className="text-[10px] sm:text-xs text-muted-foreground uppercase">Customer</div>
               </div>
-              <div className="text-center p-4 rounded-xl bg-muted/30">
-                <CreditCard className="w-5 h-5 text-muted-foreground mx-auto mb-2" />
-                <div className="text-sm font-medium">{saleTransaction.paymentMethod}</div>
-                <div className="text-xs text-muted-foreground">Payment</div>
+              <div className="text-center p-3 sm:p-4 rounded-xl bg-muted/30">
+                <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground mx-auto mb-1 sm:mb-2" />
+                <div className="text-xs sm:text-sm font-medium truncate">{saleTransaction.paymentMethod}</div>
+                <div className="text-[10px] sm:text-xs text-muted-foreground uppercase">Payment</div>
               </div>
             </div>
 
@@ -372,12 +370,12 @@ export function SaleDetailsModal({ isOpen, onOpenChange, saleTransaction, curren
           </div>
         </ScrollArea>
 
-        <DialogFooter className="mt-auto pt-4 p-6 border-t flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div className="flex gap-2">
+        <DialogFooter className="mt-auto pt-4 p-4 sm:p-6 border-t flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="flex gap-2 w-full sm:w-auto">
             {saleTransaction.isCreditSale && !saleTransaction.isPaid && onRecordPayment && (
                 <Button 
                     variant="outline" 
-                    className="bg-primary text-white hover:bg-primary/90"
+                    className="bg-primary text-white hover:bg-primary/90 flex-1 sm:flex-none"
                     onClick={handleRecordPaymentInternal}
                 >
                     <Wallet className="mr-2 h-4 w-4" /> Record Payment
@@ -385,7 +383,7 @@ export function SaleDetailsModal({ isOpen, onOpenChange, saleTransaction, curren
             )}
           </div>
           <DialogClose asChild>
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+            <Button variant="outline" className="w-full sm:w-auto" onClick={() => onOpenChange(false)}>
               Close
             </Button>
           </DialogClose>

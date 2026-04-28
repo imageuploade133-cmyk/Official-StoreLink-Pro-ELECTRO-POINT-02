@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import * as React from "react";
 
 import {
   Drawer,
@@ -33,23 +33,23 @@ export function ActionModal({
 
   return (
     <Drawer open={isOpen} onOpenChange={onOpenChange} dismissible={true}>
-      <DrawerContent className="flex flex-col h-screen w-screen max-w-full sm:max-w-md mx-auto overflow-hidden">
+      <DrawerContent className="flex flex-col h-[85vh] sm:h-screen w-full sm:max-w-md mx-auto overflow-hidden rounded-t-[20px] sm:rounded-none">
         {/* Drag Handle Indicator */}
         <div 
           className="w-full flex flex-col items-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none select-none hover:bg-muted/20 transition-colors shrink-0"
           data-vaul-drag-handle
         >
-          <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+          <div className="w-10 h-1.5 rounded-full bg-muted-foreground/30" />
         </div>
 
-        <DrawerHeader className="px-6 py-4 border-b shrink-0">
-          <DrawerTitle className="flex items-center gap-2">
+        <DrawerHeader className="px-4 sm:px-6 py-4 border-b shrink-0">
+          <DrawerTitle className="flex items-center gap-2 text-xl sm:text-2xl">
             {title}
           </DrawerTitle>
-          {description && <DrawerDescription>{description}</DrawerDescription>}
+          {description && <DrawerDescription className="text-sm">{description}</DrawerDescription>}
         </DrawerHeader>
         
-        <div className="flex justify-end px-6 py-2 shrink-0">
+        <div className="flex justify-end px-4 sm:px-6 py-2 shrink-0">
           <DrawerClose asChild>
             <Button 
               variant="ghost" 
@@ -63,14 +63,14 @@ export function ActionModal({
         </div>
 
         <ScrollArea className="flex-1 min-h-0 overflow-hidden">
-          <div className="flex flex-col space-y-2 px-6 py-4">
+          <div className="flex flex-col space-y-3 px-4 sm:px-6 py-4">
             {children}
           </div>
         </ScrollArea>
         
-        <DrawerFooter className="shrink-0">
+        <DrawerFooter className="p-4 sm:p-6 shrink-0 border-t">
           <DrawerClose asChild>
-            <Button type="button" variant="secondary" className="w-full">
+            <Button type="button" variant="secondary" className="w-full h-11 sm:h-10">
               <X className="mr-2 h-4 w-4" /> Close
             </Button>
           </DrawerClose>

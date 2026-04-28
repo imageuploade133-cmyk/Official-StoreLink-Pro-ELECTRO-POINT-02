@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import * as React from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -34,8 +35,8 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { format as formatDate, startOfDay, endOfDay, subDays } from 'date-fns';
 import { cn, convertToDateSafely } from '@/lib/utils';
-import { Skeleton } from '../ui/skeleton';
-import { Input } from '../ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Input } from '@/components/ui/input';
 import { useSettings } from '@/contexts/settings-context';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
@@ -206,40 +207,43 @@ export function StaffSalesModal({ isOpen, onOpenChange, allSales, staffMap, curr
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-0">
-        <DialogHeader className="p-6 pb-4 border-b flex-row justify-between items-center">
+      <DialogContent className="max-w-4xl w-[95vw] sm:w-[90vw] md:w-[85vw] h-[95vh] sm:h-[90vh] flex flex-col p-0 overflow-hidden">
+        <DialogHeader className="p-4 sm:p-6 pb-2 sm:pb-4 border-b flex-row justify-between items-center shrink-0">
           <div>
-            <DialogTitle className="text-2xl font-bold flex items-center gap-3">
-              <Users className="h-7 w-7 text-primary" />
+            <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-3">
+              <Users className="h-6 w-6 sm:h-7 sm:w-7 text-primary" />
               Staff Performance
             </DialogTitle>
-            <DialogDescription>
-              A detailed breakdown of sales by each staff member for the selected day.
+            <DialogDescription className="text-xs sm:text-sm hidden sm:block">
+              Detailed breakdown of sales by staff for the selected day.
             </DialogDescription>
           </div>
         </DialogHeader>
         
-        <div className="px-6 py-4 border-b grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-            <div className="relative">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b flex flex-col sm:flex-row gap-3 items-center shrink-0">
+            <div className="relative w-full sm:flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                    placeholder="Search sold products within this day..."
+                    placeholder="Search sold products..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 h-10"
+                    className="pl-10 h-9 sm:h-10"
                 />
             </div>
-            <div className="flex items-center gap-2 justify-end">
-                <Button variant="outline" size="sm" onClick={() => handleDatePreset('today')}>Today</Button>
-                <Button variant="outline" size="sm" onClick={() => handleDatePreset('yesterday')}>Yesterday</Button>
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                <div className="flex gap-1">
+                    <Button variant="outline" size="sm" className="h-8 text-[10px] px-2" onClick={() => handleDatePreset('today')}>Today</Button>
+                    <Button variant="outline" size="sm" className="h-8 text-[10px] px-2" onClick={() => handleDatePreset('yesterday')}>Yesterday</Button>
+                </div>
                  <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant={"outline"}
-                      className={cn("w-[240px] justify-start text-left font-normal", !selectedDate && "text-muted-foreground")}
+                      size="sm"
+                      className={cn("flex-1 sm:w-[180px] justify-start text-left font-normal h-8 text-[10px] sm:text-xs", !selectedDate && "text-muted-foreground")}
                     >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {selectedDate ? formatDate(selectedDate, "PPP") : <span>Pick a date</span>}
+                      <CalendarIcon className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+                      {selectedDate ? formatDate(selectedDate, "MMM dd, yy") : <span>Pick a date</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="end">
@@ -256,22 +260,22 @@ export function StaffSalesModal({ isOpen, onOpenChange, allSales, staffMap, curr
         </div>
 
         <ScrollArea className="flex-1">
-          <div className="p-6 space-y-4">
+          <div className="p-4 sm:p-6 space-y-4">
             <div id="printable-staff-report">
-                <div className="report-header no-print">
-                    <h1 className="store-name">Staff Sales Report</h1>
-                    <p className="report-title">{settings?.storeName || 'v9 POS System'}</p>
-                    <p className="report-date">{selectedDate ? formatDate(selectedDate, 'PPP') : 'N/A'}</p>
+                <div className="report-header no-print hidden sm:block text-center">
+                    <h1 className="store-name text-2xl font-bold">Staff Sales Report</h1>
+                    <p className="report-title text-muted-foreground">{settings?.storeName || 'v9 POS System'}</p>
+                    <p className="report-date text-sm font-medium">{selectedDate ? formatDate(selectedDate, 'PPP') : 'N/A'}</p>
                 </div>
                 {isLoading ? (
                     <div className="space-y-3">
                         {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-20 w-full" />)}
                     </div>
                 ) : aggregatedStaffSales.length === 0 ? (
-                  <div className="text-center text-muted-foreground py-16">
-                     <Info className="mx-auto h-12 w-12 mb-4" />
-                    <p className="font-semibold text-lg">No Sales Data</p>
-                    <p>No sales recorded by any staff for {selectedDate ? formatDate(selectedDate, 'PPP') : 'the selected date'}.</p>
+                  <div className="text-center text-muted-foreground py-12 sm:py-16">
+                     <Info className="mx-auto h-10 w-10 sm:h-12 sm:w-12 mb-4 opacity-20" />
+                    <p className="font-semibold text-base sm:text-lg">No Sales Data</p>
+                    <p className="text-xs sm:text-sm px-4">No sales recorded by staff for {selectedDate ? formatDate(selectedDate, 'PPP') : 'the selected date'}.</p>
                   </div>
                 ) : (
                   <Accordion type="multiple" className="w-full" defaultValue={aggregatedStaffSales.map(s => s.staffId)}>
@@ -295,56 +299,58 @@ export function StaffSalesModal({ isOpen, onOpenChange, allSales, staffMap, curr
                       };
                       
                       return (
-                      <AccordionItem value={staff.staffId} key={staff.staffId} className="staff-section">
-                        <AccordionTrigger className="hover:bg-accent/50 px-4 py-3 rounded-lg text-lg staff-header">
-                          <div className="flex justify-between items-center w-full pr-4">
-                            <div className="text-left">
-                                <p className="font-semibold text-primary staff-name">{staff.staffName}</p>
-                                <p className="text-xs text-muted-foreground">{staff.staffEmail}</p>
+                      <AccordionItem value={staff.staffId} key={staff.staffId} className="staff-section border-none mb-3 bg-muted/20 rounded-xl overflow-hidden">
+                        <AccordionTrigger className="hover:no-underline hover:bg-muted/40 px-4 py-3 text-lg staff-header">
+                          <div className="flex justify-between items-center w-full pr-2">
+                            <div className="text-left flex flex-col sm:flex-row sm:items-center sm:gap-3">
+                                <p className="font-bold text-primary staff-name text-sm sm:text-base leading-none mb-1 sm:mb-0">{staff.staffName}</p>
+                                <p className="text-[10px] text-muted-foreground truncate max-w-[120px] sm:max-w-none">{staff.staffEmail}</p>
                             </div>
-                            <div className="flex items-center gap-4 text-sm staff-summary">
-                                <Badge variant="secondary">{staff.totalTransactions} sale(s)</Badge>
-                                <span className="font-bold text-green-600 dark:text-green-400">{formatCurrency(staff.totalSales, currencySymbol)}</span>
+                            <div className="flex items-center gap-2 sm:gap-4 text-xs staff-summary">
+                                <Badge variant="secondary" className="text-[10px] sm:text-xs">{staff.totalTransactions} sale(s)</Badge>
+                                <span className="font-black text-green-600 dark:text-green-400 text-sm sm:text-base">{formatCurrency(staff.totalSales, currencySymbol)}</span>
                             </div>
                           </div>
                         </AccordionTrigger>
-                        <AccordionContent className="bg-muted/30 p-0">
+                        <AccordionContent className="p-0">
                           {filteredItems.length === 0 ? (
-                               <p className="text-center text-sm text-muted-foreground py-4">No matching products found for this staff member.</p>
+                               <p className="text-center text-[10px] sm:text-xs text-muted-foreground py-4">No matching products found.</p>
                           ) : (
-                            <>
+                            <div className="overflow-x-auto">
                               <Table>
-                                <TableHeader>
+                                <TableHeader className="bg-muted/50">
                                   <TableRow>
-                                    <TableHead className="pl-6 w-1/3">Product Sold</TableHead>
-                                    <TableHead className="text-center">Time</TableHead>
-                                    <TableHead className="text-center">Quantity</TableHead>
-                                    <TableHead className="text-right pr-6">Total Value</TableHead>
+                                    <TableHead className="pl-4 text-[10px] uppercase font-black">Product</TableHead>
+                                    <TableHead className="text-center text-[10px] uppercase font-black">Time</TableHead>
+                                    <TableHead className="text-center text-[10px] uppercase font-black">Qty</TableHead>
+                                    <TableHead className="text-right pr-4 text-[10px] uppercase font-black">Total</TableHead>
                                   </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                   {paginatedItems.map((item, index) => (
-                                    <TableRow key={`${item.productId}-${index}`}>
-                                      <TableCell className="font-medium pl-6">{item.productName}</TableCell>
-                                      <TableCell className="text-center text-xs">{formatDate(item.timestamp, 'p')}</TableCell>
-                                      <TableCell className="text-center">{item.quantity}</TableCell>
-                                      <TableCell className="text-right pr-6">{formatCurrency(item.totalPrice, currencySymbol)}</TableCell>
+                                    <TableRow key={`${item.productId}-${index}`} className="hover:bg-transparent">
+                                      <TableCell className="font-bold pl-4 text-xs">{item.productName}</TableCell>
+                                      <TableCell className="text-center text-[10px] font-medium">{formatDate(item.timestamp, 'p')}</TableCell>
+                                      <TableCell className="text-center text-xs font-bold">{item.quantity}</TableCell>
+                                      <TableCell className="text-right pr-4 text-xs font-black">{formatCurrency(item.totalPrice, currencySymbol)}</TableCell>
                                     </TableRow>
                                   ))}
                                 </TableBody>
                               </Table>
                               {totalPages > 1 && (
-                                  <div className="flex items-center justify-end gap-2 p-2 border-t no-print">
-                                      <span className="text-xs text-muted-foreground">Page {currentPage} of {totalPages}</span>
-                                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handlePageChange('prev')} disabled={currentPage === 1}>
-                                          <ChevronLeft className="h-4 w-4" />
-                                      </Button>
-                                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handlePageChange('next')} disabled={currentPage === totalPages}>
-                                          <ChevronRight className="h-4 w-4" />
-                                      </Button>
+                                  <div className="flex items-center justify-between p-3 border-t no-print bg-white/50">
+                                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Page {currentPage} of {totalPages}</span>
+                                      <div className="flex gap-1">
+                                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handlePageChange('prev')} disabled={currentPage === 1}>
+                                            <ChevronLeft className="h-4 w-4" />
+                                        </Button>
+                                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handlePageChange('next')} disabled={currentPage === totalPages}>
+                                            <ChevronRight className="h-4 w-4" />
+                                        </Button>
+                                      </div>
                                   </div>
                               )}
-                            </>
+                            </div>
                           )}
                         </AccordionContent>
                       </AccordionItem>
@@ -354,14 +360,14 @@ export function StaffSalesModal({ isOpen, onOpenChange, allSales, staffMap, curr
             </div>
           </div>
         </ScrollArea>
-
-        <DialogFooter className="p-6 border-t mt-auto flex-row justify-between items-center no-print">
-            <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={handlePrint}><Printer className="mr-2 h-4 w-4" /> Print</Button>
-                <Button variant="outline" size="sm" onClick={handleDownloadPdf}><Download className="mr-2 h-4 w-4" /> Export PDF</Button>
+        
+        <DialogFooter className="p-4 sm:p-6 border-t mt-auto flex flex-col sm:flex-row justify-between items-center gap-4 no-print shrink-0 bg-background">
+            <div className="flex gap-2 w-full sm:w-auto">
+                <Button variant="outline" size="sm" className="flex-1 sm:flex-none h-10 sm:h-9" onClick={handlePrint}><Printer className="mr-2 h-4 w-4" /> Print</Button>
+                <Button variant="outline" size="sm" className="flex-1 sm:flex-none h-10 sm:h-9" onClick={handleDownloadPdf}><Download className="mr-2 h-4 w-4" /> Export</Button>
             </div>
             <DialogClose asChild>
-                <Button variant="outline" size="sm"><X className="mr-2 h-4 w-4" /> Close</Button>
+                <Button variant="outline" size="sm" className="w-full sm:w-auto h-10 sm:h-9" onClick={() => onOpenChange(false)}><X className="mr-2 h-4 w-4" /> Close</Button>
             </DialogClose>
         </DialogFooter>
       </DialogContent>

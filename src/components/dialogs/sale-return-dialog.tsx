@@ -1,5 +1,6 @@
 'use client';
-import React, { useState, useEffect, useMemo } from 'react';
+import * as React from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm, useWatch, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -295,30 +296,30 @@ export function SaleReturnDialog({ isOpen, onOpenChange, saleTransaction, curren
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl w-[95vw] sm:w-full max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0">
-        <DialogHeader className="p-6 pb-2">
-          <DialogTitle className="flex items-center gap-2 text-xl">
-            <Undo2 className="h-6 w-6 text-primary"/>
-            Return Items <span className="text-muted-foreground font-normal">#{saleTransaction.id.substring(0, 8).toUpperCase()}</span>
+      <DialogContent className="max-w-2xl w-[95vw] sm:w-[90vw] md:w-[85vw] max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0">
+        <DialogHeader className="p-4 sm:p-6 pb-2">
+          <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
+            <Undo2 className="h-5 w-5 sm:h-6 sm:w-6 text-primary"/>
+            Return Items <span className="text-muted-foreground font-normal text-xs sm:text-sm">#{saleTransaction.id.substring(0, 8).toUpperCase()}</span>
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-xs sm:text-sm">
             Select the quantity of each item to return.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="px-6 pb-4">
+        <div className="px-4 sm:px-6 pb-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Filter items in this sale..."
+              placeholder="Filter items..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 h-10"
+              className="pl-10 h-9 sm:h-10"
             />
           </div>
         </div>
 
-        <ScrollArea className="flex-1 px-6">
+        <ScrollArea className="flex-1 px-4 sm:px-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pb-6">
               <div className="space-y-4">
@@ -457,11 +458,11 @@ export function SaleReturnDialog({ isOpen, onOpenChange, saleTransaction, curren
           </Form>
         </ScrollArea>
 
-        <div className="p-6 border-t bg-muted/30">
+        <div className="p-4 sm:p-6 border-t bg-muted/30">
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-            <div className="w-full sm:w-auto">
-              <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-1">Total Refund Amount</p>
-              <p className="text-2xl font-black text-primary leading-none">
+            <div className="w-full sm:w-auto text-center sm:text-left">
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-1">Total Refund Amount</p>
+              <p className="text-xl sm:text-2xl font-black text-primary leading-none">
                 {formatCurrency(totalRefundAmount, currencySymbol)}
               </p>
             </div>
@@ -470,7 +471,7 @@ export function SaleReturnDialog({ isOpen, onOpenChange, saleTransaction, curren
               <Button 
                 type="button" 
                 variant="outline" 
-                className="flex-1 sm:flex-none"
+                className="flex-1 sm:flex-none h-11 sm:h-10"
                 onClick={() => onOpenChange(false)} 
                 disabled={form.formState.isSubmitting}
               >
@@ -478,7 +479,7 @@ export function SaleReturnDialog({ isOpen, onOpenChange, saleTransaction, curren
               </Button>
               <Button 
                 onClick={form.handleSubmit(onSubmit)}
-                className="flex-1 sm:flex-none min-w-[140px]"
+                className="flex-1 sm:flex-none min-w-[140px] h-11 sm:h-10"
                 disabled={form.formState.isSubmitting || totalRefundAmount <= 0}
               >
                 {form.formState.isSubmitting ? (
@@ -486,7 +487,7 @@ export function SaleReturnDialog({ isOpen, onOpenChange, saleTransaction, curren
                 ) : (
                   <Undo2 className="mr-2 h-4 w-4"/>
                 )}
-                Process Return
+                Process
               </Button>
             </div>
           </div>

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import * as React from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -229,165 +230,123 @@ export function UserSalesHistoryModal({
     <>
       <Dialog open={isOpen} onOpenChange={handleModalClose}>
         <DialogContent 
-          className="max-w-5xl h-[95vh] sm:h-[90vh] flex flex-col p-0 overflow-hidden"
+          className="max-w-5xl w-[95vw] sm:w-[90vw] md:w-[85vw] h-[95vh] sm:h-[90vh] flex flex-col p-0 overflow-hidden"
           onPointerDownOutside={(e) => e.preventDefault()}
         >
-          <DialogHeader className="p-6 pb-4 border-b shrink-0 bg-background">
+          <DialogHeader className="p-4 sm:p-6 pb-2 sm:pb-4 border-b shrink-0 bg-background">
             <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                    <DialogTitle className="text-2xl font-bold flex items-center gap-3">
-                        <History className="h-7 w-7 text-primary"/> Your POS History
+                    <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-3">
+                        <History className="h-6 w-6 sm:h-7 sm:w-7 text-primary"/> POS History
                     </DialogTitle>
-                    <DialogDescription>Track performance and manage transactions from this terminal.</DialogDescription>
+                    <DialogDescription className="text-xs sm:text-sm">Performance and transactions from this terminal.</DialogDescription>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline" size="icon" onClick={fetchData} disabled={isLoading}>
+                    <Button variant="outline" size="icon" className="h-8 w-8 sm:h-9 sm:w-9" onClick={fetchData} disabled={isLoading}>
                         <RotateCcw className={cn("h-4 w-4", isLoading && "animate-spin")} />
                     </Button>
                     <DialogClose asChild>
-                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full"><X className="h-5 w-5"/></Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9 rounded-full"><X className="h-4 w-4 sm:h-5 sm:w-5"/></Button>
                     </DialogClose>
                 </div>
             </div>
           </DialogHeader>
 
           {/* Filters & Inputs */}
-          <div className="px-6 py-4 border-b space-y-4 shrink-0 bg-muted/5">
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
-                  <div className="md:col-span-2 relative">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b space-y-3 sm:space-y-4 shrink-0 bg-muted/5">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center">
+                  <div className="relative w-full sm:flex-grow">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input 
-                      placeholder="Search ID, customer or method..." 
+                      placeholder="Search..." 
                       value={searchTerm} 
                       onChange={(e) => setSearchTerm(e.target.value)} 
-                      className="pl-10 h-10 border-muted-foreground/20" 
+                      className="pl-10 h-9 sm:h-10 text-sm" 
                     />
                   </div>
-                  <div className="md:col-span-3 flex items-center gap-2">
+                  <div className="w-full sm:w-auto">
                     <Popover>
                         <PopoverTrigger asChild>
-                            <Button variant={"outline"} className={cn("flex-grow justify-start text-left font-normal h-10", !dateRange && "text-muted-foreground")}>
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {dateRange?.from ? (dateRange.to ? (<>{format(dateRange.from, "LLL dd")} - {format(dateRange.to, "LLL dd, y")}</>) : format(dateRange.from, "LLL dd, y")) : (<span>Pick a date range</span>)}
+                            <Button variant={"outline"} size="sm" className={cn("w-full sm:w-[220px] justify-start text-left font-normal h-9 sm:h-10 text-xs", !dateRange && "text-muted-foreground")}>
+                                <CalendarIcon className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                                {dateRange?.from ? (dateRange.to ? (<>{format(dateRange.from, "LLL dd")} - {format(dateRange.to, "LLL dd")}</>) : format(dateRange.from, "LLL dd")) : (<span>Pick dates</span>)}
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="end">
-                            <div className="p-3 border-b bg-muted/20">
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div className="space-y-1">
-                                        <Label htmlFor="pos-date-from" className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">From Date</Label>
-                                        <Input
-                                            id="pos-date-from"
-                                            type="date"
-                                            className="h-8 text-xs"
-                                            value={dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : ''}
-                                            onChange={(e) => {
-                                                const d = e.target.value ? new Date(e.target.value + 'T00:00:00') : undefined;
-                                                setDateRange(prev => ({ ...prev, from: d }));
-                                            }}
-                                        />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <Label htmlFor="pos-date-to" className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">To Date</Label>
-                                        <Input
-                                            id="pos-date-to"
-                                            type="date"
-                                            className="h-8 text-xs"
-                                            value={dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : ''}
-                                            onChange={(e) => {
-                                                const d = e.target.value ? new Date(e.target.value + 'T00:00:00') : undefined;
-                                                setDateRange(prev => ({ ...prev, to: d }));
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                            <Calendar initialFocus mode="range" defaultMonth={dateRange?.from} selected={dateRange} onSelect={setDateRange} numberOfMonths={2} />
+                            <Calendar initialFocus mode="range" defaultMonth={dateRange?.from} selected={dateRange} onSelect={setDateRange} numberOfMonths={2} className="hidden sm:block" />
+                            <Calendar initialFocus mode="range" defaultMonth={dateRange?.from} selected={dateRange} onSelect={setDateRange} numberOfMonths={1} className="block sm:hidden" />
                         </PopoverContent>
                     </Popover>
                   </div>
               </div>
 
               <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as SalesTypeFilter)} className="w-full">
-                <TabsList className="grid w-full grid-cols-4 h-10">
-                    <TabsTrigger value="all" className="flex items-center gap-2"><Filter className="h-3.5 w-3.5" /> All</TabsTrigger>
-                    <TabsTrigger value="sales" className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5" /> Paid</TabsTrigger>
-                    <TabsTrigger value="credit" className="flex items-center gap-2"><CreditCard className="h-3.5 w-3.5" /> Credit</TabsTrigger>
-                    <TabsTrigger value="refunds" className="flex items-center gap-2"><Undo2 className="h-3.5 w-3.5" /> Returns</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-4 h-9 sm:h-10">
+                    <TabsTrigger value="all" className="text-[10px] sm:text-xs">All</TabsTrigger>
+                    <TabsTrigger value="sales" className="text-[10px] sm:text-xs">Paid</TabsTrigger>
+                    <TabsTrigger value="credit" className="text-[10px] sm:text-xs">Credit</TabsTrigger>
+                    <TabsTrigger value="refunds" className="text-[10px] sm:text-xs">Returns</TabsTrigger>
                 </TabsList>
               </Tabs>
           </div>
           
           {/* Summary Banner */}
-           <div className="px-6 py-4 grid grid-cols-1 md:grid-cols-4 gap-4 bg-primary/5 shrink-0 border-b">
+           <div className="px-4 sm:px-6 py-3 sm:py-4 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 bg-primary/5 shrink-0 border-b">
             <div className="space-y-1">
-                 <p className="text-[10px] font-black uppercase text-primary tracking-widest flex items-center gap-1.5">
+                 <p className="text-[9px] sm:text-[10px] font-black uppercase text-primary tracking-widest flex items-center gap-1">
                     <DollarSign className="h-3 w-3" /> Net Revenue
                  </p>
-                 {isLoading ? <Skeleton className="h-8 w-24" /> : <div className="text-xl font-bold tracking-tight text-primary">{formatCurrency(stats.totalSales, currencySymbol)}</div>}
+                 {isLoading ? <Skeleton className="h-6 w-20" /> : <div className="text-base sm:text-xl font-bold tracking-tight text-primary">{formatCurrency(stats.totalSales, currencySymbol)}</div>}
             </div>
             <div className="space-y-1">
-                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest flex items-center gap-1.5">
+                <p className="text-[9px] sm:text-[10px] font-black uppercase text-muted-foreground tracking-widest flex items-center gap-1">
                     <ShoppingBag className="h-3 w-3" /> Volume
                 </p>
-                {isLoading ? <Skeleton className="h-8 w-12" /> : <div className="text-xl font-bold">{stats.count}</div>}
+                {isLoading ? <Skeleton className="h-6 w-10" /> : <div className="text-base sm:text-xl font-bold">{stats.count}</div>}
             </div>
             <div className="space-y-1">
-                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest flex items-center gap-1.5">
+                <p className="text-[9px] sm:text-[10px] font-black uppercase text-muted-foreground tracking-widest flex items-center gap-1">
                     <TrendingUp className="h-3 w-3" /> Avg Sale
                 </p>
-                {isLoading ? <Skeleton className="h-8 w-20" /> : <div className="text-xl font-bold">{formatCurrency(stats.count > 0 ? stats.totalSales / stats.count : 0, currencySymbol)}</div>}
+                {isLoading ? <Skeleton className="h-6 w-16" /> : <div className="text-base sm:text-xl font-bold">{formatCurrency(stats.count > 0 ? stats.totalSales / stats.count : 0, currencySymbol)}</div>}
             </div>
             <div className="space-y-1 text-right">
-                <p className="text-[10px] font-black uppercase text-orange-600 tracking-widest flex items-center justify-end gap-1.5">
+                <p className="text-[9px] sm:text-[10px] font-black uppercase text-orange-600 tracking-widest flex items-center justify-end gap-1">
                     <Undo2 className="h-3 w-3" /> Refunds
                 </p>
-                {isLoading ? <Skeleton className="h-8 w-20 ml-auto" /> : <div className="text-xl font-bold text-orange-600">{formatCurrency(stats.refunds, currencySymbol)}</div>}
+                {isLoading ? <Skeleton className="h-6 w-16 ml-auto" /> : <div className="text-base sm:text-xl font-bold text-orange-600">{formatCurrency(stats.refunds, currencySymbol)}</div>}
             </div>
           </div>
 
           <div className="flex-1 overflow-hidden flex flex-col relative">
             <ScrollArea className="flex-1">
-                <div className="px-6 min-h-full">
+                <div className="px-2 sm:px-6 min-h-full">
                     {isLoading ? (
-                        <div className="space-y-4 py-6">
-                            {[...Array(6)].map((_, i) => (
-                                <div key={i} className="flex items-center gap-4 p-4 rounded-lg border bg-muted/10">
-                                    <Skeleton className="h-10 w-10 rounded-full" />
-                                    <div className="flex-grow space-y-2">
-                                        <Skeleton className="h-4 w-1/3" />
-                                        <Skeleton className="h-3 w-1/4" />
-                                    </div>
-                                    <Skeleton className="h-8 w-20" />
-                                </div>
-                            ))}
+                        <div className="space-y-2 py-4">
+                            {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
                         </div>
                     ) : error ? (
-                        <div className="flex flex-col items-center justify-center py-24 text-center">
-                          <AlertTriangle className="h-16 w-16 text-destructive/30 mb-4"/>
-                          <h3 className="text-xl font-bold text-destructive">Loading Error</h3>
-                          <p className="text-muted-foreground max-w-sm mt-2">{error}</p>
-                          <Button variant="outline" onClick={fetchData} className="mt-6">
-                            <RotateCcw className="mr-2 h-4 w-4" /> Try Again
+                        <div className="flex flex-col items-center justify-center py-12 sm:py-24 text-center px-4">
+                          <AlertTriangle className="h-10 w-10 sm:h-16 sm:w-16 text-destructive/30 mb-4"/>
+                          <h3 className="text-lg sm:text-xl font-bold text-destructive">Error</h3>
+                          <p className="text-xs sm:text-sm text-muted-foreground mt-2">{error}</p>
+                          <Button variant="outline" size="sm" onClick={fetchData} className="mt-6">
+                            Retry
                           </Button>
                         </div>
                     ) : filteredSales.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-32 text-muted-foreground text-center">
-                          <div className="bg-muted p-6 rounded-full mb-6">
-                            <Search className="h-12 w-12 opacity-20"/>
-                          </div>
-                          <h3 className="text-xl font-semibold">No transactions found</h3>
-                          <p className="text-sm max-w-xs mt-2">Try adjusting filters or searching for different criteria.</p>
+                        <div className="flex flex-col items-center justify-center py-20 sm:py-32 text-muted-foreground text-center">
+                          <Search className="h-10 w-10 sm:h-12 sm:w-12 opacity-10 mb-4"/>
+                          <h3 className="text-lg font-semibold">No transactions</h3>
                         </div>
                     ) : (
                         <Table>
                             <TableHeader className="sticky top-0 bg-background z-10">
                                 <TableRow className="hover:bg-transparent">
-                                    <TableHead className="w-[120px]">Date</TableHead>
-                                    <TableHead>Customer</TableHead>
-                                    <TableHead className="text-right">Net Total</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
+                                    <TableHead className="w-[100px] sm:w-[120px] text-[10px] uppercase font-black">Date</TableHead>
+                                    <TableHead className="text-[10px] uppercase font-black">Customer</TableHead>
+                                    <TableHead className="text-right text-[10px] uppercase font-black">Total</TableHead>
+                                    <TableHead className="text-right text-[10px] uppercase font-black">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -396,35 +355,29 @@ export function UserSalesHistoryModal({
                                 const total = (sale.grandTotal || 0) - (sale.returnedAmount || 0);
                                 const status = getSaleStatusInfo(sale);
                                 return (
-                                    <TableRow key={sale.id} className="hover:bg-muted/30 transition-colors group">
-                                        <TableCell className="font-medium text-xs py-4">
-                                          <div className="font-bold">{saleDate ? format(saleDate, 'EEEE - MMM- dd- yyyy') : 'N/A'}</div>
-                                          <div className="text-muted-foreground">{saleDate ? format(saleDate, 'h:mm a') : ''}</div>
+                                    <TableRow key={sale.id} className="group">
+                                        <TableCell className="py-3 sm:py-4">
+                                          <div className="font-bold text-[10px] sm:text-xs">{saleDate ? format(saleDate, 'MMM dd, yy') : 'N/A'}</div>
+                                          <div className="text-[9px] text-muted-foreground hidden sm:block">{saleDate ? format(saleDate, 'h:mm a') : ''}</div>
                                         </TableCell>
-                                        <TableCell className="max-w-[180px] py-4">
-                                          <div className="truncate font-semibold" title={sale.customerName || 'Walk-in'}>
-                                            {sale.customerName || 'Walk-in Customer'}
+                                        <TableCell className="py-3 sm:py-4">
+                                          <div className="truncate font-bold text-xs sm:text-sm" title={sale.customerName || 'Walk-in'}>
+                                            {sale.customerName || 'Walk-in'}
                                           </div>
-                                          <div className="text-[10px] text-muted-foreground uppercase font-mono">#{sale.id.substring(0, 8)}</div>
-                                        </TableCell>
-                                        <TableCell className="text-right py-4">
-                                          <div className="font-bold text-sm">{formatCurrency(total, currencySymbol)}</div>
-                                          <div className="text-[10px] text-muted-foreground">{sale.paymentMethod}</div>
-                                        </TableCell>
-                                        <TableCell className="py-4">
-                                          <Badge variant="outline" className={cn("text-[9px] font-black uppercase px-2 py-0", status.color)}>
+                                          <Badge variant="outline" className={cn("text-[8px] font-black uppercase px-1 py-0", status.color)}>
                                             {status.text}
                                           </Badge>
-                                          {(sale.returnedAmount || 0) > 0 && (
-                                            <Badge variant="destructive" className="ml-1 text-[8px] px-1 py-0 h-4">RET</Badge>
-                                          )}
                                         </TableCell>
-                                        <TableCell className="text-right py-4">
-                                            <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-primary/10 hover:text-primary" onClick={() => handleViewDetails(sale)}>
+                                        <TableCell className="text-right py-3 sm:py-4">
+                                          <div className="font-black text-xs sm:text-sm">{formatCurrency(total, currencySymbol)}</div>
+                                          <div className="text-[9px] text-muted-foreground hidden sm:block">{sale.paymentMethod}</div>
+                                        </TableCell>
+                                        <TableCell className="text-right py-3 sm:py-4 px-1 sm:px-4">
+                                            <div className="flex items-center justify-end gap-1">
+                                                <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={() => handleViewDetails(sale)}>
                                                   <Eye className="h-4 w-4"/>
                                                 </Button>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-primary/10 hover:text-primary" onClick={() => handleReprintReceipt(sale)}>
+                                                <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={() => handleReprintReceipt(sale)}>
                                                   <Printer className="h-4 w-4"/>
                                                 </Button>
                                             </div>
@@ -440,34 +393,32 @@ export function UserSalesHistoryModal({
           </div>
 
           {/* Pagination */}
-          <DialogFooter className="p-6 py-4 border-t flex flex-row justify-between items-center shrink-0 bg-background shadow-[0_-4px_10px_rgba(0,0,0,0.03)]">
-            <div className="flex items-center gap-2">
-                <div className="bg-muted p-1 rounded-md text-[10px] font-black uppercase text-muted-foreground px-2">
-                    {filteredSales.length} Records
-                </div>
+          <DialogFooter className="p-4 sm:p-6 py-3 sm:py-4 border-t flex flex-row justify-between items-center shrink-0 bg-background shadow-[0_-4px_10px_rgba(0,0,0,0.03)]">
+            <div className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">
+                {filteredSales.length} Records
             </div>
-            <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2 sm:gap-4">
+                <div className="flex items-center gap-1 sm:gap-2">
                     <Button 
                       variant="outline" 
                       size="icon"
-                      className="h-8 w-8"
+                      className="h-7 w-7 sm:h-8 sm:w-8"
                       onClick={() => setCurrentPage(p => Math.max(1, p - 1))} 
                       disabled={currentPage === 1 || isLoading}
                     >
-                      <ChevronLeft className="h-4 w-4"/>
+                      <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4"/>
                     </Button>
-                    <div className="text-[11px] font-bold tabular-nums min-w-[40px] text-center">
+                    <div className="text-[10px] sm:text-[11px] font-bold tabular-nums min-w-[30px] sm:min-w-[40px] text-center">
                         {currentPage} / {totalPages || 1}
                     </div>
                     <Button 
                       variant="outline" 
                       size="icon"
-                      className="h-8 w-8"
+                      className="h-7 w-7 sm:h-8 sm:w-8"
                       onClick={() => setCurrentPage(p => Math.min(totalPages, p+1))} 
                       disabled={currentPage >= totalPages || isLoading}
                     >
-                      <ChevronRight className="h-4 w-4"/>
+                      <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4"/>
                     </Button>
                 </div>
             </div>
@@ -482,7 +433,6 @@ export function UserSalesHistoryModal({
             saleTransaction={selectedSaleForDetails}
             currencySymbol={currencySymbol}
             staffMap={userStaffMap}
-            onRecordPayment={(s) => handleRecordPayment(s)}
         />
       )}
 
