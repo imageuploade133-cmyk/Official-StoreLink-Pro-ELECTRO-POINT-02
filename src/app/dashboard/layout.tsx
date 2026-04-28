@@ -396,7 +396,7 @@ export default function DashboardLayout({
       )}
 
       {/* Content Area */}
-      <div className="flex flex-col dark:bg-black">
+      <div className="flex flex-col dark:bg-black overflow-x-auto">
         {/* Header */}
         <header className="flex h-14 shrink-0 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6 sticky top-0 z-20 dark:bg-card dark:border-border/50">
           {showSidebar && (
@@ -606,7 +606,7 @@ export default function DashboardLayout({
         </header>
 
         {/* Main Content */}
-        <div className="flex-1 dark:bg-black">
+        <div className="flex-1 dark:bg-black overflow-x-auto">
           <main className="p-4 lg:p-6 pb-20 dark:bg-black">
             {children}
           </main>
