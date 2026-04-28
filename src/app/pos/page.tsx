@@ -111,7 +111,7 @@ export default function POSPage() {
   const firestore = useFirestore();
   const router = useRouter();
   
-  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
+  const currentStoreId = useMemo(() => staffMember?.store_id || store?.id || null, [staffMember, store]);
   
   const [products, setProducts] = useState<DisplayProduct[]>([]);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -472,7 +472,12 @@ export default function POSPage() {
     paymentDetails?: PaymentDetails,
     initialPaymentAtSale?: number | null
   ): Promise<boolean> => {
-    if (!saleDataForDialog || !currentUser || !firestore) return false;
+    if (!saleDataForDialog || !currentUser || !firestore || !currentStoreId) {
+      if (!currentStoreId) {
+        toast({ variant: 'destructive', title: 'Sale Failed', description: 'Store ID is missing. Please refresh and try again.' });
+      }
+      return false;
+    }
 
     let finalTransactionDataForUI: SaleTransaction | null = null;
     const saleTimestamp = Timestamp.now(); 
@@ -677,8 +682,8 @@ export default function POSPage() {
         unitPrice: item.salePrice,
         originalPrice: item.sellingPrice !== item.salePrice ? ensureNumber(item.sellingPrice) : null,
         totalPrice: item.salePrice * item.quantity,
-        variantId: item.selectedVariantId,
-        selectedOptions: item.selectedOptions,
+        variantId: item.selectedVariantId || null,
+        selectedOptions: item.selectedOptions || null,
       }));
 
     if (isCredit) {
@@ -712,8 +717,8 @@ export default function POSPage() {
       unitPrice: item.salePrice,
       originalPrice: ensureNumber(item.sellingPrice) !== item.salePrice ? ensureNumber(item.sellingPrice) : null,
       totalPrice: item.salePrice * item.quantity,
-      variantId: item.selectedVariantId,
-      selectedOptions: item.selectedOptions,
+      variantId: item.selectedVariantId || null,
+      selectedOptions: item.selectedOptions || null,
     }));
 
     setSaleDataForDialog({
@@ -742,8 +747,8 @@ export default function POSPage() {
             stock: item.stock,
             barcode: item.barcode || null,
             categoryId: item.categoryId,
-            variantId: item.selectedVariantId,
-            selectedOptions: item.selectedOptions,
+            variantId: item.selectedVariantId || null,
+            selectedOptions: item.selectedOptions || null,
         })),
         store_id: currentStoreId!,
         totalAmount: grandTotal,
