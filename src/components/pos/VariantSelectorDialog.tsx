@@ -99,7 +99,7 @@ export function VariantSelectorDialog({
             <p className="text-xs md:text-sm text-muted-foreground uppercase font-bold tracking-wider">Stock</p>
             {selectedVariant ? (
               selectedVariant.stock > 0 ? (
-                <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-green-200">
+                <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/40 border-green-200 dark:border-green-800/50 font-bold">
                   {selectedVariant.stock} In Stock
                 </Badge>
               ) : (

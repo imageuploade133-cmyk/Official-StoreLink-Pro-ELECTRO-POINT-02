@@ -794,10 +794,10 @@ export default function POSPage() {
   
   return (
     <TooltipProvider>
-      <div className="min-h-screen lg:h-dvh flex flex-col overflow-x-auto lg:overflow-hidden bg-muted/30">
-        <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6">
+      <div className="min-h-screen lg:h-dvh flex flex-col overflow-x-auto lg:overflow-hidden bg-muted/30 dark:bg-black">
+        <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6 dark:bg-black/50 dark:backdrop-blur-md">
             <div className="flex items-center gap-3">
-                <div className="p-2 bg-muted rounded-md">
+                <div className="p-2 bg-muted rounded-md dark:bg-zinc-900">
                     <Store className="h-6 w-6 text-primary" />
                 </div>
                 <div>
@@ -808,7 +808,7 @@ export default function POSPage() {
         </header>
 
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-5 lg:grid-rows-none gap-3 sm:gap-6 min-h-0 p-3 sm:p-6">
-          <div className="lg:col-span-3 h-full flex flex-col bg-card p-2 sm:p-4 rounded-xl shadow-lg lg:overflow-hidden">
+          <div className="lg:col-span-3 h-full flex flex-col bg-card p-2 sm:p-4 rounded-xl shadow-lg lg:overflow-hidden dark:bg-zinc-900/50 dark:border-zinc-800 dark:border">
             <ProductArea
               onAddToCart={handleAddToCart}
               onProductsLoaded={setProducts}
