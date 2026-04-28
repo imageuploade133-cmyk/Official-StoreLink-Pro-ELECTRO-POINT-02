@@ -119,7 +119,7 @@ export const ProductCard = React.memo(({ product, onAddToCart, priority, currenc
     
     return (
         <Card className={cn(
-            "overflow-hidden shadow-sm transition-shadow duration-200 flex flex-col group border-2",
+            "overflow-hidden shadow-sm transition-shadow duration-200 flex flex-col group border-2 pos-product-card",
             isSmallMode ? "rounded-xl" : "rounded-2xl"
         )}>
         <div className={cn(
@@ -202,16 +202,16 @@ export const ProductCard = React.memo(({ product, onAddToCart, priority, currenc
                     {product.stock <= 0 ? (
                     <Badge variant="destructive" className="text-[10px] px-2 py-0.5 uppercase font-black">Sold Out</Badge>
                     ) : product.stock <= lowStockThreshold && product.stock > 0 ? (
-                    <Badge variant="outline" className="text-[10px] px-2 py-0.5 border-orange-500 text-orange-600 font-bold bg-orange-50">Low: {product.stock}</Badge>
+                    <Badge variant="outline" className="text-[10px] px-2 py-0.5 border-orange-500/50 text-orange-600 dark:text-orange-400 font-bold bg-orange-50 dark:bg-orange-950/30">Low: {product.stock}</Badge>
                     ) : product.stock > lowStockThreshold ? ( 
-                    <Badge variant="default" className="text-[10px] px-2 py-0.5 bg-green-100 text-green-700 border-green-200 hover:bg-green-200 font-bold">
+                    <Badge variant="default" className="text-[10px] px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800/50 hover:bg-green-200 dark:hover:bg-green-900/50 font-bold">
                         {product.stock} In Stock
                         </Badge>
                     ) : null}
                 </div>
             )}
             {isSmallMode && product.stock <= lowStockThreshold && product.stock > 0 && (
-                <div className="text-[10px] font-black text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200 w-fit">
+                <div className="text-[10px] font-black text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/30 px-1.5 py-0.5 rounded border border-orange-200 dark:border-orange-800/50 w-fit">
                     LOW: {product.stock}
                 </div>
             )}

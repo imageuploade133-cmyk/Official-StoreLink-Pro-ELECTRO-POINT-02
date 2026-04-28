@@ -29,6 +29,8 @@ interface SaleDataForDialog {
     grandTotal: number;
     subtotal: number;
     discountAmount?: number;
+    taxAmount?: number;
+    taxRate?: number;
     customer: Customer | null;
     notes: string;
     isCreditSale: boolean;
@@ -183,53 +185,53 @@ export function ConfirmPaymentDialog({
   if (saleData.isCreditSale) {
       return (
         <Dialog open={isOpen} onOpenChange={(open) => { if (!open && !isProcessing) onClose('cancel'); }}>
-            <DialogContent className="sm:max-w-lg p-6 bg-white rounded-lg shadow-xl" onPointerDownOutside={(e) => e.preventDefault()}>
+            <DialogContent className="sm:max-w-lg p-6 bg-background rounded-lg shadow-xl" onPointerDownOutside={(e) => e.preventDefault()}>
                 <DialogHeader className="mb-6">
-                    <DialogTitle className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-2">
                         <AlertTriangle className="text-orange-500 h-6 w-6"/> Confirm Credit Sale
                     </DialogTitle>
-                    <DialogDescription className="text-lg text-gray-600 mt-2">Review the details for <span className="font-extrabold text-primary">{saleData.customer?.name || 'this credit sale'}</span> before finalizing.</DialogDescription>
+                    <DialogDescription className="text-lg text-muted-foreground mt-2">Review the details for <span className="font-extrabold text-primary">{saleData.customer?.name || 'this credit sale'}</span> before finalizing.</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-6 py-4 text-base">
-                    <Card className="border-2 border-green-200 bg-green-50 shadow-sm">
+                    <Card className="border-2 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/20 shadow-sm">
                         <CardContent className="pt-6 space-y-4">
                             {saleData.discountAmount && saleData.discountAmount > 0 ? (
                                 <>
-                                <div className="flex justify-between items-center text-gray-700">
+                                <div className="flex justify-between items-center text-foreground">
                                     <span className="text-lg font-medium">Subtotal:</span>
                                     <span className="font-bold text-lg">{formatCurrencyDisplay(saleData.subtotal)}</span>
                                 </div>
-                                <div className="flex justify-between items-center text-red-600">
+                                <div className="flex justify-between items-center text-destructive">
                                     <span className="text-lg font-medium">Discount:</span>
                                     <span className="font-bold text-lg">-{formatCurrencyDisplay(saleData.discountAmount)}</span>
                                 </div>
                                 </>
                             ) : null}
                             {saleData.taxAmount && saleData.taxAmount > 0 ? (
-                                <div className="flex justify-between items-center text-blue-600">
+                                <div className="flex justify-between items-center text-blue-600 dark:text-blue-400">
                                     <span className="text-lg font-medium">{settings?.taxName || 'Tax'} ({saleData.taxRate}%):</span>
                                     <span className="font-bold text-lg">+{formatCurrencyDisplay(saleData.taxAmount)}</span>
                                 </div>
                             ) : null}
                             <div className="flex justify-between items-center">
-                                <span className="text-lg font-medium text-gray-700 flex items-center gap-2"><DollarSign className="h-5 w-5 text-green-600"/> Sale Total:</span> 
-                                <span className="font-extrabold text-2xl text-green-700">{formatCurrencyDisplay(grandTotal)}</span>
+                                <span className="text-lg font-medium text-foreground flex items-center gap-2"><DollarSign className="h-5 w-5 text-green-600 dark:text-green-400"/> Sale Total:</span>
+                                <span className="font-extrabold text-2xl text-green-700 dark:text-green-400">{formatCurrencyDisplay(grandTotal)}</span>
                             </div>
                             <div className="flex justify-between items-center">
-                                <span className="text-lg font-medium text-gray-700 flex items-center gap-2"><Wallet className="h-5 w-5 text-blue-600"/> Initial Payment:</span> 
-                                <span className="font-bold text-xl text-blue-700">{formatCurrencyDisplay(saleData.initialPaymentAtSale ?? 0)}</span>
+                                <span className="text-lg font-medium text-foreground flex items-center gap-2"><Wallet className="h-5 w-5 text-blue-600 dark:text-blue-400"/> Initial Payment:</span>
+                                <span className="font-bold text-xl text-blue-700 dark:text-blue-300">{formatCurrencyDisplay(saleData.initialPaymentAtSale ?? 0)}</span>
                             </div>
-                            <Separator className="my-4 bg-gray-200" />
+                            <Separator className="my-4 bg-border" />
                             <div className="flex justify-between items-center">
-                                <span className="font-bold text-xl text-red-700 flex items-center gap-2"><CreditCard className="h-5 w-5 text-red-600"/> Amount on Credit:</span>
-                                <span className="font-extrabold text-2xl text-red-700">{formatCurrencyDisplay(grandTotal - (saleData.initialPaymentAtSale ?? 0))}</span>
+                                <span className="font-bold text-xl text-red-700 dark:text-red-400 flex items-center gap-2"><CreditCard className="h-5 w-5 text-red-600 dark:text-red-400"/> Amount on Credit:</span>
+                                <span className="font-extrabold text-2xl text-red-700 dark:text-red-400">{formatCurrencyDisplay(grandTotal - (saleData.initialPaymentAtSale ?? 0))}</span>
                             </div>
                         </CardContent>
                     </Card>
-                     <Card className="border-2 border-gray-200 bg-gray-50 shadow-sm">
+                     <Card className="border-2 border-border bg-muted/30 shadow-sm">
                         <CardContent className="pt-6 space-y-4">
                             <div className="flex justify-between items-center">
-                                <span className="text-lg font-medium text-gray-700 flex items-center gap-2"><CalendarDays className="h-5 w-5 text-purple-600"/> Payment Due Date:</span> 
+                                <span className="text-lg font-medium text-foreground flex items-center gap-2"><CalendarDays className="h-5 w-5 text-purple-600 dark:text-purple-400"/> Payment Due Date:</span>
                                 <span className="font-bold text-lg">{saleData.dueDate ? format(saleData.dueDate, 'PPP') : 'N/A'}</span>
                             </div>
                         </CardContent>
@@ -237,7 +239,7 @@ export function ConfirmPaymentDialog({
                 </div>
                 <DialogFooter className="mt-6">
                     <Button variant="outline" onClick={() => onClose('back')} disabled={isProcessing} className="px-6 py-3 text-base">Back</Button>
-                    <Button onClick={handleConfirm} disabled={isProcessing} className="px-6 py-3 text-base bg-orange-600 hover:bg-orange-700">
+                    <Button onClick={handleConfirm} disabled={isProcessing} className="px-6 py-3 text-base btn-confirm-orange">
                         {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
                         Confirm Sale
                     </Button>
@@ -249,24 +251,24 @@ export function ConfirmPaymentDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open && !isProcessing) onClose('cancel'); }}>
-      <DialogContent className="sm:max-w-lg p-0 h-auto max-h-[90vh] flex flex-col" onPointerDownOutside={(e) => e.preventDefault()}>
+      <DialogContent className="sm:max-w-lg p-0 h-auto max-h-[90vh] flex flex-col bg-background" onPointerDownOutside={(e) => e.preventDefault()}>
         <DialogHeader className="p-6 pb-4 border-b">
-          <DialogTitle className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <DollarSign className="h-6 w-6 text-green-600" /> Finalize Payment
+          <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <DollarSign className="h-6 w-6 text-green-600 dark:text-green-400" /> Finalize Payment
           </DialogTitle>
-          <DialogDescription className="text-lg text-gray-600 mt-2">
+          <DialogDescription className="text-lg text-muted-foreground mt-2">
             {saleData.discountAmount && saleData.discountAmount > 0 && (
                 <span className="text-sm block">
                     Subtotal: {formatCurrencyDisplay(saleData.subtotal)}
-                    <span className="text-red-500 ml-2">(-{formatCurrencyDisplay(saleData.discountAmount)})</span>
+                    <span className="text-destructive ml-2">(-{formatCurrencyDisplay(saleData.discountAmount)})</span>
                 </span>
             )}
             {saleData.taxAmount && saleData.taxAmount > 0 && (
                 <span className="text-sm block">
-                    {settings?.taxName || 'Tax'} Collected: <span className="text-blue-600">+{formatCurrencyDisplay(saleData.taxAmount)} ({saleData.taxRate}%)</span>
+                    {settings?.taxName || 'Tax'} Collected: <span className="text-blue-600 dark:text-blue-400">+{formatCurrencyDisplay(saleData.taxAmount)} ({saleData.taxRate}%)</span>
                 </span>
             )}
-            Total Due: <span className="font-extrabold text-green-600">{formatCurrencyDisplay(grandTotal)}</span>
+            Total Due: <span className="font-extrabold text-green-600 dark:text-green-400">{formatCurrencyDisplay(grandTotal)}</span>
           </DialogDescription>
         </DialogHeader>
         <ScrollArea className="flex-1">
@@ -335,7 +337,7 @@ export function ConfirmPaymentDialog({
           <Button variant="outline" onClick={() => onClose('cancel')} disabled={isProcessing} className="px-6 py-3 text-base">
             Cancel
           </Button>
-          <Button onClick={handleConfirm} disabled={isProcessing} className="px-6 py-3 text-base bg-green-600 hover:bg-green-700">
+          <Button onClick={handleConfirm} disabled={isProcessing} className="px-6 py-3 text-base btn-confirm-pos">
             {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Complete Sale
           </Button>

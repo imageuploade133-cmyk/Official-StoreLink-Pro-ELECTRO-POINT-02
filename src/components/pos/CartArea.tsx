@@ -115,7 +115,7 @@ export function CartArea({
     };
     
     return (
-        <Card className="flex-1 flex flex-col min-h-0 shadow-lg">
+        <Card className="flex-1 flex flex-col min-h-0 shadow-lg dark:bg-zinc-900/50 dark:border-zinc-800 pos-cart-container">
             <CardHeader className="pb-3">
             <div className="flex justify-between items-center mb-2">
                 <CardTitle className="font-headline text-xl">
@@ -231,7 +231,7 @@ export function CartArea({
                         <span>{formatCurrency(subtotal, currencySymbol)}</span>
                     </div>
                      {discountAmount > 0 && (
-                        <div className="flex justify-between items-center text-red-600">
+                        <div className="flex justify-between items-center text-destructive">
                             <button onClick={onClearDiscount} className="flex items-center gap-1 hover:underline">
                                 <Tag className="h-3.5 w-3.5" />
                                 Discount {discount.type === 'percentage' ? `(${discount.value}%)` : ''}
@@ -242,7 +242,7 @@ export function CartArea({
                     )}
                 </div>
 
-                <div className="flex justify-between items-center text-xl font-bold text-primary my-4">
+                <div className="flex justify-between items-center text-xl font-bold text-primary my-4 pos-accent-glow">
                     <span>Grand Total</span>
                     <span>{formatCurrency(grandTotal, currencySymbol)}</span>
                 </div>
@@ -254,7 +254,7 @@ export function CartArea({
                         {!selectedCustomer && cartItems.length > 0 && (<TooltipContent><p>Please select an active customer for a credit sale.</p></TooltipContent>)}
                         {selectedCustomer && selectedCustomer.status !== 'active' && cartItems.length > 0 && (<TooltipContent><p>Customer {selectedCustomer.name} is {selectedCustomer.status} and cannot make credit purchases.</p></TooltipContent>)}
                     </Tooltip>
-                    <Button className="h-11 col-span-1 bg-green-600 hover:bg-green-700 text-white" onClick={onInitiatePayment} disabled={cartItems.length === 0 || isProcessingSale}>{isProcessingSale && (<Loader2 className="mr-1.5 h-4 w-4 animate-spin" />)}<CheckIconLucide className="mr-1.5 h-4 w-4" /> Pay Now</Button>
+                    <Button className="h-11 col-span-1 btn-confirm-pos" onClick={onInitiatePayment} disabled={cartItems.length === 0 || isProcessingSale}>{isProcessingSale && (<Loader2 className="mr-1.5 h-4 w-4 animate-spin" />)}<CheckIconLucide className="mr-1.5 h-4 w-4" /> Pay Now</Button>
                     <Button variant="outline" className="h-11" onClick={onInitiateHoldSale} disabled={cartItems.length === 0 || isProcessingSale}>{isProcessingSale && (<Loader2 className="mr-1.5 h-4 w-4 animate-spin" />)}<PauseCircle className="mr-1.5 h-4 w-4" /> Hold Sale</Button>
                 </div>
             </div>

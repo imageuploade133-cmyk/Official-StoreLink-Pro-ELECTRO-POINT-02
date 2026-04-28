@@ -126,11 +126,11 @@ export function CustomerSearchList({
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-black text-sm sm:text-base text-gray-900 dark:text-gray-100 truncate max-w-[150px] sm:max-w-none">{customer.name}</p>
                     {customer.uid ? (
-                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-[9px] h-4 sm:h-5 uppercase font-black px-1 sm:px-1.5">
+                      <Badge variant="outline" className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 text-[9px] h-4 sm:h-5 uppercase font-black px-1 sm:px-1.5">
                         <Globe className="h-2 w-2 sm:h-2.5 sm:w-2.5 mr-0.5 sm:mr-1" /> Web
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="bg-muted text-muted-foreground text-[9px] h-4 sm:h-5 uppercase font-black px-1 sm:px-1.5">
+                      <Badge variant="outline" className="bg-muted dark:bg-zinc-800 text-muted-foreground dark:text-zinc-400 text-[9px] h-4 sm:h-5 uppercase font-black px-1 sm:px-1.5">
                         <MonitorSmartphone className="h-2 w-2 sm:h-2.5 sm:w-2.5 mr-0.5 sm:mr-1" /> POS
                       </Badge>
                     )}

@@ -88,7 +88,7 @@ export function ProductSearchBar({
                 data-barcode-input="true"
               />
               {isSearchDropdownOpen && liveSearchResults.length > 0 && (
-                <Card className="absolute top-full left-0 right-0 mt-1 z-50 max-h-80 overflow-y-auto shadow-xl border">
+                <Card className="absolute top-full left-0 right-0 mt-1 z-50 max-h-80 overflow-y-auto shadow-xl border dark:bg-zinc-900 dark:border-zinc-800">
                   <CardContent className="p-0">
                     {liveSearchResults.map((product) => {
                       const effectivePrice = calculateEffectivePrice(product, today);
@@ -115,11 +115,11 @@ export function ProductSearchBar({
                             {product.stock <= 0 ? (
                               <Badge variant="destructive" className="text-xs whitespace-nowrap">Out of Stock</Badge>
                             ) : product.stock <= (product.lowStockThreshold ?? globalLowStockThreshold) && product.stock > 0 ? (
-                              <Badge variant="outline" className="text-xs whitespace-nowrap border-orange-500 text-orange-600">
+                              <Badge variant="outline" className="text-xs whitespace-nowrap border-orange-500/50 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/30">
                                 Low: {product.stock}
                               </Badge>
                             ) : product.stock > (product.lowStockThreshold ?? globalLowStockThreshold) ? (
-                              <Badge variant="default" className="text-xs whitespace-nowrap bg-green-100 text-green-700 border-green-200 hover:bg-green-200">
+                              <Badge variant="default" className="text-xs whitespace-nowrap bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800/50 hover:bg-green-200 dark:hover:bg-green-900/50">
                                 In Stock
                               </Badge>
                             ) : null}

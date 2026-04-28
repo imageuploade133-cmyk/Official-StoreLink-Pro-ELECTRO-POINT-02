@@ -418,6 +418,48 @@
 }
 
 /* ╔══════════════════════════════════════════════════════════════╗
+   ║  POS SPECIFIC DARK MODE REFINEMENTS                         ║
+   ╚══════════════════════════════════════════════════════════════╝ */
+
+.dark .pos-product-card {
+  @apply bg-[#1c1c1e] border-[#323235] hover:border-[#424245] transition-all duration-300;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.dark .pos-product-card:hover {
+  @apply -translate-y-1;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.dark .pos-cart-container {
+  @apply bg-[#0a0a0a] border-[#252525];
+}
+
+.dark .pos-sidebar-item {
+  @apply hover:bg-[#1c1c1e] text-[#a1a1a6] hover:text-white;
+}
+
+.dark .pos-accent-glow {
+  text-shadow: 0 0 15px rgba(0, 113, 227, 0.4);
+}
+
+.btn-confirm-pos {
+  @apply bg-green-600 hover:bg-green-500 text-white shadow-lg shadow-green-500/20 transition-all duration-200 active:scale-95;
+}
+
+.dark .btn-confirm-pos {
+  @apply bg-[#34c759] hover:bg-[#30d158] shadow-[#34c759]/20;
+}
+
+.btn-confirm-orange {
+  @apply bg-orange-600 hover:bg-orange-500 text-white shadow-lg shadow-orange-500/20 transition-all duration-200 active:scale-95;
+}
+
+.dark .btn-confirm-orange {
+  @apply bg-[#ff9500] hover:bg-[#ffb340] shadow-[#ff9500]/20;
+}
+
+/* ╔══════════════════════════════════════════════════════════════╗
    ║  APPLE DARK MODE — Midnight Icon System                     ║
    ║  Category-colored icons for clear visual hierarchy          ║
    ╚══════════════════════════════════════════════════════════════╝ */
