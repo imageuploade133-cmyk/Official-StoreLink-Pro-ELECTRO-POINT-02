@@ -287,7 +287,7 @@ export default function DashboardLayout({
   return (
     <div
       className={cn(
-        'grid h-[100dvh] w-full overflow-hidden',
+        'grid min-h-screen w-full',
         showSidebar && 'transition-[grid-template-columns] duration-300 ease-in-out',
         showSidebar && (isMinimized
           ? 'md:grid-cols-[80px_1fr]'
@@ -297,7 +297,7 @@ export default function DashboardLayout({
     >
       {/* Sidebar */}
       {showSidebar && (
-        <aside className="hidden border-r bg-sidebar-background md:flex md:flex-col overflow-hidden dark:bg-sidebar-background dark:border-sidebar-border">
+        <aside className="hidden border-r bg-sidebar-background md:flex md:flex-col sticky top-0 h-screen overflow-hidden dark:bg-sidebar-background dark:border-sidebar-border">
           <div
             className={cn(
               'flex h-14 shrink-0 items-center border-b dark:border-sidebar-border lg:h-[60px]',
@@ -396,9 +396,9 @@ export default function DashboardLayout({
       )}
 
       {/* Content Area */}
-      <div className="flex flex-col overflow-hidden dark:bg-black">
+      <div className="flex flex-col dark:bg-black">
         {/* Header */}
-        <header className="flex h-14 shrink-0 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6 dark:bg-card dark:border-border/50">
+        <header className="flex h-14 shrink-0 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6 sticky top-0 z-20 dark:bg-card dark:border-border/50">
           {showSidebar && (
             <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <SheetTrigger asChild>
@@ -605,8 +605,8 @@ export default function DashboardLayout({
           <UserNav />
         </header>
 
-        {/* Main Content (ONLY SCROLL HERE) */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden h-full custom-scrollbar dark:bg-black" style={{ scrollBehavior: 'smooth' }}>
+        {/* Main Content */}
+        <div className="flex-1 dark:bg-black">
           <main className="p-4 lg:p-6 pb-20 dark:bg-black">
             {children}
           </main>
