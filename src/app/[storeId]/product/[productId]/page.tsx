@@ -994,13 +994,16 @@ export default function ProductDetailsPage() {
 
   if (isLoadingProduct) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          <div className="lg:col-span-7"><Skeleton className="aspect-square w-full rounded-3xl" /></div>
-          <div className="lg:col-span-5 space-y-6">
-            <Skeleton className="h-12 w-3/4" />
-            <Skeleton className="h-6 w-1/4" />
-            <Skeleton className="h-32 w-full" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-white dark:bg-black min-h-screen">
+        <div className="flex flex-col gap-8">
+          <Skeleton className="h-4 w-64 rounded-full opacity-40 mb-8" />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <div className="lg:col-span-7"><Skeleton className="aspect-square w-full rounded-[2.5rem]" /></div>
+            <div className="lg:col-span-5 space-y-6">
+              <Skeleton className="h-12 w-3/4 rounded-full" />
+              <Skeleton className="h-6 w-1/4 rounded-full" />
+              <Skeleton className="h-32 w-full rounded-3xl" />
+            </div>
           </div>
         </div>
       </div>

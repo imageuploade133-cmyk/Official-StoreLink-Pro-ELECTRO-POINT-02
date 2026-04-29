@@ -215,7 +215,14 @@ export default function AllCategoriesPage() {
                 {isLoading && categories.length === 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
                         {Array.from({ length: 6 }).map((_, i) => (
-                           <Skeleton key={i} className="aspect-[4/5] rounded-[2.5rem]" />
+                           <div key={i} className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden">
+                               <Skeleton className="h-full w-full" />
+                               <div className="absolute inset-0 p-8 flex flex-col justify-end space-y-3">
+                                   <Skeleton className="h-3 w-1/3 rounded-full opacity-40" />
+                                   <Skeleton className="h-10 w-2/3 rounded-full" />
+                                   <Skeleton className="h-4 w-1/2 rounded-full opacity-40" />
+                               </div>
+                           </div>
                         ))}
                     </div>
                 ) : categories.length > 0 ? (
