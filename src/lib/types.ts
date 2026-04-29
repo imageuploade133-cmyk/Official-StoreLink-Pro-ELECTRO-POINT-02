@@ -1031,6 +1031,8 @@ export interface InstallmentRecord {
     paymentHistory: PaymentRecord[];
     createdAt: Timestamp;
     updatedAt: Timestamp;
+    completedAt?: Timestamp | null;
+    isRead?: boolean;
 }
 
 export interface PaymentRecord {
