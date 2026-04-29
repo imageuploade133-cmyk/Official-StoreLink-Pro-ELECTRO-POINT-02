@@ -158,8 +158,9 @@ export default function DashboardLayout({
     { href: '/dashboard/flexible-payments', icon: Wallet, label: 'Pay Small Small', perm: 'manage_flexible_payments' },
     { heading: 'E-Commerce' },
     { href: '/dashboard/orders', icon: ShoppingBag, label: 'Website Orders', perm: 'manage_orders' },
+    { href: '/dashboard/installment-orders', icon: CreditCard, label: 'Installment Orders', perm: 'manage_flexible_payments' },
     { href: '/dashboard/order-alerts', icon: BellRing, label: 'Order Alerts', perm: 'manage_settings' },
-    { href: '/dashboard/whatsapp-logs', icon: History, label: 'WhatsApp Logs', perm: 'manage_settings' },
+
     { href: '/dashboard/online-customers', icon: UsersRound, label: 'Online Customers', perm: 'view_online_customers' },
     { href: '/dashboard/shopping-experience-settings', icon: CreditCard, label: 'Checkout & Redirection', perm: 'manage_settings' },
     { heading: 'Inventory' },

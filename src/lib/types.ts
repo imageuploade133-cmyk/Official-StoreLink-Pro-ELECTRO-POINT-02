@@ -774,6 +774,14 @@ export interface Product {
   variantOptions?: ProductOption[];
   advancedDetailsEnabled?: boolean;
   variantStockTotal?: number;
+  installmentEnabled?: boolean;
+  downPaymentPercentage?: number;
+  numberOfPayments?: number;
+  paymentInterval?: 'daily' | 'weekly' | 'monthly' | 'custom';
+  installmentStartDate?: Timestamp | null;
+  lateFee?: number;
+  autoCalculateInstallments?: boolean;
+  installmentTerms?: string;
 }
 
 export interface DisplayProduct extends Product {
@@ -1000,6 +1008,30 @@ export interface ActivityLog {
     entityDescription: string;
     details: Record<string, any>;
 }
+
+export interface InstallmentRecord {
+    id: string;
+    store_id: string;
+    customerId: string;
+    customerName: string;
+    customerEmail?: string;
+    customerPhone?: string;
+    productId: string;
+    productName: string;
+    totalAmount: number;
+    downPaymentAmount: number;
+    remainingBalance: number;
+    numberOfPayments: number;
+    paymentInterval: 'daily' | 'weekly' | 'monthly' | 'custom';
+    nextDueDate: Timestamp;
+    lastPaymentDate?: Timestamp | null;
+    lateFee?: number;
+    status: 'active' | 'completed' | 'overdue' | 'cancelled';
+    paymentHistory: PaymentRecord[];
+    createdAt: Timestamp;
+    updatedAt: Timestamp;
+}
+
 export interface PaymentRecord {
     paymentDate: Timestamp;
     amountPaid: number;
