@@ -226,6 +226,14 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
       isActive: z.boolean().default(true),
       isManual: z.boolean().optional().default(false),
     })).optional().default([]),
+    installmentEnabled: z.boolean().default(false),
+    downPaymentPercentage: z.coerce.number().min(0).max(100).optional().default(0),
+    numberOfPayments: z.coerce.number().int().min(1).optional().default(1),
+    paymentInterval: z.enum(["daily", "weekly", "monthly", "custom"]).optional().default("monthly"),
+    installmentStartDate: z.date().optional().nullable(),
+    lateFee: z.coerce.number().min(0).optional().default(0),
+    autoCalculateInstallments: z.boolean().default(true),
+    installmentTerms: z.string().optional().or(z.literal("")),
   });
 
   return baseSchema
@@ -383,6 +391,14 @@ export function ProductForm({
       variantStockTotal: defaultValues?.variantStockTotal ?? (defaultValues?.hasVariants ? defaultValues?.variants?.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0) : 0),
       variantOptions: defaultValues?.variantOptions || [],
       variants: defaultValues?.variants || [],
+      installmentEnabled: defaultValues?.installmentEnabled ?? false,
+      downPaymentPercentage: defaultValues?.downPaymentPercentage ?? 0,
+      numberOfPayments: defaultValues?.numberOfPayments ?? 1,
+      paymentInterval: defaultValues?.paymentInterval ?? "monthly",
+      installmentStartDate: defaultValues?.installmentStartDate ? (defaultValues.installmentStartDate instanceof Date ? defaultValues.installmentStartDate : (defaultValues.installmentStartDate as any).toDate()) : null,
+      lateFee: defaultValues?.lateFee ?? 0,
+      autoCalculateInstallments: defaultValues?.autoCalculateInstallments ?? true,
+      installmentTerms: defaultValues?.installmentTerms ?? "",
     },
   });
 
@@ -473,6 +489,14 @@ export function ProductForm({
           variantStockTotal: defaultValues?.variantStockTotal ?? (defaultValues?.hasVariants ? defaultValues?.variants?.reduce((acc: number, v: any) => acc + (Number(v.stock) || 0), 0) : 0),
           variantOptions: defaultValues?.variantOptions || [],
           variants: defaultValues?.variants || [],
+          installmentEnabled: defaultValues?.installmentEnabled ?? false,
+          downPaymentPercentage: defaultValues?.downPaymentPercentage ?? 0,
+          numberOfPayments: defaultValues?.numberOfPayments ?? 1,
+          paymentInterval: defaultValues?.paymentInterval ?? "monthly",
+          installmentStartDate: defaultValues?.installmentStartDate ? (defaultValues.installmentStartDate instanceof Date ? defaultValues.installmentStartDate : (defaultValues.installmentStartDate as any).toDate()) : null,
+          lateFee: defaultValues?.lateFee ?? 0,
+          autoCalculateInstallments: defaultValues?.autoCalculateInstallments ?? true,
+          installmentTerms: defaultValues?.installmentTerms ?? "",
         });
         setHasInitialReset(true);
         lastResetId.current = currentId;
@@ -1136,7 +1160,183 @@ export function ProductForm({
 
             </CardContent>
           </Card>
+          
+          
           <ProductVariantsManager storeId={currentStoreId} />
+
+          <Card className="shadow-xl border-none ring-1 ring-border">
+            <CardHeader className="bg-muted/30">
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <CreditCard className="h-5 w-5 text-primary" /> Installment Payment (Pay Small Small)
+                  </CardTitle>
+                  <CardDescription>Enable customers to pay in installments for this product.</CardDescription>
+                </div>
+                <FormField
+                  control={form.control}
+                  name="installmentEnabled"
+                  render={({ field }) => (
+                    <FormControl>
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                  )}
+                />
+              </div>
+            </CardHeader>
+            {form.watch('installmentEnabled') && (
+              <CardContent className="pt-6 space-y-6 animate-in fade-in slide-in-from-top-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="downPaymentPercentage"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-bold">Down Payment (%)</FormLabel>
+                        <FormControl>
+                          <Input type="number" {...field} placeholder="25" value={field.value ?? ''} />
+                        </FormControl>
+                        <FormDescription className="text-xs">Initial payment percentage.</FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="numberOfPayments"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-bold">Number of Installments</FormLabel>
+                        <FormControl>
+                          <Input type="number" {...field} placeholder="4" value={field.value ?? ''} />
+                        </FormControl>
+                        <FormDescription className="text-xs">Total number of payments after down payment.</FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="paymentInterval"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-bold">Payment Interval</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select interval" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="daily">Daily</SelectItem>
+                            <SelectItem value="weekly">Weekly</SelectItem>
+                            <SelectItem value="monthly">Monthly</SelectItem>
+                            <SelectItem value="custom">Custom Date</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="installmentStartDate"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel className="font-bold">Start Date</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant={"outline"}
+                                className={cn(
+                                  "w-full pl-3 text-left font-normal h-10",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value ? (
+                                  format(field.value, "PPP")
+                                ) : (
+                                  <span>Pick a date</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={field.value || undefined}
+                              onSelect={field.onChange}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="lateFee"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-bold">Late Fee (Optional)</FormLabel>
+                        <FormControl>
+                          <Input type="number" {...field} placeholder="0.00" value={field.value ?? ''} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="autoCalculateInstallments"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                        <div className="space-y-0.5">
+                          <FormLabel>Auto-calculate Amounts</FormLabel>
+                          <FormDescription className="text-xs">Divide balance equally across installments.</FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="installmentTerms"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-bold">Terms and Conditions</FormLabel>
+                      <FormControl>
+                        <RichTextEditor
+                          storeId={currentStoreId}
+                          value={field.value || ''}
+                          onChange={field.onChange}
+                          placeholder="Specify terms for installment payments..."
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            )}
+          </Card>
+
+
+          
+
 
           <Card className="shadow-xl border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">

@@ -1411,6 +1411,74 @@ export default function ProductDetailsPage() {
                 </Button>
               </div>
 
+              
+              {product.installmentEnabled && !isOutOfStock && (
+                <div className="mt-6 p-6 rounded-3xl bg-primary/5 border-2 border-primary/20 space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="h-5 w-5 text-primary" />
+                      <h3 className="font-bold text-lg">Pay Small Small</h3>
+                    </div>
+                    <Badge className="bg-primary text-white">Available</Badge>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Amount to Pay Now</span>
+                      <span className="font-black text-primary">{formatCurrency(currentPrice * (product.downPaymentPercentage || 0) / 100, currencySymbol)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Remaining Balance</span>
+                      <span className="font-bold">{formatCurrency(currentPrice * (1 - (product.downPaymentPercentage || 0) / 100), currencySymbol)}</span>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                        <span>Down Payment Progress</span>
+                        <span>{product.downPaymentPercentage}%</span>
+                      </div>
+                      <Progress value={product.downPaymentPercentage} className="h-2 bg-primary/10" />
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-white/50 dark:bg-black/20 border border-primary/10 space-y-3">
+                      <div className="flex items-center gap-2 text-xs font-bold text-primary">
+                        <Clock className="h-4 w-4" />
+                        Next Payment: {format(
+                          product.paymentInterval === 'daily' ? new Date(Date.now() + 86400000) :
+                          product.paymentInterval === 'weekly' ? new Date(Date.now() + 7 * 86400000) :
+                          new Date(Date.now() + 30 * 86400000), 
+                          'PPPP'
+                        )} at {format(new Date(), 'p')}
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[10px] font-black uppercase text-muted-foreground">Payment Schedule</p>
+                        <p className="text-[10px] text-muted-foreground leading-relaxed">
+                          Pay balance in {product.numberOfPayments} {product.paymentInterval} installments of {formatCurrency((currentPrice * (1 - (product.downPaymentPercentage || 0) / 100)) / (product.numberOfPayments || 1), currencySymbol)}.
+                        </p>
+                      </div>
+                      {product.lateFee > 0 && (
+                        <p className="text-[9px] text-rose-600 font-bold italic">* A late fee of {formatCurrency(product.lateFee, currencySymbol)} applies to delayed payments.</p>
+                      )}
+                    </div>
+
+                    <Button 
+                      asChild
+                      className="w-full h-12 rounded-2xl bg-primary text-white font-bold"
+                    >
+                      <Link href={getStoreUrl(`/checkout/installment?productId=${product.id}&qty=${quantity}&variantId=${selectedVariant?.id || ''}`)}>
+                        Choose Installment Plan
+                      </Link>
+                    </Button>
+                    
+                    {product.installmentTerms && (
+                      <div className="pt-2">
+                         <p className="text-[9px] text-muted-foreground italic">By clicking above, you agree to our installment terms.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <StockBar stock={currentStock} lowStockThreshold={lowStockThreshold} className="mt-4" />
               
               {filteredPaymentMethods.find(m => m.id === 'fast_checkout')?.config?.enableQuickPayButtons && !isOutOfStock && (
