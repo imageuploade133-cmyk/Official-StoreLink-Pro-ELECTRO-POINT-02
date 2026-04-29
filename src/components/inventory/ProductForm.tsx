@@ -1513,6 +1513,16 @@ export function ProductForm({
 
           <Card className="shadow-xl border-none ring-1 ring-border">
             <CardHeader className="bg-muted/30">
+              <div className="flex items-center justify-between mb-3">
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" /> Product Description & Story
+                </CardTitle>
+                <Badge variant="outline" className="text-[10px] uppercase font-black px-2 py-0 h-5 bg-green-50 border-green-200 text-green-600">Perfect Indicator</Badge>
+              </div>
+              <CardDescription className="mb-4">
+                Create a rich narrative and manage high-quality multimedia assets for your product showcase.
+              </CardDescription>
+              <Separator className="mb-6 opacity-50" />
               <div className="flex justify-between items-center">
                 <div className="flex-1 mr-4">
                   <FormField
