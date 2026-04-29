@@ -79,6 +79,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { CategoryForm, type CategoryFormValues } from './CategoryForm';
@@ -234,6 +235,7 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
     lateFee: z.coerce.number().min(0).optional().default(0),
     autoCalculateInstallments: z.boolean().default(true),
     installmentTerms: z.string().optional().or(z.literal("")),
+    installmentPaymentMethods: z.array(z.string()).optional().default([]),
   });
 
   return baseSchema
@@ -399,6 +401,7 @@ export function ProductForm({
       lateFee: defaultValues?.lateFee ?? 0,
       autoCalculateInstallments: defaultValues?.autoCalculateInstallments ?? true,
       installmentTerms: defaultValues?.installmentTerms ?? "",
+      installmentPaymentMethods: defaultValues?.installmentPaymentMethods ?? [],
     },
   });
 
@@ -497,6 +500,7 @@ export function ProductForm({
           lateFee: defaultValues?.lateFee ?? 0,
           autoCalculateInstallments: defaultValues?.autoCalculateInstallments ?? true,
           installmentTerms: defaultValues?.installmentTerms ?? "",
+          installmentPaymentMethods: defaultValues?.installmentPaymentMethods ?? [],
         });
         setHasInitialReset(true);
         lastResetId.current = currentId;
@@ -1330,7 +1334,62 @@ export function ProductForm({
                     </FormItem>
                   )}
                 />
-              </CardContent>
+              
+                <div className="space-y-4 pt-4 border-t">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <FormLabel className="font-bold">Accepted Payment Methods (Optional)</FormLabel>
+                      <p className="text-xs text-muted-foreground">
+                        Select the payment methods that can be used for installment payments on this product. Leave empty to allow all payment methods.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {settings?.paymentMethods && settings.paymentMethods.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 bg-muted/30 rounded-xl border border-dashed">
+                      {settings.paymentMethods.map((method) => (
+                        <FormField
+                          key={method.id}
+                          control={form.control}
+                          name="installmentPaymentMethods"
+                          render={({ field }) => {
+                            const isSelected = field.value?.includes(method.id);
+                            return (
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={isSelected}
+                                    onCheckedChange={(checked) => {
+                                      const currentValue = field.value || [];
+                                      if (checked) {
+                                        field.onChange([...currentValue, method.id]);
+                                      } else {
+                                        field.onChange(currentValue.filter((id) => id !== method.id));
+                                      }
+                                    }}
+                                  />
+                                </FormControl>
+                                <div className="flex items-center gap-2">
+                                  {method.iconUrl ? (
+                                    <Image src={method.iconUrl} alt={method.name} width={20} height={20} className="rounded-sm object-contain" unoptimized />
+                                  ) : (
+                                    <CreditCard className="h-4 w-4 text-muted-foreground" />
+                                  )}
+                                  <span className="text-sm font-medium">{method.name}</span>
+                                </div>
+                              </FormItem>
+                            );
+                          }}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-sm text-muted-foreground p-4 bg-muted/30 rounded-xl border border-dashed text-center">
+                      No payment methods configured.
+                    </div>
+                  )}
+                </div>
+</CardContent>
             )}
           </Card>
 

@@ -66,6 +66,21 @@ export default function InstallmentCheckoutPage() {
 
   const currencySymbol = settings?.currency || '$';
   
+  // Compute allowed payment methods based on product's installmentPaymentMethods setting
+  const allowedPaymentMethods = useMemo(() => {
+    if (!product) return [];
+    const productPaymentMethods = product.installmentPaymentMethods || [];
+    const storePaymentMethods = settings?.paymentMethods || [];
+    
+    // If product has specific payment methods set, filter by them
+    if (productPaymentMethods.length > 0) {
+      return storePaymentMethods.filter(m => productPaymentMethods.includes(m.id));
+    }
+    
+    // If no specific methods set on product, return all store payment methods
+    return storePaymentMethods;
+  }, [product, settings?.paymentMethods]);
+  
   const currentPrice = useMemo(() => {
     if (!product) return 0;
     if (variantId && product.variants) {
@@ -278,7 +293,27 @@ export default function InstallmentCheckoutPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {allowedPaymentMethods.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                      {allowedPaymentMethods.map((method) => (
+                        <button 
+                          key={method.id} 
+                          onClick={() => handleCompleteCheckout(method.name)} 
+                          className="group p-6 rounded-3xl border-2 border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 hover:border-primary/50 hover:bg-primary/5 transition-all text-center space-y-3 active:scale-95"
+                        >
+                          <div className="h-12 w-12 rounded-2xl bg-white dark:bg-black shadow-sm flex items-center justify-center mx-auto group-hover:scale-110 transition-transform overflow-hidden">
+                            {method.iconUrl ? (
+                              <Image src={method.iconUrl} alt={method.name} width={24} height={24} className="object-contain" unoptimized />
+                            ) : (
+                              <CreditCard className="h-5 w-5 text-slate-400" />
+                            )}
+                          </div>
+                          <p className="font-bold text-sm">{method.name}</p>
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <button onClick={() => handleCompleteCheckout('Paystack')} className="group p-6 rounded-3xl border-2 border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 hover:border-primary/50 hover:bg-primary/5 transition-all text-center space-y-3 active:scale-95">
                           <div className="h-12 w-12 rounded-2xl bg-white dark:bg-black shadow-sm flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                               <Image src="https://paystack.com/favicon.ico" alt="Paystack" width={24} height={24} className="rounded-full" />
@@ -297,7 +332,8 @@ export default function InstallmentCheckoutPage() {
                           </div>
                           <p className="font-bold text-sm">Transfer</p>
                       </button>
-                  </div>
+                    </div>
+                  )}
 
                   <p className="text-[10px] text-center text-slate-400 font-medium italic">All payments are secured and encrypted. Your plan activates immediately after payment.</p>
                 </div>
