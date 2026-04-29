@@ -21,7 +21,7 @@ import {
   addDays,
 } from 'date-fns';
 
-import type { SaleTransaction, Product, StockTransfer as StockTransferType, SaleReturn, WebsiteTraffic, Order, Settings } from '@/lib/types';
+import type { SaleTransaction, Product, StockTransfer as StockTransferType, SaleReturn, WebsiteTraffic, Order, Settings, AdLink } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/contexts/auth-context';
 import { convertToDateSafely } from "@/lib/utils";
@@ -33,6 +33,7 @@ import { Loader2, LayoutDashboard } from 'lucide-react';
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 import { WebsiteAnalytics } from '@/components/dashboard/WebsiteAnalytics';
+import { ExtendedStats } from '@/components/dashboard/ExtendedStats';
 import { StaticStats } from '@/components/dashboard/StaticStats';
 import { PeriodAnalysis } from '@/components/dashboard/PeriodAnalysis';
 import { InventoryStats } from '@/components/dashboard/InventoryStats';
@@ -77,6 +78,13 @@ export default function DashboardPage() {
     return firestoreQuery(collection(firestore, 'orders'), where('store_id', '==', currentStoreId));
   }, [firestore, currentStoreId]);
   const { data: ordersData, isLoading: isLoadingOrders } = useCollection<Order>(ordersQuery);
+
+  // Ads Data
+  const adsQuery = useMemo(() => {
+    if (!firestore || !currentStoreId) return null;
+    return firestoreQuery(collection(firestore, 'ads'), where('store_id', '==', currentStoreId));
+  }, [firestore, currentStoreId]);
+  const { data: adsData, isLoading: isLoadingAds } = useCollection<AdLink>(adsQuery);
 
   useEffect(() => {
     const now = new Date();
@@ -251,6 +259,14 @@ export default function DashboardPage() {
       return orderDate && orderDate >= todayStart && orderDate <= todayEnd;
     }).length : 0;
 
+    // Calculate ad clicks
+    const totalAdClicks = adsData ? adsData.reduce((sum, ad) => sum + (ad.clicks || 0), 0) : 0;
+    const todayAdClicks = adsData ? adsData.reduce((sum, ad) => {
+      // For simplicity, we count all clicks as today clicks since we don't have click timestamps
+      // In a real implementation, you would track click timestamps
+      return sum + (ad.clicks || 0);
+    }, 0) : 0;
+
     // --- PERIOD STATS (dependent on dateRange picker) ---
     const filteredSales = !dateRange?.from ? [] : allSales.filter(sale => {
       const saleDate = convertToDateSafely(sale.createdAt);
@@ -299,9 +315,11 @@ export default function DashboardPage() {
       dueCreditSales: outstandingCreditSales.map(sale => ({ ...sale, amountActuallyDue: (sale.grandTotal || 0) - (sale.amountPaidTowardsCredit || 0) - (sale.returnedAmount || 0), isOverdue: sale.dueDate ? isBefore(convertToDateSafely(sale.dueDate)!, startOfDay(now)) : false})).sort((a,b) => (convertToDateSafely(a.dueDate)?.getTime() ?? 0) - (convertToDateSafely(a.dueDate)?.getTime() ?? 0)).slice(0, 5),
       recentStockTransfers: allTransfers.slice(0, 3).map(t => ({...t, transferDateDisplay: convertToDateSafely(t.transferDate) ? format(convertToDateSafely(t.transferDate)!, 'PP p') : 'N/A'})),
       availableYears: Array.from(years).sort((a,b) => b-a),
-      todayOrdersCount
+      todayOrdersCount,
+      totalAdClicks,
+      todayAdClicks
     };
-  }, [allSales, allProducts, allTransfers, dateRange, globalLowStockThreshold, _, ordersData]);
+  }, [allSales, allProducts, allTransfers, dateRange, globalLowStockThreshold, _, ordersData, adsData]);
 
   const totalLoading = isAuthLoading || isLoadingSettings;
 
@@ -327,6 +345,13 @@ export default function DashboardPage() {
         todayViews={trafficData?.todayViews || 0}
         totalOrders={ordersData?.length || 0}
         todayOrders={todayOrdersCount}
+      />
+      
+      <ExtendedStats
+        isLoading={isLoading || isLoadingAds}
+        allSales={allSales}
+        todayAdClicks={todayAdClicks}
+        totalAdClicks={totalAdClicks}
       />
       
       <StaticStats
