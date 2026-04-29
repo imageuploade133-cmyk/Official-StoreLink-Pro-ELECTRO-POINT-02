@@ -14,7 +14,8 @@ import {
   Share2,
   Scan,
   PackageSearch,
-  LayoutGrid
+  LayoutGrid,
+  CalendarClock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/PageHeader';
@@ -73,7 +74,7 @@ export default function InventoryPage() {
   const [isCloning, setIsCloning] = useState(false);
   const [isUpdatingSettings, setIsUpdatingSettings] = useState(false);
   const [isBarcodeScannerOpen, setIsBarcodeScannerOpen] = useState(false);
-  const [stockFilter, setStockFilter] = useState<'all' | 'low' | 'out' | 'variant'>('all');
+  const [stockFilter, setStockFilter] = useState<'all' | 'low' | 'out' | 'variant' | 'expired'>('all');
 
   const firestore = useFirestore();
   const { user, store, staffMember } = useAuth();
@@ -93,6 +94,7 @@ export default function InventoryPage() {
   const [lowStockCount, setLowStockCount] = useState(0);
   const [outOfStockCount, setOutOfStockCount] = useState(0);
   const [variantStockCount, setVariantStockCount] = useState(0);
+  const [expiredCount, setExpiredCount] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(15);
 
   // Stable cursors using refs to avoid infinite loops in useEffect
@@ -121,6 +123,8 @@ export default function InventoryPage() {
         q = query(q, where('stock', '<=', globalLowStockThreshold), where('stock', '>', 0));
       } else if (stockFilter === 'variant') {
         q = query(q, where('hasVariants', '==', true));
+      } else if (stockFilter === 'expired') {
+        q = query(q, where('expiryDate', '<=', new Date()));
       }
       
       q = query(q, orderBy('name', 'asc'));
@@ -135,16 +139,19 @@ export default function InventoryPage() {
         const outQ = query(baseQ, where('stock', '<=', 0));
         const lowQ = query(baseQ, where('stock', '<=', globalLowStockThreshold), where('stock', '>', 0));
         const variantQ = query(baseQ, where('hasVariants', '==', true));
+        const expiredQ = query(baseQ, where('expiryDate', '<=', new Date()));
 
-        const [outSnap, lowSnap, variantSnap] = await Promise.all([
+        const [outSnap, lowSnap, variantSnap, expiredSnap] = await Promise.all([
           getCountFromServer(outQ),
           getCountFromServer(lowQ),
-          getCountFromServer(variantQ)
+          getCountFromServer(variantQ),
+          getCountFromServer(expiredQ)
         ]);
 
         setOutOfStockCount(outSnap.data().count);
         setLowStockCount(lowSnap.data().count);
         setVariantStockCount(variantSnap.data().count);
+        setExpiredCount(expiredSnap.data().count);
       }
 
       // 2. Apply cursors from refs
@@ -484,6 +491,19 @@ export default function InventoryPage() {
                 />
             </div>
             <Button 
+                variant="outline"
+                disabled={isLoading || isNavigating} 
+                size="lg"
+                className="rounded-xl h-12 px-6 border-dashed"
+                onClick={() => {
+                  setIsNavigating(true);
+                  router.push('/dashboard/inventory/expired');
+                }}
+            >
+                <CalendarClock className="mr-2 h-4 w-4" />
+                Expiry Manager
+            </Button>
+            <Button 
                 disabled={isLoading || isNavigating} 
                 size="lg"
                 className="rounded-xl h-12 px-6 shadow-lg shadow-primary/20"
@@ -535,6 +555,7 @@ export default function InventoryPage() {
         lowStockCount={lowStockCount}
         outOfStockCount={outOfStockCount}
         variantStockCount={variantStockCount}
+        expiredCount={expiredCount}
       />
 
       <div className="flex items-center gap-2 bg-muted/30 p-1 rounded-xl w-fit border">
@@ -570,6 +591,14 @@ export default function InventoryPage() {
           className="rounded-lg h-8 px-4 font-bold text-xs uppercase tracking-wider"
         >
           Out of Stock
+        </Button>
+        <Button 
+          variant={stockFilter === 'expired' ? 'default' : 'ghost'} 
+          size="sm" 
+          onClick={() => handleStockFilterChange('expired')}
+          className="rounded-lg h-8 px-4 font-bold text-xs uppercase tracking-wider"
+        >
+          Expired
         </Button>
       </div>
 

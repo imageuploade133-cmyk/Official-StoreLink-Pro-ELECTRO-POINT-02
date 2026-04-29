@@ -14,6 +14,7 @@ interface InventoryStatsProps {
   lowStockCount?: number;
   outOfStockCount?: number;
   variantStockCount?: number;
+  expiredCount?: number;
 }
 
 export function InventoryStats({
@@ -25,6 +26,7 @@ export function InventoryStats({
   lowStockCount = 0,
   outOfStockCount = 0,
   variantStockCount = 0,
+  expiredCount = 0,
 }: InventoryStatsProps) {
   if (isLoading) {
     return (
@@ -95,6 +97,15 @@ export function InventoryStats({
             </div>
             <div className="h-10 w-10 rounded-full bg-orange-100 dark:bg-orange-900/50 flex items-center justify-center">
                 <TrendingUp className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+            </div>
+        </div>
+        <div className="flex-1 bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/20 dark:to-background border border-amber-100 dark:border-amber-900/30 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+            <div className="flex flex-col">
+                <span className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400">Expired</span>
+                <span className="text-2xl font-black text-amber-700 dark:text-amber-300">{expiredCount}</span>
+            </div>
+            <div className="h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">
+                <Boxes className="h-5 w-5 text-amber-600 dark:text-amber-400" />
             </div>
         </div>
       </div>

@@ -82,7 +82,7 @@ export function InventoryStats({ isLoading, stats }: InventoryStatsProps) {
           )}
           <p className="text-xs text-muted-foreground mt-1">Past expiry date</p>
           <Button variant="ghost" size="sm" className="text-xs p-0 h-auto mt-4 text-orange-700 dark:text-orange-400 hover:underline" asChild>
-            <Link href="/dashboard/inventory">Review <ArrowRight className="ml-1 h-3 w-3" /></Link>
+            <Link href="/dashboard/inventory/expired">Review <ArrowRight className="ml-1 h-3 w-3" /></Link>
           </Button>
         </CardContent>
       </Card>
