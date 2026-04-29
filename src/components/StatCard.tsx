@@ -4,6 +4,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import type { LucideIcon } from 'lucide-react';
 
@@ -16,6 +17,7 @@ interface StatCardProps {
   titleClassName?: string;
   valueClassName?: string;
   iconClassName?: string;
+  href?: string;
 }
 
 export function StatCard({
@@ -27,10 +29,12 @@ export function StatCard({
   titleClassName,
   valueClassName,
   iconClassName,
+  href,
 }: StatCardProps) {
-  return (
+  const content = (
     <Card className={cn(
       "relative overflow-hidden transition-all duration-300 border-2",
+      href && "cursor-pointer hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]",
       className
     )}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
@@ -47,4 +51,10 @@ export function StatCard({
       </CardContent>
     </Card>
   );
+
+  if (href) {
+    return <Link href={href} className="block">{content}</Link>;
+  }
+
+  return content;
 }

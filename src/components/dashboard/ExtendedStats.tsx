@@ -42,7 +42,6 @@ export function ExtendedStats({
       const saleDate = convertToDateSafely(sale.createdAt);
       if (!saleDate) return;
 
-      // Calculate Tax
       if (sale.taxRate && sale.taxRate > 0) {
         const taxAmount = sale.taxAmountCalculated || 0;
         if (saleDate >= todayStart && saleDate <= todayEnd) {
@@ -53,7 +52,6 @@ export function ExtendedStats({
         }
       }
 
-      // Calculate Credit Payments from payment history
       if (sale.paymentHistory && Array.isArray(sale.paymentHistory)) {
         sale.paymentHistory.forEach(payment => {
           const paymentDate = convertToDateSafely(payment.paymentDate);
@@ -101,6 +99,7 @@ export function ExtendedStats({
         titleClassName="text-orange-600 dark:text-orange-400"
         iconClassName="text-orange-500 bg-orange-100 dark:bg-orange-900/50"
         valueClassName="text-orange-700 dark:text-orange-300"
+        href="/dashboard/tax-vat"
       />
       <StatCard
         title="This Month's Tax/VAT"
@@ -111,6 +110,7 @@ export function ExtendedStats({
         titleClassName="text-cyan-600 dark:text-cyan-400"
         iconClassName="text-cyan-500 bg-cyan-100 dark:bg-cyan-900/50"
         valueClassName="text-cyan-700 dark:text-cyan-300"
+        href="/dashboard/tax-vat"
       />
       <StatCard
         title="Today's Credit Payments"
@@ -121,6 +121,7 @@ export function ExtendedStats({
         titleClassName="text-teal-600 dark:text-teal-400"
         iconClassName="text-teal-500 bg-teal-100 dark:bg-teal-900/50"
         valueClassName="text-teal-700 dark:text-teal-300"
+        href="/dashboard/my-sales"
       />
       <StatCard
         title="This Month's Credit Payments"
@@ -131,6 +132,7 @@ export function ExtendedStats({
         titleClassName="text-violet-600 dark:text-violet-400"
         iconClassName="text-violet-500 bg-violet-100 dark:bg-violet-900/50"
         valueClassName="text-violet-700 dark:text-violet-300"
+        href="/dashboard/my-sales"
       />
       <StatCard
         title="Today's Ad Clicks"
@@ -141,6 +143,7 @@ export function ExtendedStats({
         titleClassName="text-pink-600 dark:text-pink-400"
         iconClassName="text-pink-500 bg-pink-100 dark:bg-pink-900/50"
         valueClassName="text-pink-700 dark:text-pink-300"
+        href="/dashboard/earn-money-ads"
       />
       <StatCard
         title="Total Ad Clicks"
@@ -151,6 +154,7 @@ export function ExtendedStats({
         titleClassName="text-fuchsia-600 dark:text-fuchsia-400"
         iconClassName="text-fuchsia-500 bg-fuchsia-100 dark:bg-fuchsia-900/50"
         valueClassName="text-fuchsia-700 dark:text-fuchsia-300"
+        href="/dashboard/earn-money-ads"
       />
     </div>
   );

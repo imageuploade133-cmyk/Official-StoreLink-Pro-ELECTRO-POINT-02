@@ -67,7 +67,7 @@ export function DueCreditSales({ isLoading, dueCreditSales }: DueCreditSalesProp
                         <TableCell>{sale.isOverdue ? (<Badge variant="destructive">Overdue</Badge>) : (<Badge variant="outline">Upcoming</Badge>)}</TableCell>
                         <TableCell className="text-center">
                           <Button variant="ghost" size="sm" asChild>
-                            <Link href={`/sales-history?search=${sale.id}`}><Eye className="mr-1 h-3.5 w-3.5" /> Details</Link>
+                            <Link href={`/dashboard/sales-history?search=${sale.id}`}><Eye className="mr-1 h-3.5 w-3.5" /> Details</Link>
                           </Button>
                         </TableCell>
                       </TableRow>
