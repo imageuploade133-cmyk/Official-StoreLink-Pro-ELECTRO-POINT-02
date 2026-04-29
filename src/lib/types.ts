@@ -782,6 +782,7 @@ export interface Product {
   lateFee?: number;
   autoCalculateInstallments?: boolean;
   installmentTerms?: string;
+  installmentPaymentMethods?: string[]; // Array of payment method IDs allowed for installment payments
 }
 
 export interface DisplayProduct extends Product {
