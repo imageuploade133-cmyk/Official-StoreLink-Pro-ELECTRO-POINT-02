@@ -19,6 +19,7 @@ import {
   History,
   HandCoins,
   Loader2,
+  Send,
   Calendar as CalendarIcon
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -51,6 +52,7 @@ import { useToast } from '@/hooks/use-toast';
 import type { InstallmentRecord, PaymentRecord } from '@/lib/types';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 import { recordInstallmentPaymentAction, sendInstallmentReminderAction } from '@/app/actions/installments';
 
 export default function InstallmentOrdersPage() {
@@ -66,6 +68,7 @@ export default function InstallmentOrdersPage() {
   
   const [selectedRecord, setSelectedRecord] = useState<InstallmentRecord | null>(null);
   const [isRecordPaymentOpen, setIsRecordPaymentOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState('');
   const [paymentNotes, setPaymentNotes] = useState('');
   const [isSubmittingPayment, setIsSubmittingPayment] = useState(false);
@@ -280,7 +283,7 @@ export default function InstallmentOrdersPage() {
                             <DropdownMenuItem onClick={() => handleSendReminder(record)} className="gap-2 cursor-pointer">
                                 <Send className="h-4 w-4 text-primary" /> Send WhatsApp Reminder
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="gap-2 cursor-pointer">
+                            <DropdownMenuItem onClick={() => { setSelectedRecord(record); setIsHistoryOpen(true); }} className="gap-2 cursor-pointer font-bold">
                                 <History className="h-4 w-4 text-blue-600" /> Payment History
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
@@ -347,6 +350,64 @@ export default function InstallmentOrdersPage() {
             >
                 {isSubmittingPayment ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
                 Post Payment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
+        <DialogContent className="sm:max-w-[500px] rounded-[2rem]">
+          <DialogHeader>
+            <DialogTitle>Payment History</DialogTitle>
+            <DialogDescription>
+              Viewing payments for {selectedRecord?.customerName}&apos;s {selectedRecord?.productName} plan.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="flex justify-between items-center px-2">
+                <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">Recent Payments</span>
+                <Badge variant="outline" className="font-bold">{selectedRecord?.paymentHistory.length || 0} Payments</Badge>
+            </div>
+            <div className="max-h-[400px] overflow-y-auto space-y-2 pr-2">
+                {selectedRecord?.paymentHistory && selectedRecord.paymentHistory.length > 0 ? (
+                    [...selectedRecord.paymentHistory].reverse().map((payment, i) => (
+                        <div key={i} className="p-4 rounded-2xl bg-muted/30 border border-border/50 flex justify-between items-center group hover:bg-muted/50 transition-colors">
+                            <div className="flex gap-3 items-center">
+                                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                                    <HandCoins className="h-5 w-5" />
+                                </div>
+                                <div>
+                                    <p className="font-black text-sm">{formatCurrency(payment.amountPaid, currencySymbol)}</p>
+                                    <p className="text-[10px] font-bold text-muted-foreground uppercase">{format(payment.paymentDate.toDate(), 'PPP p')}</p>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <Badge variant="secondary" className="text-[9px] font-black uppercase">{payment.paymentMethod}</Badge>
+                                {payment.notes && <p className="text-[9px] text-muted-foreground mt-1 max-w-[150px] truncate">{payment.notes}</p>}
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <div className="text-center py-12 text-muted-foreground">
+                        <History className="h-12 w-12 mx-auto opacity-10 mb-2" />
+                        <p className="font-bold">No payments recorded yet.</p>
+                    </div>
+                )}
+            </div>
+            <div className="pt-4 border-t">
+                <div className="flex justify-between items-center text-sm">
+                    <span className="font-bold text-muted-foreground">Total Paid</span>
+                    <span className="font-black text-green-600">{selectedRecord && formatCurrency(selectedRecord.totalAmount - selectedRecord.remainingBalance, currencySymbol)}</span>
+                </div>
+                <div className="flex justify-between items-center text-sm mt-1">
+                    <span className="font-bold text-muted-foreground">Remaining</span>
+                    <span className="font-black text-primary">{selectedRecord && formatCurrency(selectedRecord.remainingBalance, currencySymbol)}</span>
+                </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsHistoryOpen(false)} className="w-full h-12 rounded-xl font-bold">
+                Close History
             </Button>
           </DialogFooter>
         </DialogContent>

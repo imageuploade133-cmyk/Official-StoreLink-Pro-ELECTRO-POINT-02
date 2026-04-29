@@ -72,6 +72,36 @@ export async function createInstallmentPlanAction({
 
         await installmentRef.set(installmentData);
 
+        // Send WhatsApp notification if phone is available
+        if (customerPhone && storeId) {
+            try {
+                const waSettings = await getWhatsAppSettings(storeId);
+                if (waSettings && waSettings.enabled) {
+                    const message = `*Installment Plan Activated!*\n\n` +
+                                  `Hello ${customerName},\n` +
+                                  `Your installment plan for *${productName}* has been successfully activated.\n\n` +
+                                  `*Total Amount:* ${totalAmount.toLocaleString()}\n` +
+                                  `*Down Payment:* ${downPaymentAmount.toLocaleString()}\n` +
+                                  `*Remaining Balance:* ${(totalAmount - downPaymentAmount).toLocaleString()}\n` +
+                                  `*Installment Amount:* ${( (totalAmount - downPaymentAmount) / numberOfPayments ).toLocaleString()}\n` +
+                                  `*Next Due Date:* ${nextDueDate.toLocaleDateString()}\n\n` +
+                                  `You can track your payments in your account dashboard. Thank you!`;
+
+                    await sendWhatsAppViaEBulkSMS(
+                        waSettings.username,
+                        waSettings.apiKey,
+                        [customerPhone],
+                        'Plan Activated',
+                        message,
+                        2,
+                        waSettings.senderNumber
+                    );
+                }
+            } catch (waError) {
+                console.error('Failed to send WhatsApp activation notification:', waError);
+            }
+        }
+
         return { success: true, installmentId: installmentRef.id };
     } catch (error: any) {
         console.error('Error creating installment plan:', error);
@@ -83,6 +113,7 @@ export async function recordInstallmentPaymentAction(installmentId: string, amou
     try {
         const installmentRef = adminDb.collection('installmentRecords').doc(installmentId);
         
+        let updatedData: any = null;
         await adminDb.runTransaction(async (transaction) => {
             const installmentDoc = await transaction.get(installmentRef);
             if (!installmentDoc.exists) throw new Error('Installment record not found');
@@ -106,6 +137,15 @@ export async function recordInstallmentPaymentAction(installmentId: string, amou
                 else if (data.paymentInterval === 'monthly') nextDue.setMonth(nextDue.getMonth() + 1);
             }
 
+            updatedData = {
+                ...data,
+                remainingBalance: newRemainingBalance,
+                status: isCompleted ? 'completed' : data.status,
+                lastPaymentDate: admin.firestore.Timestamp.now(),
+                nextDueDate: isCompleted ? data.nextDueDate : admin.firestore.Timestamp.fromDate(nextDue),
+                paymentHistory: [...data.paymentHistory, newPayment]
+            };
+
             transaction.update(installmentRef, {
                 remainingBalance: newRemainingBalance,
                 status: isCompleted ? 'completed' : data.status,
@@ -115,6 +155,40 @@ export async function recordInstallmentPaymentAction(installmentId: string, amou
                 updatedAt: admin.firestore.FieldValue.serverTimestamp()
             });
         });
+
+        // Send WhatsApp notification if phone is available
+        if (updatedData && updatedData.customerPhone && updatedData.store_id) {
+            try {
+                const waSettings = await getWhatsAppSettings(updatedData.store_id);
+                if (waSettings && waSettings.enabled) {
+                    const isCompleted = updatedData.remainingBalance === 0;
+                    let message = `*Payment Received!*\n\n` +
+                                  `Hello ${updatedData.customerName},\n` +
+                                  `We have received your payment of *${amount.toLocaleString()}* for *${updatedData.productName}*.\n\n`;
+                    
+                    if (isCompleted) {
+                        message += `*Congratulations!* Your payment plan is now fully completed. Thank you for your patronage!`;
+                    } else {
+                        message += `*Remaining Balance:* ${updatedData.remainingBalance.toLocaleString()}\n` +
+                                   `*Next Due Date:* ${updatedData.nextDueDate.toDate().toLocaleDateString()}\n\n` +
+                                   `Thank you!`;
+                    }
+
+                    await sendWhatsAppViaEBulkSMS(
+                        waSettings.username,
+                        waSettings.apiKey,
+                        [updatedData.customerPhone],
+                        'Payment Received',
+                        message,
+                        2,
+                        waSettings.senderNumber
+                    );
+                }
+            } catch (waError) {
+                console.error('Failed to send WhatsApp notification:', waError);
+                // Don't fail the whole action if WhatsApp fails
+            }
+        }
 
         return { success: true };
     } catch (error: any) {
