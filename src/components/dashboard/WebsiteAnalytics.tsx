@@ -63,6 +63,7 @@ export function WebsiteAnalytics({
         titleClassName="text-rose-600 dark:text-rose-400"
         iconClassName="text-rose-500 bg-rose-100 dark:bg-rose-900/50"
         valueClassName="text-rose-700 dark:text-rose-300"
+        href="/dashboard/orders"
       />
       <StatCard
         title="Total Online Orders"
@@ -73,6 +74,7 @@ export function WebsiteAnalytics({
         titleClassName="text-amber-600 dark:text-amber-400"
         iconClassName="text-amber-500 bg-amber-100 dark:bg-amber-900/50"
         valueClassName="text-amber-700 dark:text-amber-300"
+        href="/dashboard/orders"
       />
     </div>
   );

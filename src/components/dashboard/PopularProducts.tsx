@@ -54,7 +54,7 @@ export function PopularProducts({ isLoading, popularProductsData }: PopularProdu
       {popularProductsData.length > 0 && (
         <CardFooter className="flex justify-end">
           <Button variant="outline" size="sm" asChild>
-            <Link href="/product-sales">View All Product Sales <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            <Link href="/dashboard/product-sales">View All Product Sales <ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Button>
         </CardFooter>
       )}
