@@ -14,6 +14,9 @@ export async function GET(request: Request) {
     
     let querySnapshot;
     try {
+      if (!adminDb) {
+        throw new Error('Firebase Admin DB not initialized');
+      }
       // Try querying by storeId (new format)
       querySnapshot = await providersRef.where('storeId', '==', storeId).where('isActive', '==', true).get();
       
@@ -31,46 +34,54 @@ export async function GET(request: Request) {
           name: 'Pay with Card (Paystack)',
           provider: 'paystack',
           publicKey: process.env.PAYSTACK_PUBLIC_KEY,
-          mode: process.env.PAYSTACK_PUBLIC_KEY.startsWith('pk_live') ? 'live' : 'test',
+          mode: (process.env.PAYSTACK_PUBLIC_KEY || '').startsWith('pk_live') ? 'live' : 'test',
         }]);
       }
-      throw dbError; // Rethrow if no fallback possible
+      
+      // Return empty array instead of throwing to prevent 500 and keep frontend stable
+      return NextResponse.json([], { status: 200 });
     }
 
     const methods: any[] = [];
-    querySnapshot.forEach((doc) => {
-      const data = doc.data() as PaymentProvider;
-      let config: any = {};
-      try {
-        config = JSON.parse(decrypt(data.config));
-      } catch (e) {}
+    if (querySnapshot && !querySnapshot.empty) {
+        querySnapshot.forEach((doc) => {
+          const data = doc.data() as PaymentProvider;
+          let config: any = {};
+          if (data.config) {
+              try {
+                config = JSON.parse(decrypt(data.config));
+              } catch (e) {
+                console.error(`Error decrypting config for provider ${data.providerName}:`, e);
+              }
+          }
 
-      const mode = data.mode || 'test';
-      const publicKey = mode === 'live' ? config.livePublicKey : config.testPublicKey || config.publicKey;
+          const mode = data.mode || 'test';
+          const publicKey = mode === 'live' ? config.livePublicKey : config.testPublicKey || config.publicKey;
 
-      methods.push({
-        id: data.providerName,
-        name: data.providerName === 'paystack' ? 'Pay with Card (Paystack)' : 
-              data.providerName === 'flutterwave' ? 'Pay with Card (Flutterwave)' :
-              data.providerName === 'opay' ? 'Pay with OPay' :
-              data.providerName === 'palmpay' ? 'Pay with PalmPay' :
-              data.providerName === 'paypal' ? 'Pay with PayPal' :
-              data.providerName === 'stripe' ? 'Pay with Card (Stripe)' :
-              data.providerName === 'nowpayments' ? 'Pay with Crypto' :
-              data.providerName === 'monnify' ? 'Pay with Monnify' :
-              data.providerName === 'adyen' ? 'Pay with Adyen' :
-              data.providerName === 'manual' ? 'Bank Transfer' : data.providerName,
+          methods.push({
+            id: doc.id || data.providerName,
+            name: data.providerName === 'paystack' ? 'Pay with Card (Paystack)' : 
+                  data.providerName === 'flutterwave' ? 'Pay with Card (Flutterwave)' :
+                  data.providerName === 'opay' ? 'Pay with OPay' :
+                  data.providerName === 'palmpay' ? 'Pay with PalmPay' :
+                  data.providerName === 'paypal' ? 'Pay with PayPal' :
+                  data.providerName === 'stripe' ? 'Pay with Card (Stripe)' :
+                  data.providerName === 'nowpayments' ? 'Pay with Crypto' :
+                  data.providerName === 'monnify' ? 'Pay with Monnify' :
+                  data.providerName === 'adyen' ? 'Pay with Adyen' :
+                  data.providerName === 'manual' ? 'Bank Transfer' : data.providerName,
 
-        provider: data.providerName,
-        publicKey: publicKey, // Only expose correct public key
-        mode: mode,
-        instructions: config.instructions || '',
-        config: data.providerName === 'fast_checkout' ? config : undefined,
-        allowedLocations: data.allowedLocations || [],
-        paymentRegion: data.paymentRegion || '',
-        logoUrl: config.logoUrl || '',
-      });
-    });
+            provider: data.providerName,
+            publicKey: publicKey, // Only expose correct public key
+            mode: mode,
+            instructions: config.instructions || '',
+            config: data.providerName === 'fast_checkout' ? config : undefined,
+            allowedLocations: data.allowedLocations || [],
+            paymentRegion: data.paymentRegion || '',
+            logoUrl: config.logoUrl || '',
+          });
+        });
+    }
 
     return NextResponse.json(methods);
   } catch (error: any) {
