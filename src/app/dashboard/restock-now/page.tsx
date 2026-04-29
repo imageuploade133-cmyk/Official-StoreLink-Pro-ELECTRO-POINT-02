@@ -13,6 +13,10 @@ import {
   limit,
   serverTimestamp,
   runTransaction,
+  startAfter,
+  endBefore,
+  QueryDocumentSnapshot,
+  QueryConstraint,
   type DocumentData
 } from 'firebase/firestore';
 import { useSettings } from '@/contexts/settings-context';
@@ -37,8 +41,13 @@ import {
   Upload,
   X,
   ClipboardList,
-  ArrowRight
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  RefreshCw
 } from 'lucide-react';
+
+const PAGE_SIZE = 50;
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -89,30 +98,50 @@ export default function RestockNowPage() {
   const [recentAudits, setRecentAudits] = useState<StockAuditEntry[]>([]);
   const [isLoadingAudits, setIsLoadingAudits] = useState(false);
 
-  const fetchRecentAudits = useCallback(async (productId?: string) => {
+  // Pagination state for audits
+  const [auditCurrentPage, setAuditCurrentPage] = useState(1);
+  const [auditHasNext, setAuditHasNext] = useState(false);
+  const [auditHasPrev, setAuditHasPrev] = useState(false);
+  const [auditLastDoc, setAuditLastDoc] = useState<QueryDocumentSnapshot | null>(null);
+  const [auditFirstDoc, setAuditFirstDoc] = useState<QueryDocumentSnapshot | null>(null);
+
+  const fetchRecentAudits = useCallback(async (productId?: string, cursorDoc?: QueryDocumentSnapshot | null, isPrev = false) => {
     if (!firestore || !currentStoreId) return;
     setIsLoadingAudits(true);
     try {
-      let q;
+      let constraints: QueryConstraint[] = [
+        where('store_id', '==', currentStoreId),
+        orderBy('timestamp', 'desc'),
+        limit(PAGE_SIZE)
+      ];
+
       if (productId) {
-        q = query(
-          collection(firestore, 'stockAudit'),
+        constraints = [
           where('store_id', '==', currentStoreId),
           where('productId', '==', productId),
           orderBy('timestamp', 'desc'),
-          limit(20)
-        );
-      } else {
-        q = query(
-          collection(firestore, 'stockAudit'),
-          where('store_id', '==', currentStoreId),
-          orderBy('timestamp', 'desc'),
-          limit(20)
-        );
+          limit(PAGE_SIZE)
+        ];
       }
 
+      if (cursorDoc) {
+        if (isPrev) {
+          constraints = [
+            where('store_id', '==', currentStoreId),
+            ...(productId ? [where('productId', '==', productId)] : []),
+            orderBy('timestamp', 'asc'),
+            limit(PAGE_SIZE)
+          ];
+          constraints.push(endBefore(cursorDoc));
+        } else {
+          constraints.push(startAfter(cursorDoc));
+        }
+      }
+
+      const q = query(collection(firestore, 'stockAudit'), ...constraints);
       const snapshot = await getDocs(q);
-      const audits = snapshot.docs.map(d => {
+
+      let audits = snapshot.docs.map(d => {
         const data = d.data() as any;
         return {
           id: d.id,
@@ -120,7 +149,31 @@ export default function RestockNowPage() {
           timestamp: data.timestamp
         } as StockAuditEntry;
       });
+
+      // Reverse if fetching previous page
+      if (isPrev && cursorDoc) {
+        audits = audits.reverse();
+      }
+
       setRecentAudits(audits);
+
+      // Update pagination state
+      if (snapshot.docs.length > 0) {
+        setAuditLastDoc(snapshot.docs[snapshot.docs.length - 1]);
+        setAuditFirstDoc(snapshot.docs[0]);
+      }
+
+      setAuditHasNext(snapshot.docs.length === PAGE_SIZE);
+      if (cursorDoc && isPrev) {
+        setAuditHasPrev(false);
+      } else if (cursorDoc) {
+        setAuditHasPrev(true);
+      }
+
+      if (snapshot.docs.length > 0 && !isPrev) {
+        setAuditFirstDoc(snapshot.docs[0]);
+      }
+
     } catch (error) {
       console.error('Error fetching audits:', error);
     } finally {
@@ -128,11 +181,31 @@ export default function RestockNowPage() {
     }
   }, [firestore, currentStoreId]);
 
+  const goToNextAuditPage = useCallback(async () => {
+    if (!auditHasNext || isLoadingAudits) return;
+    setAuditCurrentPage(prev => prev + 1);
+    await fetchRecentAudits(selectedProduct?.id, auditLastDoc, false);
+  }, [auditHasNext, isLoadingAudits, auditLastDoc, selectedProduct?.id, fetchRecentAudits]);
+
+  const goToPrevAuditPage = useCallback(async () => {
+    if (!auditHasPrev || isLoadingAudits || !auditFirstDoc) return;
+    setAuditCurrentPage(prev => Math.max(1, prev - 1));
+    await fetchRecentAudits(selectedProduct?.id, auditFirstDoc, true);
+  }, [auditHasPrev, isLoadingAudits, auditFirstDoc, selectedProduct?.id, fetchRecentAudits]);
+
+  const handleRefreshAudits = useCallback(async () => {
+    setAuditCurrentPage(1);
+    setAuditHasPrev(false);
+    setAuditLastDoc(null);
+    setAuditFirstDoc(null);
+    await fetchRecentAudits(selectedProduct?.id);
+  }, [selectedProduct?.id, fetchRecentAudits]);
+
   useEffect(() => {
     if (currentStoreId) {
-      fetchRecentAudits(selectedProduct?.id);
+      handleRefreshAudits();
     }
-  }, [currentStoreId, selectedProduct?.id, fetchRecentAudits]);
+  }, [currentStoreId, selectedProduct?.id]);
 
   const searchProducts = useCallback(async (term: string) => {
     if (!firestore || !currentStoreId || !term.trim()) return;
@@ -832,11 +905,22 @@ export default function RestockNowPage() {
                 {selectedProduct && <span className="ml-1 font-bold text-primary">Filtered for: {selectedProduct.name}</span>}
               </CardDescription>
             </div>
-            {selectedProduct && (
-              <Button variant="outline" size="sm" onClick={() => fetchRecentAudits()}>
-                Show All Logs
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              {selectedProduct && (
+                <Button variant="outline" size="sm" onClick={handleRefreshAudits}>
+                  <RefreshCw className={cn("mr-2 h-4 w-4", isLoadingAudits && "animate-spin")} />
+                  Refresh
+                </Button>
+              )}
+              {selectedProduct && (
+                <Button variant="outline" size="sm" onClick={() => { 
+                  setSelectedProduct(null);
+                  handleRefreshAudits();
+                }}>
+                  Show All Logs
+                </Button>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-0">
@@ -907,10 +991,33 @@ export default function RestockNowPage() {
             </div>
           )}
         </CardContent>
-        <CardFooter className="py-3 bg-muted/5 border-t">
+        <CardFooter className="flex justify-between items-center py-3 border-t bg-muted/5">
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={goToPrevAuditPage} 
+              disabled={!auditHasPrev || isLoadingAudits}
+              className="gap-1"
+            >
+              <ChevronLeft className="h-4 w-4" /> Previous
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              Page {auditCurrentPage}
+            </span>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={goToNextAuditPage} 
+              disabled={!auditHasNext || isLoadingAudits}
+              className="gap-1"
+            >
+              Next <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
           <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest flex items-center gap-2">
             <Info className="h-3 w-3" />
-            Showing recent stock movements for this store
+            {auditHasNext ? `${PAGE_SIZE}+ logs` : `${recentAudits.length} logs`} loaded per fetch
           </p>
         </CardFooter>
       </Card>

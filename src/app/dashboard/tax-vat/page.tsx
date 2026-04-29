@@ -25,9 +25,11 @@ import {
   Loader2,
   Clock,
   Filter,
-  X
+  X,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
-import { format, startOfDay, endOfDay, startOfMonth, endOfMonth, setHours, setMinutes } from "date-fns";
+import { format, startOfDay, endOfDay, startOfMonth, endOfMonth } from "date-fns";
 import { useFirestore } from '@/firebase';
 import { useAuth } from '@/contexts/auth-context';
 import { 
@@ -37,7 +39,11 @@ import {
   where, 
   orderBy,
   limit,
-  Timestamp
+  startAfter,
+  endBefore,
+  Timestamp,
+  QueryDocumentSnapshot,
+  QueryConstraint
 } from 'firebase/firestore'; 
 import type { SaleTransaction, Order } from '@/lib/types';
 import { convertToDateSafely, cn } from '@/lib/utils';
@@ -50,6 +56,8 @@ import { DateRange } from 'react-day-picker';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 
+const PAGE_SIZE = 50;
+
 export default function TaxVatPage() {
   const { settings } = useSettings();
   const { store, staffMember, isLoading: isAuthLoading } = useAuth();
@@ -61,67 +69,160 @@ export default function TaxVatPage() {
   const [posSales, setPosSales] = useState<SaleTransaction[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   
+  // Pagination state for POS Sales
+  const [posCurrentPage, setPosCurrentPage] = useState(1);
+  const [posHasNext, setPosHasNext] = useState(false);
+  const [posHasPrev, setPosHasPrev] = useState(false);
+  const [posLastDoc, setPosLastDoc] = useState<QueryDocumentSnapshot | null>(null);
+  const [posFirstDoc, setPosFirstDoc] = useState<QueryDocumentSnapshot | null>(null);
+  
+  // Pagination state for Orders
+  const [ordersCurrentPage, setOrdersCurrentPage] = useState(1);
+  const [ordersHasNext, setOrdersHasNext] = useState(false);
+  const [ordersHasPrev, setOrdersHasPrev] = useState(false);
+  const [ordersLastDoc, setOrdersLastDoc] = useState<QueryDocumentSnapshot | null>(null);
+  const [ordersFirstDoc, setOrdersFirstDoc] = useState<QueryDocumentSnapshot | null>(null);
+  
   // Filtering state
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [startTime, setStartTime] = useState("00:00");
   const [endTime, setEndTime] = useState("23:59");
   const [isFiltering, setIsFiltering] = useState(false);
   
-  const fetchTaxData = useCallback(async (start?: Date, end?: Date) => {
+  const fetchTaxData = useCallback(async (
+    start?: Date, 
+    end?: Date, 
+    posCursor?: QueryDocumentSnapshot | null, 
+    ordersCursor?: QueryDocumentSnapshot | null, 
+    isPrevPos?: boolean, 
+    isPrevOrders?: boolean
+  ) => {
     if (!firestore || !currentStoreId) return;
     setIsLoading(true);
 
     try {
-      // Build POS Sales query
-      let salesQuery = query(
-        collection(firestore, "saleTransactions"),
+      // Build POS Sales query with pagination
+      let salesConstraints: QueryConstraint[] = [
         where("store_id", "==", currentStoreId),
-        orderBy("createdAt", "desc")
-      );
+        orderBy("createdAt", "desc"),
+        limit(PAGE_SIZE)
+      ];
 
       if (start) {
-        salesQuery = query(salesQuery, where("createdAt", ">=", Timestamp.fromDate(start)));
+        salesConstraints.push(where("createdAt", ">=", Timestamp.fromDate(start)));
       }
       if (end) {
-        salesQuery = query(salesQuery, where("createdAt", "<=", Timestamp.fromDate(end)));
+        salesConstraints.push(where("createdAt", "<=", Timestamp.fromDate(end)));
       }
       
-      if (!start && !end) {
-        salesQuery = query(salesQuery, limit(1000));
+      // Apply cursor-based pagination
+      if (posCursor) {
+        if (isPrevPos) {
+          salesConstraints = [
+            where("store_id", "==", currentStoreId),
+            orderBy("createdAt", "asc"),
+            limit(PAGE_SIZE)
+          ];
+          if (start) salesConstraints.push(where("createdAt", ">=", Timestamp.fromDate(start)));
+          if (end) salesConstraints.push(where("createdAt", "<=", Timestamp.fromDate(end)));
+          salesConstraints.push(endBefore(posCursor));
+        } else {
+          salesConstraints.push(startAfter(posCursor));
+        }
       }
 
+      const salesQuery = query(collection(firestore, "saleTransactions"), ...salesConstraints);
       const salesSnap = await getDocs(salesQuery);
-      const salesList = salesSnap.docs.map(doc => ({
+      
+      let salesList = salesSnap.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
         createdAt: convertToDateSafely(doc.data().createdAt)
       })) as SaleTransaction[];
-      setPosSales(salesList);
+      
+      // Reverse if fetching previous page
+      if (isPrevPos && posCursor) {
+        salesList = salesList.reverse();
+      }
+      
+      // Update pagination cursors
+      if (salesSnap.docs.length > 0) {
+        setPosLastDoc(salesSnap.docs[salesSnap.docs.length - 1]);
+        setPosFirstDoc(salesSnap.docs[0]);
+      }
+      setPosHasNext(salesSnap.docs.length === PAGE_SIZE);
+      if (posCursor && isPrevPos) {
+        setPosHasPrev(false);
+      } else if (posCursor) {
+        setPosHasPrev(true);
+      }
+      
+      // Store pos first doc for prev navigation
+      if (salesSnap.docs.length > 0 && !isPrevPos) {
+        setPosFirstDoc(salesSnap.docs[0]);
+      }
 
-      // Build Website Orders query
-      let ordersQuery = query(
-        collection(firestore, "orders"),
+      // Build Website Orders query with pagination
+      let ordersConstraints: QueryConstraint[] = [
         where("store_id", "==", currentStoreId),
-        orderBy("createdAt", "desc")
-      );
+        orderBy("createdAt", "desc"),
+        limit(PAGE_SIZE)
+      ];
 
       if (start) {
-        ordersQuery = query(ordersQuery, where("createdAt", ">=", Timestamp.fromDate(start)));
+        ordersConstraints.push(where("createdAt", ">=", Timestamp.fromDate(start)));
       }
       if (end) {
-        ordersQuery = query(ordersQuery, where("createdAt", "<=", Timestamp.fromDate(end)));
+        ordersConstraints.push(where("createdAt", "<=", Timestamp.fromDate(end)));
+      }
+      
+      // Apply cursor-based pagination for orders
+      if (ordersCursor) {
+        if (isPrevOrders) {
+          ordersConstraints = [
+            where("store_id", "==", currentStoreId),
+            orderBy("createdAt", "asc"),
+            limit(PAGE_SIZE)
+          ];
+          if (start) ordersConstraints.push(where("createdAt", ">=", Timestamp.fromDate(start)));
+          if (end) ordersConstraints.push(where("createdAt", "<=", Timestamp.fromDate(end)));
+          ordersConstraints.push(endBefore(ordersCursor));
+        } else {
+          ordersConstraints.push(startAfter(ordersCursor));
+        }
       }
 
-      if (!start && !end) {
-        ordersQuery = query(ordersQuery, limit(1000));
-      }
-
+      const ordersQuery = query(collection(firestore, "orders"), ...ordersConstraints);
       const ordersSnap = await getDocs(ordersQuery);
-      const ordersList = ordersSnap.docs.map(doc => ({
+      
+      let ordersList = ordersSnap.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
         createdAt: convertToDateSafely(doc.data().createdAt)
       })) as Order[];
+      
+      // Reverse if fetching previous page
+      if (isPrevOrders && ordersCursor) {
+        ordersList = ordersList.reverse();
+      }
+      
+      // Update pagination cursors for orders
+      if (ordersSnap.docs.length > 0) {
+        setOrdersLastDoc(ordersSnap.docs[ordersSnap.docs.length - 1]);
+        setOrdersFirstDoc(ordersSnap.docs[0]);
+      }
+      setOrdersHasNext(ordersSnap.docs.length === PAGE_SIZE);
+      if (ordersCursor && isPrevOrders) {
+        setOrdersHasPrev(false);
+      } else if (ordersCursor) {
+        setOrdersHasPrev(true);
+      }
+      
+      if (ordersSnap.docs.length > 0 && !isPrevOrders) {
+        setOrdersFirstDoc(ordersSnap.docs[0]);
+      }
+
+      setPosSales(salesList);
       setOrders(ordersList);
 
     } catch (e) {
@@ -130,6 +231,58 @@ export default function TaxVatPage() {
       setIsLoading(false);
     }
   }, [firestore, currentStoreId]);
+  
+  const goToNextPosPage = useCallback(async () => {
+    if (!posHasNext || isLoading) return;
+    setPosCurrentPage(prev => prev + 1);
+    await fetchTaxData(
+      dateRange?.from ? new Date(dateRange.from) : undefined,
+      dateRange?.to ? new Date(dateRange.to) : undefined,
+      posLastDoc,
+      null,
+      false,
+      false
+    );
+  }, [posHasNext, isLoading, posLastDoc, dateRange, fetchTaxData]);
+  
+  const goToPrevPosPage = useCallback(async () => {
+    if (!posHasPrev || isLoading || !posFirstDoc) return;
+    setPosCurrentPage(prev => Math.max(1, prev - 1));
+    await fetchTaxData(
+      dateRange?.from ? new Date(dateRange.from) : undefined,
+      dateRange?.to ? new Date(dateRange.to) : undefined,
+      posFirstDoc,
+      null,
+      true,
+      false
+    );
+  }, [posHasPrev, isLoading, posFirstDoc, dateRange, fetchTaxData]);
+  
+  const goToNextOrdersPage = useCallback(async () => {
+    if (!ordersHasNext || isLoading) return;
+    setOrdersCurrentPage(prev => prev + 1);
+    await fetchTaxData(
+      dateRange?.from ? new Date(dateRange.from) : undefined,
+      dateRange?.to ? new Date(dateRange.to) : undefined,
+      null,
+      ordersLastDoc,
+      false,
+      false
+    );
+  }, [ordersHasNext, isLoading, ordersLastDoc, dateRange, fetchTaxData]);
+  
+  const goToPrevOrdersPage = useCallback(async () => {
+    if (!ordersHasPrev || isLoading || !ordersFirstDoc) return;
+    setOrdersCurrentPage(prev => Math.max(1, prev - 1));
+    await fetchTaxData(
+      dateRange?.from ? new Date(dateRange.from) : undefined,
+      dateRange?.to ? new Date(dateRange.to) : undefined,
+      null,
+      ordersFirstDoc,
+      false,
+      true
+    );
+  }, [ordersHasPrev, isLoading, ordersFirstDoc, dateRange, fetchTaxData]);
 
   const handleApplyFilter = () => {
     if (dateRange?.from) {
@@ -142,6 +295,12 @@ export default function TaxVatPage() {
       end.setHours(endH, endM, 59, 999);
 
       setIsFiltering(true);
+      setPosCurrentPage(1);
+      setOrdersCurrentPage(1);
+      setPosHasPrev(false);
+      setOrdersHasPrev(false);
+      setPosLastDoc(null);
+      setOrdersLastDoc(null);
       fetchTaxData(start, end);
     }
   };
@@ -151,6 +310,12 @@ export default function TaxVatPage() {
     setStartTime("00:00");
     setEndTime("23:59");
     setIsFiltering(false);
+    setPosCurrentPage(1);
+    setOrdersCurrentPage(1);
+    setPosHasPrev(false);
+    setOrdersHasPrev(false);
+    setPosLastDoc(null);
+    setOrdersLastDoc(null);
     fetchTaxData();
   };
 
@@ -358,7 +523,7 @@ export default function TaxVatPage() {
             <CardDescription>
               {isFiltering 
                 ? `Showing transactions from ${format(new Date(dateRange?.from || 0), 'PPP')} to ${format(new Date(dateRange?.to || dateRange?.from || 0), 'PPP')}.`
-                : 'Recent transactions that included tax calculations.'}
+                : 'Recent transactions that included tax calculations. Use pagination to load more.'}
             </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
@@ -424,6 +589,34 @@ export default function TaxVatPage() {
             </Table>
           </ScrollArea>
         </CardContent>
+        <CardFooter className="flex justify-between items-center py-3 border-t bg-muted/5">
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={goToPrevPosPage} 
+              disabled={!posHasPrev || isLoading}
+              className="gap-1"
+            >
+              <ChevronLeft className="h-4 w-4" /> Previous
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              Page {posCurrentPage}
+            </span>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={goToNextPosPage} 
+              disabled={!posHasNext || isLoading}
+              className="gap-1"
+            >
+              Next <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+          <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">
+            {posHasNext ? `${PAGE_SIZE}+ items` : `${posSales.length} items`} loaded per fetch
+          </p>
+        </CardFooter>
       </Card>
     </div>
   );

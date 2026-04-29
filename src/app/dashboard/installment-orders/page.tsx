@@ -1,26 +1,26 @@
-
 'use client';
 
-import React, { useState, useMemo, useCallback } from 'react';
-import { useFirestore, useCollection } from '@/firebase';
-import { collection, query, where, orderBy, doc, updateDoc, Timestamp, addDoc } from 'firebase/firestore';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { useFirestore } from '@/firebase';
+import { collection, query, where, orderBy, getDocs, limit, startAfter, endBefore, QueryDocumentSnapshot, QueryConstraint } from 'firebase/firestore';
 import { PageHeader } from '@/components/PageHeader';
 import { 
   CreditCard, 
   Search, 
-  Filter, 
   MoreVertical, 
   CheckCircle2, 
   Clock, 
   AlertCircle, 
   XCircle,
   Download,
-  Eye,
   History,
   HandCoins,
   Loader2,
   Send,
-  Calendar as CalendarIcon
+  Calendar as CalendarIcon,
+  ChevronLeft,
+  ChevronRight,
+  RefreshCw
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -41,20 +41,21 @@ import {
   DialogDescription, 
   DialogFooter, 
   DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
+  DialogTitle 
 } from '@/components/ui/dialog';
 import { useAuth } from '@/contexts/auth-context';
 import { useSettings } from '@/contexts/settings-context';
 import { formatCurrency } from '@/lib/formatUtils';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
-import type { InstallmentRecord, PaymentRecord } from '@/lib/types';
+import type { InstallmentRecord } from '@/lib/types';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { recordInstallmentPaymentAction, sendInstallmentReminderAction, markAllInstallmentsAsReadAction } from '@/app/actions/installments';
 import { Check } from 'lucide-react';
+
+const PAGE_SIZE = 50;
 
 export default function InstallmentOrdersPage() {
   const firestore = useFirestore();
@@ -74,13 +75,105 @@ export default function InstallmentOrdersPage() {
   const [paymentNotes, setPaymentNotes] = useState('');
   const [isSubmittingPayment, setIsSubmittingPayment] = useState(false);
 
-  const installmentQuery = useMemo(() => {
-    if (!firestore || !currentStoreId) return null;
-    let q = query(collection(firestore, 'installmentRecords'), where('store_id', '==', currentStoreId), orderBy('createdAt', 'desc'));
-    return q;
-  }, [firestore, currentStoreId]);
+  // Pagination state
+  const [records, setRecords] = useState<InstallmentRecord[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrev, setHasPrev] = useState(false);
+  const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot | null>(null);
+  const [firstDoc, setFirstDoc] = useState<QueryDocumentSnapshot | null>(null);
 
-  const { data: records, isLoading } = useCollection<InstallmentRecord>(installmentQuery);
+  const fetchRecords = useCallback(async (cursorDoc?: QueryDocumentSnapshot | null, isPrev = false) => {
+    if (!firestore || !currentStoreId) return;
+    setIsLoading(true);
+
+    try {
+      let constraints: QueryConstraint[] = [
+        where('store_id', '==', currentStoreId),
+        orderBy('createdAt', 'desc'),
+        limit(PAGE_SIZE)
+      ];
+
+      if (cursorDoc) {
+        if (isPrev) {
+          constraints = [
+            where('store_id', '==', currentStoreId),
+            orderBy('createdAt', 'asc'),
+            limit(PAGE_SIZE)
+          ];
+          constraints.push(endBefore(cursorDoc));
+        } else {
+          constraints.push(startAfter(cursorDoc));
+        }
+      }
+
+      const q = query(collection(firestore, 'installmentRecords'), ...constraints);
+      const snapshot = await getDocs(q);
+      
+      let newRecords = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as InstallmentRecord[];
+
+      // Reverse if fetching previous page
+      if (isPrev && cursorDoc) {
+        newRecords = newRecords.reverse();
+      }
+
+      setRecords(newRecords);
+
+      // Update pagination state
+      if (snapshot.docs.length > 0) {
+        setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
+        setFirstDoc(snapshot.docs[0]);
+      }
+      
+      setHasNext(snapshot.docs.length === PAGE_SIZE);
+      if (cursorDoc && isPrev) {
+        setHasPrev(false);
+      } else if (cursorDoc) {
+        setHasPrev(true);
+      }
+
+      if (snapshot.docs.length > 0 && !isPrev) {
+        setFirstDoc(snapshot.docs[0]);
+      }
+
+    } catch (error) {
+      console.error('Error fetching installment records:', error);
+      toast({ variant: 'destructive', title: 'Error', description: 'Failed to load installment records.' });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [firestore, currentStoreId, toast]);
+
+  // Initial fetch
+  useEffect(() => {
+    if (currentStoreId && firestore) {
+      fetchRecords();
+    }
+  }, [currentStoreId, firestore, fetchRecords]);
+
+  const goToNextPage = useCallback(async () => {
+    if (!hasNext || isLoading) return;
+    setCurrentPage(prev => prev + 1);
+    await fetchRecords(lastDoc, false);
+  }, [hasNext, isLoading, lastDoc, fetchRecords]);
+
+  const goToPrevPage = useCallback(async () => {
+    if (!hasPrev || isLoading || !firstDoc) return;
+    setCurrentPage(prev => Math.max(1, prev - 1));
+    await fetchRecords(firstDoc, true);
+  }, [hasPrev, isLoading, firstDoc, fetchRecords]);
+
+  const handleRefresh = useCallback(async () => {
+    setCurrentPage(1);
+    setHasPrev(false);
+    setLastDoc(null);
+    setFirstDoc(null);
+    await fetchRecords();
+  }, [fetchRecords]);
 
   const stats = useMemo(() => {
     if (!records) return { totalIncome: 0, todayIncome: 0, totalCompleted: 0, todayCompleted: 0 };
@@ -95,7 +188,7 @@ export default function InstallmentOrdersPage() {
 
     records.forEach(record => {
       record.paymentHistory?.forEach(payment => {
-        const paymentDate = payment.paymentDate.toDate();
+        const paymentDate = payment.paymentDate?.toDate ? payment.paymentDate.toDate() : new Date(payment.paymentDate);
         totalIncome += payment.amountPaid;
         if (paymentDate >= today) {
           todayIncome += payment.amountPaid;
@@ -104,8 +197,7 @@ export default function InstallmentOrdersPage() {
 
       if (record.status === 'completed') {
         totalCompleted++;
-        // Check if it was completed today
-        const completedAt = (record.completedAt || record.updatedAt)?.toDate();
+        const completedAt = record.completedAt?.toDate ? record.completedAt.toDate() : record.updatedAt?.toDate ? record.updatedAt.toDate() : null;
         if (completedAt && completedAt >= today) {
           todayCompleted++;
         }
@@ -118,8 +210,8 @@ export default function InstallmentOrdersPage() {
   const filteredRecords = useMemo(() => {
     if (!records) return [];
     return records.filter(r => {
-      const matchesSearch = r.customerName.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                           r.productName.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = r.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           r.productName?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = statusFilter === 'all' || r.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
@@ -133,6 +225,7 @@ export default function InstallmentOrdersPage() {
       const result = await markAllInstallmentsAsReadAction(currentStoreId);
       if (result.success) {
         toast({ title: "Success", description: "All installment orders marked as read." });
+        await handleRefresh();
       } else {
         throw new Error(result.error);
       }
@@ -158,6 +251,7 @@ export default function InstallmentOrdersPage() {
               setIsRecordPaymentOpen(false);
               setPaymentAmount('');
               setPaymentNotes('');
+              await handleRefresh();
           } else {
               throw new Error(result.error);
           }
@@ -201,7 +295,7 @@ export default function InstallmentOrdersPage() {
           r.totalAmount - r.remainingBalance,
           r.remainingBalance,
           r.status,
-          format(r.nextDueDate.toDate(), 'yyyy-MM-dd')
+          r.nextDueDate?.toDate ? format(r.nextDueDate.toDate(), 'yyyy-MM-dd') : 'N/A'
       ]);
       
       const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
@@ -222,6 +316,10 @@ export default function InstallmentOrdersPage() {
           description="Track and manage customer Pay Small Small plans."
         />
         <div className="flex flex-wrap gap-2">
+            <Button variant="outline" onClick={handleRefresh} disabled={isLoading} className="font-bold">
+                <RefreshCw className={cn("mr-2 h-4 w-4", isLoading && "animate-spin")} />
+                Refresh
+            </Button>
             <Button 
                 variant="outline" 
                 onClick={handleMarkAllAsRead} 
@@ -358,7 +456,7 @@ export default function InstallmentOrdersPage() {
                                 "text-sm font-bold",
                                 record.status === 'overdue' ? "text-red-600" : ""
                             )}>
-                                {format(record.nextDueDate.toDate(), 'PPP')}
+                                {record.nextDueDate?.toDate ? format(record.nextDueDate.toDate(), 'PPP') : 'N/A'}
                             </span>
                         </div>
                       </TableCell>
@@ -393,6 +491,34 @@ export default function InstallmentOrdersPage() {
             </TableBody>
           </Table>
         </CardContent>
+        <div className="flex justify-between items-center py-3 px-6 border-t bg-muted/5">
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={goToPrevPage} 
+              disabled={!hasPrev || isLoading}
+              className="gap-1"
+            >
+              <ChevronLeft className="h-4 w-4" /> Previous
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              Page {currentPage}
+            </span>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={goToNextPage} 
+              disabled={!hasNext || isLoading}
+              className="gap-1"
+            >
+              Next <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+          <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">
+            {hasNext ? `${PAGE_SIZE}+ records` : `${records.length} records`} loaded per fetch
+          </p>
+        </div>
       </Card>
 
       <Dialog open={isRecordPaymentOpen} onOpenChange={setIsRecordPaymentOpen}>
@@ -459,7 +585,7 @@ export default function InstallmentOrdersPage() {
           <div className="space-y-4 py-4">
             <div className="flex justify-between items-center px-2">
                 <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">Recent Payments</span>
-                <Badge variant="outline" className="font-bold">{selectedRecord?.paymentHistory.length || 0} Payments</Badge>
+                <Badge variant="outline" className="font-bold">{selectedRecord?.paymentHistory?.length || 0} Payments</Badge>
             </div>
             <div className="max-h-[400px] overflow-y-auto space-y-2 pr-2">
                 {selectedRecord?.paymentHistory && selectedRecord.paymentHistory.length > 0 ? (
@@ -471,7 +597,9 @@ export default function InstallmentOrdersPage() {
                                 </div>
                                 <div>
                                     <p className="font-black text-sm">{formatCurrency(payment.amountPaid, currencySymbol)}</p>
-                                    <p className="text-[10px] font-bold text-muted-foreground uppercase">{format(payment.paymentDate.toDate(), 'PPP p')}</p>
+                                    <p className="text-[10px] font-bold text-muted-foreground uppercase">
+                                      {payment.paymentDate?.toDate ? format(payment.paymentDate.toDate(), 'PPP p') : 'N/A'}
+                                    </p>
                                 </div>
                             </div>
                             <div className="text-right">
