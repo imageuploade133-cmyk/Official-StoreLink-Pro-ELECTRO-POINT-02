@@ -53,7 +53,8 @@ import type { InstallmentRecord, PaymentRecord } from '@/lib/types';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { recordInstallmentPaymentAction, sendInstallmentReminderAction } from '@/app/actions/installments';
+import { recordInstallmentPaymentAction, sendInstallmentReminderAction, markAllInstallmentsAsReadAction } from '@/app/actions/installments';
+import { Check } from 'lucide-react';
 
 export default function InstallmentOrdersPage() {
   const firestore = useFirestore();
@@ -81,6 +82,39 @@ export default function InstallmentOrdersPage() {
 
   const { data: records, isLoading } = useCollection<InstallmentRecord>(installmentQuery);
 
+  const stats = useMemo(() => {
+    if (!records) return { totalIncome: 0, todayIncome: 0, totalCompleted: 0, todayCompleted: 0 };
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let totalIncome = 0;
+    let todayIncome = 0;
+    let totalCompleted = 0;
+    let todayCompleted = 0;
+
+    records.forEach(record => {
+      record.paymentHistory?.forEach(payment => {
+        const paymentDate = payment.paymentDate.toDate();
+        totalIncome += payment.amountPaid;
+        if (paymentDate >= today) {
+          todayIncome += payment.amountPaid;
+        }
+      });
+
+      if (record.status === 'completed') {
+        totalCompleted++;
+        // Check if it was completed today
+        const completedAt = (record.completedAt || record.updatedAt)?.toDate();
+        if (completedAt && completedAt >= today) {
+          todayCompleted++;
+        }
+      }
+    });
+
+    return { totalIncome, todayIncome, totalCompleted, todayCompleted };
+  }, [records]);
+
   const filteredRecords = useMemo(() => {
     if (!records) return [];
     return records.filter(r => {
@@ -90,6 +124,24 @@ export default function InstallmentOrdersPage() {
       return matchesSearch && matchesStatus;
     });
   }, [records, searchTerm, statusFilter]);
+
+  const [isMarkingRead, setIsMarkingRead] = useState(false);
+  const handleMarkAllAsRead = async () => {
+    if (!currentStoreId) return;
+    setIsMarkingRead(true);
+    try {
+      const result = await markAllInstallmentsAsReadAction(currentStoreId);
+      if (result.success) {
+        toast({ title: "Success", description: "All installment orders marked as read." });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error: any) {
+      toast({ variant: "destructive", title: "Error", description: error.message });
+    } finally {
+      setIsMarkingRead(false);
+    }
+  };
 
   const handleRecordPayment = async () => {
       if (!selectedRecord || !paymentAmount) return;
@@ -169,9 +221,47 @@ export default function InstallmentOrdersPage() {
           title="Installment Orders" 
           description="Track and manage customer Pay Small Small plans."
         />
-        <Button variant="outline" onClick={exportToCsv} disabled={filteredRecords.length === 0}>
-          <Download className="mr-2 h-4 w-4" /> Export CSV
-        </Button>
+        <div className="flex flex-wrap gap-2">
+            <Button 
+                variant="outline" 
+                onClick={handleMarkAllAsRead} 
+                disabled={isMarkingRead || !records?.some(r => r.isRead === false)}
+                className="font-bold"
+            >
+                {isMarkingRead ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
+                Mark all as read
+            </Button>
+            <Button variant="outline" onClick={exportToCsv} disabled={filteredRecords.length === 0} className="font-bold">
+                <Download className="mr-2 h-4 w-4" /> Export CSV
+            </Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="shadow-sm border-none ring-1 ring-border bg-card/50">
+          <CardHeader className="pb-2">
+            <CardDescription className="text-[10px] font-black uppercase tracking-widest">Total Income</CardDescription>
+            <CardTitle className="text-2xl font-black">{formatCurrency(stats.totalIncome, currencySymbol)}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card className="shadow-sm border-none ring-1 ring-border bg-card/50">
+          <CardHeader className="pb-2">
+            <CardDescription className="text-[10px] font-black uppercase tracking-widest text-green-600">Today's Income</CardDescription>
+            <CardTitle className="text-2xl font-black text-green-600">{formatCurrency(stats.todayIncome, currencySymbol)}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card className="shadow-sm border-none ring-1 ring-border bg-card/50">
+          <CardHeader className="pb-2">
+            <CardDescription className="text-[10px] font-black uppercase tracking-widest text-blue-600">Total Completed</CardDescription>
+            <CardTitle className="text-2xl font-black text-blue-600">{stats.totalCompleted}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card className="shadow-sm border-none ring-1 ring-border bg-card/50">
+          <CardHeader className="pb-2">
+            <CardDescription className="text-[10px] font-black uppercase tracking-widest text-purple-600">Today Completed</CardDescription>
+            <CardTitle className="text-2xl font-black text-purple-600">{stats.todayCompleted}</CardTitle>
+          </CardHeader>
+        </Card>
       </div>
 
       <div className="flex flex-col md:flex-row gap-4">
@@ -238,7 +328,10 @@ export default function InstallmentOrdersPage() {
                     <TableRow key={record.id} className="group hover:bg-muted/30 transition-colors">
                       <TableCell className="py-4 pl-6">
                         <div>
-                            <p className="font-black text-gray-900">{record.customerName}</p>
+                            <div className="flex items-center gap-2">
+                                <p className="font-black text-gray-900">{record.customerName}</p>
+                                {record.isRead === false && <Badge className="h-4 px-1.5 text-[8px] bg-destructive text-destructive-foreground animate-pulse">NEW</Badge>}
+                            </div>
                             <p className="text-xs text-primary font-bold">{record.productName}</p>
                             <div className="mt-1">{getStatusBadge(record.status)}</div>
                         </div>

@@ -66,6 +66,7 @@ export async function createInstallmentPlanAction({
             lateFee: lateFee || 0,
             status: 'active',
             paymentHistory: [firstPayment],
+            isRead: false,
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
             updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         };
@@ -152,7 +153,8 @@ export async function recordInstallmentPaymentAction(installmentId: string, amou
                 lastPaymentDate: admin.firestore.Timestamp.now(),
                 nextDueDate: isCompleted ? data.nextDueDate : admin.firestore.Timestamp.fromDate(nextDue),
                 paymentHistory: admin.firestore.FieldValue.arrayUnion(newPayment),
-                updatedAt: admin.firestore.FieldValue.serverTimestamp()
+                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+                ...(isCompleted ? { completedAt: admin.firestore.FieldValue.serverTimestamp() } : {})
             });
         });
 
@@ -248,6 +250,35 @@ export async function sendInstallmentReminderAction(installmentId: string, store
         return { success: true };
     } catch (error: any) {
         console.error('Error sending reminder:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+export async function markAllInstallmentsAsReadAction(storeId: string) {
+    try {
+        const installmentRefs = await adminDb.collection('installmentRecords')
+            .where('store_id', '==', storeId)
+            .get();
+        
+        const batch = adminDb.batch();
+        let updatedCount = 0;
+        installmentRefs.docs.forEach(doc => {
+            const data = doc.data();
+            if (data.isRead !== true) {
+                batch.update(doc.ref, { 
+                    isRead: true, 
+                    updatedAt: admin.firestore.FieldValue.serverTimestamp() 
+                });
+                updatedCount++;
+            }
+        });
+        
+        if (updatedCount > 0) {
+            await batch.commit();
+        }
+        return { success: true };
+    } catch (error: any) {
+        console.error('Error marking installments as read:', error);
         return { success: false, error: error.message };
     }
 }

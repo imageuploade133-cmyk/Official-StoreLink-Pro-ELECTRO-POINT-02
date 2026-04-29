@@ -83,7 +83,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, where } from 'firebase/firestore';
-import type { Order } from '@/lib/types';
+import type { Order, InstallmentRecord } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import {
@@ -116,6 +116,15 @@ export default function DashboardLayout({
   }, [firestore, user, staffMember, store]);
   const { data: pendingOrders } = useCollection<Order>(pendingOrdersQuery);
   const pendingCount = pendingOrders?.filter(o => o.isRead !== true).length || 0;
+
+  const installmentOrdersQuery = useMemo(() => {
+    if (!firestore || !user) return null;
+    const storeId = staffMember?.store_id || store?.id;
+    if (!storeId) return null;
+    return query(collection(firestore, 'installmentRecords'), where('store_id', '==', storeId));
+  }, [firestore, user, staffMember, store]);
+  const { data: installmentRecords } = useCollection<InstallmentRecord>(installmentOrdersQuery);
+  const installmentUnreadCount = installmentRecords?.filter(r => r.isRead === false).length || 0;
 
   // Restore zoom level from localStorage on mount
   useEffect(() => {
@@ -338,7 +347,9 @@ export default function DashboardLayout({
                   }
                   
                   const isOrdersLink = item.href === '/dashboard/orders';
-                  const showBadge = isOrdersLink && pendingCount > 0;
+                  const isInstallmentLink = item.href === '/dashboard/installment-orders';
+                  const showBadge = (isOrdersLink && pendingCount > 0) || (isInstallmentLink && installmentUnreadCount > 0);
+                  const badgeCount = isOrdersLink ? pendingCount : (isInstallmentLink ? installmentUnreadCount : 0);
 
                   if (isMinimized) {
                     return (
@@ -362,7 +373,7 @@ export default function DashboardLayout({
                           </Link>
                         </TooltipTrigger>
                         <TooltipContent side="right">
-                          {item.label} {showBadge && `(${pendingCount} pending)`}
+                          {item.label} {showBadge && `(${badgeCount} pending)`}
                         </TooltipContent>
                       </Tooltip>
                     );
@@ -384,7 +395,7 @@ export default function DashboardLayout({
                           variant="destructive" 
                           className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full px-0 text-[10px] animate-pulse"
                         >
-                          {pendingCount}
+                          {badgeCount}
                         </Badge>
                       )}
                     </Link>
@@ -443,7 +454,9 @@ export default function DashboardLayout({
                         }
                         
                         const isOrdersLink = item.href === '/dashboard/orders';
-                        const showBadge = isOrdersLink && pendingCount > 0;
+                        const isInstallmentLink = item.href === '/dashboard/installment-orders';
+                        const showBadge = (isOrdersLink && pendingCount > 0) || (isInstallmentLink && installmentUnreadCount > 0);
+                        const badgeCount = isOrdersLink ? pendingCount : (isInstallmentLink ? installmentUnreadCount : 0);
 
                         return (
                           <Link
@@ -464,7 +477,7 @@ export default function DashboardLayout({
                                 variant="destructive" 
                                 className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full px-0 text-xs animate-pulse"
                               >
-                                {pendingCount}
+                                {badgeCount}
                               </Badge>
                             )}
                           </Link>
