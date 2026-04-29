@@ -16,6 +16,7 @@ import {
 import type { Product, Category } from '@/lib/types';
 import { ProductCard } from '@/components/store/ProductCard';
 import { useSettings } from '@/contexts/settings-context';
+import { useGlobalLoading } from '@/contexts/global-loading-context';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
@@ -36,6 +37,7 @@ function ShopPageContent() {
     const params = useParams();
     const storeId = params?.storeId as string;
     const { getStoreUrl } = useStoreUrl();
+    const { setPageDataLoaded } = useGlobalLoading();
     
     // URL-driven state
     const categoryFromUrl = searchParams.get('category') || 'all';
@@ -308,6 +310,12 @@ function ShopPageContent() {
 
     const totalPages = Math.ceil(totalProductsCount / ITEMS_PER_PAGE);
     const isLoading = isLoadingProducts || isLoadingCategories;
+
+    useEffect(() => {
+        if (!isLoading) {
+            setPageDataLoaded(true);
+        }
+    }, [isLoading, setPageDataLoaded]);
 
     const currentCategory = useMemo(() => {
         if (categoryFromUrl === 'all' || !categories) return null;
