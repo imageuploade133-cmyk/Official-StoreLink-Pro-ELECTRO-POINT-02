@@ -145,153 +145,231 @@ export default function InstallmentCheckoutPage() {
 
   if (step === 'success') {
       return (
-          <div className="max-w-2xl mx-auto px-4 py-20 text-center space-y-6">
+          <div className="max-w-2xl mx-auto px-4 py-20 text-center space-y-8 animate-in fade-in zoom-in duration-700">
               <div className="flex justify-center">
-                <div className="h-20 w-20 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                    <CheckCircle2 className="h-12 w-12" />
+                <div className="h-24 w-24 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-xl shadow-emerald-500/20">
+                    <CheckCircle2 className="h-14 w-14" />
                 </div>
               </div>
-              <h1 className="text-4xl font-black">Plan Activated!</h1>
-              <p className="text-muted-foreground text-lg">Thank you, {formData.name}. Your first payment of {formatCurrency(downPaymentAmount, currencySymbol)} has been recorded.</p>
-              <div className="p-6 rounded-3xl bg-muted/50 border space-y-4 text-left">
-                  <div className="flex justify-between">
-                      <span className="font-medium text-muted-foreground">Product</span>
-                      <span className="font-bold">{product.name}</span>
-                  </div>
-                  <div className="flex justify-between">
-                      <span className="font-medium text-muted-foreground">Remaining Balance</span>
-                      <span className="font-bold">{formatCurrency(remainingBalance, currencySymbol)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                      <span className="font-medium text-muted-foreground">Next Due Date</span>
-                      <span className="font-bold">{format(nextDueDate, 'PPP')}</span>
+              <div className="space-y-2">
+                <h1 className="text-4xl md:text-5xl font-black tracking-tight">Plan Activated!</h1>
+                <p className="text-slate-500 dark:text-slate-400 text-lg font-medium">Thank you, {formData.name}. Your journey to ownership has begun.</p>
+              </div>
+              
+              <div className="overflow-hidden rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl">
+                  <div className="p-8 space-y-6 text-left">
+                      <div className="flex items-center justify-between pb-6 border-b border-slate-100 dark:border-slate-800">
+                          <div className="flex items-center gap-4">
+                              <div className="relative h-16 w-16 rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
+                                  <Image src={product.imageUrl || ''} alt={product.name} fill className="object-cover" unoptimized />
+                              </div>
+                              <div>
+                                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Product</p>
+                                  <p className="font-bold text-slate-900 dark:text-white leading-tight">{product.name}</p>
+                              </div>
+                          </div>
+                          <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-none px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">Active Plan</Badge>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-8">
+                          <div className="space-y-1">
+                              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Paid Today</p>
+                              <p className="text-xl font-black text-emerald-600">{formatCurrency(downPaymentAmount, currencySymbol)}</p>
+                          </div>
+                          <div className="space-y-1">
+                              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Balance</p>
+                              <p className="text-xl font-black text-slate-900 dark:text-white">{formatCurrency(remainingBalance, currencySymbol)}</p>
+                          </div>
+                      </div>
+
+                      <div className="p-5 rounded-3xl bg-slate-50 dark:bg-white/5 space-y-3">
+                          <div className="flex items-center gap-2 text-xs font-black text-primary uppercase tracking-widest">
+                              <Clock className="h-4 w-4" />
+                              Next Due Date
+                          </div>
+                          <p className="text-lg font-bold text-slate-800 dark:text-slate-200">
+                              {format(nextDueDate, 'MMMM do, yyyy')}
+                          </p>
+                          <p className="text-[11px] text-slate-500 font-medium">
+                              We'll send you a reminder 3 days before your next payment of {formatCurrency(installmentAmount, currencySymbol)} is due.
+                          </p>
+                      </div>
                   </div>
               </div>
-              <Button asChild className="w-full h-14 rounded-2xl text-lg font-bold" size="lg">
-                  <Link href={getStoreUrl('/')}>Return to Store</Link>
+
+              <Button asChild className="w-full h-16 rounded-[2rem] text-lg font-black bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all" size="lg">
+                  <Link href={getStoreUrl('/store')}>Return to Store</Link>
               </Button>
           </div>
       );
   }
 
   return (
-    <div className="min-h-screen bg-muted/30 py-12">
+    <div className="min-h-screen bg-[#f5f5f7] dark:bg-black py-8 md:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-black tracking-tight">Installment Checkout</h1>
-          <Button variant="ghost" onClick={() => router.back()}><ArrowLeft className="mr-2 h-4 w-4" /> Back</Button>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 md:mb-12">
+          <div className="space-y-1">
+            <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white">Installment Checkout</h1>
+            <p className="text-slate-500 font-medium">Complete your details to activate your flexible payment plan.</p>
+          </div>
+          <Button variant="ghost" onClick={() => router.back()} className="w-fit h-12 px-6 rounded-2xl hover:bg-white dark:hover:bg-white/5 shadow-sm transition-all active:scale-95">
+            <ArrowLeft className="mr-2 h-5 w-5" /> 
+            <span className="font-bold">Back</span>
+          </Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2"><User className="h-5 w-5 text-primary" /> 1. Your Details</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleProceedToPayment} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-start">
+          <div className="lg:col-span-7 space-y-8">
+            <div className="overflow-hidden rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none transition-all duration-500">
+              <div className="p-6 md:p-8 space-y-6">
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                    <User className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-black tracking-tight">1. Your Identity</h2>
+                    <p className="text-xs text-slate-400 font-medium uppercase tracking-widest">Personal Information</p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleProceedToPayment} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input id="name" name="name" value={formData.name} onChange={handleInputChange} required />
+                    <Label htmlFor="name" className="text-[10px] font-black uppercase tracking-widest ml-1">Full Name</Label>
+                    <Input id="name" name="name" value={formData.name} onChange={handleInputChange} required className="h-14 rounded-2xl border-slate-100 bg-slate-50/50 dark:bg-white/5 dark:border-white/10 focus:ring-primary/20 transition-all" placeholder="Enter your full name" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} required />
+                    <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest ml-1">Email Address</Label>
+                    <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} required className="h-14 rounded-2xl border-slate-100 bg-slate-50/50 dark:bg-white/5 dark:border-white/10 focus:ring-primary/20 transition-all" placeholder="email@example.com" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input id="phone" name="phone" value={formData.phone} onChange={handleInputChange} required />
+                    <Label htmlFor="phone" className="text-[10px] font-black uppercase tracking-widest ml-1">Phone Number</Label>
+                    <Input id="phone" name="phone" value={formData.phone} onChange={handleInputChange} required className="h-14 rounded-2xl border-slate-100 bg-slate-50/50 dark:bg-white/5 dark:border-white/10 focus:ring-primary/20 transition-all" placeholder="+234 ..." />
                   </div>
                   <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="address">Delivery Address</Label>
-                    <Input id="address" name="address" value={formData.address} onChange={handleInputChange} />
+                    <Label htmlFor="address" className="text-[10px] font-black uppercase tracking-widest ml-1">Delivery Address</Label>
+                    <Input id="address" name="address" value={formData.address} onChange={handleInputChange} className="h-14 rounded-2xl border-slate-100 bg-slate-50/50 dark:bg-white/5 dark:border-white/10 focus:ring-primary/20 transition-all" placeholder="Your residential or work address" />
                   </div>
                   {step === 'details' && (
-                    <Button type="submit" className="md:col-span-2 h-12 rounded-xl mt-4">Proceed to Payment</Button>
+                    <Button type="submit" className="md:col-span-2 h-16 rounded-[2rem] bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-lg font-black mt-4 shadow-xl hover:scale-[1.01] active:scale-[0.99] transition-all">
+                      Continue to Payment
+                    </Button>
                   )}
                 </form>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {step !== 'details' && (
-              <Card className="animate-in fade-in slide-in-from-top-4">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2"><CreditCard className="h-5 w-5 text-primary" /> 2. Down Payment</CardTitle>
-                  <CardDescription>Pay your initial deposit to activate the plan.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="p-6 rounded-2xl bg-primary/5 border-2 border-primary/10 text-center">
-                      <p className="text-sm font-medium text-muted-foreground uppercase tracking-widest">Amount to Pay Now</p>
-                      <h2 className="text-4xl font-black text-primary">{formatCurrency(downPaymentAmount, currencySymbol)}</h2>
+              <div className="overflow-hidden rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none transition-all duration-500 animate-in fade-in slide-in-from-top-8">
+                <div className="p-6 md:p-8 space-y-8">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                        <CreditCard className="h-6 w-6" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-black tracking-tight">2. Down Payment</h2>
+                        <p className="text-xs text-slate-400 font-medium uppercase tracking-widest">Initial Deposit</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Paying Now</p>
+                       <p className="text-2xl font-black text-primary">{formatCurrency(downPaymentAmount, currencySymbol)}</p>
+                    </div>
                   </div>
-                  
-                  <div className="grid grid-cols-1 gap-3">
-                      <Button onClick={() => handleCompleteCheckout('Paystack')} className="h-14 rounded-2xl bg-[#09a5db] hover:bg-[#09a5db]/90 text-white font-bold text-lg">
-                          Pay with Paystack
-                      </Button>
-                      <Button onClick={() => handleCompleteCheckout('Flutterwave')} className="h-14 rounded-2xl bg-[#f5a623] hover:bg-[#f5a623]/90 text-white font-bold text-lg">
-                          Pay with Flutterwave
-                      </Button>
-                      <Button onClick={() => handleCompleteCheckout('Bank Transfer')} variant="outline" className="h-14 rounded-2xl font-bold">
-                          Bank Transfer / Offline
-                      </Button>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <button onClick={() => handleCompleteCheckout('Paystack')} className="group p-6 rounded-3xl border-2 border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 hover:border-primary/50 hover:bg-primary/5 transition-all text-center space-y-3 active:scale-95">
+                          <div className="h-12 w-12 rounded-2xl bg-white dark:bg-black shadow-sm flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                              <Image src="https://paystack.com/favicon.ico" alt="Paystack" width={24} height={24} className="rounded-full" />
+                          </div>
+                          <p className="font-bold text-sm">Paystack</p>
+                      </button>
+                      <button onClick={() => handleCompleteCheckout('Flutterwave')} className="group p-6 rounded-3xl border-2 border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 hover:border-primary/50 hover:bg-primary/5 transition-all text-center space-y-3 active:scale-95">
+                          <div className="h-12 w-12 rounded-2xl bg-white dark:bg-black shadow-sm flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                              <Image src="https://flutterwave.com/favicon.ico" alt="Flutterwave" width={24} height={24} className="rounded-full" />
+                          </div>
+                          <p className="font-bold text-sm">Flutterwave</p>
+                      </button>
+                      <button onClick={() => handleCompleteCheckout('Bank Transfer')} className="group p-6 rounded-3xl border-2 border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 hover:border-primary/50 hover:bg-primary/5 transition-all text-center space-y-3 active:scale-95">
+                          <div className="h-12 w-12 rounded-2xl bg-white dark:bg-black shadow-sm flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                              <ArrowLeft className="h-6 w-6 rotate-90 text-slate-400" />
+                          </div>
+                          <p className="font-bold text-sm">Transfer</p>
+                      </button>
                   </div>
-                </CardContent>
-              </Card>
+
+                  <p className="text-[10px] text-center text-slate-400 font-medium italic">All payments are secured and encrypted. Your plan activates immediately after payment.</p>
+                </div>
+              </div>
             )}
           </div>
 
-          <div className="space-y-6">
-            <Card className="sticky top-24">
-              <CardHeader>
-                <CardTitle>Plan Summary</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex gap-4">
-                    <div className="relative h-16 w-16 rounded-xl overflow-hidden bg-muted border">
+          <div className="lg:col-span-5 space-y-6">
+            <div className="sticky top-24 overflow-hidden rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl">
+              <div className="p-8 space-y-8">
+                <h3 className="text-2xl font-black tracking-tight">Plan Summary</h3>
+                
+                <div className="flex gap-6 items-center p-4 rounded-3xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5">
+                    <div className="relative h-20 w-20 rounded-2xl overflow-hidden shadow-lg flex-shrink-0">
                         <Image src={product.imageUrl || ''} alt={product.name} fill className="object-cover" unoptimized />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="font-bold truncate">{product.name}</p>
-                        <p className="text-xs text-muted-foreground">Qty: {qty}</p>
+                        <p className="font-black text-slate-900 dark:text-white leading-tight mb-1">{product.name}</p>
+                        <Badge variant="outline" className="bg-white dark:bg-black rounded-lg text-[9px] font-black uppercase tracking-widest border-slate-200">Qty: {qty}</Badge>
                     </div>
                 </div>
                 
-                <Separator />
-                
-                <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                        <span>Total Product Value</span>
-                        <span className="font-bold">{formatCurrency(totalAmount, currencySymbol)}</span>
+                <div className="space-y-4">
+                    <div className="flex justify-between items-center text-sm">
+                        <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Total Value</span>
+                        <span className="font-black text-slate-900 dark:text-white text-lg">{formatCurrency(totalAmount, currencySymbol)}</span>
                     </div>
-                    <div className="flex justify-between text-sm text-primary font-bold">
-                        <span>Down Payment ({product.downPaymentPercentage}%)</span>
-                        <span>{formatCurrency(downPaymentAmount, currencySymbol)}</span>
+                    <div className="flex justify-between items-center text-sm">
+                        <span className="text-primary font-black uppercase tracking-widest text-[10px]">Down Payment ({product.downPaymentPercentage}%)</span>
+                        <span className="font-black text-primary text-lg">{formatCurrency(downPaymentAmount, currencySymbol)}</span>
                     </div>
-                    <Separator className="my-2" />
-                    <div className="flex justify-between text-sm">
-                        <span>Remaining Balance</span>
-                        <span className="font-bold">{formatCurrency(remainingBalance, currencySymbol)}</span>
+                    <div className="h-[1px] w-full bg-slate-100 dark:bg-slate-800 my-2" />
+                    <div className="flex justify-between items-center text-sm">
+                        <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Balance to Spread</span>
+                        <span className="font-black text-slate-900 dark:text-white text-lg">{formatCurrency(remainingBalance, currencySymbol)}</span>
                     </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-muted/50 space-y-3">
-                    <div className="flex items-center gap-2 text-xs font-bold">
-                        <Clock className="h-3 w-3 text-primary" />
-                        Schedule: {product.numberOfPayments} {product.paymentInterval} payments
+                <div className="p-6 rounded-3xl bg-primary/5 border border-primary/10 space-y-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
+                            <Clock className="h-4 w-4" />
+                            Installment Plan
+                        </div>
+                        <Badge className="bg-primary text-white text-[9px] font-black rounded-full px-2">{product.numberOfPayments} Parts</Badge>
                     </div>
-                    <div className="flex justify-between text-xs">
-                        <span>Installment Amount</span>
-                        <span className="font-black">{formatCurrency(installmentAmount, currencySymbol)}</span>
+                    <div className="flex justify-between items-end">
+                        <div className="space-y-0.5">
+                           <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Recurring Amount</p>
+                           <p className="text-xl font-black text-primary">{formatCurrency(installmentAmount, currencySymbol)}</p>
+                        </div>
+                        <p className="text-[10px] font-black text-slate-400 mb-1">{product.paymentInterval.toUpperCase()}</p>
                     </div>
-                    <Progress value={0} className="h-1" />
+                    <div className="h-1.5 w-full bg-primary/10 rounded-full overflow-hidden">
+                       <div className="h-full bg-primary/30 w-1/4 rounded-full" />
+                    </div>
+                    <div className="flex justify-between text-[9px] font-black text-slate-400 uppercase tracking-tighter">
+                       <span>Today</span>
+                       <span>{product.paymentInterval}ly Payments</span>
+                    </div>
                 </div>
-              </CardContent>
-              <CardFooter className="flex-col gap-2 italic text-[10px] text-muted-foreground">
-                <p>First payment of {formatCurrency(downPaymentAmount, currencySymbol)} due today.</p>
-                <p>Next payment of {formatCurrency(installmentAmount, currencySymbol)} due on {format(nextDueDate, 'PP')}.</p>
-              </CardFooter>
-            </Card>
+              </div>
+              <div className="px-8 py-6 bg-slate-50 dark:bg-white/5 border-t border-slate-100 dark:border-white/5 space-y-2">
+                <div className="flex items-center gap-2 text-[10px] text-slate-500 font-bold">
+                   <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                   First payment due today.
+                </div>
+                <div className="flex items-center gap-2 text-[10px] text-slate-500 font-bold">
+                   <div className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+                   Next payment due {format(nextDueDate, 'MMM do, yyyy')}.
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
