@@ -115,7 +115,7 @@ const iconMap = {
   Send,
 };
 
-function IndividualTrackPlayer({ track, branding }: { track: any, branding: any, key?: any }) {
+function IndividualTrackPlayer({ track, branding }: { track: any, branding: any }) {
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
@@ -536,6 +536,26 @@ export default function ProductDetailsPage() {
     return matchingVariants.reduce((acc, v) => acc + (Number(v.stock) || 0), 0);
   }, [product, selectedVariant, selectedOptions]);
 
+  const installmentData = useMemo(() => {
+    if (!product || !product.installmentEnabled || !currentPrice) return null;
+    
+    const downPaymentAmount = currentPrice * (product.downPaymentPercentage || 0) / 100;
+    const remainingBalance = currentPrice - downPaymentAmount;
+    const installmentAmount = remainingBalance / (product.numberOfPayments || 1);
+    
+    let nextDueDate = today ? new Date(today) : new Date();
+    if (product.paymentInterval === 'daily') nextDueDate.setDate(nextDueDate.getDate() + 1);
+    else if (product.paymentInterval === 'weekly') nextDueDate.setDate(nextDueDate.getDate() + 7);
+    else nextDueDate.setMonth(nextDueDate.getMonth() + 1);
+
+    return {
+      downPaymentAmount,
+      remainingBalance,
+      installmentAmount,
+      nextDueDate
+    };
+  }, [product, currentPrice, today]);
+
   const isCurrentlyOutOfStock = currentStock <= 0;
   const isEntireProductOutOfStock = useMemo(() => {
     if (!product) return true;
@@ -759,7 +779,11 @@ export default function ProductDetailsPage() {
   const recommendationsDescription = settings?.relatedProductsDescription || 'Specially curated items from the same collection.';
 
   const isDiscounted = product ? (effectivePrice < product.sellingPrice) : false;
-  const isOutOfStock = product ? (product.hasVariants ? isCurrentlyOutOfStock : product.stock <= 0) : false;
+  const isOutOfStock = useMemo(() => {
+    if (!product) return false;
+    return product.hasVariants ? isCurrentlyOutOfStock : (Number(product.stock) || 0) <= 0;
+  }, [product, isCurrentlyOutOfStock]);
+
   const isInWishlist = isProductInWishlist(productId);
 
   const galleryImages = useMemo(() => {
@@ -948,6 +972,17 @@ export default function ProductDetailsPage() {
     return `${shapeClass} ${sizeClass}`;
   }, [settings]);
 
+  const productPageBgStyle = useMemo(() => {
+    if (settings?.ourCollectionBackgroundApplyTo?.includes('product') && !settings?.ourCollectionBackgroundApplyTo?.includes('global')) {
+      return getCollectionBackgroundStyle(settings);
+    }
+    return {};
+  }, [settings]);
+
+  const hasPageBg = useMemo(() => {
+    return settings?.ourCollectionBackgroundApplyTo?.includes('product') || settings?.ourCollectionBackgroundApplyTo?.includes('global');
+  }, [settings]);
+
   if (isLoadingProduct) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -986,17 +1021,6 @@ export default function ProductDetailsPage() {
   };
 
   const visibleVoices = (distributedVoices || []).filter(v => v.isVisible !== false);
-
-  const productPageBgStyle = useMemo(() => {
-    if (settings?.ourCollectionBackgroundApplyTo?.includes('product') && !settings?.ourCollectionBackgroundApplyTo?.includes('global')) {
-      return getCollectionBackgroundStyle(settings);
-    }
-    return {};
-  }, [settings]);
-
-  const hasPageBg = useMemo(() => {
-    return settings?.ourCollectionBackgroundApplyTo?.includes('product') || settings?.ourCollectionBackgroundApplyTo?.includes('global');
-  }, [settings]);
 
   return (
     <div 
@@ -1412,7 +1436,7 @@ export default function ProductDetailsPage() {
               </div>
 
               
-              {product.installmentEnabled && !isOutOfStock && (
+              {installmentData && !isOutOfStock && (
                 <div className="mt-6 p-6 rounded-3xl bg-primary/5 border-2 border-primary/20 space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -1425,11 +1449,11 @@ export default function ProductDetailsPage() {
                   <div className="space-y-4">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Amount to Pay Now</span>
-                      <span className="font-black text-primary">{formatCurrency(currentPrice * (product.downPaymentPercentage || 0) / 100, currencySymbol)}</span>
+                      <span className="font-black text-primary">{formatCurrency(installmentData.downPaymentAmount, currencySymbol)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Remaining Balance</span>
-                      <span className="font-bold">{formatCurrency(currentPrice * (1 - (product.downPaymentPercentage || 0) / 100), currencySymbol)}</span>
+                      <span className="font-bold">{formatCurrency(installmentData.remainingBalance, currencySymbol)}</span>
                     </div>
                     
                     <div className="space-y-2">
@@ -1443,17 +1467,12 @@ export default function ProductDetailsPage() {
                     <div className="p-4 rounded-2xl bg-white/50 dark:bg-black/20 border border-primary/10 space-y-3">
                       <div className="flex items-center gap-2 text-xs font-bold text-primary">
                         <Clock className="h-4 w-4" />
-                        Next Payment: {format(
-                          product.paymentInterval === 'daily' ? new Date(Date.now() + 86400000) :
-                          product.paymentInterval === 'weekly' ? new Date(Date.now() + 7 * 86400000) :
-                          new Date(Date.now() + 30 * 86400000), 
-                          'PPPP'
-                        )} at {format(new Date(), 'p')}
+                        Next Payment: {format(installmentData.nextDueDate, 'PPPP')} at {format(new Date(), 'p')}
                       </div>
                       <div className="space-y-1">
                         <p className="text-[10px] font-black uppercase text-muted-foreground">Payment Schedule</p>
                         <p className="text-[10px] text-muted-foreground leading-relaxed">
-                          Pay balance in {product.numberOfPayments} {product.paymentInterval} installments of {formatCurrency((currentPrice * (1 - (product.downPaymentPercentage || 0) / 100)) / (product.numberOfPayments || 1), currencySymbol)}.
+                          Pay balance in {product.numberOfPayments} {product.paymentInterval} installments of {formatCurrency(installmentData.installmentAmount, currencySymbol)}.
                         </p>
                       </div>
                       {product.lateFee > 0 && (
