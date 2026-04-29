@@ -184,7 +184,9 @@ export default function DashboardPage() {
     dueCreditSales,
     recentStockTransfers,
     availableYears,
-    todayOrdersCount
+    todayOrdersCount,
+    totalAdClicks,
+    todayAdClicks
   } = useMemo(() => {
     // --- STATIC STATS (independent of dateRange picker) ---
     const now = new Date();
