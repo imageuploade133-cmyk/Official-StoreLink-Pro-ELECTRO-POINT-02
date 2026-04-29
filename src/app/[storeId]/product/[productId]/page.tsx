@@ -1437,61 +1437,97 @@ export default function ProductDetailsPage() {
 
               
               {installmentData && !isOutOfStock && (
-                <div className="mt-6 p-6 rounded-3xl bg-primary/5 border-2 border-primary/20 space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <CreditCard className="h-5 w-5 text-primary" />
-                      <h3 className="font-bold text-lg">Pay Small Small</h3>
-                    </div>
-                    <Badge className="bg-primary text-white">Available</Badge>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Amount to Pay Now</span>
-                      <span className="font-black text-primary">{formatCurrency(installmentData.downPaymentAmount, currencySymbol)}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Remaining Balance</span>
-                      <span className="font-bold">{formatCurrency(installmentData.remainingBalance, currencySymbol)}</span>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                        <span>Down Payment Progress</span>
-                        <span>{product.downPaymentPercentage}%</span>
+                <div className="mt-8 overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-slate-950 border border-slate-200 dark:border-slate-800 shadow-xl transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
+                  <div className="p-6 md:p-8 space-y-6">
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                            <CreditCard className="h-5 w-5" />
+                          </div>
+                          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Flexible Ownership</span>
+                        </div>
+                        <h3 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Pay Small Small</h3>
+                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Spread your cost comfortably over {product.numberOfPayments} payments.</p>
                       </div>
-                      <Progress value={product.downPaymentPercentage} className="h-2 bg-primary/10" />
+                      <Badge className="bg-emerald-500 hover:bg-emerald-600 text-white border-none px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/20">
+                        Instant Approval
+                      </Badge>
                     </div>
 
-                    <div className="p-4 rounded-2xl bg-white/50 dark:bg-black/20 border border-primary/10 space-y-3">
-                      <div className="flex items-center gap-2 text-xs font-bold text-primary">
-                        <Clock className="h-4 w-4" />
-                        Next Payment: {format(installmentData.nextDueDate, 'PPPP')} at {format(new Date(), 'p')}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-5 rounded-3xl bg-white dark:bg-white/5 border border-slate-100 dark:border-white/5 shadow-sm space-y-1">
+                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Pay Today</p>
+                        <p className="text-xl font-black text-primary">{formatCurrency(installmentData.downPaymentAmount, currencySymbol)}</p>
                       </div>
-                      <div className="space-y-1">
-                        <p className="text-[10px] font-black uppercase text-muted-foreground">Payment Schedule</p>
-                        <p className="text-[10px] text-muted-foreground leading-relaxed">
-                          Pay balance in {product.numberOfPayments} {product.paymentInterval} installments of {formatCurrency(installmentData.installmentAmount, currencySymbol)}.
-                        </p>
+                      <div className="p-5 rounded-3xl bg-slate-100/50 dark:bg-white/5 border border-transparent shadow-inner space-y-1">
+                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Balance</p>
+                        <p className="text-xl font-black text-slate-700 dark:text-slate-200">{formatCurrency(installmentData.remainingBalance, currencySymbol)}</p>
                       </div>
-                      {product.lateFee > 0 && (
-                        <p className="text-[9px] text-rose-600 font-bold italic">* A late fee of {formatCurrency(product.lateFee, currencySymbol)} applies to delayed payments.</p>
-                      )}
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-end">
+                          <div className="space-y-0.5">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Down Payment</p>
+                            <p className="text-xs font-bold text-slate-700 dark:text-slate-300">{product.downPaymentPercentage}% required upfront</p>
+                          </div>
+                          <span className="text-xs font-black text-primary">{product.downPaymentPercentage}%</span>
+                        </div>
+                        <div className="h-2.5 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden p-0.5 border border-slate-200/50 dark:border-white/5">
+                           <div 
+                              className="h-full bg-primary rounded-full shadow-[0_0_10px_rgba(var(--primary),0.5)] transition-all duration-1000 ease-out" 
+                              style={{ width: `${product.downPaymentPercentage}%` }}
+                           />
+                        </div>
+                      </div>
+
+                      <div className="relative p-5 rounded-[2rem] bg-primary/5 border border-primary/10 overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:scale-110 transition-transform duration-500">
+                           <Clock className="h-12 w-12 text-primary" />
+                        </div>
+                        
+                        <div className="relative z-10 space-y-3">
+                          <div className="flex items-center gap-2 text-[11px] font-black text-primary uppercase tracking-wider">
+                            <Clock className="h-3.5 w-3.5" />
+                            Next: {format(installmentData.nextDueDate, 'MMMM do')}
+                          </div>
+                          
+                          <div className="space-y-1">
+                            <p className="text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">
+                              {formatCurrency(installmentData.installmentAmount, currencySymbol)} / {product.paymentInterval}
+                            </p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                              Your remaining balance will be split into {product.numberOfPayments} equal installments.
+                            </p>
+                          </div>
+
+                          {product.lateFee > 0 && (
+                            <div className="flex items-center gap-1.5 pt-1">
+                              <Info className="h-3 w-3 text-rose-500" />
+                              <p className="text-[9px] text-rose-500 font-bold italic tracking-tight">
+                                Late fee of {formatCurrency(product.lateFee, currencySymbol)} applies after due date.
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
 
                     <Button 
                       asChild
-                      className="w-full h-12 rounded-2xl bg-primary text-white font-bold"
+                      className="w-full h-16 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-slate-200 dark:shadow-none group"
                     >
-                      <Link href={getStoreUrl(`/checkout/installment?productId=${product.id}&qty=${quantity}&variantId=${selectedVariant?.id || ''}`)}>
-                        Choose Installment Plan
+                      <Link href={getStoreUrl(`/store/checkout/installment?productId=${product.id}&qty=${quantity}&variantId=${selectedVariant?.id || ''}`)} className="flex items-center justify-center gap-3">
+                        <span className="text-lg font-black tracking-tight">Choose Installment Plan</span>
+                        <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                       </Link>
                     </Button>
                     
                     {product.installmentTerms && (
-                      <div className="pt-2">
-                         <p className="text-[9px] text-muted-foreground italic">By clicking above, you agree to our installment terms.</p>
+                      <div className="text-center">
+                         <p className="text-[10px] text-slate-400 font-medium italic">By proceeding, you agree to our <span className="text-primary hover:underline cursor-pointer">Installment Terms & Conditions</span>.</p>
                       </div>
                     )}
                   </div>
