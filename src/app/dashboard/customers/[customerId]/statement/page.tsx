@@ -408,13 +408,15 @@ export default function CustomerStatementPage() {
           <p className="text-[9px] text-slate-400 font-medium mt-2 uppercase">Lifetime Purchases</p>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border-l-4 border-emerald-500 shadow-lg ring-1 ring-black/5">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border-l-4 border-blue-500 shadow-lg ring-1 ring-black/5">
           <div className="flex justify-between items-start mb-4">
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Account Credit</p>
-            <PiggyBank className="h-5 w-5 text-emerald-500/40" />
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Total Paid</p>
+            <Wallet className="h-5 w-5 text-blue-500/40" />
           </div>
-          <p className="text-2xl font-black tracking-tighter text-emerald-600">{formatCurrency(customer?.creditBalance || 0, currencySymbol)}</p>
-          <p className="text-[9px] text-slate-400 font-medium mt-2 uppercase">Unallocated Deposits</p>
+          <p className="text-2xl font-black tracking-tighter text-blue-600">
+            {formatCurrency((customer?.totalSpent || 0) - (customer?.outstandingCredit || 0) + (customer?.creditBalance || 0), currencySymbol)}
+          </p>
+          <p className="text-[9px] text-slate-400 font-medium mt-2 uppercase">Settled Amount</p>
         </div>
 
         <div className={cn("p-6 rounded-xl border-l-4 shadow-lg ring-1 ring-black/5", (customer?.outstandingCredit || 0) > 0.01 ? "bg-red-50 dark:bg-red-950/20 border-red-500" : "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-500")}>
@@ -425,16 +427,16 @@ export default function CustomerStatementPage() {
           <p className={cn("text-2xl font-black tracking-tighter", (customer?.outstandingCredit || 0) > 0.01 ? "text-red-600" : "text-emerald-600")}>
             {(customer?.outstandingCredit || 0) <= 0.01 ? "CLEARED" : formatCurrency(customer?.outstandingCredit || 0, currencySymbol)}
           </p>
-          <p className="text-[9px] font-bold mt-2 uppercase">Active Pay-Small-Small</p>
+          <p className="text-[9px] font-bold mt-2 uppercase">Amount Still Owed</p>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border-l-4 border-primary shadow-lg ring-1 ring-black/5">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border-l-4 border-emerald-500 shadow-lg ring-1 ring-black/5">
           <div className="flex justify-between items-start mb-4">
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Sync Metrics</p>
-            <History className="h-5 w-5 text-primary/40" />
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Credit Balance</p>
+            <PiggyBank className="h-5 w-5 text-emerald-500/40" />
           </div>
-          <p className="text-2xl font-black tracking-tighter text-primary">BATCH {currentPage}</p>
-          <p className="text-[9px] text-slate-400 font-medium mt-2 uppercase">Page {currentPage} of Ledger</p>
+          <p className="text-2xl font-black tracking-tighter text-emerald-600">{formatCurrency(customer?.creditBalance || 0, currencySymbol)}</p>
+          <p className="text-[9px] text-slate-400 font-medium mt-2 uppercase">Unallocated Deposits</p>
         </div>
       </div>
 
@@ -451,15 +453,16 @@ export default function CustomerStatementPage() {
                 <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Ref ID</TableHead>
                 <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Description</TableHead>
                 <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest text-center">Type</TableHead>
-                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest text-right">Debit (+)</TableHead>
-                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest text-right">Credit (-)</TableHead>
+                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest text-right">Debt Due (+)</TableHead>
+                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest text-right">Amount Paid (-)</TableHead>
+                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest text-right">Balance</TableHead>
                 <TableHead className="no-print text-center w-[100px] text-[10px] font-black uppercase text-slate-500 tracking-widest">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredLedger.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-48 text-center text-muted-foreground">
+                  <TableCell colSpan={8} className="h-48 text-center text-muted-foreground">
                     {isLoading ? <Loader2 className="h-8 w-8 animate-spin mx-auto opacity-20" /> : (
                         <>
                             <History className="h-12 w-12 mx-auto mb-4 opacity-10" />
@@ -471,6 +474,9 @@ export default function CustomerStatementPage() {
               ) : (
                 filteredLedger.map((entry) => {
                   const showPayButton = entry.type === 'sale' && entry.isCreditSale && entry.originalSale && !entry.originalSale.isPaid;
+                  const saleBalance = entry.type === 'sale' && entry.originalSale 
+                    ? (entry.originalSale.grandTotal || 0) - (entry.originalSale.amountPaidTowardsCredit || 0) - (entry.originalSale.initialPaymentMadeAtTimeOfSale || 0) - (entry.originalSale.returnedAmount || 0)
+                    : 0;
                   
                   return (
                     <TableRow key={entry.id} className="hover:bg-primary/5 transition-colors group">
@@ -489,6 +495,9 @@ export default function CustomerStatementPage() {
                       </TableCell>
                       <TableCell className="text-right font-bold text-emerald-600">
                         {entry.credit > 0 ? `-${formatCurrency(entry.credit, currencySymbol)}` : '-'}
+                      </TableCell>
+                      <TableCell className="text-right font-bold text-primary">
+                        {entry.type === 'sale' && entry.isCreditSale ? formatCurrency(Math.max(0, saleBalance), currencySymbol) : '-'}
                       </TableCell>
                       <TableCell className="no-print text-center">
                         {showPayButton && (

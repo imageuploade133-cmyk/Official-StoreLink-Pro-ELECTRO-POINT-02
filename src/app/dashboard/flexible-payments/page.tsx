@@ -289,6 +289,7 @@ export default function FlexiblePaymentsPage() {
                   <TableRow>
                     <TableHead className="font-black uppercase text-[10px] tracking-widest pl-6">Customer</TableHead>
                     <TableHead className="text-right font-black uppercase text-[10px] tracking-widest">Debt Due</TableHead>
+                    <TableHead className="text-right font-black uppercase text-[10px] tracking-widest">Amount Paid</TableHead>
                     <TableHead className="text-right font-black uppercase text-[10px] tracking-widest">Credit Bal</TableHead>
                     <TableHead className="text-right font-black uppercase text-[10px] tracking-widest">Net Position</TableHead>
                     <TableHead className="text-right font-black uppercase text-[10px] tracking-widest pr-6">Account Tools</TableHead>
@@ -297,11 +298,11 @@ export default function FlexiblePaymentsPage() {
                 <TableBody>
                   {isLoadingCustomers && customers.length === 0 ? (
                     [...Array(5)].map((_, i) => (
-                      <TableRow key={i}><TableCell colSpan={5} className="py-8"><Loader2 className="h-6 w-6 animate-spin mx-auto opacity-20" /></TableCell></TableRow>
+                      <TableRow key={i}><TableCell colSpan={6} className="py-8"><Loader2 className="h-6 w-6 animate-spin mx-auto opacity-20" /></TableCell></TableRow>
                     ))
                   ) : filteredCustomers.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="h-48 text-center text-muted-foreground">
+                      <TableCell colSpan={6} className="h-48 text-center text-muted-foreground">
                         <div className="flex flex-col items-center gap-2">
                           <PiggyBank className="h-12 w-12 opacity-10" />
                           <p className="font-medium">No matching accounts found in this batch.</p>
@@ -312,6 +313,7 @@ export default function FlexiblePaymentsPage() {
                     filteredCustomers.map((customer) => {
                       const debt = customer.outstandingCredit || 0;
                       const credit = customer.creditBalance || 0;
+                      const totalPaid = (customer.totalSpent || 0) - debt + credit;
                       const net = credit - debt;
                       
                       const statementPath = customer.uid 
@@ -326,6 +328,9 @@ export default function FlexiblePaymentsPage() {
                           </TableCell>
                           <TableCell className="text-right font-bold text-orange-600">
                             {debt > 0 ? formatCurrency(debt, currencySymbol) : '-'}
+                          </TableCell>
+                          <TableCell className="text-right font-bold text-blue-600">
+                            {totalPaid > 0 ? formatCurrency(totalPaid, currencySymbol) : '-'}
                           </TableCell>
                           <TableCell className="text-right font-bold text-green-600">
                             {credit > 0 ? formatCurrency(credit, currencySymbol) : '-'}
