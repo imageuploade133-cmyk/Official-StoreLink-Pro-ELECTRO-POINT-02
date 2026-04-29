@@ -42,8 +42,9 @@ import {
   Receipt,
   ChevronLeft,
   ChevronRight,
-  RotateCcw
-} from 'lucide-react';
+  RotateCcw,
+  Loader2
+  } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from '@/components/ui/table';
@@ -86,10 +87,7 @@ export default function OnlineCustomerStatementPage() {
   const customerId = params.customerId as string;
   const currencySymbol = settings?.currency || '$';
 
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: subDays(new Date(), 30),
-    to: new Date()
-  });
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [searchTerm, setSearchTerm] = useState('');
 
   // Pagination state
@@ -504,7 +502,7 @@ export default function OnlineCustomerStatementPage() {
                 filteredLedger.map((entry) => {
                   const showPayButton = entry.type === 'sale' && entry.isCreditSale && entry.originalSale && !entry.originalSale.isPaid;
                   const saleBalance = entry.type === 'sale' && entry.originalSale 
-                    ? (entry.originalSale.grandTotal || 0) - (entry.originalSale.amountPaidTowardsCredit || 0) - (entry.originalSale.initialPaymentMadeAtTimeOfSale || 0) - (entry.originalSale.returnedAmount || 0)
+                    ? (entry.originalSale.grandTotal || 0) - (entry.originalSale.amountPaidTowardsCredit || 0) - (entry.originalSale.returnedAmount || 0)
                     : 0;
                   
                   return (
