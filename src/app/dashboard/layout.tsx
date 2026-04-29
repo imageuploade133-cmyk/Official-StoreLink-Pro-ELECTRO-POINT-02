@@ -55,6 +55,7 @@ import {
   Coins,
   ZoomIn,
   Palette,
+  CalendarClock,
   Image as ImageIcon
 } from 'lucide-react';
 import { PageSpinner } from '@/components/ui/spinner';
@@ -178,6 +179,7 @@ export default function DashboardLayout({
     { href: '/dashboard/categories', icon: FolderTree, label: 'Categories', perm: 'view_categories' },
     { href: '/dashboard/stock-audit', icon: ClipboardList, label: 'Stock Audit Log', perm: 'view_stock_audit' },
     { href: '/dashboard/stock-alerts', icon: AlertTriangle, label: 'View Stock Alerts', perm: 'view_stock_alerts' },
+    { href: '/dashboard/inventory/expired', icon: CalendarClock, label: 'Expired Products', perm: 'view_inventory' },
     { href: '/dashboard/restock-now', icon: SquarePlus, label: 'Restock Now', perm: 'transfer_stock' },
     { href: '/dashboard/restock-history', icon: ListChecks, label: 'Restock History', perm: 'transfer_stock' },
     { href: '/dashboard/print-barcodes', icon: Printer, label: 'Print Barcodes', perm: 'canPrintBarcodes' },
