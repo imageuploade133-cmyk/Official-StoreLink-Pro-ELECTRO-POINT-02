@@ -57,7 +57,8 @@ import {
   AudioWaveform,
   FastForward,
   ArrowLeft,
-  Gift
+  Gift,
+  Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -288,6 +289,8 @@ export default function ProductDetailsPage() {
   const [showVideo, setShowVideo] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isOutOfDataDrawerOpen, setIsOutOfDataDrawerOpen] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isLoadingInstallment, setIsLoadingInstallment] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: string }>({});
@@ -839,6 +842,7 @@ export default function ProductDetailsPage() {
 
   const handleAddToCart = () => {
     if (product) {
+      setIsAddingToCart(true);
       // Use variant image if available for easy understanding in cart
       const variantImage = selectedVariant?.imageUrl || previewVariant?.imageUrl || activeImage;
 
@@ -852,6 +856,11 @@ export default function ProductDetailsPage() {
         };
         addToCart(itemWithVariant as any, currentPrice);
       }
+      toast({
+        title: "Added to Bag",
+        description: `${quantity}x ${product.name} added to your bag`,
+      });
+      setTimeout(() => setIsAddingToCart(false), 300);
     }
   };
 
@@ -1424,14 +1433,19 @@ export default function ProductDetailsPage() {
                 <Button
                   onClick={isOutOfStock ? () => setIsOutOfDataDrawerOpen(true) : handleAddToCart}
                   style={isOutOfStock ? { backgroundColor: '#e2e8f0', color: '#94a3b8' } : buttonStyle}
-                  disabled={isChangingVariant}
+                  disabled={isChangingVariant || isAddingToCart}
                   className={cn(
                       "flex-1 font-semibold tracking-tight shadow-sm transition-all active:scale-[0.98] group",
                       buttonClasses,
                       (isOutOfStock || isChangingVariant) && "cursor-pointer"
                   )}
                 >
-                  <AddToCartIcon className="mr-2 md:mr-3 h-4 md:h-5 w-4 md:w-5" /> {isOutOfStock ? "Out of Stock" : (isChangingVariant ? "Updating.." : addToCartText)}
+                  {isAddingToCart ? (
+                    <Loader2 className="mr-2 md:mr-3 h-4 md:h-5 w-4 md:w-5 animate-spin" />
+                  ) : (
+                    <AddToCartIcon className="mr-2 md:mr-3 h-4 md:h-5 w-4 md:w-5" />
+                  )}
+                  {isOutOfStock ? "Out of Stock" : (isChangingVariant ? "Updating.." : addToCartText)}
                 </Button>
               </div>
 
@@ -1516,13 +1530,27 @@ export default function ProductDetailsPage() {
                     </div>
 
                     <Button 
-                      asChild
+                      onClick={() => {
+                        setIsLoadingInstallment(true);
+                        // Short delay for loading feedback before navigation
+                        setTimeout(() => {
+                          router.push(getStoreUrl(`/store/checkout/installment?productId=${product.id}&qty=${quantity}&variantId=${selectedVariant?.id || ''}`));
+                        }, 300);
+                      }}
+                      disabled={isLoadingInstallment}
                       className="w-full h-16 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-slate-200 dark:shadow-none group"
                     >
-                      <Link href={getStoreUrl(`/store/checkout/installment?productId=${product.id}&qty=${quantity}&variantId=${selectedVariant?.id || ''}`)} className="flex items-center justify-center gap-3">
-                        <span className="text-lg font-black tracking-tight">Choose Installment Plan</span>
-                        <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                      </Link>
+                      {isLoadingInstallment ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          <span className="text-lg font-black tracking-tight">Loading...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-lg font-black tracking-tight">Choose Installment Plan</span>
+                          <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                        </>
+                      )}
                     </Button>
                     
                     {product.installmentTerms && (
