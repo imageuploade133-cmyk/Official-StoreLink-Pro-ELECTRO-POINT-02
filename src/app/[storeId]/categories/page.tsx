@@ -29,6 +29,7 @@ import Link from 'next/link';
 import { useStoreUrl } from '@/hooks/use-store-url';
 
 import { useSettings } from '@/contexts/settings-context';
+import { useGlobalLoading } from '@/contexts/global-loading-context';
 
 const ITEMS_PER_PAGE = 12;
 
@@ -78,6 +79,7 @@ export default function AllCategoriesPage() {
     const firestore = useFirestore();
     const router = useRouter();
     const { settings } = useSettings();
+    const { setPageDataLoaded } = useGlobalLoading();
     
     const [searchTerm, setSearchTerm] = useState('');
     const [categories, setCategories] = useState<Category[]>([]);
@@ -146,6 +148,12 @@ export default function AllCategoriesPage() {
     }, [searchTerm, firestore, fetchCategories]);
 
     const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+
+    useEffect(() => {
+        if (!isLoading) {
+            setPageDataLoaded(true);
+        }
+    }, [isLoading, setPageDataLoaded]);
 
     return (
         <div className="bg-white dark:bg-black min-h-screen">

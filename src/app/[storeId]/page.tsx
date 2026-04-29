@@ -1,12 +1,12 @@
-
 'use client';
 
 import React, { useMemo } from 'react';
 import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, where, orderBy } from 'firebase/firestore';
 import type { BrandValue, Category, HomepageSection } from '@/lib/types';
-import { ArrowRight, Truck, ShieldCheck, Headset, Leaf, Sparkles, Gift } from 'lucide-react';
+import { Truck, ShieldCheck, Headset, Leaf, Sparkles, Gift } from 'lucide-react';
 import { useSettings } from '@/contexts/settings-context';
+import { useGlobalLoading } from '@/contexts/global-loading-context';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
 import { HeroCarousel } from './HeroCarousel';
 import Autoplay from "embla-carousel-autoplay";
@@ -15,8 +15,6 @@ import { ProductSection } from '@/components/store/ProductSection';
 import { CustomUISection } from '@/components/store/CustomUISection';
 import { CategoryGallery } from '@/components/store/CategoryGallery';
 import { BannerAd } from '@/components/ads/BannerAd';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import { useParams } from 'next/navigation';
 import { cn, isWhiteOrTransparent, getCollectionBackgroundStyle } from '@/lib/utils';
 
@@ -29,27 +27,36 @@ const DynamicIcon = ({ name }: { name: string }) => {
 export default function StoreHomePage() {
   const firestore = useFirestore();
   const { settings, store, isLoadingSettings } = useSettings();
+  const { setPageDataLoaded } = useGlobalLoading();
   const currencySymbol = settings?.currency || '$';
   const params = useParams();
   const storeId = params?.storeId as string;
   const effectiveStoreId = store?.id || storeId;
-
-  console.log("Store slug:", storeId, "Effective ID:", effectiveStoreId);
 
   // Fetch Categories once for name mapping across all sections
   const categoriesQuery = useMemo(() => {
     if (!firestore || !effectiveStoreId) return null;
     return query(collection(firestore, 'categories'), where('store_id', '==', effectiveStoreId), orderBy('name'));
   }, [firestore, effectiveStoreId]);
-  const { data: categories } = useCollection<Category>(categoriesQuery);
+  const { data: categories, isLoading: isLoadingCategories } = useCollection<Category>(categoriesQuery);
 
   // Fetch Homepage Sections (Product & Custom UI)
   const sectionsQuery = useMemo(() => {
     if (!firestore || !effectiveStoreId) return null;
     return query(collection(firestore, 'homepageSections'), where('store_id', '==', effectiveStoreId), where('published', '==', true), orderBy('order', 'asc'));
   }, [firestore, effectiveStoreId]);
-  const { data: sections } = useCollection<HomepageSection>(sectionsQuery);
+  const { data: sections, isLoading: isLoadingSections } = useCollection<HomepageSection>(sectionsQuery);
   
+  React.useEffect(() => {
+    if (!isLoadingCategories && !isLoadingSections && !isLoadingSettings) {
+      // Small delay for smooth transition
+      const timer = setTimeout(() => {
+        setPageDataLoaded(true);
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoadingCategories, isLoadingSections, isLoadingSettings, setPageDataLoaded]);
+
   const coveredCategoryIds = useMemo(() => {
     return sections
       ?.filter(s => s.selectionType === 'category' && s.categoryId)

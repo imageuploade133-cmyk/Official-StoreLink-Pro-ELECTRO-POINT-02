@@ -11,6 +11,7 @@ import { useCart } from '@/contexts/cart-context';
 import { useWishlist } from '@/contexts/wishlist-context';
 import { useRecentlyViewed } from '@/contexts/recently-viewed-context';
 import { useSettings } from '@/contexts/settings-context';
+import { useGlobalLoading } from '@/contexts/global-loading-context';
 import { formatCurrency } from '@/lib/formatUtils';
 import { calculateEffectivePrice } from '@/lib/pos-utils';
 import type { Product, Category, ProductReview, HomepageSection, VoiceSignature } from '@/lib/types';
@@ -276,6 +277,7 @@ export default function ProductDetailsPage() {
   const firestore = useFirestore();
   const { settings } = useSettings();
   const { addToCart } = useCart();
+  const { setPageDataLoaded } = useGlobalLoading();
   const { isProductInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const { addViewedProduct } = useRecentlyViewed();
   const { toast } = useToast();
@@ -423,6 +425,11 @@ export default function ProductDetailsPage() {
   const productRef = useMemo(() => firestore && resolvedProductId ? doc(firestore, 'products', resolvedProductId) : null, [firestore, resolvedProductId]);
   const { data: product, isLoading: isLoadingProductFromDoc } = useDoc<Product>(productRef);
   const isLoadingProduct = isResolving || isLoadingProductFromDoc;
+  useEffect(() => {
+    if (!isLoadingProduct) {
+      setPageDataLoaded(true);
+    }
+  }, [isLoadingProduct, setPageDataLoaded]);
 
   // Fetch Category info
   const categoryRef = useMemo(() => (firestore && product?.categoryId) ? doc(firestore, 'categories', product.categoryId) : null, [firestore, product?.categoryId]);
