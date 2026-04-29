@@ -1335,63 +1335,68 @@ export function ProductForm({
                   )}
                 />
               
-                <div className="space-y-4 pt-4 border-t">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <FormLabel className="font-bold">Accepted Payment Methods (Optional)</FormLabel>
-                      <p className="text-xs text-muted-foreground">
-                        Select the payment methods that can be used for installment payments on this product. Leave empty to allow all payment methods.
-                      </p>
-                    </div>
-                  </div>
-                  
-                  {settings?.paymentMethods && settings.paymentMethods.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 bg-muted/30 rounded-xl border border-dashed">
-                      {settings.paymentMethods.map((method) => (
-                        <FormField
-                          key={method.id}
-                          control={form.control}
-                          name="installmentPaymentMethods"
-                          render={({ field }) => {
-                            const isSelected = field.value?.includes(method.id);
-                            return (
-                              <FormItem className="flex items-center space-x-3 space-y-0">
-                                <FormControl>
-                                  <Checkbox
-                                    checked={isSelected}
-                                    onCheckedChange={(checked) => {
-                                      const currentValue = field.value || [];
-                                      if (checked) {
-                                        field.onChange([...currentValue, method.id]);
-                                      } else {
-                                        field.onChange(currentValue.filter((id) => id !== method.id));
-                                      }
-                                    }}
-                                  />
-                                </FormControl>
-                                <div className="flex items-center gap-2">
-                                  {method.iconUrl ? (
-                                    <Image src={method.iconUrl} alt={method.name} width={20} height={20} className="rounded-sm object-contain" unoptimized />
-                                  ) : (
-                                    <CreditCard className="h-4 w-4 text-muted-foreground" />
-                                  )}
-                                  <span className="text-sm font-medium">{method.name}</span>
-                                </div>
-                              </FormItem>
-                            );
-                          }}
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-sm text-muted-foreground p-4 bg-muted/30 rounded-xl border border-dashed text-center">
-                      No payment methods configured.
-                    </div>
-                  )}
-                </div>
+
 </CardContent>
             )}
           </Card>
+
+          {form.watch('installmentEnabled') && (
+            <Card className="shadow-xl border-none ring-1 ring-border animate-in fade-in slide-in-from-top-2">
+              <CardHeader className="bg-muted/30">
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="h-5 w-5 text-primary" /> Accepted Payment Methods (Optional)
+                </CardTitle>
+                <CardDescription>
+                  Select the payment methods that can be used for installment payments on this product. Leave empty to allow all payment methods.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6">
+                {settings?.paymentMethods && settings.paymentMethods.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 bg-muted/30 rounded-xl border border-dashed">
+                    {settings.paymentMethods.map((method) => (
+                      <FormField
+                        key={method.id}
+                        control={form.control}
+                        name="installmentPaymentMethods"
+                        render={({ field }) => {
+                          const isSelected = field.value?.includes(method.id);
+                          return (
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                              <FormControl>
+                                <Checkbox
+                                  checked={isSelected}
+                                  onCheckedChange={(checked) => {
+                                    const currentValue = field.value || [];
+                                    if (checked) {
+                                      field.onChange([...currentValue, method.id]);
+                                    } else {
+                                      field.onChange(currentValue.filter((id) => id !== method.id));
+                                    }
+                                  }}
+                                />
+                              </FormControl>
+                              <div className="flex items-center gap-2">
+                                {method.iconUrl ? (
+                                  <Image src={method.iconUrl} alt={method.name} width={20} height={20} className="rounded-sm object-contain" unoptimized />
+                                ) : (
+                                  <CreditCard className="h-4 w-4 text-muted-foreground" />
+                                )}
+                                <span className="text-sm font-medium">{method.name}</span>
+                              </div>
+                            </FormItem>
+                          );
+                        }}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-sm text-muted-foreground p-4 bg-muted/30 rounded-xl border border-dashed text-center">
+                    No payment methods configured.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
 
           
