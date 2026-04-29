@@ -18,6 +18,7 @@ import { useStoreUrl } from '@/hooks/use-store-url';
 
 import { OrderHistoryTab } from './components/OrderHistoryTab';
 import { ProfileSettingsTab } from './components/ProfileSettingsTab';
+import { InstallmentsTab } from './components/InstallmentsTab';
 
 export default function AccountPage() {
   const { user, isLoading: isAuthLoading } = useUser();
@@ -206,13 +207,20 @@ export default function AccountPage() {
         {/* Tabs Content */}
         <div className="lg:col-span-8">
           <Tabs defaultValue="orders" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 p-1 bg-slate-100 dark:bg-slate-900 rounded-2xl h-14 mb-8">
+            <TabsList className="grid w-full grid-cols-3 p-1 bg-slate-100 dark:bg-slate-900 rounded-2xl h-14 mb-8">
               <TabsTrigger 
                 value="orders" 
                 className="rounded-xl font-black uppercase text-[10px] tracking-widest"
               >
                 <ShoppingBag className="w-4 h-4 mr-2" />
                 Order History
+              </TabsTrigger>
+              <TabsTrigger 
+                value="installments" 
+                className="rounded-xl font-black uppercase text-[10px] tracking-widest"
+              >
+                <CreditCard className="w-4 h-4 mr-2" />
+                Installments
               </TabsTrigger>
               <TabsTrigger 
                 value="profile"
@@ -225,6 +233,10 @@ export default function AccountPage() {
 
             <TabsContent value="orders" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
               <OrderHistoryTab user={user} />
+            </TabsContent>
+
+            <TabsContent value="installments" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+              <InstallmentsTab user={user} />
             </TabsContent>
 
             <TabsContent value="profile" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
