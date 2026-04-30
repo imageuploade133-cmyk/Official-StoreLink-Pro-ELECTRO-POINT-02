@@ -451,7 +451,7 @@ export function AppleImageGallery({
         <>
           <button
             onClick={(e) => { e.stopPropagation(); onPrev(); }}
-            disabled={activeImageIndex === 0}
+            disabled={activeIndex === 0}
             className={cn(
               "md:hidden absolute left-0 top-0 bottom-0 w-1/3 z-40"
             )}
@@ -459,7 +459,7 @@ export function AppleImageGallery({
           />
           <button
             onClick={(e) => { e.stopPropagation(); onNext(); }}
-            disabled={activeImageIndex === images.length - 1}
+            disabled={activeIndex === images.length - 1}
             className={cn(
               "md:hidden absolute right-0 top-0 bottom-0 w-1/3 z-40"
             )}
