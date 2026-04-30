@@ -17,11 +17,11 @@ import {
 } from 'lucide-react';
 import { 
   CommandDialog, 
-  CommandInput, 
   CommandList, 
   CommandEmpty, 
   CommandGroup, 
-  CommandItem 
+  CommandItem,
+  CommandSeparator
 } from '@/components/ui/command';
 import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, where, limit, orderBy } from 'firebase/firestore';
