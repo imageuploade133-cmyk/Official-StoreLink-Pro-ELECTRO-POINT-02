@@ -11,7 +11,7 @@
   </defs>
   <!-- Background rounded square -->
   <rect width="64" height="64" rx="14" fill="url(#bg)"/>
-  <!-- E shape (StoreLink-Pro logo mark) -->
+  <!-- E shape (V9 POS System logo mark) -->
   <path d="M16 16H48V22H16V16Z" fill="url(#accent)"/>
   <path d="M16 29H40V35H16V29Z" fill="white" opacity="0.9"/>
   <path d="M16 42H48V48H16V42Z" fill="url(#accent)"/>

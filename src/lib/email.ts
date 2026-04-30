@@ -126,7 +126,7 @@ export async function sendOrderNotifications(order: any, settings: any, storeNam
                 },
             });
 
-            const senderName = emailAlertSettings.senderName || storeName || 'StoreLink Pro';
+            const senderName = emailAlertSettings.senderName || storeName || 'V9 POS System';
             const from = `"${senderName}" <${emailAlertSettings.gmailEmail}>`;
 
             // Send to customer
@@ -359,7 +359,7 @@ export function generateTemplate(data: any, type: 'confirmation' | 'notification
 <body style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1e293b; margin: 0; padding: 0; background-color: #f8fafc; font-weight: bold;">
     <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);">
         <div style="background-color: #2563eb; padding: 40px 20px; text-align: center;">
-            <div style="font-size: 28px; font-weight: 800; color: #ffffff; letter-spacing: -0.025em;">StoreLink Pro</div>
+            <div style="font-size: 28px; font-weight: 800; color: #ffffff; letter-spacing: -0.025em;">V9 POS System</div>
         </div>
         <div style="padding: 40px 30px;">
             <h2 style="margin-top: 0; color: #0f172a; font-size: 24px; font-weight: 700;">${title}</h2>
@@ -422,7 +422,7 @@ export function generateTemplate(data: any, type: 'confirmation' | 'notification
         </div>
         <div style="background-color: #f1f5f9; padding: 30px; text-align: center;">
             <p style="margin: 0; color: #94a3b8; font-size: 12px; font-weight: bold;">
-                &copy; ${data.year} StoreLink Pro. Empowering businesses with smart E-Commerce & POS solutions.
+                &copy; ${data.year} V9 POS System. Empowering businesses with smart E-Commerce & POS solutions.
             </p>
         </div>
     </div>

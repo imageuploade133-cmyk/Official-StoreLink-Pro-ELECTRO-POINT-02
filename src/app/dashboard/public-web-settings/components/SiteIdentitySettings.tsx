@@ -56,7 +56,7 @@ interface SiteIdentitySettingsProps {
 }
 
 const defaultIdentityValues: FormValues = {
-  storeName: 'StoreLink-Pro',
+  storeName: 'V9 POS System',
   invoiceLogoUrl: '',
   storeLogoUrl: '',
   storeLogoWidth: 120,
@@ -83,7 +83,7 @@ export function SiteIdentitySettings({ settingsData, isLoading, storeId }: SiteI
   useEffect(() => {
     if (settingsData) {
       form.reset({
-        storeName: settingsData.storeName || 'StoreLink-Pro',
+        storeName: settingsData.storeName || 'V9 POS System',
         invoiceLogoUrl: settingsData.invoiceLogoUrl || '',
         storeLogoUrl: settingsData.storeLogoUrl || '',
         storeLogoWidth: settingsData.storeLogoWidth || 120,

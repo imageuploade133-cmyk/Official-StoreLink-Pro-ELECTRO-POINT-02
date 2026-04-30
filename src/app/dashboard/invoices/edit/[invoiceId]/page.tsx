@@ -69,7 +69,7 @@ export default function EditInvoicePage() {
   const { data: invoice, isLoading: isFetching } = useDoc<any>(invoiceRef);
 
   const currencySymbol = settings?.currency || '$';
-  const storeName = settings?.storeName || 'StoreLink Pro';
+  const storeName = settings?.storeName || 'V9 POS System';
 
   const [status, setStatus] = useState<'draft' | 'paid' | 'credit'>('draft');
   const [invoiceNumber, setInvoiceNumber] = useState('');

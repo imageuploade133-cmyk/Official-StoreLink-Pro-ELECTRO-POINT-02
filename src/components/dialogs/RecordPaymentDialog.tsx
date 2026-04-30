@@ -41,7 +41,7 @@ import { useFirestore } from '@/firebase';
 import { useAuth } from '@/contexts/auth-context';
 
 const DEFAULT_PAYMENT_METHODS: PaymentMethod[] = [{ id: 'cash', name: 'Cash' }];
-const DEFAULT_STORE_NAME = 'StoreLink Pro';
+const DEFAULT_STORE_NAME = 'V9 POS System';
 
 interface RecordPaymentDialogProps {
   isOpen: boolean;

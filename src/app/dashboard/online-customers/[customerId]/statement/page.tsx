@@ -373,7 +373,7 @@ export default function OnlineCustomerStatementPage() {
             )}
           </div>
           <div>
-            <h1 className="text-2xl font-black tracking-tight text-primary uppercase">{settings?.storeName || 'StoreLink Pro'}</h1>
+            <h1 className="text-2xl font-black tracking-tight text-primary uppercase">{settings?.storeName || 'V9 POS System'}</h1>
             <p className="text-sm font-semibold text-slate-500">Official Web & POS Statement</p>
           </div>
         </div>

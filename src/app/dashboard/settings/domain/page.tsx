@@ -525,7 +525,7 @@ export default function DomainSettingsPage() {
               DNS Configuration Required
             </CardTitle>
             <CardDescription>
-              Please add the following records to your DNS provider (e.g., GoDaddy, Namecheap) to point your domain to Storelink.
+              Please add the following records to your DNS provider (e.g., GoDaddy, Namecheap) to point your domain to V9 POS System.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
