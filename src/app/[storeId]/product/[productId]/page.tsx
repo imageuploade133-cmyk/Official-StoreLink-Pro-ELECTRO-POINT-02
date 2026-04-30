@@ -319,6 +319,58 @@ export default function ProductDetailsPage() {
     });
   };
 
+
+
+  const [resolvedProductId, setResolvedProductId] = useState<string | null>(null);
+  const [isResolving, setIsResolving] = useState(true);
+
+  useEffect(() => {
+    if (!firestore || !productId || !storeId) return;
+
+    const resolve = async () => {
+      setIsResolving(true);
+      try {
+        // 1. Try by ID
+        const docRef = doc(firestore, 'products', productId);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists() && docSnap.data()?.store_id === storeId) {
+          setResolvedProductId(productId);
+        } else {
+          // 2. Try by Slug
+          const q = query(
+            collection(firestore, 'products'), 
+            where('store_id', '==', storeId), 
+            where('slug', '==', productId), 
+            limit(1)
+          );
+          const querySnap = await getDocs(q);
+          if (!querySnap.empty) {
+            setResolvedProductId(querySnap.docs[0].id);
+          } else {
+            // 3. Fallback: Check if name-to-slug matches
+            // This handles existing products that don't have the slug field yet
+            const productsRef = collection(firestore, 'products');
+            const qAll = query(productsRef, where('store_id', '==', storeId));
+            const allSnap = await getDocs(qAll);
+            const match = allSnap.docs.find(d => slugify(d.data().name) === productId);
+            if (match) {
+              setResolvedProductId(match.id);
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Resolution error:", e);
+      } finally {
+        setIsResolving(false);
+      }
+    };
+    resolve();
+  }, [firestore, productId, storeId]);
+
+  // Fetch Product
+  const productRef = useMemo(() => firestore && resolvedProductId ? doc(firestore, 'products', resolvedProductId) : null, [firestore, resolvedProductId]);
+  const { data: product, isLoading: isLoadingProductFromDoc } = useDoc<Product>(productRef);
+
   const isOptionValueAvailable = (optionName: string, value: string) => {
     if (!product?.variants || !product.variantOptions) return true;
 
@@ -385,56 +437,6 @@ export default function ProductDetailsPage() {
 
     setTimeout(() => setIsChangingVariant(false), 400);
   };
-
-  const [resolvedProductId, setResolvedProductId] = useState<string | null>(null);
-  const [isResolving, setIsResolving] = useState(true);
-
-  useEffect(() => {
-    if (!firestore || !productId || !storeId) return;
-
-    const resolve = async () => {
-      setIsResolving(true);
-      try {
-        // 1. Try by ID
-        const docRef = doc(firestore, 'products', productId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists() && docSnap.data()?.store_id === storeId) {
-          setResolvedProductId(productId);
-        } else {
-          // 2. Try by Slug
-          const q = query(
-            collection(firestore, 'products'), 
-            where('store_id', '==', storeId), 
-            where('slug', '==', productId), 
-            limit(1)
-          );
-          const querySnap = await getDocs(q);
-          if (!querySnap.empty) {
-            setResolvedProductId(querySnap.docs[0].id);
-          } else {
-            // 3. Fallback: Check if name-to-slug matches
-            // This handles existing products that don't have the slug field yet
-            const productsRef = collection(firestore, 'products');
-            const qAll = query(productsRef, where('store_id', '==', storeId));
-            const allSnap = await getDocs(qAll);
-            const match = allSnap.docs.find(d => slugify(d.data().name) === productId);
-            if (match) {
-              setResolvedProductId(match.id);
-            }
-          }
-        }
-      } catch (e) {
-        console.error("Resolution error:", e);
-      } finally {
-        setIsResolving(false);
-      }
-    };
-    resolve();
-  }, [firestore, productId, storeId]);
-
-  // Fetch Product
-  const productRef = useMemo(() => firestore && resolvedProductId ? doc(firestore, 'products', resolvedProductId) : null, [firestore, resolvedProductId]);
-  const { data: product, isLoading: isLoadingProductFromDoc } = useDoc<Product>(productRef);
   const isLoadingProduct = isResolving || isLoadingProductFromDoc;
   useEffect(() => {
     if (!isLoadingProduct) {
@@ -523,6 +525,43 @@ export default function ProductDetailsPage() {
       v.isActive && matchesVariant(v, selectedOptions)
     );
   }, [product, selectedOptions]);
+
+  const galleryImages = useMemo(() => {
+    if (!product) return [];
+    const all = [product.imageUrl, ...(product.additionalImageUrls || [])].filter(Boolean) as string[];
+    
+    // Priority: Add images from the currently previewed variant
+    if (previewVariant) {
+        if (previewVariant.imageUrl && !all.includes(previewVariant.imageUrl)) {
+            all.push(previewVariant.imageUrl);
+        }
+        if (previewVariant.additionalImageUrls) {
+            previewVariant.additionalImageUrls.forEach(url => {
+                if (url && !all.includes(url)) {
+                    all.push(url);
+                }
+            });
+        }
+    }
+
+    // Add other variant images to ensure all are available in gallery
+    if (product.variants) {
+        product.variants.forEach(v => {
+            if (v.imageUrl && !all.includes(v.imageUrl)) {
+                all.push(v.imageUrl);
+            }
+            if (v.additionalImageUrls) {
+                v.additionalImageUrls.forEach(url => {
+                    if (url && !all.includes(url)) {
+                        all.push(url);
+                    }
+                });
+            }
+        });
+    }
+
+    return all;
+  }, [product, previewVariant]);
 
   const selectedVariant = useMemo(() => {
     if (!product?.hasVariants || !product.variants || !product.variantOptions) return null;
@@ -865,42 +904,6 @@ export default function ProductDetailsPage() {
 
   const isInWishlist = isProductInWishlist(productId);
 
-  const galleryImages = useMemo(() => {
-    if (!product) return [];
-    const all = [product.imageUrl, ...(product.additionalImageUrls || [])].filter(Boolean) as string[];
-    
-    // Priority: Add images from the currently previewed variant
-    if (previewVariant) {
-        if (previewVariant.imageUrl && !all.includes(previewVariant.imageUrl)) {
-            all.push(previewVariant.imageUrl);
-        }
-        if (previewVariant.additionalImageUrls) {
-            previewVariant.additionalImageUrls.forEach(url => {
-                if (url && !all.includes(url)) {
-                    all.push(url);
-                }
-            });
-        }
-    }
-
-    // Add other variant images to ensure all are available in gallery
-    if (product.variants) {
-        product.variants.forEach(v => {
-            if (v.imageUrl && !all.includes(v.imageUrl)) {
-                all.push(v.imageUrl);
-            }
-            if (v.additionalImageUrls) {
-                v.additionalImageUrls.forEach(url => {
-                    if (url && !all.includes(url)) {
-                        all.push(url);
-                    }
-                });
-            }
-        });
-    }
-
-    return all;
-  }, [product, previewVariant]);
 
   const reviewStats = useMemo(() => {
     if (!reviews || reviews.length === 0) return { avg: 0, count: 0, distribution: [0, 0, 0, 0, 0] };
