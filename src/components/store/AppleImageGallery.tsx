@@ -34,26 +34,34 @@ export function AppleImageGallery({
   const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set([activeIndex]));
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
   const imageContainerRef = useRef<HTMLDivElement>(null);
-  const hideControlsTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  // Reset state when modal opens
+  // Reset state when modal opens and handle body scroll lock
   useEffect(() => {
     if (isOpen) {
       setIsZoomed(false);
       setShowControls(true);
       setLoadedImages(prev => new Set(prev).add(activeIndex));
+      
+      // Prevent scrolling
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
     }
   }, [isOpen, activeIndex]);
 
   // Preload adjacent images
   useEffect(() => {
+    if (!isOpen) return;
     const preloadIndices = [activeIndex - 1, activeIndex + 1];
     preloadIndices.forEach(idx => {
       if (idx >= 0 && idx < images.length && !loadedImages.has(idx)) {
         setLoadedImages(prev => new Set(prev).add(idx));
       }
     });
-  }, [activeIndex, images.length, loadedImages]);
+  }, [activeIndex, images.length, loadedImages, isOpen]);
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -87,19 +95,12 @@ export function AppleImageGallery({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, isZoomed, onClose, onNext, onPrev]);
 
-  // Auto-hide controls after 3 seconds
+  // Controls always visible for better UX
   useEffect(() => {
-    if (isOpen && !isZoomed) {
-      hideControlsTimeout.current = setTimeout(() => {
-        setShowControls(false);
-      }, 3000);
+    if (isOpen) {
+      setShowControls(true);
     }
-    return () => {
-      if (hideControlsTimeout.current) {
-        clearTimeout(hideControlsTimeout.current);
-      }
-    };
-  }, [isOpen, isZoomed]);
+  }, [isOpen]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!isZoomed || !imageContainerRef.current) return;
@@ -188,70 +189,74 @@ export function AppleImageGallery({
 
   return (
     <div
-      className="fixed inset-0 z-[9999] bg-black/98 backdrop-blur-xl animate-in fade-in duration-300"
-      onClick={(e) => {
-        if (e.target === e.currentTarget && !isZoomed) {
-          onClose();
-        }
-      }}
+      className="fixed inset-0 z-[9999] flex items-center justify-center animate-in fade-in duration-300"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Header Controls */}
-      <div
-        className={cn(
-          "absolute top-0 left-0 right-0 z-50 px-4 py-4 flex items-center justify-between transition-all duration-300",
-          showControls ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"
-        )}
-        style={{
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%)',
-        }}
-      >
-        <div className="flex items-center gap-3 text-white">
-          <span className="text-sm font-medium opacity-90">
-            {activeIndex + 1} of {images.length}
-          </span>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleShare}
-            className="h-11 w-11 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center transition-all hover:bg-white/20 active:scale-95"
-            aria-label="Share image"
-          >
-            <Share2 className="h-5 w-5 text-white" />
-          </button>
+      <div 
+        className="absolute inset-0 bg-black/90 backdrop-blur-md" 
+        onClick={() => !isZoomed && onClose()}
+      />
+      
+      <div className="relative w-full h-full md:w-[96vw] md:h-[94vh] md:rounded-[2.5rem] overflow-hidden flex flex-col items-center justify-center bg-black/20 z-10">
+        {/* Header Controls */}
+        <div
+          className={cn(
+            "absolute top-0 left-0 right-0 z-50 px-6 py-6 flex items-center justify-between transition-all duration-300",
+            showControls ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"
+          )}
+          style={{
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 100%)',
+          }}
+        >
+          <div className="flex items-center gap-3 text-white">
+            <div className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10">
+              <span className="text-xs font-bold tracking-wider uppercase opacity-90">
+                {activeIndex + 1} / {images.length}
+              </span>
+            </div>
+          </div>
           
-          <button
-            onClick={handleDownload}
-            className="h-11 w-11 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center transition-all hover:bg-white/20 active:scale-95"
-            aria-label="Download image"
-          >
-            <Download className="h-5 w-5 text-white" />
-          </button>
-          
-          <button
-            onClick={onClose}
-            className="h-11 w-11 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center transition-all hover:bg-white/20 active:scale-95"
-            aria-label="Close gallery"
-          >
-            <X className="h-6 w-6 text-white" />
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleShare}
+              className="h-12 w-12 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center transition-all hover:bg-white/20 hover:scale-110 active:scale-95"
+              aria-label="Share image"
+            >
+              <Share2 className="h-5 w-5 text-white" />
+            </button>
+            
+            <button
+              onClick={handleDownload}
+              className="h-12 w-12 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center transition-all hover:bg-white/20 hover:scale-110 active:scale-95"
+              aria-label="Download image"
+            >
+              <Download className="h-5 w-5 text-white" />
+            </button>
+            
+            <button
+              onClick={onClose}
+              className="h-12 w-12 rounded-full bg-primary text-white shadow-lg flex items-center justify-center transition-all hover:bg-primary/90 hover:scale-110 active:scale-95 ring-4 ring-primary/20"
+              aria-label="Close gallery"
+            >
+              <X className="h-6 w-6" />
+            </button>
+          </div>
         </div>
-      </div>
 
       {/* Zoom Controls */}
       <div
         className={cn(
-          "absolute bottom-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 transition-all duration-300",
+          "absolute bottom-28 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 transition-all duration-300",
           showControls ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
         )}
         style={{
-          background: 'rgba(255,255,255,0.1)',
+          background: 'rgba(0,0,0,0.4)',
           backdropFilter: 'blur(20px)',
           borderRadius: '9999px',
           padding: '8px 16px',
-          border: '1px solid rgba(255,255,255,0.2)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
         }}
       >
         <button
@@ -296,30 +301,30 @@ export function AppleImageGallery({
             onClick={(e) => { e.stopPropagation(); onPrev(); }}
             disabled={activeIndex === 0}
             className={cn(
-              "hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 h-14 w-14 rounded-full items-center justify-center transition-all duration-300 z-50",
+              "hidden md:flex absolute left-8 top-1/2 -translate-y-1/2 h-16 w-16 rounded-full items-center justify-center transition-all duration-300 z-50",
               showControls ? "opacity-100 scale-100" : "opacity-0 scale-90 pointer-events-none",
-              "bg-white/10 backdrop-blur-xl border border-white/20",
-              "hover:bg-white/20 active:scale-95",
-              "disabled:opacity-30 disabled:cursor-not-allowed"
+              "bg-black/20 backdrop-blur-xl border border-white/10 shadow-2xl",
+              "hover:bg-primary hover:border-primary hover:scale-110 active:scale-95",
+              "disabled:opacity-10 disabled:cursor-not-allowed group"
             )}
             aria-label="Previous image"
           >
-            <ChevronLeft className="h-7 w-7 text-white" />
+            <ChevronLeft className="h-8 w-8 text-white transition-transform group-hover:-translate-x-1" />
           </button>
           
           <button
             onClick={(e) => { e.stopPropagation(); onNext(); }}
             disabled={activeIndex === images.length - 1}
             className={cn(
-              "hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 h-14 w-14 rounded-full items-center justify-center transition-all duration-300 z-50",
+              "hidden md:flex absolute right-8 top-1/2 -translate-y-1/2 h-16 w-16 rounded-full items-center justify-center transition-all duration-300 z-50",
               showControls ? "opacity-100 scale-100" : "opacity-0 scale-90 pointer-events-none",
-              "bg-white/10 backdrop-blur-xl border border-white/20",
-              "hover:bg-white/20 active:scale-95",
-              "disabled:opacity-30 disabled:cursor-not-allowed"
+              "bg-black/20 backdrop-blur-xl border border-white/10 shadow-2xl",
+              "hover:bg-primary hover:border-primary hover:scale-110 active:scale-95",
+              "disabled:opacity-10 disabled:cursor-not-allowed group"
             )}
             aria-label="Next image"
           >
-            <ChevronRight className="h-7 w-7 text-white" />
+            <ChevronRight className="h-8 w-8 text-white transition-transform group-hover:translate-x-1" />
           </button>
         </>
       )}
@@ -446,7 +451,6 @@ export function AppleImageGallery({
         </div>
       )}
 
-      {/* Tap areas for mobile navigation */}
       {hasMultipleImages && !isZoomed && (
         <>
           <button
@@ -467,6 +471,7 @@ export function AppleImageGallery({
           />
         </>
       )}
+      </div>
     </div>
   );
 }
