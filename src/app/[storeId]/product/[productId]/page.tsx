@@ -94,6 +94,7 @@ import { useAds } from '@/contexts/ad-context';
 import { useStoreUrl } from '@/hooks/use-store-url';
 import { FastCheckoutButtons } from '@/components/store/FastCheckoutButtons';
 import { AppleProductPageSkeleton } from '@/components/store/AppleProductPageSkeleton';
+import { AppleImageGallery } from '@/components/store/AppleImageGallery';
 import { getStoreUrl as getAbsoluteStoreUrl } from '@/lib/domain';
 
 const iconMap = {
@@ -1281,76 +1282,17 @@ export default function ProductDetailsPage() {
                 </div>
               </div>
               
-              {/* Lightbox Modal */}
-              {isLightboxOpen && (
-                <div 
-                  className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex items-center justify-center"
-                  onClick={() => setIsLightboxOpen(false)}
-                >
-                  <button 
-                    onClick={() => setIsLightboxOpen(false)}
-                    className="absolute top-4 right-4 h-12 w-12 rounded-full bg-white/10 backdrop-blur-md text-white border-none shadow-xl transition-all hover:scale-110 active:scale-95 z-10 flex items-center justify-center"
-                    aria-label="Close lightbox"
-                  >
-                    <X className="h-6 w-6" />
-                  </button>
-                  
-                  <button
-                    onClick={(e) => { e.stopPropagation(); goPrevImage(); }}
-                    disabled={activeImageIndex === 0}
-                    className={cn(
-                      "absolute left-4 top-1/2 -translate-y-1/2 h-14 w-14 rounded-full",
-                      "bg-white/10 backdrop-blur-md border border-white/20",
-                      "flex items-center justify-center",
-                      "transition-all duration-300",
-                      "hover:scale-110 active:scale-95",
-                      "disabled:opacity-30 disabled:cursor-not-allowed"
-                    )}
-                    aria-label="Previous image"
-                  >
-                    <ChevronLeft className="h-7 w-7" />
-                  </button>
-
-                  <button
-                    onClick={(e) => { e.stopPropagation(); goNextImage(); }}
-                    disabled={activeImageIndex === galleryImages.length - 1}
-                    className={cn(
-                      "absolute right-4 top-1/2 -translate-y-1/2 h-14 w-14 rounded-full",
-                      "bg-white/10 backdrop-blur-md border border-white/20",
-                      "flex items-center justify-center",
-                      "transition-all duration-300",
-                      "hover:scale-110 active:scale-95",
-                      "disabled:opacity-30 disabled:cursor-not-allowed"
-                    )}
-                    aria-label="Next image"
-                  >
-                    <ChevronRightIcon className="h-7 w-7" />
-                  </button>
-                  
-                  <div 
-                    className="relative w-full h-full max-w-5xl max-h-[90vh] p-4"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Image 
-                      src={activeImage || product.imageUrl || defaultImageUrl} 
-                      alt={product.name} 
-                      fill 
-                      className={cn(
-                        "object-contain transition-all duration-300",
-                        imageSlideDirection === "right" && "animate-slide-left",
-                        imageSlideDirection === "left" && "animate-slide-right"
-                      )} 
-                      unoptimized 
-                    />
-                  </div>
-                  
-                  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-sm text-white px-6 py-2 rounded-full flex items-center gap-4">
-                    <span className="text-sm font-medium">
-                      {activeImageIndex + 1} / {galleryImages.length}
-                    </span>
-                  </div>
-                </div>
-              )}
+              {/* Apple-style Image Gallery Modal */}
+              <AppleImageGallery
+                images={galleryImages}
+                activeIndex={activeImageIndex}
+                isOpen={isLightboxOpen}
+                onClose={() => setIsLightboxOpen(false)}
+                onNext={goNextImage}
+                onPrev={goPrevImage}
+                productName={product.name}
+                alt={product.name}
+              />
               
               <div className="flex flex-wrap gap-2 md:gap-3 lg:gap-4 justify-center md:justify-start overflow-x-auto pb-2">
                 {galleryImages.map((url, idx) => {
