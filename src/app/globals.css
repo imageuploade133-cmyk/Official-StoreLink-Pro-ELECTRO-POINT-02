@@ -613,3 +613,34 @@
 .animate-progress-loading {
   animation: progress-loading 2s infinite ease-in-out;
 }
+
+/* Product Image Gallery Animations */
+@keyframes slide-left {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-right {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-left {
+  animation: slide-left 0.4s ease-out forwards;
+}
+
+.animate-slide-right {
+  animation: slide-right 0.4s ease-out forwards;
+}
