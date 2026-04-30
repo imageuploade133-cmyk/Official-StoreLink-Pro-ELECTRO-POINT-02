@@ -317,7 +317,11 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
 
   return (
     <>
-      <ProductLoadingOverlay isVisible={isLoadingProduct} productName={product.name} />
+      <ProductLoadingOverlay 
+        isVisible={isLoadingProduct} 
+        productName={product.name}
+        productImage={product.imageUrl || settings?.defaultProductImageUrl}
+      />
       <div
         className={cn(
           "group relative flex flex-col transition-all duration-500 overflow-hidden",
