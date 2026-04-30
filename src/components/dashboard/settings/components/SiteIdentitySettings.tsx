@@ -51,7 +51,7 @@ export function SiteIdentitySettings({ settingsData, isLoading }: SiteIdentitySe
   const form = useForm<FormValues>({
     resolver: zodResolver(siteIdentitySchema),
     defaultValues: {
-      storeName: 'StoreLink-Pro',
+      storeName: 'V9 POS System',
       storeNameFontSize: 24,
       invoiceLogoUrl: '',
       storeLogoUrl: '',
@@ -65,7 +65,7 @@ export function SiteIdentitySettings({ settingsData, isLoading }: SiteIdentitySe
   useEffect(() => {
     if (settingsData) {
       form.reset({
-        storeName: settingsData.storeName || 'StoreLink-Pro',
+        storeName: settingsData.storeName || 'V9 POS System',
         storeNameFontSize: settingsData.storeNameFontSize || 24,
         invoiceLogoUrl: settingsData.invoiceLogoUrl || '',
         storeLogoUrl: settingsData.storeLogoUrl || '',

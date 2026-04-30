@@ -40,7 +40,7 @@ export function ReceiptModal({ isOpen, onClose, saleTransaction, staffMap }: Rec
 
   const {
     enableExternalPrinter = true,
-    storeName: globalStoreName = 'StoreLink-Pro',
+    storeName: globalStoreName = 'V9 POS System',
     receiptFooterMessage,
     storeAddress: globalStoreAddress,
     storePhone: globalStoreContact,
@@ -486,7 +486,7 @@ export function ReceiptModal({ isOpen, onClose, saleTransaction, staffMap }: Rec
 
                 <footer style={{ textAlign: 'center', marginTop: '10px' }}>
                   {receiptFooterMessage && <p style={{ fontWeight: 'bold' }}>{receiptFooterMessage.toUpperCase()}</p>}
-                  <p style={{ fontSize: '8px', marginTop: '5px' }}>POWERED BY STORELINK PRO</p>
+                  <p style={{ fontSize: '8px', marginTop: '5px' }}>POWERED BY V9 POS System</p>
                 </footer>
               </div>
             </TabsContent>

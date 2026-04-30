@@ -77,7 +77,7 @@ export function CustomerDepositsModal({
   const handlePrintReceipt = (payment: CreditPayment) => {
     const receiptInfo: CreditPaymentReceiptInfo = {
       id: payment.id,
-      storeName: settings?.storeName || 'StoreLink Pro',
+      storeName: settings?.storeName || 'V9 POS System',
       customerName: customer.name,
       saleIdPaidAgainst: payment.saleId || 'MULTI-BAL',
       originalSaleDate: payment.paymentDate,

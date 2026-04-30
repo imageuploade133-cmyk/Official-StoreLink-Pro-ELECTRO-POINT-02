@@ -537,7 +537,7 @@ export default function CartPage() {
                           </LoadingButton>
 
                           <div className="flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground pt-4">
-                              <ShoppingCart className="h-3 w-3" /> Secure Checkout Powered by StoreLink
+                              <ShoppingCart className="h-3 w-3" /> Secure Checkout Powered by V9 POS System
                           </div>
                       </div>
                   </div>

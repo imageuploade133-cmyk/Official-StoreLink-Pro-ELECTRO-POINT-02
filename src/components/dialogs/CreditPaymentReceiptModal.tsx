@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 import type { CreditPaymentReceiptInfo, SaleTransactionItem } from '@/lib/types';
 import { format } from 'date-fns';
 import { Printer, X, Download, FileText, Receipt } from 'lucide-react';
@@ -45,11 +46,12 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
   
   const enableExternalPrinter = settings?.enableExternalPrinter ?? true;
 
-  const storeName = settings?.storeName || 'StoreLink-Pro';
+  const storeName = settings?.storeName || 'V9 POS System';
   const storeAddress = settings?.storeAddress;
   const storeContact = settings?.storePhone;
   const storeLogoUrl = settings?.storeLogoUrl;
   const invoiceLogoUrl = settings?.invoiceLogoUrl;
+  const invoiceAccentColor = settings?.invoiceAccentColor || '#1A73E8';
 
   useEffect(() => {
     if (isOpen && paymentInfo) {
@@ -266,6 +268,8 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
     customerTotalOutstandingAfterPayment
   } = paymentInfo;
 
+  const previousOutstanding = (customerTotalOutstandingAfterPayment || 0) + (paymentRecord.amountPaid || 0);
+
   const jsPaymentDate = convertToDateSafely(paymentRecord.paymentDate);
   const jsOriginalSaleDate = convertToDateSafely(originalSaleDate);
 
@@ -338,7 +342,7 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
                   </div>
                   <footer style={{ marginTop: '20px', textAlign: 'center', fontSize: '0.8em', borderTop: '1px solid #eee', paddingTop: '10px' }}>
                     {settings?.receiptFooterMessage && <p>{settings.receiptFooterMessage}</p>}
-                    <p>Powered by StoreLink Pro</p>
+                    <p>Powered by V9 POS System</p>
                   </footer>
               </div>
             </TabsContent>

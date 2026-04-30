@@ -72,7 +72,7 @@ import { UserNav } from '@/components/UserNav';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { ElysiumLogo } from '@/components/icons';
+import { V9Logo } from '@/components/icons';
 import { ThemeToggle } from '@/components/theme-toggle';
 import {
   Tooltip,
@@ -105,7 +105,18 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [isMinimized, setIsMinimized] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(100);
+  const [zoomLevel, setZoomLevel] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedZoom = safeStorage.getItem('dashboard-zoom');
+      if (savedZoom) {
+        const parsedZoom = parseInt(savedZoom, 10);
+        if (!isNaN(parsedZoom) && parsedZoom >= 0 && parsedZoom <= 200) {
+          return parsedZoom;
+        }
+      }
+    }
+    return 100;
+  });
 
   const firestore = useFirestore();
   const pendingOrdersQuery = useMemo(() => {
@@ -126,17 +137,6 @@ export default function DashboardLayout({
   }, [firestore, user, staffMember, store]);
   const { data: installmentRecords } = useCollection<InstallmentRecord>(installmentOrdersQuery);
   const installmentUnreadCount = installmentRecords?.filter(r => r.isRead === false).length || 0;
-
-  // Restore zoom level from localStorage on mount
-  useEffect(() => {
-    const savedZoom = safeStorage.getItem('dashboard-zoom');
-    if (savedZoom) {
-      const parsedZoom = parseInt(savedZoom, 10);
-      if (!isNaN(parsedZoom) && parsedZoom >= 0 && parsedZoom <= 200) {
-        setZoomLevel(parsedZoom);
-      }
-    }
-  }, []);
 
   // Apply zoom level using font-size scaling (affects all rem/em units proportionally)
   useEffect(() => {
@@ -293,7 +293,7 @@ export default function DashboardLayout({
 
   if (isLoading || !user || isCustomer || (!store && !staffMember)) {
     const subLabel = (!store && !staffMember) ? "Locating your store..." : "Authenticating your account…";
-    return <PageSpinner label="StoreLink Pro" subLabel={subLabel} />;
+    return <PageSpinner label="V9 POS System" subLabel={subLabel} />;
   }
 
   return (
@@ -309,7 +309,7 @@ export default function DashboardLayout({
     >
       {/* Sidebar */}
       {showSidebar && (
-        <aside className="hidden border-r bg-sidebar-background md:flex md:flex-col sticky top-0 h-screen overflow-hidden dark:bg-sidebar-background dark:border-sidebar-border">
+        <aside className="hidden border-r bg-sidebar-background md:flex md:flex-col sticky top-0 h-screen overflow-hidden dark:bg-sidebar-background dark:border-sidebar-border z-30 transition-all duration-300">
           <div
             className={cn(
               'flex h-14 shrink-0 items-center border-b dark:border-sidebar-border lg:h-[60px]',
@@ -318,11 +318,17 @@ export default function DashboardLayout({
           >
             <Link
               href="/dashboard"
-              className="flex items-center gap-2 text-lg font-semibold"
+              className={cn(
+                "flex items-center font-semibold transition-all duration-300",
+                isMinimized ? "justify-center" : "gap-2"
+              )}
             >
-              <ElysiumLogo className="h-6 w-6" />
-              <span className={cn(isMinimized && 'sr-only')}>
-                StoreLink-Pro
+              <V9Logo className="h-6 w-6 shrink-0" />
+              <span className={cn(
+                "text-lg transition-all duration-300 truncate",
+                isMinimized ? "w-0 opacity-0 pointer-events-none absolute" : "w-auto opacity-100"
+              )}>
+                V9 POS System
               </span>
             </Link>
           </div>
@@ -331,7 +337,7 @@ export default function DashboardLayout({
             <TooltipProvider delayDuration={0}>
               <nav
                 className={cn(
-                  'grid items-start gap-1 py-4 text-sm font-medium',
+                  'grid items-start gap-1 py-4 text-sm font-medium transition-all duration-300',
                   isMinimized ? 'justify-center px-2' : 'px-4'
                 )}
               >
@@ -438,8 +444,8 @@ export default function DashboardLayout({
                     href="/dashboard"
                     className="flex items-center gap-2 text-lg font-semibold"
                   >
-                    <ElysiumLogo className="h-6 w-6" />
-                    <span>StoreLink-Pro</span>
+                    <V9Logo className="h-6 w-6" />
+                    <span>V9 POS System</span>
                   </Link>
                 </div>
 

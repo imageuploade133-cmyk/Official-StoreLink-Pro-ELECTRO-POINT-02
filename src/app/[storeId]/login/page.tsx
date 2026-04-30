@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ElysiumLogo } from "@/components/icons";
+import { V9Logo } from "@/components/icons";
 import { useState, useEffect, useMemo, type FormEvent } from "react";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { PageSpinner, Spinner } from "@/components/ui/spinner";
@@ -173,7 +173,7 @@ export default function StoreLoginPage() {
                 {storeLogo ? (
                     <Image src={storeLogo} alt={storeName} width={40} height={40} className="h-10 w-auto object-contain" />
                 ) : (
-                    <ElysiumLogo className="h-10 w-10 text-primary" />
+                    <V9Logo className="h-10 w-10 text-primary" />
                 )}
             </div>
             <h1 className="text-4xl font-bold font-headline">Welcome Back</h1>

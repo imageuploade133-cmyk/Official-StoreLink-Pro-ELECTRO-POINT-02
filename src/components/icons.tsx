@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
-export const ElysiumLogo = (props: React.SVGProps<SVGSVGElement>) => (
+export const V9Logo = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     width="40"
     height="40"
@@ -20,15 +20,14 @@ export const ElysiumLogo = (props: React.SVGProps<SVGSVGElement>) => (
     </defs>
     <rect width="40" height="40" rx="12" fill="url(#logo-gradient)" />
     <path
-      d="M12 12H28V15.5H16.5V18.5H26V21.5H16.5V24.5H28V28H12V12Z"
-      fill="white"
-    />
-    <path
-      d="M30 10L32 12M32 10L30 12"
+      d="M10 12L20 28L30 12"
       stroke="white"
-      strokeWidth="1.5"
+      strokeWidth="4"
       strokeLinecap="round"
-      className="opacity-40"
+      strokeLinejoin="round"
     />
+    <circle cx="28" cy="28" r="6" fill="white" />
+    <text x="25" y="32" fill="hsl(var(--primary))" fontSize="10" fontWeight="bold">9</text>
   </svg>
 );
+

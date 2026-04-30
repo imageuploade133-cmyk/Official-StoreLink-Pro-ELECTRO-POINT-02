@@ -19,7 +19,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: 'StoreLink Pro',
+  title: 'V9 POS System',
   description: 'Modern Point of Sale System',
   icons: {
     icon: [

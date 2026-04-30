@@ -46,7 +46,7 @@ interface WatermarkSettingsProps {
 const defaultWatermarkValues: FormValues = {
   webWatermarkEnabled: false,
   webWatermarkType: 'text',
-  webWatermarkText: 'STORELINK PRO',
+  webWatermarkText: 'V9 POS System',
   webWatermarkImageUrl: '',
   webWatermarkOpacity: 0.1,
   webWatermarkFontSize: 120,
@@ -70,7 +70,7 @@ export function WatermarkSettings({ settingsData, isLoading, storeId }: Watermar
       form.reset({
         webWatermarkEnabled: settingsData.webWatermarkEnabled || false,
         webWatermarkType: settingsData.webWatermarkType || 'text',
-        webWatermarkText: settingsData.webWatermarkText || 'STORELINK PRO',
+        webWatermarkText: settingsData.webWatermarkText || 'V9 POS System',
         webWatermarkImageUrl: settingsData.webWatermarkImageUrl || '',
         webWatermarkOpacity: settingsData.webWatermarkOpacity ?? 0.1,
         webWatermarkFontSize: settingsData.webWatermarkFontSize || 120,

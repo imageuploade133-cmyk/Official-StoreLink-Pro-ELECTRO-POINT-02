@@ -433,7 +433,7 @@ export function OrderDetailsModal({
                 <div className="header">
                     <div className="header-left">
                         {settings?.invoiceLogoUrl && <img src={settings.invoiceLogoUrl} alt={settings?.storeName} />}
-                        <h1>{settings?.storeName || 'StoreLink Pro'}</h1>
+                        <h1>{settings?.storeName || 'V9 POS System'}</h1>
                         <p style={{ fontSize: '12px', color: '#666' }}>{settings?.storeAddress}</p>
                         <p style={{ fontSize: '12px', color: '#666' }}>{settings?.storePhone}</p>
                     </div>

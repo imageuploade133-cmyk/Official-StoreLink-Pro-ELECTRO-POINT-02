@@ -1,7 +1,7 @@
 'use client';
 
 import { Skeleton } from '@/components/ui/skeleton';
-import { ElysiumLogo } from '../icons';
+import { V9Logo } from '../icons';
 import { useSettings } from '@/contexts/settings-context';
 import { cn } from '@/lib/utils';
 
@@ -22,7 +22,7 @@ export function PublicPageSkeleton() {
             <div className="flex items-center gap-8" suppressHydrationWarning>
               <div className="flex items-center gap-3">
                 <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center animate-pulse">
-                  <ElysiumLogo className="h-5 w-5 text-primary/40" />
+                  <V9Logo className="h-5 w-5 text-primary/40" />
                 </div>
                 <Skeleton className="h-4 w-24 rounded-full opacity-50" />
               </div>
@@ -67,7 +67,7 @@ export function PublicPageSkeleton() {
              <div className="relative">
                 <div className="absolute -inset-4 bg-primary/5 rounded-full blur-2xl animate-pulse" />
                 <div className="relative h-20 w-20 rounded-3xl bg-white dark:bg-white/[0.05] border border-black/[0.05] dark:border-white/[0.05] shadow-2xl flex items-center justify-center overflow-hidden">
-                    <ElysiumLogo className="h-10 w-10 text-primary animate-pulse" />
+                    <V9Logo className="h-10 w-10 text-primary animate-pulse" />
                     <div className="absolute inset-0 skeleton-shimmer opacity-20" />
                 </div>
              </div>
@@ -108,7 +108,7 @@ export function PublicPageSkeleton() {
             <div className="col-span-2 space-y-6">
                 <div className="flex items-center gap-2">
                     <div className="h-6 w-6 rounded-md bg-primary/10 flex items-center justify-center">
-                        <ElysiumLogo className="h-3 w-3 text-primary/40" />
+                        <V9Logo className="h-3 w-3 text-primary/40" />
                     </div>
                     <Skeleton className="h-4 w-32 rounded-full opacity-40" />
                 </div>
