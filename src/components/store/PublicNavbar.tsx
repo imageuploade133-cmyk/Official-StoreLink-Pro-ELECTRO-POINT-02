@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import * as React from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
@@ -54,6 +55,7 @@ import { formatCurrency } from '@/lib/formatUtils';
 import { calculateEffectivePrice } from '@/lib/pos-utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useStoreUrl } from '@/hooks/use-store-url';
+import { SearchOverlay } from '@/components/store/SearchOverlay';
 
 export function PublicNavbar() {
     const { settings } = useSettings();
@@ -68,7 +70,6 @@ export function PublicNavbar() {
     const firestore = useFirestore();
     const { storeId, getStoreUrl } = useStoreUrl();
 
-    const [navbarSearch, setNavbarSearch] = useState('');
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const searchContainerRef = useRef<HTMLDivElement>(null);
 
@@ -83,57 +84,6 @@ export function PublicNavbar() {
     }, [firestore, storeId]);
 
     const { data: categories, isLoading: isLoadingCategories } = useCollection<Category>(categoriesQuery);
-
-    // Fetch products for live search
-    const productsQuery = useMemo(() => {
-        if (!firestore || !storeId) return null;
-        return query(
-            collection(firestore, 'products'), 
-            where('store_id', '==', storeId),
-            where('isVisibleOnWeb', '==', true),
-            limit(1000) 
-        );
-    }, [firestore, storeId]);
-
-    const { data: products } = useCollection<Product>(productsQuery);
-
-    // ROBUST SEARCH ENGINE
-    const { searchResults, categoryMatches, similarSuggestions } = useMemo(() => {
-        const term = navbarSearch.toLowerCase().trim();
-        if (!term || !products) return { searchResults: [], categoryMatches: [], similarSuggestions: [] };
-
-        let directMatches: Product[] = [];
-        if (term === 'new arrivals') {
-            directMatches = products.filter(p => p.isNewArrival);
-        } else if (term === 'best sellers') {
-            directMatches = products.filter(p => p.isPopular);
-        } else {
-            directMatches = products.filter(p => 
-                p.name.toLowerCase().includes(term) || 
-                p.sku?.toLowerCase().includes(term) ||
-                p.dataAiHint?.toLowerCase().includes(term)
-            );
-        }
-
-        const catMatches = (categories || []).filter(c => 
-            c.name.toLowerCase().includes(term)
-        );
-
-        let suggestions: Product[] = [];
-        if (directMatches.length > 0) {
-            const topCategory = directMatches[0].categoryId;
-            suggestions = products.filter(p => 
-                p.categoryId === topCategory && 
-                !directMatches.find(dm => dm.id === p.id)
-            ).slice(0, 4);
-        }
-
-        return { 
-            searchResults: directMatches.slice(0, 10), 
-            categoryMatches: catMatches.slice(0, 3),
-            similarSuggestions: suggestions
-        };
-    }, [navbarSearch, products, categories]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -186,15 +136,6 @@ export function PublicNavbar() {
     
     const heightMap = { compact: 48, default: 64, expanded: 80, full: 100 };
     const navbarHeight = settings?.navbarHeight ? (heightMap[settings.navbarHeight as keyof typeof heightMap] || 64) : (logoContainerHeight + (navbarPadding * 2));
-
-    const handleNavbarSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (navbarSearch.trim()) {
-            router.push(getStoreUrl(`/store/search?q=${encodeURIComponent(navbarSearch.trim())}`));
-            setIsSearchFocused(false);
-            setNavbarSearch('');
-        }
-    };
 
     const Logo = () => (
       <Link href={getStoreUrl('/store')} className="flex items-center gap-3 text-lg font-semibold group" onClick={() => setIsMenuOpen(false)}>
@@ -522,209 +463,7 @@ export function PublicNavbar() {
               </div>
           </div>
 
-          {/* Full Screen Immersive Search Overlay */}
-          {isSearchFocused && (
-            <div className="fixed inset-0 z-[100] bg-white/95 dark:bg-slate-950/95 backdrop-blur-3xl animate-in fade-in duration-500 flex flex-col">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#0071e3]/5 via-transparent to-[#0071e3]/5 pointer-events-none" />
-                
-                <div className="max-w-site-container mx-auto w-full px-6 sm:px-10 lg:px-12 flex flex-col h-full py-10 md:py-20 relative z-10">
-                    <div className="flex items-center justify-between gap-8 mb-16 md:mb-24">
-                        <div className="flex-1 max-w-3xl relative">
-                            <form onSubmit={handleNavbarSearch} className="relative group">
-                                <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-6 w-6 text-[#0071e3]" strokeWidth={3} />
-                                <Input 
-                                    autoFocus
-                                    className="w-full pl-14 pr-12 bg-slate-100/50 dark:bg-slate-800/50 border-2 border-[#0071e3]/20 focus:bg-white dark:focus:bg-slate-900 rounded-3xl h-16 text-xl md:text-2xl font-bold tracking-tight transition-all shadow-inner"
-                                    placeholder="Search products, collections or SKUs..."
-                                    value={navbarSearch}
-                                    onChange={(e) => setNavbarSearch(e.target.value)}
-                                />
-                                {navbarSearch && (
-                                    <button 
-                                        type="button"
-                                        onClick={() => setNavbarSearch('')}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors"
-                                    >
-                                        <X className="h-5 w-5 text-slate-400" />
-                                    </button>
-                                )}
-                            </form>
-                        </div>
-                        <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            onClick={() => {
-                                setIsSearchFocused(false);
-                                setNavbarSearch('');
-                            }}
-                            className="h-16 w-16 rounded-full border-2 border-slate-100 dark:border-slate-800 hover:border-[#0071e3]/20 hover:bg-[#0071e3]/5 transition-all group shrink-0 shadow-sm active:scale-95 flex items-center justify-center"
-                        >
-                            <X className="h-8 w-8 text-slate-400 group-hover:text-[#0071e3] group-hover:rotate-90 transition-all duration-500" strokeWidth={3} />
-                        </Button>
-                    </div>
-
-                    <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-16 overflow-hidden">
-                        <div className="lg:col-span-8 flex flex-col min-h-0">
-                            <div className="flex items-baseline justify-between mb-8 pb-4 border-b border-slate-100 dark:border-slate-800">
-                                <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400">
-                                    {navbarSearch ? 'Universal Registry Matches' : 'Discovery Feed'}
-                                </h3>
-                                {navbarSearch && (
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-[#0071e3] bg-[#0071e3]/5 px-3 py-1 rounded-full border border-[#0071e3]/10">
-                                        {searchResults.length + categoryMatches.length} Matches Found
-                                    </span>
-                                )}
-                            </div>
-
-                            <ScrollArea className="flex-1 -mx-4 px-4">
-                                {navbarSearch ? (
-                                    (searchResults.length > 0 || categoryMatches.length > 0) ? (
-                                        <div className="space-y-10 pb-10">
-                                            {/* Category Results */}
-                                            {categoryMatches.length > 0 && (
-                                                <div className="space-y-4">
-                                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-[#0071e3] flex items-center gap-2">
-                                                        <LayoutGrid className="h-3 w-3" /> Related Collections
-                                                    </h4>
-                                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                                        {categoryMatches.map(cat => (
-                                                            <Link 
-                                                                key={cat.id}
-                                                                href={getStoreUrl(`/store/shop?category=${cat.id}`)}
-                                                                className="flex items-center gap-4 p-4 bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-100 dark:border-slate-800 hover:border-[#0071e3]/30 transition-all"
-                                                                onClick={() => setIsSearchFocused(false)}
-                                                            >
-                                                                <div className="relative h-10 w-10 rounded-xl bg-muted overflow-hidden shrink-0">
-                                                                    <Image src={cat.imageUrl || `https://picsum.photos/seed/${cat.id}/100/100`} alt="" fill className="object-cover" unoptimized />
-                                                                </div>
-                                                                <span className="font-bold text-sm truncate">{cat.name}</span>
-                                                            </Link>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {/* Product Results */}
-                                            {searchResults.length > 0 ? (
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                                    {searchResults.map(product => (
-                                                        <Link 
-                                                            key={product.id}
-                                                            href={getStoreUrl(`/store/product/${product.slug || product.id}`)}
-                                                            className="flex items-center gap-6 p-6 bg-white dark:bg-slate-900 rounded-[2rem] transition-all border border-slate-100 dark:border-slate-800 hover:border-[#0071e3]/30 group shadow-lg hover:shadow-2xl active:scale-[0.98]"
-                                                            onClick={() => setIsSearchFocused(false)}
-                                                        >
-                                                            <div className="relative h-20 w-20 md:h-24 md:w-24 rounded-2xl overflow-hidden border bg-white flex-shrink-0 shadow-sm">
-                                                                <Image 
-                                                                    src={product.imageUrl || 'https://placehold.co/200x200.png'} 
-                                                                    alt={product.name} 
-                                                                    fill 
-                                                                    className={cn(
-                                                                        "object-cover transition-transform duration-700",
-                                                                        settings?.enableHoverZoom !== false && "group-hover:scale-110"
-                                                                    )}
-                                                                    unoptimized
-                                                                />
-                                                            </div>
-                                                            <div className="flex-1 min-w-0 space-y-1">
-                                                                <p className="text-lg md:text-xl font-black text-slate-900 dark:text-white truncate group-hover:text-[#0071e3] transition-colors tracking-tight leading-tight">
-                                                                    {product.name}
-                                                                </p>
-                                                                <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-                                                                    {categories?.find(c => c.id === product.categoryId)?.name || 'Premium Registry'}
-                                                                </p>
-                                                                <p className="text-base font-black text-[#0071e3] tracking-tight mt-2">
-                                                                    {formatCurrency(calculateEffectivePrice(product as any, new Date()), settings?.currency || '$')}
-                                                                </p>
-                                                            </div>
-                                                            <div className="h-12 w-12 rounded-full bg-[#0071e3] text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-xl group-hover:translate-x-2 shrink-0">
-                                                                <ArrowRight className="h-5 w-5" strokeWidth={3} />
-                                                            </div>
-                                                        </Link>
-                                                    ))}
-                                                </div>
-                                            ) : null}
-                                        </div>
-                                    ) : (
-                                        <div className="py-20 text-center space-y-6">
-                                            <div className="h-32 w-32 bg-slate-100 dark:bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                                                <Search className="h-12 w-12 text-slate-300" strokeWidth={1.5}/>
-                                            </div>
-                                            <div>
-                                                <p className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">No items found</p>
-                                            </div>
-                                        </div>
-                                    )
-                                ) : (
-                                    <div className="space-y-16 py-10">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                                            <div className="space-y-6">
-                                                <h4 className="text-[10px] font-black uppercase tracking-[0.25em] text-[#0071e3] flex items-center gap-2">
-                                                    <TrendingUp className="h-3 w-3" /> Popular Registry Requests
-                                                </h4>
-                                                <div className="flex flex-col gap-4">
-                                                    {products?.slice(0, 5).map((p, idx) => (
-                                                        <Link 
-                                                            key={p.id} 
-                                                            href={getStoreUrl(`/store/product/${p.slug || p.id}`)}
-                                                            className="group flex items-center gap-4 text-xl font-bold hover:text-[#0071e3] transition-colors tracking-tight"
-                                                            onClick={() => setIsSearchFocused(false)}
-                                                        >
-                                                            <span className="text-slate-200 dark:text-slate-800 font-black text-3xl group-hover:text-[#0071e3]/20 transition-colors italic">0{idx + 1}</span>
-                                                            {p.name}
-                                                        </Link>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                            <div className="space-y-6">
-                                                <h4 className="text-[10px] font-black uppercase tracking-[0.25em] text-[#0071e3] flex items-center gap-2">
-                                                    <History className="h-3 w-3" /> Direct Access
-                                                </h4>
-                                                <div className="flex flex-wrap gap-3">
-                                                    {['New Arrivals', 'Clearance', 'Flash Hub', 'Best Sellers', 'Luxury', 'Essential'].map(tag => (
-                                                        <Button 
-                                                            key={tag} 
-                                                            variant="outline" 
-                                                            className="rounded-full px-6 py-6 font-black text-[10px] uppercase tracking-widest border-slate-200 dark:border-slate-800 hover:border-[#0071e3] hover:text-[#0071e3] transition-all bg-white dark:bg-slate-900 shadow-sm active:scale-95"
-                                                            onClick={() => setNavbarSearch(tag)}
-                                                        >
-                                                            {tag}
-                                                        </Button>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </ScrollArea>
-                        </div>
-
-                        <div className="lg:col-span-4 hidden lg:flex flex-col space-y-10 border-l border-slate-100 dark:border-slate-800 pl-16">
-                            <div>
-                                <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 mb-8">Premium Collections</h3>
-                                <div className="space-y-4">
-                                    {categories?.slice(0, 10).map(cat => (
-                                        <Link 
-                                            key={cat.id} 
-                                            href={getStoreUrl(`/store/shop?category=${cat.id}`)}
-                                            className="block group"
-                                            onClick={() => setIsSearchFocused(false)}
-                                        >
-                                            <div className="flex items-center justify-between group-hover:translate-x-2 transition-transform duration-500">
-                                                <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase group-hover:text-[#0071e3] transition-colors">
-                                                    {cat.name}
-                                                </span>
-                                                <ArrowRight className="h-5 w-5 text-[#0071e3] opacity-0 group-hover:opacity-100 transition-opacity" strokeWidth={3} />
-                                            </div>
-                                        </Link>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-          )}
+          <SearchOverlay open={isSearchFocused} onOpenChange={setIsSearchFocused} />
         </nav>
     );
 }
