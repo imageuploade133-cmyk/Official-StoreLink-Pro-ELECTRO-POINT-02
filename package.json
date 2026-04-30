@@ -83,6 +83,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.5",
     "@types/jsbarcode": "^3.1.5",
     "@types/lodash": "^4.17.6",
     "@types/node": "^20",
