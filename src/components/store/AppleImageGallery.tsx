@@ -199,100 +199,92 @@ export function AppleImageGallery({
       />
       
       <div className="relative w-full h-full md:w-[96vw] md:h-[94vh] md:rounded-[2.5rem] overflow-hidden flex flex-col items-center justify-center bg-black/20 z-10">
-        {/* Header Controls */}
+        {/* Top Counter */}
         <div
           className={cn(
-            "absolute top-0 left-0 right-0 z-50 px-6 py-6 flex items-center justify-between transition-all duration-300",
+            "absolute top-10 left-0 right-0 z-50 flex justify-center transition-all duration-300",
             showControls ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"
           )}
-          style={{
-            background: 'linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 100%)',
-          }}
         >
-          <div className="flex items-center gap-3 text-white">
-            <div className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10">
-              <span className="text-xs font-bold tracking-wider uppercase opacity-90">
-                {activeIndex + 1} / {images.length}
-              </span>
-            </div>
+          <div className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white">
+            <span className="text-xs font-bold tracking-wider uppercase opacity-90">
+              {activeIndex + 1} / {images.length}
+            </span>
           </div>
-          
-          <div className="flex items-center gap-3">
+        </div>
+
+        {/* Action Controls & Zoom Controls */}
+        <div
+          className={cn(
+            "absolute z-50 left-1/2 -translate-x-1/2 flex items-center gap-3 transition-all duration-300",
+            hasMultipleImages ? "bottom-32" : "bottom-10",
+            showControls ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
+          )}
+        >
+          <div className="flex items-center gap-2 bg-black/40 backdrop-blur-xl rounded-full p-2 border border-white/10 shadow-2xl">
+            {/* Share */}
             <button
               onClick={handleShare}
-              className="h-12 w-12 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center transition-all hover:bg-white/20 hover:scale-110 active:scale-95"
+              className="h-10 w-10 rounded-full flex items-center justify-center transition-all hover:bg-white/10 active:scale-95"
               aria-label="Share image"
             >
               <Share2 className="h-5 w-5 text-white" />
             </button>
             
+            {/* Download */}
             <button
               onClick={handleDownload}
-              className="h-12 w-12 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center transition-all hover:bg-white/20 hover:scale-110 active:scale-95"
+              className="h-10 w-10 rounded-full flex items-center justify-center transition-all hover:bg-white/10 active:scale-95"
               aria-label="Download image"
             >
               <Download className="h-5 w-5 text-white" />
             </button>
             
+            <div className="w-px h-6 bg-white/20 mx-1" />
+            
+            {/* Zoom Controls */}
             <button
-              onClick={onClose}
-              className="h-12 w-12 rounded-full bg-primary text-white shadow-lg flex items-center justify-center transition-all hover:bg-primary/90 hover:scale-110 active:scale-95 ring-4 ring-primary/20"
-              aria-label="Close gallery"
+              onClick={() => setIsZoomed(!isZoomed)}
+              className={cn(
+                "h-10 w-10 rounded-full flex items-center justify-center transition-all active:scale-95",
+                isZoomed ? "bg-white/20" : "hover:bg-white/10"
+              )}
+              aria-label={isZoomed ? "Zoom out" : "Zoom in"}
             >
-              <X className="h-6 w-6" />
+              {isZoomed ? (
+                <ZoomOut className="h-5 w-5 text-white" />
+              ) : (
+                <ZoomIn className="h-5 w-5 text-white" />
+              )}
+            </button>
+            
+            <button
+              onClick={() => setIsZoomed(false)}
+              disabled={!isZoomed}
+              className={cn(
+                "h-10 w-10 rounded-full flex items-center justify-center transition-all active:scale-95",
+                !isZoomed && "opacity-40 cursor-not-allowed"
+              )}
+              aria-label="Reset zoom"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="text-white">
+                <rect x="3" y="3" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5" />
+                <rect x="11" y="3" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5" />
+                <rect x="3" y="11" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5" />
+                <rect x="11" y="11" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5" fill="currentColor" opacity="0.3" />
+              </svg>
             </button>
           </div>
-        </div>
 
-      {/* Zoom Controls */}
-      <div
-        className={cn(
-          "absolute bottom-28 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 transition-all duration-300",
-          showControls ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
-        )}
-        style={{
-          background: 'rgba(0,0,0,0.4)',
-          backdropFilter: 'blur(20px)',
-          borderRadius: '9999px',
-          padding: '8px 16px',
-          border: '1px solid rgba(255,255,255,0.1)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-        }}
-      >
-        <button
-          onClick={() => setIsZoomed(!isZoomed)}
-          className={cn(
-            "h-10 w-10 rounded-full flex items-center justify-center transition-all active:scale-95",
-            isZoomed ? "bg-white/30" : "hover:bg-white/10"
-          )}
-          aria-label={isZoomed ? "Zoom out" : "Zoom in"}
-        >
-          {isZoomed ? (
-            <ZoomOut className="h-5 w-5 text-white" />
-          ) : (
-            <ZoomIn className="h-5 w-5 text-white" />
-          )}
-        </button>
-        
-        <div className="w-px h-6 bg-white/30 mx-1" />
-        
-        <button
-          onClick={() => setIsZoomed(false)}
-          disabled={!isZoomed}
-          className={cn(
-            "h-10 w-10 rounded-full flex items-center justify-center transition-all active:scale-95",
-            !isZoomed && "opacity-40 cursor-not-allowed"
-          )}
-          aria-label="Reset zoom"
-        >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="text-white">
-            <rect x="3" y="3" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5" />
-            <rect x="11" y="3" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5" />
-            <rect x="3" y="11" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5" />
-            <rect x="11" y="11" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5" fill="currentColor" opacity="0.3" />
-          </svg>
-        </button>
-      </div>
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="h-12 w-12 rounded-full bg-primary text-white shadow-xl flex items-center justify-center transition-all hover:bg-primary/90 hover:scale-110 active:scale-95 ring-4 ring-primary/20"
+            aria-label="Close gallery"
+          >
+            <X className="h-6 w-6" />
+          </button>
+        </div>
 
       {/* Navigation Arrows - Desktop */}
       {hasMultipleImages && !isZoomed && (
