@@ -433,7 +433,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
             </div>
 
             {/* Centered slidable thumbnail gallery */}
-            <div className="px-6 py-4 flex justify-center gap-3 overflow-x-auto no-scrollbar -mt-12 relative z-20">
+            <div className="px-6 py-4 flex justify-start md:justify-center gap-3 overflow-x-auto no-scrollbar -mt-12 relative z-20 scroll-smooth">
                 {galleryImages.map((url, idx) => (
                     <button 
                         key={url + idx} 

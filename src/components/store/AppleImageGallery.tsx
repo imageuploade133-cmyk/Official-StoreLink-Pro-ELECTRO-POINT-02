@@ -13,6 +13,7 @@ interface AppleImageGalleryProps {
   onClose: () => void;
   onNext: () => void;
   onPrev: () => void;
+  onSelect?: (index: number) => void;
   productName?: string;
   alt?: string;
 }
@@ -24,6 +25,7 @@ export function AppleImageGallery({
   onClose,
   onNext,
   onPrev,
+  onSelect,
   productName = 'Product',
   alt = 'Product image',
 }: AppleImageGalleryProps) {
@@ -35,6 +37,17 @@ export function AppleImageGallery({
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const hideControlsTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  // Body scroll lock
+  useEffect(() => {
+    if (isOpen) {
+      const originalStyle = window.getComputedStyle(document.body).overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalStyle;
+      };
+    }
+  }, [isOpen]);
 
   // Reset state when modal opens
   useEffect(() => {
@@ -136,16 +149,22 @@ export function AppleImageGallery({
     const deltaY = e.changedTouches[0].clientY - touchStart.y;
     const minSwipeDistance = 50;
 
-    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
-      if (deltaX > 0) {
-        onPrev();
-      } else {
-        onNext();
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (Math.abs(deltaX) > minSwipeDistance) {
+        if (deltaX > 0) {
+          onPrev();
+        } else {
+          onNext();
+        }
+      }
+    } else {
+      if (deltaY > minSwipeDistance && !isZoomed) {
+        onClose();
       }
     }
     
     setTouchStart(null);
-  }, [touchStart, onPrev, onNext]);
+  }, [touchStart, onPrev, onNext, onClose, isZoomed]);
 
   const handleDownload = useCallback(async () => {
     try {
@@ -188,7 +207,7 @@ export function AppleImageGallery({
 
   return (
     <div
-      className="fixed inset-0 z-[9999] bg-black/98 backdrop-blur-xl animate-in fade-in duration-300"
+      className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-md animate-in fade-in duration-300 overflow-hidden"
       onClick={(e) => {
         if (e.target === e.currentTarget && !isZoomed) {
           onClose();
@@ -232,10 +251,10 @@ export function AppleImageGallery({
           
           <button
             onClick={onClose}
-            className="h-11 w-11 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center transition-all hover:bg-white/20 active:scale-95"
+            className="h-12 w-12 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center transition-all hover:bg-white/20 active:scale-95 hover:rotate-90"
             aria-label="Close gallery"
           >
-            <X className="h-6 w-6 text-white" />
+            <X className="h-7 w-7 text-white" strokeWidth={2.5} />
           </button>
         </div>
       </div>
@@ -398,7 +417,7 @@ export function AppleImageGallery({
             padding: '40px 16px 24px',
           }}
         >
-          <div className="flex items-center justify-center gap-2 max-w-2xl mx-auto">
+          <div className="flex items-center justify-start md:justify-center gap-2 max-w-2xl mx-auto overflow-x-auto no-scrollbar py-2 px-4">
             {images.map((img, idx) => (
               <button
                 key={idx}
@@ -406,7 +425,9 @@ export function AppleImageGallery({
                   e.stopPropagation();
                   if (idx !== activeIndex) {
                     setIsZoomed(false);
-                    if (idx > activeIndex) {
+                    if (onSelect) {
+                      onSelect(idx);
+                    } else if (idx > activeIndex) {
                       onNext();
                     } else {
                       onPrev();
@@ -416,7 +437,7 @@ export function AppleImageGallery({
                 className={cn(
                   "relative flex-shrink-0 w-14 h-14 md:w-16 md:h-16 rounded-lg overflow-hidden transition-all duration-200",
                   activeIndex === idx
-                    ? "ring-2 ring-white scale-105 shadow-lg"
+                    ? "ring-2 ring-white scale-105 shadow-lg z-10"
                     : "opacity-50 hover:opacity-80 active:scale-95"
                 )}
               >
