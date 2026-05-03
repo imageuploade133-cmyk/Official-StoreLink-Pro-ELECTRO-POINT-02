@@ -1,36 +1,17 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import Image from 'next/image';
 import { useRecentlyViewed } from '@/contexts/recently-viewed-context';
 import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, where, documentId, orderBy } from 'firebase/firestore';
 import type { Product, Category } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { 
-    History, 
-    ChevronLeft, 
-    Trash2, 
-    ShoppingBag, 
-    Loader2, 
-    Heart, 
-    ShoppingCart, 
-    Star,
-    X,
-    Filter,
-    ArrowLeft
-} from 'lucide-react';
-import { useSettings } from '@/contexts/settings-context';
-import { useCart } from '@/contexts/cart-context';
-import { useWishlist } from '@/contexts/wishlist-context';
-import { formatCurrency } from '@/lib/formatUtils';
-import { calculateEffectivePrice } from '@/lib/pos-utils';
+import { History, ArrowLeft, Filter, X } from 'lucide-react';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
-import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-
 import { useStoreUrl } from '@/hooks/use-store-url';
+import { StoreAppProductCard } from './StoreAppProductCard';
 
 interface RecentlyViewedViewProps {
     onClose: () => void;
@@ -40,14 +21,8 @@ interface RecentlyViewedViewProps {
 export function RecentlyViewedView({ onClose, onSelectProduct }: RecentlyViewedViewProps) {
     const { viewedProductIds, clearHistory, removeViewedProduct } = useRecentlyViewed();
     const firestore = useFirestore();
-    const { settings } = useSettings();
     const { storeId } = useStoreUrl();
-    const { addToCart } = useCart();
-    const { wishlistProductIds, addToWishlist, removeFromWishlist } = useWishlist();
     const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
-    
-    const currencySymbol = settings?.currency || '$';
-    const defaultImageUrl = settings?.defaultProductImageUrl || 'https://placehold.co/400x500.png';
     
     const targetIds = useMemo(() => viewedProductIds.slice(0, 20), [viewedProductIds]);
 
@@ -137,11 +112,14 @@ export function RecentlyViewedView({ onClose, onSelectProduct }: RecentlyViewedV
 
             <ScrollArea className="flex-1 px-4 pb-32">
                 {isLoading && viewedProductIds.length > 0 ? (
-                    <div className="grid grid-cols-2 gap-4 p-2 py-6">
+                    <div className="grid grid-cols-2 gap-x-5 gap-y-10 px-6 py-6">
                         {[...Array(4)].map((_, i) => (
-                            <div key={i} className="space-y-3">
-                                <div className="aspect-[4/5] w-full bg-slate-200 dark:bg-slate-800 rounded-[2rem] animate-pulse" />
-                                <div className="h-4 w-3/4 bg-slate-200 dark:bg-slate-800 rounded-full animate-pulse" />
+                            <div key={i} className="space-y-4">
+                                <div className="aspect-[3/4] bg-slate-100/50 dark:bg-slate-900/50 rounded-[2.5rem] animate-pulse" />
+                                <div className="space-y-2 px-2">
+                                    <div className="h-2 w-1/2 bg-slate-100/50 dark:bg-slate-900/50 rounded-full animate-pulse" />
+                                    <div className="h-4 w-full bg-slate-100/50 dark:bg-slate-900/50 rounded-full animate-pulse" />
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -157,53 +135,15 @@ export function RecentlyViewedView({ onClose, onSelectProduct }: RecentlyViewedV
                         <Button onClick={onClose} size="lg" className="rounded-2xl font-black uppercase text-[10px] tracking-widest px-10 h-14 shadow-xl active:scale-95 transition-transform">Begin Exploration</Button>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-2 gap-4 p-2">
-                        {orderedProducts.map((product) => {
-                            const price = calculateEffectivePrice(product as any, new Date());
-                            
-                            return (
-                                <div 
-                                    key={product.id}
-                                    className="group relative flex flex-col gap-3 animate-in fade-in slide-in-from-bottom-2 duration-500"
-                                >
-                                    <div 
-                                        className="relative w-full aspect-[4/5] overflow-hidden rounded-[2rem] bg-white dark:bg-slate-800 shadow-lg border border-slate-100 dark:border-slate-800 active:scale-[0.98] transition-all"
-                                        onClick={() => onSelectProduct(product.id)}
-                                    >
-                                        <Image 
-                                            src={product.imageUrl || defaultImageUrl} 
-                                            alt={product.name} 
-                                            fill 
-                                            className={cn(
-                                                "object-cover transition-transform duration-1000",
-                                                settings?.enableHoverZoom !== false && "group-hover:scale-110"
-                                            )}
-                                            unoptimized 
-                                        />
-                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-primary/5 transition-colors duration-500" />
-                                        
-                                        <button 
-                                            onClick={(e) => handleRemoveItem(e, product.id)}
-                                            className="absolute top-3 right-3 size-9 flex items-center justify-center bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl shadow-xl text-slate-400 hover:text-rose-500 hover:scale-110 transition-all active:scale-90 z-30 border border-white/50"
-                                        >
-                                            <X className="h-5 w-5" strokeWidth={3} />
-                                        </button>
-
-                                        {product.promo?.isActive && (
-                                            <div className="absolute bottom-3 left-3">
-                                                <Badge className="bg-rose-500 text-white font-black text-2xs uppercase tracking-widest px-2 py-0.5 border-none shadow-lg">On Offer</Badge>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="flex flex-col gap-1 px-1">
-                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-primary/60 truncate">{product.categoryName}</p>
-                                        <h4 className="font-black text-sm text-slate-900 dark:text-white truncate leading-tight tracking-tight">{product.name}</h4>
-                                        <p className="text-primary font-black text-base tracking-tighter mt-0.5">{formatCurrency(price, currencySymbol)}</p>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                    <div className="grid grid-cols-2 gap-x-5 gap-y-10 px-6 py-6">
+                        {orderedProducts.map((product) => (
+                            <StoreAppProductCard 
+                                key={product.id} 
+                                product={product} 
+                                categoryName={product.categoryName}
+                                onProductClick={onSelectProduct}
+                            />
+                        ))}
                     </div>
                 )}
             </ScrollArea>
