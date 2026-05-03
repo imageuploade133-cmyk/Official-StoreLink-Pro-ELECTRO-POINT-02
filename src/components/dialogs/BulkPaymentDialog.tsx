@@ -46,7 +46,7 @@ interface BulkPaymentDialogProps {
   currencySymbol: string;
 }
 
-const DEFAULT_STORE_NAME = 'V9 POS System';
+const DEFAULT_STORE_NAME = 'StoreLink Pro';
 
 export function BulkPaymentDialog({
   isOpen,

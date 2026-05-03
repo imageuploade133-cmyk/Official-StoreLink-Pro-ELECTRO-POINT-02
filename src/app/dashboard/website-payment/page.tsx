@@ -2817,7 +2817,7 @@ function AccountForm({ onSubmit, isSaving, defaultValues }: { onSubmit: (values:
           <FormItem><FormLabel>Bank Name</FormLabel><FormControl><Input placeholder="e.g., First National Bank" {...field} /></FormControl><FormMessage /></FormItem>
         )} />
         <FormField control={form.control} name="accountName" render={({ field }) => (
-          <FormItem><FormLabel>Account Holder Name</FormLabel><FormControl><Input placeholder="e.g., V9 POS System Ltd" {...field} /></FormControl><FormMessage /></FormItem>
+          <FormItem><FormLabel>Account Holder Name</FormLabel><FormControl><Input placeholder="e.g., StoreLink Pro Ltd" {...field} /></FormControl><FormMessage /></FormItem>
         )} />
         <FormField control={form.control} name="accountNumber" render={({ field }) => (
           <FormItem><FormLabel>Account Number</FormLabel><FormControl><Input placeholder="e.g., 1234567890" {...field} /></FormControl><FormMessage /></FormItem>

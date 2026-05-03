@@ -498,7 +498,7 @@ export function RichTextEditor({ value, onChange, placeholder, className, storeI
             <span>{value?.length || 0} Characters</span>
         </div>
         <div className="flex items-center gap-2">
-            V9 POS System Editor v2.9
+            StoreLink Pro Editor v2.9
         </div>
       </div>
     </div>

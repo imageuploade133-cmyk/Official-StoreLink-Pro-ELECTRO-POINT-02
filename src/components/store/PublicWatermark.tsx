@@ -37,7 +37,7 @@ export function PublicWatermark() {
                 color: 'currentColor' 
             }}
           >
-            {settings.webWatermarkText || 'V9 POS System'}
+            {settings.webWatermarkText || 'StoreLink Pro'}
           </span>
         ) : (
           settings.webWatermarkImageUrl && (

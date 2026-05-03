@@ -5,7 +5,7 @@ import React, { useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Mail, Phone, Link as LinkIcon, MapPin } from 'lucide-react';
-import { V9Logo } from '@/components/icons';
+import { StoreLinkLogo } from '@/components/icons';
 import { useSettings } from '@/contexts/settings-context';
 import { useFirestore, useCollection } from '@/firebase';
 import { collection, query, orderBy, where } from 'firebase/firestore';
@@ -27,7 +27,7 @@ export function PublicFooter() {
   const { settings } = useSettings();
   const { storeId, getStoreUrl } = useStoreUrl();
   const firestore = useFirestore();
-  const storeName = settings?.storeName || 'V9 POS System';
+  const storeName = settings?.storeName || 'StoreLink Pro';
   const logoUrl = settings?.invoiceLogoUrl;
   const storePhone = settings?.storePhone;
   const storeEmail = settings?.storeEmail;
@@ -148,7 +148,7 @@ export function PublicFooter() {
                 className="font-black whitespace-nowrap leading-none tracking-tighter"
                 style={{ fontSize: `${settings.webWatermarkFontSize ?? 120}px` }}
               >
-                {settings.webWatermarkText || 'V9 POS System'}
+                {settings.webWatermarkText || 'StoreLink Pro'}
               </span>
             ) : (
               settings.webWatermarkImageUrl && (
@@ -342,7 +342,7 @@ export function PublicFooter() {
                     />
                   </div>
                 ) : showMainSiteLogo ? (
-                  <V9Logo className="h-6 w-6" style={{ color: textColor }} />
+                  <StoreLinkLogo className="h-6 w-6" style={{ color: textColor }} />
                 ) : null}
                 {showPublicStoreName && (
                   <span className={'font-extrabold tracking-tighter text-2xl whitespace-pre-wrap break-words leading-tight max-w-[200px] sm:max-w-[250px]'} style={{ color: 'inherit' }}>{storeName}</span>

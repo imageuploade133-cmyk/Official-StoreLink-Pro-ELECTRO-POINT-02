@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
-import { V9Logo } from '@/components/icons';
+import { StoreLinkLogo } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { useSettings } from '@/contexts/settings-context';
 import { useAuth as useFirebaseAuthInstance, useFirestore, useCollection, useDoc } from '@/firebase';
@@ -108,7 +108,7 @@ export function PublicNavbar() {
         }
     }, [isSearchFocused]);
 
-    const storeName = settings?.storeName || 'V9 POS System';
+    const storeName = settings?.storeName || 'StoreLink Pro';
     const logoUrl = settings?.invoiceLogoUrl;
     const storeLogoWidth = settings?.storeLogoWidth || 120;
     const storeNameFontSize = settings?.storeNameFontSize || 24;
@@ -154,7 +154,7 @@ export function PublicNavbar() {
             />
         </div>
         ) : showMainSiteLogo ? (
-          <V9Logo className="h-8 w-8 text-[#0071e3]" />
+          <StoreLinkLogo className="h-8 w-8 text-[#0071e3]" />
         ) : null}
         {showPublicStoreName && (
           <span 
@@ -441,7 +441,7 @@ export function PublicNavbar() {
                                         {navbarShowAccount && !user ? (
                                             <div className="flex flex-col gap-4">
                                                 <Button asChild className="w-full h-12 rounded-full font-bold bg-[#0071e3] text-white" onClick={() => setIsMenuOpen(false)}>
-                                                    <Link href={getStoreUrl("/store/signup")}>Join V9 POS System</Link>
+                                                    <Link href={getStoreUrl("/store/signup")}>Join StoreLink Pro</Link>
                                                 </Button>
                                                 <Button asChild variant="ghost" className="w-full h-12 rounded-full font-bold text-[#0071e3]" onClick={() => setIsMenuOpen(false)}>
                                                     <Link href={getStoreUrl("/store/login")}>Sign In</Link>

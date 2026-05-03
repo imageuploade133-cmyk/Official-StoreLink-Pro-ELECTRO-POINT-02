@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { V9Logo } from "@/components/icons";
+import { StoreLinkLogo } from "@/components/icons";
 import { useState, useEffect } from "react";
 import { Mail, Lock, Eye, EyeOff, Store as StoreIcon, Plus } from "lucide-react";
 import { PageSpinner, Spinner } from "@/components/ui/spinner";
@@ -140,7 +140,7 @@ export default function AdminLoginPage() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                     <div className="absolute bottom-10 left-10 text-white">
-                        <h2 className="text-4xl font-bold font-headline">V9 POS System</h2>
+                        <h2 className="text-4xl font-bold font-headline">StoreLink Pro</h2>
                         <p className="text-white/80 mt-2 max-w-lg">
                             {stores.length > 0 ? "Select the store you want to manage." : "Manage your business with ease."}
                         </p>
@@ -150,7 +150,7 @@ export default function AdminLoginPage() {
                     <div className="mx-auto grid w-[350px] gap-6">
                         <div className="grid gap-2 text-center">
                             <div className="flex justify-center mb-4">
-                                <V9Logo className="h-10 w-10 text-primary" />
+                                <StoreLinkLogo className="h-10 w-10 text-primary" />
                             </div>
                             <h1 className="text-4xl font-bold font-headline">
                                 {stores.length > 0 ? "Select a Store" : "No Store Found"}
@@ -221,7 +221,7 @@ export default function AdminLoginPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         <div className="absolute bottom-10 left-10 text-white">
-            <h2 className="text-4xl font-bold font-headline">V9 POS System</h2>
+            <h2 className="text-4xl font-bold font-headline">StoreLink Pro</h2>
             <p className="text-white/80 mt-2 max-w-lg">
                 The ultimate all-in-one solution for managing your e-commerce business with unparalleled efficiency and insight.
             </p>
@@ -231,7 +231,7 @@ export default function AdminLoginPage() {
         <div className="mx-auto grid w-[350px] gap-6">
           <div className="grid gap-2 text-center">
              <div className="flex justify-center mb-4">
-                <V9Logo className="h-10 w-10 text-primary" />
+                <StoreLinkLogo className="h-10 w-10 text-primary" />
             </div>
             <h1 className="text-4xl font-bold font-headline">Staff Portal</h1>
             <p className="text-balance text-muted-foreground">

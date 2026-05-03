@@ -352,7 +352,7 @@ export default function CustomerStatementPage() {
             )}
           </div>
           <div>
-            <h1 className="text-2xl font-black tracking-tight text-primary uppercase">{settings?.storeName || 'V9 POS System'}</h1>
+            <h1 className="text-2xl font-black tracking-tight text-primary uppercase">{settings?.storeName || 'StoreLink Pro'}</h1>
             <p className="text-sm font-semibold text-slate-500">Official Account Summary</p>
           </div>
         </div>

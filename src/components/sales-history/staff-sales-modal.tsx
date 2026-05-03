@@ -264,7 +264,7 @@ export function StaffSalesModal({ isOpen, onOpenChange, allSales, staffMap, curr
             <div id="printable-staff-report">
                 <div className="report-header no-print hidden sm:block text-center">
                     <h1 className="store-name text-2xl font-bold">Staff Sales Report</h1>
-                    <p className="report-title text-muted-foreground">{settings?.storeName || 'v9 POS System'}</p>
+                    <p className="report-title text-muted-foreground">{settings?.storeName || 'StoreLink Pro'}</p>
                     <p className="report-date text-sm font-medium">{selectedDate ? formatDate(selectedDate, 'PPP') : 'N/A'}</p>
                 </div>
                 {isLoading ? (

@@ -68,7 +68,7 @@ export async function POST(request: Request) {
 
     const html = generateTemplate(dummyData, 'confirmation');
     const from = `"${senderName || 'Test Store'}" <${senderEmail}>`;
-    const subject = `Test Email from ${senderName || 'V9 POS System'}`;
+    const subject = `Test Email from ${senderName || 'StoreLink Pro'}`;
 
     const { success, error: providerError } = await sendViaProvider(provider, finalApiKey, from, testEmail, subject, html, {
         storeId,

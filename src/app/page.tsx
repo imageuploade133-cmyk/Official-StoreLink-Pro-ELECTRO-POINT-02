@@ -6,9 +6,9 @@ import { useAuth } from '@/contexts/auth-context';
 import { PageSpinner } from '@/components/ui/spinner';
 
 const loadingStates = [
-  { label: 'V9 POS System', subLabel: 'Initializing your workspace…' },
-  { label: 'V9 POS System', subLabel: 'Checking your session…' },
-  { label: 'V9 POS System', subLabel: 'Almost ready…' },
+  { label: 'StoreLink Pro', subLabel: 'Initializing your workspace…' },
+  { label: 'StoreLink Pro', subLabel: 'Checking your session…' },
+  { label: 'StoreLink Pro', subLabel: 'Almost ready…' },
 ];
 
 export default function HomePage() {

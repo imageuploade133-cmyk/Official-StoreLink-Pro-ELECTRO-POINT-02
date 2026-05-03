@@ -35,7 +35,7 @@ interface CreditPaymentReceiptModalProps {
   currencySymbol: string;
 }
 
-const DEFAULT_STORE_NAME = 'V9 POS System';
+const DEFAULT_STORE_NAME = 'StoreLink Pro';
 
 export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, currencySymbol }: CreditPaymentReceiptModalProps) {
   const { settings, isLoading: isSettingsLoading } = useSettings();
@@ -303,7 +303,7 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
 
                 <footer style={{ textAlign: 'center', marginTop: '10px' }}>
                   {settings?.receiptFooterMessage && <p style={{ fontWeight: 'bold' }}>{settings.receiptFooterMessage.toUpperCase()}</p>}
-                  <p style={{ fontSize: '8px', marginTop: '5px' }}>POWERED BY V9 POS System</p>
+                  <p style={{ fontSize: '8px', marginTop: '5px' }}>POWERED BY StoreLink Pro</p>
                 </footer>
               </div>
             </TabsContent>
@@ -411,7 +411,7 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
                      
                     <footer className="pt-10 border-t border-gray-100 text-center space-y-2">
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{storeName}</p>
-                        <p className="text-[10px] text-gray-400">Payment Processed via V9 POS System POS</p>
+                        <p className="text-[10px] text-gray-400">Payment Processed via StoreLink Pro POS</p>
                     </footer>
                  </div>
                </div>

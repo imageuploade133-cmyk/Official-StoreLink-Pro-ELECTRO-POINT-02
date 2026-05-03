@@ -33,7 +33,7 @@ import { cn } from '@/lib/utils';
 export default function LogisticsPage() {
   const { settings } = useSettings();
   const { getStoreUrl } = useStoreUrl();
-  const storeName = settings?.storeName || 'V9 POS System';
+  const storeName = settings?.storeName || 'StoreLink Pro';
   const isVisible = settings?.showLogisticsOnPublicSite !== false;
 
   const defaultFaqs = [

@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
-export const V9Logo = (props: React.SVGProps<SVGSVGElement>) => (
+export const StoreLinkLogo = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     width="40"
     height="40"
@@ -14,20 +14,22 @@ export const V9Logo = (props: React.SVGProps<SVGSVGElement>) => (
   >
     <defs>
         <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="currentColor" />
-            <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.8" />
+            <stop offset="0%" stopColor="#0071e3" />
+            <stop offset="100%" stopColor="#003d7a" />
         </linearGradient>
     </defs>
-    <rect width="40" height="40" rx="12" fill="url(#logo-gradient)" />
+    <rect width="40" height="40" rx="10" fill="url(#logo-gradient)" />
     <path
-      d="M10 12L20 28L30 12"
-      stroke="white"
-      strokeWidth="4"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      d="M12 20C12 15.5817 15.5817 12 20 12H28V16H20C17.7909 16 16 17.7909 16 20C16 22.2091 17.7909 24 20 24H28V28H20C15.5817 28 12 24.4183 12 20Z"
+      fill="white"
     />
-    <circle cx="28" cy="28" r="6" fill="white" />
-    <text x="25" y="32" fill="hsl(var(--primary))" fontSize="10" fontWeight="bold">9</text>
+    <path
+      d="M28 20C28 24.4183 24.4183 28 20 28H12V24H20C22.2091 24 24 22.2091 24 20C24 17.7909 22.2091 16 20 16H12V12H20C24.4183 12 28 15.5817 28 20Z"
+      fill="white"
+      fillOpacity="0.8"
+    />
   </svg>
 );
+
+export const StoreLinkLogo = StoreLinkLogo;
 

@@ -56,7 +56,7 @@ export function getMainDomain(host?: string | null): string {
   }
 
   // Server-side fallback (this will be used during build/SSR if env is missing)
-  return 'V9 POS Systempro.com';
+  return 'storelinkpro.com';
 }
 
 /**
