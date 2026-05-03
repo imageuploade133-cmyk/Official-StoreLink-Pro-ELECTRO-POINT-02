@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
-import Image from 'next/image';
 import { useFirestore, useCollection } from '@/firebase';
 import { 
   collection, 
@@ -10,8 +9,6 @@ import {
   orderBy, 
   limit, 
   getDocs, 
-  startAfter, 
-  getCountFromServer,
   type QueryDocumentSnapshot,
   type DocumentData 
 } from 'firebase/firestore';
@@ -21,22 +18,16 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { 
     Search as SearchIcon, 
-    ChevronRight, 
     X, 
     Filter, 
-    Sparkles, 
-    TrendingUp, 
     Loader2, 
     Plus,
-    RotateCcw,
     ArrowLeft
 } from 'lucide-react';
-import { formatCurrency } from '@/lib/formatUtils';
-import { calculateEffectivePrice } from '@/lib/pos-utils';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
 import { useParams } from 'next/navigation';
+import { StoreAppProductCard } from '@/components/store-app/StoreAppProductCard';
 
 const BATCH_SIZE = 12;
 
@@ -205,46 +196,31 @@ export function SearchView({ onClose, onSelectProduct, initialCategoryId, onClea
                     </div>
                     
                     {isLoading && results.length === 0 ? (
-                        <div className="grid grid-cols-1 gap-3">
-                            {[...Array(6)].map((_, i) => (
-                                <div key={i} className="h-24 w-full bg-slate-100/50 dark:bg-slate-900/50 rounded-2xl animate-pulse" />
-                            ))}
-                        </div>
-                    ) : results.length > 0 ? (
-                        <div className="grid grid-cols-1 gap-3">
-                            {results.map((p) => (
-                                <div 
-                                    key={p.id} 
-                                    onClick={() => onSelectProduct(p.id)} 
-                                    className="flex items-center gap-4 p-3 bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800/50 transition-all active:scale-[0.98] w-full text-left group cursor-pointer"
-                                >
-                                    <div className="relative h-16 w-16 rounded-xl overflow-hidden shrink-0 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800">
-                                        <Image 
-                                            src={p.imageUrl || 'https://placehold.co/200x200.png'} 
-                                            alt={p.name} 
-                                            fill 
-                                            className={cn(
-                                                "object-cover transition-transform duration-700",
-                                                settings?.enableHoverZoom !== false && "group-hover:scale-105"
-                                            )}
-                                            unoptimized 
-                                        />
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-[9px] font-bold uppercase text-primary tracking-wide mb-0.5 opacity-80">
-                                            {categories?.find(c => c.id === p.categoryId)?.name || 'Premium Series'}
-                                        </p>
-                                        <p className="font-bold text-base text-slate-900 dark:text-slate-100 truncate leading-tight tracking-tight">{p.name}</p>
-                                        <p className="text-primary font-bold text-sm mt-0.5">{formatCurrency(calculateEffectivePrice(p as any, new Date()), currencySymbol)}</p>
-                                    </div>
-                                    <div className="h-8 w-8 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-all">
-                                        <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-primary" strokeWidth={2.5} />
+                        <div className="grid grid-cols-2 gap-x-5 gap-y-10">
+                            {[...Array(4)].map((_, i) => (
+                                <div key={i} className="space-y-4">
+                                    <div className="aspect-[3/4] bg-slate-100/50 dark:bg-slate-900/50 rounded-[2.5rem] animate-pulse" />
+                                    <div className="space-y-2 px-2">
+                                        <div className="h-2 w-1/2 bg-slate-100/50 dark:bg-slate-900/50 rounded-full animate-pulse" />
+                                        <div className="h-4 w-full bg-slate-100/50 dark:bg-slate-900/50 rounded-full animate-pulse" />
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                    ) : results.length > 0 ? (
+                        <div className="grid grid-cols-2 gap-x-5 gap-y-10">
+                            {results.map((p) => (
+                                <StoreAppProductCard 
+                                    key={p.id} 
+                                    product={p} 
+                                    category={categories?.find(c => c.id === p.categoryId)}
+                                    categoryName={categories?.find(c => c.id === p.categoryId)?.name}
+                                    onProductClick={onSelectProduct}
+                                />
+                            ))}
 
                             {hasMore && (
-                                <div className="pt-6">
+                                <div className="col-span-2 pt-6">
                                     <Button 
                                         onClick={() => fetchResults(true)}
                                         disabled={isLoadingMore}
