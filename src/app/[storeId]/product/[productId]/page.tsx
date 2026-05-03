@@ -966,7 +966,7 @@ export default function ProductDetailsPage() {
 
     const shareData = {
       title: product.name || 'Check this out!',
-      text: product.description?.replace(/<[^>]*>?/gm, '').substring(0, 100) || 'Amazing product found on V9 POS System.',
+      text: product.description?.replace(/<[^>]*>?/gm, '').substring(0, 100) || 'Amazing product found on StoreLink Pro.',
       url: fullUrl,
     };
     if (navigator.share) {

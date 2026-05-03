@@ -1,7 +1,7 @@
 # Camera Capture & Background Removal Features
 
 ## Overview
-This document describes the camera capture and AI-powered background removal features for creating professional product mockups in V9 POS System.
+This document describes the camera capture and AI-powered background removal features for creating professional product mockups in StoreLink Pro.
 
 ## Features
 

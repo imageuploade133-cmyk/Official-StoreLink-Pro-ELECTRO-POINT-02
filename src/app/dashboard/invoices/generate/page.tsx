@@ -53,7 +53,7 @@ interface InvoiceItem {
   unitPrice: number;
 }
 
-const DEFAULT_STORE_NAME = 'V9 POS System';
+const DEFAULT_STORE_NAME = 'StoreLink Pro';
 
 export default function GenerateInvoicePage() {
   const firestore = useFirestore();

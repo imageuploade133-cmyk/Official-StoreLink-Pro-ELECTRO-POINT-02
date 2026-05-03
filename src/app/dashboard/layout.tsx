@@ -72,7 +72,7 @@ import { UserNav } from '@/components/UserNav';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { V9Logo } from '@/components/icons';
+import { StoreLinkLogo } from '@/components/icons';
 import { ThemeToggle } from '@/components/theme-toggle';
 import {
   Tooltip,
@@ -293,7 +293,7 @@ export default function DashboardLayout({
 
   if (isLoading || !user || isCustomer || (!store && !staffMember)) {
     const subLabel = (!store && !staffMember) ? "Locating your store..." : "Authenticating your account…";
-    return <PageSpinner label="V9 POS System" subLabel={subLabel} />;
+    return <PageSpinner label="StoreLink Pro" subLabel={subLabel} />;
   }
 
   return (
@@ -323,12 +323,12 @@ export default function DashboardLayout({
                 isMinimized ? "justify-center" : "gap-2"
               )}
             >
-              <V9Logo className="h-6 w-6 shrink-0" />
+              <StoreLinkLogo className="h-6 w-6 shrink-0" />
               <span className={cn(
                 "text-lg transition-all duration-300 truncate",
                 isMinimized ? "w-0 opacity-0 pointer-events-none absolute" : "w-auto opacity-100"
               )}>
-                V9 POS System
+                StoreLink Pro
               </span>
             </Link>
           </div>
@@ -444,8 +444,8 @@ export default function DashboardLayout({
                     href="/dashboard"
                     className="flex items-center gap-2 text-lg font-semibold"
                   >
-                    <V9Logo className="h-6 w-6" />
-                    <span>V9 POS System</span>
+                    <StoreLinkLogo className="h-6 w-6" />
+                    <span>StoreLink Pro</span>
                   </Link>
                 </div>
 

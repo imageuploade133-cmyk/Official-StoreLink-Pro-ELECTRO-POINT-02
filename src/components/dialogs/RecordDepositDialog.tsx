@@ -33,7 +33,7 @@ interface RecordDepositDialogProps {
   onSuccess?: (args: { success: boolean; receiptInfo?: CreditPaymentReceiptInfo }) => void;
 }
 
-const DEFAULT_STORE_NAME = 'V9 POS System';
+const DEFAULT_STORE_NAME = 'StoreLink Pro';
 
 export function RecordDepositDialog({
   isOpen,

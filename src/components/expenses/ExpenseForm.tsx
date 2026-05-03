@@ -108,7 +108,7 @@ export function ExpenseForm({ onAddExpense, isSubmitting, balanceByMethod }: Exp
             return;
         }
         const neededAmount = watchedAmount - allAvailableFunds;
-        const message = `URGENT FUND REQUEST from ${settings.storeName || 'v9 POS'}:\n\n`
+        const message = `URGENT FUND REQUEST from ${settings.storeName || 'StoreLink Pro'}:\n\n`
             + `An expense of ${formatCurrency(watchedAmount, settings.currency || '$')} needs to be paid.\n`
             + `Current available funds are short by ${formatCurrency(neededAmount, settings.currency || '$')}.\n\n`
             + `Please approve and transfer the required amount.\n`

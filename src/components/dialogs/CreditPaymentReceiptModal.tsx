@@ -46,7 +46,7 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
   
   const enableExternalPrinter = settings?.enableExternalPrinter ?? true;
 
-  const storeName = settings?.storeName || 'V9 POS System';
+  const storeName = settings?.storeName || 'StoreLink Pro';
   const storeAddress = settings?.storeAddress;
   const storeContact = settings?.storePhone;
   const storeLogoUrl = settings?.storeLogoUrl;
@@ -342,7 +342,7 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
                   </div>
                   <footer style={{ marginTop: '20px', textAlign: 'center', fontSize: '0.8em', borderTop: '1px solid #eee', paddingTop: '10px' }}>
                     {settings?.receiptFooterMessage && <p>{settings.receiptFooterMessage}</p>}
-                    <p>Powered by V9 POS System</p>
+                    <p>Powered by StoreLink Pro</p>
                   </footer>
               </div>
             </TabsContent>

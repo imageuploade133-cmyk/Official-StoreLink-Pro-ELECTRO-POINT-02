@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { V9Logo } from '@/components/icons';
+import { StoreLinkLogo } from '@/components/icons';
 
 // ─────────────────────────────────────────────
 // Inline / button spinner (replaces small Loader2)
@@ -73,7 +73,7 @@ interface PageSpinnerProps {
 }
 
 export function PageSpinner({
-  label = 'Loading V9 POS System',
+  label = 'Loading StoreLink Pro',
   subLabel = 'Setting up your workspace…',
 }: PageSpinnerProps) {
   return (
@@ -134,7 +134,7 @@ export function PageSpinner({
           className="absolute flex items-center justify-center rounded-xl bg-black/30 backdrop-blur-md border border-white/10"
           style={{ width: 56, height: 56 }}
         >
-          <V9Logo className="h-7 w-7 text-blue-500" />
+          <StoreLinkLogo className="h-7 w-7 text-blue-500" />
         </div>
       </div>
 

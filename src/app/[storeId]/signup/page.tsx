@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { V9Logo } from "@/components/icons";
+import { StoreLinkLogo } from "@/components/icons";
 import { useState, useEffect, useMemo } from "react";
 import { 
     Mail, 
@@ -324,7 +324,7 @@ export default function StoreSignupPage() {
                 {storeLogo ? (
                     <Image src={storeLogo} alt={storeName} width={40} height={40} className="h-10 w-auto object-contain" unoptimized />
                 ) : (
-                    <V9Logo className="h-10 w-10 text-primary" />
+                    <StoreLinkLogo className="h-10 w-10 text-primary" />
                 )}
             </div>
             <h1 className="text-4xl font-bold font-headline">Create an Account</h1>

@@ -1,20 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#1e3a5f"/>
-      <stop offset="100%" style="stop-color:#0f172a"/>
-    </linearGradient>
-    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#60a5fa"/>
-      <stop offset="100%" style="stop-color:#3b82f6"/>
+      <stop offset="0%" style="stop-color:#0071e3"/>
+      <stop offset="100%" style="stop-color:#003d7a"/>
     </linearGradient>
   </defs>
-  <!-- Background rounded square -->
-  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
-  <!-- E shape (V9 POS System logo mark) -->
-  <path d="M16 16H48V22H16V16Z" fill="url(#accent)"/>
-  <path d="M16 29H40V35H16V29Z" fill="white" opacity="0.9"/>
-  <path d="M16 42H48V48H16V42Z" fill="url(#accent)"/>
-  <!-- Spark dot top-right -->
-  <circle cx="52" cy="12" r="3" fill="#60a5fa" opacity="0.6"/>
+  <rect width="64" height="64" rx="16" fill="url(#bg)"/>
+  <path d="M20 32C20 25.3726 25.3726 20 32 20H44V26H32C28.6863 26 26 28.6863 26 32C26 35.3137 28.6863 38 32 38H44V44H32C25.3726 44 20 38.6274 20 32Z" fill="white"/>
+  <path d="M44 32C44 38.6274 38.6274 44 32 44H20V38H32C35.3137 38 38 35.3137 38 32C38 28.6863 35.3137 26 32 26H20V20H32C38.6274 20 44 25.3726 44 32Z" fill="white" opacity="0.8"/>
 </svg>

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { V9Logo } from "@/components/icons";
+import { StoreLinkLogo } from "@/components/icons";
 import { useState, useEffect, useMemo } from "react";
 import { 
     Mail, 
@@ -372,7 +372,7 @@ export default function MerchantSignupPage() {
     if (isUserLoading || (user && isAuthContextLoading) || isSuccessfullySubmitted) {
         return (
             <div className="relative">
-                <PageSpinner label="V9 POS System" subLabel={isSuccessfullySubmitted ? "Account created! Redirecting to login..." : "Preparing your workspace…"} />
+                <PageSpinner label="StoreLink Pro" subLabel={isSuccessfullySubmitted ? "Account created! Redirecting to login..." : "Preparing your workspace…"} />
                 {isSuccessfullySubmitted && (
                     <div className="fixed bottom-10 left-0 right-0 z-[60] flex flex-col items-center gap-3">
                         <p className="text-slate-400 text-xs animate-pulse">If you are not redirected automatically, click the button below.</p>
@@ -396,7 +396,7 @@ export default function MerchantSignupPage() {
         <div className="mx-auto grid w-[400px] gap-6 px-4">
           <div className="grid gap-2 text-center mb-4">
              <div className="flex justify-center mb-4 h-10">
-                <V9Logo className="h-10 w-10 text-primary" />
+                <StoreLinkLogo className="h-10 w-10 text-primary" />
             </div>
             <h1 className="text-4xl font-bold font-headline">Create a Store</h1>
             <p className="text-balance text-muted-foreground text-sm">
@@ -621,7 +621,7 @@ export default function MerchantSignupPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         <div className="absolute bottom-10 left-10 text-white max-w-lg">
-            <h2 className="text-4xl font-black tracking-tighter uppercase">V9 POS System</h2>
+            <h2 className="text-4xl font-black tracking-tighter uppercase">StoreLink Pro</h2>
             <p className="text-white/80 mt-2 font-medium">The ultimate all-in-one solution for managing your e-commerce business with unparalleled efficiency and insight.</p>
         </div>
       </div>
