@@ -18,6 +18,8 @@ import { BannerAd } from '@/components/ads/BannerAd';
 import { useParams } from 'next/navigation';
 import { cn, isWhiteOrTransparent, getCollectionBackgroundStyle } from '@/lib/utils';
 
+import { TopCategoryBar } from '@/components/store/TopCategoryBar';
+
 const iconComponents = { Truck, ShieldCheck, Headset, Leaf, Sparkles, Gift };
 const DynamicIcon = ({ name }: { name: string }) => {
     const Icon = iconComponents[name as keyof typeof iconComponents];
@@ -99,6 +101,7 @@ export default function StoreHomePage() {
   return (
     <div style={homepageBgStyle}>
       <HeroCarousel />
+      <TopCategoryBar />
       
       {settings?.showBrandValues !== false && (
         <section 

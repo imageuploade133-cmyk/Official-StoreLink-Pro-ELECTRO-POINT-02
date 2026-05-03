@@ -138,11 +138,11 @@ export function PublicNavbar() {
     const navbarHeight = settings?.navbarHeight ? (heightMap[settings.navbarHeight as keyof typeof heightMap] || 64) : (logoContainerHeight + (navbarPadding * 2));
 
     const Logo = () => (
-      <Link href={getStoreUrl('/store')} className="flex items-center gap-3 text-lg font-semibold group" onClick={() => setIsMenuOpen(false)}>
+      <Link href={getStoreUrl('/store')} className="flex items-center gap-2 text-lg font-semibold group" onClick={() => setIsMenuOpen(false)}>
         {showMainSiteLogo && logoUrl ? (
-          <div style={{ width: `${storeLogoWidth}px`, height: `${logoContainerHeight}px` }} className="relative flex items-center">
-            <Image 
-                src={logoUrl} 
+          <div style={{ width: `min(${storeLogoWidth}px, 80px)`, height: `${logoContainerHeight}px` }} className="relative flex items-center">
+            <Image
+                src={logoUrl}
                 alt={storeName}
                 fill
                 sizes={`${storeLogoWidth}px`}
@@ -154,12 +154,12 @@ export function PublicNavbar() {
             />
         </div>
         ) : showMainSiteLogo ? (
-          <StoreLinkLogo className="h-8 w-8 text-[#0071e3]" />
+          <StoreLinkLogo className="h-6 w-6 text-[#ff4500]" />
         ) : null}
         {showPublicStoreName && (
-          <span 
-              className={'font-black tracking-tighter text-[#1d1d1f] dark:text-white group-hover:opacity-80 transition-opacity whitespace-pre-wrap break-words leading-tight max-w-[150px] sm:max-w-[200px] md:max-w-[250px]'}
-              style={{ fontSize: `${storeNameFontSize}px` }}
+          <span
+              className={'font-black tracking-tighter text-[#1d1d1f] dark:text-white group-hover:opacity-80 transition-opacity whitespace-pre-wrap break-words leading-tight max-w-[80px] sm:max-w-[200px] md:max-w-[250px] overflow-hidden line-clamp-1'}
+              style={{ fontSize: `min(${storeNameFontSize}px, 16px)` }}
           >
             {storeName}
           </span>
@@ -211,38 +211,33 @@ export function PublicNavbar() {
               <div className="flex justify-between items-center relative" style={{ height: `${navbarHeight}px` }}>
                   <div className={cn(
                       "flex-shrink-0 flex items-center pr-4 transition-all duration-500",
-                      navbarLogoPosition === 'center' ? "absolute left-1/2 -translate-x-1/2" : 
+                      navbarLogoPosition === 'center' ? "absolute left-1/2 -translate-x-1/2" :
                       navbarLogoPosition === 'right' ? "order-3 pl-4 pr-0" : "order-1"
                   )}>
                     <Logo />
                   </div>
-                  
+
                   {navbarShowSearch && (
                       <div className={cn(
-                          "hidden lg:flex flex-1 max-w-md mx-12 relative",
+                          "flex flex-1 max-w-md mx-2 sm:mx-12 relative",
                           navbarLogoPosition === 'center' ? "order-1" : "order-2"
                       )} ref={searchContainerRef}>
                         <div className="w-full relative group">
                             <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
                                 <Search className="h-4 w-4" strokeWidth={2.5} />
                             </div>
-                            <Input 
+                            <Input
                                 readOnly
-                                className="w-full pl-11 pr-12 bg-black/[0.03] dark:bg-white/[0.03] border-[1.5px] border-black/5 dark:border-white/5 rounded-full h-10 text-xs font-medium tracking-tight cursor-pointer transition-all hover:bg-white dark:hover:bg-black hover:border-[#0071e3]/30 hover:shadow-md active:scale-[0.98]"
+                                className="w-full pl-11 pr-12 bg-black/[0.03] dark:bg-white/[0.03] border-[1.5px] border-black/5 dark:border-white/5 rounded-full h-10 text-xs font-medium tracking-tight cursor-pointer transition-all hover:bg-white dark:hover:bg-black hover:border-[#ff4500]/30 hover:shadow-md active:scale-[0.98]"
                                 placeholder="Search"
                                 onClick={() => setIsSearchFocused(true)}
                             />
-                            <div className="absolute inset-y-0 right-4 flex items-center">
-                                <div className="h-5 px-1.5 rounded-md border border-black/[0.05] dark:border-white/[0.05] bg-white dark:bg-black flex items-center justify-center text-[9px] font-bold text-slate-400 opacity-60 shadow-sm pointer-events-none uppercase tracking-tighter">
-                                    /
-                                </div>
-                            </div>
                         </div>
                       </div>
                   )}
 
                   <div className={cn(
-                      "flex items-center gap-3",
+                      "flex items-center gap-1 sm:gap-3",
                       navbarLogoPosition === 'center' ? "order-3 ml-auto" : "order-3"
                   )}>
                     <div className="hidden lg:flex items-center gap-6 mr-6 font-semibold text-[13px] tracking-tight">
@@ -326,10 +321,10 @@ export function PublicNavbar() {
                             <UserButton isLoading={isLoading} user={user} staffMember={staffMember} router={router} handleLogout={handleLogout} getInitials={getInitials} getStoreUrl={getStoreUrl} />
                         )}
                         {navbarShowSearch && (
-                            <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                className="lg:hidden h-10 w-10 rounded-full text-[#1d1d1f] dark:text-[#f5f5f7] hover:bg-black/[0.05] dark:hover:bg-white/[0.05]"
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="hidden h-10 w-10 rounded-full text-[#1d1d1f] dark:text-[#f5f5f7] hover:bg-black/[0.05] dark:hover:bg-white/[0.05]"
                                 onClick={() => setIsSearchFocused(true)}
                             >
                                 <Search className="h-5 w-5" strokeWidth={2} />
@@ -349,11 +344,11 @@ export function PublicNavbar() {
                             </Button>
                         )}
                         {navbarShowCart && (
-                            <Button asChild variant="ghost" size="icon" className="group h-10 w-10 rounded-full text-[#1d1d1f] dark:text-[#f5f5f7] hover:bg-black/[0.05] dark:hover:bg-white/[0.05] relative transition-all">
+                            <Button asChild variant="ghost" size="icon" className="group h-10 w-10 rounded-full text-[#1d1d1f] dark:text-[#f5f5f7] hover:bg-black/[0.05] dark:hover:bg-white/[0.05] relative transition-all hidden sm:inline-flex">
                             <Link href={getStoreUrl('/store/cart')}>
-                                <ShoppingBag className={cn("h-5 w-5 transition-transform duration-300 group-hover:scale-110", cartCount > 0 && "text-[#0071e3]")} />
+                                <ShoppingBag className={cn("h-5 w-5 transition-transform duration-300 group-hover:scale-110", cartCount > 0 && "text-[#ff4500]")} />
                                 {cartCount > 0 && (
-                                    <span className="absolute top-1 right-1 h-3.5 w-3.5 bg-[#0071e3] text-white text-[8px] flex items-center justify-center rounded-full font-bold border-2 border-white dark:border-black animate-in zoom-in duration-300">
+                                    <span className="absolute top-1 right-1 h-3.5 w-3.5 bg-[#ff4500] text-white text-[8px] flex items-center justify-center rounded-full font-bold border-2 border-white dark:border-black animate-in zoom-in duration-300">
                                         {cartCount}
                                     </span>
                                 )}
@@ -362,11 +357,11 @@ export function PublicNavbar() {
                         )}
 
                         {navbarShowThemeToggle && (
-                            <ThemeToggle className="h-10 w-10 rounded-full text-[#1d1d1f] dark:text-[#f5f5f7] hover:bg-black/[0.05] dark:hover:bg-white/[0.05] transition-all" />
+                            <ThemeToggle className="h-10 w-10 rounded-full text-[#1d1d1f] dark:text-[#f5f5f7] hover:bg-black/[0.05] dark:hover:bg-white/[0.05] transition-all hidden sm:inline-flex" />
                         )}
-                        
+
                         {(navbarMenuStyle !== 'none') && (
-                            <div className="md:hidden">
+                            <div className="hidden sm:block md:hidden">
                             <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
                                 <SheetTrigger asChild>
                                 <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full text-[#1d1d1f] dark:text-[#f5f5f7] hover:bg-black/[0.05] dark:hover:bg-white/[0.05]">

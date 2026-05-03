@@ -54,11 +54,21 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
   // Calculate rating stats from reviews
   const ratingStats = useMemo(() => calculateRatingStats(reviews), [reviews]);
 
-  // Pricing Engine logic
+  // pricing engine logic
   const effectivePrice = useMemo(() =>
     calculateEffectivePrice(product as any, today, category),
     [product, today, category]
   );
+
+  // Simulated sales count for TEMU-like social proof
+  const salesCount = useMemo(() => {
+    // Deterministic pseudo-random number based on product ID
+    let hash = 0;
+    for (let i = 0; i < product.id.length; i++) {
+        hash = product.id.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return Math.abs(hash % 5000) + 100;
+  }, [product.id]);
 
   const isDiscounted = effectivePrice < product.sellingPrice;
   const isOutOfStock = useMemo(() => {
@@ -364,15 +374,15 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
 
             {/* Badges */}
             {settings?.productCardShowBadges !== false && (
-                <div className="absolute top-5 left-5 flex flex-col gap-2 z-10 pointer-events-none">
+                <div className="absolute top-2 left-2 flex flex-col gap-1 z-10 pointer-events-none">
                 {product.isOfficialBrand && (
-                    <Badge className="bg-[#0071e3] text-white font-semibold text-[9px] px-3 py-1 rounded-full border-none shadow-sm uppercase tracking-wider">
-                    Official
+                    <Badge className="bg-[#ff4500] text-white font-black text-[8px] px-2 py-0.5 rounded-sm border-none shadow-sm uppercase tracking-wider">
+                    TEMU Choice
                     </Badge>
                 )}
                 {isDiscounted && !isOutOfStock && (
-                    <Badge className="bg-[#e11d48] text-white font-semibold text-[9px] px-3 py-1 rounded-full border-none shadow-sm uppercase tracking-wider">
-                    Offer
+                    <Badge className="bg-[#ff4500] text-white font-black text-[10px] px-2 py-0.5 rounded-sm border-none shadow-sm uppercase tracking-wider">
+                    -{Math.round((1 - effectivePrice / product.sellingPrice) * 100)}%
                     </Badge>
                 )}
                 </div>
@@ -382,12 +392,12 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
             {settings?.productCardShowWishlist !== false && (
                 <button
                 className={cn(
-                    "absolute top-5 right-5 h-10 w-10 flex items-center justify-center rounded-full bg-white/90 dark:bg-black/90 backdrop-blur-xl shadow-xl transition-all duration-500 z-10 border border-black/[0.03] dark:border-white/[0.03] opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0",
-                    isInWishlist ? "text-rose-500 opacity-100 translate-y-0" : "text-black dark:text-white"
+                    "absolute top-2 right-2 h-8 w-8 flex items-center justify-center rounded-full bg-white/90 dark:bg-black/90 backdrop-blur-xl shadow-md transition-all duration-500 z-10 border border-black/[0.03] dark:border-white/[0.03]",
+                    isInWishlist ? "text-rose-500" : "text-black dark:text-white"
                 )}
                 onClick={handleWishlistToggle}
                 >
-                <Heart className={cn("h-4 w-4 transition-all duration-500", isInWishlist && "fill-current")} />
+                <Heart className={cn("h-3.5 w-3.5 transition-all duration-500", isInWishlist && "fill-current")} />
                 </button>
             )}
 
@@ -411,85 +421,64 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
 
         {/* Content Area */}
         <div className={cn(
-            "flex flex-col flex-1 p-6 space-y-4",
-            cardStyle === 'minimal' && "p-4 px-0"
+            "flex flex-col flex-1 p-3 space-y-2",
+            cardStyle === 'minimal' && "p-3 px-0"
         )}>
           <div className="flex-1 space-y-1">
-            <div className={cn(
-                "flex justify-between items-center",
-                titleAlign === 'center' && "flex-col gap-1"
-            )}>
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-[#86868b]">
-                  {category?.name || product.categoryName || 'Collection'}
-              </p>
-              {settings?.productCardShowRating !== false && ratingStats.totalReviews > 0 && (
-                <ProductRating
-                  averageRating={ratingStats.averageRating}
-                  totalReviews={ratingStats.totalReviews}
-                  size="xs"
-                  showLabel={false}
-                />
-              )}
-            </div>
-
             <h3 className={cn(
-                "text-lg font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] leading-tight tracking-tight transition-colors duration-300",
+                "text-sm font-medium text-[#1d1d1f] dark:text-[#f5f5f7] leading-tight tracking-tight line-clamp-2 transition-colors duration-300",
                 titleAlign === 'center' && "text-center",
-                titleLines === 1 && "line-clamp-1",
-                titleLines === 2 && "line-clamp-2",
-                titleLines === 3 && "line-clamp-3"
             )}>
               {product.name}
             </h3>
+            
+            <div className="flex items-center gap-2">
+                {settings?.productCardShowRating !== false && (
+                    <div className="flex items-center bg-orange-50 dark:bg-orange-950/30 px-1.5 py-0.5 rounded text-[10px] font-bold text-orange-600">
+                        <Star className="h-2.5 w-2.5 fill-current mr-1" />
+                        {ratingStats.averageRating || '4.8'}
+                    </div>
+                )}
+                <span className="text-[10px] text-slate-400 font-medium">{salesCount >= 1000 ? `${(salesCount / 1000).toFixed(1)}k+` : salesCount} sold</span>
+            </div>
           </div>
 
-          <div className="space-y-3">
-            {settings?.productCardShowStockBar !== false && (
-                <StockBar
-                    stock={stockValue}
-                    lowStockThreshold={product.lowStockThreshold || 10}
-                />
-            )}
-
+          <div className="space-y-2">
             <div className={cn(
-                "flex items-center justify-between pt-1",
-                priceAlign === 'center' && "flex-col gap-2 justify-center"
+                "flex items-center justify-between",
+                priceAlign === 'center' && "flex-col gap-1 justify-center"
             )}>
                 <div className={cn(
-                    "flex flex-col",
+                    "flex items-baseline gap-1.5",
                     priceAlign === 'center' && "items-center"
                 )}>
                     <span className={cn(
-                        "text-xl font-semibold tracking-tight",
-                        isDiscounted ? "text-[#e11d48]" : "text-[#1d1d1f] dark:text-[#f5f5f7]"
+                        "text-lg font-bold tracking-tight text-[#ff4500]",
                     )}>
                         {formatCurrency(effectivePrice, currencySymbol)}
                     </span>
                     {isDiscounted && (
-                        <span className="text-xs text-[#86868b] line-through font-medium tracking-tight">
+                        <span className="text-[10px] text-slate-400 line-through font-medium">
                         {formatCurrency(product.sellingPrice, currencySymbol)}
                         </span>
                     )}
                 </div>
 
-                {/* Mobile Quick Add */}
-                {settings?.productCardShowQuickAdd !== false && (
-                    <div className="md:hidden">
-                    <Button
-                        size="icon"
-                        style={gridBtnStyle}
-                        className={cn(
-                            "h-10 w-10 rounded-full active:scale-90 transition-transform shadow-sm flex items-center justify-center",
-                            gridBtnClasses
-                        )}
-                        onClick={handleAddToCart}
-                        disabled={isOutOfStock}
-                    >
-                        <Plus className="h-5 w-5" />
-                    </Button>
-                    </div>
-                )}
+                <div className="hidden sm:block">
+                    <span className="text-[8px] font-black uppercase tracking-widest text-[#00b894] bg-[#00b894]/10 px-1.5 py-0.5 rounded-sm">Free Shipping</span>
+                </div>
             </div>
+
+            {/* Mobile/Quick Add Button */}
+            {settings?.productCardShowQuickAdd !== false && !isOutOfStock && (
+                <Button
+                    size="sm"
+                    onClick={handleAddToCart}
+                    className="w-full h-8 rounded-full bg-[#ff4500] hover:bg-[#ff4500]/90 text-white text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all"
+                >
+                    Add to Cart
+                </Button>
+            )}
           </div>
         </div>
       </div>
