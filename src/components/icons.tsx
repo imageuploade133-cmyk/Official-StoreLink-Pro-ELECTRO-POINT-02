@@ -31,5 +31,3 @@ export const StoreLinkLogo = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-export const StoreLinkLogo = StoreLinkLogo;
-
