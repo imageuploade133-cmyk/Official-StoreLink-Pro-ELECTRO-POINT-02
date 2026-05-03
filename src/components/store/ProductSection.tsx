@@ -810,7 +810,7 @@ export function ProductSection({ section, categories, excludeCategoryIds }: Prod
                 </>
             ) : (
               <div className="space-y-16">
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 md:gap-10">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-10">
                     {isLoading ? (
                         Array.from({ length: BATCH_SIZE }).map((_, i) => <ProductCardSkeleton key={i} />)
                     ) : (
