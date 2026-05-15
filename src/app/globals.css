@@ -285,31 +285,100 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Moving Blue Light Border Effect */
-  @keyframes rotate-border {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+  /* Futuristic Premium UI Utilities */
+  .premium-card {
+    @apply relative overflow-hidden rounded-[2rem] transition-all duration-500;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
   }
 
-  .animate-moving-border {
+  .dark .premium-card {
+    background: rgba(28, 28, 30, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .premium-card:hover {
+    @apply -translate-y-2;
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 15px 45px 0 rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+
+  .moving-border-glow {
     position: relative;
+    padding: 1px; /* Space for border */
   }
 
-  .animate-moving-border::before {
+  .moving-border-glow::before {
     content: "";
     position: absolute;
     inset: 0;
-    border-radius: inherit;
     padding: 2px;
-    background: conic-gradient(from 0deg, transparent 0 270deg, #3b82f6 360deg);
+    border-radius: inherit;
+    background: conic-gradient(
+      from var(--border-angle),
+      transparent 20%,
+      rgba(59, 130, 246, 0.3),
+      rgba(59, 130, 246, 1) 95%,
+      transparent
+    );
     -webkit-mask: 
-       linear-gradient(#fff 0 0) content-box, 
-       linear-gradient(#fff 0 0);
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
-    animation: rotate-border 4s linear infinite;
     pointer-events: none;
     z-index: 10;
+    animation: rotate-border-angle 6s linear infinite;
+  }
+
+  .moving-border-glow::after {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    border-radius: inherit;
+    background: conic-gradient(
+      from var(--border-angle),
+      transparent 70%,
+      rgba(59, 130, 246, 0.15) 95%,
+      transparent
+    );
+    filter: blur(15px);
+    z-index: 5;
+    pointer-events: none;
+    animation: rotate-border-angle 6s linear infinite;
+  }
+
+  @property --border-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+  }
+
+  @keyframes rotate-border-angle {
+    to { --border-angle: 360deg; }
+  }
+
+  .glass-light {
+    @apply bg-white/40 backdrop-blur-md border border-white/20 shadow-xl;
+  }
+
+  .glass-dark {
+    @apply bg-black/40 backdrop-blur-md border border-white/10 shadow-2xl;
+  }
+
+  .text-glow-blue {
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+  }
+
+  .bg-grid-slate-100 {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(241 245 249 / 0.1)'%3E%3Cpath d='M0 .5H31.5V32'/%3E%3C/svg%3E");
+  }
+
+  .dark .bg-grid-slate-100 {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.03)'%3E%3Cpath d='M0 .5H31.5V32'/%3E%3C/svg%3E");
   }
 }
 
