@@ -195,6 +195,110 @@ export default function GlobalLandingPage() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-primary/10 rounded-full blur-[120px] -z-0" />
       </section>
 
+      {/* Voice Description Feature Showcase */}
+      <section className="py-32 bg-slate-50 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row items-center gap-16">
+            <div className="lg:w-1/2">
+              <h2 className="text-sm font-black text-primary uppercase tracking-[0.3em] mb-4">Innovation</h2>
+              <h3 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.1] mb-8">
+                Your products, <br /><span className="text-primary">with a voice.</span>
+              </h3>
+              <p className="text-xl text-slate-500 font-medium leading-relaxed mb-8">
+                Bring your products to life with integrated voice descriptions. Give your customers an immersive shopping experience with expert insights and audio pitches.
+              </p>
+              <div className="space-y-4">
+                {[
+                  "Immersive audio signatures for every product",
+                  "Explain complex features with expert narration",
+                  "Increase accessibility for all customers",
+                  "Build trust through personal audio pitches"
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-3 text-slate-700 font-bold">
+                    <CheckCircle2 className="h-5 w-5 text-primary" />
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="lg:w-1/2 relative">
+              <div className="relative bg-white p-8 rounded-[3rem] shadow-2xl border border-slate-100">
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+                    <Zap className="h-8 w-8 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Audio Experience</p>
+                    <p className="text-xl font-bold">Listen to Audio Signature</p>
+                  </div>
+                </div>
+                
+                <div className="h-2 w-full bg-slate-100 rounded-full mb-4 overflow-hidden">
+                  <div className="h-full bg-primary w-2/3 rounded-full" />
+                </div>
+                <div className="flex justify-between text-xs font-bold text-slate-400 mb-8">
+                  <span>1:24</span>
+                  <span>2:10</span>
+                </div>
+                
+                <div className="flex justify-center gap-6">
+                  <div className="h-12 w-12 rounded-full bg-slate-50 flex items-center justify-center">
+                    <ArrowRight className="h-6 w-6 text-slate-400 rotate-180" />
+                  </div>
+                  <div className="h-16 w-16 rounded-full bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/30">
+                    <Zap className="h-8 w-8 fill-current" />
+                  </div>
+                  <div className="h-12 w-12 rounded-full bg-slate-50 flex items-center justify-center">
+                    <ArrowRight className="h-6 w-6 text-slate-400" />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Decorative elements */}
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl -z-10" />
+              <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-400/20 rounded-full blur-3xl -z-10" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Create Website Section */}
+      <section className="py-32 px-4 sm:px-6 lg:px-8 bg-white border-t border-slate-100">
+        <div className="max-w-7xl mx-auto text-center">
+          <h2 className="text-5xl md:text-7xl font-black tracking-tight text-slate-900 mb-8 leading-[0.9]">
+            Your brand. Your store.<br />
+            <span className="text-primary">Your way.</span>
+          </h2>
+          <p className="text-xl md:text-2xl text-slate-500 max-w-3xl mx-auto mb-12 font-medium leading-relaxed">
+            Create your stunning e-commerce website in minutes. With StoreLink Pro, you have the tools to build a global brand from day one.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            {[
+              {
+                title: "Custom Domains",
+                description: "Connect your own domain or use our high-speed subdomains."
+              },
+              {
+                title: "Beautiful Themes",
+                description: "Choose from professional designs optimized for conversion."
+              },
+              {
+                title: "Global Reach",
+                description: "Sell to customers anywhere in the world with ease."
+              }
+            ].map((item, i) => (
+              <div key={i} className="p-10 rounded-[2rem] bg-slate-50 border border-slate-100">
+                <h4 className="text-2xl font-black mb-4">{item.title}</h4>
+                <p className="text-slate-500 font-medium">{item.description}</p>
+              </div>
+            ))}
+          </div>
+          <Button size="lg" className="h-16 px-12 rounded-full text-xl font-black shadow-2xl shadow-primary/30" asChild>
+            <Link href="/signup-merchant">Create Your Store Now</Link>
+          </Button>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-32 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-6xl mx-auto bg-primary rounded-[3rem] p-12 md:p-24 text-center relative overflow-hidden shadow-3xl shadow-primary/30">

@@ -726,7 +726,7 @@ export default function ProductDetailsPage() {
         setActiveImageIndex(index);
       }
     }
-  }, [activeImage, galleryImages]);
+  }, [activeImage, galleryImages, activeImageIndex]);
 
   // Image navigation functions
   const goToImage = useCallback((index: number) => {
@@ -860,7 +860,7 @@ export default function ProductDetailsPage() {
         orderBy('createdAt', 'desc'),
         limit(12)
     );
-  }, [firestore, product?.categoryId, productId, storeId]);
+  }, [firestore, product?.categoryId, storeId]);
 
   const { data: rawRelatedProducts } = useCollection<Product>(relatedQuery);
 
@@ -1341,6 +1341,14 @@ export default function ProductDetailsPage() {
                 <span className="text-[10px] md:text-[11px] text-[#86868b] font-medium">{reviewStats.avg} / 5.0 ({reviewStats.count} reviews)</span>
               </div>
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-[#1d1d1f] dark:text-[#f5f5f7] leading-tight">{product.name}</h1>
+              {product.voiceEnabled && visibleVoices.length > 0 && (
+                <div className="flex items-center gap-2 animate-in fade-in slide-in-from-left-4 duration-500">
+                  <Badge className="bg-primary/10 text-primary border-primary/20 flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+                    <Volume2 className="h-3.5 w-3.5" />
+                    Voice Description Available
+                  </Badge>
+                </div>
+              )}
               <div className="flex items-start gap-3 pt-2">
                 <div className={cn("flex flex-col gap-1 md:gap-1.5 transition-all duration-300", isChangingVariant && "opacity-40 blur-[1px]")}>
                   {!today ? <Skeleton className="h-8 md:h-10 w-32" /> : (

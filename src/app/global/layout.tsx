@@ -24,8 +24,9 @@ export default function GlobalLayout({
           </Link>
           <div className="hidden md:flex items-center gap-10">
             <Link href="/global#features" className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Features</Link>
-            <Link href="/global#solutions" className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Solutions</Link>
-            <Link href="/global#pricing" className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Pricing</Link>
+            <Link href="/global/blog" className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Blog</Link>
+            <Link href="/global/careers" className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Careers</Link>
+            <Link href="/global/contact" className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Contact</Link>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/login" className="hidden sm:block text-sm font-bold text-slate-600 hover:text-primary transition-colors">
@@ -68,8 +69,8 @@ export default function GlobalLayout({
               <h5 className="font-bold text-slate-900 mb-6 uppercase tracking-widest text-xs">Company</h5>
               <ul className="space-y-4">
                 <li><Link href="/global/about" className="text-slate-500 hover:text-primary transition-colors font-medium">About Us</Link></li>
-                <li><Link href="#" className="text-slate-500 hover:text-primary transition-colors font-medium">Careers</Link></li>
-                <li><Link href="#" className="text-slate-500 hover:text-primary transition-colors font-medium">Blog</Link></li>
+                <li><Link href="/global/careers" className="text-slate-500 hover:text-primary transition-colors font-medium">Careers</Link></li>
+                <li><Link href="/global/blog" className="text-slate-500 hover:text-primary transition-colors font-medium">Blog</Link></li>
                 <li><Link href="/global/contact" className="text-slate-500 hover:text-primary transition-colors font-medium">Contact</Link></li>
               </ul>
             </div>
