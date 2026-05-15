@@ -180,7 +180,7 @@ export function ResetPasswordModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[400px] p-0 overflow-hidden border border-black/5 dark:border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.2)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)] rounded-[2rem] bg-background/80 backdrop-blur-2xl transition-all duration-500 animate-in fade-in zoom-in-95">
+      <DialogContent className="sm:max-w-[400px] p-0 overflow-hidden border border-black/5 dark:border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.2)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)] rounded-[2rem] bg-background/80 backdrop-blur-2xl transition-all duration-500 animate-in fade-in zoom-in-95 text-foreground">
         <div className="relative p-8 pt-10 overflow-hidden">
           {/* Subtle background decoration */}
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
@@ -195,13 +195,13 @@ export function ResetPasswordModal({
           </div>
 
           <DialogHeader className="text-center relative z-10 space-y-2">
-            <DialogTitle className="text-2xl font-semibold tracking-tight">
+            <DialogTitle className="text-2xl font-semibold tracking-tight text-foreground dark:text-white">
               {step === 'request' && "Reset Password"}
               {step === 'sent' && "Check Email"}
               {step === 'reset' && "New Password"}
               {step === 'success' && "All Set!"}
             </DialogTitle>
-            <DialogDescription className="text-muted-foreground/80 text-sm leading-relaxed px-2">
+            <DialogDescription className="text-muted-foreground/80 dark:text-muted-foreground text-sm leading-relaxed px-2">
               {step === 'request' && "Enter your email to receive a secure reset link."}
               {step === 'sent' && `A secure link has been sent to ${emailForReset}.`}
               {step === 'reset' && "Choose a strong password for your account."}
@@ -217,10 +217,10 @@ export function ResetPasswordModal({
                 <div className="relative group">
                   <Input
                     {...forgotForm.register('email')}
-                    id="email"
+                    id="email-reset"
                     type="email"
                     placeholder="Email address"
-                    className="h-12 rounded-xl bg-secondary/30 border-transparent focus:bg-background focus:border-primary/30 focus:ring-4 focus:ring-primary/5 transition-all text-sm placeholder:text-muted-foreground/50"
+                    className="h-12 rounded-xl bg-secondary/30 border-transparent focus:bg-background focus:border-primary/30 focus:ring-4 focus:ring-primary/5 transition-all text-sm placeholder:text-muted-foreground/50 text-foreground"
                     disabled={isLoading}
                   />
                 </div>
@@ -278,7 +278,7 @@ export function ResetPasswordModal({
                     id="password-reset"
                     type={showPassword ? "text" : "password"}
                     placeholder="New password"
-                    className="h-12 rounded-xl bg-secondary/30 border-transparent focus:bg-background focus:border-primary/30 focus:ring-4 focus:ring-primary/5 transition-all text-sm pr-10"
+                    className="h-12 rounded-xl bg-secondary/30 border-transparent focus:bg-background focus:border-primary/30 focus:ring-4 focus:ring-primary/5 transition-all text-sm pr-10 text-foreground"
                     disabled={isLoading}
                   />
                   <button
@@ -293,7 +293,7 @@ export function ResetPasswordModal({
                 {renderStrengthBar()}
                 
                 <div className="flex justify-between items-center px-1">
-                  <span className="text-[10px] text-muted-foreground/60 font-medium uppercase tracking-wider">Strength</span>
+                  <span className="text-[10px] text-muted-foreground/60 dark:text-muted-foreground/80 font-medium uppercase tracking-wider">Strength</span>
                   <span className={cn(
                     "text-[10px] font-semibold uppercase tracking-wider",
                     passwordStrength <= 2 ? "text-red-400" : 
@@ -318,7 +318,7 @@ export function ResetPasswordModal({
                     type={showPassword ? "text" : "password"}
                     placeholder="Confirm password"
                     className={cn(
-                      "h-12 rounded-xl bg-secondary/30 border-transparent focus:bg-background focus:border-primary/30 focus:ring-4 focus:ring-primary/5 transition-all text-sm",
+                      "h-12 rounded-xl bg-secondary/30 border-transparent focus:bg-background focus:border-primary/30 focus:ring-4 focus:ring-primary/5 transition-all text-sm text-foreground",
                       passwordsMatch && "border-emerald-500/20 bg-emerald-50/5 dark:bg-emerald-500/5"
                     )}
                     disabled={isLoading}
