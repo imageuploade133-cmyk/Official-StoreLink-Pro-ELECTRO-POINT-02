@@ -13,35 +13,25 @@ import { Mail, Lock, Eye, EyeOff, Store as StoreIcon, Plus } from "lucide-react"
 import { PageSpinner, Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/hooks/use-toast";
 import placeholderImages from '@/lib/placeholder-images.json';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 import { useAuth as useFirebaseAuthInstance, useFirestore } from "@/firebase";
 import { useAuth } from "@/contexts/auth-context";
-import { useRouter } from "next/navigation";
-import { signInWithEmailAndPassword, sendPasswordResetEmail, AuthError, signOut } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { useRouter, useSearchParams } from "next/navigation";
+import { signInWithEmailAndPassword, AuthError, signOut } from "firebase/auth";
 
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ResetPasswordModal } from "@/components/auth/ResetPasswordModal";
 
 export default function AdminLoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
     const loginImage = placeholderImages['login-background'];
 
-    const [isResetLoading, setIsResetLoading] = useState(false);
-    const [resetError, setResetError] = useState('');
-    const [isForgotPassOpen, setIsForgotPassOpen] = useState(false);
+    const searchParams = useSearchParams();
+    const oobCode = searchParams.get('oobCode');
+    const [isForgotPassOpen, setIsForgotPassOpen] = useState(!!oobCode);
     const [showPassword, setShowPassword] = useState(false);
 
     const auth = useFirebaseAuthInstance();
-    const firestore = useFirestore();
     const router = useRouter();
     const { user, store, stores, setSelectedStoreId, staffMember, isCustomer, isLoading: isAuthLoading } = useAuth();
 
@@ -56,10 +46,6 @@ export default function AdminLoginPage() {
           } else if (stores.length === 1) {
              setSelectedStoreId(stores[0].id);
              router.replace('/dashboard');
-          } else {
-            // Break the redirect loop from signup page
-            // If user is logged in but has no stores/staff record, let them stay on this page 
-            // to either sign out or click the 'Create a New Store' button.
           }
         }
     }, [user, isAuthLoading, store, stores, staffMember, isCustomer, router, setSelectedStoreId]);
@@ -91,34 +77,6 @@ export default function AdminLoginPage() {
             });
             setIsLoading(false);
         }
-    }
-
-    const handlePasswordReset = (e: React.FormEvent) => {
-        e.preventDefault();
-        setResetError('');
-        setIsResetLoading(true);
-
-        const email = (document.getElementById('reset-email') as HTMLInputElement).value;
-        if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-            setResetError('Please enter a valid email address.');
-            setIsResetLoading(false);
-            return;
-        }
-
-        sendPasswordResetEmail(auth, email)
-            .then(() => {
-                toast({
-                    title: "Password Reset Link Sent",
-                    description: `If an account with that email exists, a reset link has been sent.`,
-                });
-                setIsForgotPassOpen(false);
-            })
-            .catch((error: AuthError) => {
-                setResetError(error.message);
-            })
-            .finally(() => {
-                setIsResetLoading(false);
-            });
     }
 
     if (isAuthLoading) {
@@ -255,52 +213,13 @@ export default function AdminLoginPage() {
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
-                <Dialog open={isForgotPassOpen} onOpenChange={setIsForgotPassOpen}>
-                  <DialogTrigger asChild>
-                    <button
-                        type="button"
-                        onClick={() => setResetError('')}
-                        className="ml-auto inline-block text-sm text-muted-foreground hover:underline"
-                    >
-                        Forgot your password?
-                    </button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <form onSubmit={handlePasswordReset}>
-                        <DialogHeader>
-                          <DialogTitle>Reset Password</DialogTitle>
-                          <DialogDescription>
-                            Enter your email and we&apos;ll send a link to get back into your account.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="reset-email">Email</Label>
-                                <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                        id="reset-email"
-                                        type="email"
-                                        placeholder="name@example.com"
-                                        required
-                                        className="pl-10"
-                                    />
-                                </div>
-                            </div>
-                            {resetError && <p className="text-sm font-medium text-destructive">{resetError}</p>}
-                        </div>
-                        <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => setIsForgotPassOpen(false)}>
-                                Cancel
-                            </Button>
-                            <Button type="submit" disabled={isResetLoading}>
-                                {isResetLoading && <Spinner size="sm" className="mr-2 text-primary-foreground" />}
-                                Send reset link
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                  </DialogContent>
-                </Dialog>
+                <button
+                    type="button"
+                    onClick={() => setIsForgotPassOpen(true)}
+                    className="ml-auto inline-block text-sm text-muted-foreground hover:underline"
+                >
+                    Forgot your password?
+                </button>
               </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -333,6 +252,11 @@ export default function AdminLoginPage() {
           </div>
         </div>
       </div>
+      <ResetPasswordModal 
+        isOpen={isForgotPassOpen} 
+        onOpenChange={setIsForgotPassOpen} 
+        oobCode={oobCode}
+      />
     </div>
   )
 }
