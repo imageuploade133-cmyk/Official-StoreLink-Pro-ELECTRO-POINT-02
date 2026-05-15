@@ -154,7 +154,7 @@ export function PublicNavbar() {
             />
         </div>
         ) : showMainSiteLogo ? (
-          <StoreLinkLogo className="h-6 w-6 text-[#ff4500]" />
+          <StoreLinkLogo className="h-6 w-6 text-primary" />
         ) : null}
         {showPublicStoreName && (
           <span
@@ -228,7 +228,7 @@ export function PublicNavbar() {
                             </div>
                             <Input
                                 readOnly
-                                className="w-full pl-11 pr-12 bg-black/[0.03] dark:bg-white/[0.03] border-[1.5px] border-black/5 dark:border-white/5 rounded-full h-10 text-xs font-medium tracking-tight cursor-pointer transition-all hover:bg-white dark:hover:bg-black hover:border-[#ff4500]/30 hover:shadow-md active:scale-[0.98]"
+                                className="w-full pl-11 pr-12 bg-black/[0.03] dark:bg-white/[0.03] border-[1.5px] border-black/5 dark:border-white/5 rounded-full h-10 text-xs font-medium tracking-tight cursor-pointer transition-all hover:bg-white dark:hover:bg-black hover:border-primary/30 hover:shadow-md active:scale-[0.98]"
                                 placeholder="Search"
                                 onClick={() => setIsSearchFocused(true)}
                             />
@@ -346,9 +346,9 @@ export function PublicNavbar() {
                         {navbarShowCart && (
                             <Button asChild variant="ghost" size="icon" className="group h-10 w-10 rounded-full text-[#1d1d1f] dark:text-[#f5f5f7] hover:bg-black/[0.05] dark:hover:bg-white/[0.05] relative transition-all hidden sm:inline-flex">
                             <Link href={getStoreUrl('/store/cart')}>
-                                <ShoppingBag className={cn("h-5 w-5 transition-transform duration-300 group-hover:scale-110", cartCount > 0 && "text-[#ff4500]")} />
+                                <ShoppingBag className={cn("h-5 w-5 transition-transform duration-300 group-hover:scale-110", cartCount > 0 && "text-primary")} />
                                 {cartCount > 0 && (
-                                    <span className="absolute top-1 right-1 h-3.5 w-3.5 bg-[#ff4500] text-white text-[8px] flex items-center justify-center rounded-full font-bold border-2 border-white dark:border-black animate-in zoom-in duration-300">
+                                    <span className="absolute top-1 right-1 h-3.5 w-3.5 bg-primary text-white text-[8px] flex items-center justify-center rounded-full font-bold border-2 border-white dark:border-black animate-in zoom-in duration-300">
                                         {cartCount}
                                     </span>
                                 )}

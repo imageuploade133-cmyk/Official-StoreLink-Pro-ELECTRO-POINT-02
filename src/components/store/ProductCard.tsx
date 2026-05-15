@@ -376,12 +376,12 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
             {settings?.productCardShowBadges !== false && (
                 <div className="absolute top-2 left-2 flex flex-col gap-1 z-10 pointer-events-none">
                 {product.isOfficialBrand && (
-                    <Badge className="bg-[#ff4500] text-white font-black text-[8px] px-2 py-0.5 rounded-sm border-none shadow-sm uppercase tracking-wider">
-                    TEMU Choice
+                    <Badge className="bg-primary text-white font-black text-[8px] px-2 py-0.5 rounded-sm border-none shadow-sm uppercase tracking-wider">
+                    StoreLink Choice
                     </Badge>
                 )}
                 {isDiscounted && !isOutOfStock && (
-                    <Badge className="bg-[#ff4500] text-white font-black text-[10px] px-2 py-0.5 rounded-sm border-none shadow-sm uppercase tracking-wider">
+                    <Badge className="bg-primary text-white font-black text-[10px] px-2 py-0.5 rounded-sm border-none shadow-sm uppercase tracking-wider">
                     -{Math.round((1 - effectivePrice / product.sellingPrice) * 100)}%
                     </Badge>
                 )}
@@ -453,7 +453,7 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
                     priceAlign === 'center' && "items-center"
                 )}>
                     <span className={cn(
-                        "text-lg font-bold tracking-tight text-[#ff4500]",
+                        "text-lg font-bold tracking-tight text-primary",
                     )}>
                         {formatCurrency(effectivePrice, currencySymbol)}
                     </span>
@@ -474,7 +474,7 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
                 <Button
                     size="sm"
                     onClick={handleAddToCart}
-                    className="w-full h-8 rounded-full bg-[#ff4500] hover:bg-[#ff4500]/90 text-white text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all"
+                    className="w-full h-8 rounded-full bg-primary hover:bg-primary/90 text-white text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all"
                 >
                     Add to Cart
                 </Button>

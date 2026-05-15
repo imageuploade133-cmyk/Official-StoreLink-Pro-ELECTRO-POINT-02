@@ -49,7 +49,7 @@ export function TopCategoryBar() {
             href={getStoreUrl(`/store/shop?category=${category.id}`)}
             className="flex flex-col items-center gap-2 shrink-0 group"
             >
-            <div className="relative h-16 w-16 sm:h-20 sm:w-20 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-900 border-2 border-transparent group-hover:border-[#ff4500] transition-all duration-300 shadow-sm">
+            <div className="relative h-16 w-16 sm:h-20 sm:w-20 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-900 border-2 border-transparent group-hover:border-primary transition-all duration-300 shadow-sm">
                 <Image
                 src={category.imageUrl || `https://picsum.photos/seed/${category.id}/100/100`}
                 alt={category.name}
@@ -58,7 +58,7 @@ export function TopCategoryBar() {
                 unoptimized
                 />
             </div>
-            <span className="text-[10px] sm:text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-[#ff4500] transition-colors truncate max-w-[64px] sm:max-w-[80px]">
+            <span className="text-[10px] sm:text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-primary transition-colors truncate max-w-[64px] sm:max-w-[80px]">
                 {category.name}
             </span>
             </Link>
