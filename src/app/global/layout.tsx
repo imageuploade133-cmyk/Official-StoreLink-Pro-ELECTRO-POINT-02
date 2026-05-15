@@ -23,7 +23,7 @@ export default function GlobalLayout({
             </span>
           </Link>
           <div className="hidden md:flex items-center gap-10">
-            <Link href="/global#features" className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Features</Link>
+            <Link href="/global/features" className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Features</Link>
             <Link href="/global/blog" className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Blog</Link>
             <Link href="/global/careers" className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Careers</Link>
             <Link href="/global/contact" className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Contact</Link>
@@ -58,10 +58,10 @@ export default function GlobalLayout({
             <div>
               <h5 className="font-bold text-slate-900 mb-6 uppercase tracking-widest text-xs">Product</h5>
               <ul className="space-y-4">
-                <li><Link href="/global#features" className="text-slate-500 hover:text-primary transition-colors font-medium">Features</Link></li>
-                <li><Link href="/global#pos" className="text-slate-500 hover:text-primary transition-colors font-medium">POS System</Link></li>
-                <li><Link href="/global#inventory" className="text-slate-500 hover:text-primary transition-colors font-medium">Inventory</Link></li>
-                <li><Link href="/global#analytics" className="text-slate-500 hover:text-primary transition-colors font-medium">Analytics</Link></li>
+                <li><Link href="/global/features" className="text-slate-500 hover:text-primary transition-colors font-medium">Features</Link></li>
+                <li><Link href="/global/features" className="text-slate-500 hover:text-primary transition-colors font-medium">POS System</Link></li>
+                <li><Link href="/global/features" className="text-slate-500 hover:text-primary transition-colors font-medium">Inventory</Link></li>
+                <li><Link href="/global/features" className="text-slate-500 hover:text-primary transition-colors font-medium">Analytics</Link></li>
               </ul>
             </div>
 
