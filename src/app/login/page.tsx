@@ -30,6 +30,8 @@ import { doc, getDoc } from "firebase/firestore";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 
+import { useStoreUrl } from "@/hooks/use-store-url";
+
 export default function AdminLoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
@@ -44,6 +46,7 @@ export default function AdminLoginPage() {
     const firestore = useFirestore();
     const router = useRouter();
     const { user, store, stores, setSelectedStoreId, staffMember, isCustomer, isLoading: isAuthLoading } = useAuth();
+    const { getStoreUrl } = useStoreUrl();
 
     useEffect(() => {
         if (!isAuthLoading && user) {
@@ -52,7 +55,7 @@ export default function AdminLoginPage() {
           } else if (store || staffMember) {
             router.replace('/dashboard');
           } else if (isCustomer) {
-            router.replace('/store/account');
+            router.replace(getStoreUrl('/store/account'));
           } else if (stores.length === 1) {
              setSelectedStoreId(stores[0].id);
              router.replace('/dashboard');

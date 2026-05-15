@@ -71,13 +71,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [selectedStoreId]);
 
   // Reset loading states when user changes to prevent race conditions
-  const currentUid = user?.uid || null;
-  if (currentUid !== lastLoadedUid) {
-    setLastLoadedUid(currentUid);
-    setIsStaffLoading(!!user);
-    setIsStoreLoading(!!user);
-    setIsCustomerLoading(!!user);
-  }
+  useEffect(() => {
+    const currentUid = user?.uid || null;
+    if (currentUid !== lastLoadedUid) {
+      setLastLoadedUid(currentUid);
+      setIsStaffLoading(!!user);
+      setIsStoreLoading(!!user);
+      setIsCustomerLoading(!!user);
+    }
+  }, [user, lastLoadedUid]);
 
   // Monitor Staff Record
   useEffect(() => {

@@ -95,12 +95,16 @@ import {
 import { safeStorage } from '@/lib/storage-utils';
 
 
+import { useStoreUrl } from '@/hooks/use-store-url';
+
+
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const { user, permissions, isLoading, isCustomer, store, staffMember } = useAuth();
+  const { getStoreUrl } = useStoreUrl();
   const router = useRouter();
   const pathname = usePathname();
   const [isMinimized, setIsMinimized] = useState(false);
@@ -282,7 +286,7 @@ export default function DashboardLayout({
         router.replace('/login');
       } else if (isCustomer) {
         // Explicitly block customers from the dashboard
-        router.replace('/store/account');
+        router.replace(getStoreUrl('/store/account'));
       } else if (!store && !staffMember && !isGracePeriodActive && pathname !== '/signup-merchant') {
         // No store or staff record yet, and grace period has expired
         console.log("No store found after grace period, redirecting to signup-merchant");

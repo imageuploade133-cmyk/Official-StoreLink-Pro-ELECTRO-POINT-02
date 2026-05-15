@@ -30,6 +30,7 @@ export default function HomePage() {
         if (store || staffMember) {
           router.replace('/dashboard');
         } else if (isCustomer) {
+          // Use a relative path or a more specific store-based path if possible
           router.replace('/global/account');
         } else {
           // Logged in but no recognized role, could be a new merchant
@@ -37,7 +38,10 @@ export default function HomePage() {
         }
       } else {
         // Default for visitors: Show the store
-        router.replace('/global');
+        // Only redirect if we are truly at the root to avoid interference
+        if (window.location.pathname === '/') {
+           router.replace('/global');
+        }
       }
     }
   }, [user, store, staffMember, isCustomer, isLoading, router]);

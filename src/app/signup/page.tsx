@@ -5,9 +5,12 @@ import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 
+import { useStoreUrl } from '@/hooks/use-store-url';
+
 export default function SignupRedirect() {
   const router = useRouter();
   const { user, store, staffMember, isCustomer, isLoading } = useAuth();
+  const { getStoreUrl } = useStoreUrl();
 
   useEffect(() => {
     if (!isLoading) {
@@ -15,15 +18,15 @@ export default function SignupRedirect() {
         if (store || staffMember) {
           router.replace('/dashboard');
         } else if (isCustomer) {
-          router.replace('/store/account');
+          router.replace(getStoreUrl('/store/account'));
         } else {
           router.replace('/signup-merchant');
         }
       } else {
-        router.replace('/store/signup');
+        router.replace(getStoreUrl('/store/signup'));
       }
     }
-  }, [user, store, staffMember, isCustomer, isLoading, router]);
+  }, [user, store, staffMember, isCustomer, isLoading, router, getStoreUrl]);
 
   return (
     <div className="flex h-screen w-full items-center justify-center bg-background">

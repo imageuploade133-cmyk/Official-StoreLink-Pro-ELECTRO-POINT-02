@@ -15,7 +15,7 @@ import { useEffect, useMemo } from 'react';
 import { useFirestore } from '@/firebase';
 import { doc, runTransaction, increment } from 'firebase/firestore';
 import { format } from 'date-fns';
-import { useParams, usePathname } from 'next/navigation';
+import { useParams, usePathname, useRouter } from 'next/navigation';
 import { OfflineDetector } from "@/components/OfflineDetector";
 import { getStoreUrl } from "@/lib/domain";
 
@@ -25,7 +25,7 @@ function WebsiteTracker() {
   const storeId = params?.storeId as string;
 
   useEffect(() => {
-    if (!firestore || !storeId) return;
+    if (!firestore || !storeId || storeId === 'global') return;
 
     const trackVisit = async () => {
       // Prevent multiple tracking calls in the same session to reduce contention
@@ -90,7 +90,7 @@ function CanonicalLink() {
     const storeId = params?.storeId as string;
 
     const canonicalUrl = useMemo(() => {
-        if (!store || !storeId) return null;
+        if (!store || !storeId || storeId === 'global') return null;
         
         const baseUrl = getStoreUrl(
             store.id, 
@@ -135,7 +135,21 @@ export default function PublicLayout({
   children: React.ReactNode;
 }>) {
   const { isInitialLoadComplete } = useGlobalLoading();
-  const { settings } = useSettings();
+  const { settings, store } = useSettings();
+  const params = useParams();
+  const router = useRouter();
+
+  // Validate store existence and handle redirection
+  useEffect(() => {
+    if (isInitialLoadComplete) {
+        const storeId = params?.storeId as string;
+        // If we are in a store-specific route and the store doesn't exist
+        if (storeId && storeId !== 'global' && !store) {
+            console.log(`Store ${storeId} not found, redirecting to global storefront`);
+            router.replace('/global');
+        }
+    }
+  }, [isInitialLoadComplete, store, params, router]);
 
   const storeLogoWidth = settings?.storeLogoWidth || 120;
   const logoContainerHeight = Math.max(32, Math.round(storeLogoWidth * 0.33));
