@@ -705,40 +705,40 @@ export function ProductForm({
   }, [categories, form.watch('categoryId')]);
 
   const categorySelectionBody = (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="relative group">
-        <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
+        <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
         <Input
-          placeholder="Search categories (e.g. Shoes, Luxury...)"
+          placeholder="Search categories..."
           value={categorySearchTerm}
           onChange={(e) => setCategorySearchTerm(e.target.value)}
-          className="pl-12 h-14 bg-muted/40 border-primary/10 focus:border-primary/30 rounded-2xl shadow-sm text-base transition-all"
+          className="pl-9 h-11 bg-muted/40 border-primary/10 focus:border-primary/30 rounded-xl shadow-sm text-sm transition-all"
         />
       </div>
-      <div
+      <ScrollArea
         className={cn(
-          "h-80 overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-muted-foreground/20",
-          isMobile && "h-[calc(100vh-400px)] min-h-[300px]"
+          "h-[400px] pr-4",
+          isMobile && "h-[calc(100vh-350px)] min-h-[300px]"
         )}
       >
         {filteredCategories.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 bg-muted/5 rounded-3xl border-2 border-dashed">
-            <SearchIcon className="h-12 w-12 text-muted-foreground/20" />
+          <div className="flex flex-col items-center justify-center py-16 text-center space-y-3 bg-muted/5 rounded-2xl border border-dashed">
+            <SearchIcon className="h-10 w-10 text-muted-foreground/20" />
             <div className="space-y-1">
-              <p className="font-bold text-muted-foreground">No matches found</p>
-              <p className="text-xs text-muted-foreground/60 max-w-[200px]">Try a different search term or create a new category.</p>
+              <p className="font-bold text-sm text-muted-foreground">No matches found</p>
+              <p className="text-xs text-muted-foreground/60 max-w-[180px]">Try a different search term or create a new category.</p>
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4 pb-4">
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 pb-4">
             {filteredCategories.map((cat) => (
               <button
                 key={cat.id}
                 type="button"
                 className={cn(
-                  "group relative flex flex-col items-center p-4 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl",
+                  "group relative flex flex-col items-center p-3 rounded-xl border transition-all duration-200 hover:shadow-sm",
                   form.watch('categoryId') === cat.id
-                    ? "border-primary bg-primary/5 ring-4 ring-primary/10"
+                    ? "border-primary bg-primary/5 ring-2 ring-primary/20"
                     : "border-muted-foreground/10 bg-background hover:border-primary/30 hover:bg-primary/5"
                 )}
                 onClick={() => {
@@ -747,25 +747,25 @@ export function ProductForm({
                   setCategorySearchTerm('');
                 }}
               >
-                <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-muted mb-3 shadow-inner">
+                <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-muted mb-2 shadow-inner">
                   <Image
                     src={cat.imageUrl || `https://picsum.photos/seed/${cat.id}/200/200`}
                     alt={cat.name}
                     fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                    sizes="(max-width: 640px) 40vw, 150px"
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    sizes="(max-width: 640px) 30vw, 100px"
                     unoptimized
                   />
                   {form.watch('categoryId') === cat.id && (
-                    <div className="absolute inset-0 bg-primary/40 backdrop-blur-[2px] flex items-center justify-center animate-in fade-in duration-300">
-                      <div className="bg-white text-primary rounded-full p-2 shadow-2xl scale-110">
-                        <Check className="h-5 w-5" strokeWidth={4} />
+                    <div className="absolute inset-0 bg-primary/30 backdrop-blur-[1px] flex items-center justify-center animate-in fade-in duration-200">
+                      <div className="bg-white text-primary rounded-full p-1 shadow-lg scale-110">
+                        <Check className="h-3.5 w-3.5" strokeWidth={4} />
                       </div>
                     </div>
                   )}
                 </div>
                 <span className={cn(
-                  "text-xs font-black text-center line-clamp-2 leading-tight uppercase tracking-wider",
+                  "text-[10px] font-bold text-center line-clamp-2 leading-tight uppercase tracking-tight",
                   form.watch('categoryId') === cat.id ? "text-primary" : "text-foreground"
                 )}>
                   {cat.name}
@@ -774,38 +774,39 @@ export function ProductForm({
             ))}
           </div>
         )}
-      </div>
+      </ScrollArea>
     </div>
   );
 
   const categorySelectionFooter = (
     <div className="flex flex-row justify-between items-center w-full">
-      <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium italic">
+      <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-medium italic">
         <div className="p-1 bg-primary/10 rounded-full">
           <Info className="h-3 w-3 text-primary" />
         </div>
         <span className="hidden sm:inline">Missing a category?</span>
       </div>
-      <div className="flex gap-3">
+      <div className="flex gap-2">
         <Button
           type="button"
           variant="outline"
+          size="sm"
           onClick={() => {
             setIsChangeCategoryModalOpen(false);
             setIsCategoryModalOpen(true);
             setCategorySearchTerm('');
           }}
-          className="gap-2 border-primary/20 text-primary hover:bg-primary/5 font-bold rounded-xl h-11"
+          className="gap-2 border-primary/20 text-primary hover:bg-primary/5 font-bold rounded-xl h-10"
         >
-          <PlusCircle className="h-4 w-4" /> Create New
+          <PlusCircle className="h-4 w-4" /> New
         </Button>
         {isMobile ? (
           <DrawerClose asChild>
-            <Button type="button" variant="ghost" className="font-bold h-11 rounded-xl">Cancel</Button>
+            <Button type="button" variant="ghost" size="sm" className="font-bold h-10 rounded-xl">Cancel</Button>
           </DrawerClose>
         ) : (
           <DialogClose asChild>
-            <Button type="button" variant="ghost" className="font-bold h-11 rounded-xl">Cancel</Button>
+            <Button type="button" variant="ghost" size="sm" className="font-bold h-10 rounded-xl">Cancel</Button>
           </DialogClose>
         )}
       </div>
@@ -2513,7 +2514,7 @@ export function ProductForm({
       setIsChangeCategoryModalOpen(open);
       if (!open) setCategorySearchTerm('');
     }} dismissible={true}>
-      <DrawerContent className="flex flex-col h-screen w-screen overflow-hidden border-none rounded-none">
+      <DrawerContent className="flex flex-col h-[85vh] sm:h-[70vh] sm:max-w-2xl mx-auto overflow-hidden sm:rounded-t-3xl">
         <div 
           className="w-full flex flex-col items-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none select-none hover:bg-muted/20 transition-colors shrink-0"
           data-vaul-drag-handle
