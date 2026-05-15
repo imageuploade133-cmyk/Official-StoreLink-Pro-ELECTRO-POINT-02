@@ -1,4 +1,3 @@
-
 'use client';
 
 import Image from "next/image"
@@ -12,31 +11,22 @@ import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { PageSpinner, Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/hooks/use-toast";
 import placeholderImages from '@/lib/placeholder-images.json';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { useAuth as useFirebaseAuth, useUser } from "@/firebase";
+import { useAuth as useFirebaseAuth } from "@/firebase";
 import { useAuth } from "@/contexts/auth-context";
-import { useRouter } from "next/navigation";
-import { signInWithEmailAndPassword, sendPasswordResetEmail, AuthError } from "firebase/auth";
+import { useRouter, useSearchParams } from "next/navigation";
+import { signInWithEmailAndPassword, AuthError } from "firebase/auth";
 import { useSettings } from "@/contexts/settings-context";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useStoreUrl } from "@/hooks/use-store-url";
+import { ResetPasswordModal } from "@/components/auth/ResetPasswordModal";
 
 export default function StoreLoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
     const loginImagePlaceholder = placeholderImages['login-background'];
 
-    const [isResetLoading, setIsResetLoading] = useState(false);
-    const [resetError, setResetError] = useState('');
-    const [isForgotPassOpen, setIsForgotPassOpen] = useState(false);
+    const searchParams = useSearchParams();
+    const oobCode = searchParams.get('oobCode');
+    const [isForgotPassOpen, setIsForgotPassOpen] = useState(!!oobCode);
     const [showPassword, setShowPassword] = useState(false);
 
     const auth = useFirebaseAuth();
@@ -49,8 +39,6 @@ export default function StoreLoginPage() {
     const storeLogo = settings?.invoiceLogoUrl;
     const storeDescription = settings?.footerDescription || 'The ultimate all-in-one solution for managing your e-commerce business with unparalleled efficiency and insight.';
     const loginImage = settings?.loginImageUrl || loginImagePlaceholder.src;
-
-
     useEffect(() => {
         // Handle redirect reactively based on auth state
         if (!isAuthLoading && user) {
@@ -63,7 +51,7 @@ export default function StoreLoginPage() {
             router.replace('/signup-merchant');
           }
         }
-    }, [user, isAuthLoading, isCustomer, store, staffMember, router]);
+    }, [user, isAuthLoading, isCustomer, store, staffMember, router, getStoreUrl]);
 
     const handleLogin = (e: FormEvent) => {
         e.preventDefault();
@@ -78,7 +66,6 @@ export default function StoreLoginPage() {
                     title: "Login Successful",
                     description: "Redirecting to your account...",
                 });
-                // Redirection is handled by the useEffect watching the 'user' object
             })
             .catch((error: AuthError) => {
                 let description = "An unknown error occurred. Please try again.";
@@ -93,34 +80,6 @@ export default function StoreLoginPage() {
             })
             .finally(() => {
                 setIsLoading(false);
-            });
-    }
-
-    const handlePasswordReset = (e: FormEvent) => {
-        e.preventDefault();
-        setResetError('');
-        setIsResetLoading(true);
-
-        const email = (document.getElementById('reset-email') as HTMLInputElement).value;
-        if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-            setResetError('Please enter a valid email address.');
-            setIsResetLoading(false);
-            return;
-        }
-
-        sendPasswordResetEmail(auth, email)
-            .then(() => {
-                toast({
-                    title: "Password Reset Link Sent",
-                    description: `If an account with that email exists, a reset link has been sent.`,
-                });
-                setIsForgotPassOpen(false);
-            })
-            .catch((error: AuthError) => {
-                setResetError(error.message);
-            })
-            .finally(() => {
-                setIsResetLoading(false);
             });
     }
 
@@ -198,52 +157,13 @@ export default function StoreLoginPage() {
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
-                <Dialog open={isForgotPassOpen} onOpenChange={setIsForgotPassOpen}>
-                  <DialogTrigger asChild>
-                    <button
-                        type="button"
-                        onClick={() => setResetError('')}
-                        className="ml-auto inline-block text-sm text-muted-foreground hover:underline"
-                    >
-                        Forgot your password?
-                    </button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <form onSubmit={handlePasswordReset}>
-                        <DialogHeader>
-                          <DialogTitle>Reset Password</DialogTitle>
-                          <DialogDescription>
-                            Enter your email and we'll send a link to get back into your account.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="reset-email">Email</Label>
-                                <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                        id="reset-email"
-                                        type="email"
-                                        placeholder="name@example.com"
-                                        required
-                                        className="pl-10"
-                                    />
-                                </div>
-                            </div>
-                            {resetError && <p className="text-sm font-medium text-destructive">{resetError}</p>}
-                        </div>
-                        <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => setIsForgotPassOpen(false)}>
-                                Cancel
-                            </Button>
-                            <Button type="submit" disabled={isResetLoading}>
-                                {isResetLoading && <Spinner size="sm" className="mr-2 text-primary-foreground" />}
-                                Send reset link
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                  </DialogContent>
-                </Dialog>
+                <button
+                    type="button"
+                    onClick={() => setIsForgotPassOpen(true)}
+                    className="ml-auto inline-block text-sm text-muted-foreground hover:underline"
+                >
+                    Forgot your password?
+                </button>
               </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -275,6 +195,11 @@ export default function StoreLoginPage() {
           </form>
         </div>
       </div>
+      <ResetPasswordModal 
+        isOpen={isForgotPassOpen} 
+        onOpenChange={setIsForgotPassOpen} 
+        oobCode={oobCode}
+      />
     </div>
   )
 }
