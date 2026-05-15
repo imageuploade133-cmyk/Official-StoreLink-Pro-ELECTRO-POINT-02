@@ -15,199 +15,290 @@ import {
   Zap,
   Layout,
   BarChart3,
-  Users
+  Users,
+  ChevronRight,
+  Star
 } from 'lucide-react';
-import Image from 'next/image';
 
 export default function GlobalLandingPage() {
   return (
-    <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-primary/10 selection:text-primary">
+    <div className="min-h-screen bg-[#fafafa] text-slate-900 font-sans selection:bg-primary selection:text-white">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-xl border-b border-slate-100/50">
+      <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 group cursor-pointer">
-            <div className="bg-primary rounded-lg p-1 transition-transform group-hover:rotate-12">
-              <StoreLinkLogo className="h-7 w-7 text-white" />
+          <div className="flex items-center gap-2.5 group cursor-pointer">
+            <div className="bg-primary rounded-xl p-1.5 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 shadow-lg shadow-primary/20">
+              <StoreLinkLogo className="h-6 w-6 text-white" />
             </div>
-            <span className="font-bold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600">
-              StoreLink Pro
+            <span className="font-bold text-xl tracking-tight text-slate-900">
+              StoreLink<span className="text-primary font-black">Pro</span>
             </span>
           </div>
-          <div className="hidden md:flex items-center gap-8">
-            <Link href="#features" className="text-sm font-semibold text-slate-600 hover:text-primary transition-colors">Features</Link>
-            <Link href="#solutions" className="text-sm font-semibold text-slate-600 hover:text-primary transition-colors">Solutions</Link>
+          <div className="hidden md:flex items-center gap-10">
+            <Link href="#features" className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Features</Link>
+            <Link href="#solutions" className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Solutions</Link>
+            <Link href="#pricing" className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Pricing</Link>
           </div>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" className="font-bold text-slate-600 hover:text-primary" asChild>
-              <Link href="/login">Login</Link>
-            </Button>
-            <Button className="font-bold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all" asChild>
-              <Link href="/signup-merchant">Get Started</Link>
+          <div className="flex items-center gap-4">
+            <Link href="/login" className="hidden sm:block text-sm font-bold text-slate-600 hover:text-primary transition-colors">
+              Login
+            </Link>
+            <Button className="rounded-full px-6 font-bold shadow-lg shadow-primary/25 hover:shadow-primary/35 transition-all active:scale-95" asChild>
+              <Link href="/signup-merchant">Start Free Trial</Link>
             </Button>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
-        {/* Background Gradients */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10">
-          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px]" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/5 rounded-full blur-[120px]" />
+      <section className="relative pt-40 pb-24 overflow-hidden">
+        {/* Decorative Background */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1000px] -z-10 opacity-40">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-full bg-[radial-gradient(50%_50%_at_50%_50%,#e2e8f0_0%,rgba(255,255,255,0)_100%)]" />
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-bold mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <Zap className="h-4 w-4 fill-primary" />
-            <span>The Future of Retail is Here</span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200 shadow-sm text-slate-600 text-xs font-bold mb-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
+            <span className="uppercase tracking-wider">New: AI-Powered Inventory is live</span>
+            <ChevronRight className="h-3 w-3" />
           </div>
-          <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-900 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-75">
-            One Platform.<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-600">Infinite Possibilities.</span>
+          
+          <h1 className="text-6xl md:text-8xl font-black tracking-tight text-slate-900 mb-8 leading-[0.9] animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-100">
+            One platform.<br />
+            <span className="text-primary">Infinite possibilities.</span>
           </h1>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
-            StoreLink Pro is the comprehensive multi-tenant e-commerce and POS platform designed for modern retailers. Scale your business with powerful inventory, sales, and customer management.
+          
+          <p className="text-xl md:text-2xl text-slate-500 max-w-2xl mx-auto mb-12 font-medium leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+            The all-in-one OS for modern retail. Unified commerce, lightning POS, and global scale—built for the next generation of merchants.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
-            <Button size="lg" className="h-14 px-10 text-lg font-bold shadow-xl shadow-primary/25" asChild>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-5 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
+            <Button size="lg" className="h-14 px-10 rounded-full text-lg font-bold shadow-2xl shadow-primary/30" asChild>
               <Link href="/signup-merchant">
-                Launch Your Store <ArrowRight className="ml-2 h-5 w-5" />
+                Get Started for Free
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="h-14 px-10 text-lg font-bold border-2" asChild>
-              <Link href="/login">Merchant Dashboard</Link>
+            <Button size="lg" variant="outline" className="h-14 px-10 rounded-full text-lg font-bold border-2 bg-white" asChild>
+              <Link href="/login">View Live Demo</Link>
             </Button>
           </div>
           
-          {/* Dashboard Preview Mockup */}
-          <div className="mt-20 relative mx-auto max-w-5xl animate-in fade-in zoom-in duration-1000 delay-300">
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-200 bg-slate-900 aspect-[16/9]">
-              <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
-                 <div className="text-slate-500 flex flex-col items-center gap-4">
-                    <Layout className="h-20 w-20 opacity-20" />
-                    <p className="font-bold tracking-widest uppercase opacity-20">StoreLink Pro Interface</p>
-                 </div>
-              </div>
-              {/* Floating UI Elements */}
-              <div className="absolute top-10 left-10 p-4 bg-white/10 backdrop-blur-md rounded-xl border border-white/10 shadow-2xl animate-bounce-slow">
-                 <BarChart3 className="h-8 w-8 text-primary" />
-              </div>
-              <div className="absolute bottom-10 right-10 p-4 bg-white/10 backdrop-blur-md rounded-xl border border-white/10 shadow-2xl animate-pulse">
-                 <Users className="h-8 w-8 text-blue-400" />
+          {/* Main App Mockup */}
+          <div className="mt-24 relative max-w-6xl mx-auto animate-in fade-in zoom-in-95 duration-1000 delay-500">
+            <div className="relative rounded-[2rem] p-2 bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.05),0_20px_50px_rgba(0,0,0,0.1)]">
+              <div className="relative rounded-[1.5rem] overflow-hidden bg-slate-50 aspect-[16/10] border border-slate-200">
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+                   <div className="flex flex-col items-center gap-6 opacity-30 scale-150">
+                      <StoreLinkLogo className="h-20 w-20 text-primary" />
+                      <div className="h-1.5 w-40 bg-slate-300 rounded-full" />
+                      <div className="h-1.5 w-24 bg-slate-300 rounded-full" />
+                   </div>
+                </div>
+                
+                {/* Floating Elements */}
+                <div className="absolute top-1/4 left-10 p-5 bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-white flex items-center gap-4 animate-bounce-slow">
+                  <div className="h-12 w-12 rounded-xl bg-green-100 flex items-center justify-center">
+                    <BarChart3 className="h-6 w-6 text-green-600" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Revenue</p>
+                    <p className="text-xl font-black text-slate-900">+$12,450.00</p>
+                  </div>
+                </div>
+
+                <div className="absolute bottom-1/4 right-10 p-5 bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-white flex items-center gap-4 animate-float">
+                  <div className="h-12 w-12 rounded-xl bg-blue-100 flex items-center justify-center">
+                    <Users className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">New Customers</p>
+                    <p className="text-xl font-black text-slate-900">+48</p>
+                  </div>
+                </div>
               </div>
             </div>
+            
+            {/* Visual background element */}
+            <div className="absolute -top-12 -right-12 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10" />
+            <div className="absolute -bottom-12 -left-12 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl -z-10" />
           </div>
         </div>
       </section>
 
+      {/* Social Proof */}
+      <section className="py-12 border-y border-slate-100 bg-white">
+        <div className="max-w-7xl mx-auto px-4 flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-50 grayscale">
+          <div className="font-black text-2xl tracking-tighter italic">RETAILFLOW</div>
+          <div className="font-black text-2xl tracking-tighter">MERCHLY</div>
+          <div className="font-black text-2xl tracking-tighter italic underline decoration-primary">SPEEDSHOP</div>
+          <div className="font-black text-2xl tracking-tighter">CORE</div>
+          <div className="font-black text-2xl tracking-tighter italic">VANTAGE</div>
+        </div>
+      </section>
+
       {/* Features Grid */}
-      <section id="features" className="py-32 bg-slate-50 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <section id="features" className="py-32 px-4 sm:px-6 lg:px-8 relative bg-white">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight">Built for Growth</h2>
-            <p className="text-slate-600 max-w-2xl mx-auto text-lg font-medium leading-relaxed">
-              Every tool you need to manage your retail empire, from a single storefront to a global network of shops.
-            </p>
+          <div className="max-w-3xl mb-24">
+            <h2 className="text-sm font-black text-primary uppercase tracking-[0.3em] mb-4">Core Capabilities</h2>
+            <h3 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.1]">
+              Everything you need to <br />run your business.
+            </h3>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
-                icon: <ShoppingBag className="h-8 w-8 text-white" />,
-                title: "Multi-Storefront",
-                description: "Launch beautiful, high-converting online stores for each of your brands under one central account.",
-                color: "bg-primary"
+                icon: <ShoppingBag className="h-6 w-6 text-primary" />,
+                title: "Unified Storefront",
+                description: "One back-office to manage beautiful online stores across multiple subdomains and custom domains.",
+                gradient: "from-blue-50 to-indigo-50"
               },
               {
-                icon: <Smartphone className="h-8 w-8 text-white" />,
-                title: "Cloud POS",
-                description: "Seamlessly integrate your physical and online sales with our lightning-fast Point of Sale system.",
-                color: "bg-blue-600"
+                icon: <Smartphone className="h-6 w-6 text-blue-600" />,
+                title: "Hybrid Cloud POS",
+                description: "A professional-grade POS system that works on any device, syncing real-time with your online store.",
+                gradient: "from-slate-50 to-blue-50"
               },
               {
-                icon: <PieChart className="h-8 w-8 text-white" />,
-                title: "Real-time Analytics",
-                description: "Gain deep insights into your sales, inventory, and customer behavior with interactive reports.",
-                color: "bg-indigo-600"
+                icon: <Zap className="h-6 w-6 text-amber-500" />,
+                title: "Instant Analytics",
+                description: "Real-time insights into your sales, staff performance, and customer trends from anywhere in the world.",
+                gradient: "from-amber-50 to-orange-50"
               },
               {
-                icon: <Globe className="h-8 w-8 text-white" />,
-                title: "Custom Domains",
-                description: "Full SSL-protected custom domains or subdomains for a completely branded customer experience.",
-                color: "bg-emerald-600"
+                icon: <Globe className="h-6 w-6 text-emerald-600" />,
+                title: "Global Payments",
+                description: "Accept any currency with native integrations for Stripe, PayPal, Paystack, and Flutterwave.",
+                gradient: "from-emerald-50 to-teal-50"
               },
               {
-                icon: <Shield className="h-8 w-8 text-white" />,
-                title: "Secure Payments",
-                description: "Accept payments globally via Stripe, PayPal, Paystack, and more with 100% secure processing.",
-                color: "bg-amber-600"
+                icon: <Shield className="h-6 w-6 text-indigo-600" />,
+                title: "Enterprise Security",
+                description: "Bank-grade encryption, secure checkout, and granular staff permissions for total peace of mind.",
+                gradient: "from-indigo-50 to-purple-50"
               },
               {
-                icon: <CheckCircle2 className="h-8 w-8 text-white" />,
+                icon: <CheckCircle2 className="h-6 w-6 text-rose-600" />,
                 title: "Smart Inventory",
-                description: "Auto-sync stock levels across all channels, set low-stock alerts, and manage bulk transfers.",
-                color: "bg-rose-600"
+                description: "Automated stock tracking, bulk imports, and low-stock alerts to keep your business running smoothly.",
+                gradient: "from-rose-50 to-pink-50"
               }
             ].map((feature, index) => (
-              <div key={index} className="group bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
-                <div className={`mb-8 p-4 ${feature.color} rounded-2xl inline-block shadow-lg group-hover:rotate-6 transition-transform`}>
+              <div key={index} className={`group relative p-10 rounded-[2rem] border border-slate-100 bg-gradient-to-br ${feature.gradient} transition-all duration-300 hover:shadow-2xl hover:shadow-slate-200/50 hover:-translate-y-1`}>
+                <div className="mb-8 h-14 w-14 bg-white rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-500">
                   {feature.icon}
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4">{feature.title}</h3>
-                <p className="text-slate-600 leading-relaxed font-medium">{feature.description}</p>
+                <h4 className="text-2xl font-black text-slate-900 mb-4">{feature.title}</h4>
+                <p className="text-slate-500 leading-relaxed font-medium">{feature.description}</p>
+                <div className="mt-8 flex items-center text-sm font-bold text-slate-900 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  Learn more <ChevronRight className="h-4 w-4 ml-1" />
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
+      {/* Testimonial Section */}
+      <section className="py-32 bg-[#09090b] text-white overflow-hidden relative">
+        <div className="max-w-7xl mx-auto px-4 relative z-10">
+          <div className="flex flex-col items-center text-center">
+            <div className="flex gap-1 mb-8">
+              {[1,2,3,4,5].map(i => <Star key={i} className="h-5 w-5 fill-primary text-primary" />)}
+            </div>
+            <blockquote className="text-3xl md:text-5xl font-black tracking-tight max-w-4xl mb-12 leading-tight">
+              &quot;StoreLink Pro transformed how we manage our 12 locations. The POS is lightning fast and the multi-store management is a game changer.&quot;
+            </blockquote>
+            <div className="flex items-center gap-4">
+              <div className="h-14 w-14 rounded-full bg-slate-800" />
+              <div className="text-left">
+                <p className="font-bold text-lg">Marcus Chen</p>
+                <p className="text-slate-500 text-sm">Founder, Urban Collective</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Background Decorative */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-primary/10 rounded-full blur-[120px] -z-0" />
+      </section>
+
       {/* CTA Section */}
-      <section className="py-32 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto bg-slate-900 rounded-[3.5rem] p-12 md:p-24 text-center relative overflow-hidden shadow-2xl">
+      <section className="py-32 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-6xl mx-auto bg-primary rounded-[3rem] p-12 md:p-24 text-center relative overflow-hidden shadow-3xl shadow-primary/30">
           <div className="relative z-10">
-            <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tighter">Ready to revolutionize<br />your business?</h2>
-            <p className="text-slate-400 text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
-              Join the new generation of merchants who are scaling faster with StoreLink Pro&apos;s all-in-one ecosystem.
+            <h2 className="text-4xl md:text-7xl font-black text-white mb-8 tracking-tighter">Ready to scale?</h2>
+            <p className="text-white/80 text-xl mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
+              Join thousands of merchants who are growing their business with the world&apos;s most flexible commerce platform.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Button size="lg" className="h-16 px-12 text-xl font-black bg-white text-slate-900 hover:bg-slate-100" asChild>
-                <Link href="/signup-merchant">Get Started Now</Link>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+                <Button size="lg" className="h-16 px-12 rounded-full text-xl font-black bg-white text-primary hover:bg-slate-50 transition-all active:scale-95" asChild>
+                  <Link href="/signup-merchant">Start Free Trial</Link>
                 </Button>
-                <Link href="/login" className="text-white font-bold hover:text-primary transition-colors flex items-center gap-2">
-                    Or Sign In to Dashboard <ArrowRight className="h-5 w-5" />
+                <Link href="/login" className="text-white font-bold hover:underline transition-all flex items-center gap-2 text-lg">
+                    Speak with Sales <ArrowRight className="h-5 w-5" />
                 </Link>
             </div>
           </div>
           {/* Decorative Elements */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2" />
+          <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2" />
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-20 border-t border-slate-100 px-4 sm:px-6 lg:px-8 bg-slate-50/50">
+      <footer className="py-24 bg-[#fafafa] border-t border-slate-200 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-10">
-            <div className="flex flex-col items-center md:items-start gap-4">
-                <div className="flex items-center gap-2">
-                    <StoreLinkLogo className="h-8 w-8 text-primary" />
-                    <span className="font-black text-2xl tracking-tighter">StoreLink Pro</span>
-                </div>
-                <p className="text-slate-500 text-sm font-medium">Empowering commerce everywhere.</p>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
+            <div className="col-span-1 md:col-span-1">
+              <div className="flex items-center gap-2.5 mb-6">
+                <StoreLinkLogo className="h-8 w-8 text-primary" />
+                <span className="font-black text-2xl tracking-tighter">StoreLink Pro</span>
+              </div>
+              <p className="text-slate-500 font-medium leading-relaxed mb-8">
+                The operating system for modern commerce. Unified, global, and ready for whatever comes next.
+              </p>
             </div>
             
-            <div className="flex flex-wrap justify-center gap-x-12 gap-y-6">
-                <Link href="#features" className="text-sm font-bold text-slate-600 hover:text-primary transition-colors uppercase tracking-widest">Features</Link>
-                <Link href="/signup-merchant" className="text-sm font-bold text-slate-600 hover:text-primary transition-colors uppercase tracking-widest">Sign Up</Link>
-                <Link href="/login" className="text-sm font-bold text-slate-600 hover:text-primary transition-colors uppercase tracking-widest">Merchant Login</Link>
+            <div>
+              <h5 className="font-bold text-slate-900 mb-6 uppercase tracking-widest text-xs">Product</h5>
+              <ul className="space-y-4">
+                <li><Link href="#" className="text-slate-500 hover:text-primary transition-colors font-medium">Features</Link></li>
+                <li><Link href="#" className="text-slate-500 hover:text-primary transition-colors font-medium">POS System</Link></li>
+                <li><Link href="#" className="text-slate-500 hover:text-primary transition-colors font-medium">Inventory</Link></li>
+                <li><Link href="#" className="text-slate-500 hover:text-primary transition-colors font-medium">Analytics</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h5 className="font-bold text-slate-900 mb-6 uppercase tracking-widest text-xs">Company</h5>
+              <ul className="space-y-4">
+                <li><Link href="#" className="text-slate-500 hover:text-primary transition-colors font-medium">About Us</Link></li>
+                <li><Link href="#" className="text-slate-500 hover:text-primary transition-colors font-medium">Careers</Link></li>
+                <li><Link href="#" className="text-slate-500 hover:text-primary transition-colors font-medium">Blog</Link></li>
+                <li><Link href="#" className="text-slate-500 hover:text-primary transition-colors font-medium">Contact</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h5 className="font-bold text-slate-900 mb-6 uppercase tracking-widest text-xs">Legal</h5>
+              <ul className="space-y-4">
+                <li><Link href="#" className="text-slate-500 hover:text-primary transition-colors font-medium">Privacy Policy</Link></li>
+                <li><Link href="#" className="text-slate-500 hover:text-primary transition-colors font-medium">Terms of Service</Link></li>
+                <li><Link href="#" className="text-slate-500 hover:text-primary transition-colors font-medium">Cookie Policy</Link></li>
+              </ul>
             </div>
           </div>
           
-          <div className="mt-20 pt-8 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-slate-400 text-xs font-bold">© {new Date().getFullYear()} STORELINK PRO. ALL RIGHTS RESERVED.</p>
-            <div className="flex items-center gap-8">
-                <span className="text-slate-400 text-xs font-bold cursor-pointer hover:text-slate-600">PRIVACY POLICY</span>
-                <span className="text-slate-400 text-xs font-bold cursor-pointer hover:text-slate-600">TERMS OF SERVICE</span>
+          <div className="pt-8 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-6">
+            <p className="text-slate-400 text-xs font-bold tracking-widest uppercase">
+              © {new Date().getFullYear()} StoreLink Pro. All rights reserved.
+            </p>
+            <div className="flex items-center gap-6">
+               <div className="h-8 w-8 rounded-full bg-slate-200" />
+               <div className="h-8 w-8 rounded-full bg-slate-200" />
+               <div className="h-8 w-8 rounded-full bg-slate-200" />
             </div>
           </div>
         </div>
@@ -218,8 +309,16 @@ export default function GlobalLandingPage() {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-20px); }
         }
+        @keyframes float {
+          0%, 100% { transform: translateY(0) translateX(0); }
+          33% { transform: translateY(-10px) translateX(5px); }
+          66% { transform: translateY(5px) translateX(-5px); }
+        }
         .animate-bounce-slow {
           animation: bounce-slow 6s ease-in-out infinite;
+        }
+        .animate-float {
+          animation: float 8s ease-in-out infinite;
         }
       `}</style>
     </div>
