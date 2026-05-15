@@ -710,18 +710,18 @@ export function WebStoreProductForm() {
       <div className="relative group">
         <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
         <Input
-          placeholder="Search categories (e.g. Shoes, Luxury...)"
+          placeholder="Search categories..."
           value={categorySearchTerm}
           onChange={(e) => setCategorySearchTerm(e.target.value)}
-          className="pl-12 h-14 bg-muted/40 border-primary/10 focus:border-primary/30 rounded-2xl shadow-sm text-base transition-all"
+          className="pl-12 h-12 bg-muted/40 border-primary/10 focus:border-primary/30 rounded-xl shadow-sm text-sm transition-all"
         />
       </div>
       <div
         ref={scrollContainerRef}
         onScroll={handleCategoryScroll}
         className={cn(
-          "h-80 overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-muted-foreground/20",
-          isMobile && "h-[calc(100vh-400px)] min-h-[300px]"
+          "max-h-[60vh] overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-muted-foreground/20",
+          isMobile ? "h-[50vh]" : "h-96"
         )}
       >
         {isLoadingPaginatedCategories ? (
@@ -741,16 +741,16 @@ export function WebStoreProductForm() {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4 pb-4">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 pb-4">
             {displayedCategories.map((cat) => (
               <button
                 key={cat.id}
                 type="button"
                 className={cn(
-                  "group relative flex flex-col items-center p-4 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl",
+                  "group relative flex flex-col items-center p-2 rounded-xl border transition-all duration-200",
                   form.watch('categoryId') === cat.id
-                    ? "border-primary bg-primary/5 ring-4 ring-primary/10"
-                    : "border-muted-foreground/10 bg-background hover:border-primary/30 hover:bg-primary/5"
+                    ? "border-primary bg-primary/5 ring-2 ring-primary/20"
+                    : "border-border bg-background hover:border-primary/50 hover:bg-primary/5 shadow-sm hover:shadow-md"
                 )}
                 onClick={() => {
                   form.setValue('categoryId', cat.id, { shouldValidate: true });
@@ -758,7 +758,7 @@ export function WebStoreProductForm() {
                   setCategorySearchTerm('');
                 }}
               >
-                <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-muted mb-3 shadow-inner">
+                <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-muted mb-2 shadow-inner">
                   <Image
                     src={cat.imageUrl || `https://picsum.photos/seed/${cat.id}/200/200`}
                     alt={cat.name}
@@ -768,16 +768,16 @@ export function WebStoreProductForm() {
                     unoptimized
                   />
                   {form.watch('categoryId') === cat.id && (
-                    <div className="absolute inset-0 bg-primary/40 backdrop-blur-[2px] flex items-center justify-center animate-in fade-in duration-300">
-                      <div className="bg-white text-primary rounded-full p-2 shadow-2xl scale-110">
-                        <Check className="h-5 w-5" strokeWidth={4} />
+                    <div className="absolute inset-0 bg-primary/60 backdrop-blur-[1px] flex items-center justify-center animate-in fade-in zoom-in duration-200">
+                      <div className="bg-white text-primary rounded-full p-1.5 shadow-xl scale-100">
+                        <Check className="h-3.5 w-3.5" strokeWidth={4} />
                       </div>
                     </div>
                   )}
                 </div>
                 <span className={cn(
-                  "text-xs font-black text-center line-clamp-2 leading-tight uppercase tracking-wider",
-                  form.watch('categoryId') === cat.id ? "text-primary" : "text-foreground"
+                  "text-[10px] font-bold text-center line-clamp-2 leading-tight uppercase tracking-tight px-1",
+                  form.watch('categoryId') === cat.id ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
                 )}>
                   {cat.name}
                 </span>
@@ -2011,7 +2011,7 @@ export function WebStoreProductForm() {
                       <FormLabel className="font-black text-xs uppercase tracking-wider flex items-center gap-2">
                           <Info className="h-3.5 w-3.5 text-primary" /> Product Insight
                       </FormLabel>
-                      <p className="text-[10px] text-muted-foreground">Show "Listed Since" metrics</p>
+                      <p className="text-[10px] text-muted-foreground">Show &quot;Listed Since&quot; metrics</p>
                     </div>
                     <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} disabled={isSaving} /></FormControl>
                   </FormItem>
@@ -2113,54 +2113,83 @@ export function WebStoreProductForm() {
     </FormProvider>
 
     {/* Change Category Modal */}
-    <Drawer open={isChangeCategoryModalOpen} onOpenChange={(open) => {
-      setIsChangeCategoryModalOpen(open);
-      if (!open) setCategorySearchTerm('');
-    }} dismissible={true}>
-      <DrawerContent className="flex flex-col h-screen w-screen overflow-hidden border-none rounded-none">
-        <div
-          className="w-full flex flex-col items-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none select-none hover:bg-muted/20 transition-colors shrink-0"
-          data-vaul-drag-handle
-        >
-          <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
-        </div>
-
-        <div className="flex justify-end px-6 py-2 shrink-0">
-          <DrawerClose asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-muted">
-              <X className="h-4 w-4" />
-              <span className="sr-only">Close</span>
-            </Button>
-          </DrawerClose>
-        </div>
-
-        <div className="flex-1 flex flex-col min-h-0">
-          <DrawerHeader className="px-8 pb-4 text-left shrink-0">
-            <DrawerTitle className="flex items-center gap-3 text-2xl font-bold tracking-tight">
+    {!isMobile ? (
+      <Dialog open={isChangeCategoryModalOpen} onOpenChange={(open) => {
+        setIsChangeCategoryModalOpen(open);
+        if (!open) setCategorySearchTerm('');
+      }}>
+        <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col p-0 overflow-hidden rounded-3xl border-none shadow-2xl">
+          <DialogHeader className="px-8 pt-8 pb-4">
+            <DialogTitle className="flex items-center gap-3 text-2xl font-bold tracking-tight">
               <div className="p-2.5 bg-primary/10 rounded-2xl">
                 <Layers className="h-6 w-6 text-primary"/>
               </div>
-              Select Target Category
-            </DrawerTitle>
-            <DrawerDescription className="text-base text-left">
-              Organize your product by assigning it to a specific collection.
-            </DrawerDescription>
-          </DrawerHeader>
-
+              Select Category
+            </DialogTitle>
+            <DialogDescription>
+              Assign this product to a collection for better organization.
+            </DialogDescription>
+          </DialogHeader>
+          
           <div className="flex-1 overflow-y-auto px-8 py-2">
              {categorySelectionBody}
           </div>
 
-          <DrawerFooter className="flex flex-row justify-between items-center border-t p-8 bg-muted/10 shrink-0 mt-auto">
+          <DialogFooter className="p-8 bg-muted/20 border-t mt-auto">
             {categorySelectionFooter}
-          </DrawerFooter>
-        </div>
-      </DrawerContent>
-    </Drawer>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    ) : (
+      <Drawer open={isChangeCategoryModalOpen} onOpenChange={(open) => {
+        setIsChangeCategoryModalOpen(open);
+        if (!open) setCategorySearchTerm('');
+      }} dismissible={true}>
+        <DrawerContent className="flex flex-col h-[85vh] overflow-hidden border-none rounded-t-[32px]">
+          <div 
+            className="w-full flex flex-col items-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none select-none hover:bg-muted/20 transition-colors shrink-0"
+            data-vaul-drag-handle
+          >
+            <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+          </div>
+
+          <div className="flex justify-end px-6 py-2 shrink-0">
+            <DrawerClose asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-muted">
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+              </Button>
+            </DrawerClose>
+          </div>
+
+          <div className="flex-1 flex flex-col min-h-0">
+            <DrawerHeader className="px-8 pb-4 text-left shrink-0">
+              <DrawerTitle className="flex items-center gap-3 text-2xl font-bold tracking-tight">
+                <div className="p-2.5 bg-primary/10 rounded-2xl">
+                  <Layers className="h-6 w-6 text-primary"/>
+                </div>
+                Select Category
+              </DrawerTitle>
+              <DrawerDescription className="text-base text-left">
+                Choose a collection for your product.
+              </DrawerDescription>
+            </DrawerHeader>
+            
+            <div className="flex-1 overflow-y-auto px-8 py-2">
+               {categorySelectionBody}
+            </div>
+
+            <DrawerFooter className="flex flex-row justify-between items-center border-t p-8 bg-muted/10 shrink-0 mt-auto">
+              {categorySelectionFooter}
+            </DrawerFooter>
+          </div>
+        </DrawerContent>
+      </Drawer>
+    )}
 
     {/* Create New Category Modal */}
     <Drawer open={isCategoryModalOpen} onOpenChange={setIsCategoryModalOpen} dismissible={true}>
-      <DrawerContent className="flex flex-col h-screen w-screen overflow-hidden border-none rounded-none">
+      <DrawerContent className="flex flex-col h-[85vh] overflow-hidden border-none rounded-t-[32px]">
         <DrawerHeader className="sr-only">
           <DrawerTitle>Create New Category</DrawerTitle>
           <DrawerDescription>Add a new collection to organize your products.</DrawerDescription>
