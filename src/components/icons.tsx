@@ -9,13 +9,13 @@ export const StoreLinkLogo = (props: React.SVGProps<SVGSVGElement>) => (
     viewBox="0 0 40 40"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    className={cn("drop-shadow-lg transition-all duration-500 hover:scale-110 hover:brightness-110 group-hover:drop-shadow-[0_0_8px_rgba(255,69,0,0.5)]", props.className)}
+    className={cn("drop-shadow-lg transition-all duration-500 hover:scale-110 hover:brightness-110 group-hover:drop-shadow-[0_0_8px_rgba(0,113,227,0.5)]", props.className)}
     {...props}
   >
     <defs>
         <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#ff4500" />
-            <stop offset="100%" stopColor="#ff8c00" />
+            <stop offset="0%" stopColor="hsl(var(--primary))" />
+            <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.85" />
         </linearGradient>
     </defs>
     <rect width="40" height="40" rx="10" fill="url(#logo-gradient)" />

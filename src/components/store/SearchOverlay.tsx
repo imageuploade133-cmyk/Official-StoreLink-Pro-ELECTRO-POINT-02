@@ -140,7 +140,7 @@ export function SearchOverlay({ open, onOpenChange }: SearchOverlayProps) {
       {/* Search Input Header */}
       <div className="relative flex items-center border-b border-black/5 dark:border-white/5 bg-gradient-to-b from-white/80 to-white/40 dark:from-black/80 dark:to-black/40">
         <div className="flex-1 flex items-center px-4 h-14">
-          <Search className="h-5 w-5 shrink-0 text-[#ff4500] mr-3" strokeWidth={2.5} />
+          <Search className="h-5 w-5 shrink-0 text-primary mr-3" strokeWidth={2.5} />
           <form onSubmit={handleSearch} className="flex-1">
             <input
               ref={inputRef}
@@ -176,11 +176,11 @@ export function SearchOverlay({ open, onOpenChange }: SearchOverlayProps) {
         <CommandEmpty className="py-16">
           <div className="flex flex-col items-center justify-center space-y-4 px-4">
             <div className="relative">
-              <div className="rounded-full bg-gradient-to-br from-[#ff4500]/10 to-[#ff4500]/5 dark:from-[#ff4500]/20 dark:to-[#ff4500]/10 p-5">
-                <Search className="h-10 w-10 text-[#ff4500]" />
+              <div className="rounded-full bg-gradient-to-br from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 p-5">
+                <Search className="h-10 w-10 text-primary" />
               </div>
               <div className="absolute -bottom-1 -right-1 rounded-full bg-white dark:bg-black p-1.5 shadow-sm">
-                <Package className="h-3.5 w-3.5 text-[#ff4500]" />
+                <Package className="h-3.5 w-3.5 text-primary" />
               </div>
             </div>
             <div className="text-center space-y-1">
@@ -204,7 +204,7 @@ export function SearchOverlay({ open, onOpenChange }: SearchOverlayProps) {
                   <button
                     key={item}
                     onClick={() => setSearch(item)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-black/[0.03] dark:bg-white/[0.03] hover:bg-[#ff4500]/10 hover:text-[#ff4500] border border-black/5 dark:border-white/5 hover:border-[#ff4500]/20 text-xs font-medium text-foreground transition-all duration-200"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-black/[0.03] dark:bg-white/[0.03] hover:bg-primary/10 hover:text-primary border border-black/5 dark:border-white/5 hover:border-primary/20 text-xs font-medium text-foreground transition-all duration-200"
                   >
                     <Sparkles className="h-3 w-3" />
                     {item}
@@ -227,7 +227,7 @@ export function SearchOverlay({ open, onOpenChange }: SearchOverlayProps) {
                   <CommandItem
                     key={cat.id}
                     onSelect={() => handleItemClick(`/store/shop?category=${cat.id}`)}
-                    className="cursor-pointer flex items-center gap-3 p-3 rounded-xl hover:bg-[#ff4500]/5 active:bg-[#ff4500]/10 transition-all duration-200 aspect-square sm:aspect-auto"
+                    className="cursor-pointer flex items-center gap-3 p-3 rounded-xl hover:bg-primary/5 active:bg-primary/10 transition-all duration-200 aspect-square sm:aspect-auto"
                     >
                     <div className="relative h-12 w-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 shadow-sm border border-black/5 dark:border-white/5">
                       <Image 
@@ -268,7 +268,7 @@ export function SearchOverlay({ open, onOpenChange }: SearchOverlayProps) {
                       onSelect={() => handleItemClick(`/store/shop?category=${cat.id}`)}
                       className="cursor-pointer w-full"
                     >
-                      <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-[#ff4500]/5 active:bg-[#ff4500]/10 transition-all duration-200 group">
+                      <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-primary/5 active:bg-primary/10 transition-all duration-200 group">
                         <div className="relative h-14 w-14 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 shadow-sm border border-black/5 dark:border-white/5 transition-transform group-hover:scale-105">
                           <Image 
                             src={cat.imageUrl || `https://picsum.photos/seed/${cat.id}/100/100`} 
@@ -282,7 +282,7 @@ export function SearchOverlay({ open, onOpenChange }: SearchOverlayProps) {
                           <span className="font-semibold text-sm truncate">{cat.name}</span>
                           <span className="text-xs text-muted-foreground">View collection</span>
                         </div>
-                        <ArrowRight className="h-4 w-4 text-[#ff4500] opacity-0 group-aria-selected:opacity-100 transition-opacity shrink-0" />
+                        <ArrowRight className="h-4 w-4 text-primary opacity-0 group-aria-selected:opacity-100 transition-opacity shrink-0" />
                       </div>
                     </CommandItem>
                   ))}
@@ -310,7 +310,7 @@ export function SearchOverlay({ open, onOpenChange }: SearchOverlayProps) {
                         onSelect={() => handleItemClick(`/store/product/${product.slug || product.id}`)}
                         className="cursor-pointer w-full"
                       >
-                        <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-[#ff4500]/5 active:bg-[#ff4500]/10 transition-all duration-200 group">
+                        <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-primary/5 active:bg-primary/10 transition-all duration-200 group">
                           <div className="relative h-16 w-16 rounded-xl overflow-hidden bg-white dark:bg-slate-800 shrink-0 shadow-sm border border-black/5 dark:border-white/5 transition-transform group-hover:scale-105">
                             <Image 
                               src={product.imageUrl || 'https://placehold.co/100x100.png'} 
@@ -328,7 +328,7 @@ export function SearchOverlay({ open, onOpenChange }: SearchOverlayProps) {
                           <div className="flex flex-col flex-1 min-w-0">
                             <span className="font-semibold text-sm truncate">{product.name}</span>
                             <div className="flex items-center gap-2 mt-0.5">
-                              <span className="text-sm font-bold text-[#ff4500]">
+                              <span className="text-sm font-bold text-primary">
                                 {formatCurrency(effectivePrice, settings?.currency || '$')}
                               </span>
                               {hasDiscount && (
@@ -348,7 +348,7 @@ export function SearchOverlay({ open, onOpenChange }: SearchOverlayProps) {
                               </span>
                             )}
                           </div>
-                          <ArrowRight className="h-4 w-4 text-[#ff4500] opacity-0 group-aria-selected:opacity-100 transition-opacity shrink-0" />
+                          <ArrowRight className="h-4 w-4 text-primary opacity-0 group-aria-selected:opacity-100 transition-opacity shrink-0" />
                         </div>
                       </CommandItem>
                     );
@@ -361,7 +361,7 @@ export function SearchOverlay({ open, onOpenChange }: SearchOverlayProps) {
             {(categoryMatches.length > 0 || searchResults.length > 0) && (
               <div className="p-4 mt-2">
                 <Button
-                  className="w-full justify-center gap-2.5 rounded-xl h-12 text-sm font-semibold bg-gradient-to-r from-[#ff4500] to-[#ff8c00] hover:from-[#ff8c00] hover:to-[#ff4500] text-white shadow-lg shadow-[#ff4500]/20 transition-all duration-300 active:scale-[0.98]"
+                  className="w-full justify-center gap-2.5 rounded-xl h-12 text-sm font-semibold bg-primary hover:opacity-90 text-white shadow-lg shadow-primary/20 transition-all duration-300 active:scale-[0.98]"
                   onClick={handleSearch}
                 >
                   View all results for &quot;{search}&quot;
@@ -377,7 +377,7 @@ export function SearchOverlay({ open, onOpenChange }: SearchOverlayProps) {
                 <div className="grid grid-cols-2 gap-2">
                   {['Use generic keywords', 'Check spelling', 'Try shorter terms', 'Browse categories'].map((tip) => (
                     <div key={tip} className="flex items-center gap-2 text-xs text-muted-foreground/70 bg-black/[0.02] dark:bg-white/[0.02] rounded-lg px-3 py-2">
-                      <div className="h-1.5 w-1.5 rounded-full bg-[#0071e3]/50" />
+                      <div className="h-1.5 w-1.5 rounded-full bg-primary/50" />
                       {tip}
                     </div>
                   ))}
@@ -394,7 +394,6 @@ export function SearchOverlay({ open, onOpenChange }: SearchOverlayProps) {
           <span className="flex items-center gap-1">
             <kbd className="inline-flex h-5 select-none items-center rounded border border-black/10 dark:border-white/10 bg-white dark:bg-black px-1.5 font-mono text-[9px] font-medium shadow-sm">
               ↵
-
             </kbd>
             <span>to search</span>
           </span>

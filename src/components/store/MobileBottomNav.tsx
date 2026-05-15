@@ -56,13 +56,13 @@ export function MobileBottomNav() {
             href={item.href}
             className={cn(
               "flex flex-col items-center justify-center flex-1 gap-1 transition-all duration-300",
-              item.active ? "text-[#ff4500] scale-110" : "text-slate-500 dark:text-slate-400"
+              item.active ? "text-primary scale-110" : "text-slate-500 dark:text-slate-400"
             )}
           >
             <div className="relative">
               <item.icon className={cn("h-6 w-6", item.active && "fill-current")} strokeWidth={item.active ? 2.5 : 2} />
               {item.badge !== undefined && item.badge > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 h-4 w-4 bg-[#ff4500] text-white text-[10px] flex items-center justify-center rounded-full font-bold border-2 border-white dark:border-black animate-in zoom-in duration-300">
+                <span className="absolute -top-1.5 -right-1.5 h-4 w-4 bg-primary text-white text-[10px] flex items-center justify-center rounded-full font-bold border-2 border-white dark:border-black animate-in zoom-in duration-300">
                   {item.badge}
                 </span>
               )}
