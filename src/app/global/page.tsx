@@ -57,7 +57,7 @@ export default function GlobalLandingPage() {
           
           {/* Main App Mockup */}
           <div className="mt-24 relative max-w-6xl mx-auto animate-in fade-in zoom-in-95 duration-1000 delay-500">
-            <div className="relative rounded-[2rem] p-2 bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.05),0_20px_50px_rgba(0,0,0,0.1)]">
+            <div className="relative rounded-[2rem] p-2 bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.05),0_20px_50px_rgba(0,0,0,0.1)] animate-moving-border">
               <div className="relative rounded-[1.5rem] overflow-hidden bg-slate-50 aspect-[16/10] border border-slate-200">
                 <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
                    <div className="flex flex-col items-center gap-6 opacity-30 scale-150">
@@ -68,7 +68,7 @@ export default function GlobalLandingPage() {
                 </div>
                 
                 {/* Floating Elements */}
-                <div className="absolute top-1/4 left-10 p-5 bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-white flex items-center gap-4 animate-bounce-slow">
+                <div className="absolute top-1/4 left-10 p-5 bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-white flex items-center gap-4 animate-bounce-slow animate-moving-border">
                   <div className="h-12 w-12 rounded-xl bg-green-100 flex items-center justify-center">
                     <BarChart3 className="h-6 w-6 text-green-600" />
                   </div>
@@ -78,7 +78,7 @@ export default function GlobalLandingPage() {
                   </div>
                 </div>
 
-                <div className="absolute bottom-1/4 right-10 p-5 bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-white flex items-center gap-4 animate-float">
+                <div className="absolute bottom-1/4 right-10 p-5 bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-white flex items-center gap-4 animate-float animate-moving-border">
                   <div className="h-12 w-12 rounded-xl bg-blue-100 flex items-center justify-center">
                     <Users className="h-6 w-6 text-blue-600" />
                   </div>
@@ -157,7 +157,7 @@ export default function GlobalLandingPage() {
                 gradient: "from-rose-50 to-pink-50"
               }
             ].map((feature, index) => (
-              <div key={index} className={`group relative p-10 rounded-[2rem] border border-slate-100 bg-gradient-to-br ${feature.gradient} transition-all duration-300 hover:shadow-2xl hover:shadow-slate-200/50 hover:-translate-y-1`}>
+              <div key={index} className={`group relative p-10 rounded-[2rem] border border-slate-100 bg-gradient-to-br ${feature.gradient} transition-all duration-300 hover:shadow-2xl hover:shadow-slate-200/50 hover:-translate-y-1 animate-moving-border`}>
                 <div className="mb-8 h-14 w-14 bg-white rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-500">
                   {feature.icon}
                 </div>
@@ -224,7 +224,7 @@ export default function GlobalLandingPage() {
               </div>
             </div>
             <div className="lg:w-1/2 relative">
-              <div className="relative bg-white p-8 rounded-[3rem] shadow-2xl border border-slate-100">
+              <div className="relative bg-white p-8 rounded-[3rem] shadow-2xl border border-slate-100 animate-moving-border">
                 <div className="flex items-center gap-4 mb-8">
                   <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center">
                     <Zap className="h-8 w-8 text-primary" />
@@ -289,7 +289,7 @@ export default function GlobalLandingPage() {
                 description: "Sell to customers anywhere in the world with ease."
               }
             ].map((item, i) => (
-              <div key={i} className="p-10 rounded-[2rem] bg-slate-50 border border-slate-100">
+              <div key={i} className="p-10 rounded-[2rem] bg-slate-50 border border-slate-100 animate-moving-border">
                 <h4 className="text-2xl font-black mb-4">{item.title}</h4>
                 <p className="text-slate-500 font-medium">{item.description}</p>
               </div>
@@ -303,7 +303,7 @@ export default function GlobalLandingPage() {
 
       {/* CTA Section */}
       <section className="py-32 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-6xl mx-auto bg-primary rounded-[3rem] p-12 md:p-24 text-center relative overflow-hidden shadow-3xl shadow-primary/30">
+        <div className="max-w-6xl mx-auto bg-primary rounded-[3rem] p-12 md:p-24 text-center relative overflow-hidden shadow-3xl shadow-primary/30 animate-moving-border">
           <div className="relative z-10">
             <h2 className="text-4xl md:text-7xl font-black text-white mb-8 tracking-tighter">Ready to scale?</h2>
             <p className="text-white/80 text-xl mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
