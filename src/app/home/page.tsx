@@ -159,9 +159,15 @@ export default function HomeLandingPage() {
                   </p>
                 </div>
                 <div className="flex-1 grid grid-cols-2 gap-4">
-                    {[1,2,3,4].map(i => (
+                    {[1, 2, 3, 4].map(i => (
                         <div key={i} className="bg-white rounded-2xl flex items-center justify-center p-6 shadow-sm group-hover:scale-105 transition-transform duration-500">
-                            <CreditCard className="h-8 w-8 text-[#5856d6] opacity-30" />
+                            <Image 
+                                src={`https://emakemrnd.com.ng/${i}.png`}
+                                alt={`Payment Provider ${i}`}
+                                width={80}
+                                height={40}
+                                className="object-contain max-h-12 w-auto"
+                            />
                         </div>
                     ))}
                 </div>
