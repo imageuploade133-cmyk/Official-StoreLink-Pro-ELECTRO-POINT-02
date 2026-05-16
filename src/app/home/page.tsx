@@ -1,352 +1,390 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { StoreLinkLogo } from '@/components/icons';
 import { useAuth } from '@/contexts/auth-context';
-import { 
-  ArrowRight, 
-  CheckCircle2, 
-  ShoppingBag, 
-  Smartphone, 
-  Globe, 
-  Shield,
-  Zap,
-  BarChart3,
-  Users,
-  ChevronRight,
-  Star
-} from 'lucide-react';
 
 export default function HomeLandingPage() {
   const { user } = useAuth();
+  
   return (
-    <>
-      {/* Hero Section */}
-      <section className="relative pt-40 pb-24 overflow-hidden">
-        {/* Decorative Background */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1000px] -z-10 opacity-40">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-full bg-[radial-gradient(50%_50%_at_50%_50%,#e2e8f0_0%,rgba(255,255,255,0)_100%)]" />
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200 shadow-sm text-slate-600 text-xs font-bold mb-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-            <span className="uppercase tracking-wider">New: AI-Powered Inventory is live</span>
-            <ChevronRight className="h-3 w-3" />
-          </div>
-          
-          <h1 className="text-6xl md:text-8xl font-black tracking-tight text-slate-900 mb-8 leading-[0.9] animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-100">
-            One platform.<br />
-            <span className="text-primary">Infinite possibilities.</span>
-          </h1>
-          
-          <p className="text-xl md:text-2xl text-slate-500 max-w-2xl mx-auto mb-12 font-medium leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
-            The all-in-one OS for modern retail. Unified commerce, lightning POS, and global scale—built for the next generation of merchants.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-5 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
-            <Button size="lg" className="h-14 px-10 rounded-full text-lg font-bold shadow-2xl shadow-primary/30" asChild>
-              <Link href={user ? "/dashboard" : "/signup-merchant"}>
-                {user ? "active account" : "Get Started for Free"}
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" className="h-14 px-10 rounded-full text-lg font-bold border-2 bg-white" asChild>
-              <Link href={user ? "/dashboard" : "/login"}>
-                {user ? "View Dashboard" : "View Live Demo"}
-              </Link>
-            </Button>
-          </div>
-          
-          {/* Main App Mockup */}
-          <div className="mt-24 relative max-w-6xl mx-auto animate-in fade-in zoom-in-95 duration-1000 delay-500">
-            <div className="relative rounded-[2rem] p-2 bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.05),0_20px_50px_rgba(0,0,0,0.1)]">
-              <div className="relative rounded-[1.5rem] overflow-hidden bg-slate-50 aspect-[16/10] border border-slate-200">
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-                   <div className="flex flex-col items-center gap-6 opacity-30 scale-150">
-                      <StoreLinkLogo className="h-20 w-20 text-primary" />
-                      <div className="h-1.5 w-40 bg-slate-300 rounded-full" />
-                      <div className="h-1.5 w-24 bg-slate-300 rounded-full" />
-                   </div>
-                </div>
-                
-                {/* Floating Elements */}
-                <div className="absolute top-1/4 left-10 p-5 bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-white flex items-center gap-4 animate-bounce-slow">
-                  <div className="h-12 w-12 rounded-xl bg-green-100 flex items-center justify-center">
-                    <BarChart3 className="h-6 w-6 text-green-600" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Revenue</p>
-                    <p className="text-xl font-black text-slate-900">+$12,450.00</p>
-                  </div>
-                </div>
-
-                <div className="absolute bottom-1/4 right-10 p-5 bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-white flex items-center gap-4 animate-float">
-                  <div className="h-12 w-12 rounded-xl bg-blue-100 flex items-center justify-center">
-                    <Users className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">New Customers</p>
-                    <p className="text-xl font-black text-slate-900">+48</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Visual background element */}
-            <div className="absolute -top-12 -right-12 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10" />
-            <div className="absolute -bottom-12 -left-12 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl -z-10" />
-          </div>
-        </div>
-      </section>
-
-      {/* Social Proof */}
-      <section className="py-12 border-y border-slate-100 bg-white">
-        <div className="max-w-7xl mx-auto px-4 flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-50 grayscale">
-          <div className="font-black text-2xl tracking-tighter italic">RETAILFLOW</div>
-          <div className="font-black text-2xl tracking-tighter">MERCHLY</div>
-          <div className="font-black text-2xl tracking-tighter italic underline decoration-primary">SPEEDSHOP</div>
-          <div className="font-black text-2xl tracking-tighter">CORE</div>
-          <div className="font-black text-2xl tracking-tighter italic">VANTAGE</div>
-        </div>
-      </section>
-
-      {/* Features Grid */}
-      <section id="features" className="py-32 px-4 sm:px-6 lg:px-8 relative bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="max-w-3xl mb-24">
-            <h2 className="text-sm font-black text-primary uppercase tracking-[0.3em] mb-4">Core Capabilities</h2>
-            <h3 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.1]">
-              Everything you need to <br />run your business.
-            </h3>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                icon: <ShoppingBag className="h-6 w-6 text-primary" />,
-                title: "Unified Storefront",
-                description: "One back-office to manage beautiful online stores across multiple subdomains and custom domains.",
-                gradient: "from-blue-50 to-indigo-50"
-              },
-              {
-                icon: <Smartphone className="h-6 w-6 text-blue-600" />,
-                title: "Hybrid Cloud POS",
-                description: "A professional-grade POS system that works on any device, syncing real-time with your online store.",
-                gradient: "from-slate-50 to-blue-50"
-              },
-              {
-                icon: <Zap className="h-6 w-6 text-amber-500" />,
-                title: "Instant Analytics",
-                description: "Real-time insights into your sales, staff performance, and customer trends from anywhere in the world.",
-                gradient: "from-amber-50 to-orange-50"
-              },
-              {
-                icon: <Globe className="h-6 w-6 text-emerald-600" />,
-                title: "Global Payments",
-                description: "Accept any currency with native integrations for Stripe, PayPal, Paystack, and Flutterwave.",
-                gradient: "from-emerald-50 to-teal-50"
-              },
-              {
-                icon: <Shield className="h-6 w-6 text-indigo-600" />,
-                title: "Enterprise Security",
-                description: "Bank-grade encryption, secure checkout, and granular staff permissions for total peace of mind.",
-                gradient: "from-indigo-50 to-purple-50"
-              },
-              {
-                icon: <CheckCircle2 className="h-6 w-6 text-rose-600" />,
-                title: "Smart Inventory",
-                description: "Automated stock tracking, bulk imports, and low-stock alerts to keep your business running smoothly.",
-                gradient: "from-rose-50 to-pink-50"
-              }
-            ].map((feature, index) => (
-              <div key={index} className={`group relative p-10 rounded-[2rem] border border-slate-100 bg-gradient-to-br ${feature.gradient} transition-all duration-300 hover:shadow-2xl hover:shadow-slate-200/50 hover:-translate-y-1`}>
-                <div className="mb-8 h-14 w-14 bg-white rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-500">
-                  {feature.icon}
-                </div>
-                <h4 className="text-2xl font-black text-slate-900 mb-4">{feature.title}</h4>
-                <p className="text-slate-500 leading-relaxed font-medium">{feature.description}</p>
-                <div className="mt-8 flex items-center text-sm font-bold text-slate-900 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Link href="/home/features" className="flex items-center">
-                    Learn more <ChevronRight className="h-4 w-4 ml-1" />
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonial Section */}
-      <section className="py-32 bg-[#09090b] text-white overflow-hidden relative">
-        <div className="max-w-7xl mx-auto px-4 relative z-10">
-          <div className="flex flex-col items-center text-center">
-            <div className="flex gap-1 mb-8">
-              {[1,2,3,4,5].map(i => <Star key={i} className="h-5 w-5 fill-primary text-primary" />)}
-            </div>
-            <blockquote className="text-3xl md:text-5xl font-black tracking-tight max-w-4xl mb-12 leading-tight">
-              &quot;StoreLink Pro transformed how we manage our 12 locations. The POS is lightning fast and the multi-store management is a game changer.&quot;
-            </blockquote>
-            <div className="flex items-center gap-4">
-              <div className="h-14 w-14 rounded-full bg-slate-800" />
-              <div className="text-left">
-                <p className="font-bold text-lg">Marcus Chen</p>
-                <p className="text-slate-500 text-sm">Founder, Urban Collective</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        {/* Background Decorative */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-primary/10 rounded-full blur-[120px] -z-0" />
-      </section>
-
-      {/* Voice Description Feature Showcase */}
-      <section className="py-32 bg-slate-50 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row items-center gap-16">
-            <div className="lg:w-1/2">
-              <h2 className="text-sm font-black text-primary uppercase tracking-[0.3em] mb-4">Innovation</h2>
-              <h3 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.1] mb-8">
-                Your products, <br /><span className="text-primary">with a voice.</span>
-              </h3>
-              <p className="text-xl text-slate-500 font-medium leading-relaxed mb-8">
-                Bring your products to life with integrated voice descriptions. Give your customers an immersive shopping experience with expert insights and audio pitches.
-              </p>
-              <div className="space-y-4">
-                {[
-                  "Immersive audio signatures for every product",
-                  "Explain complex features with expert narration",
-                  "Increase accessibility for all customers",
-                  "Build trust through personal audio pitches"
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 text-slate-700 font-bold">
-                    <CheckCircle2 className="h-5 w-5 text-primary" />
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="lg:w-1/2 relative">
-              <div className="relative bg-white p-8 rounded-[3rem] shadow-2xl border border-slate-100">
-                <div className="flex items-center gap-4 mb-8">
-                  <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-                    <Zap className="h-8 w-8 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Audio Experience</p>
-                    <p className="text-xl font-bold">Listen to Audio Signature</p>
-                  </div>
-                </div>
-                
-                <div className="h-2 w-full bg-slate-100 rounded-full mb-4 overflow-hidden">
-                  <div className="h-full bg-primary w-2/3 rounded-full" />
-                </div>
-                <div className="flex justify-between text-xs font-bold text-slate-400 mb-8">
-                  <span>1:24</span>
-                  <span>2:10</span>
-                </div>
-                
-                <div className="flex justify-center gap-6">
-                  <div className="h-12 w-12 rounded-full bg-slate-50 flex items-center justify-center">
-                    <ArrowRight className="h-6 w-6 text-slate-400 rotate-180" />
-                  </div>
-                  <div className="h-16 w-16 rounded-full bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/30">
-                    <Zap className="h-8 w-8 fill-current" />
-                  </div>
-                  <div className="h-12 w-12 rounded-full bg-slate-50 flex items-center justify-center">
-                    <ArrowRight className="h-6 w-6 text-slate-400" />
-                  </div>
-                </div>
-              </div>
-              
-              {/* Decorative elements */}
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl -z-10" />
-              <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-400/20 rounded-full blur-3xl -z-10" />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Create Website Section */}
-      <section className="py-32 px-4 sm:px-6 lg:px-8 bg-white border-t border-slate-100">
-        <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-5xl md:text-7xl font-black tracking-tight text-slate-900 mb-8 leading-[0.9]">
-            Your brand. Your store.<br />
-            <span className="text-primary">Your way.</span>
-          </h2>
-          <p className="text-xl md:text-2xl text-slate-500 max-w-3xl mx-auto mb-12 font-medium leading-relaxed">
-            Create your stunning e-commerce website in minutes. With StoreLink Pro, you have the tools to build a global brand from day one.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-            {[
-              {
-                title: "Custom Domains",
-                description: "Connect your own domain or use our high-speed subdomains."
-              },
-              {
-                title: "Beautiful Themes",
-                description: "Choose from professional designs optimized for conversion."
-              },
-              {
-                title: "Global Reach",
-                description: "Sell to customers anywhere in the world with ease."
-              }
-            ].map((item, i) => (
-              <div key={i} className="p-10 rounded-[2rem] bg-slate-50 border border-slate-100">
-                <h4 className="text-2xl font-black mb-4">{item.title}</h4>
-                <p className="text-slate-500 font-medium">{item.description}</p>
-              </div>
-            ))}
-          </div>
-          <Button size="lg" className="h-16 px-12 rounded-full text-xl font-black shadow-2xl shadow-primary/30" asChild>
-            <Link href="/signup-merchant">Create Your Store Now</Link>
-          </Button>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-32 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-6xl mx-auto bg-primary rounded-[3rem] p-12 md:p-24 text-center relative overflow-hidden shadow-3xl shadow-primary/30">
-          <div className="relative z-10">
-            <h2 className="text-4xl md:text-7xl font-black text-white mb-8 tracking-tighter">Ready to scale?</h2>
-            <p className="text-white/80 text-xl mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
-              Join thousands of merchants who are growing their business with the world&apos;s most flexible commerce platform.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                <Button size="lg" className="h-16 px-12 rounded-full text-xl font-black bg-white text-primary hover:bg-slate-50 transition-all active:scale-95" asChild>
-                  <Link href={user ? "/dashboard" : "/signup-merchant"}>
-                    {user ? "active account" : "Start Free Trial"}
-                  </Link>
-                </Button>
-                <Link href={user ? "/dashboard" : "/login"} className="text-white font-bold hover:underline transition-all flex items-center gap-2 text-lg">
-                    {user ? "View Dashboard" : "Speak with Sales"} <ArrowRight className="h-5 w-5" />
-                </Link>
-            </div>
-          </div>
-          {/* Decorative Elements */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2" />
-        </div>
-      </section>
-
+    <div className="fixed inset-0 z-[100] bg-[#f9f9ff] text-[#111c2d] overflow-hidden flex font-sans">
+      {/* External CSS for fonts and icons */}
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Hanken+Grotesk:wght@400;600;700&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+      
       <style jsx global>{`
-        @keyframes bounce-slow {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-20px); }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
         }
-        @keyframes float {
-          0%, 100% { transform: translateY(0) translateX(0); }
-          33% { transform: translateY(-10px) translateX(5px); }
-          66% { transform: translateY(5px) translateX(-5px); }
+        .metric-card {
+            background-color: white;
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .animate-bounce-slow {
-          animation: bounce-slow 6s ease-in-out infinite;
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.05);
         }
-        .animate-float {
-          animation: float 8s ease-in-out infinite;
+        .font-hanken {
+            font-family: 'Hanken Grotesk', sans-serif;
+        }
+        h1, h2, h3 {
+            font-family: 'Hanken Grotesk', sans-serif;
         }
       `}</style>
-    </>
+
+      {/* SideNavBar Shell */}
+      <aside className="bg-white w-[220px] h-screen border-r border-[#c3c6d7] shadow-sm flex flex-col z-50 py-8 px-5 shrink-0 overflow-y-auto">
+        <div className="mb-6 flex items-center gap-2">
+          <span className="material-symbols-outlined text-[#004ac6] text-2xl font-bold">store</span>
+          <div>
+            <h1 className="text-[18px] font-bold text-[#004ac6] leading-tight">StoreLink Pro</h1>
+            <p className="text-[10px] text-[#434655]">SaaS Dashboard</p>
+          </div>
+        </div>
+        <nav className="flex flex-col gap-1.5">
+          <p className="text-[10px] font-semibold text-[#434655] px-3 py-1.5 uppercase tracking-widest mt-5">Core</p>
+          <a className="bg-[#2563eb] text-white font-bold rounded-lg flex items-center gap-3 px-3 py-2 transition-all" href="#">
+            <span className="material-symbols-outlined text-[20px]">dashboard</span>
+            <span className="text-[14px]">Dashboard</span>
+          </a>
+          <a className="text-[#434655] hover:bg-[#f0f3ff] transition-colors duration-200 flex items-center gap-3 px-3 py-2 rounded-lg" href="#">
+            <span className="material-symbols-outlined text-[20px]">point_of_sale</span>
+            <span className="text-[14px]">POS</span>
+          </a>
+          <a className="text-[#434655] hover:bg-[#f0f3ff] transition-colors duration-200 flex items-center gap-3 px-3 py-2 rounded-lg" href="#">
+            <span className="material-symbols-outlined text-[20px]">person</span>
+            <span className="text-[14px]">My Profile</span>
+          </a>
+          
+          <p className="text-[10px] font-semibold text-[#434655] px-3 py-1.5 uppercase tracking-widest mt-5">Invoicing</p>
+          <a className="text-[#434655] hover:bg-[#f0f3ff] transition-colors duration-200 flex items-center gap-3 px-3 py-2 rounded-lg" href="#">
+            <span className="material-symbols-outlined text-[20px]">receipt_long</span>
+            <span className="text-[14px]">Invoices</span>
+          </a>
+          <a className="text-[#434655] hover:bg-[#f0f3ff] transition-colors duration-200 flex items-center gap-3 px-3 py-2 rounded-lg" href="#">
+            <span className="material-symbols-outlined text-[20px]">add_box</span>
+            <span className="text-[14px]">Generate</span>
+          </a>
+          <a className="text-[#434655] hover:bg-[#f0f3ff] transition-colors duration-200 flex items-center gap-3 px-3 py-2 rounded-lg" href="#">
+            <span className="material-symbols-outlined text-[20px]">settings</span>
+            <span className="text-[14px]">Settings</span>
+          </a>
+
+          <p className="text-[10px] font-semibold text-[#434655] px-3 py-1.5 uppercase tracking-widest mt-5">Reports</p>
+          <a className="text-[#434655] hover:bg-[#f0f3ff] transition-colors duration-200 flex items-center gap-3 px-3 py-2 rounded-lg" href="#">
+            <span className="material-symbols-outlined text-[20px]">trending_up</span>
+            <span className="text-[14px]">Sales</span>
+          </a>
+          <a className="text-[#434655] hover:bg-[#f0f3ff] transition-colors duration-200 flex items-center gap-3 px-3 py-2 rounded-lg" href="#">
+            <span className="material-symbols-outlined text-[20px]">history</span>
+            <span className="text-[14px]">History</span>
+          </a>
+          <a className="text-[#434655] hover:bg-[#f0f3ff] transition-colors duration-200 flex items-center gap-3 px-3 py-2 rounded-lg" href="#">
+            <span className="material-symbols-outlined text-[20px]">assignment_return</span>
+            <span className="text-[14px]">Refunds</span>
+          </a>
+          <a className="text-[#434655] hover:bg-[#f0f3ff] transition-colors duration-200 flex items-center gap-3 px-3 py-2 rounded-lg" href="#">
+            <span className="material-symbols-outlined text-[20px]">inventory_2</span>
+            <span className="text-[14px]">Products</span>
+          </a>
+          <a className="text-[#434655] hover:bg-[#f0f3ff] transition-colors duration-200 flex items-center gap-3 px-3 py-2 rounded-lg" href="#">
+            <span className="material-symbols-outlined text-[20px]">receipt</span>
+            <span className="text-[14px]">Expenses</span>
+          </a>
+          <a className="text-[#434655] hover:bg-[#f0f3ff] transition-colors duration-200 flex items-center gap-3 px-3 py-2 rounded-lg" href="#">
+            <span className="material-symbols-outlined text-[20px]">percent</span>
+            <span className="text-[14px]">Tax & VAT</span>
+          </a>
+
+          <p className="text-[10px] font-semibold text-[#434655] px-3 py-1.5 uppercase tracking-widest mt-5">Financials</p>
+          <a className="text-[#434655] hover:bg-[#f0f3ff] transition-colors duration-200 flex items-center gap-3 px-3 py-2 rounded-lg" href="#">
+            <span className="material-symbols-outlined text-[20px]">account_balance_wallet</span>
+            <span className="text-[14px]">Pay Small Small</span>
+          </a>
+        </nav>
+      </aside>
+
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* TopNavBar Shell */}
+        <header className="h-16 bg-white border-b border-[#c3c6d7] flex justify-between items-center px-6 z-40 shrink-0">
+          <div className="flex items-center gap-4">
+            <button className="p-2 hover:bg-[#f0f3ff] rounded-full transition-colors">
+              <span className="material-symbols-outlined text-[#737686]" style={{ fontSize: '18px' }}>arrow_back_ios</span>
+            </button>
+          </div>
+          <div className="flex items-center gap-4">
+            <button className="p-2 hover:bg-[#f0f3ff] rounded-full transition-colors text-[#737686]">
+              <span className="material-symbols-outlined">dark_mode</span>
+            </button>
+            <button className="p-2 hover:bg-[#f0f3ff] rounded-full transition-colors text-[#737686] relative">
+              <span className="material-symbols-outlined">notifications</span>
+              <span className="absolute top-2 right-2 w-2 h-2 bg-[#ba1a1a] rounded-full"></span>
+            </button>
+            <div className="flex items-center gap-3 ml-2 pl-4 border-l border-[#c3c6d7]">
+              <div className="w-8 h-8 rounded-full bg-[#2563eb] text-white flex items-center justify-center font-bold text-[12px]">
+                {(user?.displayName || 'Doha').substring(0, 2).toUpperCase()}
+              </div>
+              <span className="font-bold text-[12px] text-[#111c2d]">{user?.displayName || 'Doha'}</span>
+            </div>
+          </div>
+        </header>
+
+        {/* Main Content Canvas */}
+        <main className="flex-1 p-6 overflow-y-auto">
+          {/* Dashboard Header */}
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-12 h-12 rounded-xl bg-[#dee8ff] border border-[#c3c6d7] flex items-center justify-center text-[#004ac6]">
+              <span className="material-symbols-outlined text-[32px]">grid_view</span>
+            </div>
+            <div>
+              <h2 className="text-[30px] font-bold text-[#111c2d] leading-tight">Dashboard</h2>
+              <p className="text-[14px] text-[#434655]">An overview of your store&apos;s performance.</p>
+            </div>
+          </div>
+
+          {/* Metric Grid: Row 1 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-5">
+            {/* Total Website Views */}
+            <div className="metric-card p-5 rounded-xl border border-[#dbe1ff]">
+              <div className="flex justify-between items-start mb-4">
+                <span className="text-[12px] font-bold text-[#004ac6] uppercase tracking-tight">Total Website Views</span>
+                <div className="w-8 h-8 rounded-full bg-[#f0f3ff] flex items-center justify-center text-[#004ac6]">
+                  <span className="material-symbols-outlined text-lg">language</span>
+                </div>
+              </div>
+              <h3 className="text-[30px] font-bold text-[#004ac6] mb-1">105</h3>
+              <p className="text-[12px] text-[#434655]">Cumulative visits to your public store.</p>
+            </div>
+
+            {/* Today's Website Views */}
+            <div className="metric-card p-5 rounded-xl border border-[#d1fae5]">
+              <div className="flex justify-between items-start mb-4">
+                <span className="text-[12px] font-bold text-[#059669] uppercase tracking-tight">Today&apos;s Website Views</span>
+                <div className="w-8 h-8 rounded-full bg-[#f0fdf4] flex items-center justify-center text-[#059669]">
+                  <span className="material-symbols-outlined text-lg">monitoring</span>
+                </div>
+              </div>
+              <h3 className="text-[30px] font-bold text-[#059669] mb-1">3</h3>
+              <p className="text-[12px] text-[#434655]">Unique page views recorded today.</p>
+            </div>
+
+            {/* Today's Online Orders */}
+            <div className="metric-card p-5 rounded-xl border border-[#fee2e2]">
+              <div className="flex justify-between items-start mb-4">
+                <span className="text-[12px] font-bold text-[#dc2626] uppercase tracking-tight">Today&apos;s Online Orders</span>
+                <div className="w-8 h-8 rounded-full bg-[#fef2f2] flex items-center justify-center text-[#dc2626]">
+                  <span className="material-symbols-outlined text-lg">shopping_basket</span>
+                </div>
+              </div>
+              <h3 className="text-[30px] font-bold text-[#dc2626] mb-1">12</h3>
+              <p className="text-[12px] text-[#434655]">Orders received in the last 24 hours.</p>
+            </div>
+
+            {/* Total Online Orders */}
+            <div className="metric-card p-5 rounded-xl border border-[#fef3c7]">
+              <div className="flex justify-between items-start mb-4">
+                <span className="text-[12px] font-bold text-[#d97706] uppercase tracking-tight">Total Online Orders</span>
+                <div className="w-8 h-8 rounded-full bg-[#fffbeb] flex items-center justify-center text-[#d97706]">
+                  <span className="material-symbols-outlined text-lg">shopping_cart</span>
+                </div>
+              </div>
+              <h3 className="text-[30px] font-bold text-[#d97706] mb-1">1,450</h3>
+              <p className="text-[12px] text-[#434655]">Successful orders placed via the website.</p>
+            </div>
+          </div>
+
+          {/* Metric Grid: Row 2 (Six columns on desktop) */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5 mb-5">
+            {/* Today's Tax/VAT */}
+            <div className="metric-card p-4 rounded-xl border border-[#ffedd5]">
+              <div className="flex justify-between items-start mb-3">
+                <span className="text-[10px] text-[#ea580c] uppercase font-bold tracking-wider">Today&apos;s Tax/VAT</span>
+                <div className="w-6 h-6 rounded-md bg-[#fff7ed] flex items-center justify-center text-[#ea580c]">
+                  <span className="material-symbols-outlined text-sm">request_quote</span>
+                </div>
+              </div>
+              <h3 className="text-[24px] font-bold text-[#111c2d] truncate">$425.50</h3>
+              <p className="text-[10px] text-[#434655] mt-1">Tax from today&apos;s sales.</p>
+            </div>
+
+            {/* This Month's Tax/VAT */}
+            <div className="metric-card p-4 rounded-xl border border-[#ccfbf1]">
+              <div className="flex justify-between items-start mb-3">
+                <span className="text-[10px] text-[#0d9488] uppercase font-bold tracking-wider">This Month&apos;s Tax/VAT</span>
+                <div className="w-6 h-6 rounded-md bg-[#f0fdfa] flex items-center justify-center text-[#0d9488]">
+                  <span className="material-symbols-outlined text-sm">receipt</span>
+                </div>
+              </div>
+              <h3 className="text-[24px] font-bold text-[#111c2d] truncate">$12,840.00</h3>
+              <p className="text-[10px] text-[#434655] mt-1">Tax collected this month.</p>
+            </div>
+
+            {/* Today's Credit Payments */}
+            <div className="metric-card p-4 rounded-xl border border-[#dcfce7]">
+              <div className="flex justify-between items-start mb-3">
+                <span className="text-[10px] text-[#16a34a] uppercase font-bold tracking-wider">Today&apos;s Credit Payments</span>
+                <div className="w-6 h-6 rounded-md bg-[#f0fdf4] flex items-center justify-center text-[#16a34a]">
+                  <span className="material-symbols-outlined text-sm">credit_card</span>
+                </div>
+              </div>
+              <h3 className="text-[24px] font-bold text-[#111c2d] truncate">$1,200.00</h3>
+              <p className="text-[10px] text-[#434655] mt-1">Today&apos;s credit sales.</p>
+            </div>
+
+            {/* This Month's Credit Payments */}
+            <div className="metric-card p-4 rounded-xl border border-[#f3e8ff]">
+              <div className="flex justify-between items-start mb-3">
+                <span className="text-[10px] text-[#9333ea] uppercase font-bold tracking-wider">This Month&apos;s Credit</span>
+                <div className="w-6 h-6 rounded-md bg-[#faf5ff] flex items-center justify-center text-[#9333ea]">
+                  <span className="material-symbols-outlined text-sm">account_balance</span>
+                </div>
+              </div>
+              <h3 className="text-[24px] font-bold text-[#111c2d] truncate">$45,600.00</h3>
+              <p className="text-[10px] text-[#434655] mt-1">Monthly credit intake.</p>
+            </div>
+
+            {/* Today's Ad Clicks */}
+            <div className="metric-card p-4 rounded-xl border border-[#fce7f3]">
+              <div className="flex justify-between items-start mb-3">
+                <span className="text-[10px] text-[#db2777] uppercase font-bold tracking-wider">Today&apos;s Ad Clicks</span>
+                <div className="w-6 h-6 rounded-md bg-[#fdf2f8] flex items-center justify-center text-[#db2777]">
+                  <span className="material-symbols-outlined text-sm">ads_click</span>
+                </div>
+              </div>
+              <h3 className="text-[24px] font-bold text-[#111c2d] truncate">142</h3>
+              <p className="text-[10px] text-[#434655] mt-1">Clicks recorded today.</p>
+            </div>
+
+            {/* Total Ad Clicks */}
+            <div className="metric-card p-4 rounded-xl border border-[#ede9fe]">
+              <div className="flex justify-between items-start mb-3">
+                <span className="text-[10px] text-[#7c3aed] uppercase font-bold tracking-wider">Total Ad Clicks</span>
+                <div className="w-6 h-6 rounded-md bg-[#f5f3ff] flex items-center justify-center text-[#7c3aed]">
+                  <span className="material-symbols-outlined text-sm">ads_click</span>
+                </div>
+              </div>
+              <h3 className="text-[24px] font-bold text-[#111c2d] truncate">8,430</h3>
+              <p className="text-[10px] text-[#434655] mt-1">Total ad performance.</p>
+            </div>
+          </div>
+
+          {/* Metric Grid: Row 3 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
+            {/* Today's Sales */}
+            <div className="metric-card p-6 rounded-xl border-l-4 border-l-[#2563eb] border border-[#c3c6d7]/30">
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-[12px] font-bold text-[#2563eb]">Today&apos;s Sales</span>
+                  <span className="material-symbols-outlined text-[#434655] text-sm">expand_more</span>
+                </div>
+                <span className="material-symbols-outlined text-[#737686]">shopping_bag</span>
+              </div>
+              <h3 className="text-[30px] font-bold text-[#2563eb] mb-1 truncate">$3,240.00</h3>
+              <p className="text-[12px] text-[#2563eb]/70">Net sales for today</p>
+            </div>
+
+            {/* Sales Snapshot */}
+            <div className="metric-card p-6 rounded-xl border-l-4 border-l-[#16a34a] border border-[#c3c6d7]/30">
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-[12px] font-bold text-[#16a34a]">Sales Snapshot</span>
+                  <div className="bg-[#f0fdf4] px-2 py-0.5 rounded text-[10px] text-[#16a34a] flex items-center gap-1">
+                    This Week <span className="material-symbols-outlined text-[10px]">expand_more</span>
+                  </div>
+                </div>
+                <span className="material-symbols-outlined text-[#737686]">package_2</span>
+              </div>
+              <h3 className="text-[30px] font-bold text-[#16a34a] mb-1 truncate">$24,500.00</h3>
+              <p className="text-[12px] text-[#16a34a]/70">Net sales for this week</p>
+            </div>
+
+            {/* Monthly Sales */}
+            <div className="metric-card p-6 rounded-xl border-l-4 border-l-[#9333ea] border border-[#c3c6d7]/30">
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-[12px] font-bold text-[#9333ea]">Monthly Sales</span>
+                  <span className="material-symbols-outlined text-[#434655] text-sm">more_horiz</span>
+                </div>
+                <span className="material-symbols-outlined text-[#737686]">wallet</span>
+              </div>
+              <h3 className="text-[30px] font-bold text-[#9333ea] mb-1 truncate">$118,200.00</h3>
+              <p className="text-[12px] text-[#9333ea]/70">Net sales for ...</p>
+            </div>
+
+            {/* Yearly Sales */}
+            <div className="metric-card p-6 rounded-xl border-l-4 border-l-[#dc2626] border border-[#c3c6d7]/30">
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-[12px] font-bold text-[#dc2626]">Yearly Sales</span>
+                  <span className="material-symbols-outlined text-[#434655] text-sm">more_horiz</span>
+                </div>
+                <span className="material-symbols-outlined text-[#737686]">local_mall</span>
+              </div>
+              <h3 className="text-[30px] font-bold text-[#dc2626] mb-1 truncate">$1,420,000.00</h3>
+              <p className="text-[12px] text-[#dc2626]/70">Net sales for the year</p>
+            </div>
+          </div>
+
+          {/* Period Analysis Section */}
+          <section className="metric-card rounded-2xl p-6 border border-[#c3c6d7]/30 mb-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+              <div>
+                <h3 className="text-[20px] font-bold text-[#111c2d]">Period Analysis</h3>
+                <p className="text-[14px] text-[#434655]">Select a date range to analyze sales performance for a specific period.</p>
+              </div>
+              <div className="flex items-center bg-[#f0f3ff] p-1 rounded-lg border border-[#c3c6d7]/50">
+                <button className="px-4 py-1.5 rounded-md text-[12px] font-bold text-[#434655] hover:text-[#111c2d] transition-colors">7 Days</button>
+                <button className="px-4 py-1.5 rounded-md text-[12px] font-bold bg-[#004ac6] text-white shadow-sm transition-all">30 Days</button>
+                <button className="px-4 py-1.5 rounded-md text-[12px] font-bold text-[#434655] hover:text-[#111c2d] transition-colors">Custom</button>
+              </div>
+            </div>
+            <div className="relative w-full pt-4 pr-4 h-[240px]">
+              {/* Y-Axis Markers */}
+              <div className="absolute left-0 top-4 bottom-8 flex flex-col justify-between text-[12px] text-[#737686] pointer-events-none pr-4 w-12 items-end border-r border-[#c3c6d7]/20">
+                <span>$20k</span>
+                <span>$15k</span>
+                <span>$10k</span>
+                <span>$5k</span>
+                <span>$0</span>
+              </div>
+              {/* Grid Lines */}
+              <div className="absolute left-12 right-0 top-4 bottom-8 flex flex-col justify-between pointer-events-none">
+                <div className="w-full border-t border-[#c3c6d7]/10"></div>
+                <div className="w-full border-t border-[#c3c6d7]/10"></div>
+                <div className="w-full border-t border-[#c3c6d7]/10"></div>
+                <div className="w-full border-t border-[#c3c6d7]/10"></div>
+                <div className="w-full border-t border-[#c3c6d7]/30"></div>
+              </div>
+              {/* Chart Area */}
+              <div className="absolute left-12 right-0 top-4 bottom-8">
+                <svg className="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 1000 100">
+                  <defs>
+                    <linearGradient id="chartGradient" x1="0%" x2="0%" y1="0%" y2="100%">
+                      <stop offset="0%" stopColor="#2563eb" stopOpacity="0.25"></stop>
+                      <stop offset="100%" stopColor="#2563eb" stopOpacity="0.01"></stop>
+                    </linearGradient>
+                  </defs>
+                  <path d="M 0 100 Q 150 15, 333 45 T 666 30 T 1000 5 L 1000 100 L 0 100 Z" fill="url(#chartGradient)"></path>
+                  <path d="M 0 100 Q 150 15, 333 45 T 666 30 T 1000 5" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round"></path>
+                  <circle cx="0" cy="100" fill="white" r="4" stroke="#2563eb" strokeWidth="2"></circle>
+                  <circle cx="333" cy="45" fill="white" r="4" stroke="#2563eb" strokeWidth="2"></circle>
+                  <circle cx="666" cy="30" fill="white" r="4" stroke="#2563eb" strokeWidth="2"></circle>
+                  <circle cx="1000" cy="5" fill="#2563eb" r="5" stroke="white" strokeWidth="2"></circle>
+                </svg>
+              </div>
+              {/* X-Axis Labels */}
+              <div className="absolute left-12 right-0 bottom-0 flex justify-between pt-2">
+                <span className="text-[12px] text-[#434655]">30 days ago</span>
+                <span className="text-[12px] text-[#434655]">20 days ago</span>
+                <span className="text-[12px] text-[#434655]">10 days ago</span>
+                <span className="text-[12px] text-[#111c2d] font-bold">Today</span>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
   );
 }

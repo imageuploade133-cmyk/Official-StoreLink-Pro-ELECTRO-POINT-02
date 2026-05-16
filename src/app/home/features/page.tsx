@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { 
   ShoppingBag, 
@@ -190,8 +191,62 @@ export default function FeaturesPage() {
               <Link href="/login">Explore Demo</Link>
             </Button>
           </div>
+
+          {/* Visual Mockup with Revenue and Ticket Images */}
+          <div className="mt-20 relative max-w-4xl mx-auto">
+            <div className="relative rounded-[2rem] p-2 bg-white shadow-2xl border border-slate-200 overflow-hidden">
+              <div className="aspect-[16/9] bg-white rounded-[1.5rem] relative overflow-hidden">
+                <Image 
+                  src="https://emakemrnd.com.ng/D2.png" 
+                  alt="StoreLink Pro Features Dashboard" 
+                  fill
+                  priority
+                  className="object-contain"
+                />
+
+                {/* Revenue Element */}
+                <div className="absolute top-1/4 left-10 p-5 bg-white/95 backdrop-blur rounded-2xl shadow-xl border border-slate-100 flex items-center gap-4 animate-bounce-slow z-10">
+                  <div className="h-12 w-12 rounded-xl bg-green-100 flex items-center justify-center">
+                    <BarChart3 className="h-6 w-6 text-green-600" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Revenue</p>
+                    <p className="text-xl font-black text-slate-900">+$12,450.00</p>
+                  </div>
+                </div>
+
+                {/* Customers Element */}
+                <div className="absolute bottom-1/4 right-10 p-5 bg-white/95 backdrop-blur rounded-2xl shadow-xl border border-slate-100 flex items-center gap-4 animate-float z-10">
+                  <div className="h-12 w-12 rounded-xl bg-blue-100 flex items-center justify-center">
+                    <Users className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">New Customers</p>
+                    <p className="text-xl font-black text-slate-900">+48</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
+
+      <style jsx global>{`
+        @keyframes bounce-slow {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-15px); }
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0) translateX(0); }
+          50% { transform: translateY(-10px) translateX(5px); }
+        }
+        .animate-bounce-slow {
+          animation: bounce-slow 5s ease-in-out infinite;
+        }
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+      `}</style>
 
       {/* Main Features Sections */}
       {features.map((section, idx) => (
