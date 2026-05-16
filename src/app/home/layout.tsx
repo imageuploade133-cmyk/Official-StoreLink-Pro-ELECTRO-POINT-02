@@ -1,14 +1,19 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { StoreLinkLogo } from '@/components/icons';
 import { ChevronRight } from 'lucide-react';
+import { useAuth } from '@/contexts/auth-context';
 
 export default function HomeLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen bg-[#fafafa] text-slate-900 font-sans selection:bg-primary selection:text-white">
       {/* Navigation */}
@@ -29,11 +34,13 @@ export default function HomeLayout({
             <Link href="/home/contact" className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Contact</Link>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/login" className="hidden sm:block text-sm font-bold text-slate-600 hover:text-primary transition-colors">
-              Login
+            <Link href={user ? "/dashboard" : "/login"} className="hidden sm:block text-sm font-bold text-slate-600 hover:text-primary transition-colors">
+              {user ? "View Dashboard" : "Login"}
             </Link>
             <Button className="rounded-full px-6 font-bold shadow-lg shadow-primary/25 hover:shadow-primary/35 transition-all active:scale-95" asChild>
-              <Link href="/signup-merchant">Start Free Trial</Link>
+              <Link href={user ? "/dashboard" : "/signup-merchant"}>
+                {user ? "active account" : "Start Free Trial"}
+              </Link>
             </Button>
           </div>
         </div>

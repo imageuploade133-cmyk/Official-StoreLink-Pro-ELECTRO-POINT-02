@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { StoreLinkLogo } from '@/components/icons';
+import { useAuth } from '@/contexts/auth-context';
 import { 
   ArrowRight, 
   CheckCircle2, 
@@ -19,6 +20,7 @@ import {
 } from 'lucide-react';
 
 export default function HomeLandingPage() {
+  const { user } = useAuth();
   return (
     <>
       {/* Hero Section */}
@@ -46,12 +48,14 @@ export default function HomeLandingPage() {
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-5 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
             <Button size="lg" className="h-14 px-10 rounded-full text-lg font-bold shadow-2xl shadow-primary/30" asChild>
-              <Link href="/signup-merchant">
-                Get Started for Free
+              <Link href={user ? "/dashboard" : "/signup-merchant"}>
+                {user ? "active account" : "Get Started for Free"}
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="h-14 px-10 rounded-full text-lg font-bold border-2 bg-white" asChild>
-              <Link href="/login">View Live Demo</Link>
+              <Link href={user ? "/dashboard" : "/login"}>
+                {user ? "View Dashboard" : "View Live Demo"}
+              </Link>
             </Button>
           </div>
           
@@ -311,10 +315,12 @@ export default function HomeLandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                 <Button size="lg" className="h-16 px-12 rounded-full text-xl font-black bg-white text-primary hover:bg-slate-50 transition-all active:scale-95" asChild>
-                  <Link href="/signup-merchant">Start Free Trial</Link>
+                  <Link href={user ? "/dashboard" : "/signup-merchant"}>
+                    {user ? "active account" : "Start Free Trial"}
+                  </Link>
                 </Button>
-                <Link href="/login" className="text-white font-bold hover:underline transition-all flex items-center gap-2 text-lg">
-                    Speak with Sales <ArrowRight className="h-5 w-5" />
+                <Link href={user ? "/dashboard" : "/login"} className="text-white font-bold hover:underline transition-all flex items-center gap-2 text-lg">
+                    {user ? "View Dashboard" : "Speak with Sales"} <ArrowRight className="h-5 w-5" />
                 </Link>
             </div>
           </div>
