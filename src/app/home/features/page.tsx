@@ -193,17 +193,16 @@ export default function FeaturesPage() {
           </div>
 
           {/* Visual Mockup with Revenue and Ticket Images */}
-          <div className="mt-20 relative max-w-5xl mx-auto">
+          <div className="mt-20 relative max-w-4xl mx-auto">
             <div className="relative rounded-[2rem] p-2 bg-white shadow-2xl border border-slate-200 overflow-hidden">
-              <div className="aspect-[16/9] bg-slate-100 rounded-[1.5rem] relative overflow-hidden">
+              <div className="aspect-[16/9] bg-white rounded-[1.5rem] relative overflow-hidden">
                 <Image 
                   src="https://emakemrnd.com.ng/D2.png" 
                   alt="StoreLink Pro Features Dashboard" 
                   fill
                   priority
-                  className="object-cover"
+                  className="object-contain"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent" />
 
                 {/* Revenue Element */}
                 <div className="absolute top-1/4 left-10 p-5 bg-white/95 backdrop-blur rounded-2xl shadow-xl border border-slate-100 flex items-center gap-4 animate-bounce-slow z-10">

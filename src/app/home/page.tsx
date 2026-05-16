@@ -61,18 +61,17 @@ export default function HomeLandingPage() {
           </div>
           
           {/* Main App Mockup */}
-          <div className="mt-24 relative max-w-6xl mx-auto animate-in fade-in zoom-in-95 duration-1000 delay-500">
+          <div className="mt-24 relative max-w-4xl mx-auto animate-in fade-in zoom-in-95 duration-1000 delay-500">
             <div className="relative rounded-[2rem] p-2 bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.05),0_20px_50px_rgba(0,0,0,0.1)]">
-              <div className="relative rounded-[1.5rem] overflow-hidden bg-slate-50 aspect-[16/10] border border-slate-200">
+              <div className="relative rounded-[1.5rem] overflow-hidden bg-white aspect-[16/10] border border-slate-200">
                 <div className="absolute inset-0">
                   <Image 
                     src="https://emakemrnd.com.ng/D1.png" 
                     alt="StoreLink Pro Dashboard" 
                     fill
                     priority
-                    className="object-cover"
+                    className="object-contain"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent" />
                 </div>
                 
                 {/* Floating Elements */}
