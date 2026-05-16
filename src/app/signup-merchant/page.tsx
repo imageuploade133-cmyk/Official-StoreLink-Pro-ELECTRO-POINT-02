@@ -67,7 +67,7 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 export default function MerchantSignupPage() {
     const { toast } = useToast();
     const [showPassword, setShowPassword] = useState(false);
-    const loginImage = "https://emakemrnd.com.ng/storelink%20bg%20logo.png";
+    const loginImage = "https://emakemrnd.com.ng/storelink%20bg%20logo1.png";
 
     const auth = useFirebaseAuthInstance();
     const firestore = useFirestore();

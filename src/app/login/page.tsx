@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 export default function AdminLoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
-    const loginImage = "https://emakemrnd.com.ng/storelink%20bg%20logo.png";
+    const loginImage = "https://emakemrnd.com.ng/storelink%20bg%20logo1.png";
 
     const searchParams = useSearchParams();
     const oobCode = searchParams.get('oobCode');
