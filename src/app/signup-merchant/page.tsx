@@ -34,6 +34,7 @@ import * as z from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useAuth } from "@/contexts/auth-context";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const reservedSlugs = [
   'dashboard', 'login', 'signup', 'signup-merchant', 'pos', 'api', 'actions', 
@@ -66,6 +67,7 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 export default function MerchantSignupPage() {
     const { toast } = useToast();
     const [showPassword, setShowPassword] = useState(false);
+    const loginImage = "https://emakemrnd.com.ng/storelink%20bg%20logo.png";
 
     const auth = useFirebaseAuthInstance();
     const firestore = useFirestore();
@@ -253,151 +255,194 @@ export default function MerchantSignupPage() {
     }
 
   return (
-    <div className="w-full min-h-screen bg-[#fbfbfd] flex items-center justify-center p-4">
-      <div className="w-full max-w-[480px] animate-in fade-in zoom-in-95 duration-700">
-        <div className="bg-white dark:bg-[#1d1d1f] rounded-[2.5rem] p-10 shadow-[0_20px_80px_rgba(0,0,0,0.1)] border border-[#d2d2d7]/30">
-          <div className="text-center mb-10">
-             <div className="flex justify-center mb-6">
-                <StoreLinkLogo className="h-12 w-12 text-[#0071e3]" />
-            </div>
-            <h1 className="text-3xl font-semibold tracking-tight text-[#1d1d1f] dark:text-white mb-2">Create a Store</h1>
-            <p className="text-[#86868b] text-sm">
-              {currentStep === 1 ? 'Start with your admin account.' : 
-               currentStep === 2 ? 'Tell us about your business.' : 
-               'Finalize your setup.'}
-            </p>
-          </div>
-
-          {/* Progress Dots */}
-          <div className="flex justify-center gap-2 mb-10">
-            {[1, 2, 3].map((step) => (
-              <div 
-                key={step} 
-                className={cn(
-                    "h-1.5 rounded-full transition-all duration-500",
-                    currentStep === step ? "w-8 bg-[#0071e3]" : "w-1.5 bg-[#d2d2d7]"
-                )}
-              />
-            ))}
-          </div>
-
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                {currentStep === 1 && (
-                  <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
-                    <FormField control={form.control} name="name" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs font-semibold text-[#86868b] uppercase tracking-wider ml-1">Full Name</FormLabel><FormControl><Input placeholder="John Doe" className="h-12 rounded-xl bg-[#f5f5f7] border-none focus-visible:ring-2 focus-visible:ring-[#0071e3]" {...field} /></FormControl><FormMessage /></FormItem>
-                    )}/>
-                    <FormField control={form.control} name="email" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs font-semibold text-[#86868b] uppercase tracking-wider ml-1">Email Address</FormLabel><FormControl><Input type="email" placeholder="m@example.com" className="h-12 rounded-xl bg-[#f5f5f7] border-none focus-visible:ring-2 focus-visible:ring-[#0071e3]" {...field} /></FormControl><FormMessage /></FormItem>
-                    )}/>
-                    <div className="grid grid-cols-2 gap-4">
-                        <FormField control={form.control} name="password" render={({ field }) => (
-                            <FormItem><FormLabel className="text-xs font-semibold text-[#86868b] uppercase tracking-wider ml-1">Password</FormLabel>
-                              <div className="relative">
-                                <FormControl><Input type={showPassword ? 'text' : 'password'} className="h-12 rounded-xl bg-[#f5f5f7] border-none focus-visible:ring-2 focus-visible:ring-[#0071e3]" placeholder="••••••" {...field} /></FormControl>
-                                 <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 text-[#d2d2d7]" onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</Button>
-                              </div>
-                            <FormMessage /></FormItem>
-                        )}/>
-                        <FormField control={form.control} name="confirmPassword" render={({ field }) => (
-                            <FormItem><FormLabel className="text-xs font-semibold text-[#86868b] uppercase tracking-wider ml-1">Confirm</FormLabel><FormControl><Input type={showPassword ? 'text' : 'password'} className="h-12 rounded-xl bg-[#f5f5f7] border-none focus-visible:ring-2 focus-visible:ring-[#0071e3]" placeholder="••••••" {...field} /></FormControl><FormMessage /></FormItem>
-                        )}/>
-                    </div>
-                  </div>
-                )}
-
-                {currentStep === 2 && (
-                  <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
-                    <FormField control={form.control} name="storeName" render={({ field }) => (
-                        <FormItem><FormLabel className="text-xs font-semibold text-[#86868b] uppercase tracking-wider ml-1">Store Name</FormLabel><FormControl><Input placeholder="My Store" className="h-12 rounded-xl bg-[#f5f5f7] border-none focus-visible:ring-2 focus-visible:ring-[#0071e3]" {...field} /></FormControl><FormMessage /></FormItem>
-                    )}/>
-                    <FormField control={form.control} name="storeSlug" render={({ field }) => (
-                        <FormItem>
-                            <FormLabel className="text-xs font-semibold text-[#86868b] uppercase tracking-wider ml-1">Store URL Slug</FormLabel>
-                            <FormControl>
-                                <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#d2d2d7] text-sm">/</span>
-                                    <Input
-                                        placeholder="my-store"
-                                        className={cn(
-                                            "h-12 pl-7 rounded-xl bg-[#f5f5f7] border-none focus-visible:ring-2 focus-visible:ring-[#0071e3]",
-                                            slugStatus === 'available' && "focus-visible:ring-green-500",
-                                            slugStatus === 'taken' && "focus-visible:ring-rose-500"
-                                        )}
-                                        {...field}
-                                    />
-                                    <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                                        {slugStatus === 'checking' && <Spinner size="sm" />}
-                                        {slugStatus === 'available' && <Check className="h-4 w-4 text-green-500" />}
-                                    </div>
-                                </div>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}/>
-                    <div className="grid grid-cols-2 gap-4">
-                        <FormField control={form.control} name="storePhone" render={({ field }) => (
-                            <FormItem><FormLabel className="text-xs font-semibold text-[#86868b] uppercase tracking-wider ml-1">Phone</FormLabel><FormControl><Input placeholder="+234..." className="h-12 rounded-xl bg-[#f5f5f7] border-none focus-visible:ring-2 focus-visible:ring-[#0071e3]" {...field} /></FormControl><FormMessage /></FormItem>
-                        )}/>
-                        <FormField control={form.control} name="storeAddress" render={({ field }) => (
-                            <FormItem><FormLabel className="text-xs font-semibold text-[#86868b] uppercase tracking-wider ml-1">Address</FormLabel><FormControl><Input placeholder="Lagos, NG" className="h-12 rounded-xl bg-[#f5f5f7] border-none focus-visible:ring-2 focus-visible:ring-[#0071e3]" {...field} /></FormControl><FormMessage /></FormItem>
-                        )}/>
-                    </div>
-                  </div>
-                )}
-
-                {currentStep === 3 && (
-                  <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
-                    <div className="bg-[#f5f5f7] p-6 rounded-[2rem] space-y-4">
-                        <h3 className="text-sm font-semibold text-[#1d1d1f] flex items-center gap-2">
-                          <Check className="h-4 w-4 text-[#34c759]" />
-                          Review Details
-                        </h3>
-                        <div className="space-y-2 text-xs">
-                          <div className="flex justify-between"><span className="text-[#86868b]">Admin</span><span className="font-semibold">{form.getValues('name')}</span></div>
-                          <div className="flex justify-between"><span className="text-[#86868b]">Store</span><span className="font-semibold">{form.getValues('storeName')}</span></div>
-                          <div className="flex justify-between"><span className="text-[#86868b]">URL</span><span className="font-semibold">/{form.getValues('storeSlug')}</span></div>
-                        </div>
-                    </div>
-                    
-                    <p className="text-[11px] text-[#86868b] text-center px-4">
-                        By creating a store, you agree to our <Link href="/home/terms-of-service" className="text-[#0071e3] hover:underline">Terms of Service</Link> and <Link href="/home/privacy-policy" className="text-[#0071e3] hover:underline">Privacy Policy</Link>.
-                    </p>
-                  </div>
-                )}
-
-                <div className="flex gap-4 pt-4">
-                    {currentStep > 1 && (
-                        <Button type="button" variant="ghost" onClick={prevStep} className="flex-1 h-12 rounded-full font-semibold text-[#86868b]" disabled={isLoading}>
-                            Back
-                        </Button>
-                    )}
-                    {currentStep < totalSteps ? (
-                        <Button type="button" onClick={nextStep} className="flex-1 h-12 rounded-full bg-[#1d1d1f] text-white hover:bg-[#2d2d2f] font-semibold">
-                            Continue <ChevronRight className="ml-1 h-4 w-4" />
-                        </Button>
-                    ) : (
-                        <Button type="submit" className="flex-1 h-12 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold" disabled={isLoading}>
-                            {isLoading ? <Spinner size="sm" className="mr-2" /> : 'Launch Store'}
-                        </Button>
-                    )}
+    <div className="flex min-h-screen w-full bg-[#fbfbfd] dark:bg-[#121214]">
+        {/* Left side - Branding & Image */}
+        <div className="hidden lg:flex lg:w-1/2 relative bg-[#0071e3]/5 items-center justify-center overflow-hidden border-r border-[#d2d2d7]/30">
+            <div className="absolute inset-0 z-0 opacity-40 dark:opacity-20 bg-[radial-gradient(#0071e3_1px,transparent_1px)] [background-size:32px_32px]"></div>
+            
+            <div className="relative z-10 w-full h-full flex flex-col items-center justify-center p-12 text-center">
+                <div className="absolute top-12 left-12 flex items-center gap-2">
+                    <StoreLinkLogo className="h-8 w-8 text-[#0071e3]" />
+                    <span className="font-bold text-xl tracking-tight text-[#1d1d1f] dark:text-white">StoreLink Pro</span>
                 </div>
 
-                {currentStep === 1 && (
-                  <div className="text-center text-sm pt-4">
-                      Already have an account?{" "}
-                      <Link href="/login" className="text-[#0071e3] font-semibold hover:underline">Sign in</Link>
-                  </div>
-                )}
-            </form>
-          </Form>
+                <div className="relative w-full aspect-square max-w-[500px] animate-in fade-in zoom-in duration-1000">
+                    <Image
+                        src={loginImage}
+                        alt="StoreLink Pro Branding"
+                        fill
+                        className="object-contain drop-shadow-2xl"
+                        priority
+                    />
+                </div>
+
+                <div className="mt-8 max-w-md">
+                    <h2 className="text-3xl font-bold text-[#1d1d1f] dark:text-white mb-4">
+                        Launch Your Store. <br/>
+                        <span className="text-[#0071e3]">Scale Your Vision.</span>
+                    </h2>
+                    <p className="text-[#86868b] text-lg">
+                        Join thousands of merchants who trust StoreLink Pro for their business growth.
+                    </p>
+                </div>
+            </div>
+
+            {/* Decorative Elements */}
+            <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-[#0071e3] rounded-full blur-[120px] opacity-20"></div>
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#0071e3] rounded-full blur-[120px] opacity-10"></div>
         </div>
-        
-        <p className="mt-8 text-center text-[11px] text-[#86868b] font-medium uppercase tracking-[0.2em]">
-            Powered by StoreLink Pro
-        </p>
-      </div>
+
+        {/* Right side - Action Area */}
+        <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-6 relative">
+            <div className="absolute top-8 right-8 z-50">
+                <ThemeToggle />
+            </div>
+
+            <div className="w-full max-w-[500px] animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="bg-white dark:bg-[#1d1d1f] rounded-[2.5rem] p-10 shadow-[0_20px_80px_rgba(0,0,0,0.08)] border border-[#d2d2d7]/30">
+                    <div className="text-center mb-8">
+                        <div className="flex justify-center mb-6 lg:hidden">
+                            <StoreLinkLogo className="h-12 w-12 text-[#0071e3]" />
+                        </div>
+                        <h1 className="text-3xl font-semibold tracking-tight text-[#1d1d1f] dark:text-white mb-2">Create a Store</h1>
+                        <p className="text-[#86868b] text-sm">
+                            {currentStep === 1 ? 'Start with your admin account.' : 
+                            currentStep === 2 ? 'Tell us about your business.' : 
+                            'Finalize your setup.'}
+                        </p>
+                    </div>
+
+                    {/* Progress Dots */}
+                    <div className="flex justify-center gap-2 mb-8">
+                        {[1, 2, 3].map((step) => (
+                        <div 
+                            key={step} 
+                            className={cn(
+                                "h-1.5 rounded-full transition-all duration-500",
+                                currentStep === step ? "w-8 bg-[#0071e3]" : "w-1.5 bg-[#d2d2d7]"
+                            )}
+                        />
+                        ))}
+                    </div>
+
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+                            {currentStep === 1 && (
+                            <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
+                                <FormField control={form.control} name="name" render={({ field }) => (
+                                    <FormItem><FormLabel className="text-xs font-semibold text-[#86868b] uppercase tracking-wider ml-1">Full Name</FormLabel><FormControl><Input placeholder="John Doe" className="h-12 rounded-xl bg-[#f5f5f7] dark:bg-[#2d2d2f] border-none focus-visible:ring-2 focus-visible:ring-[#0071e3]" {...field} /></FormControl><FormMessage /></FormItem>
+                                )}/>
+                                <FormField control={form.control} name="email" render={({ field }) => (
+                                    <FormItem><FormLabel className="text-xs font-semibold text-[#86868b] uppercase tracking-wider ml-1">Email Address</FormLabel><FormControl><Input type="email" placeholder="m@example.com" className="h-12 rounded-xl bg-[#f5f5f7] dark:bg-[#2d2d2f] border-none focus-visible:ring-2 focus-visible:ring-[#0071e3]" {...field} /></FormControl><FormMessage /></FormItem>
+                                )}/>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <FormField control={form.control} name="password" render={({ field }) => (
+                                        <FormItem><FormLabel className="text-xs font-semibold text-[#86868b] uppercase tracking-wider ml-1">Password</FormLabel>
+                                        <div className="relative">
+                                            <FormControl><Input type={showPassword ? 'text' : 'password'} className="h-12 rounded-xl bg-[#f5f5f7] dark:bg-[#2d2d2f] border-none focus-visible:ring-2 focus-visible:ring-[#0071e3]" placeholder="••••••" {...field} /></FormControl>
+                                            <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 text-[#d2d2d7] hover:bg-transparent" onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</Button>
+                                        </div>
+                                        <FormMessage /></FormItem>
+                                    )}/>
+                                    <FormField control={form.control} name="confirmPassword" render={({ field }) => (
+                                        <FormItem><FormLabel className="text-xs font-semibold text-[#86868b] uppercase tracking-wider ml-1">Confirm</FormLabel><FormControl><Input type={showPassword ? 'text' : 'password'} className="h-12 rounded-xl bg-[#f5f5f7] dark:bg-[#2d2d2f] border-none focus-visible:ring-2 focus-visible:ring-[#0071e3]" placeholder="••••••" {...field} /></FormControl><FormMessage /></FormItem>
+                                    )}/>
+                                </div>
+                            </div>
+                            )}
+
+                            {currentStep === 2 && (
+                            <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
+                                <FormField control={form.control} name="storeName" render={({ field }) => (
+                                    <FormItem><FormLabel className="text-xs font-semibold text-[#86868b] uppercase tracking-wider ml-1">Store Name</FormLabel><FormControl><Input placeholder="My Store" className="h-12 rounded-xl bg-[#f5f5f7] dark:bg-[#2d2d2f] border-none focus-visible:ring-2 focus-visible:ring-[#0071e3]" {...field} /></FormControl><FormMessage /></FormItem>
+                                )}/>
+                                <FormField control={form.control} name="storeSlug" render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-xs font-semibold text-[#86868b] uppercase tracking-wider ml-1">Store URL Slug</FormLabel>
+                                        <FormControl>
+                                            <div className="relative">
+                                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#d2d2d7] text-sm">/</span>
+                                                <Input
+                                                    placeholder="my-store"
+                                                    className={cn(
+                                                        "h-12 pl-7 rounded-xl bg-[#f5f5f7] dark:bg-[#2d2d2f] border-none focus-visible:ring-2 focus-visible:ring-[#0071e3]",
+                                                        slugStatus === 'available' && "focus-visible:ring-green-500",
+                                                        slugStatus === 'taken' && "focus-visible:ring-rose-500"
+                                                    )}
+                                                    {...field}
+                                                />
+                                                <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                                                    {slugStatus === 'checking' && <Spinner size="sm" />}
+                                                    {slugStatus === 'available' && <Check className="h-4 w-4 text-green-500" />}
+                                                </div>
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}/>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <FormField control={form.control} name="storePhone" render={({ field }) => (
+                                        <FormItem><FormLabel className="text-xs font-semibold text-[#86868b] uppercase tracking-wider ml-1">Phone</FormLabel><FormControl><Input placeholder="+234..." className="h-12 rounded-xl bg-[#f5f5f7] dark:bg-[#2d2d2f] border-none focus-visible:ring-2 focus-visible:ring-[#0071e3]" {...field} /></FormControl><FormMessage /></FormItem>
+                                    )}/>
+                                    <FormField control={form.control} name="storeAddress" render={({ field }) => (
+                                        <FormItem><FormLabel className="text-xs font-semibold text-[#86868b] uppercase tracking-wider ml-1">Address</FormLabel><FormControl><Input placeholder="Lagos, NG" className="h-12 rounded-xl bg-[#f5f5f7] dark:bg-[#2d2d2f] border-none focus-visible:ring-2 focus-visible:ring-[#0071e3]" {...field} /></FormControl><FormMessage /></FormItem>
+                                    )}/>
+                                </div>
+                            </div>
+                            )}
+
+                            {currentStep === 3 && (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+                                <div className="bg-[#f5f5f7] dark:bg-[#2d2d2f] p-6 rounded-[2rem] space-y-4">
+                                    <h3 className="text-sm font-semibold text-[#1d1d1f] dark:text-white flex items-center gap-2">
+                                    <Check className="h-4 w-4 text-[#34c759]" />
+                                    Review Details
+                                    </h3>
+                                    <div className="space-y-2 text-xs">
+                                    <div className="flex justify-between"><span className="text-[#86868b]">Admin</span><span className="font-semibold text-[#1d1d1f] dark:text-white">{form.getValues('name')}</span></div>
+                                    <div className="flex justify-between"><span className="text-[#86868b]">Store</span><span className="font-semibold text-[#1d1d1f] dark:text-white">{form.getValues('storeName')}</span></div>
+                                    <div className="flex justify-between"><span className="text-[#86868b]">URL</span><span className="font-semibold text-[#1d1d1f] dark:text-white">/{form.getValues('storeSlug')}</span></div>
+                                    </div>
+                                </div>
+                                
+                                <p className="text-[11px] text-[#86868b] text-center px-4">
+                                    By creating a store, you agree to our <Link href="/home/terms-of-service" className="text-[#0071e3] hover:underline">Terms of Service</Link> and <Link href="/home/privacy-policy" className="text-[#0071e3] hover:underline">Privacy Policy</Link>.
+                                </p>
+                            </div>
+                            )}
+
+                            <div className="flex gap-4 pt-4">
+                                {currentStep > 1 && (
+                                    <Button type="button" variant="ghost" onClick={prevStep} className="flex-1 h-12 rounded-full font-semibold text-[#86868b] hover:bg-[#f5f5f7] dark:hover:bg-[#2d2d2f]" disabled={isLoading}>
+                                        Back
+                                    </Button>
+                                )}
+                                {currentStep < totalSteps ? (
+                                    <Button type="button" onClick={nextStep} className="flex-1 h-12 rounded-full bg-[#1d1d1f] dark:bg-white dark:text-black text-white hover:bg-[#2d2d2f] font-semibold transition-all active:scale-95">
+                                        Continue <ChevronRight className="ml-1 h-4 w-4" />
+                                    </Button>
+                                ) : (
+                                    <Button type="submit" className="flex-1 h-12 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold shadow-lg shadow-[#0071e3]/20 transition-all active:scale-95" disabled={isLoading}>
+                                        {isLoading ? <Spinner size="sm" className="mr-2" /> : 'Launch Store'}
+                                    </Button>
+                                )}
+                            </div>
+
+                            {currentStep === 1 && (
+                            <div className="text-center text-sm pt-4">
+                                Already have an account?{" "}
+                                <Link href="/login" className="text-[#0071e3] font-semibold hover:underline">Sign in</Link>
+                            </div>
+                            )}
+                        </form>
+                    </Form>
+                </div>
+                
+                <p className="mt-8 text-center text-[11px] text-[#86868b] font-medium uppercase tracking-[0.2em]">
+                    Powered by StoreLink Pro
+                </p>
+            </div>
+        </div>
     </div>
   )
 }
