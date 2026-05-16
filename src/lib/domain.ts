@@ -1,5 +1,5 @@
 
-export const RESERVED_SUBDOMAINS = ['www', 'admin', 'dashboard', 'api', 'pos', 'signup', 'login', 'signup-merchant', 'shop', 'auth', 'mail', 'support', 'docs', 'global'];
+export const RESERVED_SUBDOMAINS = ['www', 'admin', 'dashboard', 'api', 'pos', 'signup', 'login', 'signup-merchant', 'shop', 'auth', 'mail', 'support', 'docs', 'global', 'home'];
 
 /**
  * Gets the main domain of the application.

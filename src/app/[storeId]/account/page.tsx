@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo } from 'react';
 import { useUser, useAuth, useFirestore, useDoc } from '@/firebase';
-import { Loader2, ShoppingBag, UserCircle, LogOut, Wallet, Coins, CheckCircle2 } from 'lucide-react';
+import { Loader2, ShoppingBag, UserCircle, LogOut, Wallet, Coins, CheckCircle2, CreditCard } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
