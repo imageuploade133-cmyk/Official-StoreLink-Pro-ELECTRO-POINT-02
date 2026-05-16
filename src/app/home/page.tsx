@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { StoreLinkLogo } from '@/components/icons';
 import { useAuth } from '@/contexts/auth-context';
@@ -90,6 +91,26 @@ export default function HomeLandingPage() {
                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">New Customers</p>
                     <p className="text-xl font-black text-slate-900">+48</p>
                   </div>
+                </div>
+
+                {/* Additional Images from ticket */}
+                <div className="absolute top-10 right-[20%] w-40 h-auto rounded-2xl overflow-hidden shadow-2xl border-4 border-white animate-bounce-slow delay-150 rotate-3 z-20">
+                  <Image 
+                    src="https://emakemrnd.com.ng/D1.png" 
+                    alt="Analytics" 
+                    width={200} 
+                    height={200}
+                    className="w-full h-auto"
+                  />
+                </div>
+                <div className="absolute bottom-10 left-[20%] w-40 h-auto rounded-2xl overflow-hidden shadow-2xl border-4 border-white animate-float delay-300 -rotate-3 z-20">
+                  <Image 
+                    src="https://emakemrnd.com.ng/D2.png" 
+                    alt="Sales Tracking" 
+                    width={200} 
+                    height={200}
+                    className="w-full h-auto"
+                  />
                 </div>
               </div>
             </div>
