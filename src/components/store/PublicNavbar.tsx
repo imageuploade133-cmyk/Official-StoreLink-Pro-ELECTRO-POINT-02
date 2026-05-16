@@ -137,36 +137,6 @@ export function PublicNavbar() {
     const heightMap = { compact: 48, default: 64, expanded: 80, full: 100 };
     const navbarHeight = settings?.navbarHeight ? (heightMap[settings.navbarHeight as keyof typeof heightMap] || 64) : (logoContainerHeight + (navbarPadding * 2));
 
-    const Logo = () => (
-      <Link href={getStoreUrl('/store')} className="flex items-center gap-2 text-lg font-semibold group" onClick={() => setIsMenuOpen(false)}>
-        {showMainSiteLogo && logoUrl ? (
-          <div style={{ width: `min(${storeLogoWidth}px, 80px)`, height: `${logoContainerHeight}px` }} className="relative flex items-center">
-            <Image
-                src={logoUrl}
-                alt={storeName}
-                fill
-                sizes={`${storeLogoWidth}px`}
-                className={cn(
-                    "object-contain transition-transform duration-500",
-                    settings?.enableHoverZoom !== false && "group-hover:scale-105"
-                )}
-                unoptimized
-            />
-        </div>
-        ) : showMainSiteLogo ? (
-          <StoreLinkLogo className="h-6 w-6 text-primary" />
-        ) : null}
-        {showPublicStoreName && (
-          <span
-              className={'font-black tracking-tighter text-[#1d1d1f] dark:text-white group-hover:opacity-80 transition-opacity whitespace-pre-wrap break-words leading-tight max-w-[80px] sm:max-w-[200px] md:max-w-[250px] overflow-hidden line-clamp-1'}
-              style={{ fontSize: `min(${storeNameFontSize}px, 16px)` }}
-          >
-            {storeName}
-          </span>
-        )}
-      </Link>
-    );
-
     const getInitials = (email?: string | null) => {
         if (!email) return 'U';
         const parts = email.split('@')[0].replace(/[^a-zA-Z]/g, ' ').split(' ').filter(Boolean);
@@ -214,7 +184,33 @@ export function PublicNavbar() {
                       navbarLogoPosition === 'center' ? "absolute left-1/2 -translate-x-1/2" :
                       navbarLogoPosition === 'right' ? "order-3 pl-4 pr-0" : "order-1"
                   )}>
-                    <Logo />
+                    <Link href={getStoreUrl('/store')} className="flex items-center gap-2 text-lg font-semibold group" onClick={() => setIsMenuOpen(false)}>
+                        {showMainSiteLogo && logoUrl ? (
+                        <div style={{ width: `min(${storeLogoWidth}px, 80px)`, height: `${logoContainerHeight}px` }} className="relative flex items-center">
+                            <Image
+                                src={logoUrl}
+                                alt={storeName}
+                                fill
+                                sizes={`${storeLogoWidth}px`}
+                                className={cn(
+                                    "object-contain transition-transform duration-500",
+                                    settings?.enableHoverZoom !== false && "group-hover:scale-105"
+                                )}
+                                unoptimized
+                            />
+                        </div>
+                        ) : showMainSiteLogo ? (
+                        <StoreLinkLogo className="h-6 w-6 text-primary" />
+                        ) : null}
+                        {showPublicStoreName && (
+                        <span
+                            className={'font-black tracking-tighter text-[#1d1d1f] dark:text-white group-hover:opacity-80 transition-opacity whitespace-pre-wrap break-words leading-tight max-w-[80px] sm:max-w-[200px] md:max-w-[250px] overflow-hidden line-clamp-1'}
+                            style={{ fontSize: `min(${storeNameFontSize}px, 16px)` }}
+                        >
+                            {storeName}
+                        </span>
+                        )}
+                    </Link>
                   </div>
 
                   {navbarShowSearch && (
@@ -264,7 +260,7 @@ export function PublicNavbar() {
                                 <DropdownMenuContent 
                                     align="start" 
                                     sideOffset={12}
-                                    className="w-72 p-4 rounded-[2.5rem] shadow-[0_30px_70px_rgba(0,0,0,0.2)] dark:shadow-[0_30px_70px_rgba(0,0,0,0.6)] border-[3px] border-black/10 dark:border-white/10 bg-white/95 dark:bg-black/95 backdrop-blur-3xl animate-in fade-in slide-in-from-top-3 duration-500"
+                                    className="w-72 p-4 rounded-[2rem] shadow-[0_30px_70px_rgba(0,0,0,0.2)] dark:shadow-[0_30px_70px_rgba(0,0,0,0.6)] border border-[#d2d2d7]/50 bg-white/95 dark:bg-black/95 backdrop-blur-3xl animate-in fade-in slide-in-from-top-3 duration-500"
                                 >
                                     <div className="max-h-[480px] overflow-y-auto py-1 pr-1 custom-scrollbar">
                                         {isLoadingCategories ? (
