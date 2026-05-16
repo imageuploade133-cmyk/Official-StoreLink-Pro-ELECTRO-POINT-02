@@ -106,6 +106,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'emakemrnd.com.ng',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };

@@ -207,8 +207,14 @@ export default function FeaturesPage() {
             </div>
             <div className="lg:w-1/2 grid grid-cols-2 gap-6">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="aspect-square bg-white/5 rounded-[2.5rem] border border-white/10 flex items-center justify-center p-8 transition-colors hover:bg-white/10">
-                   <CreditCard className="h-12 w-12 text-[#0071e3] opacity-50" />
+                <div key={i} className="aspect-square bg-white/5 rounded-[2.5rem] border border-white/10 flex items-center justify-center p-8 transition-colors hover:bg-white/10 group">
+                   <Image 
+                      src={`https://emakemrnd.com.ng/${i}.png`}
+                      alt={`Payment Provider ${i}`}
+                      width={120}
+                      height={60}
+                      className="object-contain max-h-20 w-auto group-hover:scale-110 transition-transform duration-500"
+                   />
                 </div>
               ))}
             </div>
