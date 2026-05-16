@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
 export default function StoreAppRedirectPage() {
-    redirect('/store-app/global');
+    redirect('/store-app/home');
 }

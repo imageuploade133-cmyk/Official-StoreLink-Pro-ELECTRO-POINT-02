@@ -16,7 +16,8 @@ export function useStoreUrl() {
     // 2. params.storeId from URL
     // 3. staffMember's store_id
     // 4. ownedStore's id
-    return publicStore?.id || (params?.storeId as string) || staffMember?.store_id || ownedStore?.id || 'global';
+    const id = publicStore?.id || (params?.storeId as string) || staffMember?.store_id || ownedStore?.id || 'global';
+    return id === 'home' ? 'global' : id;
   }, [params, publicStore, ownedStore, staffMember]);
 
   const getStoreUrl = (path: string) => {

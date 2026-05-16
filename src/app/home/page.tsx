@@ -18,7 +18,7 @@ import {
   Star
 } from 'lucide-react';
 
-export default function GlobalLandingPage() {
+export default function HomeLandingPage() {
   return (
     <>
       {/* Hero Section */}
@@ -164,7 +164,7 @@ export default function GlobalLandingPage() {
                 <h4 className="text-2xl font-black text-slate-900 mb-4">{feature.title}</h4>
                 <p className="text-slate-500 leading-relaxed font-medium">{feature.description}</p>
                 <div className="mt-8 flex items-center text-sm font-bold text-slate-900 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Link href="/global/features" className="flex items-center">
+                  <Link href="/home/features" className="flex items-center">
                     Learn more <ChevronRight className="h-4 w-4 ml-1" />
                   </Link>
                 </div>
