@@ -64,16 +64,19 @@ export default function HomeLandingPage() {
           <div className="mt-24 relative max-w-6xl mx-auto animate-in fade-in zoom-in-95 duration-1000 delay-500">
             <div className="relative rounded-[2rem] p-2 bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.05),0_20px_50px_rgba(0,0,0,0.1)]">
               <div className="relative rounded-[1.5rem] overflow-hidden bg-slate-50 aspect-[16/10] border border-slate-200">
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-                   <div className="flex flex-col items-center gap-6 opacity-30 scale-150">
-                      <StoreLinkLogo className="h-20 w-20 text-primary" />
-                      <div className="h-1.5 w-40 bg-slate-300 rounded-full" />
-                      <div className="h-1.5 w-24 bg-slate-300 rounded-full" />
-                   </div>
+                <div className="absolute inset-0">
+                  <Image 
+                    src="https://emakemrnd.com.ng/D1.png" 
+                    alt="StoreLink Pro Dashboard" 
+                    fill
+                    priority
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent" />
                 </div>
                 
                 {/* Floating Elements */}
-                <div className="absolute top-1/4 left-10 p-5 bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-white flex items-center gap-4 animate-bounce-slow">
+                <div className="absolute top-1/4 left-10 p-5 bg-white/95 backdrop-blur rounded-2xl shadow-2xl border border-white flex items-center gap-4 animate-bounce-slow z-10">
                   <div className="h-12 w-12 rounded-xl bg-green-100 flex items-center justify-center">
                     <BarChart3 className="h-6 w-6 text-green-600" />
                   </div>
@@ -83,7 +86,7 @@ export default function HomeLandingPage() {
                   </div>
                 </div>
 
-                <div className="absolute bottom-1/4 right-10 p-5 bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-white flex items-center gap-4 animate-float">
+                <div className="absolute bottom-1/4 right-10 p-5 bg-white/95 backdrop-blur rounded-2xl shadow-2xl border border-white flex items-center gap-4 animate-float z-10">
                   <div className="h-12 w-12 rounded-xl bg-blue-100 flex items-center justify-center">
                     <Users className="h-6 w-6 text-blue-600" />
                   </div>
@@ -91,26 +94,6 @@ export default function HomeLandingPage() {
                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">New Customers</p>
                     <p className="text-xl font-black text-slate-900">+48</p>
                   </div>
-                </div>
-
-                {/* Additional Images from ticket */}
-                <div className="absolute top-10 right-[20%] w-40 h-auto rounded-2xl overflow-hidden shadow-2xl border-4 border-white animate-bounce-slow delay-150 rotate-3 z-20">
-                  <Image 
-                    src="https://emakemrnd.com.ng/D1.png" 
-                    alt="Analytics" 
-                    width={200} 
-                    height={200}
-                    className="w-full h-auto"
-                  />
-                </div>
-                <div className="absolute bottom-10 left-[20%] w-40 h-auto rounded-2xl overflow-hidden shadow-2xl border-4 border-white animate-float delay-300 -rotate-3 z-20">
-                  <Image 
-                    src="https://emakemrnd.com.ng/D2.png" 
-                    alt="Sales Tracking" 
-                    width={200} 
-                    height={200}
-                    className="w-full h-auto"
-                  />
                 </div>
               </div>
             </div>

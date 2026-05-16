@@ -193,55 +193,38 @@ export default function FeaturesPage() {
           </div>
 
           {/* Visual Mockup with Revenue and Ticket Images */}
-          <div className="mt-20 relative max-w-4xl mx-auto">
+          <div className="mt-20 relative max-w-5xl mx-auto">
             <div className="relative rounded-[2rem] p-2 bg-white shadow-2xl border border-slate-200 overflow-hidden">
-              <div className="aspect-[16/9] bg-slate-100 rounded-[1.5rem] flex items-center justify-center relative overflow-hidden">
-                <div className="flex flex-col items-center gap-4 opacity-20">
-                   <div className="h-16 w-16 rounded-full bg-primary" />
-                   <div className="h-2 w-32 bg-slate-400 rounded-full" />
-                   <div className="h-2 w-24 bg-slate-400 rounded-full" />
-                </div>
+              <div className="aspect-[16/9] bg-slate-100 rounded-[1.5rem] relative overflow-hidden">
+                <Image 
+                  src="https://emakemrnd.com.ng/D2.png" 
+                  alt="StoreLink Pro Features Dashboard" 
+                  fill
+                  priority
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent" />
 
                 {/* Revenue Element */}
-                <div className="absolute top-1/4 left-10 p-4 bg-white rounded-2xl shadow-xl border border-slate-100 flex items-center gap-3 animate-bounce-slow">
-                  <div className="h-10 w-10 rounded-xl bg-green-100 flex items-center justify-center">
-                    <BarChart3 className="h-5 w-5 text-green-600" />
+                <div className="absolute top-1/4 left-10 p-5 bg-white/95 backdrop-blur rounded-2xl shadow-xl border border-slate-100 flex items-center gap-4 animate-bounce-slow z-10">
+                  <div className="h-12 w-12 rounded-xl bg-green-100 flex items-center justify-center">
+                    <BarChart3 className="h-6 w-6 text-green-600" />
                   </div>
                   <div className="text-left">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Revenue</p>
-                    <p className="text-lg font-black text-slate-900">+$12,450.00</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Revenue</p>
+                    <p className="text-xl font-black text-slate-900">+$12,450.00</p>
                   </div>
                 </div>
 
                 {/* Customers Element */}
-                <div className="absolute bottom-1/4 right-10 p-4 bg-white rounded-2xl shadow-xl border border-slate-100 flex items-center gap-3 animate-float">
-                  <div className="h-10 w-10 rounded-xl bg-blue-100 flex items-center justify-center">
-                    <Users className="h-5 w-5 text-blue-600" />
+                <div className="absolute bottom-1/4 right-10 p-5 bg-white/95 backdrop-blur rounded-2xl shadow-xl border border-slate-100 flex items-center gap-4 animate-float z-10">
+                  <div className="h-12 w-12 rounded-xl bg-blue-100 flex items-center justify-center">
+                    <Users className="h-6 w-6 text-blue-600" />
                   </div>
                   <div className="text-left">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">New Customers</p>
-                    <p className="text-lg font-black text-slate-900">+48</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">New Customers</p>
+                    <p className="text-xl font-black text-slate-900">+48</p>
                   </div>
-                </div>
-
-                {/* Ticket Images */}
-                <div className="absolute top-10 right-20 w-32 h-auto rounded-xl overflow-hidden shadow-2xl border-2 border-white rotate-6 animate-pulse">
-                  <Image 
-                    src="https://emakemrnd.com.ng/D1.png" 
-                    alt="Feature Preview 1" 
-                    width={150} 
-                    height={150}
-                    className="w-full h-auto"
-                  />
-                </div>
-                <div className="absolute bottom-10 left-20 w-32 h-auto rounded-xl overflow-hidden shadow-2xl border-2 border-white -rotate-6 animate-bounce-slow delay-700">
-                  <Image 
-                    src="https://emakemrnd.com.ng/D2.png" 
-                    alt="Feature Preview 2" 
-                    width={150} 
-                    height={150}
-                    className="w-full h-auto"
-                  />
                 </div>
               </div>
             </div>
