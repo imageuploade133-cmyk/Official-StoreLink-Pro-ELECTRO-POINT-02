@@ -92,17 +92,17 @@ export default function HomeLandingPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-[24rem]">
             {/* Large Card - POS */}
-            <div className="md:col-span-8 group relative overflow-hidden rounded-[2.5rem] bg-[#f5f5f7] border border-[#d2d2d7]/50 p-10 transition-all duration-500 hover:shadow-xl">
-              <div className="relative z-10 max-w-md">
-                <div className="h-12 w-12 rounded-xl bg-white flex items-center justify-center shadow-sm mb-6">
+            <div className="md:col-span-8 group relative overflow-hidden rounded-[2.5rem] bg-[#1d1d1f] border border-white/10 p-10 transition-all duration-500 hover:shadow-2xl hover:border-white/20">
+              <div className="relative z-20 max-w-md">
+                <div className="h-12 w-12 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center shadow-sm mb-6">
                   <Smartphone className="h-6 w-6 text-[#0071e3]" />
                 </div>
-                <h4 className="text-3xl font-semibold mb-4 tracking-tight">Hybrid Cloud POS</h4>
-                <p className="text-[#86868b] text-lg font-medium leading-relaxed">
+                <h4 className="text-3xl font-semibold mb-4 tracking-tight text-white">Hybrid Cloud POS</h4>
+                <p className="text-white/60 text-lg font-medium leading-relaxed">
                   Professional-grade Point of Sale that works on any device. Online or offline, your data stays perfectly in sync.
                 </p>
               </div>
-              <div className="absolute bottom-0 right-0 w-2/3 h-2/3 translate-x-10 translate-y-10 group-hover:translate-x-5 group-hover:translate-y-5 transition-transform duration-700">
+              <div className="absolute bottom-0 right-0 w-[75%] h-[75%] translate-x-10 translate-y-10 group-hover:translate-x-5 group-hover:translate-y-5 transition-transform duration-700 z-10">
                  <Image 
                     src="https://emakemrnd.com.ng/D1.png" 
                     alt="POS Mockup" 
@@ -110,7 +110,13 @@ export default function HomeLandingPage() {
                     className="object-cover rounded-tl-3xl shadow-2xl"
                     unoptimized
                   />
+                  {/* Premium Dark Fade Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#1d1d1f] via-[#1d1d1f]/40 to-transparent z-10" />
+                  <div className="absolute inset-0 bg-gradient-to-l from-[#1d1d1f] via-transparent to-transparent z-10" />
               </div>
+              
+              {/* Subtle background glow */}
+              <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-[#0071e3]/10 rounded-full blur-[100px] z-0" />
             </div>
 
             {/* Small Card - Security */}
