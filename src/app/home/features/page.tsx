@@ -182,13 +182,29 @@ export default function FeaturesPage() {
           <p className="text-xl md:text-2xl text-slate-500 max-w-3xl mx-auto mb-10 font-medium">
             Everything you need to sell online and in-person, manage inventory, and grow your business with AI-powered tools.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
             <Button size="lg" className="h-14 px-10 rounded-full text-lg font-bold shadow-xl shadow-primary/20" asChild>
               <Link href="/signup-merchant">Create your store now</Link>
             </Button>
             <Button size="lg" variant="outline" className="h-14 px-10 rounded-full text-lg font-bold bg-white" asChild>
               <Link href="/login">Explore Demo</Link>
             </Button>
+          </div>
+
+          <div className="relative max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
+            <div className="relative rounded-[2.5rem] p-2 bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.05),0_20px_50px_rgba(0,0,0,0.1)]">
+              <div className="relative rounded-[2rem] overflow-hidden bg-slate-100 border border-slate-200 aspect-[16/9]">
+                <img 
+                  src="https://emakemrnd.com.ng/D1.png" 
+                  alt="StoreLink Pro Dashboard" 
+                  className="w-full h-full object-cover object-top"
+                />
+              </div>
+            </div>
+            
+            {/* Floating decoration */}
+            <div className="absolute -top-12 -right-12 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10" />
+            <div className="absolute -bottom-12 -left-12 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl -z-10" />
           </div>
         </div>
       </section>
@@ -285,29 +301,12 @@ export default function FeaturesPage() {
               </ul>
             </div>
             <div className="lg:w-1/2 relative">
-              <div className="bg-slate-50 p-8 rounded-[3rem] border border-slate-100 shadow-2xl relative z-10">
-                <div className="flex items-center justify-between mb-8">
-                  <div>
-                    <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Monthly Revenue</p>
-                    <p className="text-3xl font-black text-slate-900">$42,500.00</p>
-                  </div>
-                  <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center">
-                    <BarChart3 className="h-6 w-6 text-primary" />
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  {[60, 80, 45, 90, 70].map((h, i) => (
-                    <div key={i} className="flex items-center gap-4">
-                      <div className="w-12 text-xs font-bold text-slate-400">Week {i+1}</div>
-                      <div className="flex-1 h-3 bg-slate-200 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-primary rounded-full transition-all duration-1000" 
-                          style={{ width: `${h}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <div className="bg-white p-2 rounded-[2rem] border border-slate-200 shadow-2xl relative z-10 overflow-hidden aspect-[4/3]">
+                <img 
+                  src="https://emakemrnd.com.ng/D2.png" 
+                  alt="Advanced Analytics Dashboard" 
+                  className="w-full h-full object-cover object-top rounded-[1.5rem]"
+                />
               </div>
               <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl -z-0" />
             </div>

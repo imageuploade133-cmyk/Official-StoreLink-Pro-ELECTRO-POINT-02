@@ -63,12 +63,12 @@ export default function HomeLandingPage() {
           <div className="mt-24 relative max-w-6xl mx-auto animate-in fade-in zoom-in-95 duration-1000 delay-500">
             <div className="relative rounded-[2rem] p-2 bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.05),0_20px_50px_rgba(0,0,0,0.1)]">
               <div className="relative rounded-[1.5rem] overflow-hidden bg-slate-50 aspect-[16/10] border border-slate-200">
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-                   <div className="flex flex-col items-center gap-6 opacity-30 scale-150">
-                      <StoreLinkLogo className="h-20 w-20 text-primary" />
-                      <div className="h-1.5 w-40 bg-slate-300 rounded-full" />
-                      <div className="h-1.5 w-24 bg-slate-300 rounded-full" />
-                   </div>
+                <div className="absolute inset-0">
+                  <img 
+                    src="https://emakemrnd.com.ng/D1.png" 
+                    alt="StoreLink Pro Dashboard" 
+                    className="w-full h-full object-cover object-top"
+                  />
                 </div>
                 
                 {/* Floating Elements */}
@@ -201,24 +201,24 @@ export default function HomeLandingPage() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-primary/10 rounded-full blur-[120px] -z-0" />
       </section>
 
-      {/* Voice Description Feature Showcase */}
+      {/* Future Page Feature Showcase */}
       <section className="py-32 bg-slate-50 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center gap-16">
             <div className="lg:w-1/2">
-              <h2 className="text-sm font-black text-primary uppercase tracking-[0.3em] mb-4">Innovation</h2>
+              <h2 className="text-sm font-black text-primary uppercase tracking-[0.3em] mb-4">Future-Ready</h2>
               <h3 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.1] mb-8">
-                Your products, <br /><span className="text-primary">with a voice.</span>
+                Advanced insights, <br /><span className="text-primary">at your fingertips.</span>
               </h3>
               <p className="text-xl text-slate-500 font-medium leading-relaxed mb-8">
-                Bring your products to life with integrated voice descriptions. Give your customers an immersive shopping experience with expert insights and audio pitches.
+                Experience the next generation of commerce management. Our future-ready dashboard gives you unparalleled control over every aspect of your retail empire.
               </p>
               <div className="space-y-4">
                 {[
-                  "Immersive audio signatures for every product",
-                  "Explain complex features with expert narration",
-                  "Increase accessibility for all customers",
-                  "Build trust through personal audio pitches"
+                  "Real-time predictive analytics",
+                  "Advanced inventory forecasting",
+                  "Multi-channel sales synchronization",
+                  "AI-powered customer behavior insights"
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-3 text-slate-700 font-bold">
                     <CheckCircle2 className="h-5 w-5 text-primary" />
@@ -228,36 +228,12 @@ export default function HomeLandingPage() {
               </div>
             </div>
             <div className="lg:w-1/2 relative">
-              <div className="relative bg-white p-8 rounded-[3rem] shadow-2xl border border-slate-100">
-                <div className="flex items-center gap-4 mb-8">
-                  <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-                    <Zap className="h-8 w-8 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Audio Experience</p>
-                    <p className="text-xl font-bold">Listen to Audio Signature</p>
-                  </div>
-                </div>
-                
-                <div className="h-2 w-full bg-slate-100 rounded-full mb-4 overflow-hidden">
-                  <div className="h-full bg-primary w-2/3 rounded-full" />
-                </div>
-                <div className="flex justify-between text-xs font-bold text-slate-400 mb-8">
-                  <span>1:24</span>
-                  <span>2:10</span>
-                </div>
-                
-                <div className="flex justify-center gap-6">
-                  <div className="h-12 w-12 rounded-full bg-slate-50 flex items-center justify-center">
-                    <ArrowRight className="h-6 w-6 text-slate-400 rotate-180" />
-                  </div>
-                  <div className="h-16 w-16 rounded-full bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/30">
-                    <Zap className="h-8 w-8 fill-current" />
-                  </div>
-                  <div className="h-12 w-12 rounded-full bg-slate-50 flex items-center justify-center">
-                    <ArrowRight className="h-6 w-6 text-slate-400" />
-                  </div>
-                </div>
+              <div className="relative bg-white p-2 rounded-[2rem] shadow-2xl border border-slate-100 overflow-hidden aspect-[4/3]">
+                <img 
+                  src="https://emakemrnd.com.ng/D2.png" 
+                  alt="Future Page Preview" 
+                  className="w-full h-full object-cover object-top rounded-[1.5rem]"
+                />
               </div>
               
               {/* Decorative elements */}
