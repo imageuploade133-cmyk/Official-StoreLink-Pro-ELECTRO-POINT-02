@@ -157,17 +157,18 @@ export default function GlobalLandingPage() {
                 gradient: "from-rose-50 to-pink-50"
               }
             ].map((feature, index) => (
-              <div key={index} className={`group relative p-10 rounded-[2rem] border border-slate-100 bg-gradient-to-br ${feature.gradient} transition-all duration-300 hover:shadow-2xl hover:shadow-slate-200/50 hover:-translate-y-1`}>
-                <div className="mb-8 h-14 w-14 bg-white rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-500">
+              <div 
+                key={index} 
+                className={`premium-card p-10 bg-gradient-to-br ${feature.gradient} group`}
+              >
+                <div className="premium-card-icon-wrapper mb-8">
                   {feature.icon}
                 </div>
-                <h4 className="text-2xl font-black text-slate-900 mb-4">{feature.title}</h4>
-                <p className="text-slate-500 leading-relaxed font-medium">{feature.description}</p>
-                <div className="mt-8 flex items-center text-sm font-bold text-slate-900 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Link href="/global/features" className="flex items-center">
-                    Learn more <ChevronRight className="h-4 w-4 ml-1" />
-                  </Link>
-                </div>
+                <h4 className="premium-card-title">{feature.title}</h4>
+                <p className="premium-card-description">{feature.description}</p>
+                <Link href="/global/features" className="premium-card-link">
+                  Learn more <ChevronRight className="h-4 w-4 ml-1" />
+                </Link>
               </div>
             ))}
           </div>
@@ -224,13 +225,13 @@ export default function GlobalLandingPage() {
               </div>
             </div>
             <div className="lg:w-1/2 relative">
-              <div className="relative bg-white p-8 rounded-[3rem] shadow-2xl border border-slate-100">
+              <div className="premium-card premium-card-large p-8">
                 <div className="flex items-center gap-4 mb-8">
                   <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center">
                     <Zap className="h-8 w-8 text-primary" />
                   </div>
                   <div>
-                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Audio Experience</p>
+                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest dark:text-slate-500">Audio Experience</p>
                     <p className="text-xl font-bold">Listen to Audio Signature</p>
                   </div>
                 </div>
@@ -289,9 +290,9 @@ export default function GlobalLandingPage() {
                 description: "Sell to customers anywhere in the world with ease."
               }
             ].map((item, i) => (
-              <div key={i} className="p-10 rounded-[2rem] bg-slate-50 border border-slate-100">
-                <h4 className="text-2xl font-black mb-4">{item.title}</h4>
-                <p className="text-slate-500 font-medium">{item.description}</p>
+              <div key={i} className="premium-card-subtle p-10">
+                <h4 className="premium-card-title">{item.title}</h4>
+                <p className="premium-card-description">{item.description}</p>
               </div>
             ))}
           </div>

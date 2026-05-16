@@ -204,12 +204,12 @@ export default function FeaturesPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {section.items.map((item, itemIdx) => (
-                <div key={itemIdx} className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-                  <div className="h-14 w-14 rounded-2xl bg-slate-50 flex items-center justify-center mb-6">
+                <div key={itemIdx} className="premium-card p-8 group">
+                  <div className="premium-card-icon-wrapper mb-6">
                     {item.icon}
                   </div>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-3">{item.title}</h3>
-                  <p className="text-slate-500 font-medium leading-relaxed">{item.description}</p>
+                  <h3 className="premium-card-title">{item.title}</h3>
+                  <p className="premium-card-description">{item.description}</p>
                 </div>
               ))}
             </div>
@@ -247,7 +247,7 @@ export default function FeaturesPage() {
             </div>
             <div className="lg:w-1/2 grid grid-cols-2 gap-4">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="aspect-square bg-white/5 rounded-3xl border border-white/10 flex items-center justify-center p-8">
+                <div key={i} className="premium-card aspect-square flex items-center justify-center p-8">
                    <CreditCard className="h-12 w-12 text-primary opacity-50" />
                 </div>
               ))}
@@ -285,11 +285,11 @@ export default function FeaturesPage() {
               </ul>
             </div>
             <div className="lg:w-1/2 relative">
-              <div className="bg-slate-50 p-8 rounded-[3rem] border border-slate-100 shadow-2xl relative z-10">
+              <div className="premium-card premium-card-large p-8 relative z-10">
                 <div className="flex items-center justify-between mb-8">
                   <div>
-                    <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Monthly Revenue</p>
-                    <p className="text-3xl font-black text-slate-900">$42,500.00</p>
+                    <p className="text-sm font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">Monthly Revenue</p>
+                    <p className="text-3xl font-black text-slate-900 dark:text-white">$42,500.00</p>
                   </div>
                   <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center">
                     <BarChart3 className="h-6 w-6 text-primary" />
@@ -298,8 +298,8 @@ export default function FeaturesPage() {
                 <div className="space-y-4">
                   {[60, 80, 45, 90, 70].map((h, i) => (
                     <div key={i} className="flex items-center gap-4">
-                      <div className="w-12 text-xs font-bold text-slate-400">Week {i+1}</div>
-                      <div className="flex-1 h-3 bg-slate-200 rounded-full overflow-hidden">
+                      <div className="w-12 text-xs font-bold text-slate-400 dark:text-slate-500">Week {i+1}</div>
+                      <div className="flex-1 h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                         <div 
                           className="h-full bg-primary rounded-full transition-all duration-1000" 
                           style={{ width: `${h}%` }}
