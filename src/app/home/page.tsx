@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { StoreLinkLogo } from '@/components/icons';
 import { useAuth } from '@/contexts/auth-context';
@@ -16,313 +17,265 @@ import {
   BarChart3,
   Users,
   ChevronRight,
-  Star
+  Star,
+  Sparkles,
+  Layout,
+  MousePointer2,
+  CreditCard,
+  Package
 } from 'lucide-react';
 
 export default function HomeLandingPage() {
   const { user } = useAuth();
+  
   return (
-    <>
+    <div className="bg-[#fbfbfd] text-[#1d1d1f]">
       {/* Hero Section */}
-      <section className="relative pt-40 pb-24 overflow-hidden">
-        {/* Decorative Background */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1000px] -z-10 opacity-40">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-full bg-[radial-gradient(50%_50%_at_50%_50%,#e2e8f0_0%,rgba(255,255,255,0)_100%)]" />
-        </div>
-
+      <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200 shadow-sm text-slate-600 text-xs font-bold mb-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-            <span className="uppercase tracking-wider">New: AI-Powered Inventory is live</span>
-            <ChevronRight className="h-3 w-3" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#d2d2d7] shadow-sm text-[#1d1d1f] text-sm font-medium mb-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+            <span className="flex h-2 w-2 rounded-full bg-[#0071e3]" />
+            <span>AI-Powered Commerce is here.</span>
+            <ChevronRight className="h-4 w-4 text-[#86868b]" />
           </div>
           
-          <h1 className="text-6xl md:text-8xl font-black tracking-tight text-slate-900 mb-8 leading-[0.9] animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-100">
+          <h1 className="text-5xl md:text-8xl font-semibold tracking-tight text-[#1d1d1f] mb-8 leading-[1.05] animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-100">
             One platform.<br />
-            <span className="text-primary">Infinite possibilities.</span>
+            <span className="text-[#0071e3]">Everything retail.</span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-slate-500 max-w-2xl mx-auto mb-12 font-medium leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
-            The all-in-one OS for modern retail. Unified commerce, lightning POS, and global scale—built for the next generation of merchants.
+          <p className="text-xl md:text-2xl text-[#86868b] max-w-2xl mx-auto mb-12 font-medium leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+            The unified OS for modern commerce. Lightning-fast POS, beautiful online stores, and global scale.
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-5 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
-            <Button size="lg" className="h-14 px-10 rounded-full text-lg font-bold shadow-2xl shadow-primary/30" asChild>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
+            <Button size="lg" className="h-12 px-8 rounded-full text-base font-semibold bg-[#0071e3] hover:bg-[#0077ed] text-white" asChild>
               <Link href={user ? "/dashboard" : "/signup-merchant"}>
-                {user ? "active account" : "Get Started for Free"}
+                {user ? "Go to Dashboard" : "Start Free Trial"}
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="h-14 px-10 rounded-full text-lg font-bold border-2 bg-white" asChild>
-              <Link href={user ? "/dashboard" : "/login"}>
-                {user ? "View Dashboard" : "View Live Demo"}
-              </Link>
-            </Button>
+            <Link href={user ? "/dashboard" : "/login"} className="text-[#0066cc] font-semibold hover:underline flex items-center gap-1 group text-lg">
+              {user ? "View Activity" : "Learn more"} <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-0.5" />
+            </Link>
           </div>
           
-          {/* Main App Mockup */}
-          <div className="mt-24 relative max-w-6xl mx-auto animate-in fade-in zoom-in-95 duration-1000 delay-500">
-            <div className="relative rounded-[2rem] p-2 bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.05),0_20px_50px_rgba(0,0,0,0.1)]">
-              <div className="relative rounded-[1.5rem] overflow-hidden bg-slate-50 aspect-[16/10] border border-slate-200">
-                <div className="absolute inset-0">
-                  <img 
-                    src="https://emakemrnd.com.ng/D1.png" 
-                    alt="StoreLink Pro Dashboard" 
-                    className="w-full h-full object-cover object-top"
-                  />
-                </div>
-                
-                {/* Floating Elements */}
-                <div className="absolute top-1/4 left-10 p-5 bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-white flex items-center gap-4 animate-bounce-slow">
-                  <div className="h-12 w-12 rounded-xl bg-green-100 flex items-center justify-center">
-                    <BarChart3 className="h-6 w-6 text-green-600" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Revenue</p>
-                    <p className="text-xl font-black text-slate-900">+$12,450.00</p>
-                  </div>
-                </div>
-
-                <div className="absolute bottom-1/4 right-10 p-5 bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-white flex items-center gap-4 animate-float">
-                  <div className="h-12 w-12 rounded-xl bg-blue-100 flex items-center justify-center">
-                    <Users className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">New Customers</p>
-                    <p className="text-xl font-black text-slate-900">+48</p>
-                  </div>
-                </div>
+          {/* Hero Device Mockup */}
+          <div className="mt-20 relative max-w-5xl mx-auto animate-in fade-in zoom-in-95 duration-1000 delay-500">
+            <div className="relative rounded-[2.5rem] p-3 bg-white shadow-[0_20px_80px_rgba(0,0,0,0.1)] border border-[#d2d2d7]/30">
+              <div className="relative rounded-[2rem] overflow-hidden bg-[#f5f5f7] aspect-[16/10] border border-[#d2d2d7]/50">
+                <Image 
+                  src="https://emakemrnd.com.ng/D1.png" 
+                  alt="StoreLink Pro Dashboard" 
+                  fill
+                  className="object-cover object-top"
+                  unoptimized
+                />
               </div>
             </div>
             
-            {/* Visual background element */}
-            <div className="absolute -top-12 -right-12 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10" />
-            <div className="absolute -bottom-12 -left-12 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl -z-10" />
+            {/* Ambient glows */}
+            <div className="absolute -top-20 -right-20 w-80 h-80 bg-[#0071e3]/5 rounded-full blur-[100px] -z-10" />
+            <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-[#5ac8fa]/5 rounded-full blur-[100px] -z-10" />
           </div>
         </div>
       </section>
 
-      {/* Social Proof */}
-      <section className="py-12 border-y border-slate-100 bg-white">
-        <div className="max-w-7xl mx-auto px-4 flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-50 grayscale">
-          <div className="font-black text-2xl tracking-tighter italic">RETAILFLOW</div>
-          <div className="font-black text-2xl tracking-tighter">MERCHLY</div>
-          <div className="font-black text-2xl tracking-tighter italic underline decoration-primary">SPEEDSHOP</div>
-          <div className="font-black text-2xl tracking-tighter">CORE</div>
-          <div className="font-black text-2xl tracking-tighter italic">VANTAGE</div>
-        </div>
-      </section>
-
-      {/* Features Grid */}
-      <section id="features" className="py-32 px-4 sm:px-6 lg:px-8 relative bg-white">
+      {/* Bento Grid Features */}
+      <section id="features" className="py-32 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
-          <div className="max-w-3xl mb-24">
-            <h2 className="text-sm font-black text-primary uppercase tracking-[0.3em] mb-4">Core Capabilities</h2>
-            <h3 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.1]">
-              Everything you need to <br />run your business.
+          <div className="text-center mb-20">
+            <h2 className="text-lg font-semibold text-[#0071e3] mb-4">Capabilities</h2>
+            <h3 className="text-4xl md:text-6xl font-semibold text-[#1d1d1f] tracking-tight">
+              Built for what&apos;s next.
             </h3>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                icon: <ShoppingBag className="h-6 w-6 text-primary" />,
-                title: "Unified Storefront",
-                description: "One back-office to manage beautiful online stores across multiple subdomains and custom domains.",
-                gradient: "from-blue-50 to-indigo-50"
-              },
-              {
-                icon: <Smartphone className="h-6 w-6 text-blue-600" />,
-                title: "Hybrid Cloud POS",
-                description: "A professional-grade POS system that works on any device, syncing real-time with your online store.",
-                gradient: "from-slate-50 to-blue-50"
-              },
-              {
-                icon: <Zap className="h-6 w-6 text-amber-500" />,
-                title: "Instant Analytics",
-                description: "Real-time insights into your sales, staff performance, and customer trends from anywhere in the world.",
-                gradient: "from-amber-50 to-orange-50"
-              },
-              {
-                icon: <Globe className="h-6 w-6 text-emerald-600" />,
-                title: "Global Payments",
-                description: "Accept any currency with native integrations for Stripe, PayPal, Paystack, and Flutterwave.",
-                gradient: "from-emerald-50 to-teal-50"
-              },
-              {
-                icon: <Shield className="h-6 w-6 text-indigo-600" />,
-                title: "Enterprise Security",
-                description: "Bank-grade encryption, secure checkout, and granular staff permissions for total peace of mind.",
-                gradient: "from-indigo-50 to-purple-50"
-              },
-              {
-                icon: <CheckCircle2 className="h-6 w-6 text-rose-600" />,
-                title: "Smart Inventory",
-                description: "Automated stock tracking, bulk imports, and low-stock alerts to keep your business running smoothly.",
-                gradient: "from-rose-50 to-pink-50"
-              }
-            ].map((feature, index) => (
-              <div key={index} className={`group relative p-10 rounded-[2rem] border border-slate-100 bg-gradient-to-br ${feature.gradient} transition-all duration-300 hover:shadow-2xl hover:shadow-slate-200/50 hover:-translate-y-1`}>
-                <div className="mb-8 h-14 w-14 bg-white rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-500">
-                  {feature.icon}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-[24rem]">
+            {/* Large Card - POS */}
+            <div className="md:col-span-8 group relative overflow-hidden rounded-[2.5rem] bg-[#f5f5f7] border border-[#d2d2d7]/50 p-10 transition-all duration-500 hover:shadow-xl">
+              <div className="relative z-10 max-w-md">
+                <div className="h-12 w-12 rounded-xl bg-white flex items-center justify-center shadow-sm mb-6">
+                  <Smartphone className="h-6 w-6 text-[#0071e3]" />
                 </div>
-                <h4 className="text-2xl font-black text-slate-900 mb-4">{feature.title}</h4>
-                <p className="text-slate-500 leading-relaxed font-medium">{feature.description}</p>
-                <div className="mt-8 flex items-center text-sm font-bold text-slate-900 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Link href="/home/features" className="flex items-center">
-                    Learn more <ChevronRight className="h-4 w-4 ml-1" />
-                  </Link>
-                </div>
+                <h4 className="text-3xl font-semibold mb-4 tracking-tight">Hybrid Cloud POS</h4>
+                <p className="text-[#86868b] text-lg font-medium leading-relaxed">
+                  Professional-grade Point of Sale that works on any device. Online or offline, your data stays perfectly in sync.
+                </p>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonial Section */}
-      <section className="py-32 bg-[#09090b] text-white overflow-hidden relative">
-        <div className="max-w-7xl mx-auto px-4 relative z-10">
-          <div className="flex flex-col items-center text-center">
-            <div className="flex gap-1 mb-8">
-              {[1,2,3,4,5].map(i => <Star key={i} className="h-5 w-5 fill-primary text-primary" />)}
+              <div className="absolute bottom-0 right-0 w-2/3 h-2/3 translate-x-10 translate-y-10 group-hover:translate-x-5 group-hover:translate-y-5 transition-transform duration-700">
+                 <Image 
+                    src="https://emakemrnd.com.ng/D1.png" 
+                    alt="POS Mockup" 
+                    fill
+                    className="object-cover rounded-tl-3xl shadow-2xl"
+                    unoptimized
+                  />
+              </div>
             </div>
-            <blockquote className="text-3xl md:text-5xl font-black tracking-tight max-w-4xl mb-12 leading-tight">
-              &quot;StoreLink Pro transformed how we manage our 12 locations. The POS is lightning fast and the multi-store management is a game changer.&quot;
-            </blockquote>
-            <div className="flex items-center gap-4">
-              <div className="h-14 w-14 rounded-full bg-slate-800" />
-              <div className="text-left">
-                <p className="font-bold text-lg">Marcus Chen</p>
-                <p className="text-slate-500 text-sm">Founder, Urban Collective</p>
+
+            {/* Small Card - Security */}
+            <div className="md:col-span-4 group relative overflow-hidden rounded-[2.5rem] bg-[#1d1d1f] p-10 transition-all duration-500 hover:shadow-xl">
+              <div className="relative z-10 text-white">
+                <div className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center mb-6">
+                  <Shield className="h-6 w-6 text-[#0071e3]" />
+                </div>
+                <h4 className="text-2xl font-semibold mb-4 tracking-tight text-white">Bank-Grade Security</h4>
+                <p className="text-white/60 font-medium leading-relaxed">
+                  Enterprise security features to protect your business and your customers&apos; data.
+                </p>
+              </div>
+              <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-[#0071e3]/20 rounded-full blur-3xl" />
+            </div>
+
+            {/* Small Card - Analytics */}
+            <div className="md:col-span-4 group relative overflow-hidden rounded-[2.5rem] bg-[#f5f5f7] border border-[#d2d2d7]/50 p-10 transition-all duration-500 hover:shadow-xl">
+              <div className="relative z-10">
+                <div className="h-12 w-12 rounded-xl bg-white flex items-center justify-center shadow-sm mb-6">
+                  <BarChart3 className="h-6 w-6 text-[#34c759]" />
+                </div>
+                <h4 className="text-2xl font-semibold mb-4 tracking-tight">Real-time Insights</h4>
+                <p className="text-[#86868b] font-medium leading-relaxed">
+                  Advanced analytics to help you make informed decisions about your growth.
+                </p>
+              </div>
+            </div>
+
+            {/* Medium Card - Global Payments */}
+            <div className="md:col-span-8 group relative overflow-hidden rounded-[2.5rem] bg-[#f5f5f7] border border-[#d2d2d7]/50 p-10 transition-all duration-500 hover:shadow-xl">
+              <div className="flex flex-col md:flex-row h-full gap-8">
+                <div className="flex-1 relative z-10">
+                   <div className="h-12 w-12 rounded-xl bg-white flex items-center justify-center shadow-sm mb-6">
+                    <Globe className="h-6 w-6 text-[#5856d6]" />
+                  </div>
+                  <h4 className="text-3xl font-semibold mb-4 tracking-tight">Global Payments</h4>
+                  <p className="text-[#86868b] text-lg font-medium leading-relaxed">
+                    Accept payments in any currency with native integrations for Stripe, PayPal, and more.
+                  </p>
+                </div>
+                <div className="flex-1 grid grid-cols-2 gap-4">
+                    {[1,2,3,4].map(i => (
+                        <div key={i} className="bg-white rounded-2xl flex items-center justify-center p-6 shadow-sm group-hover:scale-105 transition-transform duration-500">
+                            <CreditCard className="h-8 w-8 text-[#5856d6] opacity-30" />
+                        </div>
+                    ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
-        {/* Background Decorative */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-primary/10 rounded-full blur-[120px] -z-0" />
       </section>
 
-      {/* Future Page Feature Showcase */}
-      <section className="py-32 bg-slate-50 overflow-hidden">
+      {/* Full Width Feature Section */}
+      <section className="py-32 bg-[#f5f5f7]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row items-center gap-16">
+          <div className="flex flex-col lg:flex-row items-center gap-20">
             <div className="lg:w-1/2">
-              <h2 className="text-sm font-black text-primary uppercase tracking-[0.3em] mb-4">Future-Ready</h2>
-              <h3 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-[1.1] mb-8">
-                Advanced insights, <br /><span className="text-primary">at your fingertips.</span>
+               <h2 className="text-lg font-semibold text-[#0071e3] mb-4">Design First</h2>
+              <h3 className="text-4xl md:text-6xl font-semibold text-[#1d1d1f] tracking-tight leading-tight mb-8">
+                Your store,<br />your way.
               </h3>
-              <p className="text-xl text-slate-500 font-medium leading-relaxed mb-8">
-                Experience the next generation of commerce management. Our future-ready dashboard gives you unparalleled control over every aspect of your retail empire.
+              <p className="text-xl text-[#86868b] font-medium leading-relaxed mb-10">
+                Choose from a library of stunning, high-conversion themes. Customize every detail to match your brand identity without writing a single line of code.
               </p>
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {[
-                  "Real-time predictive analytics",
-                  "Advanced inventory forecasting",
-                  "Multi-channel sales synchronization",
-                  "AI-powered customer behavior insights"
+                  { icon: <Layout />, text: "Visual Page Builder" },
+                  { icon: <MousePointer2 />, text: "Drag & Drop UI" },
+                  { icon: <Sparkles />, text: "AI Image Tools" },
+                  { icon: <CheckCircle2 />, text: "Mobile Optimized" }
                 ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 text-slate-700 font-bold">
-                    <CheckCircle2 className="h-5 w-5 text-primary" />
-                    {item}
+                  <div key={i} className="flex items-center gap-3 font-semibold text-[#1d1d1f]">
+                    <span className="text-[#0071e3]">{item.icon}</span>
+                    {item.text}
                   </div>
                 ))}
               </div>
             </div>
-            <div className="lg:w-1/2 relative">
-              <div className="relative bg-white p-2 rounded-[2rem] shadow-2xl border border-slate-100 overflow-hidden aspect-[4/3]">
-                <img 
-                  src="https://emakemrnd.com.ng/D2.png" 
-                  alt="Future Page Preview" 
-                  className="w-full h-full object-cover object-top rounded-[1.5rem]"
-                />
-              </div>
-              
-              {/* Decorative elements */}
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl -z-10" />
-              <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-400/20 rounded-full blur-3xl -z-10" />
+            <div className="lg:w-1/2">
+                <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl border border-[#d2d2d7]/50 aspect-[4/3]">
+                    <Image 
+                        src="https://emakemrnd.com.ng/D2.png" 
+                        alt="Customization Preview" 
+                        fill
+                        className="object-cover"
+                        unoptimized
+                    />
+                </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Create Website Section */}
-      <section className="py-32 px-4 sm:px-6 lg:px-8 bg-white border-t border-slate-100">
-        <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-5xl md:text-7xl font-black tracking-tight text-slate-900 mb-8 leading-[0.9]">
-            Your brand. Your store.<br />
-            <span className="text-primary">Your way.</span>
-          </h2>
-          <p className="text-xl md:text-2xl text-slate-500 max-w-3xl mx-auto mb-12 font-medium leading-relaxed">
-            Create your stunning e-commerce website in minutes. With StoreLink Pro, you have the tools to build a global brand from day one.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-            {[
-              {
-                title: "Custom Domains",
-                description: "Connect your own domain or use our high-speed subdomains."
-              },
-              {
-                title: "Beautiful Themes",
-                description: "Choose from professional designs optimized for conversion."
-              },
-              {
-                title: "Global Reach",
-                description: "Sell to customers anywhere in the world with ease."
-              }
-            ].map((item, i) => (
-              <div key={i} className="p-10 rounded-[2rem] bg-slate-50 border border-slate-100">
-                <h4 className="text-2xl font-black mb-4">{item.title}</h4>
-                <p className="text-slate-500 font-medium">{item.description}</p>
-              </div>
-            ))}
-          </div>
-          <Button size="lg" className="h-16 px-12 rounded-full text-xl font-black shadow-2xl shadow-primary/30" asChild>
-            <Link href="/signup-merchant">Create Your Store Now</Link>
-          </Button>
-        </div>
-      </section>
-
-      {/* CTA Section */}
+      {/* Testimonial Card */}
       <section className="py-32 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-6xl mx-auto bg-primary rounded-[3rem] p-12 md:p-24 text-center relative overflow-hidden shadow-3xl shadow-primary/30">
-          <div className="relative z-10">
-            <h2 className="text-4xl md:text-7xl font-black text-white mb-8 tracking-tighter">Ready to scale?</h2>
-            <p className="text-white/80 text-xl mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
-              Join thousands of merchants who are growing their business with the world&apos;s most flexible commerce platform.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                <Button size="lg" className="h-16 px-12 rounded-full text-xl font-black bg-white text-primary hover:bg-slate-50 transition-all active:scale-95" asChild>
-                  <Link href={user ? "/dashboard" : "/signup-merchant"}>
-                    {user ? "active account" : "Start Free Trial"}
-                  </Link>
-                </Button>
-                <Link href={user ? "/dashboard" : "/login"} className="text-white font-bold hover:underline transition-all flex items-center gap-2 text-lg">
-                    {user ? "View Dashboard" : "Speak with Sales"} <ArrowRight className="h-5 w-5" />
-                </Link>
+        <div className="max-w-5xl mx-auto">
+          <div className="rounded-[3rem] bg-[#f5f5f7] p-12 md:p-24 text-center border border-[#d2d2d7]/30">
+            <div className="flex justify-center gap-0.5 mb-10">
+              {[1,2,3,4,5].map(i => <Star key={i} className="h-6 w-6 fill-[#ff9500] text-[#ff9500]" />)}
+            </div>
+            <blockquote className="text-3xl md:text-5xl font-semibold tracking-tight text-[#1d1d1f] mb-12 leading-tight">
+              &quot;The most polished commerce platform we&apos;ve used. It just works, beautifully.&quot;
+            </blockquote>
+            <div className="flex items-center justify-center gap-4">
+              <div className="h-16 w-16 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 shadow-inner" />
+              <div className="text-left">
+                <p className="font-bold text-xl text-[#1d1d1f]">David Richards</p>
+                <p className="text-[#86868b] font-medium">Founder, Artisan Goods</p>
+              </div>
             </div>
           </div>
-          {/* Decorative Elements */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2" />
+        </div>
+      </section>
+
+      {/* CTA Card */}
+      <section className="py-32 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="relative overflow-hidden rounded-[3rem] bg-[#0071e3] p-12 md:p-24 text-center">
+            <div className="relative z-10">
+                <h2 className="text-4xl md:text-7xl font-semibold text-white mb-8 tracking-tight">Ready to scale?</h2>
+                <p className="text-white/80 text-xl md:text-2xl mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
+                Join 10,000+ merchants building the future of retail on StoreLink Pro.
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+                    <Button size="lg" className="h-14 px-10 rounded-full text-lg font-semibold bg-white text-[#0071e3] hover:bg-[#f5f5f7] transition-all" asChild>
+                        <Link href={user ? "/dashboard" : "/signup-merchant"}>
+                        {user ? "Go to Dashboard" : "Start Free Trial"}
+                        </Link>
+                    </Button>
+                    <Link href="/home/contact" className="text-white font-semibold hover:underline text-lg flex items-center gap-1 group">
+                        Speak with sales <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-0.5" />
+                    </Link>
+                </div>
+            </div>
+            {/* Abstract background patterns */}
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
+            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-black/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2" />
+          </div>
         </div>
       </section>
 
       <style jsx global>{`
-        @keyframes bounce-slow {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-20px); }
+        @font-face {
+          font-family: 'SF Pro Display';
+          src: url('https://sf-static.b-cdn.net/font/SF-Pro-Display-Regular.woff2') format('woff2');
+          font-weight: 400;
         }
-        @keyframes float {
-          0%, 100% { transform: translateY(0) translateX(0); }
-          33% { transform: translateY(-10px) translateX(5px); }
-          66% { transform: translateY(5px) translateX(-5px); }
+        @font-face {
+          font-family: 'SF Pro Display';
+          src: url('https://sf-static.b-cdn.net/font/SF-Pro-Display-Semibold.woff2') format('woff2');
+          font-weight: 600;
         }
-        .animate-bounce-slow {
-          animation: bounce-slow 6s ease-in-out infinite;
+        @font-face {
+          font-family: 'SF Pro Display';
+          src: url('https://sf-static.b-cdn.net/font/SF-Pro-Display-Bold.woff2') format('woff2');
+          font-weight: 700;
         }
-        .animate-float {
-          animation: float 8s ease-in-out infinite;
+        
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+          -webkit-font-smoothing: antialiased;
         }
       `}</style>
-    </>
+    </div>
   );
 }

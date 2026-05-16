@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 
-
 import Image from "next/image" 
 import Link from "next/link";
 import { Button } from "@/components/ui/button"
@@ -9,17 +8,18 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { StoreLinkLogo } from "@/components/icons";
 import { useState, useEffect } from "react";
-import { Mail, Lock, Eye, EyeOff, Store as StoreIcon, Plus } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Store as StoreIcon, Plus, ChevronRight } from "lucide-react";
 import { PageSpinner, Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/hooks/use-toast";
 import placeholderImages from '@/lib/placeholder-images.json';
-import { useAuth as useFirebaseAuthInstance, useFirestore } from "@/firebase";
+import { useAuth as useFirebaseAuthInstance } from "@/firebase";
 import { useAuth } from "@/contexts/auth-context";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signInWithEmailAndPassword, AuthError, signOut } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ResetPasswordModal } from "@/components/auth/ResetPasswordModal";
+import { cn } from "@/lib/utils";
 
 export default function AdminLoginPage() {
     const [isLoading, setIsLoading] = useState(false);
@@ -60,8 +60,8 @@ export default function AdminLoginPage() {
         try {
             await signInWithEmailAndPassword(auth, email, password);
             toast({
-                title: "Login Successful",
-                description: "Redirecting to the dashboard...",
+                title: "Welcome back",
+                description: "Opening your dashboard...",
             });
         } catch (error: any) {
             let description = "An unknown error occurred. Please try again.";
@@ -85,74 +85,56 @@ export default function AdminLoginPage() {
 
     if (user && (stores.length === 0 || (stores.length > 1 && !store)) && !staffMember && !isCustomer) {
         return (
-            <div className="w-full min-h-screen grid lg:grid-cols-2 relative">
-                <div className="absolute top-4 right-4 z-50">
+            <div className="w-full min-h-screen bg-[#fbfbfd] flex items-center justify-center p-4">
+                <div className="absolute top-8 right-8 z-50">
                     <ThemeToggle />
                 </div>
-                <div className="hidden bg-muted lg:block relative">
-                    <Image
-                        src={loginImage.src}
-                        alt="A beautiful storefront"
-                        fill
-                        className="object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                    <div className="absolute bottom-10 left-10 text-white">
-                        <h2 className="text-4xl font-bold font-headline">StoreLink Pro</h2>
-                        <p className="text-white/80 mt-2 max-w-lg">
-                            {stores.length > 0 ? "Select the store you want to manage." : "Manage your business with ease."}
-                        </p>
-                    </div>
-                </div>
-                <div className="flex items-center justify-center py-12 px-4">
-                    <div className="mx-auto grid w-[350px] gap-6">
-                        <div className="grid gap-2 text-center">
-                            <div className="flex justify-center mb-4">
-                                <StoreLinkLogo className="h-10 w-10 text-primary" />
+                
+                <div className="w-full max-w-[440px] animate-in fade-in zoom-in-95 duration-700">
+                    <div className="bg-white dark:bg-[#1d1d1f] rounded-[2.5rem] p-10 shadow-[0_20px_80px_rgba(0,0,0,0.1)] border border-[#d2d2d7]/30">
+                        <div className="text-center mb-10">
+                            <div className="flex justify-center mb-6">
+                                <StoreLinkLogo className="h-12 w-12 text-[#0071e3]" />
                             </div>
-                            <h1 className="text-4xl font-bold font-headline">
+                            <h1 className="text-3xl font-semibold tracking-tight text-[#1d1d1f] dark:text-white mb-2">
                                 {stores.length > 0 ? "Select a Store" : "No Store Found"}
                             </h1>
-                            <p className="text-balance text-muted-foreground text-sm">
+                            <p className="text-[#86868b] text-sm">
                                 {stores.length > 0 
-                                    ? "You have multiple stores under this account." 
-                                    : "You are logged in as " + (user.email || "your account") + " but don&apos;t have a store yet."}
+                                    ? "Choose the store you want to manage today." 
+                                    : "You don't have any stores yet. Create your first one to get started."}
                             </p>
                         </div>
-                        <div className="grid gap-3">
+
+                        <div className="space-y-3">
                             {stores.map((s) => (
-                                <Button 
+                                <button 
                                     key={s.id} 
-                                    variant="outline" 
-                                    className="h-auto py-4 justify-start px-6 border-2 hover:border-primary/50 transition-all" 
+                                    className="w-full flex items-center gap-4 p-4 rounded-2xl bg-[#f5f5f7] dark:bg-[#2d2d2f] hover:bg-[#f0f0f2] dark:hover:bg-[#3d3d3f] transition-all duration-300 group text-left border border-transparent hover:border-[#0071e3]/20" 
                                     onClick={() => setSelectedStoreId(s.id)}
                                 >
-                                    <StoreIcon className="mr-4 h-5 w-5 text-primary" />
-                                    <div className="text-left">
-                                        <div className="font-bold">{s.name}</div>
-                                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground opacity-70">DB: {s.databaseId || '(default)'}</div>
+                                    <div className="h-10 w-10 rounded-xl bg-white dark:bg-[#1d1d1f] flex items-center justify-center shadow-sm text-[#0071e3]">
+                                        <StoreIcon className="h-5 w-5" />
                                     </div>
-                                </Button>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="font-semibold text-[#1d1d1f] dark:text-white truncate">{s.name}</div>
+                                        <div className="text-[10px] uppercase tracking-widest text-[#86868b]">Store ID: {s.id}</div>
+                                    </div>
+                                    <ChevronRight className="h-4 w-4 text-[#d2d2d7] group-hover:text-[#0071e3] transition-colors" />
+                                </button>
                             ))}
-                            {stores.length > 0 && (
-                                <div className="relative my-4">
-                                    <div className="absolute inset-0 flex items-center">
-                                        <span className="w-full border-t" />
-                                    </div>
-                                    <div className="relative flex justify-center text-xs uppercase">
-                                        <span className="bg-background px-2 text-muted-foreground">Or</span>
-                                    </div>
-                                </div>
-                            )}
-                            <Button asChild variant="secondary" className="h-12 border-2">
-                                <Link href="/signup-merchant">
-                                    <Plus className="mr-2 h-4 w-4" />
-                                    Create a New Store
-                                </Link>
-                            </Button>
-                            <Button variant="ghost" size="sm" onClick={() => signOut(auth)} className="mt-4 text-muted-foreground">
-                                Sign out of {user.email || "account"}
-                            </Button>
+
+                            <div className="pt-4 space-y-3">
+                                <Button asChild variant="outline" className="w-full h-12 rounded-full font-semibold border-[#d2d2d7] hover:bg-[#f5f5f7]">
+                                    <Link href="/signup-merchant">
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        Create New Store
+                                    </Link>
+                                </Button>
+                                <Button variant="ghost" size="sm" onClick={() => signOut(auth)} className="w-full text-[#86868b] hover:text-[#0071e3]">
+                                    Sign out of {user.email}
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -160,98 +142,85 @@ export default function AdminLoginPage() {
         );
     }
 
-    if (user && store) {
-        return <PageSpinner label="Staff Portal" subLabel="Redirecting to dashboard…" />;
-    }
-
   return (
-    <div className="w-full min-h-screen grid lg:grid-cols-2 relative">
-      <div className="absolute top-4 right-4 z-50">
+    <div className="w-full min-h-screen bg-[#fbfbfd] flex items-center justify-center p-4">
+      <div className="absolute top-8 right-8 z-50">
         <ThemeToggle />
       </div>
-      <div className="hidden bg-muted lg:block relative">
-        <Image
-          src={loginImage.src}
-          alt="A beautiful storefront"
-          data-ai-hint={loginImage.hint}
-          fill
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-        <div className="absolute bottom-10 left-10 text-white">
-            <h2 className="text-4xl font-bold font-headline">StoreLink Pro</h2>
-            <p className="text-white/80 mt-2 max-w-lg">
-                The ultimate all-in-one solution for managing your e-commerce business with unparalleled efficiency and insight.
-            </p>
+
+      <div className="w-full max-w-[440px] animate-in fade-in zoom-in-95 duration-700">
+        <div className="bg-white dark:bg-[#1d1d1f] rounded-[2.5rem] p-10 shadow-[0_20px_80px_rgba(0,0,0,0.1)] border border-[#d2d2d7]/30">
+            <div className="text-center mb-10">
+                <div className="flex justify-center mb-6">
+                    <StoreLinkLogo className="h-12 w-12 text-[#0071e3]" />
+                </div>
+                <h1 className="text-3xl font-semibold tracking-tight text-[#1d1d1f] dark:text-white mb-2">Staff Portal</h1>
+                <p className="text-[#86868b] text-sm">Sign in to manage your commerce empire.</p>
+            </div>
+
+            <form onSubmit={handleLogin} className="space-y-6">
+                <div className="space-y-2">
+                    <Label htmlFor="email" className="text-xs font-semibold text-[#86868b] uppercase tracking-wider ml-1">Email</Label>
+                    <div className="relative">
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#d2d2d7]" />
+                        <Input
+                            id="email"
+                            type="email"
+                            placeholder="email@example.com"
+                            required
+                            className="h-12 pl-11 rounded-xl bg-[#f5f5f7] dark:bg-[#2d2d2f] border-none focus-visible:ring-2 focus-visible:ring-[#0071e3] transition-all"
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <div className="flex items-center justify-between ml-1">
+                        <Label htmlFor="password" className="text-xs font-semibold text-[#86868b] uppercase tracking-wider">Password</Label>
+                        <button
+                            type="button"
+                            onClick={() => setIsForgotPassOpen(true)}
+                            className="text-xs text-[#0066cc] hover:underline font-medium"
+                        >
+                            Forgot password?
+                        </button>
+                    </div>
+                    <div className="relative">
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#d2d2d7]" />
+                        <Input 
+                            id="password" 
+                            type={showPassword ? "text" : "password"} 
+                            required 
+                            placeholder="Required" 
+                            className="h-12 pl-11 pr-11 rounded-xl bg-[#f5f5f7] dark:bg-[#2d2d2f] border-none focus-visible:ring-2 focus-visible:ring-[#0071e3] transition-all" 
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#d2d2d7] hover:text-[#86868b] transition-colors"
+                        >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                    </div>
+                </div>
+
+                <Button type="submit" className="w-full h-12 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold transition-all active:scale-95" disabled={isLoading}>
+                    {isLoading ? <Spinner size="sm" className="mr-2" /> : "Sign In"}
+                </Button>
+            </form>
+
+            <div className="mt-10 text-center">
+                <p className="text-sm text-[#86868b]">
+                    Don&apos;t have a store?{" "}
+                    <Link href="/signup-merchant" className="text-[#0066cc] font-semibold hover:underline">Start for free</Link>
+                </p>
+            </div>
         </div>
+        
+        <p className="mt-8 text-center text-[11px] text-[#86868b] font-medium uppercase tracking-[0.2em]">
+            Powered by StoreLink Pro
+        </p>
       </div>
-      <div className="flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[350px] gap-6">
-          <div className="grid gap-2 text-center">
-             <div className="flex justify-center mb-4">
-                <StoreLinkLogo className="h-10 w-10 text-primary" />
-            </div>
-            <h1 className="text-4xl font-bold font-headline">Staff Portal</h1>
-            <p className="text-balance text-muted-foreground">
-              Please sign in to access the dashboard.
-            </p>
-          </div>
-          <form onSubmit={handleLogin} className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-                <button
-                    type="button"
-                    onClick={() => setIsForgotPassOpen(true)}
-                    className="ml-auto inline-block text-sm text-muted-foreground hover:underline"
-                >
-                    Forgot your password?
-                </button>
-              </div>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input id="password" type={showPassword ? "text" : "password"} required placeholder="Password" className="pl-10 pr-10" />
-                <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                    {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                    ) : (
-                        <Eye className="h-4 w-4" />
-                    )}
-                </button>
-              </div>
-            </div>
-            <Button type="submit" className="w-full border-2 border-border dark:border-border hover:border-primary/75" disabled={isLoading}>
-                {isLoading && <Spinner size="sm" className="mr-2 text-primary-foreground" />}
-              Login
-            </Button>
-          </form>
-          <div className="text-center text-sm">
-            Don&apos;t have a store yet?{" "}
-            <Link href="/signup-merchant" className="underline text-primary font-bold">Create one now</Link>
-          </div>
-          <div className="mt-4 text-center text-sm text-muted-foreground font-bold">
-            Powered By Ads Developments Inc.
-          </div>
-        </div>
-      </div>
+
       <ResetPasswordModal 
         isOpen={isForgotPassOpen} 
         onOpenChange={setIsForgotPassOpen} 

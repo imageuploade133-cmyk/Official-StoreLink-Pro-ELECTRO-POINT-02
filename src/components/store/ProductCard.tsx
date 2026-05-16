@@ -45,24 +45,25 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
 
   const settings = overrideSettings || globalSettings;
 
+  const [isClient, setIsClient] = useState(false);
+
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsClient(true);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setToday(new Date());
   }, []);
 
   const isInWishlist = isProductInWishlist(product.id);
 
-  // Calculate rating stats from reviews
   const ratingStats = useMemo(() => calculateRatingStats(reviews), [reviews]);
 
-  // pricing engine logic
   const effectivePrice = useMemo(() =>
-    calculateEffectivePrice(product as any, today, category),
-    [product, today, category]
+    calculateEffectivePrice(product as any, isClient ? today : null, category),
+    [product, today, category, isClient]
   );
 
-  // Simulated sales count for TEMU-like social proof
   const salesCount = useMemo(() => {
-    // Deterministic pseudo-random number based on product ID
     let hash = 0;
     for (let i = 0; i < product.id.length; i++) {
         hash = product.id.charCodeAt(i) + ((hash << 5) - hash);
@@ -111,16 +112,14 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
     setIsLoadingProduct(true);
   };
 
-  // Product Card Designer Settings
   const cardStyle = settings?.productCardStyle || 'default';
   const borderRadius = settings?.productCardBorderRadius || 'full';
   const shadow = settings?.productCardShadow || 'md';
   const borderWidth = settings?.productCardBorderWidth || 'thin';
-  const borderColor = settings?.productCardBorderColor || (cardStyle === 'modern' ? 'rgba(255,255,255,0.2)' : '');
-  const bgColor = settings?.productCardBgColor || (cardStyle === 'modern' ? 'rgba(255,255,255,0.05)' : '');
+  const borderColor = settings?.productCardBorderColor || '';
+  const bgColor = settings?.productCardBgColor || '';
   const hoverEffect = settings?.productCardHoverEffect || 'lift';
   const imageRatio = settings?.productCardImageRatio || 'portrait';
-  const titleLines = settings?.productCardTitleLines || 2;
   const titleAlign = settings?.productCardTitleAlign || 'left';
   const priceAlign = settings?.productCardPriceAlign || 'left';
   const cardHeight = settings?.productCardHeight;
@@ -131,15 +130,15 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
     md: 'rounded-md',
     lg: 'rounded-lg',
     xl: 'rounded-xl',
-    full: 'rounded-[32px]',
+    full: 'rounded-[24px]',
   };
 
   const shadowMap: Record<string, string> = {
     none: 'shadow-none',
     sm: 'shadow-sm',
-    md: 'shadow-md',
-    lg: 'shadow-lg',
-    xl: 'shadow-xl',
+    md: 'shadow-[0_10px_40px_rgba(0,0,0,0.04)]',
+    lg: 'shadow-[0_20px_50px_rgba(0,0,0,0.08)]',
+    xl: 'shadow-[0_30px_60px_rgba(0,0,0,0.12)]',
   };
 
   const borderWidthMap: Record<string, string> = {
@@ -151,9 +150,9 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
 
   const hoverEffectMap: Record<string, string> = {
     none: '',
-    lift: 'hover:-translate-y-2 transition-all duration-300',
-    zoom: '', // handled on image
-    glow: 'transition-all duration-300',
+    lift: 'hover:-translate-y-1.5 hover:shadow-xl transition-all duration-500 ease-apple',
+    zoom: '', 
+    glow: 'transition-all duration-500',
     border: 'hover:border-primary transition-all duration-300',
   };
 
@@ -163,105 +162,24 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
     landscape: 'aspect-[4/3]',
   };
 
-  const processCustomHtml = (html: string) => {
-    if (!html) return '';
-    return html
-      .replace(/\{\{product\.name\}\}/g, product.name)
-      .replace(/\{\{product\.id\}\}/g, product.id)
-      .replace(/\{\{product\.slug\}\}/g, product.slug || product.id)
-      .replace(/\{\{product\.price\}\}/g, effectivePrice.toFixed(2))
-      .replace(/\{\{product\.originalPrice\}\}/g, product.sellingPrice.toFixed(2))
-      .replace(/\{\{product\.imageUrl\}\}/g, product.imageUrl || '')
-      .replace(/\{\{product\.category\}\}/g, category?.name || product.categoryName || 'General')
-      .replace(/\{\{product\.stock\}\}/g, stockValue.toString())
-      .replace(/\{\{product\.stockPercentage\}\}/g, Math.min((stockValue / 50) * 100, 100).toString())
-      .replace(/\{\{product\.stockLabel\}\}/g, stockValue > 0 ? `In Stock (${stockValue})` : 'Out of Stock')
-      .replace(/\{\{product\.reviewCount\}\}/g, ratingStats.totalReviews.toString())
-      .replace(/\{\{product\.isNew\}\}/g, product.isNewArrival ? 'true' : 'false')
-      .replace(/\{\{product\.isPopular\}\}/g, product.isPopular ? 'true' : 'false')
-      .replace(/\{\{product\.isOfficial\}\}/g, product.isOfficialBrand ? 'true' : 'false')
-      .replace(/\{\{product\.discount\}\}/g, isDiscounted ? Math.round((1 - effectivePrice / product.sellingPrice) * 100).toString() : '0')
-      .replace(/\{\{currency\}\}/g, currencySymbol)
-      .replace(/\{\{cardHeight\}\}/g, (cardHeight || 380).toString())
-      // Handle simple #if blocks
-      .replace(/\{\{#if product\.isOfficial\}\}([\s\S]*?)\{\{\/if\}\}/g, product.isOfficialBrand ? '$1' : '')
-      .replace(/\{\{#if product\.isNew\}\}([\s\S]*?)\{\{\/if\}\}/g, product.isNewArrival ? '$1' : '')
-      .replace(/\{\{#if product\.isPopular\}\}([\s\S]*?)\{\{\/if\}\}/g, product.isPopular ? '$1' : '')
-      .replace(/\{\{#if product\.discount\}\}([\s\S]*?)\{\{\/if\}\}/g, isDiscounted ? '$1' : '')
-      .replace(/\{\{#if product\.originalPrice\}\}([\s\S]*?)\{\{\/if\}\}/g, isDiscounted ? '$1' : '');
-  };
-
-  const handleCustomClick = (e: React.MouseEvent) => {
-    const target = e.target as HTMLElement;
-    const button = target.closest('button');
-    if (button) {
-      const text = button.textContent || '';
-      if (text.includes('Add') || text.includes('🛒')) {
-        handleAddToCart(e);
-      } else if (text.includes('♡') || text.includes('Wishlist')) {
-        handleWishlistToggle(e);
-      }
-    }
-  };
-
-  if (cardStyle === 'custom' && settings?.productCardCustomHtml) {
-      return (
-          <div 
-            onClick={handleCustomClick}
-            className="cursor-pointer"
-            dangerouslySetInnerHTML={{ __html: processCustomHtml(settings.productCardCustomHtml) }} 
-          />
-      );
-  }
-
-  // Grid Button Style
   const gridBtnStyle = useMemo(() => {
     const useIndividual = settings?.useIndividualBtnSettings !== false;
     const style = useIndividual
         ? (settings?.storeGridCartStyle || 'standard')
         : (settings?.storeBtnStyle || 'standard');
 
-    if (style === 'gradient') {
-        return {
-            background: `linear-gradient(135deg, ${settings?.storeGridCartGradientStart || '#10b981'}, ${settings?.storeGridCartGradientEnd || '#059669'})`,
-            color: 'white',
-            border: 'none'
-        };
-    } else if (style === 'image' && settings?.storeGridCartImageUrl) {
-        return {
-            backgroundImage: `url('${settings.storeGridCartImageUrl}')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            color: 'white',
-            textShadow: '0 1px 3px rgba(0,0,0,0.5)',
-            border: 'none'
-        };
-    } else if (style === 'outline') {
-        return {
-            backgroundColor: 'transparent',
-            color: settings?.storeGridCartColor || '#10b981',
-            border: `2px solid ${settings?.storeGridCartColor || '#10b981'}`
-        };
-    } else if (style === 'ghost') {
-        return {
-            backgroundColor: 'transparent',
-            color: settings?.storeGridCartColor || '#10b981',
-            border: 'none'
-        };
-    } else if (style === 'apple') {
-        const color = settings?.storeGridCartColor || '#007AFF';
+    if (style === 'apple') {
+        const color = settings?.storeGridCartColor || '#0071e3';
         return {
             backgroundColor: color,
             color: 'white',
-            border: '1px solid rgba(0,0,0,0.1)',
-            boxShadow: `inset 0 1px 0 rgba(255, 255, 255, 0.3)`,
+            border: 'none',
             fontWeight: '600',
-            letterSpacing: '-0.01em',
         };
     }
 
     return {
-        backgroundColor: settings?.storeGridCartColor || '#10b981',
+        backgroundColor: settings?.storeGridCartColor || '#0071e3',
         color: 'white',
         border: 'none'
     };
@@ -274,12 +192,8 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
         : (settings?.storeBtnSize || 'md');
     
     const shape = useIndividual
-        ? (settings?.storeGridCartShape || 'md')
-        : (settings?.storeBtnShape || 'md');
-
-    const shadow = useIndividual
-        ? (settings?.storeGridCartShadow || 'sm')
-        : 'sm';
+        ? (settings?.storeGridCartShape || 'full')
+        : (settings?.storeBtnShape || 'full');
 
     const sizeClasses: Record<string, string> = {
         sm: 'h-8 text-[10px] px-3',
@@ -292,38 +206,17 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
         none: 'rounded-none',
         sm: 'rounded-sm',
         md: 'rounded-md',
-        lg: 'rounded-2xl',
+        lg: 'rounded-xl',
         full: 'rounded-full'
     };
 
-    const shadowClasses: Record<string, string> = {
-        none: 'shadow-none',
-        sm: 'shadow-sm',
-        md: 'shadow-md',
-        lg: 'shadow-lg',
-        xl: 'shadow-xl',
-        '2xl': 'shadow-2xl',
-        inner: 'shadow-inner'
-    };
-
     const sizeClass = sizeClasses[size] || sizeClasses.md;
-    let shapeClass = shapeClasses[shape] || 'rounded-md';
-    let shadowClass = shadowClasses[shadow as keyof typeof shadowClasses] || 'shadow-sm';
+    let shapeClass = shapeClasses[shape] || 'rounded-full';
 
-    const style = useIndividual
-        ? (settings?.storeGridCartStyle || 'standard')
-        : (settings?.storeBtnStyle || 'standard');
-
-    if (style === 'apple') {
-        shapeClass = 'rounded-xl';
-        shadowClass = 'shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-2px_rgba(0,0,0,0.05)]';
-    }
-
-    return `${sizeClass} ${shapeClass} ${shadowClass}`;
+    return `${sizeClass} ${shapeClass}`;
   }, [settings]);
 
   const gridCartText = product.hasVariants ? 'Select Options' : (settings?.storeGridCartText || 'Add to Bag');
-  const gridCartIcon = settings?.storeGridCartIcon;
 
   return (
     <>
@@ -335,8 +228,7 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
       <div
         className={cn(
           "group relative flex flex-col transition-all duration-500 overflow-hidden",
-          cardStyle === 'modern' ? "backdrop-blur-xl border-white/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]" : "bg-white dark:bg-[#111111] border-black/[0.08] dark:border-white/[0.12]",
-          cardStyle === 'classic' && "shadow-none",
+          "bg-white dark:bg-[#1d1d1f] border-[#d2d2d7]/30 dark:border-[#424245]/30",
           borderRadiusMap[borderRadius] || borderRadiusMap.full,
           shadowMap[shadow] || shadowMap.md,
           borderWidthMap[borderWidth] || borderWidthMap.thin,
@@ -356,7 +248,7 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
             href={getStoreUrl(`/store/product/${product.slug || product.id}`)}
             onClick={handleProductClick}
             className={cn(
-                "block relative overflow-hidden bg-[#f5f5f7] dark:bg-[#0a0a0a]",
+                "block relative overflow-hidden bg-[#f5f5f7] dark:bg-[#000000]",
                 imageRatioMap[imageRatio] || imageRatioMap.portrait
             )}
           >
@@ -365,8 +257,8 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
               alt={product.name}
               fill
               className={cn(
-                "object-cover transition-transform duration-[1500ms] ease-out",
-                hoverEffect === 'zoom' && "group-hover:scale-110",
+                "object-cover transition-transform duration-[1200ms] ease-apple",
+                hoverEffect === 'zoom' && "group-hover:scale-105",
                 isOutOfStock && "grayscale"
               )}
               unoptimized
@@ -374,15 +266,15 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
 
             {/* Badges */}
             {settings?.productCardShowBadges !== false && (
-                <div className="absolute top-2 left-2 flex flex-col gap-1 z-10 pointer-events-none">
+                <div className="absolute top-3 left-3 flex flex-col gap-1 z-10 pointer-events-none">
                 {product.isOfficialBrand && (
-                    <Badge className="bg-primary text-white font-black text-[8px] px-2 py-0.5 rounded-sm border-none shadow-sm uppercase tracking-wider">
-                    StoreLink Choice
+                    <Badge className="bg-[#0071e3] text-white font-semibold text-[9px] px-2 py-0.5 rounded-full border-none shadow-sm uppercase tracking-tight">
+                    Choice
                     </Badge>
                 )}
                 {isDiscounted && !isOutOfStock && (
-                    <Badge className="bg-primary text-white font-black text-[10px] px-2 py-0.5 rounded-sm border-none shadow-sm uppercase tracking-wider">
-                    -{Math.round((1 - effectivePrice / product.sellingPrice) * 100)}%
+                    <Badge className="bg-[#ff2d55] text-white font-bold text-[10px] px-2 py-0.5 rounded-full border-none shadow-sm">
+                    {Math.round((1 - effectivePrice / product.sellingPrice) * 100)}% OFF
                     </Badge>
                 )}
                 </div>
@@ -392,23 +284,23 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
             {settings?.productCardShowWishlist !== false && (
                 <button
                 className={cn(
-                    "absolute top-2 right-2 h-8 w-8 flex items-center justify-center rounded-full bg-white/90 dark:bg-black/90 backdrop-blur-xl shadow-md transition-all duration-500 z-10 border border-black/[0.03] dark:border-white/[0.03]",
-                    isInWishlist ? "text-rose-500" : "text-black dark:text-white"
+                    "absolute top-3 right-3 h-8 w-8 flex items-center justify-center rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-xl shadow-sm transition-all duration-500 z-10 border border-black/[0.05] dark:border-white/[0.05] opacity-0 group-hover:opacity-100",
+                    isInWishlist ? "text-[#ff2d55] opacity-100" : "text-[#1d1d1f] dark:text-white"
                 )}
                 onClick={handleWishlistToggle}
                 >
-                <Heart className={cn("h-3.5 w-3.5 transition-all duration-500", isInWishlist && "fill-current")} />
+                <Heart className={cn("h-4 w-4 transition-all duration-500", isInWishlist && "fill-current")} />
                 </button>
             )}
 
             {/* Quick Add Overlay */}
             {!isOutOfStock && settings?.productCardShowQuickAdd !== false && (
-                <div className="absolute inset-x-0 bottom-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-700 hidden md:block z-20">
+                <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 hidden md:block z-20">
                 <Button
                     onClick={handleAddToCart}
                     style={gridBtnStyle}
                     className={cn(
-                        "w-full font-semibold tracking-tight transition-all active:scale-95",
+                        "w-full font-semibold tracking-tight transition-all active:scale-95 shadow-lg",
                         gridBtnClasses
                     )}
                 >
@@ -421,51 +313,54 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
 
         {/* Content Area */}
         <div className={cn(
-            "flex flex-col flex-1 p-3 space-y-2",
-            cardStyle === 'minimal' && "p-3 px-0"
+            "flex flex-col flex-1 p-4 space-y-3",
+            cardStyle === 'minimal' && "px-0"
         )}>
-          <div className="flex-1 space-y-1">
+          <div className="flex-1 space-y-1.5">
             <h3 className={cn(
-                "text-sm font-medium text-[#1d1d1f] dark:text-[#f5f5f7] leading-tight tracking-tight line-clamp-2 transition-colors duration-300",
+                "text-[15px] font-semibold text-[#1d1d1f] dark:text-[#f5f5f7] leading-tight tracking-tight line-clamp-2 transition-colors duration-300",
                 titleAlign === 'center' && "text-center",
             )}>
               {product.name}
             </h3>
             
-            <div className="flex items-center gap-2">
+            <div className={cn(
+                "flex items-center gap-2",
+                titleAlign === 'center' && "justify-center"
+            )}>
                 {settings?.productCardShowRating !== false && (
-                    <div className="flex items-center bg-orange-50 dark:bg-orange-950/30 px-1.5 py-0.5 rounded text-[10px] font-bold text-orange-600">
-                        <Star className="h-2.5 w-2.5 fill-current mr-1" />
+                    <div className="flex items-center text-[12px] font-semibold text-[#ff9500]">
+                        <Star className="h-3 w-3 fill-current mr-1" />
                         {ratingStats.averageRating || '4.8'}
                     </div>
                 )}
-                <span className="text-[10px] text-slate-400 font-medium">{salesCount >= 1000 ? `${(salesCount / 1000).toFixed(1)}k+` : salesCount} sold</span>
+                <span className="text-[11px] text-[#86868b] font-medium">{salesCount >= 1000 ? `${(salesCount / 1000).toFixed(1)}k+` : salesCount} sold</span>
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className={cn(
                 "flex items-center justify-between",
                 priceAlign === 'center' && "flex-col gap-1 justify-center"
             )}>
                 <div className={cn(
-                    "flex items-baseline gap-1.5",
+                    "flex items-baseline gap-2",
                     priceAlign === 'center' && "items-center"
                 )}>
                     <span className={cn(
-                        "text-lg font-bold tracking-tight text-primary",
+                        "text-[17px] font-semibold tracking-tight text-[#1d1d1f] dark:text-white",
                     )}>
                         {formatCurrency(effectivePrice, currencySymbol)}
                     </span>
                     {isDiscounted && (
-                        <span className="text-[10px] text-slate-400 line-through font-medium">
+                        <span className="text-[13px] text-[#86868b] line-through font-medium">
                         {formatCurrency(product.sellingPrice, currencySymbol)}
                         </span>
                     )}
                 </div>
 
                 <div className="hidden sm:block">
-                    <span className="text-[8px] font-black uppercase tracking-widest text-[#00b894] bg-[#00b894]/10 px-1.5 py-0.5 rounded-sm">Free Shipping</span>
+                    <span className="text-[10px] font-semibold text-[#34c759] bg-[#34c759]/10 px-2 py-0.5 rounded-full">Free Shipping</span>
                 </div>
             </div>
 
@@ -474,15 +369,19 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
                 <Button
                     size="sm"
                     onClick={handleAddToCart}
-                    className="w-full h-8 rounded-full bg-primary hover:bg-primary/90 text-white text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all"
+                    className="w-full h-9 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white text-[12px] font-semibold transition-all active:scale-95 md:hidden"
                 >
-                    Add to Cart
+                    Add to Bag
                 </Button>
             )}
           </div>
         </div>
       </div>
+      <style jsx>{`
+        .ease-apple {
+            transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1.0);
+        }
+      `}</style>
     </>
   );
 }
-
