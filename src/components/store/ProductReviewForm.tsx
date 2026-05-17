@@ -16,8 +16,8 @@ import Link from 'next/link';
 import { useStoreUrl } from '@/hooks/use-store-url';
 import { useRef, useCallback } from 'react';
 
-const MAX_RECORDING_SECONDS = 58;
-const MAX_BASE64_SIZE = 850000;
+const MAX_RECORDING_SECONDS = 60;
+const MAX_BASE64_SIZE = 950000;
 
 const reviewSchema = z.object({
   rating: z.number().min(1, 'Please select a rating.').max(5),
@@ -82,7 +82,7 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
       const mimeType = getSupportedMimeType();
       const mediaRecorder = new MediaRecorder(stream, { 
         mimeType,
-        audioBitsPerSecond: 64000
+        audioBitsPerSecond: 48000
       });
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
@@ -363,7 +363,7 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
                         <div className="flex-1">
                           <div className="text-xl font-mono font-black text-rose-600">{formatTime(recordingDuration)}</div>
                           <div className="text-[8px] font-black uppercase text-rose-400 tracking-widest">
-                            {recordingDuration > MAX_RECORDING_SECONDS - 10 ? 'Finalizing recording...' : 'Recording in progress...'}
+                            {recordingDuration > MAX_RECORDING_SECONDS - 10 ? 'Will auto-save soon...' : 'Recording in progress...'}
                           </div>
                         </div>
                         <Button
