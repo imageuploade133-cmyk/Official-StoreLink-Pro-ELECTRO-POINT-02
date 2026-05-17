@@ -129,6 +129,12 @@ service cloud.firestore {
       allow write: if isSignedIn() && (storeId == 'global' || canManageStore(storeId) || storeId == request.auth.uid);
     }
 
+    match /store_reviews/{reviewId} {
+      allow read: if isSignedIn() && canManageStore(getStaffStoreId(resource.data));
+      allow create: if isSignedIn() && (request.resource.data.userId == request.auth.uid || canManageStore(getStaffStoreId(request.resource.data)));
+      allow update, delete: if isSignedIn() && canManageStore(getStaffStoreId(resource.data));
+    }
+
     /* ============================================================
        2. USER & STORE MANAGEMENT
        ============================================================ */

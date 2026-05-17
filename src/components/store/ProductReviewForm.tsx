@@ -87,6 +87,7 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
         store_id: storeId || '',
         isApproved: true,
         isHidden: false,
+        isRead: false,
         createdAt: serverTimestamp(),
       };
 
