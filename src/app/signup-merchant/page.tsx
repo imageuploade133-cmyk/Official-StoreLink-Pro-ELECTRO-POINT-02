@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox";
 import { StoreLinkLogo } from "@/components/icons";
 import { useState, useEffect } from "react";
 import { 
@@ -51,6 +52,9 @@ const signupSchema = z.object({
   databaseId: z.string().regex(/^(\(default\)|[a-z0-9-]+)$/, 'Only lowercase letters, numbers, and hyphens allowed.').optional().default('(default)'),
   password: z.string().min(6, 'Password must be at least 6 characters long.'),
   confirmPassword: z.string(),
+  acceptedTerms: z.boolean().refine(val => val === true, {
+    message: 'You must accept the terms and conditions.',
+  }),
 }).refine(data => data.password === data.confirmPassword, {
   message: "Passwords do not match.",
   path: ['confirmPassword'],
@@ -89,6 +93,7 @@ export default function MerchantSignupPage() {
             databaseId: '(default)',
             password: '',
             confirmPassword: '',
+            acceptedTerms: false,
         },
     });
 
@@ -100,7 +105,7 @@ export default function MerchantSignupPage() {
     const nextStep = async () => {
         let fieldsToValidate: (keyof SignupFormValues)[] = [];
         if (currentStep === 1) {
-            fieldsToValidate = ['name', 'email', 'password', 'confirmPassword'];
+            fieldsToValidate = ['name', 'email', 'password', 'confirmPassword', 'acceptedTerms'];
         } else if (currentStep === 2) {
             fieldsToValidate = ['storeName', 'storeSlug', 'storePhone', 'storeAddress'];
             if (slugStatus === 'taken') {
@@ -421,9 +426,26 @@ export default function MerchantSignupPage() {
                                             <FormMessage className="text-xs" />
                                         </FormItem>
                                     )}/>
-                                </div>
-                            </div>
-                            )}
+                                    </div>
+                                    <FormField control={form.control} name="acceptedTerms" render={({ field }) => (
+                                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 bg-white dark:bg-zinc-900">
+                                        <FormControl>
+                                            <Checkbox
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                                className="mt-1"
+                                            />
+                                        </FormControl>
+                                        <div className="space-y-1 leading-none">
+                                            <FormLabel className="text-sm font-medium text-zinc-700 dark:text-zinc-300 cursor-pointer">
+                                                I accept the <Link href="/home/terms-of-service" target="_blank" className="text-[#0071e3] hover:underline">Terms of Service</Link> and <Link href="/home/privacy-policy" target="_blank" className="text-[#0071e3] hover:underline">Privacy Policy</Link>
+                                            </FormLabel>
+                                            <FormMessage className="text-xs" />
+                                        </div>
+                                    </FormItem>
+                                    )}/>
+                                    </div>
+                                    )}
 
                             {currentStep === 2 && (
                             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -519,7 +541,7 @@ export default function MerchantSignupPage() {
                                 </div>
                                 
                                 <p className="text-xs text-zinc-400 text-center px-4 leading-relaxed font-medium">
-                                    By creating your store, you agree to our <Link href="#" className="text-[#0071e3] hover:underline">Terms of Service</Link> and <Link href="#" className="text-[#0071e3] hover:underline">Privacy Policy</Link>.
+                                    By creating your store, you agree to our <Link href="/home/terms-of-service" target="_blank" className="text-[#0071e3] hover:underline">Terms of Service</Link> and <Link href="/home/privacy-policy" target="_blank" className="text-[#0071e3] hover:underline">Privacy Policy</Link>.
                                 </p>
                             </div>
                             )}
