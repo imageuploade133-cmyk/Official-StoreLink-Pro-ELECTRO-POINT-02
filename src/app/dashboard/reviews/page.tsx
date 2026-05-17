@@ -46,7 +46,8 @@ import {
   ChevronLeft, 
   ChevronRight, 
   Loader2,
-  CheckCheck
+  CheckCheck,
+  Mic
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSettings } from "@/contexts/settings-context";
@@ -69,6 +70,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { format } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Label } from '@/components/ui/label';
+import { VoiceReviewPlayer } from '@/components/store/VoiceReviewPlayer';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -451,13 +453,20 @@ export default function ReviewsPage() {
                       <TableCell>
                         <div className="space-y-1.5">
                             <p className="text-sm leading-snug line-clamp-2 font-medium italic" title={review.comment}>&quot;{review.comment}&quot;</p>
-                            {review.reply ? (
-                                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-primary/5 border border-primary/10 text-[10px] font-black uppercase tracking-widest text-primary">
-                                    <ReplyIcon className="h-3 w-3" /> Replied
-                                </div>
-                            ) : (
-                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">No Response Yet</span>
-                            )}
+                            <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                                {review.audioDataUri && (
+                                    <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-[9px] font-black uppercase tracking-widest text-amber-600">
+                                        <Mic className="h-2.5 w-2.5" /> Voice
+                                    </div>
+                                )}
+                                {review.reply ? (
+                                    <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-primary/5 border border-primary/10 text-[10px] font-black uppercase tracking-widest text-primary">
+                                        <ReplyIcon className="h-3 w-3" /> Replied
+                                    </div>
+                                ) : (
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">No Response Yet</span>
+                                )}
+                            </div>
                         </div>
                       </TableCell>
                       <TableCell className="text-xs font-bold text-muted-foreground whitespace-nowrap">
@@ -530,6 +539,11 @@ export default function ReviewsPage() {
                 </div>
               </div>
               <p className="text-sm italic leading-relaxed text-slate-600 dark:text-slate-400">&quot;{selectedReview.comment}&quot;</p>
+              {selectedReview.audioDataUri && (
+                <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
+                  <VoiceReviewPlayer dataUri={selectedReview.audioDataUri} />
+                </div>
+              )}
             </div>
 
             <div className="space-y-3">
