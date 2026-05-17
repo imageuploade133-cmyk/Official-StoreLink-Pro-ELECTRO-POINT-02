@@ -224,18 +224,18 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
         if (id) {
             addViewedProduct(id);
             hasSetInitialImage.current = false;
-            setActiveImage(null);
+            Promise.resolve().then(() => setActiveImage(null));
         }
     }, [id, addViewedProduct]);
 
     useEffect(() => {
         if (product?.imageUrl && !hasSetInitialImage.current) {
-            setActiveImage(product.imageUrl);
+            Promise.resolve().then(() => setActiveImage(product.imageUrl!));
             hasSetInitialImage.current = true;
         }
     }, [product?.imageUrl]);
 
-    const categoryRef = useMemo(() => (firestore && product?.categoryId) ? doc(firestore, 'categories', product.categoryId) : null, [firestore, product?.categoryId]);
+    const categoryRef = useMemo(() => (firestore && product?.categoryId) ? doc(firestore, 'categories', product.categoryId) : null, [firestore, product]);
     const { data: category } = useDoc<Category>(categoryRef);
 
     const galleryImages = useMemo(() => {

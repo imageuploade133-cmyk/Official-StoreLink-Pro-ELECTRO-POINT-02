@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -48,7 +47,6 @@ import {
   Zap,
   Volume2,
   EyeOff,
-  Star,
   ClipboardList,
   SquarePlus,
   FileText,
@@ -57,6 +55,7 @@ import {
   ZoomIn,
   Palette,
   CalendarClock,
+  Star,
   Image as ImageIcon
 } from 'lucide-react';
 import { PageSpinner } from '@/components/ui/spinner';
@@ -261,24 +260,19 @@ export default function DashboardLayout({
   }, [showSidebar, permissibleLinks, navItems]);
 
 
-  const [isGracePeriodActive, setIsGracePeriodActive] = useState(true);
+  const [isGracePeriodExpired, setIsGracePeriodExpired] = useState(false);
 
   useEffect(() => {
-    // If we're loading or have a store, we don't need a grace period
     if (isLoading || store || staffMember) {
-      if ((store || staffMember) && isGracePeriodActive) {
-        setTimeout(() => setIsGracePeriodActive(false), 0);
-      }
       return;
     }
 
-    // If we are not loading but have no store, start a grace period
     const timer = setTimeout(() => {
-      setIsGracePeriodActive(false);
-    }, 4000); // 4 second grace period for Firestore propagation/loading
+      setIsGracePeriodExpired(true);
+    }, 4000);
 
     return () => clearTimeout(timer);
-  }, [isLoading, store, staffMember, isGracePeriodActive]);
+  }, [isLoading, store, staffMember]);
 
   useEffect(() => {
     if (!isLoading) {
@@ -287,13 +281,13 @@ export default function DashboardLayout({
       } else if (isCustomer) {
         // Explicitly block customers from the dashboard
         router.replace('/store/account');
-      } else if (!store && !staffMember && !isGracePeriodActive && pathname !== '/signup-merchant') {
+      } else if (!store && !staffMember && isGracePeriodExpired && pathname !== '/signup-merchant') {
         // No store or staff record yet, and grace period has expired
         console.log("No store found after grace period, redirecting to signup-merchant");
         router.replace('/signup-merchant');
       }
     }
-  }, [user, isLoading, isCustomer, store, staffMember, router, pathname, isGracePeriodActive]);
+  }, [user, isLoading, isCustomer, store, staffMember, router, pathname, isGracePeriodExpired]);
 
   if (isLoading || !user || isCustomer || (!store && !staffMember)) {
     const subLabel = (!store && !staffMember) ? "Locating your store..." : "Authenticating your account…";
