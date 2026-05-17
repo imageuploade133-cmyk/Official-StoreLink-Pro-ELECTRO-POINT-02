@@ -16,7 +16,7 @@ import Link from 'next/link';
 import { useStoreUrl } from '@/hooks/use-store-url';
 import { useRef, useCallback } from 'react';
 
-const MAX_RECORDING_SECONDS = 60;
+const MAX_RECORDING_SECONDS = 58;
 const MAX_BASE64_SIZE = 850000;
 
 const reviewSchema = z.object({
@@ -80,7 +80,10 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
       });
       
       const mimeType = getSupportedMimeType();
-      const mediaRecorder = new MediaRecorder(stream, { mimeType });
+      const mediaRecorder = new MediaRecorder(stream, { 
+        mimeType,
+        audioBitsPerSecond: 64000
+      });
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
@@ -96,7 +99,7 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
         reader.onloadend = () => {
           const base64Audio = reader.result as string;
           if (base64Audio.length > MAX_BASE64_SIZE) {
-            toast({ variant: "destructive", title: "Recording too long", description: "Please keep your voice comment under 60 seconds." });
+            toast({ variant: "destructive", title: "Recording too long", description: `Please keep your voice comment under ${MAX_RECORDING_SECONDS} seconds.` });
           } else {
             form.setValue('audioDataUri', base64Audio);
           }
@@ -347,21 +350,32 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
                       </Button>
                     </div>
                   ) : isRecording ? (
-                    <div className="flex items-center gap-4 p-4 bg-rose-50 rounded-2xl border-2 border-rose-200 animate-pulse">
-                      <div className="h-3 w-3 rounded-full bg-rose-500 animate-pulse" />
-                      <div className="flex-1">
-                        <div className="text-xl font-mono font-black text-rose-600">{formatTime(recordingDuration)}</div>
-                        <div className="text-[8px] font-black uppercase text-rose-400 tracking-widest">Recording in progress...</div>
+                    <div className="flex flex-col gap-2 p-4 bg-rose-50 rounded-2xl border-2 border-rose-200 relative overflow-hidden">
+                      <div 
+                        className={cn(
+                          "absolute top-0 left-0 h-1 transition-all duration-1000 ease-linear",
+                          recordingDuration > MAX_RECORDING_SECONDS - 10 ? "bg-rose-600 animate-pulse" : "bg-primary"
+                        )} 
+                        style={{ width: `${(recordingDuration / MAX_RECORDING_SECONDS) * 100}%` }} 
+                      />
+                      <div className="flex items-center gap-4">
+                        <div className="h-3 w-3 rounded-full bg-rose-500 animate-pulse" />
+                        <div className="flex-1">
+                          <div className="text-xl font-mono font-black text-rose-600">{formatTime(recordingDuration)}</div>
+                          <div className="text-[8px] font-black uppercase text-rose-400 tracking-widest">
+                            {recordingDuration > MAX_RECORDING_SECONDS - 10 ? 'Finalizing recording...' : 'Recording in progress...'}
+                          </div>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          className="rounded-xl font-black uppercase text-[10px] tracking-widest h-10"
+                          onClick={stopRecording}
+                        >
+                          <StopCircle className="h-3 w-3 mr-2" /> Stop
+                        </Button>
                       </div>
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="sm"
-                        className="rounded-xl font-black uppercase text-[10px] tracking-widest h-10"
-                        onClick={stopRecording}
-                      >
-                        <StopCircle className="h-3 w-3 mr-2" /> Stop
-                      </Button>
                     </div>
                   ) : (
                     <Button
