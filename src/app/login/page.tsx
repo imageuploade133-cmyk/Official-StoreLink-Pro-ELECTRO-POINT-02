@@ -94,7 +94,7 @@ export default function AdminLoginPage() {
                     className="object-cover"
                     priority
                 />
-                <div className="absolute inset-0 bg-black/10 dark:bg-black/40" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-black/90 via-black/40 to-transparent" />
                 <div className="absolute bottom-12 left-12 z-10">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="bg-white/20 backdrop-blur-md p-2 rounded-xl border border-white/30">

@@ -75,6 +75,7 @@ export default function MerchantSignupPage() {
     const totalSteps = 3;
 
     const [slugStatus, setSlugStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
+    const [suggestions, setSuggestions] = useState<string[]>([]);
 
     const form = useForm<SignupFormValues>({
         resolver: zodResolver(signupSchema),
@@ -130,11 +131,13 @@ export default function MerchantSignupPage() {
         const checkSlug = async () => {
             if (!storeSlug || storeSlug.length < 2) {
                 setSlugStatus('idle');
+                setSuggestions([]);
                 return;
             }
 
             if (reservedSlugs.includes(storeSlug)) {
                 setSlugStatus('taken');
+                generateSuggestions(storeSlug);
                 return;
             }
 
@@ -145,13 +148,34 @@ export default function MerchantSignupPage() {
 
                 if (docSnap.exists()) {
                     setSlugStatus('taken');
+                    generateSuggestions(storeSlug);
                 } else {
                     setSlugStatus('available');
+                    setSuggestions([]);
                 }
             } catch (error) {
                 console.error("Error checking slug:", error);
                 setSlugStatus('idle');
             }
+        };
+
+        const generateSuggestions = async (baseSlug: string) => {
+            const variants = [
+                `${baseSlug}-shop`,
+                `${baseSlug}-store`,
+                `${baseSlug}-hub`,
+                `${baseSlug}24`,
+                `${baseSlug}-official`
+            ];
+            
+            const results = await Promise.all(variants.map(async (v) => {
+                if (reservedSlugs.includes(v)) return null;
+                const docRef = doc(firestore!, 'stores', v);
+                const docSnap = await getDoc(docRef);
+                return docSnap.exists() ? null : v;
+            }));
+
+            setSuggestions(results.filter((r): r is string => r !== null).slice(0, 3));
         };
 
         const timer = setTimeout(() => {
@@ -269,7 +293,7 @@ export default function MerchantSignupPage() {
                 className="object-cover"
                 priority
             />
-            <div className="absolute inset-0 bg-black/10 dark:bg-black/40" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-black/90 via-black/40 to-transparent" />
             <div className="absolute bottom-12 left-12 z-10">
                 <div className="flex items-center gap-3 mb-4">
                     <div className="bg-white/20 backdrop-blur-md p-2 rounded-xl border border-white/30">
@@ -434,6 +458,23 @@ export default function MerchantSignupPage() {
                                                 </div>
                                             </div>
                                         </FormControl>
+                                        {slugStatus === 'taken' && suggestions.length > 0 && (
+                                            <div className="mt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                <p className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-2 ml-1">Suggested URLs:</p>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {suggestions.map((suggestion) => (
+                                                        <button
+                                                            key={suggestion}
+                                                            type="button"
+                                                            onClick={() => form.setValue('storeSlug', suggestion, { shouldValidate: true })}
+                                                            className="px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:bg-[#0071e3] hover:text-white transition-all border border-zinc-200 dark:border-zinc-700 hover:border-[#0071e3]"
+                                                        >
+                                                            {suggestion}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
                                         <FormMessage className="text-xs" />
                                     </FormItem>
                                 )}/>
