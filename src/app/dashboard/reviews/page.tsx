@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
-  collectionGroup,
   deleteDoc,
   doc,
   query,
@@ -103,6 +102,11 @@ export default function ReviewsPage() {
     try {
       const reviewRef = doc(firestore, 'products', review.productId, 'reviews', review.id);
       await updateDoc(reviewRef, { isRead: true });
+      
+      // Also update in store_reviews
+      const topLevelRef = doc(firestore, 'store_reviews', review.id);
+      await updateDoc(topLevelRef, { isRead: true }).catch(err => console.warn('Top level review doc might not exist yet', err));
+
       setReviews(prev => prev.map(r => r.id === review.id ? { ...r, isRead: true } : r));
     } catch (e) {
       console.error("Error marking review as read:", e);
@@ -113,8 +117,9 @@ export default function ReviewsPage() {
     if (!firestore || !currentStoreId || reviews.length === 0) return;
     setIsLoadingReviews(true);
     try {
+      // Use top-level collection instead of collectionGroup to avoid index requirements
       const q = query(
-        collectionGroup(firestore, 'reviews'),
+        collection(firestore, 'store_reviews'),
         where('store_id', '==', currentStoreId)
       );
       const snapshot = await getDocs(q);
@@ -131,7 +136,15 @@ export default function ReviewsPage() {
         chunk.forEach((docSnap) => {
           const data = docSnap.data();
           if (!data.isRead) {
+            // Update top level
             batch.update(docSnap.ref, { isRead: true });
+            
+            // Try to update nested
+            if (data.productId) {
+              const nestedRef = doc(firestore, 'products', data.productId, 'reviews', docSnap.id);
+              batch.update(nestedRef, { isRead: true });
+            }
+            
             chunkCount++;
           }
         });
@@ -163,18 +176,22 @@ export default function ReviewsPage() {
     setIsLoadingReviews(true);
 
     try {
-      // Use collectionGroup to find all 'reviews' subcollections
-      // Note: This requires a composite index in Firestore for collectionGroup 'reviews'
-      // with fields store_id ASC, createdAt DESC
+      // Use top-level 'store_reviews' collection to avoid collectionGroup index requirements
       let q = query(
-        collectionGroup(firestore, 'reviews'), 
+        collection(firestore, 'store_reviews'), 
         where('store_id', '==', currentStoreId), 
         orderBy('createdAt', 'desc')
       );
 
       if (direction === 'initial') {
-        const countSnap = await getCountFromServer(q);
-        setTotalCount(countSnap.data().count);
+        try {
+          const countSnap = await getCountFromServer(q);
+          setTotalCount(countSnap.data().count);
+        } catch (countErr) {
+          console.warn("Count failed, might be missing index on store_reviews too:", countErr);
+          // Fallback if index on store_reviews is not yet ready
+          setTotalCount(0);
+        }
       }
 
       if (direction === 'next' && lastDocRef.current) {
@@ -240,12 +257,19 @@ export default function ReviewsPage() {
 
     setIsSubmittingReply(true);
     try {
-      const reviewRef = doc(firestore, 'products', selectedReview.productId, 'reviews', selectedReview.id);
-      await updateDoc(reviewRef, {
+      const updateData = {
         reply: replyText.trim(),
         repliedAt: serverTimestamp(),
         isRead: true
-      });
+      };
+      
+      const reviewRef = doc(firestore, 'products', selectedReview.productId, 'reviews', selectedReview.id);
+      await updateDoc(reviewRef, updateData);
+      
+      // Also update in store_reviews
+      const topLevelRef = doc(firestore, 'store_reviews', selectedReview.id);
+      await updateDoc(topLevelRef, updateData).catch(err => console.warn('Top level review doc might not exist yet', err));
+
       toast({ title: 'Reply posted', description: 'Your response is now visible.' });
       setReplyText('');
       setIsActionModalOpen(false);
@@ -260,10 +284,17 @@ export default function ReviewsPage() {
   const toggleHideReview = async (review: ProductReview) => {
     if (!firestore || !review.productId) return;
     try {
-      const reviewRef = doc(firestore, 'products', review.productId, 'reviews', review.id);
-      await updateDoc(reviewRef, {
+      const updateData = {
         isHidden: !review.isHidden
-      });
+      };
+
+      const reviewRef = doc(firestore, 'products', review.productId, 'reviews', review.id);
+      await updateDoc(reviewRef, updateData);
+      
+      // Also update in store_reviews
+      const topLevelRef = doc(firestore, 'store_reviews', review.id);
+      await updateDoc(topLevelRef, updateData).catch(err => console.warn('Top level review doc might not exist yet', err));
+
       toast({ title: review.isHidden ? 'Review is now visible' : 'Review is now hidden' });
       setIsActionModalOpen(false);
       fetchReviews('initial');
@@ -278,6 +309,11 @@ export default function ReviewsPage() {
     try {
       const reviewRef = doc(firestore, 'products', reviewToDelete.productId, 'reviews', reviewToDelete.id);
       await deleteDoc(reviewRef);
+      
+      // Also delete in store_reviews
+      const topLevelRef = doc(firestore, 'store_reviews', reviewToDelete.id);
+      await deleteDoc(topLevelRef).catch(err => console.warn('Top level review doc might not exist yet', err));
+
       toast({ title: 'Review permanently deleted' });
       setIsDeleteDialogOpen(false);
       setReviewToDelete(null);
