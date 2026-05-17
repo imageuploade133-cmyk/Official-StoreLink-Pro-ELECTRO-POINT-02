@@ -174,7 +174,10 @@ export default function ReviewsPage() {
   const lastDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
 
   const fetchReviews = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
-    if (!firestore || !currentStoreId) return;
+    if (!firestore || !currentStoreId) {
+      setIsLoadingReviews(false);
+      return;
+    }
     setIsLoadingReviews(true);
 
     try {
@@ -245,8 +248,12 @@ export default function ReviewsPage() {
   }, [firestore, currentStoreId, toast]);
 
   useEffect(() => {
-    if (firestore && !authLoading && currentStoreId) {
-      fetchReviews('initial');
+    if (!authLoading) {
+      if (firestore && currentStoreId) {
+        fetchReviews('initial');
+      } else {
+        setIsLoadingReviews(false);
+      }
     }
   }, [firestore, authLoading, currentStoreId, fetchReviews]);
 

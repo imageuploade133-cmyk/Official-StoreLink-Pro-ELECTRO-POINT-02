@@ -299,10 +299,12 @@ export default function DashboardLayout({
     }
   }, [user, isLoading, isCustomer, store, staffMember, router, pathname, isGracePeriodExpired]);
 
+  /*
   if (isLoading || !user || isCustomer || (!store && !staffMember)) {
     const subLabel = (!store && !staffMember) ? "Locating your store..." : "Authenticating your account…";
     return <PageSpinner label="StoreLink Pro" subLabel={subLabel} />;
   }
+  */
 
   return (
     <div
