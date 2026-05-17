@@ -35,6 +35,7 @@ import {
   Plus,
   Minus,
   MessageSquare,
+  Reply as ReplyIcon,
   AudioWaveform,
   Loader2,
   TrendingUp,
@@ -49,7 +50,8 @@ import {
   Award,
   ListChecks,
   Layers,
-  Maximize
+  Maximize,
+  Ban
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -207,6 +209,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
     const [detailQty, setDetailQty] = useState(1);
     const [activeTabSub, setActiveTabSub] = useState('details');
     const [activeImage, setActiveImage] = useState<string | null>(null);
+    const hasSetInitialImage = useRef(false);
     const [showVideo, setShowVideo] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -218,11 +221,21 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
     const { data: product, isLoading: isFetching } = useDoc<Product>(productRef);
 
     useEffect(() => {
-        if (product?.imageUrl) setActiveImage(product.imageUrl);
-        if (id) addViewedProduct(id);
-    }, [product, id, addViewedProduct]);
+        if (id) {
+            addViewedProduct(id);
+            hasSetInitialImage.current = false;
+            Promise.resolve().then(() => setActiveImage(null));
+        }
+    }, [id, addViewedProduct]);
 
-    const categoryRef = useMemo(() => (firestore && product?.categoryId) ? doc(firestore, 'categories', product.categoryId) : null, [firestore, product?.categoryId]);
+    useEffect(() => {
+        if (product?.imageUrl && !hasSetInitialImage.current) {
+            Promise.resolve().then(() => setActiveImage(product.imageUrl!));
+            hasSetInitialImage.current = true;
+        }
+    }, [product?.imageUrl]);
+
+    const categoryRef = useMemo(() => (firestore && product?.categoryId) ? doc(firestore, 'categories', product.categoryId) : null, [firestore, product]);
     const { data: category } = useDoc<Category>(categoryRef);
 
     const galleryImages = useMemo(() => {
@@ -231,10 +244,10 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
         return all;
     }, [product]);
 
-    const voicesQuery = useMemo(() => firestore ? query(collection(firestore, 'products', id, 'voiceSignatures')) : null, [firestore, id]);
+    const voicesQuery = useMemo(() => (firestore && id) ? query(collection(firestore, 'products', id, 'voiceSignatures')) : null, [firestore, id]);
     const { data: distributedVoices } = useCollection<VoiceSignature>(voicesQuery);
 
-    const reviewsQuery = useMemo(() => firestore ? query(collection(firestore, 'products', id, 'reviews'), orderBy('createdAt', 'desc')) : null, [firestore, id]);
+    const reviewsQuery = useMemo(() => (firestore && id) ? query(collection(firestore, 'products', id, 'reviews'), orderBy('createdAt', 'desc')) : null, [firestore, id]);
     const { data: reviews } = useCollection<ProductReview>(reviewsQuery);
 
     const sectionsQuery = useMemo(() => (firestore && storeId) ? query(collection(firestore, 'homepageSections'), where('store_id', '==', storeId), where('isFlashSale', '==', true), where('published', '==', true)) : null, [firestore, storeId]);
@@ -266,7 +279,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
     const relatedQuery = useMemo(() => (firestore && storeId) ? query(collection(firestore, 'products'), where('store_id', '==', storeId), where('categoryId', '==', product?.categoryId || ''), where('isVisibleOnWeb', '==', true), limit(6)) : null, [firestore, product?.categoryId, storeId]);
     const { data: relatedProducts } = useCollection<Product>(relatedQuery);
 
-    // Dynamic Button Style for Add to Cart - Moved up to avoid hook error
+    // Dynamic Button Style for Add to Cart
     const addToCartButtonStyle = useMemo(() => {
         const useIndividual = settings?.useIndividualBtnSettings !== false;
         const style = useIndividual
@@ -368,7 +381,6 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
 
         if (style === 'apple') {
             shapeClass = 'rounded-xl';
-            const color = settings?.storeAddToCartColor || '#007AFF';
             // Custom shadow for Apple style
             shadowClass = 'shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-2px_rgba(0,0,0,0.05)]';
         }
@@ -391,12 +403,13 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
     const AddToCartIcon = iconMap[settings?.storeAddToCartIcon as keyof typeof iconMap] || ShoppingBag;
 
     const reviewStats = (() => {
-        if (!reviews || reviews.length === 0) return { avg: 0, count: 0, distribution: [0, 0, 0, 0, 0] };
-        const count = reviews.length;
-        const sum = reviews.reduce((s, r) => s + r.rating, 0);
+        const visibleReviews = (reviews || []).filter(r => !r.isHidden);
+        if (visibleReviews.length === 0) return { avg: 0, count: 0, distribution: [0, 0, 0, 0, 0] };
+        const count = visibleReviews.length;
+        const sum = visibleReviews.reduce((s, r) => s + r.rating, 0);
         const avg = parseFloat((sum / count).toFixed(1));
         const distribution = [0, 0, 0, 0, 0];
-        reviews.forEach(r => {
+        visibleReviews.forEach(r => {
             const idx = Math.max(0, Math.min(Math.floor(r.rating) - 1, 4));
             distribution[idx]++;
         });
@@ -634,11 +647,11 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                                 </div>
                             </div>
 
-                            <ProductReviewForm productId={id} />
+                            <ProductReviewForm productId={id} storeId={storeId} />
 
                             <div className="space-y-8 pt-4">
                                 {reviews && reviews.length > 0 ? (
-                                    reviews.map((review) => (
+                                    reviews.filter(r => !r.isHidden).map((review) => (
                                         <div key={review.id} className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-500">
                                             <div className="flex justify-between items-start">
                                                 <div className="flex gap-3">
@@ -658,7 +671,15 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                                                 </div>
                                                 <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{review.createdAt ? format(convertToDateSafely(review.createdAt)!, 'PP') : 'Recently'}</span>
                                             </div>
-                                            <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed italic">"{review.comment}"</p>
+                                            <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed italic">&quot;{review.comment}&quot;</p>
+                                            {review.reply && (
+                                                <div className="mt-4 p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-black/5 dark:border-white/5 space-y-2 animate-in fade-in slide-in-from-top-2 duration-500">
+                                                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
+                                                        <ReplyIcon className="h-3 w-3" /> Merchant Response
+                                                    </div>
+                                                    <p className="text-sm text-slate-600 dark:text-slate-400 opacity-80 italic">{review.reply}</p>
+                                                </div>
+                                            )}
                                         </div>
                                     ))
                                 ) : (

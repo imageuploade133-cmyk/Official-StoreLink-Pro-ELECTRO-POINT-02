@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -56,6 +55,7 @@ import {
   ZoomIn,
   Palette,
   CalendarClock,
+  Star,
   Image as ImageIcon
 } from 'lucide-react';
 import { PageSpinner } from '@/components/ui/spinner';
@@ -148,7 +148,7 @@ export default function DashboardLayout({
     safeStorage.setItem('dashboard-zoom', zoomLevel.toString());
   }, [zoomLevel]);
   
-  const navItems = [
+  const navItems = useMemo(() => [
     { heading: 'Core' },
     { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', perm: 'view_dashboard' },
     { href: '/pos', icon: ShoppingCart, label: 'POS', perm: 'canAccessPOS' },
@@ -197,6 +197,7 @@ export default function DashboardLayout({
     { href: '/dashboard/voice-settings', icon: Volume2, label: 'Voice Experience Settings', perm: 'manage_settings' },
     { href: '/dashboard/add-store-product', icon: PackagePlus, label: 'Add Store Product', perm: 'manage_website_content' },
     { href: '/dashboard/manage-web-catalog', icon: LayoutGrid, label: 'Manage Web Catalog', perm: 'manage_website_content' },
+    { href: '/dashboard/reviews', icon: Star, label: 'Product Reviews', perm: 'manage_website_content' },
     { href: '/dashboard/manage-coupons', icon: Ticket, label: 'Promo Codes', perm: 'manage_coupons' },
     { href: '/dashboard/stock-bar-settings', icon: Activity, label: 'Stock Bar Settings', perm: 'manage_settings' },
     { href: '/dashboard/product-card-designer', icon: Palette, label: 'Product Card Designer', perm: 'manage_settings' },
@@ -219,7 +220,7 @@ export default function DashboardLayout({
     { heading: 'Administration' },
     { href: '/dashboard/settings', icon: Settings, label: 'Settings', perm: 'manage_settings' },
     { href: '/dashboard/permissions', icon: Shield, label: 'Permissions', perm: 'view_permissions' },
-  ];
+  ], []);
 
   const permissibleLinks = useMemo(() => {
     return navItems.filter(item => {
@@ -227,7 +228,7 @@ export default function DashboardLayout({
       if (item.href === '/dashboard/profile') return !!user;
       return !!permissions[item.perm as keyof typeof permissions];
     });
-  }, [permissions, user]);
+  }, [permissions, user, navItems]);
 
   const showSidebar = useMemo(() => permissibleLinks.length > 1, [permissibleLinks]);
 
@@ -256,22 +257,19 @@ export default function DashboardLayout({
     });
 
     return finalNavItems;
-  }, [permissions, user, showSidebar, permissibleLinks]);
+  }, [showSidebar, permissibleLinks, navItems]);
 
 
-  const [isGracePeriodActive, setIsGracePeriodActive] = useState(true);
+  const [isGracePeriodExpired, setIsGracePeriodExpired] = useState(false);
 
   useEffect(() => {
-    // If we're loading or have a store, we don't need a grace period
     if (isLoading || store || staffMember) {
-      if (store || staffMember) setIsGracePeriodActive(false);
       return;
     }
 
-    // If we are not loading but have no store, start a grace period
     const timer = setTimeout(() => {
-      setIsGracePeriodActive(false);
-    }, 4000); // 4 second grace period for Firestore propagation/loading
+      setIsGracePeriodExpired(true);
+    }, 4000);
 
     return () => clearTimeout(timer);
   }, [isLoading, store, staffMember]);
@@ -283,13 +281,13 @@ export default function DashboardLayout({
       } else if (isCustomer) {
         // Explicitly block customers from the dashboard
         router.replace('/store/account');
-      } else if (!store && !staffMember && !isGracePeriodActive && pathname !== '/signup-merchant') {
+      } else if (!store && !staffMember && isGracePeriodExpired && pathname !== '/signup-merchant') {
         // No store or staff record yet, and grace period has expired
         console.log("No store found after grace period, redirecting to signup-merchant");
         router.replace('/signup-merchant');
       }
     }
-  }, [user, isLoading, isCustomer, store, staffMember, router, pathname, isGracePeriodActive]);
+  }, [user, isLoading, isCustomer, store, staffMember, router, pathname, isGracePeriodExpired]);
 
   if (isLoading || !user || isCustomer || (!store && !staffMember)) {
     const subLabel = (!store && !staffMember) ? "Locating your store..." : "Authenticating your account…";

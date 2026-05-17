@@ -37,7 +37,8 @@ import {
   CheckCircle2,
   Check,
   ThumbsUp,
-  MessageSquare,
+  MessageSquare, 
+  Reply as ReplyIcon,
   RotateCcw,
   ListChecks,
   Layers,
@@ -906,19 +907,24 @@ export default function ProductDetailsPage() {
   const isInWishlist = isProductInWishlist(productId);
 
 
+  const visibleReviews = useMemo(() => {
+    if (!reviews) return [];
+    return reviews.filter(r => r.isHidden !== true);
+  }, [reviews]);
+
   const reviewStats = useMemo(() => {
-    if (!reviews || reviews.length === 0) return { avg: 0, count: 0, distribution: [0, 0, 0, 0, 0] };
-    const count = reviews.length;
-    const sum = reviews.reduce((s, r) => s + r.rating, 0);
+    if (!visibleReviews || visibleReviews.length === 0) return { avg: 0, count: 0, distribution: [0, 0, 0, 0, 0] };
+    const count = visibleReviews.length;
+    const sum = visibleReviews.reduce((s, r) => s + r.rating, 0);
     const avg = parseFloat((sum / count).toFixed(1));
     const distribution = [0, 0, 0, 0, 0];
-    reviews.forEach(r => {
+    visibleReviews.forEach(r => {
       const idx = Math.max(0, Math.min(Math.floor(r.rating) - 1, 4));
       distribution[idx]++;
     });
     const percentages = distribution.map(val => Math.round((val / count) * 100)).reverse();
     return { avg, count, distribution: percentages };
-  }, [reviews]);
+  }, [visibleReviews]);
 
   const handleAddToCart = () => {
     if (product) {
@@ -2012,15 +2018,15 @@ export default function ProductDetailsPage() {
                       </div>
                     ))}
                   </div>
-                  <ProductReviewForm productId={productId} />
+                  <ProductReviewForm productId={productId} storeId={storeId} />
                 </div>
                 <div className="lg:col-span-8 space-y-10">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-2xl font-semibold tracking-tight text-[#1d1d1f] dark:text-[#f5f5f7]">Customer Feedback</h3>
                   </div>
-                  {reviews && reviews.length > 0 ? (
+                  {visibleReviews && visibleReviews.length > 0 ? (
                     <div className="space-y-12">
-                      {reviews.map((review) => { 
+                      {visibleReviews.map((review) => { 
                         const reviewDate = convertToDateSafely(review.createdAt); 
                         return (
                           <div key={review.id} className="space-y-4 group animate-in fade-in slide-in-from-bottom-2 duration-500">
@@ -2045,6 +2051,14 @@ export default function ProductDetailsPage() {
                               <span className="text-[11px] font-medium text-[#86868b]">{reviewDate ? format(reviewDate, 'PP') : 'Recently'}</span>
                             </div>
                             <p className="text-[#1d1d1f] dark:text-[#f5f5f7] leading-relaxed text-sm opacity-80">{review.comment}</p>
+                            {review.reply && (
+                                <div className="mt-4 p-4 rounded-2xl bg-[#f5f5f7] dark:bg-[#1d1d1f] border border-black/5 dark:border-white/5 space-y-2 animate-in fade-in slide-in-from-top-2 duration-500">
+                                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
+                                        <ReplyIcon className="h-3 w-3" /> Merchant Response
+                                    </div>
+                                    <p className="text-sm text-[#1d1d1f] dark:text-[#f5f5f7] opacity-80 italic">{review.reply}</p>
+                                </div>
+                            )}
                           </div>
                         ); 
                       })}

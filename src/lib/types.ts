@@ -1224,6 +1224,12 @@ export interface ProductReview {
   rating: number;
   comment: string;
   createdAt: Timestamp;
+  productId: string;
+  store_id: string;
+  reply?: string;
+  repliedAt?: Timestamp;
+  isHidden?: boolean;
+  isApproved?: boolean;
 }
 
 export interface AdLink {
