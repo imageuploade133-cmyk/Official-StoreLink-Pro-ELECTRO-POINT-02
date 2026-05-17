@@ -314,16 +314,29 @@ export default function MerchantSignupPage() {
                     </p>
                 </div>
 
-                {/* Progress Dots */}
-                <div className="flex justify-center lg:justify-start gap-2 mb-8">
+                {/* Progress Stages */}
+                <div className="flex justify-center lg:justify-start gap-3 mb-8">
                     {[1, 2, 3].map((s) => (
-                        <div 
-                            key={s}
-                            className={cn(
-                                "h-1.5 w-1.5 rounded-full transition-all duration-300",
-                                currentStep === s ? "bg-[#0071e3] w-6" : "bg-zinc-200 dark:bg-zinc-800"
+                        <div key={s} className="flex items-center gap-3">
+                            <div 
+                                className={cn(
+                                    "flex items-center justify-center h-8 w-8 rounded-full border-2 transition-all duration-300 text-sm font-bold",
+                                    currentStep === s 
+                                        ? "bg-[#0071e3] border-[#0071e3] text-white shadow-[0_0_15px_rgba(0,113,227,0.3)]" 
+                                        : currentStep > s 
+                                            ? "bg-emerald-500 border-emerald-500 text-white" 
+                                            : "bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-800 text-zinc-400 dark:text-zinc-600"
+                                )}
+                            >
+                                {currentStep > s ? <Check className="h-4 w-4" strokeWidth={3} /> : s}
+                            </div>
+                            {s < 3 && (
+                                <div className={cn(
+                                    "h-[2px] w-4 sm:w-8 rounded-full transition-all duration-300",
+                                    currentStep > s ? "bg-emerald-500" : "bg-zinc-200 dark:bg-zinc-800"
+                                )} />
                             )}
-                        />
+                        </div>
                     ))}
                 </div>
 
@@ -499,7 +512,7 @@ export default function MerchantSignupPage() {
 
                 <div className="mt-12 text-center lg:text-left">
                     <p className="text-[11px] text-zinc-400 dark:text-zinc-600 font-medium uppercase tracking-[0.2em]">
-                        &copy; 2024 StoreLink Pro &bull; Global E-commerce Solutions
+                        &copy; {new Date().getFullYear()} StoreLink Pro &bull; Global E-commerce Solutions
                     </p>
                 </div>
             </div>

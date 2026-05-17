@@ -65,7 +65,7 @@ export function ReceiptModal({ isOpen, onClose, saleTransaction, staffMap }: Rec
 
   useEffect(() => {
     if (isOpen && saleTransaction) {
-      setActiveFormat('small');
+      setActiveFormat('small'); // eslint-disable-line react-hooks/set-state-in-effect
       setLocalReprintCount(saleTransaction.reprintCount || 0);
     }
   }, [isOpen, saleTransaction]);
@@ -510,7 +510,7 @@ export function ReceiptModal({ isOpen, onClose, saleTransaction, staffMap }: Rec
                     <div className="flex flex-wrap justify-between items-start gap-8">
                         <div className="space-y-4">
                             <h1 className="text-4xl font-black text-gray-900 tracking-tight">
-                                {getReceiptTitle('a4')} <span className="brand-color">#{getDocPrefix()}-{jsCreatedAt ? format(jsCreatedAt, 'yyyy') : '2024'}-{id.substring(0, 4).toUpperCase()}</span>
+                                {getReceiptTitle('a4')} <span className="brand-color">#{getDocPrefix()}-{jsCreatedAt ? format(jsCreatedAt, 'yyyy') : new Date().getFullYear()}-{id.substring(0, 4).toUpperCase()}</span>
                             </h1>
                             <div className="flex gap-10">
                                 <div>
@@ -640,7 +640,7 @@ export function ReceiptModal({ isOpen, onClose, saleTransaction, staffMap }: Rec
 
                             {isCreditSale && creditPaymentInstructions && (
                                 <p className="text-sm text-gray-500 leading-relaxed italic border-l-4 brand-border pl-4">
-                                    "{creditPaymentInstructions}"
+                                    &quot;{creditPaymentInstructions}&quot;
                                 </p>
                             )}
                         </div>
