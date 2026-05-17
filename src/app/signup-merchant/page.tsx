@@ -61,6 +61,7 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 export default function MerchantSignupPage() {
     const { toast } = useToast();
     const [showPassword, setShowPassword] = useState(false);
+    const signupImage = "https://images.pexels.com/photos/135620/pexels-photo-135620.jpeg";
 
     const auth = useFirebaseAuthInstance();
     const firestore = useFirestore();
@@ -258,25 +259,49 @@ export default function MerchantSignupPage() {
     }
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-[#fafafa] dark:bg-black selection:bg-blue-500/30 font-sans">
-        <header className="fixed top-0 w-full z-50 bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-zinc-200/50 dark:border-zinc-800/50">
-            <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+    <div className="flex min-h-screen w-full bg-[#fafafa] dark:bg-black selection:bg-blue-500/30 font-sans">
+        {/* Left Side - Image */}
+        <div className="hidden lg:block lg:w-[40%] xl:w-[45%] relative overflow-hidden">
+            <Image 
+                src={signupImage}
+                alt="Signup Background"
+                fill
+                className="object-cover"
+                priority
+            />
+            <div className="absolute inset-0 bg-black/10 dark:bg-black/40" />
+            <div className="absolute top-12 left-12 z-10">
+                <Link href="/login" className="flex items-center gap-2">
+                    <StoreLinkLogo className="h-6 w-6 text-white" />
+                    <span className="font-semibold text-lg tracking-tight text-white">StoreLink <span className="text-white/60 font-normal">Pro</span></span>
+                </Link>
+            </div>
+            <div className="absolute bottom-12 left-12 z-10">
+                <h2 className="text-white font-bold text-3xl tracking-tight mb-4">Start your journey.</h2>
+                <p className="text-white/80 max-w-sm font-medium text-lg leading-relaxed">
+                    Join thousands of merchants who trust StoreLink Pro to power their commerce empires.
+                </p>
+            </div>
+        </div>
+
+        {/* Right Side - Form Area */}
+        <div className="flex-1 flex flex-col items-center justify-center p-6 relative overflow-y-auto">
+            <header className="absolute top-0 w-full z-50 lg:hidden px-6 h-16 flex items-center justify-between border-b border-zinc-200/50 dark:border-zinc-800/50 bg-white/80 dark:bg-black/80 backdrop-blur-md">
                 <Link href="/login" className="flex items-center gap-2">
                     <StoreLinkLogo className="h-6 w-6 text-[#0071e3]" />
                     <span className="font-semibold text-lg tracking-tight">StoreLink <span className="text-zinc-400 dark:text-zinc-600 font-normal">Pro</span></span>
                 </Link>
                 <div className="flex items-center gap-4">
                     <ThemeToggle />
-                    <Link href="/login" className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-                        Sign In
-                    </Link>
                 </div>
-            </div>
-        </header>
+            </header>
 
-        <main className="flex-1 flex flex-col items-center justify-center p-6 pt-24 pb-12">
-            <div className="w-full max-w-[500px]">
-                <div className="mb-10 text-center">
+            <div className="absolute top-8 right-8 hidden lg:block">
+                <ThemeToggle />
+            </div>
+
+            <div className="w-full max-w-[500px] py-12">
+                <div className="mb-10 text-center lg:text-left">
                     <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 mb-3">
                         {currentStep === 1 ? 'Create your account' : 
                          currentStep === 2 ? 'Set up your store' : 
@@ -290,7 +315,7 @@ export default function MerchantSignupPage() {
                 </div>
 
                 {/* Progress Dots */}
-                <div className="flex justify-center gap-2 mb-8">
+                <div className="flex justify-center lg:justify-start gap-2 mb-8">
                     {[1, 2, 3].map((s) => (
                         <div 
                             key={s}
@@ -472,13 +497,13 @@ export default function MerchantSignupPage() {
                     </Form>
                 </div>
 
-                <div className="mt-12 text-center">
+                <div className="mt-12 text-center lg:text-left">
                     <p className="text-[11px] text-zinc-400 dark:text-zinc-600 font-medium uppercase tracking-[0.2em]">
                         &copy; 2024 StoreLink Pro &bull; Global E-commerce Solutions
                     </p>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
   )
 }
