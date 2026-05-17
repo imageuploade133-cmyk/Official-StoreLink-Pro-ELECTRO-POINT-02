@@ -16,6 +16,7 @@ import {
   limitToLast,
   where,
   getCountFromServer,
+  writeBatch,
   type QueryDocumentSnapshot,
   type DocumentData,
   collection
@@ -45,7 +46,8 @@ import {
   Search, 
   ChevronLeft, 
   ChevronRight, 
-  Loader2
+  Loader2,
+  CheckCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSettings } from "@/contexts/settings-context";
@@ -95,6 +97,63 @@ export default function ReviewsPage() {
   const [isSuspending, setIsSuspending] = useState(false);
 
   const { toast } = useToast();
+  
+  const markAsRead = useCallback(async (review: ProductReview) => {
+    if (!firestore || !review.productId || review.isRead) return;
+    try {
+      const reviewRef = doc(firestore, 'products', review.productId, 'reviews', review.id);
+      await updateDoc(reviewRef, { isRead: true });
+      setReviews(prev => prev.map(r => r.id === review.id ? { ...r, isRead: true } : r));
+    } catch (e) {
+      console.error("Error marking review as read:", e);
+    }
+  }, [firestore]);
+
+  const markAllAsRead = async () => {
+    if (!firestore || !currentStoreId || reviews.length === 0) return;
+    setIsLoadingReviews(true);
+    try {
+      const q = query(
+        collectionGroup(firestore, 'reviews'),
+        where('store_id', '==', currentStoreId)
+      );
+      const snapshot = await getDocs(q);
+      let count = 0;
+      
+      const batchSize = 500;
+      const docs = snapshot.docs;
+      
+      for (let i = 0; i < docs.length; i += batchSize) {
+        const batch = writeBatch(firestore);
+        const chunk = docs.slice(i, i + batchSize);
+        let chunkCount = 0;
+        
+        chunk.forEach((docSnap) => {
+          const data = docSnap.data();
+          if (!data.isRead) {
+            batch.update(docSnap.ref, { isRead: true });
+            chunkCount++;
+          }
+        });
+        
+        if (chunkCount > 0) {
+          await batch.commit();
+          count += chunkCount;
+        }
+      }
+      
+      if (count > 0) {
+        toast({ title: 'Success', description: `Marked ${count} reviews as read.` });
+        fetchReviews('initial');
+      } else {
+        toast({ title: 'Info', description: 'All reviews are already marked as read.' });
+      }
+    } catch (e: any) {
+      toast({ variant: 'destructive', title: 'Error', description: e.message || 'Failed to mark reviews as read.' });
+    } finally {
+      setIsLoadingReviews(false);
+    }
+  };
 
   const firstDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
   const lastDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
@@ -184,7 +243,8 @@ export default function ReviewsPage() {
       const reviewRef = doc(firestore, 'products', selectedReview.productId, 'reviews', selectedReview.id);
       await updateDoc(reviewRef, {
         reply: replyText.trim(),
-        repliedAt: serverTimestamp()
+        repliedAt: serverTimestamp(),
+        isRead: true
       });
       toast({ title: 'Reply posted', description: 'Your response is now visible.' });
       setReplyText('');
@@ -273,10 +333,16 @@ export default function ReviewsPage() {
             title="Product Reviews"
             description="Moderate customer feedback, reply to reviews, and manage visibility."
           />
-          <Button variant="outline" onClick={() => fetchReviews('initial')} disabled={isLoadingReviews}>
-              <Loader2 className={cn("mr-2 h-4 w-4", isLoadingReviews && "animate-spin")} />
-              Refresh Reviews
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+              <Button variant="outline" onClick={markAllAsRead} disabled={isLoadingReviews || reviews.length === 0}>
+                  <CheckCheck className="mr-2 h-4 w-4" />
+                  Mark all as read
+              </Button>
+              <Button variant="outline" onClick={() => fetchReviews('initial')} disabled={isLoadingReviews}>
+                  <Loader2 className={cn("mr-2 h-4 w-4", isLoadingReviews && "animate-spin")} />
+                  Refresh Reviews
+              </Button>
+          </div>
       </div>
 
       <Card className="shadow-lg border-none ring-1 ring-border">
@@ -319,15 +385,23 @@ export default function ReviewsPage() {
                   </TableRow>
                 ) : (
                   reviews.map((review) => (
-                    <TableRow key={review.id} className={cn("group transition-colors", review.isHidden && "bg-muted/30 opacity-60")}>
+                    <TableRow key={review.id} className={cn("group transition-colors", review.isHidden && "bg-muted/30 opacity-60", !review.isRead && !review.reply && "bg-primary/[0.03] dark:bg-primary/[0.05]")}>
                       <TableCell className="pl-6">
                         <div className="flex items-center gap-3">
-                          <Avatar className="h-9 w-9 border-2 border-background shadow-sm">
-                            <AvatarImage src={review.userPhotoURL || ''} />
-                            <AvatarFallback className="font-bold text-[10px] bg-primary/10 text-primary">
-                                {review.userName.substring(0, 2).toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
+                          <div className="relative">
+                            <Avatar className="h-9 w-9 border-2 border-background shadow-sm">
+                              <AvatarImage src={review.userPhotoURL || ''} />
+                              <AvatarFallback className="font-bold text-[10px] bg-primary/10 text-primary">
+                                  {review.userName.substring(0, 2).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            {!review.isRead && !review.reply && (
+                              <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                              </span>
+                            )}
+                          </div>
                           <span className="font-bold text-sm tracking-tight">{review.userName}</span>
                         </div>
                       </TableCell>
@@ -365,7 +439,12 @@ export default function ReviewsPage() {
                         )}
                       </TableCell>
                       <TableCell className="text-right pr-6">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-primary/10 hover:text-primary transition-all" onClick={() => { setSelectedReview(review); setReplyText(review.reply || ''); setIsActionModalOpen(true); }}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-primary/10 hover:text-primary transition-all" onClick={() => { 
+                          setSelectedReview(review); 
+                          setReplyText(review.reply || ''); 
+                          setIsActionModalOpen(true); 
+                          if (!review.isRead) markAsRead(review);
+                        }}>
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </TableCell>
