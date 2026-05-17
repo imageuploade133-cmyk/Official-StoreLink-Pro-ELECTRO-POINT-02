@@ -35,7 +35,7 @@ import { FormField, FormItem, FormControl, FormLabel, FormMessage } from '@/comp
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const MAX_RECORDING_SECONDS = 60; 
-const MAX_BASE64_SIZE = 850000; 
+const MAX_BASE64_SIZE = 950000; 
 
 export function ProductVoiceRecorder() {
   const { control, setValue, watch } = useFormContext();
@@ -121,7 +121,7 @@ const startRecording = async (index: number) => {
       });
       
       const options: MediaRecorderOptions = {
-        audioBitsPerSecond: 64000
+        audioBitsPerSecond: 48000
       };
       
       const mimeType = getSupportedMimeType();
@@ -403,7 +403,7 @@ const startRecording = async (index: number) => {
                                                                 )}>
                                                                     {formatTime(currentDuration)}
                                                                 </div>
-                                                                <div className="text-[10px] font-bold text-muted-foreground uppercase">Recording Logic Active...</div>
+                                                                <div className="text-[10px] font-bold text-muted-foreground uppercase">Will auto-save at 60s...</div>
                                                             </div>
                                                             <Button 
                                                                 type="button" 
@@ -494,7 +494,7 @@ const startRecording = async (index: number) => {
           <div className="text-xs space-y-2">
               <p className="font-black text-primary uppercase tracking-widest">Database Optimization Protocol</p>
               <p className="text-muted-foreground leading-relaxed font-medium">
-                  Voice signatures are limited to **60 seconds** and optimized at **64kbps** to ensure high-fidelity audio fits perfectly within the direct code storage limits. The system will **automatically finalize** your session once the limit is reached to guarantee a successful save.
+                  Voice signatures are limited to **60 seconds** and optimized to ensure high-fidelity audio fits perfectly within the direct code storage limits. The system will **automatically finalize** your session once the limit is reached to guarantee a successful save.
               </p>
           </div>
       </div>
