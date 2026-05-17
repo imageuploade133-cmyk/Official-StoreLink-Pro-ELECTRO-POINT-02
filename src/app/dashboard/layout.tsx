@@ -83,8 +83,8 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useFirestore, useCollection } from '@/firebase';
-import { collection, query, where } from 'firebase/firestore';
-import type { Order, InstallmentRecord } from '@/lib/types';
+import { collection, query, where, collectionGroup } from 'firebase/firestore';
+import type { Order, InstallmentRecord, ProductReview } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import {
@@ -137,6 +137,15 @@ export default function DashboardLayout({
   }, [firestore, user, staffMember, store]);
   const { data: installmentRecords } = useCollection<InstallmentRecord>(installmentOrdersQuery);
   const installmentUnreadCount = installmentRecords?.filter(r => r.isRead === false).length || 0;
+
+  const reviewsQuery = useMemo(() => {
+    if (!firestore || !user) return null;
+    const storeId = staffMember?.store_id || store?.id;
+    if (!storeId) return null;
+    return query(collectionGroup(firestore, 'reviews'), where('store_id', '==', storeId));
+  }, [firestore, user, staffMember, store]);
+  const { data: reviews } = useCollection<ProductReview>(reviewsQuery);
+  const unreadReviewsCount = reviews?.filter(r => r.isRead !== true && !r.reply).length || 0;
 
   // Apply zoom level using font-size scaling (affects all rem/em units proportionally)
   useEffect(() => {
@@ -354,8 +363,9 @@ export default function DashboardLayout({
                   
                   const isOrdersLink = item.href === '/dashboard/orders';
                   const isInstallmentLink = item.href === '/dashboard/installment-orders';
-                  const showBadge = (isOrdersLink && pendingCount > 0) || (isInstallmentLink && installmentUnreadCount > 0);
-                  const badgeCount = isOrdersLink ? pendingCount : (isInstallmentLink ? installmentUnreadCount : 0);
+                  const isReviewsLink = item.href === '/dashboard/reviews';
+                  const showBadge = (isOrdersLink && pendingCount > 0) || (isInstallmentLink && installmentUnreadCount > 0) || (isReviewsLink && unreadReviewsCount > 0);
+                  const badgeCount = isOrdersLink ? pendingCount : (isInstallmentLink ? installmentUnreadCount : (isReviewsLink ? unreadReviewsCount : 0));
 
                   if (isMinimized) {
                     return (
@@ -461,8 +471,9 @@ export default function DashboardLayout({
                         
                         const isOrdersLink = item.href === '/dashboard/orders';
                         const isInstallmentLink = item.href === '/dashboard/installment-orders';
-                        const showBadge = (isOrdersLink && pendingCount > 0) || (isInstallmentLink && installmentUnreadCount > 0);
-                        const badgeCount = isOrdersLink ? pendingCount : (isInstallmentLink ? installmentUnreadCount : 0);
+                        const isReviewsLink = item.href === '/dashboard/reviews';
+                        const showBadge = (isOrdersLink && pendingCount > 0) || (isInstallmentLink && installmentUnreadCount > 0) || (isReviewsLink && unreadReviewsCount > 0);
+                        const badgeCount = isOrdersLink ? pendingCount : (isInstallmentLink ? installmentUnreadCount : (isReviewsLink ? unreadReviewsCount : 0));
 
                         return (
                           <Link

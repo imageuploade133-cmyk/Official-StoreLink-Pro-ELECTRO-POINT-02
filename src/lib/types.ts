@@ -1230,6 +1230,7 @@ export interface ProductReview {
   repliedAt?: Timestamp;
   isHidden?: boolean;
   isApproved?: boolean;
+  isRead?: boolean;
 }
 
 export interface AdLink {
