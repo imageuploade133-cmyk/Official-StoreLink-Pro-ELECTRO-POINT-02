@@ -11,23 +11,30 @@ import { FirestorePermissionError } from '../errors';
 
 export function useCollection<T>(query: Query | null) {
   const [data, setData] = useState<T[] | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!!query);
   const [error, setError] = useState<FirestoreError | null>(null);
+  const [prevQuery, setPrevQuery] = useState<Query | null>(query);
+
+  // Sync state with query change during render to avoid flashes of stale state
+  if (query !== prevQuery) {
+    setPrevQuery(query);
+    setIsLoading(!!query);
+    setData(null);
+  }
 
   useEffect(() => {
     if (!query) {
-      setData(null);
-      setIsLoading(false);
       return;
     }
 
-    setIsLoading(true);
     const unsubscribe = onSnapshot(
       query,
       (snapshot) => {
         const documents = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
+          createdAt: doc.data().createdAt,
+          updatedAt: doc.data().updatedAt,
         })) as T[];
         setData(documents);
         setIsLoading(false);
