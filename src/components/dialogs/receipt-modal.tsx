@@ -34,7 +34,7 @@ interface ReceiptModalProps {
 }
 
 export function ReceiptModal({ isOpen, onClose, saleTransaction, staffMap }: ReceiptModalProps) {
-  const { settings, isLoading: isSettingsLoading } = useSettings();
+  const { settings, isLoadingSettings: isSettingsLoading } = useSettings();
   const firestore = useFirestore();
   const currencySymbol = settings?.currency || '$';
 
@@ -63,12 +63,14 @@ export function ReceiptModal({ isOpen, onClose, saleTransaction, staffMap }: Rec
   const invoiceLogoUrl = globalInvoiceLogoUrl;
   const storeLogoUrl = globalStoreLogoUrl;
 
-  useEffect(() => {
-    if (isOpen && saleTransaction) {
-      setActiveFormat('small'); // eslint-disable-line react-hooks/set-state-in-effect
-      setLocalReprintCount(saleTransaction.reprintCount || 0);
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
+    if (isOpen) {
+      setActiveFormat('small');
+      setLocalReprintCount(saleTransaction?.reprintCount || 0);
     }
-  }, [isOpen, saleTransaction]);
+  }
 
   const transactionDetails = useMemo(() => {
     if (!saleTransaction) return null;

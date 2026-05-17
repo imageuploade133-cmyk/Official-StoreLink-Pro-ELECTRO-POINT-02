@@ -304,8 +304,8 @@ export default function MerchantSignupPage() {
                 <div className="mb-10 text-center lg:text-left">
                     <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 mb-3">
                         {currentStep === 1 ? 'Create your account' : 
-                         currentStep === 2 ? 'Create store' : 
-                         'Confirm details'}
+                         currentStep === 2 ? 'Set up your store' : 
+                         'Confirm your details'}
                     </h1>
                     <p className="text-zinc-500 dark:text-zinc-400 font-medium">
                         {currentStep === 1 ? 'Tell us who you are to get started.' : 
@@ -314,38 +314,26 @@ export default function MerchantSignupPage() {
                     </p>
                 </div>
 
-                {/* Progress Stages */}
-                <div className="flex justify-center lg:justify-start gap-2 sm:gap-4 mb-8">
-                    {[
-                        { id: 1, label: 'Account' },
-                        { id: 2, label: 'Store' },
-                        { id: 3, label: 'Confirm' }
-                    ].map((s, idx, arr) => (
-                        <div key={s.id} className="flex items-center gap-2 sm:gap-3">
-                            <div className="flex items-center gap-2">
-                                <div 
-                                    className={cn(
-                                        "flex items-center justify-center h-7 w-7 sm:h-8 sm:w-8 rounded-full border-2 transition-all duration-300 text-xs sm:text-sm font-bold",
-                                        currentStep === s.id 
-                                            ? "bg-[#0071e3] border-[#0071e3] text-white shadow-[0_0_15px_rgba(0,113,227,0.3)]" 
-                                            : currentStep > s.id 
-                                                ? "bg-emerald-500 border-emerald-500 text-white" 
-                                                : "bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-800 text-zinc-400 dark:text-zinc-600"
-                                    )}
-                                >
-                                    {currentStep > s.id ? <Check className="h-3 w-3 sm:h-4 sm:w-4" strokeWidth={3} /> : s.id}
-                                </div>
-                                <span className={cn(
-                                    "text-[10px] sm:text-xs font-semibold uppercase tracking-wider hidden xs:block",
-                                    currentStep === s.id ? "text-[#0071e3]" : "text-zinc-400"
-                                )}>
-                                    {s.label}
-                                </span>
+                {/* Progress Steps */}
+                <div className="flex justify-center lg:justify-start gap-3 mb-8">
+                    {[1, 2, 3].map((s) => (
+                        <div key={s} className="flex items-center gap-3">
+                            <div 
+                                className={cn(
+                                    "h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300",
+                                    currentStep === s 
+                                        ? "bg-[#0071e3] text-white shadow-lg shadow-[#0071e3]/20" 
+                                        : currentStep > s 
+                                            ? "bg-emerald-500 text-white" 
+                                            : "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500"
+                                )}
+                            >
+                                {currentStep > s ? <Check className="h-4 w-4" /> : s}
                             </div>
-                            {idx < arr.length - 1 && (
+                            {s < 3 && (
                                 <div className={cn(
-                                    "h-[2px] w-3 sm:w-6 rounded-full transition-all duration-300",
-                                    currentStep > s.id ? "bg-emerald-500" : "bg-zinc-200 dark:bg-zinc-800"
+                                    "h-[2px] w-6 rounded-full",
+                                    currentStep > s ? "bg-emerald-500" : "bg-zinc-100 dark:bg-zinc-800"
                                 )} />
                             )}
                         </div>

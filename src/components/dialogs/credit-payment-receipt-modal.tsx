@@ -38,7 +38,7 @@ interface CreditPaymentReceiptModalProps {
 const DEFAULT_STORE_NAME = 'StoreLink Pro';
 
 export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, currencySymbol }: CreditPaymentReceiptModalProps) {
-  const { settings, isLoading: isSettingsLoading } = useSettings();
+  const { settings, isLoadingSettings: isSettingsLoading } = useSettings();
   const firestore = useFirestore();
   const { toast } = useToast();
   const [activeFormat, setActiveFormat] = useState<'small' | 'a4'>('small');
@@ -56,12 +56,14 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
   const invoiceLogoHeight = settings?.invoiceLogoHeight || 50;
   const terminalLogoHeight = settings?.terminalLogoHeight || 60;
 
-  useEffect(() => {
-    if (isOpen && paymentInfo) {
-      setActiveFormat('small'); // eslint-disable-line react-hooks/set-state-in-effect
-      setLocalReprintCount(paymentInfo.reprintCount || 0);
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
+    if (isOpen) {
+      setActiveFormat('small');
+      setLocalReprintCount(paymentInfo?.reprintCount || 0);
     }
-  }, [isOpen, paymentInfo]);
+  }
 
   const getReceiptTitle = useCallback((format: 'small' | 'a4') => {
     return format === 'small' ? 'CREDIT PAYMENT RECEIPT' : 'PAYMENT RECEIPT';
