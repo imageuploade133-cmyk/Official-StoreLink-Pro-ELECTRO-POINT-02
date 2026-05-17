@@ -261,7 +261,7 @@ export default function MerchantSignupPage() {
   return (
     <div className="flex min-h-screen w-full bg-[#fafafa] dark:bg-black selection:bg-blue-500/30 font-sans">
         {/* Left Side - Image */}
-        <div className="hidden lg:block lg:w-[40%] xl:w-[45%] relative overflow-hidden">
+        <div className="hidden lg:block lg:w-[45%] xl:w-[50%] relative overflow-hidden">
             <Image 
                 src={signupImage}
                 alt="Signup Background"
@@ -285,23 +285,16 @@ export default function MerchantSignupPage() {
         </div>
 
         {/* Right Side - Form Area */}
-        <div className="flex-1 flex flex-col items-center justify-center p-6 relative overflow-y-auto">
-            <header className="absolute top-0 w-full z-50 lg:hidden px-6 h-16 flex items-center justify-between border-b border-zinc-200/50 dark:border-zinc-800/50 bg-white/80 dark:bg-black/80 backdrop-blur-md">
-                <Link href="/login" className="flex items-center gap-2">
-                    <StoreLinkLogo className="h-6 w-6 text-[#0071e3]" />
-                    <span className="font-semibold text-lg tracking-tight">StoreLink <span className="text-zinc-400 dark:text-zinc-600 font-normal">Pro</span></span>
-                </Link>
-                <div className="flex items-center gap-4">
-                    <ThemeToggle />
-                </div>
-            </header>
-
-            <div className="absolute top-8 right-8 hidden lg:block">
+        <div className="flex-1 flex flex-col items-center justify-center p-8 relative overflow-y-auto">
+            <div className="absolute top-8 right-8">
                 <ThemeToggle />
             </div>
 
             <div className="w-full max-w-[500px] py-12">
                 <div className="mb-10 text-center lg:text-left">
+                    <div className="mb-6 rounded-2xl bg-white dark:bg-zinc-900 p-4 shadow-sm border border-zinc-200 dark:border-zinc-800 animate-in fade-in zoom-in duration-700 lg:hidden inline-block">
+                        <StoreLinkLogo className="h-10 w-10 text-[#0071e3]" />
+                    </div>
                     <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 mb-3">
                         {currentStep === 1 ? 'Create your account' : 
                          currentStep === 2 ? 'Create store' : 
@@ -352,25 +345,25 @@ export default function MerchantSignupPage() {
                     ))}
                 </div>
 
-                <div className="bg-white dark:bg-zinc-900 rounded-3xl p-8 sm:p-10 shadow-[0_1px_3px_rgba(0,0,0,0.02),0_10px_20px_rgba(0,0,0,0.03)] border border-zinc-200/50 dark:border-zinc-800/50 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                             {currentStep === 1 && (
                             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
                                 <FormField control={form.control} name="name" render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-sm font-medium">Full Name</FormLabel>
+                                        <FormLabel className="text-sm font-medium text-zinc-700 dark:text-zinc-300 ml-1">Full Name</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="John Doe" className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-[#0071e3]/20 focus:border-[#0071e3] transition-all" {...field} />
+                                            <Input placeholder="John Doe" className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-[#0071e3]/20 focus:border-[#0071e3] transition-all bg-white dark:bg-zinc-900" {...field} />
                                         </FormControl>
                                         <FormMessage className="text-xs" />
                                     </FormItem>
                                 )}/>
                                 <FormField control={form.control} name="email" render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-sm font-medium">Email Address</FormLabel>
+                                        <FormLabel className="text-sm font-medium text-zinc-700 dark:text-zinc-300 ml-1">Email Address</FormLabel>
                                         <FormControl>
-                                            <Input type="email" placeholder="john@example.com" className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-[#0071e3]/20 focus:border-[#0071e3] transition-all" {...field} />
+                                            <Input type="email" placeholder="john@example.com" className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-[#0071e3]/20 focus:border-[#0071e3] transition-all bg-white dark:bg-zinc-900" {...field} />
                                         </FormControl>
                                         <FormMessage className="text-xs" />
                                     </FormItem>
@@ -378,10 +371,10 @@ export default function MerchantSignupPage() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <FormField control={form.control} name="password" render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-sm font-medium">Password</FormLabel>
+                                            <FormLabel className="text-sm font-medium text-zinc-700 dark:text-zinc-300 ml-1">Password</FormLabel>
                                             <div className="relative">
                                                 <FormControl>
-                                                    <Input type={showPassword ? 'text' : 'password'} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-[#0071e3]/20 focus:border-[#0071e3] transition-all pr-10" placeholder="••••••••" {...field} />
+                                                    <Input type={showPassword ? 'text' : 'password'} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-[#0071e3]/20 focus:border-[#0071e3] transition-all pr-10 bg-white dark:bg-zinc-900" placeholder="••••••••" {...field} />
                                                 </FormControl>
                                                 <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600" onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
                                             </div>
@@ -390,9 +383,9 @@ export default function MerchantSignupPage() {
                                     )}/>
                                     <FormField control={form.control} name="confirmPassword" render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-sm font-medium">Confirm</FormLabel>
+                                            <FormLabel className="text-sm font-medium text-zinc-700 dark:text-zinc-300 ml-1">Confirm</FormLabel>
                                             <FormControl>
-                                                <Input type={showPassword ? 'text' : 'password'} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-[#0071e3]/20 focus:border-[#0071e3] transition-all" placeholder="••••••••" {...field} />
+                                                <Input type={showPassword ? 'text' : 'password'} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-[#0071e3]/20 focus:border-[#0071e3] transition-all bg-white dark:bg-zinc-900" placeholder="••••••••" {...field} />
                                             </FormControl>
                                             <FormMessage className="text-xs" />
                                         </FormItem>
@@ -405,23 +398,23 @@ export default function MerchantSignupPage() {
                             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
                                 <FormField control={form.control} name="storeName" render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-sm font-medium">Store Name</FormLabel>
+                                        <FormLabel className="text-sm font-medium text-zinc-700 dark:text-zinc-300 ml-1">Store Name</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="My Awesome Store" className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-[#0071e3]/20 focus:border-[#0071e3] transition-all" {...field} />
+                                            <Input placeholder="My Awesome Store" className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-[#0071e3]/20 focus:border-[#0071e3] transition-all bg-white dark:bg-zinc-900" {...field} />
                                         </FormControl>
                                         <FormMessage className="text-xs" />
                                     </FormItem>
                                 )}/>
                                 <FormField control={form.control} name="storeSlug" render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-sm font-medium">Store URL</FormLabel>
+                                        <FormLabel className="text-sm font-medium text-zinc-700 dark:text-zinc-300 ml-1">Store URL</FormLabel>
                                         <FormControl>
                                             <div className="relative">
                                                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">storelink.pro/</span>
                                                 <Input
                                                     placeholder="my-store"
                                                     className={cn(
-                                                        "h-12 pl-[104px] rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-[#0071e3]/20 transition-all",
+                                                        "h-12 pl-[104px] rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-[#0071e3]/20 transition-all bg-white dark:bg-zinc-900",
                                                         slugStatus === 'available' && "focus:border-emerald-500",
                                                         slugStatus === 'taken' && "focus:border-rose-500",
                                                         slugStatus !== 'available' && slugStatus !== 'taken' && "focus:border-[#0071e3]"
@@ -440,18 +433,18 @@ export default function MerchantSignupPage() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <FormField control={form.control} name="storePhone" render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-sm font-medium">Phone Number</FormLabel>
+                                            <FormLabel className="text-sm font-medium text-zinc-700 dark:text-zinc-300 ml-1">Phone Number</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="+1 234 567 890" className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-[#0071e3]/20 focus:border-[#0071e3] transition-all" {...field} />
+                                                <Input placeholder="+1 234 567 890" className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-[#0071e3]/20 focus:border-[#0071e3] transition-all bg-white dark:bg-zinc-900" {...field} />
                                             </FormControl>
                                             <FormMessage className="text-xs" />
                                         </FormItem>
                                     )}/>
                                     <FormField control={form.control} name="storeAddress" render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-sm font-medium">Address</FormLabel>
+                                            <FormLabel className="text-sm font-medium text-zinc-700 dark:text-zinc-300 ml-1">Address</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="123 Street, City" className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-[#0071e3]/20 focus:border-[#0071e3] transition-all" {...field} />
+                                                <Input placeholder="123 Street, City" className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-[#0071e3]/20 focus:border-[#0071e3] transition-all bg-white dark:bg-zinc-900" {...field} />
                                             </FormControl>
                                             <FormMessage className="text-xs" />
                                         </FormItem>
