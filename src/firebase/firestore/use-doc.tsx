@@ -11,22 +11,27 @@ import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';
 
 export function useDoc<T>(docRef: DocumentReference | null) {
-  const [data, setData] = useState<T | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<FirestoreError | null>(null);
-
   // We use the path as a stable dependency to avoid re-subscribing 
   // if the docRef object reference changes but points to the same document.
   const path = docRef?.path;
 
+  const [data, setData] = useState<T | null>(null);
+  const [isLoading, setIsLoading] = useState(!!path);
+  const [error, setError] = useState<FirestoreError | null>(null);
+  const [prevPath, setPrevPath] = useState<string | undefined>(path);
+
+  // Immediate state update when path changes to avoid loading state mismatch during render
+  if (path !== prevPath) {
+    setPrevPath(path);
+    setIsLoading(!!path);
+    setData(null); // Clear old data when path changes
+  }
+
   useEffect(() => {
     if (!docRef) {
-      setData(null);
-      setIsLoading(false);
       return;
     }
 
-    setIsLoading(true);
     const unsubscribe = onSnapshot(
       docRef,
       (snapshot) => {
@@ -57,7 +62,7 @@ export function useDoc<T>(docRef: DocumentReference | null) {
     );
 
     return () => unsubscribe();
-  }, [path]); // Depend on path instead of docRef object
+  }, [path, docRef]); // Include docRef to satisfy ESLint, path ensures stability
 
   return { data, isLoading, error };
 }
