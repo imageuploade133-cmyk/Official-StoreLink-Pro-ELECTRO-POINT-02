@@ -48,6 +48,7 @@ import {
   Zap,
   Volume2,
   EyeOff,
+  Star,
   ClipboardList,
   SquarePlus,
   FileText,
@@ -220,7 +221,7 @@ export default function DashboardLayout({
     { heading: 'Administration' },
     { href: '/dashboard/settings', icon: Settings, label: 'Settings', perm: 'manage_settings' },
     { href: '/dashboard/permissions', icon: Shield, label: 'Permissions', perm: 'view_permissions' },
-  ], [user]);
+  ], []);
 
   const permissibleLinks = useMemo(() => {
     return navItems.filter(item => {
@@ -257,7 +258,7 @@ export default function DashboardLayout({
     });
 
     return finalNavItems;
-  }, [permissions, user, showSidebar, permissibleLinks, navItems]);
+  }, [showSidebar, permissibleLinks, navItems]);
 
 
   const [isGracePeriodActive, setIsGracePeriodActive] = useState(true);
@@ -266,7 +267,7 @@ export default function DashboardLayout({
     // If we're loading or have a store, we don't need a grace period
     if (isLoading || store || staffMember) {
       if ((store || staffMember) && isGracePeriodActive) {
-        setIsGracePeriodActive(false);
+        setTimeout(() => setIsGracePeriodActive(false), 0);
       }
       return;
     }
@@ -277,7 +278,7 @@ export default function DashboardLayout({
     }, 4000); // 4 second grace period for Firestore propagation/loading
 
     return () => clearTimeout(timer);
-  }, [isLoading, store, staffMember]);
+  }, [isLoading, store, staffMember, isGracePeriodActive]);
 
   useEffect(() => {
     if (!isLoading) {
