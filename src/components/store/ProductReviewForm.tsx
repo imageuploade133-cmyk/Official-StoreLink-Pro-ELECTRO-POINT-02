@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useUser, useFirestore } from '@/firebase';
-import { collection, addDoc, serverTimestamp, query, where, getDocs, limit } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, getDocs, limit, setDoc, doc } from 'firebase/firestore';
 import { Star, Loader2, Send, MessageCircle, Ban } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -77,7 +77,7 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
           return;
       }
 
-      await addDoc(collection(firestore, 'products', productId, 'reviews'), {
+      const reviewData = {
         userId: user.uid,
         userName: user.displayName || 'Valued Customer',
         userPhotoURL: user.photoURL || null,
@@ -88,7 +88,20 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
         isApproved: true,
         isHidden: false,
         createdAt: serverTimestamp(),
-      });
+      };
+
+      const docRef = await addDoc(collection(firestore, 'products', productId, 'reviews'), reviewData);
+      
+      // Also save to a top-level collection for easier querying in dashboard without collectionGroup indexes
+      try {
+        await setDoc(doc(firestore, 'store_reviews', docRef.id), {
+          ...reviewData,
+          id: docRef.id,
+        });
+      } catch (e) {
+        console.error('Error duplicating review to top-level collection:', e);
+      }
+
       toast({ title: 'Review Submitted', description: 'Thank you for your feedback!' });
       form.reset();
     } catch (e: any) {

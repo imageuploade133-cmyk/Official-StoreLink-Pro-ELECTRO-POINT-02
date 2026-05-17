@@ -83,7 +83,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useFirestore, useCollection } from '@/firebase';
-import { collection, query, where, collectionGroup } from 'firebase/firestore';
+import { collection, query, where } from 'firebase/firestore';
 import type { Order, InstallmentRecord, ProductReview } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
@@ -142,7 +142,8 @@ export default function DashboardLayout({
     if (!firestore || !user) return null;
     const storeId = staffMember?.store_id || store?.id;
     if (!storeId) return null;
-    return query(collectionGroup(firestore, 'reviews'), where('store_id', '==', storeId));
+    // Use top-level collection to avoid collectionGroup index requirements
+    return query(collection(firestore, 'store_reviews'), where('store_id', '==', storeId));
   }, [firestore, user, staffMember, store]);
   const { data: reviews } = useCollection<ProductReview>(reviewsQuery);
   const unreadReviewsCount = reviews?.filter(r => r.isRead !== true && !r.reply).length || 0;
