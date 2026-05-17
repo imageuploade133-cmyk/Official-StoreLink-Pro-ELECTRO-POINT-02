@@ -80,6 +80,7 @@ import { Progress } from '@/components/ui/progress';
 import { Slider } from '@/components/ui/slider';
 import { OutOfDataDrawer } from '@/components/ui/out-of-data-drawer';
 import { ProductReviewForm } from '@/components/store/ProductReviewForm';
+import { VoiceReviewPlayer } from "@/components/store/VoiceReviewPlayer";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getCollectionBackgroundStyle } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
@@ -2051,6 +2052,11 @@ export default function ProductDetailsPage() {
                               <span className="text-[11px] font-medium text-[#86868b]">{reviewDate ? format(reviewDate, 'PP') : 'Recently'}</span>
                             </div>
                             <p className="text-[#1d1d1f] dark:text-[#f5f5f7] leading-relaxed text-sm opacity-80">{review.comment}</p>
+                            {review.audioDataUri && (
+                              <div className="mt-3">
+                                <VoiceReviewPlayer dataUri={review.audioDataUri} />
+                              </div>
+                            )}
                             {review.reply && (
                                 <div className="mt-4 p-4 rounded-2xl bg-[#f5f5f7] dark:bg-[#1d1d1f] border border-black/5 dark:border-white/5 space-y-2 animate-in fade-in slide-in-from-top-2 duration-500">
                                     <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
