@@ -35,6 +35,7 @@ import {
   Plus,
   Minus,
   MessageSquare,
+  Reply as ReplyIcon,
   AudioWaveform,
   Loader2,
   TrendingUp,
@@ -218,11 +219,13 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
     const { data: product, isLoading: isFetching } = useDoc<Product>(productRef);
 
     useEffect(() => {
-        if (product?.imageUrl) setActiveImage(product.imageUrl);
+        if (product?.imageUrl && !activeImage) {
+            setActiveImage(product.imageUrl);
+        }
         if (id) addViewedProduct(id);
-    }, [product, id, addViewedProduct]);
+    }, [product, id, addViewedProduct, activeImage]);
 
-    const categoryRef = useMemo(() => (firestore && product?.categoryId) ? doc(firestore, 'categories', product.categoryId) : null, [firestore, product?.categoryId]);
+    const categoryRef = useMemo(() => (firestore && product?.categoryId) ? doc(firestore, 'categories', product.categoryId) : null, [firestore, product?.categoryId, product]);
     const { data: category } = useDoc<Category>(categoryRef);
 
     const galleryImages = useMemo(() => {
@@ -634,11 +637,11 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                                 </div>
                             </div>
 
-                            <ProductReviewForm productId={id} />
+                            <ProductReviewForm productId={id} storeId={storeId} />
 
                             <div className="space-y-8 pt-4">
                                 {reviews && reviews.length > 0 ? (
-                                    reviews.map((review) => (
+                                    reviews.filter(r => !r.isHidden).map((review) => (
                                         <div key={review.id} className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-500">
                                             <div className="flex justify-between items-start">
                                                 <div className="flex gap-3">
@@ -658,7 +661,15 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                                                 </div>
                                                 <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{review.createdAt ? format(convertToDateSafely(review.createdAt)!, 'PP') : 'Recently'}</span>
                                             </div>
-                                            <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed italic">"{review.comment}"</p>
+                                            <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed italic">&quot;{review.comment}&quot;</p>
+                                            {review.reply && (
+                                                <div className="mt-4 p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-black/5 dark:border-white/5 space-y-2 animate-in fade-in slide-in-from-top-2 duration-500">
+                                                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
+                                                        <ReplyIcon className="h-3 w-3" /> Merchant Response
+                                                    </div>
+                                                    <p className="text-sm text-slate-600 dark:text-slate-400 opacity-80 italic">{review.reply}</p>
+                                                </div>
+                                            )}
                                         </div>
                                     ))
                                 ) : (

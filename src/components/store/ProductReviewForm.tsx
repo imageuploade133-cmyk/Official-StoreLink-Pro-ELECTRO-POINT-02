@@ -24,9 +24,10 @@ type ReviewFormValues = z.infer<typeof reviewSchema>;
 
 interface ProductReviewFormProps {
   productId: string;
+  storeId?: string;
 }
 
-export function ProductReviewForm({ productId }: ProductReviewFormProps) {
+export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps) {
   const { user } = useUser();
   const firestore = useFirestore();
   const { toast } = useToast();
@@ -52,6 +53,10 @@ export function ProductReviewForm({ productId }: ProductReviewFormProps) {
         userPhotoURL: user.photoURL || null,
         rating: values.rating,
         comment: values.comment,
+        productId,
+        store_id: storeId || '',
+        isApproved: true,
+        isHidden: false,
         createdAt: serverTimestamp(),
       });
       toast({ title: 'Review Submitted', description: 'Thank you for your feedback!' });
