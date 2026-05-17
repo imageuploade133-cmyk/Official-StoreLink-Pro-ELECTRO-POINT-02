@@ -58,7 +58,7 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
 
   useEffect(() => {
     if (isOpen && paymentInfo) {
-      setActiveFormat('small');
+      setActiveFormat('small'); // eslint-disable-line react-hooks/set-state-in-effect
       setLocalReprintCount(paymentInfo.reprintCount || 0);
     }
   }, [isOpen, paymentInfo]);
@@ -326,7 +326,7 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
                     <div className="flex flex-wrap justify-between items-start gap-8">
                         <div className="space-y-4">
                             <h1 className="text-4xl font-black text-gray-900 tracking-tight">
-                                {getReceiptTitle('a4')} <span className="brand-color">#PAY-{jsPaymentDate ? format(jsPaymentDate, 'yyyy') : '2024'}-{paymentInfo.id.substring(0, 4).toUpperCase()}</span>
+                                {getReceiptTitle('a4')} <span className="brand-color">#PAY-{jsPaymentDate ? format(jsPaymentDate, 'yyyy') : new Date().getFullYear()}-{paymentInfo.id.substring(0, 4).toUpperCase()}</span>
                             </h1>
                             <div>
                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Payment Date</p>
@@ -380,7 +380,7 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
                         {paymentRecord.notes && (
                             <div className="mt-6 pt-6 border-t border-gray-200">
                                 <p className="text-[10px] text-gray-400 uppercase font-black tracking-widest mb-2">Notes</p>
-                                <p className="text-sm text-gray-600 italic">"{paymentRecord.notes}"</p>
+                                <p className="text-sm text-gray-600 italic">&quot;{paymentRecord.notes}&quot;</p>
                             </div>
                         )}
                     </div>
