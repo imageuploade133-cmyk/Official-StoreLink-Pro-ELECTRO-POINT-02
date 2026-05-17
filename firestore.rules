@@ -118,6 +118,12 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
+    match /{path=**}/reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isSignedIn() && (request.resource.data.userId == request.auth.uid || canManageStore(getStaffStoreId(request.resource.data)));
+      allow update, delete: if isSignedIn() && canManageStore(getStaffStoreId(resource.data));
+    }
+
     match /settings/{storeId} {
       allow read: if true; 
       allow write: if isSignedIn() && (storeId == 'global' || canManageStore(storeId) || storeId == request.auth.uid);
