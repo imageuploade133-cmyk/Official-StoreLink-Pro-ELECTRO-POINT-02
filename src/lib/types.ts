@@ -1225,7 +1225,7 @@ export interface ProductReview {
   comment: string;
   createdAt: Timestamp;
   productId: string;
-  storeId: string;
+  store_id: string;
   reply?: string;
   repliedAt?: Timestamp;
   isHidden?: boolean;

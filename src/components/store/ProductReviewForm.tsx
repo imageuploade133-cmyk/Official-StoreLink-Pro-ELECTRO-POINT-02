@@ -5,8 +5,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useUser, useFirestore } from '@/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { Star, Loader2, Send, MessageCircle } from 'lucide-react';
+import { collection, addDoc, serverTimestamp, query, where, getDocs, limit } from 'firebase/firestore';
+import { Star, Loader2, Send, MessageCircle, Ban } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -32,8 +32,23 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
   const firestore = useFirestore();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isBanned, setIsBanned] = useState(false);
   const [hoveredRating, setHoveredRating] = useState(0);
   const { getStoreUrl } = useStoreUrl();
+
+  useEffect(() => {
+    if (user && firestore && storeId) {
+        const checkBanned = async () => {
+            const customersRef = collection(firestore, 'customers');
+            const q = query(customersRef, where('store_id', '==', storeId), where('uid', '==', user.uid), limit(1));
+            const snap = await getDocs(q);
+            if (!snap.empty && snap.docs[0].data().status === 'banned') {
+                setIsBanned(true);
+            }
+        };
+        checkBanned();
+    }
+  }, [user, firestore, storeId]);
 
   const form = useForm<ReviewFormValues>({
     resolver: zodResolver(reviewSchema),
@@ -47,6 +62,21 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
     if (!user || !firestore) return;
     setIsSubmitting(true);
     try {
+      // Check if user is banned
+      const customersRef = collection(firestore, 'customers');
+      const q = query(customersRef, where('store_id', '==', storeId || ''), where('uid', '==', user.uid), limit(1));
+      const customerSnap = await getDocs(q);
+      
+      if (!customerSnap.empty && customerSnap.docs[0].data().status === 'banned') {
+          toast({ 
+            variant: 'destructive', 
+            title: 'Account Restricted', 
+            description: 'Your account has been suspended from posting reviews in this store.' 
+          });
+          setIsSubmitting(false);
+          return;
+      }
+
       await addDoc(collection(firestore, 'products', productId, 'reviews'), {
         userId: user.uid,
         userName: user.displayName || 'Valued Customer',
@@ -67,6 +97,16 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
       setIsSubmitting(false);
     }
   };
+
+  if (isBanned) {
+    return (
+      <div className="p-8 border-2 border-destructive border-dashed rounded-[2rem] text-center bg-destructive/5">
+        <Ban className="h-10 w-10 text-destructive mx-auto mb-4" />
+        <h4 className="text-xl font-black tracking-tight mb-2 text-destructive">Account Restricted</h4>
+        <p className="text-sm text-muted-foreground mb-2">You have been suspended from participating in this store&apos;s community.</p>
+      </div>
+    );
+  }
 
   if (!user) {
     return (

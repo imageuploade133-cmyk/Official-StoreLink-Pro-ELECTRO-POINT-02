@@ -33,13 +33,13 @@ export async function GET(
     }
 
     const db = getFirestore();
-    const reviewsRef = collection(db, 'productReviews');
+    const reviewsRef = collection(db, 'products', productId, 'reviews');
     
-    // Query only approved reviews for the product
+    // Query only approved and non-hidden reviews for the product
     const q = query(
       reviewsRef,
-      where('productId', '==', productId),
-      where('isApproved', '==', true)
+      where('isApproved', '==', true),
+      where('isHidden', '==', false)
     );
 
     const snapshot = await getDocs(q);
