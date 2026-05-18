@@ -397,6 +397,7 @@ export interface Settings {
   // Product Review Settings
   showProductReviews?: boolean;
   showReviewRatingOnCard?: boolean;
+  productReviewVoiceBtnColor?: string;
   // Web Store Grid Layout Settings
   storeGridColumnsDefault?: 2 | 3;
   storeGridColumnsSm?: 2 | 3;
@@ -774,6 +775,9 @@ export interface Product {
   variantOptions?: ProductOption[];
   advancedDetailsEnabled?: boolean;
   variantStockTotal?: number;
+  totalSold?: number;
+  averageRating?: number;
+  reviewCount?: number;
   installmentEnabled?: boolean;
   downPaymentPercentage?: number;
   numberOfPayments?: number;

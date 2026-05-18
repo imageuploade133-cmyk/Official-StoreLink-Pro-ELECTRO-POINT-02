@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, query, where, getDocs, orderBy, limit, startAfter, getDoc, doc } from 'firebase/firestore';
 import { initializeApp, getApps } from 'firebase/app';
 import type { ProductReview } from '@/lib/types';
 
@@ -24,6 +24,9 @@ export async function GET(
 ) {
   try {
     const { productId } = await params;
+    const { searchParams } = new URL(request.url);
+    const pageSize = parseInt(searchParams.get('limit') || '10');
+    const lastDocId = searchParams.get('lastId');
 
     if (!productId) {
       return NextResponse.json(
@@ -36,11 +39,21 @@ export async function GET(
     const reviewsRef = collection(db, 'products', productId, 'reviews');
     
     // Query only approved and non-hidden reviews for the product
-    const q = query(
+    let q = query(
       reviewsRef,
       where('isApproved', '==', true),
-      where('isHidden', '==', false)
+      where('isHidden', '==', false),
+      orderBy('createdAt', 'desc'),
+      limit(pageSize)
     );
+
+    if (lastDocId) {
+      const lastDocRef = doc(db, 'products', productId, 'reviews', lastDocId);
+      const lastDocSnap = await getDoc(lastDocRef);
+      if (lastDocSnap.exists()) {
+        q = query(q, startAfter(lastDocSnap));
+      }
+    }
 
     const snapshot = await getDocs(q);
     const reviews: ProductReview[] = snapshot.docs.map(doc => ({
@@ -48,15 +61,19 @@ export async function GET(
       id: doc.id,
     })) as ProductReview[];
 
+    const lastVisible = snapshot.docs[snapshot.docs.length - 1];
+
     return NextResponse.json(
       {
         success: true,
         data: reviews,
         count: reviews.length,
+        lastId: lastVisible ? lastVisible.id : null,
+        hasMore: reviews.length === pageSize,
       },
       {
         headers: {
-          'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
         },
       }
     );

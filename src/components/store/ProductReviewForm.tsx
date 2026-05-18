@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useFirestore, useUser } from '@/firebase';
-import { collection, addDoc, serverTimestamp, query, where, getDocs, limit, setDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, getDocs, limit, setDoc, doc, runTransaction, increment } from 'firebase/firestore';
 import { Star, Loader2, Send, MessageCircle, Ban, Mic, StopCircle, Trash2, Play, Pause, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useStoreUrl } from '@/hooks/use-store-url';
+import { useSettings } from '@/contexts/settings-context';
 import { useRef, useCallback } from 'react';
 
 const MAX_RECORDING_SECONDS = 60;
@@ -35,6 +36,7 @@ interface ProductReviewFormProps {
 export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps) {
   const { user } = useUser();
   const firestore = useFirestore();
+  const { settings } = useSettings();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isBanned, setIsBanned] = useState(false);
@@ -213,17 +215,35 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
         createdAt: serverTimestamp(),
       };
 
-      const docRef = await addDoc(collection(firestore, 'products', productId, 'reviews'), reviewData);
-      
-      // Also save to a top-level collection for easier querying in dashboard without collectionGroup indexes
-      try {
-        await setDoc(doc(firestore, 'store_reviews', docRef.id), {
+      const reviewCollectionRef = collection(firestore, 'products', productId, 'reviews');
+      const reviewDocRef = doc(reviewCollectionRef);
+      const storeReviewDocRef = doc(firestore, 'store_reviews', reviewDocRef.id);
+      const productRef = doc(firestore, 'products', productId);
+
+      await runTransaction(firestore, async (transaction) => {
+        const productSnap = await transaction.get(productRef);
+        
+        transaction.set(reviewDocRef, reviewData);
+        transaction.set(storeReviewDocRef, {
           ...reviewData,
-          id: docRef.id,
+          id: reviewDocRef.id,
         });
-      } catch (e) {
-        console.error('Error duplicating review to top-level collection:', e);
-      }
+
+        if (productSnap.exists()) {
+          const productData = productSnap.data();
+          const oldCount = productData.reviewCount || 0;
+          const oldAverage = productData.averageRating || 0;
+          const newRating = values.rating;
+          
+          const newCount = oldCount + 1;
+          const newAverage = ((oldAverage * oldCount) + newRating) / newCount;
+
+          transaction.update(productRef, {
+            reviewCount: newCount,
+            averageRating: newAverage
+          });
+        }
+      });
 
       toast({ title: 'Review Submitted', description: 'Thank you for your feedback!' });
       form.reset();
@@ -325,18 +345,34 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
                 </FormLabel>
                 <div className="space-y-4">
                   {field.value ? (
-                    <div className="flex items-center gap-4 p-4 bg-primary/5 rounded-2xl border-2 border-dashed border-primary/20 animate-in zoom-in-95 duration-300">
+                    <div 
+                      className="flex items-center gap-4 p-4 rounded-2xl border-2 border-dashed animate-in zoom-in-95 duration-300"
+                      style={{ 
+                        backgroundColor: `${settings?.productReviewVoiceBtnColor || '#3b82f6'}0D`,
+                        borderColor: `${settings?.productReviewVoiceBtnColor || '#3b82f6'}33`
+                      }}
+                    >
                       <Button
                         type="button"
                         variant="secondary"
                         size="icon"
-                        className="h-10 w-10 rounded-full bg-primary text-white hover:bg-primary/90"
+                        className="h-10 w-10 rounded-full text-white hover:opacity-90 shadow-md"
+                        style={{ 
+                          backgroundColor: settings?.productReviewVoiceBtnColor || '#3b82f6',
+                          shadowColor: `${settings?.productReviewVoiceBtnColor || '#3b82f6'}33`
+                        }}
                         onClick={togglePlayback}
                       >
                         {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                       </Button>
                       <div className="flex-1">
-                        <div className="text-[10px] font-black uppercase text-primary tracking-widest">Audio Comment Ready</div>
+                        <div 
+                          className="text-[10px] font-black uppercase tracking-widest"
+                          style={{ color: settings?.productReviewVoiceBtnColor || '#3b82f6' }}
+                        >
+                          Audio Comment Ready
+                        </div>
+
                         <div className="text-[8px] font-bold text-slate-400 uppercase">Binary Stream Encoded</div>
                       </div>
                       <Button
@@ -381,7 +417,19 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
                     <Button
                       type="button"
                       variant="outline"
-                      className="w-full h-14 rounded-2xl border-2 border-dashed hover:border-primary/50 hover:bg-primary/5 transition-all gap-3"
+                      className="w-full h-14 rounded-2xl border-2 border-dashed transition-all gap-3 group"
+                      style={{ 
+                        borderColor: `${settings?.productReviewVoiceBtnColor || '#3b82f6'}33`, // 20% opacity
+                        backgroundColor: `${settings?.productReviewVoiceBtnColor || '#3b82f6'}0D`, // 5% opacity
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = settings?.productReviewVoiceBtnColor || '#3b82f6';
+                        e.currentTarget.style.backgroundColor = `${settings?.productReviewVoiceBtnColor || '#3b82f6'}1A`; // 10% opacity
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = `${settings?.productReviewVoiceBtnColor || '#3b82f6'}33`;
+                        e.currentTarget.style.backgroundColor = `${settings?.productReviewVoiceBtnColor || '#3b82f6'}0D`;
+                      }}
                       onClick={startRecording}
                       disabled={isConverting}
                     >
@@ -389,8 +437,16 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
                          <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
                         <>
-                          <Mic className="h-4 w-4 text-primary" />
-                          <span className="font-black uppercase text-[10px] tracking-widest">Add Voice Comment</span>
+                          <Mic 
+                            className="h-5 w-5 group-hover:scale-110 transition-transform" 
+                            style={{ color: settings?.productReviewVoiceBtnColor || '#3b82f6' }}
+                          />
+                          <span 
+                            className="font-black uppercase text-[10px] tracking-widest"
+                            style={{ color: settings?.productReviewVoiceBtnColor || '#3b82f6' }}
+                          >
+                            Add Voice Comment
+                          </span>
                         </>
                       )}
                     </Button>
