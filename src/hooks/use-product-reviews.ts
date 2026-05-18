@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { ProductReview } from '@/lib/types';
 
 export function useProductReviews(productId: string) {
@@ -8,6 +8,9 @@ export function useProductReviews(productId: string) {
   const [lastId, setLastId] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
 
+  // Use a ref for lastId so fetchReviews doesn't become stale
+  const lastIdRef = useRef<string | null>(null);
+
   const fetchReviews = useCallback(async (isNextPage = false) => {
     if (!productId) return;
 
@@ -16,26 +19,28 @@ export function useProductReviews(productId: string) {
       setError(null);
 
       const url = new URL(`/api/reviews/${productId}`, window.location.origin);
-      if (isNextPage && lastId) {
-        url.searchParams.set('lastId', lastId);
+      if (isNextPage && lastIdRef.current) {
+        url.searchParams.set('lastId', lastIdRef.current);
       }
       url.searchParams.set('limit', '10');
 
       const response = await fetch(url.toString());
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch reviews: ${response.statusText}`);
       }
 
       const data = await response.json();
-      
+
       if (isNextPage) {
         setReviews(prev => [...prev, ...(data.data || [])]);
       } else {
         setReviews(data.data || []);
       }
-      
-      setLastId(data.lastId || null);
+
+      const newLastId = data.lastId || null;
+      lastIdRef.current = newLastId;
+      setLastId(newLastId);
       setHasMore(data.hasMore || false);
     } catch (err) {
       console.error('[ProductReviews] Failed to fetch reviews:', err);
@@ -44,14 +49,18 @@ export function useProductReviews(productId: string) {
     } finally {
       setIsLoading(false);
     }
-  }, [productId, lastId]);
+  }, [productId]); // Only depend on productId, not lastId
 
   useEffect(() => {
+    if (!productId) return;
+    // Reset state when productId changes
     setReviews([]);
     setLastId(null);
+    lastIdRef.current = null;
     setHasMore(false);
+    setError(null);
     fetchReviews(false);
-  }, [productId]); // Reset and fetch on productId change
+  }, [productId, fetchReviews]);
 
   const loadMore = useCallback(() => {
     if (hasMore && !isLoading) {

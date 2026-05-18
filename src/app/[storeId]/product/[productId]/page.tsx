@@ -835,15 +835,8 @@ export default function ProductDetailsPage() {
     return new Map(allCategories.map(c => [c.id, c.name]));
   }, [allCategories]);
 
-  // Fetch Reviews
-  const reviewsQuery = useMemo(() => {
-    if (!firestore || !productId) return null;
-    return query(
-      collection(firestore, 'products', productId, 'reviews'),
-      orderBy('createdAt', 'desc')
-    );
-  }, [firestore, productId]);
-  const { reviews, isLoading: isLoadingReviews, hasMore, loadMore } = useProductReviews(productId);
+  // Fetch Reviews - use resolvedProductId (actual Firestore doc ID) not the URL slug
+  const { reviews, isLoading: isLoadingReviews, hasMore, loadMore } = useProductReviews(resolvedProductId || '');
 
   const relatedQuery = useMemo(() => {
     if (!firestore || !storeId) return null;
@@ -886,10 +879,12 @@ export default function ProductDetailsPage() {
   const globalShowTechnicalSpecs = settings?.globalShowTechnicalSpecs !== false;
   const globalShowLogisticsInfo = settings?.globalShowLogisticsInfo !== false;
   const globalShowVerifiedReviews = settings?.globalShowVerifiedReviews !== false;
+  // Also respect the Shopping Experience "Enable Product Reviews" toggle
+  const globalShowProductReviews = settings?.showProductReviews !== false;
 
   const showTechnicalSpecs = (product?.showTechnicalSpecs !== false) && globalShowTechnicalSpecs;
   const showLogisticsTab = (product?.showLogisticsInfo !== false) && isLogisticsEnabled && globalShowLogisticsInfo;
-  const showVerifiedReviews = (product?.showVerifiedReviews !== false) && globalShowVerifiedReviews;
+  const showVerifiedReviews = (product?.showVerifiedReviews !== false) && globalShowVerifiedReviews && globalShowProductReviews;
   
   const addToCartText = settings?.storeAddToCartText || 'Secure Purchase';
   const AddToCartIcon = iconMap[settings?.storeAddToCartIcon as keyof typeof iconMap] || ShoppingCart;
