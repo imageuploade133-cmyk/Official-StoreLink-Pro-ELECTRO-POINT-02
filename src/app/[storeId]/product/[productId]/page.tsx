@@ -502,16 +502,15 @@ export default function ProductDetailsPage() {
     return ad;
   }, [activeAds]);
 
-  const effectivePrice = useMemo(() => {
+  const getEffectivePriceForBase = useCallback((basePrice: number) => {
     if (!product) return 0;
-    let price = calculateEffectivePrice(product as any, today, category);
+    let price = calculateEffectivePrice({ ...product, sellingPrice: basePrice } as any, today, category);
 
     if (activeSectionPromo) {
-        const base = Number(product.sellingPrice) || 0;
         if (activeSectionPromo.type === 'percentage') {
-            price = base * (1 - activeSectionPromo.value / 100);
+            price = basePrice * (1 - activeSectionPromo.value / 100);
         } else {
-            price = Math.max(0, base - activeSectionPromo.value);
+            price = Math.max(0, basePrice - activeSectionPromo.value);
         }
     }
 
@@ -521,6 +520,10 @@ export default function ProductDetailsPage() {
 
     return price;
   }, [product, today, category, activeSectionPromo, rewardAdClicked, activeRewardAd, applyRewardDiscount]);
+
+  const effectivePrice = useMemo(() => {
+    return getEffectivePriceForBase(Number(product?.sellingPrice) || 0);
+  }, [product?.sellingPrice, getEffectivePriceForBase]);
 
   const previewVariant = useMemo(() => {
     if (!product?.hasVariants || !product.variants) return null;
@@ -577,14 +580,40 @@ export default function ProductDetailsPage() {
   }, [product, selectedOptions]);
 
   const currentPrice = useMemo(() => {
-    // Use previewVariant for price updates even if all options aren't selected
+    // 1. Priority: selected or previewed variant
     const variantForPrice = selectedVariant || previewVariant;
-    if (variantForPrice && variantForPrice.sellingPrice) {
-       // Re-calculate effective price if variant has its own price
-       return calculateEffectivePrice({ ...product, sellingPrice: variantForPrice.sellingPrice } as any, today, category);
+    if (variantForPrice && typeof variantForPrice.sellingPrice === 'number' && variantForPrice.sellingPrice > 0) {
+       return getEffectivePriceForBase(variantForPrice.sellingPrice);
     }
+
+    // 2. Fallback: Minimum active variant price if variants exist but none selected
+    if (product?.hasVariants && product.variants && product.variants.length > 0) {
+      const activeVariantPrices = product.variants
+        .filter(v => v.isActive && typeof v.sellingPrice === 'number' && v.sellingPrice > 0)
+        .map(v => v.sellingPrice);
+      
+      if (activeVariantPrices.length > 0) {
+        return getEffectivePriceForBase(Math.min(...activeVariantPrices));
+      }
+    }
+
+    // 3. Last fallback: default effective price (uses product.sellingPrice)
     return effectivePrice;
-  }, [selectedVariant, previewVariant, effectivePrice, product, today, category]);
+  }, [selectedVariant, previewVariant, product, getEffectivePriceForBase, effectivePrice]);
+
+  const currentBasePrice = useMemo(() => {
+    const variantForPrice = selectedVariant || previewVariant;
+    if (variantForPrice && typeof variantForPrice.sellingPrice === "number" && variantForPrice.sellingPrice > 0) {
+      return variantForPrice.sellingPrice;
+    }
+    if (product?.hasVariants && product.variants && product.variants.length > 0) {
+       const activeVariantPrices = product.variants
+        .filter(v => v.isActive && typeof v.sellingPrice === "number" && v.sellingPrice > 0)
+        .map(v => v.sellingPrice);
+      if (activeVariantPrices.length > 0) return Math.min(...activeVariantPrices);
+    }
+    return Number(product?.sellingPrice) || 0;
+  }, [selectedVariant, previewVariant, product]);
 
   const currentStock = useMemo(() => {
     if (!product) return 0;
@@ -900,7 +929,7 @@ export default function ProductDetailsPage() {
   const recommendationsTitle = settings?.relatedProductsTitle || 'You Might Also Like';
   const recommendationsDescription = settings?.relatedProductsDescription || 'Specially curated items from the same collection.';
 
-  const isDiscounted = product ? (effectivePrice < product.sellingPrice) : false;
+  const isDiscounted = product ? (currentPrice < currentBasePrice) : false;
   const isOutOfStock = useMemo(() => {
     if (!product) return false;
     return product.hasVariants ? isCurrentlyOutOfStock : (Number(product.stock) || 0) <= 0;
@@ -1361,7 +1390,7 @@ export default function ProductDetailsPage() {
                 <div className={cn("flex flex-col gap-1 md:gap-1.5 transition-all duration-300", isChangingVariant && "opacity-40 blur-[1px]")}>
                   {!today ? <Skeleton className="h-8 md:h-10 w-32" /> : (
                     <><span className={cn("text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight", isDiscounted ? "text-[#e11d48]" : "text-[#1d1d1f] dark:text-[#f5f5f7]")}>{formatCurrency(currentPrice, currencySymbol)}</span>
-                    {isDiscounted && <span className="text-sm md:text-base text-[#86868b] line-through">Was: {formatCurrency(product.sellingPrice, currencySymbol)}</span>}</>
+                    {isDiscounted && <span className="text-sm md:text-base text-[#86868b] line-through">Was: {formatCurrency(currentBasePrice, currencySymbol)}</span>}</>
                   )}
                   {(selectedVariant?.sku || previewVariant?.sku || product.sku) && (
                     <div className="flex items-center gap-1.5 mt-1">
