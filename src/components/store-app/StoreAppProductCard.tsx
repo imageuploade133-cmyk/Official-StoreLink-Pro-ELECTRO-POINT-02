@@ -235,6 +235,10 @@ export function StoreAppProductCard({
                             onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
+                                if (product.hasVariants) {
+                                    onProductClick(product.id);
+                                    return;
+                                }
                                 addToCart(product, effectivePrice);
                                 toast({ title: "Bag Updated", description: `${product.name} successfully added.` });
                             }}

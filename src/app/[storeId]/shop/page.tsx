@@ -26,6 +26,7 @@ import { Search, ChevronLeft, ChevronRight, RotateCcw, PackageSearch, Loader2, S
 import { ProductCardSkeleton } from '@/components/store/ProductCardSkeleton';
 import { cn, getCollectionBackgroundStyle } from '@/lib/utils';
 import { useStoreUrl } from '@/hooks/use-store-url';
+import { getLowestVariantPrice } from '@/lib/pos-utils';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 const ITEMS_PER_PAGE = 12;
@@ -206,10 +207,14 @@ function ShopPageContent() {
             // Apply Sorting
             allProducts.sort((a, b) => {
                 if (sortFromUrl === 'price-low') {
-                    return (a.sellingPrice || 0) - (b.sellingPrice || 0);
+                    const aPrice = (a.hasVariants && a.variants && a.variants.length > 0) ? getLowestVariantPrice(a.variants) : (a.sellingPrice || 0);
+                    const bPrice = (b.hasVariants && b.variants && b.variants.length > 0) ? getLowestVariantPrice(b.variants) : (b.sellingPrice || 0);
+                    return aPrice - bPrice;
                 }
                 if (sortFromUrl === 'price-high') {
-                    return (b.sellingPrice || 0) - (a.sellingPrice || 0);
+                    const aPrice = (a.hasVariants && a.variants && a.variants.length > 0) ? getLowestVariantPrice(a.variants) : (a.sellingPrice || 0);
+                    const bPrice = (b.hasVariants && b.variants && b.variants.length > 0) ? getLowestVariantPrice(b.variants) : (b.sellingPrice || 0);
+                    return bPrice - aPrice;
                 }
                 if (sortFromUrl === 'name') {
                     return a.name.localeCompare(b.name);
@@ -608,7 +613,7 @@ function ShopPageContent() {
                                 </div>
                                 <h3 className="text-3xl font-black tracking-tight text-black dark:text-white">Nothing matches your search</h3>
                                 <p className="mt-4 text-[#86868b] font-medium max-w-sm mx-auto text-lg">
-                                    Try adjusting your filters or search terms to find what you're looking for.
+                                    Try adjusting your filters or search terms to find what you&apos;re looking for.
                                 </p>
                                 <Button
                                     variant="outline"

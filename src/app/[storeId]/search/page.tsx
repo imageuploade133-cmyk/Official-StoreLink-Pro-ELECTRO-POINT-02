@@ -38,6 +38,7 @@ import { ProductCard } from '@/components/store/ProductCard';
 import { ProductCardSkeleton } from '@/components/store/ProductCardSkeleton';
 import { cn, convertToDateSafely } from '@/lib/utils';
 import { useStoreUrl } from '@/hooks/use-store-url';
+import { getLowestVariantPrice } from '@/lib/pos-utils';
 
 const ITEMS_PER_PAGE = 12;
 
@@ -168,7 +169,10 @@ function SearchPageContent() {
       }
 
       // Price Range Filter
-      list = list.filter(p => p.sellingPrice >= priceRange[0] && p.sellingPrice <= priceRange[1]);
+      list = list.filter(p => {
+        const price = (p.hasVariants && p.variants && p.variants.length > 0) ? getLowestVariantPrice(p.variants) : p.sellingPrice;
+        return price >= priceRange[0] && price <= priceRange[1];
+      });
 
       // On Sale Filter
       if (onlyOnSale) {
@@ -176,8 +180,20 @@ function SearchPageContent() {
       }
 
       // Sorting
-      if (sortBy === 'price-low') list.sort((a, b) => a.sellingPrice - b.sellingPrice);
-      else if (sortBy === 'price-high') list.sort((a, b) => b.sellingPrice - a.sellingPrice);
+      if (sortBy === 'price-low') {
+        list.sort((a, b) => {
+          const aPrice = (a.hasVariants && a.variants && a.variants.length > 0) ? getLowestVariantPrice(a.variants) : a.sellingPrice;
+          const bPrice = (b.hasVariants && b.variants && b.variants.length > 0) ? getLowestVariantPrice(b.variants) : b.sellingPrice;
+          return aPrice - bPrice;
+        });
+      }
+      else if (sortBy === 'price-high') {
+        list.sort((a, b) => {
+          const aPrice = (a.hasVariants && a.variants && a.variants.length > 0) ? getLowestVariantPrice(a.variants) : a.sellingPrice;
+          const bPrice = (b.hasVariants && b.variants && b.variants.length > 0) ? getLowestVariantPrice(b.variants) : b.sellingPrice;
+          return bPrice - aPrice;
+        });
+      }
       else list.sort((a, b) => {
           const bDate = convertToDateSafely(b.createdAt)?.getTime() || 0;
           const aDate = convertToDateSafely(a.createdAt)?.getTime() || 0;
@@ -422,7 +438,7 @@ function SearchPageContent() {
                 </div>
                 <h3 className="text-2xl sm:text-3xl font-black tracking-tight mb-4">NO MATCHES FOUND</h3>
                 <p className="text-slate-500 max-w-sm mx-auto mb-10 font-medium">
-                  We couldn't find any products matching your search. Try adjusting your filters or search terms.
+                  We couldn&apos;t find any products matching your search. Try adjusting your filters or search terms.
                 </p>
                 <Button 
                   className="rounded-full px-10 h-14 font-black uppercase text-sm tracking-widest bg-[#0071e3] hover:bg-[#0077ed]" 
