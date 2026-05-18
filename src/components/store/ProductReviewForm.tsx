@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useFirestore, useUser } from '@/firebase';
-import { collection, addDoc, serverTimestamp, query, where, getDocs, limit, setDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, getDocs, limit, setDoc, doc, runTransaction, increment } from 'firebase/firestore';
 import { Star, Loader2, Send, MessageCircle, Ban, Mic, StopCircle, Trash2, Play, Pause, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -213,17 +213,35 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
         createdAt: serverTimestamp(),
       };
 
-      const docRef = await addDoc(collection(firestore, 'products', productId, 'reviews'), reviewData);
-      
-      // Also save to a top-level collection for easier querying in dashboard without collectionGroup indexes
-      try {
-        await setDoc(doc(firestore, 'store_reviews', docRef.id), {
+      const reviewCollectionRef = collection(firestore, 'products', productId, 'reviews');
+      const reviewDocRef = doc(reviewCollectionRef);
+      const storeReviewDocRef = doc(firestore, 'store_reviews', reviewDocRef.id);
+      const productRef = doc(firestore, 'products', productId);
+
+      await runTransaction(firestore, async (transaction) => {
+        const productSnap = await transaction.get(productRef);
+        
+        transaction.set(reviewDocRef, reviewData);
+        transaction.set(storeReviewDocRef, {
           ...reviewData,
-          id: docRef.id,
+          id: reviewDocRef.id,
         });
-      } catch (e) {
-        console.error('Error duplicating review to top-level collection:', e);
-      }
+
+        if (productSnap.exists()) {
+          const productData = productSnap.data();
+          const oldCount = productData.reviewCount || 0;
+          const oldAverage = productData.averageRating || 0;
+          const newRating = values.rating;
+          
+          const newCount = oldCount + 1;
+          const newAverage = ((oldAverage * oldCount) + newRating) / newCount;
+
+          transaction.update(productRef, {
+            reviewCount: newCount,
+            averageRating: newAverage
+          });
+        }
+      });
 
       toast({ title: 'Review Submitted', description: 'Thank you for your feedback!' });
       form.reset();
@@ -330,7 +348,7 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
                         type="button"
                         variant="secondary"
                         size="icon"
-                        className="h-10 w-10 rounded-full bg-primary text-white hover:bg-primary/90"
+                        className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-blue-600 text-white hover:opacity-90 shadow-md shadow-primary/20"
                         onClick={togglePlayback}
                       >
                         {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
@@ -381,7 +399,7 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
                     <Button
                       type="button"
                       variant="outline"
-                      className="w-full h-14 rounded-2xl border-2 border-dashed hover:border-primary/50 hover:bg-primary/5 transition-all gap-3"
+                      className="w-full h-14 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 hover:border-primary hover:bg-primary/10 transition-all gap-3 group"
                       onClick={startRecording}
                       disabled={isConverting}
                     >
@@ -389,8 +407,8 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
                          <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
                         <>
-                          <Mic className="h-4 w-4 text-primary" />
-                          <span className="font-black uppercase text-[10px] tracking-widest">Add Voice Comment</span>
+                          <Mic className="h-5 w-5 text-rose-500 fill-rose-500/10 group-hover:scale-110 transition-transform" />
+                          <span className="font-black uppercase text-[10px] tracking-widest text-primary">Add Voice Comment</span>
                         </>
                       )}
                     </Button>

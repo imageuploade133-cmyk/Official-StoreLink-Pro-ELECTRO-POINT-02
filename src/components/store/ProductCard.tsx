@@ -20,8 +20,6 @@ import { calculateEffectivePrice } from '@/lib/pos-utils';
 import { ProductLoadingOverlay } from './ProductLoadingOverlay';
 import { StockBar } from './StockBar';
 import { ProductRating } from './ProductRating';
-import { calculateRatingStats } from '@/lib/rating-utils';
-import { useProductReviews } from '@/hooks/use-product-reviews';
 import { Product, Category, AppSettings } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useStoreUrl } from '@/hooks/use-store-url';
@@ -41,7 +39,6 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
   const { getStoreUrl } = useStoreUrl();
   const [today, setToday] = useState<Date | null>(null);
   const [isLoadingProduct, setIsLoadingProduct] = useState(false);
-  const { reviews } = useProductReviews(product.id);
 
   const settings = overrideSettings || globalSettings;
 
@@ -55,8 +52,6 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
   }, []);
 
   const isInWishlist = isProductInWishlist(product.id);
-
-  const ratingStats = useMemo(() => calculateRatingStats(reviews), [reviews]);
 
   const effectivePrice = useMemo(() =>
     calculateEffectivePrice(product as any, isClient ? today : null, category),
@@ -331,10 +326,10 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
                 {settings?.productCardShowRating !== false && (
                     <div className="flex items-center text-[12px] font-semibold text-[#ff9500]">
                         <Star className="h-3 w-3 fill-current mr-1" />
-                        {ratingStats.averageRating || '4.8'}
+                        {product.averageRating ? product.averageRating.toFixed(1) : '0.0'}
                     </div>
                 )}
-                <span className="text-[11px] text-[#86868b] font-medium">{salesCount >= 1000 ? `${(salesCount / 1000).toFixed(1)}k+` : salesCount} sold</span>
+                <span className="text-[11px] text-[#86868b] font-medium">{(product.totalSold || 0) >= 1000 ? `${((product.totalSold || 0) / 1000).toFixed(1)}k+` : (product.totalSold || 0)} sold</span>
             </div>
           </div>
 

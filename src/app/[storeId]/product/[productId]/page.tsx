@@ -98,6 +98,7 @@ import { FastCheckoutButtons } from '@/components/store/FastCheckoutButtons';
 import { AppleProductPageSkeleton } from '@/components/store/AppleProductPageSkeleton';
 import { AppleImageGallery } from '@/components/store/AppleImageGallery';
 import { getStoreUrl as getAbsoluteStoreUrl } from '@/lib/domain';
+import { useProductReviews } from '@/hooks/use-product-reviews';
 
 const iconMap = {
   Truck,
@@ -842,7 +843,7 @@ export default function ProductDetailsPage() {
       orderBy('createdAt', 'desc')
     );
   }, [firestore, productId]);
-  const { data: reviews, isLoading: isLoadingReviews } = useCollection<ProductReview>(reviewsQuery);
+  const { reviews, isLoading: isLoadingReviews, hasMore, loadMore } = useProductReviews(productId);
 
   const relatedQuery = useMemo(() => {
     if (!firestore || !storeId) return null;
