@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useStoreUrl } from '@/hooks/use-store-url';
+import { useSettings } from '@/contexts/settings-context';
 import { useRef, useCallback } from 'react';
 
 const MAX_RECORDING_SECONDS = 60;
@@ -35,6 +36,7 @@ interface ProductReviewFormProps {
 export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps) {
   const { user } = useUser();
   const firestore = useFirestore();
+  const { settings } = useSettings();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isBanned, setIsBanned] = useState(false);
@@ -343,18 +345,34 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
                 </FormLabel>
                 <div className="space-y-4">
                   {field.value ? (
-                    <div className="flex items-center gap-4 p-4 bg-sky-50 rounded-2xl border-2 border-dashed border-sky-200 animate-in zoom-in-95 duration-300">
+                    <div 
+                      className="flex items-center gap-4 p-4 rounded-2xl border-2 border-dashed animate-in zoom-in-95 duration-300"
+                      style={{ 
+                        backgroundColor: `${settings?.productReviewVoiceBtnColor || '#3b82f6'}0D`,
+                        borderColor: `${settings?.productReviewVoiceBtnColor || '#3b82f6'}33`
+                      }}
+                    >
                       <Button
                         type="button"
                         variant="secondary"
                         size="icon"
-                        className="h-10 w-10 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 text-white hover:opacity-90 shadow-md shadow-sky-200"
+                        className="h-10 w-10 rounded-full text-white hover:opacity-90 shadow-md"
+                        style={{ 
+                          backgroundColor: settings?.productReviewVoiceBtnColor || '#3b82f6',
+                          shadowColor: `${settings?.productReviewVoiceBtnColor || '#3b82f6'}33`
+                        }}
                         onClick={togglePlayback}
                       >
                         {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                       </Button>
                       <div className="flex-1">
-                        <div className="text-[10px] font-black uppercase text-sky-600 tracking-widest">Audio Comment Ready</div>
+                        <div 
+                          className="text-[10px] font-black uppercase tracking-widest"
+                          style={{ color: settings?.productReviewVoiceBtnColor || '#3b82f6' }}
+                        >
+                          Audio Comment Ready
+                        </div>
+
                         <div className="text-[8px] font-bold text-slate-400 uppercase">Binary Stream Encoded</div>
                       </div>
                       <Button
@@ -399,7 +417,19 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
                     <Button
                       type="button"
                       variant="outline"
-                      className="w-full h-14 rounded-2xl border-2 border-dashed border-sky-200 bg-sky-50 hover:border-sky-400 hover:bg-sky-100 transition-all gap-3 group"
+                      className="w-full h-14 rounded-2xl border-2 border-dashed transition-all gap-3 group"
+                      style={{ 
+                        borderColor: `${settings?.productReviewVoiceBtnColor || '#3b82f6'}33`, // 20% opacity
+                        backgroundColor: `${settings?.productReviewVoiceBtnColor || '#3b82f6'}0D`, // 5% opacity
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = settings?.productReviewVoiceBtnColor || '#3b82f6';
+                        e.currentTarget.style.backgroundColor = `${settings?.productReviewVoiceBtnColor || '#3b82f6'}1A`; // 10% opacity
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = `${settings?.productReviewVoiceBtnColor || '#3b82f6'}33`;
+                        e.currentTarget.style.backgroundColor = `${settings?.productReviewVoiceBtnColor || '#3b82f6'}0D`;
+                      }}
                       onClick={startRecording}
                       disabled={isConverting}
                     >
@@ -407,8 +437,16 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
                          <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
                         <>
-                          <Mic className="h-5 w-5 text-sky-500 fill-sky-500/10 group-hover:scale-110 transition-transform" />
-                          <span className="font-black uppercase text-[10px] tracking-widest text-sky-600">Add Voice Comment</span>
+                          <Mic 
+                            className="h-5 w-5 group-hover:scale-110 transition-transform" 
+                            style={{ color: settings?.productReviewVoiceBtnColor || '#3b82f6' }}
+                          />
+                          <span 
+                            className="font-black uppercase text-[10px] tracking-widest"
+                            style={{ color: settings?.productReviewVoiceBtnColor || '#3b82f6' }}
+                          >
+                            Add Voice Comment
+                          </span>
                         </>
                       )}
                     </Button>

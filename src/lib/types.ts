@@ -397,6 +397,7 @@ export interface Settings {
   // Product Review Settings
   showProductReviews?: boolean;
   showReviewRatingOnCard?: boolean;
+  productReviewVoiceBtnColor?: string;
   // Web Store Grid Layout Settings
   storeGridColumnsDefault?: 2 | 3;
   storeGridColumnsSm?: 2 | 3;

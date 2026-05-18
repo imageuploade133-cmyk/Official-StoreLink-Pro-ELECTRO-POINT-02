@@ -31,6 +31,8 @@ const colorSettingsSchema = z.object({
   backgroundGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').optional(),
   backgroundGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').optional(),
   backgroundImageUrl: z.string().url('Must be a valid URL.').or(z.literal('')).optional(),
+  productReviewVoiceBtnColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').optional(),
+  voiceExperienceColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').optional(),
 });
 
 type FormValues = z.infer<typeof colorSettingsSchema>;
@@ -45,6 +47,8 @@ const defaultThemeValues: FormValues = {
   backgroundGradientStart: '#ffffff',
   backgroundGradientEnd: '#f1f5f9',
   backgroundImageUrl: '',
+  productReviewVoiceBtnColor: '#3b82f6',
+  voiceExperienceColor: '#3b82f6',
 };
 
 interface ColorSettingsProps {
@@ -98,6 +102,8 @@ export function ColorSettings({ settingsData, isLoading, storeId }: ColorSetting
         backgroundGradientStart: toHex(settingsData.backgroundGradientStart, '#ffffff'),
         backgroundGradientEnd: toHex(settingsData.backgroundGradientEnd, '#f1f5f9'),
         backgroundImageUrl: settingsData.backgroundImageUrl || '',
+        productReviewVoiceBtnColor: toHex(settingsData.productReviewVoiceBtnColor, '#3b82f6'),
+        voiceExperienceColor: toHex(settingsData.voiceExperienceColor, '#3b82f6'),
       });
     }
   }, [settingsData, form]);
@@ -206,6 +212,20 @@ export function ColorSettings({ settingsData, isLoading, storeId }: ColorSetting
                 <FormField control={form.control} name="colorSuccess" render={({ field }) => <ColorInput field={field} label="Success Color" />} />
                 <FormField control={form.control} name="colorDestructive" render={({ field }) => <ColorInput field={field} label="Destructive Color" />} />
              </div>
+            <Separator />
+            <h4 className="font-semibold text-base">Feature Specific Colors</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+               <FormField 
+                 control={form.control} 
+                 name="productReviewVoiceBtnColor" 
+                 render={({ field }) => <ColorInput field={field} label="Voice Comment Button" />} 
+               />
+               <FormField 
+                 control={form.control} 
+                 name="voiceExperienceColor" 
+                 render={({ field }) => <ColorInput field={field} label="Voice Description UI" />} 
+               />
+            </div>
             <Separator />
             <div className="space-y-4">
               <h4 className="font-semibold text-base">Background Style</h4>

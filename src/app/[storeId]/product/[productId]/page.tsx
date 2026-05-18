@@ -1102,7 +1102,7 @@ export default function ProductDetailsPage() {
   const voiceBranding = {
       preTitle: settings?.voiceExperiencePreTitle || 'Listen to Audio Signature',
       title: settings?.voiceExperienceTitle || 'Expert Insights & Detailed Pitch',
-      color: settings?.voiceExperienceColor || 'var(--primary)',
+      color: settings?.voiceExperienceColor || '#3b82f6',
       iconUrl: settings?.voiceExperienceIconUrl
   };
 
@@ -1351,7 +1351,7 @@ export default function ProductDetailsPage() {
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-[#1d1d1f] dark:text-[#f5f5f7] leading-tight">{product.name}</h1>
               {product.voiceEnabled && visibleVoices.length > 0 && (
                 <div className="flex items-center gap-2 animate-in fade-in slide-in-from-left-4 duration-500">
-                  <Badge className="bg-primary/10 text-primary border-primary/20 flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+                  <Badge className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border" style={{ backgroundColor: `${settings?.productReviewVoiceBtnColor || "#3b82f6"}0D`, color: settings?.productReviewVoiceBtnColor || "#3b82f6", borderColor: `${settings?.productReviewVoiceBtnColor || "#3b82f6"}1A` }}>
                     <Volume2 className="h-3.5 w-3.5" />
                     Voice Description Available
                   </Badge>
@@ -1400,7 +1400,7 @@ export default function ProductDetailsPage() {
             {product.voiceEnabled && visibleVoices.length > 0 && (
                 <div className="space-y-4">
                     <div className="flex items-center gap-2 mb-2">
-                        <AudioWaveform className="h-4 w-4 text-primary" />
+                        <AudioWaveform className="h-4 w-4" style={{ color: settings?.productReviewVoiceBtnColor || "#3b82f6" }} />
                         <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Audio Experience Suite</h3>
                     </div>
                     <div className="grid grid-cols-1 gap-3">
