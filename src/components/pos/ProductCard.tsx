@@ -34,12 +34,14 @@ export const ProductCard = React.memo(({ product, onAddToCart, priority, currenc
     }, [product, today]);
 
     const [priceInputString, setPriceInputString] = useState<string>(initialEffectivePriceString);
+    const [prevInitialPrice, setPrevInitialPrice] = useState<string>(initialEffectivePriceString);
     const [isValidPrice, setIsValidPrice] = useState<boolean>(true);
     
-    useEffect(() => {
+    if (initialEffectivePriceString !== prevInitialPrice) {
         setPriceInputString(initialEffectivePriceString);
-        setIsValidPrice(true); 
-    }, [initialEffectivePriceString]);
+        setPrevInitialPrice(initialEffectivePriceString);
+        setIsValidPrice(true);
+    }
 
     const handlePriceInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newStringValue = e.target.value;
@@ -156,14 +158,6 @@ export const ProductCard = React.memo(({ product, onAddToCart, priority, currenc
         </CardHeader>
         <CardContent className={cn("p-3 pt-0 sm:p-2 sm:pt-0 flex-grow space-y-3", !isSmallMode && "sm:p-4 sm:pt-0")}>
             <div className="flex flex-col gap-1">
-                {hasActivePromo && (
-                    <div className="flex items-center gap-1.5 text-muted-foreground">
-                        <Tag className="h-3 w-3" />
-                        <span className="text-[10px] font-bold line-through decoration-destructive/50">
-                            Was: {formatCurrency(product.sellingPrice, currencySymbol)}
-                        </span>
-                    </div>
-                )}
                 <div className="flex items-center gap-1.5">
                     {!isSmallMode && !product.hasVariants && <span className="text-sm font-black text-primary/60">{currencySymbol}</span>}
                     <div className="relative flex-grow">

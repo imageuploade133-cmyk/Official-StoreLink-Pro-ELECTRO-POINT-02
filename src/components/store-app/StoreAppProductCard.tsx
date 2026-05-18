@@ -307,15 +307,12 @@ export function StoreAppProductCard({
                                 effectiveVariantRange ? (
                                     effectiveVariantRange.min === effectiveVariantRange.max
                                         ? formatCurrency(effectiveVariantRange.min, currencySymbol)
-                                        : `${formatCurrency(effectiveVariantRange.min, currencySymbol)} - ${formatCurrency(effectiveVariantRange.max, currencySymbol)}`
+                                        : `From ${formatCurrency(effectiveVariantRange.min, currencySymbol)}`
                                 ) : 'Select Options'
                             ) : (
                                 formatCurrency(displayPrice, currencySymbol)
                             )}
                         </p>
-                        {isDiscounted && !product.hasVariants && (
-                            <span className="text-[10px] text-slate-400 line-through font-bold opacity-60">{formatCurrency(originalPrice, currencySymbol)}</span> 
-                        )}
                     </div>
                 </div>
             </div>

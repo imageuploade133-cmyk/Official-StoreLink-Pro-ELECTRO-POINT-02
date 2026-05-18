@@ -45,10 +45,11 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsClient(true);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setToday(new Date());
+    const timer = setTimeout(() => {
+      setIsClient(true);
+      setToday(new Date());
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const isInWishlist = isProductInWishlist(product.id);
@@ -404,17 +405,12 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
                             effectiveVariantRange ? (
                                 effectiveVariantRange.min === effectiveVariantRange.max
                                     ? formatCurrency(effectiveVariantRange.min, currencySymbol)
-                                    : `${formatCurrency(effectiveVariantRange.min, currencySymbol)} - ${formatCurrency(effectiveVariantRange.max, currencySymbol)}`
+                                    : `From ${formatCurrency(effectiveVariantRange.min, currencySymbol)}`
                             ) : 'Select Options'
                         ) : (
                             formatCurrency(displayPrice, currencySymbol)
                         )}
                     </span>
-                    {isDiscounted && !product.hasVariants && (
-                        <span className="text-[13px] text-[#86868b] line-through font-medium">
-                        {formatCurrency(originalPrice, currencySymbol)}
-                        </span>
-                    )}
                 </div>
 
                 <div className="hidden sm:block">
