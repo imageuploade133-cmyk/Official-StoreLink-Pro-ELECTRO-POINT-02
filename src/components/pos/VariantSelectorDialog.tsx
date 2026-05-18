@@ -90,7 +90,10 @@ export function VariantSelectorDialog({
         <div className="space-y-1">
           <p className="text-xs md:text-sm text-muted-foreground uppercase font-bold tracking-wider">Price</p>
           <p className="text-xl md:text-2xl font-black text-primary">
-            {formatCurrency(selectedVariant?.sellingPrice || product.sellingPrice, currencySymbol)}
+            {selectedVariant 
+              ? formatCurrency(selectedVariant.sellingPrice || (selectedVariant as any).price, currencySymbol)
+              : "Select a variant"
+            }
           </p>
         </div>
         

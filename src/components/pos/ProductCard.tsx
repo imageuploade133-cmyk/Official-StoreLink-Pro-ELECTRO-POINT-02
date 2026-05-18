@@ -165,22 +165,31 @@ export const ProductCard = React.memo(({ product, onAddToCart, priority, currenc
                     </div>
                 )}
                 <div className="flex items-center gap-1.5">
-                    {!isSmallMode && <span className="text-sm font-black text-primary/60">{currencySymbol}</span>}
+                    {!isSmallMode && !product.hasVariants && <span className="text-sm font-black text-primary/60">{currencySymbol}</span>}
                     <div className="relative flex-grow">
-                        {isSmallMode && <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] font-black text-primary/60">{currencySymbol}</span>}
-                        <Input
-                            type="string" 
-                            inputMode="decimal"
-                            aria-label={`Price for ${product.name}`}
-                            className={cn(
-                                "font-black border-muted-foreground/30 hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary bg-muted/20",
-                                isSmallMode ? "h-8 text-[10px] sm:text-xs pl-4 pr-1" : "h-10 text-base sm:text-lg p-2"
-                            )}
-                            value={priceInputString}
-                            onChange={handlePriceInputChange}
-                            onBlur={handlePriceInputBlur}
-                            disabled={isPriceInputDisabled}
-                        />
+                        {isSmallMode && !product.hasVariants && <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] font-black text-primary/60">{currencySymbol}</span>}
+                        {product.hasVariants ? (
+                            <div className={cn(
+                                "flex items-center font-black text-primary/80 bg-primary/5 border border-primary/20 rounded-md px-3",
+                                isSmallMode ? "h-8 text-[10px]" : "h-10 text-sm"
+                            )}>
+                                PRICE VARIES
+                            </div>
+                        ) : (
+                            <Input
+                                type="string" 
+                                inputMode="decimal"
+                                aria-label={`Price for ${product.name}`}
+                                className={cn(
+                                    "font-black border-muted-foreground/30 hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary bg-muted/20",
+                                    isSmallMode ? "h-8 text-[10px] sm:text-xs pl-4 pr-1" : "h-10 text-base sm:text-lg p-2"
+                                )}
+                                value={priceInputString}
+                                onChange={handlePriceInputChange}
+                                onBlur={handlePriceInputBlur}
+                                disabled={isPriceInputDisabled}
+                            />
+                        )}
                     </div>
                     {isPriceManuallyChanged && !isSmallMode && (
                         <Button

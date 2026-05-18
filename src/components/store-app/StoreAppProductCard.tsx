@@ -48,16 +48,55 @@ export function StoreAppProductCard({
         [product, today, category]
     );
 
-    const displayPrice = useMemo(() => {
+    const effectiveVariantRange = useMemo(() => {
         if (product.hasVariants && product.variants && product.variants.length > 0) {
-            const cheapest = getLowestVariantPrice(product.variants);
-            return calculateEffectivePrice({ ...product, sellingPrice: cheapest } as any, today, category as any);
+            const activeVariants = product.variants.filter(v => v.isActive !== false);
+            if (activeVariants.length === 0) return null;
+            const effectivePrices = activeVariants.map(v => 
+                calculateEffectivePrice({ ...product, sellingPrice: Number(v.sellingPrice || v.price || 0) } as any, today, category as any)
+            );
+            return {
+                min: Math.min(...effectivePrices),
+                max: Math.max(...effectivePrices)
+            };
+        }
+        return null;
+    }, [product, today, category]);
+
+    const originalVariantRange = useMemo(() => {
+        if (product.hasVariants && product.variants && product.variants.length > 0) {
+            const activeVariants = product.variants.filter(v => v.isActive !== false);
+            if (activeVariants.length === 0) return null;
+            const prices = activeVariants.map(v => Number(v.sellingPrice || v.price || 0));
+            return {
+                min: Math.min(...prices),
+                max: Math.max(...prices)
+            };
+        }
+        return null;
+    }, [product]);
+
+    const displayPrice = useMemo(() => {
+        if (product.hasVariants) {
+            return effectiveVariantRange?.min || 0;
         }
         return effectivePrice;
-    }, [product, effectivePrice, today, category]);
+    }, [product.hasVariants, effectiveVariantRange, effectivePrice]);
 
-    const isDiscounted = displayPrice < (product.hasVariants && product.variants && product.variants.length > 0 ? getLowestVariantPrice(product.variants) : product.sellingPrice) || effectivePrice < product.sellingPrice;
-    const originalPrice = (product.hasVariants && product.variants && product.variants.length > 0) ? getLowestVariantPrice(product.variants) : product.sellingPrice;
+    const isDiscounted = useMemo(() => {
+        if (product.hasVariants) {
+            if (!effectiveVariantRange || !originalVariantRange) return false;
+            return effectiveVariantRange.min < originalVariantRange.min;
+        }
+        return effectivePrice < product.sellingPrice;
+    }, [product.hasVariants, effectiveVariantRange, originalVariantRange, effectivePrice, product.sellingPrice]);
+
+    const originalPrice = useMemo(() => {
+        if (product.hasVariants) {
+            return originalVariantRange?.min || 0;
+        }
+        return product.sellingPrice;
+    }, [product.hasVariants, originalVariantRange, product.sellingPrice]);
 
     const isLiked = wishlistProductIds.has(product.id);
     const catName = categoryName 
@@ -264,10 +303,17 @@ export function StoreAppProductCard({
                     <h4 className="font-black text-sm text-slate-900 dark:text-white truncate leading-tight tracking-tight uppercase group-hover:text-primary transition-colors">{product.name}</h4>
                     <div className="flex items-baseline gap-2 pt-1">
                         <p className="text-primary font-black text-base tracking-tighter">
-                            {product.hasVariants && product.variants && product.variants.length > 0 ? 'From ' : ''}
-                            {formatCurrency(displayPrice, currencySymbol)}
+                            {product.hasVariants ? (
+                                effectiveVariantRange ? (
+                                    effectiveVariantRange.min === effectiveVariantRange.max
+                                        ? formatCurrency(effectiveVariantRange.min, currencySymbol)
+                                        : `${formatCurrency(effectiveVariantRange.min, currencySymbol)} - ${formatCurrency(effectiveVariantRange.max, currencySymbol)}`
+                                ) : 'Select Options'
+                            ) : (
+                                formatCurrency(displayPrice, currencySymbol)
+                            )}
                         </p>
-                        {isDiscounted && (
+                        {isDiscounted && !product.hasVariants && (
                             <span className="text-[10px] text-slate-400 line-through font-bold opacity-60">{formatCurrency(originalPrice, currencySymbol)}</span> 
                         )}
                     </div>
