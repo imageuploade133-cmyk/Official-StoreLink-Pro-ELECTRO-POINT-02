@@ -41,7 +41,6 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
   const { getStoreUrl } = useStoreUrl();
   const [today, setToday] = useState<Date | null>(null);
   const [isLoadingProduct, setIsLoadingProduct] = useState(false);
-  const { reviews } = useProductReviews(product.id);
 
   const settings = overrideSettings || globalSettings;
 
@@ -56,20 +55,17 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
 
   const isInWishlist = isProductInWishlist(product.id);
 
-  const ratingStats = useMemo(() => calculateRatingStats(reviews), [reviews]);
+  const ratingStats = useMemo(() => ({
+    averageRating: product.averageRating || 0,
+    reviewCount: product.reviewCount || 0
+  }), [product.averageRating, product.reviewCount]);
 
   const effectivePrice = useMemo(() =>
     calculateEffectivePrice(product as any, isClient ? today : null, category),
     [product, today, category, isClient]
   );
 
-  const salesCount = useMemo(() => {
-    let hash = 0;
-    for (let i = 0; i < product.id.length; i++) {
-        hash = product.id.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return Math.abs(hash % 5000) + 100;
-  }, [product.id]);
+  const salesCount = product.totalSold || 0;
 
   const isDiscounted = effectivePrice < product.sellingPrice;
   const isOutOfStock = useMemo(() => {
@@ -328,13 +324,17 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
                 "flex items-center gap-2",
                 titleAlign === 'center' && "justify-center"
             )}>
-                {settings?.productCardShowRating !== false && (
+                {settings?.productCardShowRating !== false && ratingStats.reviewCount > 0 && (
                     <div className="flex items-center text-[12px] font-semibold text-[#ff9500]">
                         <Star className="h-3 w-3 fill-current mr-1" />
-                        {ratingStats.averageRating || '4.8'}
+                        {ratingStats.averageRating.toFixed(1)}
                     </div>
                 )}
-                <span className="text-[11px] text-[#86868b] font-medium">{salesCount >= 1000 ? `${(salesCount / 1000).toFixed(1)}k+` : salesCount} sold</span>
+                {ratingStats.reviewCount > 0 ? (
+                  <span className="text-[11px] text-[#86868b] font-medium">{salesCount >= 1000 ? `${(salesCount / 1000).toFixed(1)}k+` : salesCount} sold</span>
+                ) : (
+                  <span className="text-[11px] text-[#86868b] font-medium">{salesCount > 0 ? `${salesCount >= 1000 ? (salesCount / 1000).toFixed(1) + 'k+' : salesCount} sold` : 'New Arrival'}</span>
+                )}
             </div>
           </div>
 

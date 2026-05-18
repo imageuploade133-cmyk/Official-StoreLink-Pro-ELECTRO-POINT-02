@@ -774,6 +774,9 @@ export interface Product {
   variantOptions?: ProductOption[];
   advancedDetailsEnabled?: boolean;
   variantStockTotal?: number;
+  averageRating?: number;
+  reviewCount?: number;
+  totalSold?: number;
   installmentEnabled?: boolean;
   downPaymentPercentage?: number;
   numberOfPayments?: number;

@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useStoreUrl } from '@/hooks/use-store-url';
 import { useRef, useCallback } from 'react';
+import { submitReviewAction } from '@/app/actions/reviews';
 
 const MAX_RECORDING_SECONDS = 60;
 const MAX_BASE64_SIZE = 950000;
@@ -210,23 +211,18 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
         store_id: storeId || '',
         isApproved: true,
         isHidden: false,
-        createdAt: serverTimestamp(),
       };
 
-      const docRef = await addDoc(collection(firestore, 'products', productId, 'reviews'), reviewData);
+      const result = await submitReviewAction(productId, reviewData);
       
-      // Also save to a top-level collection for easier querying in dashboard without collectionGroup indexes
-      try {
-        await setDoc(doc(firestore, 'store_reviews', docRef.id), {
-          ...reviewData,
-          id: docRef.id,
-        });
-      } catch (e) {
-        console.error('Error duplicating review to top-level collection:', e);
+      if (!result.success) {
+        throw new Error(result.error);
       }
 
       toast({ title: 'Review Submitted', description: 'Thank you for your feedback!' });
       form.reset();
+      // Optionally refresh page or reviews list
+      window.location.reload(); 
     } catch (e: any) {
       toast({ variant: 'destructive', title: 'Error', description: e.message || 'Failed to submit review.' });
     } finally {
@@ -380,17 +376,18 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
                   ) : (
                     <Button
                       type="button"
-                      variant="outline"
-                      className="w-full h-14 rounded-2xl border-2 border-dashed hover:border-primary/50 hover:bg-primary/5 transition-all gap-3"
+                      className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 border-none transition-all gap-3 group"
                       onClick={startRecording}
                       disabled={isConverting}
                     >
                       {isConverting ? (
-                         <Loader2 className="h-4 w-4 animate-spin" />
+                         <Loader2 className="h-5 w-5 animate-spin" />
                       ) : (
                         <>
-                          <Mic className="h-4 w-4 text-primary" />
-                          <span className="font-black uppercase text-[10px] tracking-widest">Add Voice Comment</span>
+                          <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <Mic className="h-4 w-4 text-white fill-current" />
+                          </div>
+                          <span className="font-black uppercase text-[11px] tracking-[0.1em]">Add Voice Comment</span>
                         </>
                       )}
                     </Button>

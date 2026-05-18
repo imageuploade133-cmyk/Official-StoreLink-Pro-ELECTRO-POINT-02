@@ -521,12 +521,22 @@ export default function POSPage() {
               }
               variant.stock -= item.quantity;
               variants[variantIndex] = variant;
-              transaction.update(productRefs[i], { variants, stock: newStock });
+              transaction.update(productRefs[i], { 
+                variants, 
+                stock: newStock,
+                totalSold: increment(item.quantity)
+              });
             } else {
-              transaction.update(productRefs[i], { stock: newStock });
+              transaction.update(productRefs[i], { 
+                stock: newStock,
+                totalSold: increment(item.quantity)
+              });
             }
           } else {
-            transaction.update(productRefs[i], { stock: newStock });
+            transaction.update(productRefs[i], { 
+                stock: newStock,
+                totalSold: increment(item.quantity)
+            });
           }
 
           // --- LOG STOCK AUDIT ---

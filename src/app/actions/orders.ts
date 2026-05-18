@@ -148,9 +148,13 @@ export async function placeOrderAction({
              }
              variant.stock -= quantity;
              variants[variantIndex] = variant;
-             // Also update main product stock (total sum)
+             // Also update main product stock (total sum) and totalSold
              currentStock -= quantity;
-             transaction.update(ref, { variants, stock: currentStock });
+             transaction.update(ref, { 
+                variants, 
+                stock: currentStock,
+                totalSold: admin.firestore.FieldValue.increment(quantity)
+             });
 
              // Log Stock Audit
              const auditRef = adminDb.collection('stockAudit').doc();
@@ -173,7 +177,10 @@ export async function placeOrderAction({
              if (currentStock < quantity) {
                throw new Error(`Insufficient stock for "${data?.name}". Only ${currentStock} left.`);
              }
-             transaction.update(ref, { stock: currentStock - quantity });
+             transaction.update(ref, { 
+                stock: currentStock - quantity,
+                totalSold: admin.firestore.FieldValue.increment(quantity)
+             });
 
              const auditRef = adminDb.collection('stockAudit').doc();
              transaction.set(auditRef, {
@@ -194,7 +201,10 @@ export async function placeOrderAction({
              if (currentStock < quantity) {
              throw new Error(`Insufficient stock for "${data?.name || item.productId}". Only ${currentStock} left.`);
              }
-             transaction.update(ref, { stock: currentStock - quantity });
+             transaction.update(ref, { 
+                stock: currentStock - quantity,
+                totalSold: admin.firestore.FieldValue.increment(quantity)
+             });
 
              const auditRef = adminDb.collection('stockAudit').doc();
              transaction.set(auditRef, {
