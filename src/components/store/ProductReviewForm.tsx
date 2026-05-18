@@ -343,18 +343,18 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
                 </FormLabel>
                 <div className="space-y-4">
                   {field.value ? (
-                    <div className="flex items-center gap-4 p-4 bg-primary/5 rounded-2xl border-2 border-dashed border-primary/20 animate-in zoom-in-95 duration-300">
+                    <div className="flex items-center gap-4 p-4 bg-sky-50 rounded-2xl border-2 border-dashed border-sky-200 animate-in zoom-in-95 duration-300">
                       <Button
                         type="button"
                         variant="secondary"
                         size="icon"
-                        className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-blue-600 text-white hover:opacity-90 shadow-md shadow-primary/20"
+                        className="h-10 w-10 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 text-white hover:opacity-90 shadow-md shadow-sky-200"
                         onClick={togglePlayback}
                       >
                         {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                       </Button>
                       <div className="flex-1">
-                        <div className="text-[10px] font-black uppercase text-primary tracking-widest">Audio Comment Ready</div>
+                        <div className="text-[10px] font-black uppercase text-sky-600 tracking-widest">Audio Comment Ready</div>
                         <div className="text-[8px] font-bold text-slate-400 uppercase">Binary Stream Encoded</div>
                       </div>
                       <Button
@@ -399,7 +399,7 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
                     <Button
                       type="button"
                       variant="outline"
-                      className="w-full h-14 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 hover:border-primary hover:bg-primary/10 transition-all gap-3 group"
+                      className="w-full h-14 rounded-2xl border-2 border-dashed border-sky-200 bg-sky-50 hover:border-sky-400 hover:bg-sky-100 transition-all gap-3 group"
                       onClick={startRecording}
                       disabled={isConverting}
                     >
@@ -407,8 +407,8 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
                          <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
                         <>
-                          <Mic className="h-5 w-5 text-rose-500 fill-rose-500/10 group-hover:scale-110 transition-transform" />
-                          <span className="font-black uppercase text-[10px] tracking-widest text-primary">Add Voice Comment</span>
+                          <Mic className="h-5 w-5 text-sky-500 fill-sky-500/10 group-hover:scale-110 transition-transform" />
+                          <span className="font-black uppercase text-[10px] tracking-widest text-sky-600">Add Voice Comment</span>
                         </>
                       )}
                     </Button>
