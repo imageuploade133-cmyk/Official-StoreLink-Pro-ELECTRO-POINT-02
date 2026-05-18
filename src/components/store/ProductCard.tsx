@@ -16,7 +16,7 @@ import { useCart } from '@/contexts/cart-context';
 import { useWishlist } from '@/contexts/wishlist-context';
 import { useSettings } from '@/contexts/settings-context';
 import { formatCurrency } from '@/lib/formatUtils';
-import { calculateEffectivePrice } from '@/lib/pos-utils';
+import { calculateEffectivePrice, getLowestVariantPrice } from '@/lib/pos-utils';
 import { ProductLoadingOverlay } from './ProductLoadingOverlay';
 import { StockBar } from './StockBar';
 import { ProductRating } from './ProductRating';
@@ -58,6 +58,14 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
     [product, today, category, isClient]
   );
 
+  const displayPrice = useMemo(() => {
+    if (product.hasVariants && product.variants && product.variants.length > 0) {
+      const cheapest = getLowestVariantPrice(product.variants);
+      return calculateEffectivePrice({ ...product, sellingPrice: cheapest } as any, isClient ? today : null, category);
+    }
+    return effectivePrice;
+  }, [product, effectivePrice, isClient, today, category]);
+
   const salesCount = useMemo(() => {
     let hash = 0;
     for (let i = 0; i < product.id.length; i++) {
@@ -66,7 +74,9 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
     return Math.abs(hash % 5000) + 100;
   }, [product.id]);
 
-  const isDiscounted = effectivePrice < product.sellingPrice;
+  const isDiscounted = displayPrice < (product.hasVariants && product.variants && product.variants.length > 0 ? getLowestVariantPrice(product.variants) : product.sellingPrice) || effectivePrice < product.sellingPrice;
+  const originalPrice = (product.hasVariants && product.variants && product.variants.length > 0) ? getLowestVariantPrice(product.variants) : product.sellingPrice;
+  
   const isOutOfStock = useMemo(() => {
     if (product.hasVariants && product.variants && product.variants.length > 0) {
       const activeVariants = product.variants.filter(v => v.isActive !== false);
@@ -269,7 +279,7 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
                 )}
                 {isDiscounted && !isOutOfStock && (
                     <Badge className="bg-[#ff2d55] text-white font-bold text-[10px] px-2 py-0.5 rounded-full border-none shadow-sm">
-                    {Math.round((1 - effectivePrice / product.sellingPrice) * 100)}% OFF
+                    {Math.round((1 - displayPrice / originalPrice) * 100)}% OFF
                     </Badge>
                 )}
                 </div>
@@ -345,11 +355,12 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
                     <span className={cn(
                         "text-[17px] font-semibold tracking-tight text-[#1d1d1f] dark:text-white",
                     )}>
-                        {formatCurrency(effectivePrice, currencySymbol)}
+                        {product.hasVariants && product.variants && product.variants.length > 0 ? 'From ' : ''}
+                        {formatCurrency(displayPrice, currencySymbol)}
                     </span>
                     {isDiscounted && (
                         <span className="text-[13px] text-[#86868b] line-through font-medium">
-                        {formatCurrency(product.sellingPrice, currencySymbol)}
+                        {formatCurrency(originalPrice, currencySymbol)}
                         </span>
                     )}
                 </div>

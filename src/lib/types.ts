@@ -686,6 +686,7 @@ export interface ProductVariant {
   sku?: string;
   barcode?: string;
   sellingPrice?: number;
+  price?: number;
   stock: number;
   description?: string;
   imageUrl?: string;
