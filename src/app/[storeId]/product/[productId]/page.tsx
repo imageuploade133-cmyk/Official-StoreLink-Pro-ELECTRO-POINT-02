@@ -530,12 +530,6 @@ export default function ProductDetailsPage() {
     );
   }, [product, selectedOptions]);
 
-  const canBuy = useMemo(() => {
-    if (!product) return false;
-    if (!product.hasVariants) return true;
-    return !!selectedVariant;
-  }, [product, selectedVariant]);
-
   const galleryImages = useMemo(() => {
     if (!product) return [];
     const all = [product.imageUrl, ...(product.additionalImageUrls || [])].filter(Boolean) as string[];
