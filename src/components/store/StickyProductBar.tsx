@@ -16,9 +16,10 @@ interface StickyProductBarProps {
   onToggleWishlist: () => void;
   addToCartText?: string;
   productImage?: string;
-}
+  showAddToCart?: boolean;
+  }
 
-export function StickyProductBar({
+  export function StickyProductBar({
   productName,
   productPrice,
   isInWishlist,
@@ -26,8 +27,9 @@ export function StickyProductBar({
   onAddToCart,
   onToggleWishlist,
   addToCartText = 'Add to Bag',
-  productImage
-}: StickyProductBarProps) {
+  productImage,
+  showAddToCart = true
+  }: StickyProductBarProps) {
   const { settings } = useSettings();
   const [isVisible, setIsVisible] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -232,20 +234,22 @@ export function StickyProductBar({
           </Button>
 
           {/* Add to Cart Button */}
-          <Button
-            onClick={onAddToCart}
-            disabled={isOutOfStock}
-            style={buttonStyle}
-            className={cn(
-              "font-semibold text-xs sm:text-sm tracking-tight transition-all duration-300 flex items-center gap-1.5 shrink-0 border-none shadow-sm active:scale-[0.98]",
-              buttonClasses,
-              isOutOfStock && "opacity-50 cursor-not-allowed"
-            )}
-          >
-            <ShoppingCart className="h-4 w-4" />
-            <span className="hidden sm:inline">{addToCartText}</span>
-            <span className="sm:hidden text-xs">Add</span>
-          </Button>
+          {showAddToCart && (
+            <Button
+              onClick={onAddToCart}
+              disabled={isOutOfStock}
+              style={buttonStyle}
+              className={cn(
+                "font-semibold text-xs sm:text-sm tracking-tight transition-all duration-300 flex items-center gap-1.5 shrink-0 border-none shadow-sm active:scale-[0.98]",
+                buttonClasses,
+                isOutOfStock && "opacity-50 cursor-not-allowed"
+              )}
+            >
+              <ShoppingCart className="h-4 w-4" />
+              <span className="hidden sm:inline">{addToCartText}</span>
+              <span className="sm:hidden text-xs">Add</span>
+            </Button>
+          )}
         </div>
       </div>
       

@@ -530,6 +530,12 @@ export default function ProductDetailsPage() {
     );
   }, [product, selectedOptions]);
 
+  const canBuy = useMemo(() => {
+    if (!product) return false;
+    if (!product.hasVariants) return true;
+    return !!selectedVariant;
+  }, [product, selectedVariant]);
+
   const galleryImages = useMemo(() => {
     if (!product) return [];
     const all = [product.imageUrl, ...(product.additionalImageUrls || [])].filter(Boolean) as string[];
@@ -575,6 +581,12 @@ export default function ProductDetailsPage() {
       v.isActive && matchesVariant(v, selectedOptions)
     );
   }, [product, selectedOptions]);
+
+  const canBuy = useMemo(() => {
+    if (!product) return false;
+    if (!product.hasVariants) return true;
+    return !!selectedVariant;
+  }, [product, selectedVariant]);
 
   const currentPrice = useMemo(() => {
     // Use previewVariant for price updates even if all options aren't selected
@@ -1118,13 +1130,14 @@ export default function ProductDetailsPage() {
     >
       <StickyProductBar
         productName={product.name}
-        productPrice={formatCurrency(currentPrice, currencySymbol)}
+        productPrice={(!product.hasVariants || selectedVariant || previewVariant) ? formatCurrency(currentPrice, currencySymbol) : ""}
         isInWishlist={isInWishlist}
         isOutOfStock={isOutOfStock}
         onAddToCart={isOutOfStock ? () => setIsOutOfDataDrawerOpen(true) : handleAddToCart}
         onToggleWishlist={handleToggleWishlist}
         addToCartText={isOutOfStock ? "Out of Stock" : addToCartText}
         productImage={activeImage || product.imageUrl}
+        showAddToCart={canBuy}
       />
       
       <main className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 md:py-8">
@@ -1360,8 +1373,10 @@ export default function ProductDetailsPage() {
               <div className="flex items-start gap-3 pt-2">
                 <div className={cn("flex flex-col gap-1 md:gap-1.5 transition-all duration-300", isChangingVariant && "opacity-40 blur-[1px]")}>
                   {!today ? <Skeleton className="h-8 md:h-10 w-32" /> : (
-                    <><span className={cn("text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight", isDiscounted ? "text-[#e11d48]" : "text-[#1d1d1f] dark:text-[#f5f5f7]")}>{formatCurrency(currentPrice, currencySymbol)}</span>
-                    {isDiscounted && <span className="text-sm md:text-base text-[#86868b] line-through">Was: {formatCurrency(product.sellingPrice, currencySymbol)}</span>}</>
+(!product.hasVariants || selectedVariant || previewVariant) ? (
+                      <><span className={cn("text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight", isDiscounted ? "text-[#e11d48]" : "text-[#1d1d1f] dark:text-[#f5f5f7]")}>{formatCurrency(currentPrice, currencySymbol)}</span>
+                      {isDiscounted && !product.hasVariants && <span className="text-sm md:text-base text-[#86868b] line-through">Was: {formatCurrency(product.sellingPrice, currencySymbol)}</span>}</>
+                    ) : null
                   )}
                   {(selectedVariant?.sku || previewVariant?.sku || product.sku) && (
                     <div className="flex items-center gap-1.5 mt-1">
@@ -1607,7 +1622,8 @@ export default function ProductDetailsPage() {
                   <span className="text-[10px] font-bold text-[#e11d48] animate-pulse">Only {currentStock} left!</span>
                 )}
               </div>
-              <div className={cn("flex items-center gap-3 md:gap-4 transition-all duration-300", isChangingVariant && "opacity-50 pointer-events-none")}>
+              {canBuy && (
+<div className={cn("flex items-center gap-3 md:gap-4 transition-all duration-300", isChangingVariant && "opacity-50 pointer-events-none")}>
                 <div className="flex items-center bg-gradient-to-r from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/15 border-2 border-primary/30 dark:border-primary/40 rounded-[18px] p-1.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.01)] dark:shadow-[inset_0_1px_2px_rgba(255,255,255,0.05)] gap-2">
                   <Button
                     variant="ghost"
@@ -1647,9 +1663,10 @@ export default function ProductDetailsPage() {
                   {isOutOfStock ? "Out of Stock" : (isChangingVariant ? "Updating.." : addToCartText)}
                 </Button>
               </div>
+              )}
 
               
-              {installmentData && !isOutOfStock && (
+              {canBuy && installmentData && !isOutOfStock && (
                 <div className="mt-8 overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-slate-950 border border-slate-200 dark:border-slate-800 shadow-xl transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
                   <div className="p-6 md:p-8 space-y-6">
                     <div className="flex items-start justify-between">
@@ -1763,7 +1780,7 @@ export default function ProductDetailsPage() {
 
               <StockBar stock={currentStock} lowStockThreshold={lowStockThreshold} className="mt-4" />
               
-              {filteredPaymentMethods.find(m => m.id === 'fast_checkout')?.config?.enableQuickPayButtons && !isOutOfStock && (
+              {canBuy && filteredPaymentMethods.find(m => m.id === 'fast_checkout')?.config?.enableQuickPayButtons && !isOutOfStock && (
                 <div className="pt-6 border-t border-black/[0.05] dark:border-white/[0.1]">
                   <FastCheckoutButtons 
                     storeId={storeId}
