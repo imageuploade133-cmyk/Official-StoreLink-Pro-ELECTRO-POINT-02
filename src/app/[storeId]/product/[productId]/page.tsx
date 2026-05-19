@@ -1304,6 +1304,7 @@ export default function ProductDetailsPage() {
                 isOpen={isLightboxOpen}
                 onClose={() => setIsLightboxOpen(false)}
                 onNext={goNextImage}
+                onNavigate={goToImage}
                 onPrev={goPrevImage}
                 productName={product.name}
                 alt={product.name}
