@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -89,7 +90,7 @@ export function AppleImageGallery({
     }
   }, [isOpen]);
 
-  // Body scroll lock
+  // Body scroll lock + hide bottom nav when gallery is open
   useEffect(() => {
     if (isOpen) {
       const originalOverflow = document.body.style.overflow;
@@ -99,9 +100,13 @@ export function AppleImageGallery({
       if (scrollbarWidth > 0) {
         document.body.style.paddingRight = `${scrollbarWidth}px`;
       }
+      // Add attribute to allow CSS-hiding of bottom nav
+      document.body.dataset.galleryOpen = 'true';
+
       return () => {
         document.body.style.overflow = originalOverflow;
         document.body.style.paddingRight = originalPaddingRight;
+        delete document.body.dataset.galleryOpen;
       };
     }
   }, [isOpen]);
@@ -214,9 +219,18 @@ export function AppleImageGallery({
 
   const currentImage = images[activeIndex];
 
-  return (
-    <div
-      className={cn(
+  return createPortal(
+    <>
+      {/* Inject style to hide bottom nav when gallery is open */}
+      <style>{`
+        body[data-gallery-open="true"] .md\\:hidden.fixed.bottom-0 {
+          display: none !important;
+          opacity: 0 !important;
+          pointer-events: none !important;
+        }
+      `}</style>
+      <div
+        className={cn(
         "fixed inset-0 z-[9999] flex flex-col md:flex-row",
         "transition-all duration-500 ease-out",
         mountAnim ? "opacity-100" : "opacity-0"
@@ -602,6 +616,8 @@ export function AppleImageGallery({
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>,
+    document.body
   );
 }
