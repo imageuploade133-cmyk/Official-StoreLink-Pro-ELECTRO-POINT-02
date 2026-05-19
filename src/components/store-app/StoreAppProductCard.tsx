@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useCart } from '@/contexts/cart-context';
 import { useWishlist } from '@/contexts/wishlist-context';
 import { useSettings } from '@/contexts/settings-context';
-import { calculateEffectivePrice } from '@/lib/pos-utils';
+import { calculateEffectivePrice, getLowestVariantPrice } from '@/lib/pos-utils';
 import { formatCurrency } from '@/lib/formatUtils';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -47,6 +47,56 @@ export function StoreAppProductCard({
         () => calculateEffectivePrice(product as any, today, category as any),
         [product, today, category]
     );
+
+    const effectiveVariantRange = useMemo(() => {
+        if (product.hasVariants && product.variants && product.variants.length > 0) {
+            const activeVariants = product.variants.filter(v => v.isActive !== false);
+            if (activeVariants.length === 0) return null;
+            const effectivePrices = activeVariants.map(v => 
+                calculateEffectivePrice({ ...product, sellingPrice: Number(v.sellingPrice || v.price || 0) } as any, today, category as any)
+            );
+            return {
+                min: Math.min(...effectivePrices),
+                max: Math.max(...effectivePrices)
+            };
+        }
+        return null;
+    }, [product, today, category]);
+
+    const originalVariantRange = useMemo(() => {
+        if (product.hasVariants && product.variants && product.variants.length > 0) {
+            const activeVariants = product.variants.filter(v => v.isActive !== false);
+            if (activeVariants.length === 0) return null;
+            const prices = activeVariants.map(v => Number(v.sellingPrice || v.price || 0));
+            return {
+                min: Math.min(...prices),
+                max: Math.max(...prices)
+            };
+        }
+        return null;
+    }, [product]);
+
+    const displayPrice = useMemo(() => {
+        if (product.hasVariants) {
+            return effectiveVariantRange?.min || 0;
+        }
+        return effectivePrice;
+    }, [product.hasVariants, effectiveVariantRange, effectivePrice]);
+
+    const isDiscounted = useMemo(() => {
+        if (product.hasVariants) {
+            if (!effectiveVariantRange || !originalVariantRange) return false;
+            return effectiveVariantRange.min < originalVariantRange.min;
+        }
+        return effectivePrice < product.sellingPrice;
+    }, [product.hasVariants, effectiveVariantRange, originalVariantRange, effectivePrice, product.sellingPrice]);
+
+    const originalPrice = useMemo(() => {
+        if (product.hasVariants) {
+            return originalVariantRange?.min || 0;
+        }
+        return product.sellingPrice;
+    }, [product.hasVariants, originalVariantRange, product.sellingPrice]);
 
     const isLiked = wishlistProductIds.has(product.id);
     const catName = categoryName 
@@ -224,6 +274,10 @@ export function StoreAppProductCard({
                             onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
+                                if (product.hasVariants) {
+                                    onProductClick(product.id);
+                                    return;
+                                }
                                 addToCart(product, effectivePrice);
                                 toast({ title: "Bag Updated", description: `${product.name} successfully added.` });
                             }}
@@ -248,10 +302,17 @@ export function StoreAppProductCard({
                     <p className="text-[9px] font-black uppercase tracking-[0.25em] text-primary/60">{catName}</p>
                     <h4 className="font-black text-sm text-slate-900 dark:text-white truncate leading-tight tracking-tight uppercase group-hover:text-primary transition-colors">{product.name}</h4>
                     <div className="flex items-baseline gap-2 pt-1">
-                        <p className="text-primary font-black text-base tracking-tighter">{formatCurrency(effectivePrice, currencySymbol)}</p>
-                        {effectivePrice < product.sellingPrice && (
-                            <span className="text-[10px] text-slate-400 line-through font-bold opacity-60">{formatCurrency(product.sellingPrice, currencySymbol)}</span> 
-                        )}
+                        <p className="text-primary font-black text-base tracking-tighter">
+                            {product.hasVariants ? (
+                                effectiveVariantRange ? (
+                                    effectiveVariantRange.min === effectiveVariantRange.max
+                                        ? formatCurrency(effectiveVariantRange.min, currencySymbol)
+                                        : `From ${formatCurrency(effectiveVariantRange.min, currencySymbol)}`
+                                ) : 'Select Options'
+                            ) : (
+                                formatCurrency(displayPrice, currencySymbol)
+                            )}
+                        </p>
                     </div>
                 </div>
             </div>

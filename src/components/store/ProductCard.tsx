@@ -16,7 +16,7 @@ import { useCart } from '@/contexts/cart-context';
 import { useWishlist } from '@/contexts/wishlist-context';
 import { useSettings } from '@/contexts/settings-context';
 import { formatCurrency } from '@/lib/formatUtils';
-import { calculateEffectivePrice } from '@/lib/pos-utils';
+import { calculateEffectivePrice, getLowestVariantPrice } from '@/lib/pos-utils';
 import { ProductLoadingOverlay } from './ProductLoadingOverlay';
 import { StockBar } from './StockBar';
 import { ProductRating } from './ProductRating';
@@ -45,10 +45,11 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsClient(true);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setToday(new Date());
+    const timer = setTimeout(() => {
+      setIsClient(true);
+      setToday(new Date());
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const isInWishlist = isProductInWishlist(product.id);
@@ -58,6 +59,41 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
     [product, today, category, isClient]
   );
 
+  const effectiveVariantRange = useMemo(() => {
+    if (product.hasVariants && product.variants && product.variants.length > 0) {
+      const activeVariants = product.variants.filter(v => v.isActive !== false);
+      if (activeVariants.length === 0) return null;
+      const effectivePrices = activeVariants.map(v => 
+        calculateEffectivePrice({ ...product, sellingPrice: Number(v.sellingPrice || v.price || 0) } as any, isClient ? today : null, category)
+      );
+      return {
+        min: Math.min(...effectivePrices),
+        max: Math.max(...effectivePrices)
+      };
+    }
+    return null;
+  }, [product, today, category, isClient]);
+
+  const originalVariantRange = useMemo(() => {
+    if (product.hasVariants && product.variants && product.variants.length > 0) {
+      const activeVariants = product.variants.filter(v => v.isActive !== false);
+      if (activeVariants.length === 0) return null;
+      const prices = activeVariants.map(v => Number(v.sellingPrice || v.price || 0));
+      return {
+        min: Math.min(...prices),
+        max: Math.max(...prices)
+      };
+    }
+    return null;
+  }, [product]);
+
+  const displayPrice = useMemo(() => {
+    if (product.hasVariants) {
+      return effectiveVariantRange?.min || 0;
+    }
+    return effectivePrice;
+  }, [product.hasVariants, effectiveVariantRange, effectivePrice]);
+
   const salesCount = useMemo(() => {
     let hash = 0;
     for (let i = 0; i < product.id.length; i++) {
@@ -66,7 +102,21 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
     return Math.abs(hash % 5000) + 100;
   }, [product.id]);
 
-  const isDiscounted = effectivePrice < product.sellingPrice;
+  const isDiscounted = useMemo(() => {
+    if (product.hasVariants) {
+      if (!effectiveVariantRange || !originalVariantRange) return false;
+      return effectiveVariantRange.min < originalVariantRange.min;
+    }
+    return effectivePrice < product.sellingPrice;
+  }, [product.hasVariants, effectiveVariantRange, originalVariantRange, effectivePrice, product.sellingPrice]);
+
+  const originalPrice = useMemo(() => {
+    if (product.hasVariants) {
+      return originalVariantRange?.min || 0;
+    }
+    return product.sellingPrice;
+  }, [product.hasVariants, originalVariantRange, product.sellingPrice]);
+  
   const isOutOfStock = useMemo(() => {
     if (product.hasVariants && product.variants && product.variants.length > 0) {
       const activeVariants = product.variants.filter(v => v.isActive !== false);
@@ -269,7 +319,13 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
                 )}
                 {isDiscounted && !isOutOfStock && (
                     <Badge className="bg-[#ff2d55] text-white font-bold text-[10px] px-2 py-0.5 rounded-full border-none shadow-sm">
-                    {Math.round((1 - effectivePrice / product.sellingPrice) * 100)}% OFF
+                    {product.hasVariants ? (
+                        effectiveVariantRange && originalVariantRange && originalVariantRange.min > 0
+                        ? `${Math.round((1 - effectiveVariantRange.min / originalVariantRange.min) * 100)}% OFF`
+                        : 'SALE'
+                    ) : (
+                        `${Math.round((1 - displayPrice / originalPrice) * 100)}% OFF`
+                    )}
                     </Badge>
                 )}
                 </div>
@@ -345,13 +401,16 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
                     <span className={cn(
                         "text-[17px] font-semibold tracking-tight text-[#1d1d1f] dark:text-white",
                     )}>
-                        {formatCurrency(effectivePrice, currencySymbol)}
+                        {product.hasVariants ? (
+                            effectiveVariantRange ? (
+                                effectiveVariantRange.min === effectiveVariantRange.max
+                                    ? formatCurrency(effectiveVariantRange.min, currencySymbol)
+                                    : `From ${formatCurrency(effectiveVariantRange.min, currencySymbol)}`
+                            ) : 'Select Options'
+                        ) : (
+                            formatCurrency(displayPrice, currencySymbol)
+                        )}
                     </span>
-                    {isDiscounted && (
-                        <span className="text-[13px] text-[#86868b] line-through font-medium">
-                        {formatCurrency(product.sellingPrice, currencySymbol)}
-                        </span>
-                    )}
                 </div>
 
                 <div className="hidden sm:block">

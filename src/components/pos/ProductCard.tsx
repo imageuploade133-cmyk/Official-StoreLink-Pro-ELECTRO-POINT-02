@@ -34,12 +34,14 @@ export const ProductCard = React.memo(({ product, onAddToCart, priority, currenc
     }, [product, today]);
 
     const [priceInputString, setPriceInputString] = useState<string>(initialEffectivePriceString);
+    const [prevInitialPrice, setPrevInitialPrice] = useState<string>(initialEffectivePriceString);
     const [isValidPrice, setIsValidPrice] = useState<boolean>(true);
     
-    useEffect(() => {
+    if (initialEffectivePriceString !== prevInitialPrice) {
         setPriceInputString(initialEffectivePriceString);
-        setIsValidPrice(true); 
-    }, [initialEffectivePriceString]);
+        setPrevInitialPrice(initialEffectivePriceString);
+        setIsValidPrice(true);
+    }
 
     const handlePriceInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newStringValue = e.target.value;
@@ -156,31 +158,32 @@ export const ProductCard = React.memo(({ product, onAddToCart, priority, currenc
         </CardHeader>
         <CardContent className={cn("p-3 pt-0 sm:p-2 sm:pt-0 flex-grow space-y-3", !isSmallMode && "sm:p-4 sm:pt-0")}>
             <div className="flex flex-col gap-1">
-                {hasActivePromo && (
-                    <div className="flex items-center gap-1.5 text-muted-foreground">
-                        <Tag className="h-3 w-3" />
-                        <span className="text-[10px] font-bold line-through decoration-destructive/50">
-                            Was: {formatCurrency(product.sellingPrice, currencySymbol)}
-                        </span>
-                    </div>
-                )}
                 <div className="flex items-center gap-1.5">
-                    {!isSmallMode && <span className="text-sm font-black text-primary/60">{currencySymbol}</span>}
+                    {!isSmallMode && !product.hasVariants && <span className="text-sm font-black text-primary/60">{currencySymbol}</span>}
                     <div className="relative flex-grow">
-                        {isSmallMode && <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] font-black text-primary/60">{currencySymbol}</span>}
-                        <Input
-                            type="string" 
-                            inputMode="decimal"
-                            aria-label={`Price for ${product.name}`}
-                            className={cn(
-                                "font-black border-muted-foreground/30 hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary bg-muted/20",
-                                isSmallMode ? "h-8 text-[10px] sm:text-xs pl-4 pr-1" : "h-10 text-base sm:text-lg p-2"
-                            )}
-                            value={priceInputString}
-                            onChange={handlePriceInputChange}
-                            onBlur={handlePriceInputBlur}
-                            disabled={isPriceInputDisabled}
-                        />
+                        {isSmallMode && !product.hasVariants && <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] font-black text-primary/60">{currencySymbol}</span>}
+                        {product.hasVariants ? (
+                            <div className={cn(
+                                "flex items-center font-black text-primary/80 bg-primary/5 border border-primary/20 rounded-md px-3",
+                                isSmallMode ? "h-8 text-[10px]" : "h-10 text-sm"
+                            )}>
+                                PRICE VARIES
+                            </div>
+                        ) : (
+                            <Input
+                                type="string" 
+                                inputMode="decimal"
+                                aria-label={`Price for ${product.name}`}
+                                className={cn(
+                                    "font-black border-muted-foreground/30 hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary bg-muted/20",
+                                    isSmallMode ? "h-8 text-[10px] sm:text-xs pl-4 pr-1" : "h-10 text-base sm:text-lg p-2"
+                                )}
+                                value={priceInputString}
+                                onChange={handlePriceInputChange}
+                                onBlur={handlePriceInputBlur}
+                                disabled={isPriceInputDisabled}
+                            />
+                        )}
                     </div>
                     {isPriceManuallyChanged && !isSmallMode && (
                         <Button

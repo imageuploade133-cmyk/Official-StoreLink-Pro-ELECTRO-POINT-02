@@ -7,6 +7,22 @@ export const ensureNumber = (value: any, defaultValue: number = 0): number => {
     return isNaN(num) ? defaultValue : num;
 };
 
+export const getLowestVariantPrice = (variants: any[]): number => {
+  const activeVariants = variants.filter(v => v.isActive !== false);
+  if (activeVariants.length === 0) return 0;
+  return Math.min(...activeVariants.map(v => ensureNumber(v.sellingPrice || v.price, 0)));
+};
+
+export const getVariantPriceRange = (variants: any[]): { min: number, max: number } | null => {
+  const activeVariants = variants.filter(v => v.isActive !== false);
+  if (activeVariants.length === 0) return null;
+  const prices = activeVariants.map(v => ensureNumber(v.sellingPrice || v.price, 0));
+  return {
+    min: Math.min(...prices),
+    max: Math.max(...prices)
+  };
+};
+
 /**
  * Pricing Engine logic to determine the active price for a product.
  * Hierarchy:

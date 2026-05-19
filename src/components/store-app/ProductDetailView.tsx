@@ -721,7 +721,12 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
                                             {category?.name || 'Collection'}
                                         </p>
                                         <h4 className="font-bold text-xs truncate leading-tight">{p.name}</h4>
-                                        <p className="text-sm font-black text-primary tracking-tighter">{formatCurrency(calculateEffectivePrice(p as any, new Date()), currencySymbol)}</p>
+                                        <p className="text-sm font-black text-primary tracking-tighter">
+                                            {p.hasVariants && p.variants && p.variants.length > 0 
+                                                ? `From ${formatCurrency(calculateEffectivePrice({ ...p, sellingPrice: Math.min(...p.variants.filter(v => v.isActive !== false).map(v => Number(v.sellingPrice || (v as any).price || 0))) } as any, new Date()), currencySymbol)}`
+                                                : formatCurrency(calculateEffectivePrice(p as any, new Date()), currencySymbol)
+                                            }
+                                        </p>
                                     </div>
                                 </div>
                             ))}
