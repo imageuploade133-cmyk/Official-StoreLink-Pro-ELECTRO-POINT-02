@@ -1118,7 +1118,7 @@ export default function ProductDetailsPage() {
     >
       <StickyProductBar
         productName={product.name}
-        productPrice={formatCurrency(currentPrice, currencySymbol)}
+        productPrice={(!product.hasVariants || selectedVariant || previewVariant) ? formatCurrency(currentPrice, currencySymbol) : ""}
         isInWishlist={isInWishlist}
         isOutOfStock={isOutOfStock}
         onAddToCart={isOutOfStock ? () => setIsOutOfDataDrawerOpen(true) : handleAddToCart}
@@ -1360,8 +1360,10 @@ export default function ProductDetailsPage() {
               <div className="flex items-start gap-3 pt-2">
                 <div className={cn("flex flex-col gap-1 md:gap-1.5 transition-all duration-300", isChangingVariant && "opacity-40 blur-[1px]")}>
                   {!today ? <Skeleton className="h-8 md:h-10 w-32" /> : (
-                    <><span className={cn("text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight", isDiscounted ? "text-[#e11d48]" : "text-[#1d1d1f] dark:text-[#f5f5f7]")}>{formatCurrency(currentPrice, currencySymbol)}</span>
-                    {isDiscounted && <span className="text-sm md:text-base text-[#86868b] line-through">Was: {formatCurrency(product.sellingPrice, currencySymbol)}</span>}</>
+(!product.hasVariants || selectedVariant || previewVariant) ? (
+                      <><span className={cn("text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight", isDiscounted ? "text-[#e11d48]" : "text-[#1d1d1f] dark:text-[#f5f5f7]")}>{formatCurrency(currentPrice, currencySymbol)}</span>
+                      {isDiscounted && !product.hasVariants && <span className="text-sm md:text-base text-[#86868b] line-through">Was: {formatCurrency(product.sellingPrice, currencySymbol)}</span>}</>
+                    ) : null
                   )}
                   {(selectedVariant?.sku || previewVariant?.sku || product.sku) && (
                     <div className="flex items-center gap-1.5 mt-1">
