@@ -131,7 +131,7 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
     categoryId: z.string().min(1, 'Please select a category.'),
     stock: z.coerce.number().int().min(0, 'Please add stock quantity.'),
     purchasePrice: z.coerce.number().min(0, 'Purchase price cannot be negative.'),
-    sellingPrice: z.coerce.number().min(0.01, 'Selling price must be greater than 0.'),
+    sellingPrice: z.coerce.number().min(0, 'Selling price cannot be negative.').optional().default(0),
     newPrice: z.preprocess((val) => (val === '' ? null : val), z.coerce.number().min(0.01, 'Discount price must be greater than 0.').optional().nullable()),
     lowStockThreshold: z.coerce.number().int().min(0, 'Low stock threshold cannot be negative.').optional().nullable(),
     supplierName: z.string().optional().or(z.literal('')),
@@ -252,7 +252,11 @@ const createProductFormSchema = (originalStock?: number, preventReduction?: bool
       { message: "Manual stock reduction is restricted. Current stock is " + originalStock + ". Use the 'Restock Now' page for adjustments.", path: ["stock"] }
     )
     .refine(
-      (data) => !data.newPrice || data.newPrice < data.sellingPrice,
+      (data) => data.hasVariants || (data.sellingPrice !== undefined && data.sellingPrice > 0),
+      { message: "Selling price is required when product has no variants.", path: ["sellingPrice"] }
+    )
+    .refine(
+      (data) => data.hasVariants || !data.newPrice || data.newPrice < data.sellingPrice,
       { message: 'New price must be less than the original selling price.', path: ['newPrice'] }
     )
     .refine(
@@ -1024,38 +1028,42 @@ const categorySelectionFooter = (
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="sellingPrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="font-bold">Selling Price <span className="text-destructive">*</span></FormLabel>
-                      <FormControl><Input type="number" step="0.01" {...field} value={field.value ?? ''} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="newPrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="font-bold text-green-600">New Price (Discount)</FormLabel>
-                      <FormControl><Input 
-                        type="number" 
-                        step="0.01" 
-                        {...field} 
-                        value={field.value ?? ''} 
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          field.onChange(val === '' ? null : Number(val));
-                        }}
-                        placeholder="Optional"
-                      /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {!watchHasVariants && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="sellingPrice"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-bold">Selling Price <span className="text-destructive">*</span></FormLabel>
+                          <FormControl><Input type="number" step="0.01" {...field} value={field.value ?? ''} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="newPrice"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-bold text-green-600">New Price (Discount)</FormLabel>
+                          <FormControl><Input 
+                            type="number" 
+                            step="0.01" 
+                            {...field} 
+                            value={field.value ?? ''} 
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              field.onChange(val === '' ? null : Number(val));
+                            }}
+                            placeholder="Optional"
+                          /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-dashed">

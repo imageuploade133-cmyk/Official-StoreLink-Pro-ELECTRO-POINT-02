@@ -167,6 +167,16 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
               : (product.expiryDate as any)?.toDate?.();
             const isExpired = expiryDate ? expiryDate < new Date() : false;
 
+            const variantPrices = product.hasVariants && product.variants 
+              ? product.variants
+                  .map(v => v.sellingPrice || v.price || 0)
+                  .filter(price => price > 0)
+              : [];
+            
+            const displayPrice = variantPrices.length > 0 
+              ? variantPrices[0] 
+              : (product.sellingPrice || 0);
+
             return (
               <TableRow
                 key={product.id}
@@ -195,9 +205,12 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
                             {product.hasVariants && (
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <LayoutGrid className="h-3.5 w-3.5 text-indigo-500 cursor-help" />
+                                        <div className="flex items-center gap-1 bg-indigo-50 dark:bg-indigo-900/20 px-1.5 py-0.5 rounded text-[10px] text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-100 dark:border-indigo-800/50 cursor-help">
+                                            <LayoutGrid className="h-3 w-3" />
+                                            {product.variants?.length || 0} Variants
+                                        </div>
                                     </TooltipTrigger>
-                                    <TooltipContent>This product has variants</TooltipContent>
+                                    <TooltipContent>This product has {product.variants?.length || 0} variants</TooltipContent>
                                 </Tooltip>
                             )}
                             {isExpired && (
@@ -217,6 +230,11 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
                                 </Tooltip>
                             )}
                         </div>
+                        {product.hasVariants && product.variants && product.variants.length > 0 && (
+                            <span className="text-[10px] text-muted-foreground truncate max-w-[200px] font-normal italic">
+                                {product.variants.map(v => v.name).join(', ')}
+                            </span>
+                        )}
                         {expiryDate && (
                             <span className={cn(
                                 "text-[10px] font-medium",
@@ -248,14 +266,14 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
                         {product.newPrice ? (
                             <>
                                 <span className="text-[10px] text-muted-foreground line-through decoration-destructive/50">
-                                    {formatCurrency(product.sellingPrice || 0, currencySymbol)}
+                                    {formatCurrency(displayPrice, currencySymbol)}
                                 </span>
                                 <span className="text-green-600">
                                     {formatCurrency(product.newPrice, currencySymbol)}
                                 </span>
                             </>
                         ) : (
-                            formatCurrency(product.sellingPrice || 0, currencySymbol)
+                            formatCurrency(displayPrice, currencySymbol)
                         )}
                     </div>
                 </TableCell>
