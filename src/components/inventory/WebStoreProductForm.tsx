@@ -129,7 +129,7 @@ const sectionIcons = [
 const storeProductSchema = z.object({
   name: z.string().min(3, 'Product name is required.'),
   categoryId: z.string().min(1, 'Please select a category.'),
-  sellingPrice: z.coerce.number().min(0.01, 'Price must be greater than 0.'),
+  sellingPrice: z.coerce.number().min(0, 'Price cannot be negative.').optional().default(0),
   newPrice: z.preprocess((val) => (val === '' ? null : val), z.coerce.number().min(0.01, 'Discount price must be greater than 0.').optional().nullable()),
   purchasePrice: z.coerce.number().min(0, 'Cost price cannot be negative.'),
   stock: z.coerce.number().int().min(0, 'Stock cannot be negative.'),
@@ -225,7 +225,10 @@ const storeProductSchema = z.object({
 }).refine(data => !data.isPromo || (!!data.promoType && !!data.promoValue && data.promoValue > 0), {
     message: 'Promo value is required and must be positive when active.',
     path: ['promoValue']
-}).refine(data => !data.newPrice || data.newPrice < data.sellingPrice, {
+}).refine(data => data.hasVariants || (data.sellingPrice !== undefined && data.sellingPrice > 0), {
+    message: 'Selling price is required when product has no variants.',
+    path: ['sellingPrice']
+}).refine(data => data.hasVariants || !data.newPrice || data.newPrice < data.sellingPrice, {
     message: 'New price must be less than the original selling price.',
     path: ['newPrice']
 });
@@ -900,38 +903,42 @@ export function WebStoreProductForm() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <FormField
-                  control={form.control}
-                  name="sellingPrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="font-bold">Original Price <span className="text-destructive">*</span></FormLabel>
-                      <FormControl><Input type="number" step="0.01" {...field} value={field.value ?? ''} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="newPrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="font-bold text-green-600">New Price (Discount)</FormLabel>
-                      <FormControl><Input 
-                        type="number" 
-                        step="0.01" 
-                        {...field} 
-                        value={field.value ?? ''} 
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          field.onChange(val === '' ? null : Number(val));
-                        }}
-                        placeholder="Optional"
-                      /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {!watchHasVariants && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="sellingPrice"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-bold">Original Price <span className="text-destructive">*</span></FormLabel>
+                          <FormControl><Input type="number" step="0.01" {...field} value={field.value ?? ''} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="newPrice"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-bold text-green-600">New Price (Discount)</FormLabel>
+                          <FormControl><Input 
+                            type="number" 
+                            step="0.01" 
+                            {...field} 
+                            value={field.value ?? ''} 
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              field.onChange(val === '' ? null : Number(val));
+                            }}
+                            placeholder="Optional"
+                          /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
                 <FormField
                   control={form.control}
                   name="purchasePrice"
