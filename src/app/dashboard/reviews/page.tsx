@@ -23,7 +23,6 @@ import {
 import type { ProductReview } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -42,14 +41,14 @@ import {
   EyeOff, 
   Eye,
   Ban, 
-  Search, 
   ChevronLeft, 
   ChevronRight, 
   Loader2,
   CheckCheck,
   Mic,
   Phone,
-  Undo2
+  MessageSquare,
+  CalendarDays
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSettings } from "@/contexts/settings-context";
@@ -80,7 +79,7 @@ import { Separator } from '@/components/ui/separator';
 const ITEMS_PER_PAGE = 10;
 
 export default function ReviewsPage() {
-  const { user: authUser, permissions, isLoading: authLoading, store, staffMember } = useAuth();
+  const { permissions, isLoading: authLoading, store, staffMember } = useAuth();
   const firestore = useFirestore();
   const { settings } = useSettings();
   const currentStoreId = useMemo(() => staffMember?.store_id || store?.id, [staffMember, store]);
@@ -90,6 +89,15 @@ export default function ReviewsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLastPage, setIsLastPage] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
+  const [reviewStats, setReviewStats] = useState({
+    totalComments: 0,
+    todayComments: 0,
+    totalReplies: 0,
+    hiddenReviews: 0,
+    bannedCustomers: 0,
+    totalHideOrBan: 0,
+  });
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
 
   const [selectedReview, setSelectedReview] = useState<ProductReview | null>(null);
   const [isActionModalOpen, setIsActionModalOpen] = useState(false);
@@ -176,9 +184,22 @@ export default function ReviewsPage() {
   const firstDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
   const lastDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
 
+  const getSafeCount = useCallback(async (countQuery: ReturnType<typeof query>, fallbackValue = 0) => {
+    try {
+      const countSnap = await getCountFromServer(countQuery);
+      return countSnap.data().count;
+    } catch (error) {
+      console.warn('Count query failed:', error);
+      return fallbackValue;
+    }
+  }, []);
+
   const fetchReviews = useCallback(async (direction: 'initial' | 'next' | 'prev' = 'initial') => {
     if (!firestore || !currentStoreId) return;
     setIsLoadingReviews(true);
+    if (direction === 'initial') {
+      setIsLoadingStats(true);
+    }
 
     try {
       let q = query(
@@ -188,13 +209,53 @@ export default function ReviewsPage() {
       );
 
       if (direction === 'initial') {
-        try {
-          const countSnap = await getCountFromServer(q);
-          setTotalCount(countSnap.data().count);
-        } catch (countErr) {
-          console.warn("Count failed, might be missing index on store_reviews too:", countErr);
-          setTotalCount(0);
-        }
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        const tomorrowStart = new Date(todayStart);
+        tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+
+        const storeReviewsRef = collection(firestore, 'store_reviews');
+        const totalReviewsQuery = query(storeReviewsRef, where('store_id', '==', currentStoreId));
+        const totalCommentsQuery = query(storeReviewsRef, where('store_id', '==', currentStoreId), where('comment', '>', ''));
+        const todayCommentsQuery = query(
+          storeReviewsRef,
+          where('store_id', '==', currentStoreId),
+          where('createdAt', '>=', todayStart),
+          where('createdAt', '<', tomorrowStart)
+        );
+        const totalRepliesQuery = query(storeReviewsRef, where('store_id', '==', currentStoreId), where('repliedAt', '!=', null));
+        const hiddenReviewsQuery = query(storeReviewsRef, where('store_id', '==', currentStoreId), where('isHidden', '==', true));
+        const bannedCustomersQuery = query(
+          collection(firestore, 'customers'),
+          where('store_id', '==', currentStoreId),
+          where('status', '==', 'banned')
+        );
+
+        const [
+          totalReviews,
+          totalComments,
+          todayComments,
+          totalReplies,
+          hiddenReviews,
+          bannedCustomers,
+        ] = await Promise.all([
+          getSafeCount(totalReviewsQuery),
+          getSafeCount(totalCommentsQuery),
+          getSafeCount(todayCommentsQuery),
+          getSafeCount(totalRepliesQuery),
+          getSafeCount(hiddenReviewsQuery),
+          getSafeCount(bannedCustomersQuery),
+        ]);
+
+        setTotalCount(totalReviews);
+        setReviewStats({
+          totalComments,
+          todayComments,
+          totalReplies,
+          hiddenReviews,
+          bannedCustomers,
+          totalHideOrBan: hiddenReviews + bannedCustomers,
+        });
       }
 
       if (direction === 'next' && lastDocRef.current) {
@@ -241,8 +302,11 @@ export default function ReviewsPage() {
       }
     } finally {
       setIsLoadingReviews(false);
+      if (direction === 'initial') {
+        setIsLoadingStats(false);
+      }
     }
-  }, [firestore, currentStoreId, toast]);
+  }, [firestore, currentStoreId, getSafeCount, toast]);
 
   useEffect(() => {
     if (firestore && !authLoading && currentStoreId) {
@@ -367,6 +431,7 @@ export default function ReviewsPage() {
       
       toast({ title: 'Customer Suspended', description: 'This user has been banned from store interactions.' });
       setIsActionModalOpen(false);
+      fetchReviews('initial');
     } catch (e: any) {
       toast({ variant: 'destructive', title: 'Action Failed', description: e.message || 'Failed to suspend customer.' });
     } finally {
@@ -380,10 +445,6 @@ export default function ReviewsPage() {
     setReplyAudioDataUri(review.replyAudioDataUri || null);
     setIsActionModalOpen(true);
     if (!review.isRead) markAsRead(review);
-  };
-
-  const clearVoiceReply = () => {
-    setReplyAudioDataUri(null);
   };
 
   const hasExistingReply = selectedReview?.reply || selectedReview?.replyAudioDataUri;
@@ -415,6 +476,77 @@ export default function ReviewsPage() {
                   Refresh Reviews
               </Button>
           </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <Card className="bg-primary/5 border-primary/10 shadow-none">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center justify-between">
+              Total
+              <Star className="h-3.5 w-3.5" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoadingStats ? <Skeleton className="h-8 w-16" /> : <div className="text-2xl font-black text-primary">{totalCount.toLocaleString()}</div>}
+          </CardContent>
+        </Card>
+
+        <Card className="bg-indigo-50 dark:bg-indigo-500/10 border-indigo-100 dark:border-indigo-500/20 shadow-none">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-300 flex items-center justify-between">
+              Comment
+              <MessageSquare className="h-3.5 w-3.5" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoadingStats ? <Skeleton className="h-8 w-16" /> : <div className="text-2xl font-black text-indigo-600 dark:text-indigo-300">{reviewStats.totalComments.toLocaleString()}</div>}
+          </CardContent>
+        </Card>
+
+        <Card className="bg-amber-50 dark:bg-amber-500/10 border-amber-100 dark:border-amber-500/20 shadow-none">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-300 flex items-center justify-between">
+              Today Comment
+              <CalendarDays className="h-3.5 w-3.5" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoadingStats ? <Skeleton className="h-8 w-16" /> : <div className="text-2xl font-black text-amber-600 dark:text-amber-300">{reviewStats.todayComments.toLocaleString()}</div>}
+          </CardContent>
+        </Card>
+
+        <Card className="bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20 shadow-none">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-300 flex items-center justify-between">
+              Total Replay
+              <ReplyIcon className="h-3.5 w-3.5" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoadingStats ? <Skeleton className="h-8 w-16" /> : <div className="text-2xl font-black text-emerald-600 dark:text-emerald-300">{reviewStats.totalReplies.toLocaleString()}</div>}
+          </CardContent>
+        </Card>
+
+        <Card className="bg-slate-100 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 shadow-none">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-200 flex items-center justify-between">
+              Total Hide/Band
+              <Ban className="h-3.5 w-3.5" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-1">
+            {isLoadingStats ? (
+              <Skeleton className="h-8 w-16" />
+            ) : (
+              <>
+                <div className="text-2xl font-black text-slate-700 dark:text-slate-200">{reviewStats.totalHideOrBan.toLocaleString()}</div>
+                <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                  Hidden {reviewStats.hiddenReviews.toLocaleString()} • Banned {reviewStats.bannedCustomers.toLocaleString()}
+                </p>
+              </>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       <Card className="shadow-lg border-none ring-1 ring-border">
