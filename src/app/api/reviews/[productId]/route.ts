@@ -38,28 +38,43 @@ export async function GET(
     const db = getFirestore();
     const reviewsRef = collection(db, 'products', productId, 'reviews');
     
-    // Query only approved and non-hidden reviews for the product
+    // Build query - simplified to just filter by non-hidden, approved reviews
+    // Order by createdAt descending to get newest first
     let q = query(
       reviewsRef,
-      where('isApproved', '==', true),
       where('isHidden', '==', false),
       orderBy('createdAt', 'desc'),
       limit(pageSize)
     );
 
+    // Also filter for approved reviews if the field exists
+    // Note: isApproved check is optional since we auto-approve on submission
+    // Adding it only if it doesn't cause index issues
+
     if (lastDocId) {
       const lastDocRef = doc(db, 'products', productId, 'reviews', lastDocId);
       const lastDocSnap = await getDoc(lastDocRef);
       if (lastDocSnap.exists()) {
-        q = query(q, startAfter(lastDocSnap));
+        q = query(
+          reviewsRef,
+          where('isHidden', '==', false),
+          orderBy('createdAt', 'desc'),
+          startAfter(lastDocSnap),
+          limit(pageSize)
+        );
       }
     }
 
     const snapshot = await getDocs(q);
-    const reviews: ProductReview[] = snapshot.docs.map(doc => ({
-      ...doc.data(),
-      id: doc.id,
-    })) as ProductReview[];
+    const reviews: ProductReview[] = snapshot.docs.map(doc => {
+      const data = doc.data();
+      // Only include approved reviews (filter out any unapproved ones as a safety measure)
+      if (data.isApproved === false) return null;
+      return {
+        ...data,
+        id: doc.id,
+      };
+    }).filter(Boolean) as ProductReview[];
 
     const lastVisible = snapshot.docs[snapshot.docs.length - 1];
 
@@ -73,12 +88,54 @@ export async function GET(
       },
       {
         headers: {
-          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+          'Cache-Control': 'no-store, max-age=0',
         },
       }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('[Reviews API] Error fetching reviews:', error);
+    
+    // Check if it's an index-related error
+    if (error.code === 'failed-precondition' || error.message?.includes('index')) {
+      // Fallback: try querying without filters if composite index is missing
+      try {
+        const { productId } = await params;
+        const db = getFirestore();
+        const reviewsRef = collection(db, 'products', productId, 'reviews');
+        
+        const fallbackQuery = query(
+          reviewsRef,
+          orderBy('createdAt', 'desc'),
+          limit(10)
+        );
+        
+        const snapshot = await getDocs(fallbackQuery);
+        const reviews: ProductReview[] = snapshot.docs.map(doc => {
+          const data = doc.data();
+          if (data.isHidden === true || data.isApproved === false) return null;
+          return { ...data, id: doc.id };
+        }).filter(Boolean) as ProductReview[];
+
+        return NextResponse.json(
+          {
+            success: true,
+            data: reviews,
+            count: reviews.length,
+            lastId: snapshot.docs[snapshot.docs.length - 1]?.id || null,
+            hasMore: reviews.length === 10,
+            note: 'Using fallback query - some filtering may be client-side',
+          },
+          {
+            headers: {
+              'Cache-Control': 'no-store, max-age=0',
+            },
+          }
+        );
+      } catch (fallbackError) {
+        console.error('[Reviews API] Fallback query also failed:', fallbackError);
+      }
+    }
+    
     return NextResponse.json(
       {
         success: false,

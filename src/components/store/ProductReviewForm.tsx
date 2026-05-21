@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useFirestore, useUser } from '@/firebase';
-import { collection, addDoc, serverTimestamp, query, where, getDocs, limit, setDoc, doc, runTransaction, increment } from 'firebase/firestore';
+import { collection, serverTimestamp, query, where, getDocs, limit, setDoc, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { Star, Loader2, Send, MessageCircle, Ban, Mic, StopCircle, Trash2, Play, Pause, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -183,7 +183,10 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
   });
 
   const onSubmit = async (values: ReviewFormValues) => {
-    if (!user || !firestore) return;
+    if (!user || !firestore) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Please ensure you are logged in and try again.' });
+      return;
+    }
     setIsSubmitting(true);
     try {
       // Check if user is banned
@@ -201,6 +204,10 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
           return;
       }
 
+      // Get the review collection reference using the correct firestore instance
+      const reviewCollectionRef = collection(firestore, 'products', productId, 'reviews');
+      const reviewDocRef = doc(reviewCollectionRef);
+      
       const reviewData = {
         userId: user.uid,
         userName: user.displayName || 'Valued Customer',
@@ -215,40 +222,40 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
         createdAt: serverTimestamp(),
       };
 
-      const reviewCollectionRef = collection(firestore, 'products', productId, 'reviews');
-      const reviewDocRef = doc(reviewCollectionRef);
+      // Step 1: Create the review document in product's subcollection first
+      await setDoc(reviewDocRef, reviewData);
+
+      // Step 2: Also write to store_reviews for dashboard management
       const storeReviewDocRef = doc(firestore, 'store_reviews', reviewDocRef.id);
-      const productRef = doc(firestore, 'products', productId);
-
-      await runTransaction(firestore, async (transaction) => {
-        const productSnap = await transaction.get(productRef);
-        
-        transaction.set(reviewDocRef, reviewData);
-        transaction.set(storeReviewDocRef, {
-          ...reviewData,
-          id: reviewDocRef.id,
-        });
-
-        if (productSnap.exists()) {
-          const productData = productSnap.data();
-          const oldCount = productData.reviewCount || 0;
-          const oldAverage = productData.averageRating || 0;
-          const newRating = values.rating;
-          
-          const newCount = oldCount + 1;
-          const newAverage = ((oldAverage * oldCount) + newRating) / newCount;
-
-          transaction.update(productRef, {
-            reviewCount: newCount,
-            averageRating: newAverage
-          });
-        }
+      await setDoc(storeReviewDocRef, {
+        ...reviewData,
+        id: reviewDocRef.id,
       });
+
+      // Step 3: Update product stats
+      const productRef = doc(firestore, 'products', productId);
+      const productSnap = await getDoc(productRef);
+      
+      if (productSnap.exists()) {
+        const productData = productSnap.data();
+        const oldCount = productData.reviewCount || 0;
+        const oldAverage = productData.averageRating || 0;
+        const newRating = values.rating;
+        
+        const newCount = oldCount + 1;
+        const newAverage = ((oldAverage * oldCount) + newRating) / newCount;
+
+        await updateDoc(productRef, {
+          reviewCount: newCount,
+          averageRating: newAverage
+        });
+      }
 
       toast({ title: 'Review Submitted', description: 'Thank you for your feedback!' });
       form.reset();
     } catch (e: any) {
-      toast({ variant: 'destructive', title: 'Error', description: e.message || 'Failed to submit review.' });
+      console.error('[ProductReviewForm] Submit error:', e);
+      toast({ variant: 'destructive', title: 'Error', description: e.message || 'Failed to submit review. Please try again.' });
     } finally {
       setIsSubmitting(false);
     }
