@@ -403,6 +403,9 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
     const AddToCartIcon = iconMap[settings?.storeAddToCartIcon as keyof typeof iconMap] || ShoppingBag;
 
     const reviewStats = (() => {
+        if (product?.ratingDistribution && product.ratingDistribution.length === 5) {
+            return { avg: product.averageRating || 0, count: product.reviewCount || 0, distribution: product.ratingDistribution };
+        }
         const visibleReviews = (reviews || []).filter(r => !r.isHidden);
         if (visibleReviews.length === 0) return { avg: 0, count: 0, distribution: [0, 0, 0, 0, 0] };
         const count = visibleReviews.length;

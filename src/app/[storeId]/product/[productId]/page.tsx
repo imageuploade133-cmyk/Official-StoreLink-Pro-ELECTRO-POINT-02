@@ -969,6 +969,9 @@ export default function ProductDetailsPage() {
     const fallbackAverage = Number(product?.averageRating) || 0;
 
     const fallbackDistribution = (() => {
+      if (product?.ratingDistribution && product.ratingDistribution.length === 5) {
+        return product.ratingDistribution;
+      }
       if (visibleReviews.length === 0) return [0, 0, 0, 0, 0];
       const counts = [0, 0, 0, 0, 0];
       visibleReviews.forEach((review) => {
@@ -987,7 +990,7 @@ export default function ProductDetailsPage() {
       count: reviewApiStats.totalCount > 0 ? reviewApiStats.totalCount : fallbackCount,
       distribution: reviewApiStats.totalCount > 0 ? reviewApiStats.distribution : fallbackDistribution,
     };
-  }, [visibleReviews, reviewApiStats, product?.reviewCount, product?.averageRating]);
+  }, [visibleReviews, reviewApiStats, product?.reviewCount, product?.averageRating, product?.ratingDistribution]);
 
   const handleAddToCart = () => {
     if (product) {
@@ -1773,11 +1776,11 @@ export default function ProductDetailsPage() {
                             </p>
                           </div>
 
-                          {product.lateFee > 0 && (
+                          { (product.lateFee || 0) > 0 && (
                             <div className="flex items-center gap-1.5 pt-1">
                               <Info className="h-3 w-3 text-rose-500" />
                               <p className="text-[9px] text-rose-500 font-bold italic tracking-tight">
-                                Late fee of {formatCurrency(product.lateFee, currencySymbol)} applies after due date.
+                                Late fee of {formatCurrency(product.lateFee || 0, currencySymbol)} applies after due date.
                               </p>
                             </div>
                           )}

@@ -20,6 +20,7 @@ import {
     TrendingUp
 } from 'lucide-react';
 import type { Product, Category } from '@/lib/types';
+import { ProductRating } from '@/components/store/ProductRating';
 import { useToast } from '@/hooks/use-toast';
 
 interface StoreAppProductCardProps {
@@ -301,6 +302,15 @@ export function StoreAppProductCard({
                 <div className="space-y-1.5 px-2">
                     <p className="text-[9px] font-black uppercase tracking-[0.25em] text-primary/60">{catName}</p>
                     <h4 className="font-black text-sm text-slate-900 dark:text-white truncate leading-tight tracking-tight uppercase group-hover:text-primary transition-colors">{product.name}</h4>
+                    {settings?.productCardShowRating !== false && (
+                        <ProductRating 
+                            averageRating={product.averageRating || 0} 
+                            totalReviews={product.reviewCount || 0}
+                            size="sm"
+                            showLabel={true}
+                            className="mt-0.5"
+                        />
+                    )}
                     <div className="flex items-baseline gap-2 pt-1">
                         <p className="text-primary font-black text-base tracking-tighter">
                             {product.hasVariants ? (
