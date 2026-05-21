@@ -71,12 +71,13 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
     }
 
     const baseUrl = getAbsoluteStoreUrl(
-        store.id, 
-        store.plan || 'free', 
-        store.customDomain, 
-        store.subdomain, 
-        store.primaryDomainType
-    );
+            store.id,
+            store.plan || 'free',
+            store.customDomain,
+            store.subdomain,
+            store.primaryDomainType,
+            store.slug
+        );
     
     let path = `/product/${product.slug || product.id}`;
     const fullUrl = `${baseUrl}${path}`;
