@@ -403,7 +403,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
     const AddToCartIcon = iconMap[settings?.storeAddToCartIcon as keyof typeof iconMap] || ShoppingBag;
 
     const reviewStats = (() => {
-        const visibleReviews = (reviews || []).filter(r => !r.isHidden);
+        const visibleReviews = (reviews || []).filter(r => !r.isHidden && r.isApproved !== false);
         if (visibleReviews.length === 0) return { avg: 0, count: 0, distribution: [0, 0, 0, 0, 0] };
         const count = visibleReviews.length;
         const sum = visibleReviews.reduce((s, r) => s + r.rating, 0);
@@ -651,7 +651,7 @@ export function ProductDetailView({ id, onClose, onNavigateToCart, onNavigateToR
 
                             <div className="space-y-8 pt-4">
                                 {reviews && reviews.length > 0 ? (
-                                    reviews.filter(r => !r.isHidden).map((review) => (
+                                    reviews.filter(r => !r.isHidden && r.isApproved !== false).map((review) => (
                                         <div key={review.id} className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-500">
                                             <div className="flex justify-between items-start">
                                                 <div className="flex gap-3">

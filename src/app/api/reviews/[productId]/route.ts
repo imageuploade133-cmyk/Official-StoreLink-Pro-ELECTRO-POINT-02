@@ -38,18 +38,13 @@ export async function GET(
     const db = getFirestore();
     const reviewsRef = collection(db, 'products', productId, 'reviews');
     
-    // Build query - simplified to just filter by non-hidden, approved reviews
-    // Order by createdAt descending to get newest first
+    // Build query - simplified to just order by createdAt descending
+    // We filter isHidden and isApproved in memory to handle missing fields and avoid index requirements
     let q = query(
       reviewsRef,
-      where('isHidden', '==', false),
       orderBy('createdAt', 'desc'),
       limit(pageSize)
     );
-
-    // Also filter for approved reviews if the field exists
-    // Note: isApproved check is optional since we auto-approve on submission
-    // Adding it only if it doesn't cause index issues
 
     if (lastDocId) {
       const lastDocRef = doc(db, 'products', productId, 'reviews', lastDocId);
@@ -57,7 +52,6 @@ export async function GET(
       if (lastDocSnap.exists()) {
         q = query(
           reviewsRef,
-          where('isHidden', '==', false),
           orderBy('createdAt', 'desc'),
           startAfter(lastDocSnap),
           limit(pageSize)
@@ -68,8 +62,8 @@ export async function GET(
     const snapshot = await getDocs(q);
     const reviews: ProductReview[] = snapshot.docs.map(doc => {
       const data = doc.data();
-      // Only include approved reviews (filter out any unapproved ones as a safety measure)
-      if (data.isApproved === false) return null;
+      // Only include approved reviews and non-hidden ones
+      if (data.isHidden === true || data.isApproved === false) return null;
       return {
         ...data,
         id: doc.id,

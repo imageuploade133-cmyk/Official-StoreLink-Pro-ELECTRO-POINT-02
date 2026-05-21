@@ -716,7 +716,7 @@ export default function ProductDetailsPage() {
   // Track Recently Viewed
   useEffect(() => {
     if (productId) {
-      addViewedProduct(productId);
+      addViewedProduct(resolvedProductId || productId);
     }
   }, [productId, addViewedProduct]);
 
@@ -790,9 +790,9 @@ export default function ProductDetailsPage() {
 
   // Fetch distributed voice signatures from sub-collection
   const voicesQuery = useMemo(() => {
-      if (!firestore || !productId) return null;
-      return query(collection(firestore, 'products', productId, 'voiceSignatures'));
-  }, [firestore, productId]);
+      if (!firestore || !resolvedProductId) return null;
+      return query(collection(firestore, 'products', resolvedProductId, 'voiceSignatures'));
+  }, [firestore, resolvedProductId]);
   const { data: distributedVoices } = useCollection<VoiceSignature>(voicesQuery);
 
   useEffect(() => {
@@ -843,13 +843,13 @@ export default function ProductDetailsPage() {
 
   // Fetch Reviews
   const reviewsQuery = useMemo(() => {
-    if (!firestore || !productId) return null;
+    if (!firestore || !resolvedProductId) return null;
     return query(
-      collection(firestore, 'products', productId, 'reviews'),
+      collection(firestore, 'products', resolvedProductId, 'reviews'),
       orderBy('createdAt', 'desc')
     );
-  }, [firestore, productId]);
-  const { reviews, isLoading: isLoadingReviews, hasMore, loadMore } = useProductReviews(productId);
+  }, [firestore, resolvedProductId]);
+  const { reviews, isLoading: isLoadingReviews, hasMore, loadMore } = useProductReviews(resolvedProductId || productId);
 
   const relatedQuery = useMemo(() => {
     if (!firestore || !storeId) return null;
@@ -876,7 +876,7 @@ export default function ProductDetailsPage() {
   const finalRelatedProducts = useMemo(() => {
     if (!rawRelatedProducts) return [];
     return rawRelatedProducts
-        .filter(p => p.id !== productId) 
+        .filter(p => p.id !== resolvedProductId) 
         .map(p => ({
             ...p,
             categoryName: categoryMap.get(p.categoryId || '') || 'General Collection'
@@ -912,7 +912,7 @@ export default function ProductDetailsPage() {
     return product.hasVariants ? isCurrentlyOutOfStock : (Number(product.stock) || 0) <= 0;
   }, [product, isCurrentlyOutOfStock]);
 
-  const isInWishlist = isProductInWishlist(productId);
+  const isInWishlist = isProductInWishlist(resolvedProductId || productId);
 
 
   const visibleReviews = useMemo(() => {
@@ -959,8 +959,8 @@ export default function ProductDetailsPage() {
   };
 
   const handleToggleWishlist = () => {
-    if (isInWishlist) removeFromWishlist(productId);
-    else addToWishlist(productId);
+    if (isInWishlist) removeFromWishlist(resolvedProductId || productId);
+    else addToWishlist(resolvedProductId || productId);
   };
 
   const handleShare = async () => {
@@ -2032,7 +2032,7 @@ export default function ProductDetailsPage() {
                       </div>
                     ))}
                   </div>
-                  <ProductReviewForm productId={productId} storeId={storeId} />
+                  <ProductReviewForm productId={resolvedProductId || productId} storeId={storeId} />
                 </div>
                 <div className="lg:col-span-8 space-y-10">
                   <div className="flex justify-between items-center mb-4">
@@ -2123,7 +2123,7 @@ export default function ProductDetailsPage() {
           </section>
         )}
 
-        <RecentlyViewedSection excludeId={productId} />
+        <RecentlyViewedSection excludeId={resolvedProductId || productId} />
         <OutOfDataDrawer 
             isOpen={isOutOfDataDrawerOpen} 
             onOpenChange={setIsOutOfDataDrawerOpen}
