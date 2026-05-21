@@ -47,7 +47,9 @@ import {
   ChevronRight, 
   Loader2,
   CheckCheck,
-  Mic
+  Mic,
+  Phone,
+  Undo2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSettings } from "@/contexts/settings-context";
@@ -71,6 +73,9 @@ import { format } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Label } from '@/components/ui/label';
 import { VoiceReviewPlayer } from '@/components/store/VoiceReviewPlayer';
+import { VoiceRecorder } from '@/components/store/VoiceRecorder';
+import { VoiceReplyPlayer } from '@/components/store/VoiceReplyPlayer';
+import { Separator } from '@/components/ui/separator';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -89,7 +94,9 @@ export default function ReviewsPage() {
   const [selectedReview, setSelectedReview] = useState<ProductReview | null>(null);
   const [isActionModalOpen, setIsActionModalOpen] = useState(false);
   const [replyText, setReplyText] = useState('');
+  const [replyAudioDataUri, setReplyAudioDataUri] = useState<string | null>(null);
   const [isSubmittingReply, setIsSubmittingReply] = useState(false);
+  const [replyMode, setReplyMode] = useState<'text' | 'voice' | 'both'>('text');
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [reviewToDelete, setReviewToDelete] = useState<ProductReview | null>(null);
@@ -105,7 +112,6 @@ export default function ReviewsPage() {
       const reviewRef = doc(firestore, 'products', review.productId, 'reviews', review.id);
       await updateDoc(reviewRef, { isRead: true });
       
-      // Also update in store_reviews
       const topLevelRef = doc(firestore, 'store_reviews', review.id);
       await updateDoc(topLevelRef, { isRead: true }).catch(err => console.warn('Top level review doc might not exist yet', err));
 
@@ -119,7 +125,6 @@ export default function ReviewsPage() {
     if (!firestore || !currentStoreId || reviews.length === 0) return;
     setIsLoadingReviews(true);
     try {
-      // Use top-level collection instead of collectionGroup to avoid index requirements
       const q = query(
         collection(firestore, 'store_reviews'),
         where('store_id', '==', currentStoreId)
@@ -138,10 +143,8 @@ export default function ReviewsPage() {
         chunk.forEach((docSnap) => {
           const data = docSnap.data();
           if (!data.isRead) {
-            // Update top level
             batch.update(docSnap.ref, { isRead: true });
             
-            // Try to update nested
             if (data.productId) {
               const nestedRef = doc(firestore, 'products', data.productId, 'reviews', docSnap.id);
               batch.update(nestedRef, { isRead: true });
@@ -178,7 +181,6 @@ export default function ReviewsPage() {
     setIsLoadingReviews(true);
 
     try {
-      // Use top-level 'store_reviews' collection to avoid collectionGroup index requirements
       let q = query(
         collection(firestore, 'store_reviews'), 
         where('store_id', '==', currentStoreId), 
@@ -191,7 +193,6 @@ export default function ReviewsPage() {
           setTotalCount(countSnap.data().count);
         } catch (countErr) {
           console.warn("Count failed, might be missing index on store_reviews too:", countErr);
-          // Fallback if index on store_reviews is not yet ready
           setTotalCount(0);
         }
       }
@@ -229,7 +230,6 @@ export default function ReviewsPage() {
       }
     } catch (error: any) {
       console.error("Error fetching reviews:", error);
-      // Handle the case where the index is missing
       if (error.code === 'failed-precondition' || error.message?.includes('index')) {
         toast({ 
             variant: 'destructive', 
@@ -251,29 +251,50 @@ export default function ReviewsPage() {
   }, [firestore, authLoading, currentStoreId, fetchReviews]);
 
   const handleReply = async () => {
-    if (!selectedReview || !replyText.trim() || !firestore) return;
+    if (!selectedReview || !firestore) return;
     if (!selectedReview.productId) {
         toast({ variant: 'destructive', title: 'Error', description: 'Cannot reply: Product ID missing on review.' });
         return;
     }
+    
+    const hasTextReply = replyText.trim().length > 0;
+    const hasVoiceReply = replyAudioDataUri !== null;
+    
+    if (!hasTextReply && !hasVoiceReply) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Please provide either a text or voice reply.' });
+      return;
+    }
 
     setIsSubmittingReply(true);
     try {
-      const updateData = {
-        reply: replyText.trim(),
+      const updateData: Record<string, any> = {
         repliedAt: serverTimestamp(),
         isRead: true
       };
       
+      if (hasTextReply) {
+        updateData.reply = replyText.trim();
+      }
+      
+      if (hasVoiceReply) {
+        updateData.replyAudioDataUri = replyAudioDataUri;
+        updateData.replyAudioCreatedAt = serverTimestamp();
+      }
+      
+      if (!hasTextReply && selectedReview.reply) {
+        updateData.reply = selectedReview.reply;
+      }
+      
       const reviewRef = doc(firestore, 'products', selectedReview.productId, 'reviews', selectedReview.id);
       await updateDoc(reviewRef, updateData);
       
-      // Also update in store_reviews
       const topLevelRef = doc(firestore, 'store_reviews', selectedReview.id);
       await updateDoc(topLevelRef, updateData).catch(err => console.warn('Top level review doc might not exist yet', err));
 
-      toast({ title: 'Reply posted', description: 'Your response is now visible.' });
+      const replyType = hasVoiceReply && hasTextReply ? 'text and voice' : hasVoiceReply ? 'voice' : 'text';
+      toast({ title: 'Reply posted', description: `Your ${replyType} response is now visible.` });
       setReplyText('');
+      setReplyAudioDataUri(null);
       setIsActionModalOpen(false);
       fetchReviews('initial');
     } catch (e: any) {
@@ -293,7 +314,6 @@ export default function ReviewsPage() {
       const reviewRef = doc(firestore, 'products', review.productId, 'reviews', review.id);
       await updateDoc(reviewRef, updateData);
       
-      // Also update in store_reviews
       const topLevelRef = doc(firestore, 'store_reviews', review.id);
       await updateDoc(topLevelRef, updateData).catch(err => console.warn('Top level review doc might not exist yet', err));
 
@@ -312,7 +332,6 @@ export default function ReviewsPage() {
       const reviewRef = doc(firestore, 'products', reviewToDelete.productId, 'reviews', reviewToDelete.id);
       await deleteDoc(reviewRef);
       
-      // Also delete in store_reviews
       const topLevelRef = doc(firestore, 'store_reviews', reviewToDelete.id);
       await deleteDoc(topLevelRef).catch(err => console.warn('Top level review doc might not exist yet', err));
 
@@ -354,6 +373,21 @@ export default function ReviewsPage() {
       setIsSuspending(false);
     }
   };
+
+  const openReviewModal = (review: ProductReview) => {
+    setSelectedReview(review);
+    setReplyText(review.reply || '');
+    setReplyAudioDataUri(review.replyAudioDataUri || null);
+    setIsActionModalOpen(true);
+    if (!review.isRead) markAsRead(review);
+  };
+
+  const clearVoiceReply = () => {
+    setReplyAudioDataUri(null);
+  };
+
+  const hasExistingReply = selectedReview?.reply || selectedReview?.replyAudioDataUri;
+  const canSubmitReply = (replyText.trim().length > 0 || replyAudioDataUri !== null);
 
   if (authLoading) {
     return <div className="flex h-screen w-full items-center justify-center"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>;
@@ -423,7 +457,7 @@ export default function ReviewsPage() {
                   </TableRow>
                 ) : (
                   reviews.map((review) => (
-                    <TableRow key={review.id} className={cn("group transition-colors", review.isHidden && "bg-muted/30 opacity-60", !review.isRead && !review.reply && "bg-primary/[0.03] dark:bg-primary/[0.05]")}>
+                    <TableRow key={review.id} className={cn("group transition-colors", review.isHidden && "bg-muted/30 opacity-60", !review.isRead && !review.reply && !review.replyAudioDataUri && "bg-primary/[0.03] dark:bg-primary/[0.05]")}>
                       <TableCell className="pl-6">
                         <div className="flex items-center gap-3">
                           <div className="relative">
@@ -433,7 +467,7 @@ export default function ReviewsPage() {
                                   {review.userName.substring(0, 2).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
-                            {!review.isRead && !review.reply && (
+                            {!review.isRead && !review.reply && !review.replyAudioDataUri && (
                               <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
@@ -451,21 +485,26 @@ export default function ReviewsPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="space-y-1.5">
+                        <div className="space-y-2">
                             <p className="text-sm leading-snug line-clamp-2 font-medium italic" title={review.comment}>&quot;{review.comment}&quot;</p>
-                            <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                            <div className="flex flex-wrap items-center gap-2">
                                 {review.audioDataUri && (
                                     <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-[9px] font-black uppercase tracking-widest text-amber-600">
                                         <Mic className="h-2.5 w-2.5" /> Voice
+                                    </div>
+                                )}
+                                {review.replyAudioDataUri && (
+                                    <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-black uppercase tracking-widest text-emerald-600">
+                                        <Phone className="h-2.5 w-2.5" /> Voice Reply
                                     </div>
                                 )}
                                 {review.reply ? (
                                     <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-primary/5 border border-primary/10 text-[10px] font-black uppercase tracking-widest text-primary">
                                         <ReplyIcon className="h-3 w-3" /> Replied
                                     </div>
-                                ) : (
+                                ) : (!review.replyAudioDataUri && (
                                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">No Response Yet</span>
-                                )}
+                                ))}
                             </div>
                         </div>
                       </TableCell>
@@ -484,12 +523,7 @@ export default function ReviewsPage() {
                         )}
                       </TableCell>
                       <TableCell className="text-right pr-6">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-primary/10 hover:text-primary transition-all" onClick={() => { 
-                          setSelectedReview(review); 
-                          setReplyText(review.reply || ''); 
-                          setIsActionModalOpen(true); 
-                          if (!review.isRead) markAsRead(review);
-                        }}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-primary/10 hover:text-primary transition-all" onClick={() => openReviewModal(review)}>
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </TableCell>
@@ -546,21 +580,126 @@ export default function ReviewsPage() {
               )}
             </div>
 
-            <div className="space-y-3">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Official Merchant Reply</Label>
-              <Textarea
-                placeholder="Address the customer's feedback. This will be visible on the product page."
-                value={replyText}
-                onChange={(e) => setReplyText(e.target.value)}
-                className="min-h-[120px] rounded-2xl resize-none bg-slate-50 dark:bg-slate-900 border-none focus-visible:ring-primary shadow-inner"
-              />
+            {hasExistingReply && (selectedReview.reply || selectedReview.replyAudioDataUri) && (
+              <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="h-6 w-6 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                    <ReplyIcon className="h-3 w-3 text-emerald-600" />
+                  </div>
+                  <span className="text-sm font-black text-emerald-600 uppercase tracking-widest">Your Response</span>
+                </div>
+                {selectedReview.reply && (
+                  <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">&quot;{selectedReview.reply}&quot;</p>
+                )}
+                {selectedReview.replyAudioDataUri && (
+                  <VoiceReplyPlayer 
+                    dataUri={selectedReview.replyAudioDataUri} 
+                    accentColor={settings?.productReviewVoiceBtnColor || '#10b981'}
+                  />
+                )}
+              </div>
+            )}
+
+            <Separator />
+
+            <div className="space-y-4">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                <ReplyIcon className="h-3 w-3" />
+                Reply to Customer
+              </Label>
+              
+              <div className="flex items-center gap-2 p-1 bg-muted/30 rounded-xl">
+                <button
+                  type="button"
+                  onClick={() => setReplyMode('text')}
+                  className={cn(
+                    "flex-1 py-2 px-4 rounded-lg text-xs font-black uppercase tracking-widest transition-all",
+                    replyMode === 'text' 
+                      ? "bg-primary text-primary-foreground shadow-md" 
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  Text Reply
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReplyMode('voice')}
+                  className={cn(
+                    "flex-1 py-2 px-4 rounded-lg text-xs font-black uppercase tracking-widest transition-all",
+                    replyMode === 'voice' 
+                      ? "bg-emerald-500 text-white shadow-md" 
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  Voice Reply
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReplyMode('both')}
+                  className={cn(
+                    "flex-1 py-2 px-4 rounded-lg text-xs font-black uppercase tracking-widest transition-all",
+                    replyMode === 'both' 
+                      ? "bg-amber-500 text-white shadow-md" 
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  Both
+                </button>
+              </div>
+
+              {(replyMode === 'text' || replyMode === 'both') && (
+                <div className="space-y-2">
+                  <Textarea
+                    placeholder="Type your reply message to the customer..."
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    className="min-h-[100px] rounded-2xl resize-none bg-slate-50 dark:bg-slate-900 border-none focus-visible:ring-primary shadow-inner"
+                  />
+                </div>
+              )}
+
+              {(replyMode === 'voice' || replyMode === 'both') && (
+                <div className="space-y-3">
+                  <VoiceRecorder
+                    onRecordingComplete={setReplyAudioDataUri}
+                    existingAudio={replyAudioDataUri}
+                    accentColor={settings?.productReviewVoiceBtnColor || '#10b981'}
+                    disabled={isSubmittingReply}
+                  />
+                  {replyAudioDataUri && (
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Phone className="h-3 w-3" />
+                      <span>Voice message recorded and ready to send</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <Button 
-                className="w-full h-12 rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg shadow-primary/20" 
+                className={cn(
+                  "w-full h-12 rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg",
+                  replyMode === 'voice' 
+                    ? "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20" 
+                    : replyMode === 'both'
+                    ? "bg-amber-500 hover:bg-amber-600 shadow-amber-500/20"
+                    : "shadow-lg shadow-primary/20"
+                )} 
                 onClick={handleReply} 
-                disabled={isSubmittingReply || !replyText.trim() || replyText === selectedReview.reply}
+                disabled={isSubmittingReply || !canSubmitReply}
               >
-                {isSubmittingReply ? <Loader2 className="h-4 w-4 animate-spin" /> : <ReplyIcon className="h-4 w-4 mr-2" />}
-                {selectedReview.reply ? 'Update My Reply' : 'Post Official Reply'}
+                {isSubmittingReply ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    {replyMode === 'voice' ? (
+                      <><Phone className="h-4 w-4 mr-2" /> Send Voice Reply</>
+                    ) : replyMode === 'both' ? (
+                      <><ReplyIcon className="h-4 w-4 mr-2" /> Send Text & Voice Reply</>
+                    ) : (
+                      <><ReplyIcon className="h-4 w-4 mr-2" /> Post Text Reply</>
+                    )}
+                  </>
+                )}
               </Button>
             </div>
 

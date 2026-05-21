@@ -1237,6 +1237,7 @@ export interface ProductReview {
   isApproved?: boolean;
   isRead?: boolean;
   audioDataUri?: string;
+  replyAudioDataUri?: string;
 }
 
 export interface AdLink {
