@@ -516,6 +516,9 @@ export interface Settings {
   logisticsImageUrl?: string;
   showRelatedProducts?: boolean;
   relatedProductsBackgroundColor?: string;
+  relatedProductsBackgroundStyle?: 'solid' | 'gradient';
+  relatedProductsGradientStart?: string;
+  relatedProductsGradientEnd?: string;
   relatedProductsTitle?: string;
   relatedProductsDescription?: string;
   plan?: string;

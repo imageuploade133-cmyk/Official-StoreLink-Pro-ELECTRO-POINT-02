@@ -24,12 +24,33 @@ import { cn } from '@/lib/utils';
 
 const recommendationsSchema = z.object({
   showRelatedProducts: z.boolean().default(true),
+  relatedProductsBackgroundStyle: z.enum(['solid', 'gradient']).default('solid'),
   relatedProductsBackgroundColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default('#f8fafc'),
+  relatedProductsGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default('#f5f5f7'),
+  relatedProductsGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default('#ffffff'),
   relatedProductsTitle: z.string().min(3, 'Title must be at least 3 characters.'),
   relatedProductsDescription: z.string().optional().or(z.literal('')),
 });
 
 type FormValues = z.infer<typeof recommendationsSchema>;
+
+const ColorInput = ({ field, label, disabled }: { field: any; label: string; disabled?: boolean }) => (
+    <FormItem>
+        <FormLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</FormLabel>
+        <div className="flex items-center gap-3">
+            <FormControl>
+                <Input 
+                    type="color" 
+                    {...field} 
+                    className="p-1 h-10 w-12 cursor-pointer rounded-md border-2" 
+                    disabled={disabled}
+                />
+            </FormControl>
+            <span className="text-sm font-mono font-medium text-muted-foreground">{field.value}</span>
+        </div>
+        <FormMessage />
+    </FormItem>
+);
 
 export default function RecommendationsSettingsPage() {
   const firestore = useFirestore();
@@ -66,7 +87,10 @@ export default function RecommendationsSettingsPage() {
     resolver: zodResolver(recommendationsSchema),
     defaultValues: {
       showRelatedProducts: true,
+      relatedProductsBackgroundStyle: 'solid',
       relatedProductsBackgroundColor: '#f8fafc',
+      relatedProductsGradientStart: '#f5f5f7',
+      relatedProductsGradientEnd: '#ffffff',
       relatedProductsTitle: 'You Might Also Like',
       relatedProductsDescription: 'Specially curated items from the same collection.',
     }
@@ -76,7 +100,10 @@ export default function RecommendationsSettingsPage() {
     if (settingsData) {
       form.reset({
         showRelatedProducts: settingsData.showRelatedProducts ?? true,
+        relatedProductsBackgroundStyle: settingsData.relatedProductsBackgroundStyle || 'solid',
         relatedProductsBackgroundColor: settingsData.relatedProductsBackgroundColor || '#f8fafc',
+        relatedProductsGradientStart: settingsData.relatedProductsGradientStart || '#f5f5f7',
+        relatedProductsGradientEnd: settingsData.relatedProductsGradientEnd || '#ffffff',
         relatedProductsTitle: settingsData.relatedProductsTitle || 'You Might Also Like',
         relatedProductsDescription: settingsData.relatedProductsDescription || 'Specially curated items from the same collection.',
       });
@@ -156,7 +183,6 @@ export default function RecommendationsSettingsPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormField
                         control={form.control}
@@ -172,55 +198,108 @@ export default function RecommendationsSettingsPage() {
                         )}
                     />
                     <FormField
-                        control={form.control}
-                        name="relatedProductsBackgroundColor"
-                        render={({ field }) => (
+                      control={form.control}
+                      name="relatedProductsDescription"
+                      render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Background Color</FormLabel>
-                            <div className="flex items-center gap-3">
-                                <FormControl>
-                                    <Input 
-                                        type="color" 
-                                        {...field} 
-                                        className="p-1 h-10 w-12 cursor-pointer rounded-md" 
-                                        disabled={!isVisible}
-                                    />
-                                </FormControl>
-                                <span className="text-sm font-mono text-muted-foreground">{field.value}</span>
-                                <Button 
-                                    type="button" 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    onClick={() => field.onChange('#f8fafc')}
-                                    disabled={!isVisible}
-                                >
-                                    Reset
-                                </Button>
-                            </div>
-                            <FormMessage />
+                          <FormLabel>Tagline / Description</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="e.g., Specially curated items from the same collection" 
+                              {...field} 
+                              disabled={!isVisible}
+                            />
+                          </FormControl>
+                          <FormMessage />
                         </FormItem>
-                        )}
+                      )}
                     />
                   </div>
 
-                  <FormField
-                    control={form.control}
-                    name="relatedProductsDescription"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Tagline / Description</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="e.g., Specially curated items from the same collection" 
-                            {...field} 
-                            disabled={!isVisible}
-                          />
-                        </FormControl>
-                        <FormDescription>Small text displayed below the title.</FormDescription>
-                        <FormMessage />
-                      </FormItem>
+                  <Separator />
+
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                        <Palette className="h-4 w-4" /> Background Styling
+                    </h4>
+                    
+                    <FormField
+                      control={form.control}
+                      name="relatedProductsBackgroundStyle"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              {[
+                                { value: 'solid', label: 'Solid Color', icon: '■' },
+                                { value: 'gradient', label: 'Gradient', icon: '⊔' }
+                              ].map((option) => (
+                                <button
+                                  key={option.value}
+                                  type="button"
+                                  onClick={() => field.onChange(option.value)}
+                                  disabled={!isVisible}
+                                  className={`flex items-center justify-center gap-3 rounded-xl border-2 p-4 cursor-pointer transition-all ${
+                                    field.value === option.value
+                                      ? 'border-primary bg-primary/5 shadow-sm'
+                                      : 'border-border hover:border-primary/30 hover:bg-muted/50'
+                                  } ${!isVisible && 'opacity-50 cursor-not-allowed'}`}
+                                >
+                                  <span className="text-xl">{option.icon}</span>
+                                  <span className="text-sm font-bold">{option.label}</span>
+                                </button>
+                              ))}
+                            </div>
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    {form.watch('relatedProductsBackgroundStyle') === 'solid' ? (
+                      <div className="p-4 rounded-xl border bg-muted/30 animate-in fade-in duration-300">
+                        <FormField
+                          control={form.control}
+                          name="relatedProductsBackgroundColor"
+                          render={({ field }) => (
+                            <div className="flex items-center justify-between gap-4">
+                                <ColorInput field={field} label="Solid Background Color" disabled={!isVisible} />
+                                <Button 
+                                    type="button" 
+                                    variant="outline" 
+                                    size="sm" 
+                                    onClick={() => field.onChange('#f8fafc')}
+                                    disabled={!isVisible}
+                                    className="rounded-full px-4"
+                                >
+                                    Reset Default
+                                </Button>
+                            </div>
+                          )}
+                        />
+                      </div>
+                    ) : (
+                      <div className="p-4 rounded-xl border bg-muted/30 animate-in fade-in duration-300 space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <FormField
+                            control={form.control}
+                            name="relatedProductsGradientStart"
+                            render={({ field }) => <ColorInput field={field} label="Gradient Start" disabled={!isVisible} />}
+                            />
+                            <FormField
+                            control={form.control}
+                            name="relatedProductsGradientEnd"
+                            render={({ field }) => <ColorInput field={field} label="Gradient End" disabled={!isVisible} />}
+                            />
+                        </div>
+                        <div 
+                          className="h-10 w-full rounded-lg border shadow-inner" 
+                          style={{ 
+                            background: `linear-gradient(to right, ${form.watch('relatedProductsGradientStart')}, ${form.watch('relatedProductsGradientEnd')})` 
+                          }}
+                        />
+                      </div>
                     )}
-                  />
+                  </div>
                 </CardContent>
                 <CardFooter className="border-t pt-6">
                   <Button type="submit" disabled={isSaving} size="lg" className="min-w-[200px] font-bold">
@@ -241,7 +320,7 @@ export default function RecommendationsSettingsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="text-sm space-y-4 text-muted-foreground leading-relaxed">
-              <p>The "You Might Also Like" section uses a smart fallback algorithm:</p>
+              <p>The &quot;You Might Also Like&quot; section uses a smart fallback algorithm:</p>
               <ul className="list-disc pl-5 space-y-2 font-medium">
                 <li>First, it finds products in the **same category**.</li>
                 <li>It then **randomizes** them to provide a fresh experience.</li>

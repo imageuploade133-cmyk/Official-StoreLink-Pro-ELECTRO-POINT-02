@@ -903,6 +903,17 @@ export default function ProductDetailsPage() {
 
   const showRecommendations = settings?.showRelatedProducts !== false;
   const recommendationsBg = settings?.relatedProductsBackgroundColor || 'transparent';
+  const recommendationsBgStyle = useMemo(() => {
+    if (settings?.relatedProductsBackgroundStyle === 'gradient') {
+      return {
+        background: `linear-gradient(to bottom, ${settings?.relatedProductsGradientStart || '#f5f5f7'}, ${settings?.relatedProductsGradientEnd || '#ffffff'})`
+      };
+    }
+    if (settings?.relatedProductsBackgroundStyle === 'solid' && settings?.relatedProductsBackgroundColor && settings.relatedProductsBackgroundColor !== 'transparent') {
+      return { backgroundColor: settings.relatedProductsBackgroundColor };
+    }
+    return {};
+  }, [settings]);
   const recommendationsTitle = settings?.relatedProductsTitle || 'You Might Also Like';
   const recommendationsDescription = settings?.relatedProductsDescription || 'Specially curated items from the same collection.';
 
@@ -2099,7 +2110,7 @@ export default function ProductDetailsPage() {
         )}
 
         {showRecommendations && finalRelatedProducts.length > 0 && (
-          <section className="mt-40 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-24 bg-[#f5f5f7] dark:bg-[#1d1d1f]">
+          <section className="mt-40 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-24" style={recommendationsBgStyle}>
             <div className="max-w-7xl mx-auto">
               <div className="flex items-end justify-between mb-16 px-4">
                 <div className="space-y-2">
