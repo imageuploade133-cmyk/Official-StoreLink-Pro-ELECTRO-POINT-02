@@ -31,9 +31,10 @@ type ReviewFormValues = z.infer<typeof reviewSchema>;
 interface ProductReviewFormProps {
   productId: string;
   storeId?: string;
+  onRefresh?: () => void;
 }
 
-export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps) {
+export function ProductReviewForm({ productId, storeId, onRefresh }: ProductReviewFormProps) {
   const { user } = useUser();
   const firestore = useFirestore();
   const { settings } = useSettings();
@@ -253,6 +254,7 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
 
       toast({ title: 'Review Submitted', description: 'Thank you for your feedback!' });
       form.reset();
+      if (onRefresh) onRefresh();
     } catch (e: any) {
       console.error('[ProductReviewForm] Submit error:', e);
       toast({ variant: 'destructive', title: 'Error', description: e.message || 'Failed to submit review. Please try again.' });

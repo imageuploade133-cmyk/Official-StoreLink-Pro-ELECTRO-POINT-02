@@ -38,45 +38,79 @@ export async function GET(
     const db = getFirestore();
     const reviewsRef = collection(db, 'products', productId, 'reviews');
     
-    // Build query - simplified to just filter by non-hidden, approved reviews
-    // Order by createdAt descending to get newest first
-    let q = query(
-      reviewsRef,
-      where('isHidden', '==', false),
-      orderBy('createdAt', 'desc'),
-      limit(pageSize)
-    );
+    // Better Solution: 
+    // We'll use a simpler query first to avoid index issues if they occur
+    // and handle filtering of hidden/unapproved reviews in memory for small batches
+    // OR try the filtered query and fallback gracefully.
+    
+    let reviews: ProductReview[] = [];
+    let lastVisible: any = null;
+    let hasMore = false;
 
-    // Also filter for approved reviews if the field exists
-    // Note: isApproved check is optional since we auto-approve on submission
-    // Adding it only if it doesn't cause index issues
+    try {
+      // Primary query: newest first, limited to pageSize + 1 to check for hasMore
+      let q = query(
+        reviewsRef,
+        orderBy('createdAt', 'desc'),
+        limit(pageSize + 5) // Fetch a few more to account for in-memory filtering
+      );
 
-    if (lastDocId) {
-      const lastDocRef = doc(db, 'products', productId, 'reviews', lastDocId);
-      const lastDocSnap = await getDoc(lastDocRef);
-      if (lastDocSnap.exists()) {
-        q = query(
-          reviewsRef,
-          where('isHidden', '==', false),
-          orderBy('createdAt', 'desc'),
-          startAfter(lastDocSnap),
-          limit(pageSize)
-        );
+      if (lastDocId) {
+        const lastDocRef = doc(db, 'products', productId, 'reviews', lastDocId);
+        const lastDocSnap = await getDoc(lastDocRef);
+        if (lastDocSnap.exists()) {
+          q = query(
+            reviewsRef,
+            orderBy('createdAt', 'desc'),
+            startAfter(lastDocSnap),
+            limit(pageSize + 5)
+          );
+        }
       }
-    }
 
-    const snapshot = await getDocs(q);
-    const reviews: ProductReview[] = snapshot.docs.map(doc => {
-      const data = doc.data();
-      // Only include approved reviews (filter out any unapproved ones as a safety measure)
-      if (data.isApproved === false) return null;
-      return {
-        ...data,
+      const snapshot = await getDocs(q);
+      
+      const allFetchedReviews = snapshot.docs.map(doc => ({
+        ...doc.data(),
         id: doc.id,
-      };
-    }).filter(Boolean) as ProductReview[];
+      })) as ProductReview[];
 
-    const lastVisible = snapshot.docs[snapshot.docs.length - 1];
+      // Filter in-memory to be inclusive of undefined fields
+      reviews = allFetchedReviews.filter(r => {
+        const isHidden = r.isHidden === true;
+        const isApproved = r.isApproved !== false; // Default to true if undefined
+        return !isHidden && isApproved;
+      });
+
+      // Truncate to pageSize and determine hasMore
+      if (reviews.length > pageSize) {
+        hasMore = true;
+        reviews = reviews.slice(0, pageSize);
+      } else if (allFetchedReviews.length > pageSize) {
+        // We might have more if we fetched more than pageSize but filtered some out
+        hasMore = true;
+      }
+      
+      lastVisible = snapshot.docs[Math.min(reviews.length - 1, snapshot.docs.length - 1)];
+
+    } catch (queryError: any) {
+      console.error('[Reviews API] Primary query failed, using simplified fallback:', queryError);
+      // Fallback: Extremely simple query
+      const fallbackQuery = query(reviewsRef, limit(50));
+      const snapshot = await getDocs(fallbackQuery);
+      reviews = snapshot.docs
+        .map(doc => ({ ...doc.data(), id: doc.id } as ProductReview))
+        .filter(r => r.isHidden !== true && r.isApproved !== false)
+        .sort((a, b) => {
+            const dateA = a.createdAt?.toMillis?.() || 0;
+            const dateB = b.createdAt?.toMillis?.() || 0;
+            return dateB - dateA;
+        })
+        .slice(0, pageSize);
+      
+      hasMore = snapshot.docs.length > pageSize;
+      lastVisible = snapshot.docs[reviews.length - 1];
+    }
 
     return NextResponse.json(
       {
@@ -84,7 +118,7 @@ export async function GET(
         data: reviews,
         count: reviews.length,
         lastId: lastVisible ? lastVisible.id : null,
-        hasMore: reviews.length === pageSize,
+        hasMore: hasMore,
       },
       {
         headers: {
@@ -93,49 +127,7 @@ export async function GET(
       }
     );
   } catch (error: any) {
-    console.error('[Reviews API] Error fetching reviews:', error);
-    
-    // Check if it's an index-related error
-    if (error.code === 'failed-precondition' || error.message?.includes('index')) {
-      // Fallback: try querying without filters if composite index is missing
-      try {
-        const { productId } = await params;
-        const db = getFirestore();
-        const reviewsRef = collection(db, 'products', productId, 'reviews');
-        
-        const fallbackQuery = query(
-          reviewsRef,
-          orderBy('createdAt', 'desc'),
-          limit(10)
-        );
-        
-        const snapshot = await getDocs(fallbackQuery);
-        const reviews: ProductReview[] = snapshot.docs.map(doc => {
-          const data = doc.data();
-          if (data.isHidden === true || data.isApproved === false) return null;
-          return { ...data, id: doc.id };
-        }).filter(Boolean) as ProductReview[];
-
-        return NextResponse.json(
-          {
-            success: true,
-            data: reviews,
-            count: reviews.length,
-            lastId: snapshot.docs[snapshot.docs.length - 1]?.id || null,
-            hasMore: reviews.length === 10,
-            note: 'Using fallback query - some filtering may be client-side',
-          },
-          {
-            headers: {
-              'Cache-Control': 'no-store, max-age=0',
-            },
-          }
-        );
-      } catch (fallbackError) {
-        console.error('[Reviews API] Fallback query also failed:', fallbackError);
-      }
-    }
-    
+    console.error('[Reviews API] Fatal error fetching reviews:', error);
     return NextResponse.json(
       {
         success: false,
