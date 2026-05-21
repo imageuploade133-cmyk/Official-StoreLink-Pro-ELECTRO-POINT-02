@@ -110,13 +110,17 @@ export async function GET(
       distribution: [0, 0, 0, 0, 0],
     };
 
+    // Always use the query pattern without store_id filter to avoid composite index requirement
+    // Store reviews by filtering in-memory after fetching by productId
+    
     try {
-      const constraints: QueryConstraint[] = [where('productId', 'in', productIdList)];
-      if (storeId) {
-        constraints.push(where('store_id', '==', storeId));
-      }
-      constraints.push(orderBy('createdAt', 'desc'));
-      constraints.push(limit(pageSize + 8));
+      // Query: where productId IN [...] orderBy createdAt desc
+      // This is a single-field query that doesn't require a composite index
+      const constraints: QueryConstraint[] = [
+        where('productId', 'in', productIdList),
+        orderBy('createdAt', 'desc'),
+        limit(pageSize + 8)
+      ];
 
       if (lastDocId) {
         const cursorDoc = await getDoc(doc(db, 'store_reviews', lastDocId));
@@ -126,29 +130,36 @@ export async function GET(
       }
 
       const pageSnapshot = await getDocs(query(reviewsRef, ...constraints));
-      const fetched = pageSnapshot.docs.map((reviewDoc) => ({
+      let fetched = pageSnapshot.docs.map((reviewDoc) => ({
         ...reviewDoc.data(),
         id: reviewDoc.id,
       })) as ProductReview[];
+
+      // Filter by store_id in-memory if storeId is provided (handles missing composite index)
+      if (storeId) {
+        fetched = fetched.filter(r => r.store_id === storeId);
+      }
 
       const visibleFetched = fetched.filter(isVisibleReview);
       reviews = visibleFetched.slice(0, pageSize);
       hasMore = visibleFetched.length > pageSize || pageSnapshot.docs.length > pageSize;
       lastVisibleId = reviews.length > 0 ? reviews[reviews.length - 1].id : null;
 
-      const statsConstraints: QueryConstraint[] = [where('productId', 'in', productIdList)];
-      if (storeId) {
-        statsConstraints.push(where('store_id', '==', storeId));
-      }
-
-      const statsSnapshot = await getDocs(query(reviewsRef, ...statsConstraints));
-      const allStatsReviews = statsSnapshot.docs
+      // For stats, fetch all reviews for the productIds and filter in-memory
+      const statsSnapshot = await getDocs(query(reviewsRef, where('productId', 'in', productIdList)));
+      let statsReviews = statsSnapshot.docs
         .map((reviewDoc) => ({ ...reviewDoc.data(), id: reviewDoc.id } as ProductReview))
         .filter(isVisibleReview);
-      stats = computeStats(allStatsReviews);
+      
+      // Also filter stats by store_id in-memory if storeId is provided
+      if (storeId) {
+        statsReviews = statsReviews.filter(r => r.store_id === storeId);
+      }
+      stats = computeStats(statsReviews);
     } catch (queryError) {
-      console.error('[Reviews API] Primary query failed, using fallback:', queryError);
+      console.error('[Reviews API] Query failed, trying fallback:', queryError);
 
+      // Fallback: Try nested product reviews subcollection (legacy storage)
       const allFallbackReviews: ProductReview[] = [];
 
       await Promise.all(
