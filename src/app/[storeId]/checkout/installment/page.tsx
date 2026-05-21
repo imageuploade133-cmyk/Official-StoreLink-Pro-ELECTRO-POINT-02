@@ -207,7 +207,7 @@ export default function InstallmentCheckoutPage() {
                               {format(nextDueDate, 'MMMM do, yyyy')}
                           </p>
                           <p className="text-[11px] text-slate-500 font-medium">
-                              We'll send you a reminder 3 days before your next payment of {formatCurrency(installmentAmount, currencySymbol)} is due.
+                              We&apos;ll send you a reminder 3 days before your next payment of {formatCurrency(installmentAmount, currencySymbol)} is due.
                           </p>
                       </div>
                   </div>
@@ -385,7 +385,7 @@ export default function InstallmentCheckoutPage() {
                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Recurring Amount</p>
                            <p className="text-xl font-black text-primary">{formatCurrency(installmentAmount, currencySymbol)}</p>
                         </div>
-                        <p className="text-[10px] font-black text-slate-400 mb-1">{product.paymentInterval.toUpperCase()}</p>
+                        <p className="text-[10px] font-black text-slate-400 mb-1">{(product.paymentInterval || 'monthly').toUpperCase()}</p>
                     </div>
                     <div className="h-1.5 w-full bg-primary/10 rounded-full overflow-hidden">
                        <div className="h-full bg-primary/30 w-1/4 rounded-full" />

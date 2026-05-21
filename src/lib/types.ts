@@ -522,6 +522,7 @@ export interface Settings {
   relatedProductsTitle?: string;
   relatedProductsDescription?: string;
   relatedProductsTextColor?: string;
+  relatedProductsTextColorStyle?: 'solid' | 'gradient';
   relatedProductsTextGradientStart?: string;
   relatedProductsTextGradientEnd?: string;
   relatedProductsButtonColor?: string;

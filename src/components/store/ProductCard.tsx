@@ -386,10 +386,12 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
                 titleAlign === 'center' && "justify-center"
             )}>
                 {settings?.productCardShowRating !== false && (
-                    <div className="flex items-center text-[12px] font-semibold text-[#ff9500]">
-                        <Star className="h-3 w-3 fill-current mr-1" />
-                        {product.averageRating ? product.averageRating.toFixed(1) : '0.0'}
-                    </div>
+                    <ProductRating 
+                        averageRating={product.averageRating || 0} 
+                        totalReviews={product.reviewCount || 0}
+                        size="sm"
+                        showLabel={true}
+                    />
                 )}
                 <span className="text-[11px] text-[#86868b] font-medium">{(product.totalSold || 0) >= 1000 ? `${((product.totalSold || 0) / 1000).toFixed(1)}k+` : (product.totalSold || 0)} sold</span>
             </div>

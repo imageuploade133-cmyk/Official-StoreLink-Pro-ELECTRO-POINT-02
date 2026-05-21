@@ -393,7 +393,7 @@ export function ProductReviewForm({ productId, alternateProductId, storeId, onRe
                         className="h-10 w-10 rounded-full text-white hover:opacity-90 shadow-md"
                         style={{ 
                           backgroundColor: settings?.productReviewVoiceBtnColor || '#3b82f6',
-                          shadowColor: `${settings?.productReviewVoiceBtnColor || '#3b82f6'}33`
+                          boxShadow: `0 4px 12px ${settings?.productReviewVoiceBtnColor || '#3b82f6'}33`
                         }}
                         onClick={togglePlayback}
                       >
