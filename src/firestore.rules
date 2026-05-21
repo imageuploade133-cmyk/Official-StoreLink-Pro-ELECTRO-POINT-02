@@ -40,6 +40,20 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    /* Reviews subcollection - allow authenticated users to create */
+    match /products/{productId}/reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && request.auth.uid == resource.data.userId;
+    }
+
+    /* Store reviews collection for dashboard management */
+    match /store_reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn();
+    }
+
     /* ✅ ADD THIS */
     match /settings/{document=**} {
       allow read: if true;          // public can read settings/global

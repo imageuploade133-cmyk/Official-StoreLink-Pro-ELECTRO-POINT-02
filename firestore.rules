@@ -120,7 +120,14 @@ service cloud.firestore {
 
     match /{path=**}/reviews/{reviewId} {
       allow read: if true;
-      allow create: if isSignedIn() && (request.resource.data.userId == request.auth.uid || canManageStore(getStaffStoreId(request.resource.data)));
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && canManageStore(getStaffStoreId(resource.data));
+    }
+
+    /* Store reviews collection for dashboard management */
+    match /store_reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
       allow update, delete: if isSignedIn() && canManageStore(getStaffStoreId(resource.data));
     }
 

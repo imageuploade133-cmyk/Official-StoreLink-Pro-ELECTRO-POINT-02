@@ -183,7 +183,10 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
   });
 
   const onSubmit = async (values: ReviewFormValues) => {
-    if (!user || !firestore) return;
+    if (!user || !firestore) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Please ensure you are logged in and try again.' });
+      return;
+    }
     setIsSubmitting(true);
     try {
       // Check if user is banned
@@ -201,6 +204,7 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
           return;
       }
 
+      // Get the review collection reference using the correct firestore instance
       const reviewCollectionRef = collection(firestore, 'products', productId, 'reviews');
       const reviewDocRef = doc(reviewCollectionRef);
       
@@ -250,7 +254,8 @@ export function ProductReviewForm({ productId, storeId }: ProductReviewFormProps
       toast({ title: 'Review Submitted', description: 'Thank you for your feedback!' });
       form.reset();
     } catch (e: any) {
-      toast({ variant: 'destructive', title: 'Error', description: e.message || 'Failed to submit review.' });
+      console.error('[ProductReviewForm] Submit error:', e);
+      toast({ variant: 'destructive', title: 'Error', description: e.message || 'Failed to submit review. Please try again.' });
     } finally {
       setIsSubmitting(false);
     }
