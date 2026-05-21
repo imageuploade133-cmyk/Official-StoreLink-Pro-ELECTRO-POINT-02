@@ -521,6 +521,13 @@ export interface Settings {
   relatedProductsGradientEnd?: string;
   relatedProductsTitle?: string;
   relatedProductsDescription?: string;
+  relatedProductsTextColor?: string;
+  relatedProductsTextGradientStart?: string;
+  relatedProductsTextGradientEnd?: string;
+  relatedProductsButtonColor?: string;
+  relatedProductsButtonStyle?: 'solid' | 'gradient';
+  relatedProductsButtonGradientStart?: string;
+  relatedProductsButtonGradientEnd?: string;
   plan?: string;
   enableWelcomeCredit?: boolean;
   welcomeCreditAmount?: number;

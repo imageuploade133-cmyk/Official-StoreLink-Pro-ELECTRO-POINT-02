@@ -917,6 +917,35 @@ export default function ProductDetailsPage() {
   const recommendationsTitle = settings?.relatedProductsTitle || 'You Might Also Like';
   const recommendationsDescription = settings?.relatedProductsDescription || 'Specially curated items from the same collection.';
 
+  // Text Color Styling
+  const recommendationsTextStyle = useMemo(() => {
+    if (settings?.relatedProductsTextColorStyle === 'gradient') {
+      return {
+        background: `linear-gradient(to right, ${settings?.relatedProductsTextGradientStart || '#3b82f6'}, ${settings?.relatedProductsTextGradientEnd || '#8b5cf6'})`,
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+      };
+    }
+    return { color: settings?.relatedProductsTextColor || '#1d1d1f' };
+  }, [settings]);
+
+  // Button Color Styling
+  const recommendationsButtonStyle = useMemo(() => {
+    if (settings?.relatedProductsButtonStyle === 'gradient') {
+      return {
+        background: `linear-gradient(to right, ${settings?.relatedProductsButtonGradientStart || '#3b82f6'}, ${settings?.relatedProductsButtonGradientEnd || '#1d4ed8'})`,
+        color: 'white',
+        border: 'none'
+      };
+    }
+    return {
+      backgroundColor: settings?.relatedProductsButtonColor || '#3b82f6',
+      color: 'white',
+      border: 'none'
+    };
+  }, [settings]);
+
   const isDiscounted = product ? (effectivePrice < product.sellingPrice) : false;
   const isOutOfStock = useMemo(() => {
     if (!product) return false;
@@ -2104,11 +2133,11 @@ export default function ProductDetailsPage() {
             <div className="max-w-7xl mx-auto">
               <div className="flex items-end justify-between mb-16 px-4">
                 <div className="space-y-2">
-                  <h2 className="text-4xl font-semibold tracking-tight text-[#1d1d1f] dark:text-[#f5f5f7]">{recommendationsTitle}</h2>
-                  <p className="text-[#86868b] font-medium uppercase tracking-widest text-xs">{recommendationsDescription}</p>
+                  <h2 className="text-4xl font-semibold tracking-tight" style={recommendationsTextStyle}>{recommendationsTitle}</h2>
+                  <p className="font-medium uppercase tracking-widest text-xs" style={{ ...recommendationsTextStyle, fontSize: "12px", opacity: 0.7 }}>{recommendationsDescription}</p>
                 </div>
                 <div className="flex gap-4">
-                  <Button asChild variant="ghost" className="font-semibold text-sm text-primary gap-2 hover:bg-primary/5 rounded-full">
+                  <Button asChild variant="ghost" className="font-semibold text-sm gap-2 hover:bg-primary/5 rounded-full" style={recommendationsButtonStyle}>
                     <Link href={getStoreUrl('/store/shop')}>
                       Browse Collection <ChevronRight className="h-4 w-4" />
                     </Link>
@@ -2117,7 +2146,7 @@ export default function ProductDetailsPage() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 {finalRelatedProducts.map((related) => (
-                  <ProductCard key={related.id} product={related} currencySymbol={currencySymbol} />
+                  <ProductCard key={related.id} product={related} currencySymbol={currencySymbol} recommendationButtonStyle={recommendationsButtonStyle} />
                 ))}
               </div>
             </div>

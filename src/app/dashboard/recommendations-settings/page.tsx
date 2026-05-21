@@ -30,6 +30,16 @@ const recommendationsSchema = z.object({
   relatedProductsGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default('#ffffff'),
   relatedProductsTitle: z.string().min(3, 'Title must be at least 3 characters.'),
   relatedProductsDescription: z.string().optional().or(z.literal('')),
+  // Text Color Settings
+  relatedProductsTextColorStyle: z.enum(['solid', 'gradient']).default('solid'),
+  relatedProductsTextColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default('#1d1d1f'),
+  relatedProductsTextGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default('#3b82f6'),
+  relatedProductsTextGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default('#8b5cf6'),
+  // Button Color Settings
+  relatedProductsButtonStyle: z.enum(['solid', 'gradient']).default('solid'),
+  relatedProductsButtonColor: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default('#3b82f6'),
+  relatedProductsButtonGradientStart: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default('#3b82f6'),
+  relatedProductsButtonGradientEnd: z.string().regex(/^#[0-9a-fA-F]{6}$/i, 'Must be a valid hex color').default('#1d4ed8'),
 });
 
 type FormValues = z.infer<typeof recommendationsSchema>;
@@ -93,6 +103,14 @@ export default function RecommendationsSettingsPage() {
       relatedProductsGradientEnd: '#ffffff',
       relatedProductsTitle: 'You Might Also Like',
       relatedProductsDescription: 'Specially curated items from the same collection.',
+      relatedProductsTextColorStyle: 'solid',
+      relatedProductsTextColor: '#1d1d1f',
+      relatedProductsTextGradientStart: '#3b82f6',
+      relatedProductsTextGradientEnd: '#8b5cf6',
+      relatedProductsButtonStyle: 'solid',
+      relatedProductsButtonColor: '#3b82f6',
+      relatedProductsButtonGradientStart: '#3b82f6',
+      relatedProductsButtonGradientEnd: '#1d4ed8',
     }
   });
 
@@ -106,6 +124,14 @@ export default function RecommendationsSettingsPage() {
         relatedProductsGradientEnd: settingsData.relatedProductsGradientEnd || '#ffffff',
         relatedProductsTitle: settingsData.relatedProductsTitle || 'You Might Also Like',
         relatedProductsDescription: settingsData.relatedProductsDescription || 'Specially curated items from the same collection.',
+        relatedProductsTextColorStyle: settingsData.relatedProductsTextColorStyle || 'solid',
+        relatedProductsTextColor: settingsData.relatedProductsTextColor || '#1d1d1f',
+        relatedProductsTextGradientStart: settingsData.relatedProductsTextGradientStart || '#3b82f6',
+        relatedProductsTextGradientEnd: settingsData.relatedProductsTextGradientEnd || '#8b5cf6',
+        relatedProductsButtonStyle: settingsData.relatedProductsButtonStyle || 'solid',
+        relatedProductsButtonColor: settingsData.relatedProductsButtonColor || '#3b82f6',
+        relatedProductsButtonGradientStart: settingsData.relatedProductsButtonGradientStart || '#3b82f6',
+        relatedProductsButtonGradientEnd: settingsData.relatedProductsButtonGradientEnd || '#1d4ed8',
       });
     }
   }, [settingsData, form]);
@@ -297,6 +323,200 @@ export default function RecommendationsSettingsPage() {
                             background: `linear-gradient(to right, ${form.watch('relatedProductsGradientStart')}, ${form.watch('relatedProductsGradientEnd')})` 
                           }}
                         />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Text Color Styling */}
+                  <Separator />
+
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                        <Palette className="h-4 w-4" /> Text Color Styling
+                    </h4>
+                    
+                    <FormField
+                      control={form.control}
+                      name="relatedProductsTextColorStyle"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              {[
+                                { value: 'solid', label: 'Solid Color', icon: '■' },
+                                { value: 'gradient', label: 'Gradient', icon: '⊔' }
+                              ].map((option) => (
+                                <button
+                                  key={option.value}
+                                  type="button"
+                                  onClick={() => field.onChange(option.value)}
+                                  disabled={!isVisible}
+                                  className={`flex items-center justify-center gap-3 rounded-xl border-2 p-4 cursor-pointer transition-all ${
+                                    field.value === option.value
+                                      ? 'border-primary bg-primary/5 shadow-sm'
+                                      : 'border-border hover:border-primary/30 hover:bg-muted/50'
+                                  } ${!isVisible && 'opacity-50 cursor-not-allowed'}`}
+                                >
+                                  <span className="text-xl">{option.icon}</span>
+                                  <span className="text-sm font-bold">{option.label}</span>
+                                </button>
+                              ))}
+                            </div>
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    {form.watch('relatedProductsTextColorStyle') === 'solid' ? (
+                      <div className="p-4 rounded-xl border bg-muted/30 animate-in fade-in duration-300">
+                        <div className="flex items-center justify-between gap-4">
+                            <FormField
+                              control={form.control}
+                              name="relatedProductsTextColor"
+                              render={({ field }) => <ColorInput field={field} label="Text Color" disabled={!isVisible} />}
+                            />
+                            <Button 
+                                type="button" 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => form.setValue('relatedProductsTextColor', '#1d1d1f')}
+                                disabled={!isVisible}
+                                className="rounded-full px-4"
+                            >
+                                Reset Default
+                            </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-4 rounded-xl border bg-muted/30 animate-in fade-in duration-300 space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <FormField
+                            control={form.control}
+                            name="relatedProductsTextGradientStart"
+                            render={({ field }) => <ColorInput field={field} label="Gradient Start Color" disabled={!isVisible} />}
+                            />
+                            <FormField
+                            control={form.control}
+                            name="relatedProductsTextGradientEnd"
+                            render={({ field }) => <ColorInput field={field} label="Gradient End Color" disabled={!isVisible} />}
+                            />
+                        </div>
+                        <div 
+                          className="h-10 w-full rounded-lg border shadow-inner relative overflow-hidden"
+                          style={{ 
+                            background: `linear-gradient(to right, ${form.watch('relatedProductsTextGradientStart')}, ${form.watch('relatedProductsTextGradientEnd')})` 
+                          }}
+                        >
+                          <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-sm drop-shadow-md">
+                            Preview
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Button Color Styling */}
+                  <Separator />
+
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                        <Palette className="h-4 w-4" /> Button Color Styling
+                    </h4>
+                    
+                    <FormField
+                      control={form.control}
+                      name="relatedProductsButtonStyle"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              {[
+                                { value: 'solid', label: 'Solid Color', icon: '■' },
+                                { value: 'gradient', label: 'Gradient', icon: '⊔' }
+                              ].map((option) => (
+                                <button
+                                  key={option.value}
+                                  type="button"
+                                  onClick={() => field.onChange(option.value)}
+                                  disabled={!isVisible}
+                                  className={`flex items-center justify-center gap-3 rounded-xl border-2 p-4 cursor-pointer transition-all ${
+                                    field.value === option.value
+                                      ? 'border-primary bg-primary/5 shadow-sm'
+                                      : 'border-border hover:border-primary/30 hover:bg-muted/50'
+                                  } ${!isVisible && 'opacity-50 cursor-not-allowed'}`}
+                                >
+                                  <span className="text-xl">{option.icon}</span>
+                                  <span className="text-sm font-bold">{option.label}</span>
+                                </button>
+                              ))}
+                            </div>
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    {form.watch('relatedProductsButtonStyle') === 'solid' ? (
+                      <div className="p-4 rounded-xl border bg-muted/30 animate-in fade-in duration-300">
+                        <div className="flex items-center justify-between gap-4">
+                            <FormField
+                              control={form.control}
+                              name="relatedProductsButtonColor"
+                              render={({ field }) => <ColorInput field={field} label="Button Color" disabled={!isVisible} />}
+                            />
+                            <Button 
+                                type="button" 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => form.setValue('relatedProductsButtonColor', '#3b82f6')}
+                                disabled={!isVisible}
+                                className="rounded-full px-4"
+                            >
+                                Reset Default
+                            </Button>
+                        </div>
+                        <div className="mt-4">
+                          <Button 
+                            className="w-full font-bold"
+                            style={{ backgroundColor: form.watch('relatedProductsButtonColor') }}
+                          >
+                            Button Preview
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-4 rounded-xl border bg-muted/30 animate-in fade-in duration-300 space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <FormField
+                            control={form.control}
+                            name="relatedProductsButtonGradientStart"
+                            render={({ field }) => <ColorInput field={field} label="Button Gradient Start" disabled={!isVisible} />}
+                            />
+                            <FormField
+                            control={form.control}
+                            name="relatedProductsButtonGradientEnd"
+                            render={({ field }) => <ColorInput field={field} label="Button Gradient End" disabled={!isVisible} />}
+                            />
+                        </div>
+                        <div 
+                          className="h-10 w-full rounded-lg border shadow-inner relative overflow-hidden"
+                          style={{ 
+                            background: `linear-gradient(to right, ${form.watch('relatedProductsButtonGradientStart')}, ${form.watch('relatedProductsButtonGradientEnd')})` 
+                          }}
+                        >
+                          <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-sm drop-shadow-md">
+                            Preview
+                          </span>
+                        </div>
+                        <div className="mt-4">
+                          <Button 
+                            className="w-full font-bold text-white"
+                            style={{ 
+                              background: `linear-gradient(to right, ${form.watch('relatedProductsButtonGradientStart')}, ${form.watch('relatedProductsButtonGradientEnd')})`
+                            }}
+                          >
+                            Button Preview
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </div>
