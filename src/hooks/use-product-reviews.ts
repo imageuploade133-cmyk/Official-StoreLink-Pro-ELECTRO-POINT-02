@@ -59,5 +59,11 @@ export function useProductReviews(productId: string) {
     }
   }, [hasMore, isLoading, fetchReviews]);
 
-  return { reviews, isLoading, error, hasMore, loadMore };
+  const refresh = useCallback(async () => {
+    setLastId(null);
+    setHasMore(false);
+    await fetchReviews(false);
+  }, [fetchReviews]);
+
+  return { reviews, isLoading, error, hasMore, loadMore, refresh };
 }

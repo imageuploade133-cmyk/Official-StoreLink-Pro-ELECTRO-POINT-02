@@ -849,7 +849,7 @@ export default function ProductDetailsPage() {
       orderBy('createdAt', 'desc')
     );
   }, [firestore, productId]);
-  const { reviews, isLoading: isLoadingReviews, hasMore, loadMore } = useProductReviews(productId);
+  const { reviews, isLoading: isLoadingReviews, hasMore, loadMore, refresh: refreshReviews } = useProductReviews(productId);
 
   const relatedQuery = useMemo(() => {
     if (!firestore || !storeId) return null;
@@ -961,18 +961,26 @@ export default function ProductDetailsPage() {
   }, [reviews]);
 
   const reviewStats = useMemo(() => {
-    if (!visibleReviews || visibleReviews.length === 0) return { avg: 0, count: 0, distribution: [0, 0, 0, 0, 0] };
-    const count = visibleReviews.length;
-    const sum = visibleReviews.reduce((s, r) => s + r.rating, 0);
-    const avg = parseFloat((sum / count).toFixed(1));
+    // Better Solution: Use product stats if available for the main display, 
+    // but distribution from actual fetched reviews
+    const count = product?.reviewCount || 0;
+    const avg = product?.averageRating || 0;
+    
+    if (visibleReviews.length === 0) {
+        return { avg, count, distribution: [0, 0, 0, 0, 0] };
+    }
+
     const distribution = [0, 0, 0, 0, 0];
     visibleReviews.forEach(r => {
       const idx = Math.max(0, Math.min(Math.floor(r.rating) - 1, 4));
       distribution[idx]++;
     });
-    const percentages = distribution.map(val => Math.round((val / count) * 100)).reverse();
+    
+    const fetchedCount = visibleReviews.length;
+    const percentages = distribution.map(val => Math.round((val / fetchedCount) * 100)).reverse();
+    
     return { avg, count, distribution: percentages };
-  }, [visibleReviews]);
+  }, [visibleReviews, product?.reviewCount, product?.averageRating]);
 
   const handleAddToCart = () => {
     if (product) {
@@ -2062,63 +2070,97 @@ export default function ProductDetailsPage() {
                       </div>
                     ))}
                   </div>
-                  <ProductReviewForm productId={productId} storeId={storeId} />
+                  <ProductReviewForm productId={productId} storeId={storeId} onRefresh={refreshReviews} />
                 </div>
                 <div className="lg:col-span-8 space-y-10">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-2xl font-semibold tracking-tight text-[#1d1d1f] dark:text-[#f5f5f7]">Customer Feedback</h3>
                   </div>
-                  {visibleReviews && visibleReviews.length > 0 ? (
-                    <div className="space-y-12">
-                      {visibleReviews.map((review) => { 
-                        const reviewDate = convertToDateSafely(review.createdAt); 
-                        return (
-                          <div key={review.id} className="space-y-4 group animate-in fade-in slide-in-from-bottom-2 duration-500">
-                            <div className="flex justify-between items-start">
-                              <div className="flex items-start gap-4">
-                                <Avatar className="h-10 w-10 border-0">
-                                  <AvatarImage src={review.userPhotoURL || ''} alt={review.userName} />
-                                  <AvatarFallback className="bg-[#f5f5f7] dark:bg-[#1d1d1f] text-xs font-bold">{review.userName.substring(0, 2).toUpperCase()}</AvatarFallback>
-                                </Avatar>
-                                <div className="space-y-1">
-                                  <div className="flex text-amber-400">
-                                    {[...Array(5)].map((_, i) => (
-                                      <Star key={i} className={cn("h-3 w-3 fill-current", i >= review.rating && "text-slate-300 dark:text-slate-800")} />
-                                    ))}
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <p className="font-semibold text-sm text-[#1d1d1f] dark:text-[#f5f5f7]">{review.userName}</p>
-                                    <Badge variant="secondary" className="bg-green-500/10 text-green-600 text-[9px] h-5 rounded-full border-0 font-medium px-2">Verified Purchase</Badge>
-                                  </div>
-                                </div>
-                              </div>
-                              <span className="text-[11px] font-medium text-[#86868b]">{reviewDate ? format(reviewDate, 'PP') : 'Recently'}</span>
-                            </div>
-                            <p className="text-[#1d1d1f] dark:text-[#f5f5f7] leading-relaxed text-sm opacity-80">{review.comment}</p>
-                            {review.audioDataUri && (
-                              <div className="mt-3">
-                                <VoiceReviewPlayer dataUri={review.audioDataUri} />
-                              </div>
-                            )}
-                            {review.reply && (
-                                <div className="mt-4 p-4 rounded-2xl bg-[#f5f5f7] dark:bg-[#1d1d1f] border border-black/5 dark:border-white/5 space-y-2 animate-in fade-in slide-in-from-top-2 duration-500">
-                                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
-                                        <ReplyIcon className="h-3 w-3" /> Merchant Response
-                                    </div>
-                                    <p className="text-sm text-[#1d1d1f] dark:text-[#f5f5f7] opacity-80 italic">{review.reply}</p>
-                                </div>
-                            )}
-                          </div>
-                        ); 
-                      })}
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed rounded-[2rem] bg-black/[0.02] dark:bg-white/[0.02] border-black/20 dark:border-white/20">
-                      <MessageSquare className="h-10 w-10 text-[#86868b] mb-4 opacity-20" />
-                      <h4 className="text-xl font-semibold tracking-tight text-[#1d1d1f] dark:text-[#f5f5f7]">No reviews yet</h4>
-                      <p className="text-sm text-[#86868b] max-w-xs mx-auto">Be the first to share your experience with this product!</p>
-                    </div>
-                  )}
+	                  {isLoadingReviews && visibleReviews.length === 0 ? (
+	                    <div className="space-y-10">
+	                      {[...Array(3)].map((_, i) => (
+	                        <div key={i} className="space-y-4 animate-pulse">
+	                          <div className="flex justify-between items-start">
+	                            <div className="flex items-start gap-4">
+	                              <div className="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-800" />
+	                              <div className="space-y-2">
+	                                <div className="h-3 w-20 bg-slate-200 dark:bg-slate-800 rounded" />
+	                                <div className="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded" />
+	                              </div>
+	                            </div>
+	                            <div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded" />
+	                          </div>
+	                          <div className="space-y-2">
+	                            <div className="h-4 w-full bg-slate-200 dark:bg-slate-800 rounded" />
+	                            <div className="h-4 w-2/3 bg-slate-200 dark:bg-slate-800 rounded" />
+	                          </div>
+	                        </div>
+	                      ))}
+	                    </div>
+	                  ) : visibleReviews && visibleReviews.length > 0 ? (
+	                    <div className="space-y-12">
+	                      {visibleReviews.map((review) => { 
+	                        const reviewDate = convertToDateSafely(review.createdAt); 
+	                        return (
+	                          <div key={review.id} className="space-y-4 group animate-in fade-in slide-in-from-bottom-2 duration-500">
+	                            <div className="flex justify-between items-start">
+	                              <div className="flex items-start gap-4">
+	                                <Avatar className="h-10 w-10 border-0">
+	                                  <AvatarImage src={review.userPhotoURL || ''} alt={review.userName} />
+	                                  <AvatarFallback className="bg-[#f5f5f7] dark:bg-[#1d1d1f] text-xs font-bold">{review.userName.substring(0, 2).toUpperCase()}</AvatarFallback>
+	                                </Avatar>
+	                                <div className="space-y-1">
+	                                  <div className="flex text-amber-400">
+	                                    {[...Array(5)].map((_, i) => (
+	                                      <Star key={i} className={cn("h-3 w-3 fill-current", i >= review.rating && "text-slate-300 dark:text-slate-800")} />
+	                                    ))}
+	                                  </div>
+	                                  <div className="flex items-center gap-2">
+	                                    <p className="font-semibold text-sm text-[#1d1d1f] dark:text-[#f5f5f7]">{review.userName}</p>
+	                                    <Badge variant="secondary" className="bg-green-500/10 text-green-600 text-[9px] h-5 rounded-full border-0 font-medium px-2">Verified Purchase</Badge>
+	                                  </div>
+	                                </div>
+	                              </div>
+	                              <span className="text-[11px] font-medium text-[#86868b]">{reviewDate ? format(reviewDate, 'PP') : 'Recently'}</span>
+	                            </div>
+	                            <p className="text-[#1d1d1f] dark:text-[#f5f5f7] leading-relaxed text-sm opacity-80">{review.comment}</p>
+	                            {review.audioDataUri && (
+	                              <div className="mt-3">
+	                                <VoiceReviewPlayer dataUri={review.audioDataUri} />
+	                              </div>
+	                            )}
+	                            {review.reply && (
+	                                <div className="mt-4 p-4 rounded-2xl bg-[#f5f5f7] dark:bg-[#1d1d1f] border border-black/5 dark:border-white/5 space-y-2 animate-in fade-in slide-in-from-top-2 duration-500">
+	                                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
+	                                        <ReplyIcon className="h-3 w-3" /> Merchant Response
+	                                    </div>
+	                                    <p className="text-sm text-[#1d1d1f] dark:text-[#f5f5f7] opacity-80 italic">{review.reply}</p>
+	                                </div>
+	                            )}
+	                          </div>
+	                        ); 
+	                      })}
+	                      {hasMore && (
+	                        <div className="flex justify-center pt-4">
+	                          <Button 
+	                            variant="outline" 
+	                            onClick={loadMore} 
+	                            disabled={isLoadingReviews}
+	                            className="rounded-full px-8"
+	                          >
+	                            {isLoadingReviews ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+	                            Load More Reviews
+	                          </Button>
+	                        </div>
+	                      )}
+	                    </div>
+	                  ) : (
+	                    <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed rounded-[2rem] bg-black/[0.02] dark:bg-white/[0.02] border-black/20 dark:border-white/20">
+	                      <MessageSquare className="h-10 w-10 text-[#86868b] mb-4 opacity-20" />
+	                      <h4 className="text-xl font-semibold tracking-tight text-[#1d1d1f] dark:text-[#f5f5f7]">No reviews yet</h4>
+	                      <p className="text-sm text-[#86868b] max-w-xs mx-auto">Be the first to share your experience with this product!</p>
+	                    </div>
+	                  )}
                 </div>
               </div>
             </TabsContent>
