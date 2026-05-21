@@ -97,7 +97,7 @@ import { useStoreUrl } from '@/hooks/use-store-url';
 import { FastCheckoutButtons } from '@/components/store/FastCheckoutButtons';
 import { AppleProductPageSkeleton } from '@/components/store/AppleProductPageSkeleton';
 import { AppleImageGallery } from '@/components/store/AppleImageGallery';
-import { getStoreUrl as getAbsoluteStoreUrl } from '@/lib/domain';
+
 import { useProductReviews } from '@/hooks/use-product-reviews';
 
 const iconMap = {
@@ -977,17 +977,7 @@ export default function ProductDetailsPage() {
   const handleShare = async () => {
     if (typeof window === 'undefined' || !product) return;
 
-    const baseUrl = getAbsoluteStoreUrl(
-        storeId, 
-        settings?.plan || 'free', 
-        settings?.customDomain, 
-        settings?.subdomain, 
-        settings?.primaryDomainType
-    );
-    
-    let path = `/product/${product?.slug || product?.id || productId}`;
-    
-    const fullUrl = `${baseUrl}${path}`;
+    const fullUrl = window.location.href;
 
     const shareData = {
       title: product.name || 'Check this out!',

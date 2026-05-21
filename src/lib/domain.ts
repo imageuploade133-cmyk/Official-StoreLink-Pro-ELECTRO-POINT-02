@@ -77,10 +77,12 @@ export function getStoreUrl(
   plan: string, 
   customDomain?: string | null, 
   subdomain?: string | null,
-  primaryDomainType?: 'free' | 'subdomain' | 'custom'
+  primaryDomainType?: 'free' | 'subdomain' | 'custom',
+  slug?: string | null
 ): string {
   const mainDomain = getMainDomain();
   const protocol = getProtocol();
+  const pathSegment = slug || storeId;
   
   // If primary domain type is explicitly set, use it
   if (primaryDomainType === 'custom' && customDomain) {
@@ -90,7 +92,7 @@ export function getStoreUrl(
     return `${protocol}//${subdomain}.${mainDomain}`;
   }
   if (primaryDomainType === 'free') {
-    return `${protocol}//${mainDomain}/${storeId}`;
+    return `${protocol}//${mainDomain}/${pathSegment}`;
   }
 
   // Fallback to legacy logic if primaryDomainType is not set
@@ -106,5 +108,5 @@ export function getStoreUrl(
     return `${protocol}//${storeId}.${mainDomain}`;
   }
   
-  return `${protocol}//${mainDomain}/${storeId}`;
+  return `${protocol}//${mainDomain}/${pathSegment}`;
 }
