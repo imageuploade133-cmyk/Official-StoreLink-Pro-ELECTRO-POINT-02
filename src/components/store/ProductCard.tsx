@@ -29,9 +29,10 @@ interface ProductCardProps {
   category?: Category;
   currencySymbol: string;
   overrideSettings?: Partial<AppSettings>;
+  recommendationButtonStyle?: React.CSSProperties;
 }
 
-export function ProductCard({ product, category, currencySymbol, overrideSettings }: ProductCardProps) {
+export function ProductCard({ product, category, currencySymbol, overrideSettings, recommendationButtonStyle }: ProductCardProps) {
   const router = useRouter();
   const { addToCart } = useCart();
   const { isProductInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
@@ -208,6 +209,11 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
   };
 
   const gridBtnStyle = useMemo(() => {
+    // Use recommendation button style if provided (for product recommendations section)
+    if (recommendationButtonStyle) {
+      return recommendationButtonStyle;
+    }
+    
     const useIndividual = settings?.useIndividualBtnSettings !== false;
     const style = useIndividual
         ? (settings?.storeGridCartStyle || 'standard')
@@ -228,7 +234,7 @@ export function ProductCard({ product, category, currencySymbol, overrideSetting
         color: 'white',
         border: 'none'
     };
-  }, [settings]);
+  }, [settings, recommendationButtonStyle]);
 
   const gridBtnClasses = useMemo(() => {
     const useIndividual = settings?.useIndividualBtnSettings !== false;
