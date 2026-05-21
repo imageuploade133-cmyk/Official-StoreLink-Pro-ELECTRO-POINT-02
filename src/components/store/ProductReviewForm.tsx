@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useFirestore, useUser } from '@/firebase';
-import { collection, serverTimestamp, query, where, getDocs, limit, setDoc, doc, updateDoc, getDoc } from 'firebase/firestore';
+import { collection, serverTimestamp, query, where, getDocs, limit, setDoc, doc, updateDoc } from 'firebase/firestore';
 import { Star, Loader2, Send, MessageCircle, Ban, Mic, StopCircle, Trash2, Play, Pause, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -30,11 +30,12 @@ type ReviewFormValues = z.infer<typeof reviewSchema>;
 
 interface ProductReviewFormProps {
   productId: string;
+  alternateProductId?: string;
   storeId?: string;
   onRefresh?: () => void;
 }
 
-export function ProductReviewForm({ productId, storeId, onRefresh }: ProductReviewFormProps) {
+export function ProductReviewForm({ productId, alternateProductId, storeId, onRefresh }: ProductReviewFormProps) {
   const { user } = useUser();
   const firestore = useFirestore();
   const { settings } = useSettings();
@@ -233,22 +234,30 @@ export function ProductReviewForm({ productId, storeId, onRefresh }: ProductRevi
         id: reviewDocRef.id,
       });
 
-      // Step 3: Update product stats
+      // Step 3: Recalculate and update product stats from all linked review IDs
+      const linkedProductIds = Array.from(new Set([productId, alternateProductId].filter(Boolean) as string[]));
       const productRef = doc(firestore, 'products', productId);
-      const productSnap = await getDoc(productRef);
-      
-      if (productSnap.exists()) {
-        const productData = productSnap.data();
-        const oldCount = productData.reviewCount || 0;
-        const oldAverage = productData.averageRating || 0;
-        const newRating = values.rating;
-        
-        const newCount = oldCount + 1;
-        const newAverage = ((oldAverage * oldCount) + newRating) / newCount;
+
+      if (storeId && linkedProductIds.length > 0) {
+        const reviewStatsQuery = query(
+          collection(firestore, 'store_reviews'),
+          where('store_id', '==', storeId),
+          where('productId', 'in', linkedProductIds)
+        );
+
+        const reviewStatsSnapshot = await getDocs(reviewStatsQuery);
+        const visibleReviews = reviewStatsSnapshot.docs
+          .map((reviewDoc) => reviewDoc.data())
+          .filter((review: any) => review.isHidden !== true && review.isApproved !== false);
+
+        const reviewCount = visibleReviews.length;
+        const averageRating = reviewCount > 0
+          ? Number((visibleReviews.reduce((sum: number, review: any) => sum + (Number(review.rating) || 0), 0) / reviewCount).toFixed(1))
+          : 0;
 
         await updateDoc(productRef, {
-          reviewCount: newCount,
-          averageRating: newAverage
+          reviewCount,
+          averageRating,
         });
       }
 

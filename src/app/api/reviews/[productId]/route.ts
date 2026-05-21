@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getFirestore, collection, query, where, getDocs, orderBy, limit, startAfter, getDoc, doc } from 'firebase/firestore';
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+  orderBy,
+  limit,
+  startAfter,
+  getDoc,
+  doc,
+} from 'firebase/firestore';
+import type { QueryConstraint } from 'firebase/firestore';
 import { initializeApp, getApps } from 'firebase/app';
 import type { ProductReview } from '@/lib/types';
 
-// Initialize Firebase with public config
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -13,10 +24,44 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Ensure Firebase is initialized
 if (getApps().length === 0) {
   initializeApp(firebaseConfig);
 }
+
+const isVisibleReview = (review: ProductReview) => review.isHidden !== true && review.isApproved !== false;
+
+const toMillis = (value: any): number => {
+  if (!value) return 0;
+  if (typeof value?.toMillis === 'function') return value.toMillis();
+  if (value instanceof Date) return value.getTime();
+  if (typeof value === 'number') return value;
+  return 0;
+};
+
+const computeStats = (reviews: ProductReview[]) => {
+  if (!reviews.length) {
+    return {
+      averageRating: 0,
+      totalCount: 0,
+      distribution: [0, 0, 0, 0, 0],
+    };
+  }
+
+  const distributionCounts = [0, 0, 0, 0, 0];
+  let sum = 0;
+
+  reviews.forEach((review) => {
+    const normalized = Math.max(1, Math.min(5, Math.round(Number(review.rating) || 0)));
+    distributionCounts[5 - normalized] += 1;
+    sum += Number(review.rating) || 0;
+  });
+
+  return {
+    averageRating: Number((sum / reviews.length).toFixed(1)),
+    totalCount: reviews.length,
+    distribution: distributionCounts.map((count) => Math.round((count / reviews.length) * 100)),
+  };
+};
 
 export async function GET(
   request: NextRequest,
@@ -25,91 +70,112 @@ export async function GET(
   try {
     const { productId } = await params;
     const { searchParams } = new URL(request.url);
-    const pageSize = parseInt(searchParams.get('limit') || '10');
+    const pageSize = Math.min(25, Math.max(1, parseInt(searchParams.get('limit') || '10', 10)));
     const lastDocId = searchParams.get('lastId');
+    const storeId = searchParams.get('storeId');
+    const alternateProductId = searchParams.get('alternateProductId');
 
     if (!productId) {
-      return NextResponse.json(
-        { error: 'Product ID is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });
     }
 
     const db = getFirestore();
-    const reviewsRef = collection(db, 'products', productId, 'reviews');
-    
-    // Better Solution: 
-    // We'll use a simpler query first to avoid index issues if they occur
-    // and handle filtering of hidden/unapproved reviews in memory for small batches
-    // OR try the filtered query and fallback gracefully.
-    
+    const productIds = new Set<string>([productId]);
+    if (alternateProductId) {
+      productIds.add(alternateProductId);
+    }
+
+    if (storeId) {
+      const slugMatchQuery = query(
+        collection(db, 'products'),
+        where('store_id', '==', storeId),
+        where('slug', '==', productId),
+        limit(1)
+      );
+      const slugMatchSnapshot = await getDocs(slugMatchQuery);
+      if (!slugMatchSnapshot.empty) {
+        productIds.add(slugMatchSnapshot.docs[0].id);
+      }
+    }
+
+    const productIdList = Array.from(productIds).slice(0, 10);
+    const reviewsRef = collection(db, 'store_reviews');
+
     let reviews: ProductReview[] = [];
-    let lastVisible: any = null;
     let hasMore = false;
+    let lastVisibleId: string | null = null;
+    let stats = {
+      averageRating: 0,
+      totalCount: 0,
+      distribution: [0, 0, 0, 0, 0],
+    };
 
     try {
-      // Primary query: newest first, limited to pageSize + 1 to check for hasMore
-      let q = query(
-        reviewsRef,
-        orderBy('createdAt', 'desc'),
-        limit(pageSize + 5) // Fetch a few more to account for in-memory filtering
-      );
+      const constraints: QueryConstraint[] = [where('productId', 'in', productIdList)];
+      if (storeId) {
+        constraints.push(where('store_id', '==', storeId));
+      }
+      constraints.push(orderBy('createdAt', 'desc'));
+      constraints.push(limit(pageSize + 8));
 
       if (lastDocId) {
-        const lastDocRef = doc(db, 'products', productId, 'reviews', lastDocId);
-        const lastDocSnap = await getDoc(lastDocRef);
-        if (lastDocSnap.exists()) {
-          q = query(
-            reviewsRef,
-            orderBy('createdAt', 'desc'),
-            startAfter(lastDocSnap),
-            limit(pageSize + 5)
-          );
+        const cursorDoc = await getDoc(doc(db, 'store_reviews', lastDocId));
+        if (cursorDoc.exists()) {
+          constraints.push(startAfter(cursorDoc));
         }
       }
 
-      const snapshot = await getDocs(q);
-      
-      const allFetchedReviews = snapshot.docs.map(doc => ({
-        ...doc.data(),
-        id: doc.id,
+      const pageSnapshot = await getDocs(query(reviewsRef, ...constraints));
+      const fetched = pageSnapshot.docs.map((reviewDoc) => ({
+        ...reviewDoc.data(),
+        id: reviewDoc.id,
       })) as ProductReview[];
 
-      // Filter in-memory to be inclusive of undefined fields
-      reviews = allFetchedReviews.filter(r => {
-        const isHidden = r.isHidden === true;
-        const isApproved = r.isApproved !== false; // Default to true if undefined
-        return !isHidden && isApproved;
-      });
+      const visibleFetched = fetched.filter(isVisibleReview);
+      reviews = visibleFetched.slice(0, pageSize);
+      hasMore = visibleFetched.length > pageSize || pageSnapshot.docs.length > pageSize;
+      lastVisibleId = reviews.length > 0 ? reviews[reviews.length - 1].id : null;
 
-      // Truncate to pageSize and determine hasMore
-      if (reviews.length > pageSize) {
-        hasMore = true;
-        reviews = reviews.slice(0, pageSize);
-      } else if (allFetchedReviews.length > pageSize) {
-        // We might have more if we fetched more than pageSize but filtered some out
-        hasMore = true;
+      const statsConstraints: QueryConstraint[] = [where('productId', 'in', productIdList)];
+      if (storeId) {
+        statsConstraints.push(where('store_id', '==', storeId));
       }
-      
-      lastVisible = snapshot.docs[Math.min(reviews.length - 1, snapshot.docs.length - 1)];
 
-    } catch (queryError: any) {
-      console.error('[Reviews API] Primary query failed, using simplified fallback:', queryError);
-      // Fallback: Extremely simple query
-      const fallbackQuery = query(reviewsRef, limit(50));
-      const snapshot = await getDocs(fallbackQuery);
-      reviews = snapshot.docs
-        .map(doc => ({ ...doc.data(), id: doc.id } as ProductReview))
-        .filter(r => r.isHidden !== true && r.isApproved !== false)
-        .sort((a, b) => {
-            const dateA = a.createdAt?.toMillis?.() || 0;
-            const dateB = b.createdAt?.toMillis?.() || 0;
-            return dateB - dateA;
+      const statsSnapshot = await getDocs(query(reviewsRef, ...statsConstraints));
+      const allStatsReviews = statsSnapshot.docs
+        .map((reviewDoc) => ({ ...reviewDoc.data(), id: reviewDoc.id } as ProductReview))
+        .filter(isVisibleReview);
+      stats = computeStats(allStatsReviews);
+    } catch (queryError) {
+      console.error('[Reviews API] Primary query failed, using fallback:', queryError);
+
+      const allFallbackReviews: ProductReview[] = [];
+
+      await Promise.all(
+        productIdList.map(async (id) => {
+          try {
+            const nestedReviewsRef = collection(db, 'products', id, 'reviews');
+            const nestedSnapshot = await getDocs(query(nestedReviewsRef, orderBy('createdAt', 'desc'), limit(200)));
+            nestedSnapshot.docs.forEach((reviewDoc) => {
+              allFallbackReviews.push({
+                ...reviewDoc.data(),
+                id: reviewDoc.id,
+              } as ProductReview);
+            });
+          } catch (nestedError) {
+            console.warn(`[Reviews API] Fallback failed for product ${id}:`, nestedError);
+          }
         })
-        .slice(0, pageSize);
-      
-      hasMore = snapshot.docs.length > pageSize;
-      lastVisible = snapshot.docs[reviews.length - 1];
+      );
+
+      const merged = allFallbackReviews
+        .filter(isVisibleReview)
+        .sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt));
+
+      reviews = merged.slice(0, pageSize);
+      hasMore = merged.length > pageSize;
+      lastVisibleId = reviews.length > 0 ? reviews[reviews.length - 1].id : null;
+      stats = computeStats(merged);
     }
 
     return NextResponse.json(
@@ -117,8 +183,9 @@ export async function GET(
         success: true,
         data: reviews,
         count: reviews.length,
-        lastId: lastVisible ? lastVisible.id : null,
-        hasMore: hasMore,
+        lastId: lastVisibleId,
+        hasMore,
+        stats,
       },
       {
         headers: {
@@ -133,6 +200,11 @@ export async function GET(
         success: false,
         data: [],
         count: 0,
+        stats: {
+          averageRating: 0,
+          totalCount: 0,
+          distribution: [0, 0, 0, 0, 0],
+        },
         error: error instanceof Error ? error.message : 'Failed to fetch reviews',
       },
       { status: 500 }

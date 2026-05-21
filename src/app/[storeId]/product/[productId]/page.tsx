@@ -841,15 +841,19 @@ export default function ProductDetailsPage() {
     return new Map(allCategories.map(c => [c.id, c.name]));
   }, [allCategories]);
 
-  // Fetch Reviews
-  const reviewsQuery = useMemo(() => {
-    if (!firestore || !productId) return null;
-    return query(
-      collection(firestore, 'products', productId, 'reviews'),
-      orderBy('createdAt', 'desc')
-    );
-  }, [firestore, productId]);
-  const { reviews, isLoading: isLoadingReviews, hasMore, loadMore, refresh: refreshReviews } = useProductReviews(productId);
+  const canonicalReviewProductId = resolvedProductId || productId;
+  const alternateReviewProductId = resolvedProductId && resolvedProductId !== productId ? productId : undefined;
+  const {
+    reviews,
+    isLoading: isLoadingReviews,
+    hasMore,
+    loadMore,
+    refresh: refreshReviews,
+    stats: reviewApiStats,
+  } = useProductReviews(canonicalReviewProductId, {
+    storeId,
+    alternateProductId: alternateReviewProductId,
+  });
 
   const relatedQuery = useMemo(() => {
     if (!firestore || !storeId) return null;
@@ -961,26 +965,29 @@ export default function ProductDetailsPage() {
   }, [reviews]);
 
   const reviewStats = useMemo(() => {
-    // Better Solution: Use product stats if available for the main display, 
-    // but distribution from actual fetched reviews
-    const count = product?.reviewCount || 0;
-    const avg = product?.averageRating || 0;
-    
-    if (visibleReviews.length === 0) {
-        return { avg, count, distribution: [0, 0, 0, 0, 0] };
-    }
+    const fallbackCount = Math.max(Number(product?.reviewCount) || 0, visibleReviews.length);
+    const fallbackAverage = Number(product?.averageRating) || 0;
 
-    const distribution = [0, 0, 0, 0, 0];
-    visibleReviews.forEach(r => {
-      const idx = Math.max(0, Math.min(Math.floor(r.rating) - 1, 4));
-      distribution[idx]++;
-    });
-    
-    const fetchedCount = visibleReviews.length;
-    const percentages = distribution.map(val => Math.round((val / fetchedCount) * 100)).reverse();
-    
-    return { avg, count, distribution: percentages };
-  }, [visibleReviews, product?.reviewCount, product?.averageRating]);
+    const fallbackDistribution = (() => {
+      if (visibleReviews.length === 0) return [0, 0, 0, 0, 0];
+      const counts = [0, 0, 0, 0, 0];
+      visibleReviews.forEach((review) => {
+        const normalized = Math.max(1, Math.min(5, Math.round(Number(review.rating) || 0)));
+        counts[5 - normalized] += 1;
+      });
+      return counts.map((count) => Math.round((count / visibleReviews.length) * 100));
+    })();
+
+    const averageFromVisible = visibleReviews.length > 0
+      ? Number((visibleReviews.reduce((sum, review) => sum + (Number(review.rating) || 0), 0) / visibleReviews.length).toFixed(1))
+      : fallbackAverage;
+
+    return {
+      avg: reviewApiStats.totalCount > 0 ? reviewApiStats.averageRating : averageFromVisible,
+      count: reviewApiStats.totalCount > 0 ? reviewApiStats.totalCount : fallbackCount,
+      distribution: reviewApiStats.totalCount > 0 ? reviewApiStats.distribution : fallbackDistribution,
+    };
+  }, [visibleReviews, reviewApiStats, product?.reviewCount, product?.averageRating]);
 
   const handleAddToCart = () => {
     if (product) {
@@ -2070,7 +2077,12 @@ export default function ProductDetailsPage() {
                       </div>
                     ))}
                   </div>
-                  <ProductReviewForm productId={productId} storeId={storeId} onRefresh={refreshReviews} />
+                  <ProductReviewForm
+                    productId={canonicalReviewProductId}
+                    alternateProductId={alternateReviewProductId}
+                    storeId={storeId}
+                    onRefresh={refreshReviews}
+                  />
                 </div>
                 <div className="lg:col-span-8 space-y-10">
                   <div className="flex justify-between items-center mb-4">
