@@ -969,6 +969,9 @@ export default function ProductDetailsPage() {
     const fallbackAverage = Number(product?.averageRating) || 0;
 
     const fallbackDistribution = (() => {
+      if (product?.ratingDistribution && product.ratingDistribution.length === 5) {
+        return product.ratingDistribution;
+      }
       if (visibleReviews.length === 0) return [0, 0, 0, 0, 0];
       const counts = [0, 0, 0, 0, 0];
       visibleReviews.forEach((review) => {

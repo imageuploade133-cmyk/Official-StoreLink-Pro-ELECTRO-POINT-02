@@ -789,6 +789,7 @@ export interface Product {
   totalSold?: number;
   averageRating?: number;
   reviewCount?: number;
+  ratingDistribution?: number[]; // [5-star, 4-star, 3-star, 2-star, 1-star] percentage
   installmentEnabled?: boolean;
   downPaymentPercentage?: number;
   numberOfPayments?: number;

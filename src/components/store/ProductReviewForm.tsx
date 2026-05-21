@@ -255,9 +255,20 @@ export function ProductReviewForm({ productId, alternateProductId, storeId, onRe
           ? Number((visibleReviews.reduce((sum: number, review: any) => sum + (Number(review.rating) || 0), 0) / reviewCount).toFixed(1))
           : 0;
 
+        // Calculate distribution
+        const distribution = [0, 0, 0, 0, 0];
+        visibleReviews.forEach((review: any) => {
+          const normalized = Math.max(1, Math.min(5, Math.round(Number(review.rating) || 0)));
+          distribution[5 - normalized] += 1;
+        });
+        const ratingDistribution = distribution.map((count) => 
+          reviewCount > 0 ? Math.round((count / reviewCount) * 100) : 0
+        );
+
         await updateDoc(productRef, {
           reviewCount,
           averageRating,
+          ratingDistribution,
         });
       }
 

@@ -368,6 +368,46 @@ export default function ReviewsPage() {
     }
   };
 
+  const recalculateProductStats = useCallback(async (productId: string) => {
+    if (!firestore || !currentStoreId || !productId) return;
+    try {
+      const reviewStatsQuery = query(
+        collection(firestore, 'store_reviews'),
+        where('store_id', '==', currentStoreId),
+        where('productId', '==', productId)
+      );
+
+      const reviewStatsSnapshot = await getDocs(reviewStatsQuery);
+      const visibleReviews = reviewStatsSnapshot.docs
+        .map((reviewDoc) => reviewDoc.data())
+        .filter((review: any) => review.isHidden !== true && review.isApproved !== false);
+
+      const reviewCount = visibleReviews.length;
+      const averageRating = reviewCount > 0
+        ? Number((visibleReviews.reduce((sum: number, review: any) => sum + (Number(review.rating) || 0), 0) / reviewCount).toFixed(1))
+        : 0;
+
+      // Calculate distribution
+      const distribution = [0, 0, 0, 0, 0];
+      visibleReviews.forEach((review: any) => {
+        const normalized = Math.max(1, Math.min(5, Math.round(Number(review.rating) || 0)));
+        distribution[5 - normalized] += 1;
+      });
+      const ratingDistribution = distribution.map((count) => 
+        reviewCount > 0 ? Math.round((count / reviewCount) * 100) : 0
+      );
+
+      const productRef = doc(firestore, 'products', productId);
+      await updateDoc(productRef, {
+        reviewCount,
+        averageRating,
+        ratingDistribution
+      });
+    } catch (e) {
+      console.error("Error recalculating product stats:", e);
+    }
+  }, [firestore, currentStoreId]);
+
   const toggleHideReview = async (review: ProductReview) => {
     if (!firestore || !review.productId) return;
     try {
@@ -381,6 +421,9 @@ export default function ReviewsPage() {
       const topLevelRef = doc(firestore, 'store_reviews', review.id);
       await updateDoc(topLevelRef, updateData).catch(err => console.warn('Top level review doc might not exist yet', err));
 
+      // Recalculate stats
+      await recalculateProductStats(review.productId);
+
       toast({ title: review.isHidden ? 'Review is now visible' : 'Review is now hidden' });
       setIsActionModalOpen(false);
       fetchReviews('initial');
@@ -393,11 +436,15 @@ export default function ReviewsPage() {
     if (!reviewToDelete || !firestore || !reviewToDelete.productId) return;
     setIsDeleting(true);
     try {
-      const reviewRef = doc(firestore, 'products', reviewToDelete.productId, 'reviews', reviewToDelete.id);
+      const productId = reviewToDelete.productId;
+      const reviewRef = doc(firestore, 'products', productId, 'reviews', reviewToDelete.id);
       await deleteDoc(reviewRef);
       
       const topLevelRef = doc(firestore, 'store_reviews', reviewToDelete.id);
       await deleteDoc(topLevelRef).catch(err => console.warn('Top level review doc might not exist yet', err));
+
+      // Recalculate stats
+      await recalculateProductStats(productId);
 
       toast({ title: 'Review permanently deleted' });
       setIsDeleteDialogOpen(false);
