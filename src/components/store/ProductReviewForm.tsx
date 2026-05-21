@@ -239,37 +239,42 @@ export function ProductReviewForm({ productId, alternateProductId, storeId, onRe
       const productRef = doc(firestore, 'products', productId);
 
       if (storeId && linkedProductIds.length > 0) {
-        const reviewStatsQuery = query(
-          collection(firestore, 'store_reviews'),
-          where('store_id', '==', storeId),
-          where('productId', 'in', linkedProductIds)
-        );
+        try {
+          const reviewStatsQuery = query(
+            collection(firestore, 'store_reviews'),
+            where('store_id', '==', storeId),
+            where('productId', 'in', linkedProductIds)
+          );
 
-        const reviewStatsSnapshot = await getDocs(reviewStatsQuery);
-        const visibleReviews = reviewStatsSnapshot.docs
-          .map((reviewDoc) => reviewDoc.data())
-          .filter((review: any) => review.isHidden !== true && review.isApproved !== false);
+          const reviewStatsSnapshot = await getDocs(reviewStatsQuery);
+          const visibleReviews = reviewStatsSnapshot.docs
+            .map((reviewDoc) => reviewDoc.data())
+            .filter((review: any) => review.isHidden !== true && review.isApproved !== false);
 
-        const reviewCount = visibleReviews.length;
-        const averageRating = reviewCount > 0
-          ? Number((visibleReviews.reduce((sum: number, review: any) => sum + (Number(review.rating) || 0), 0) / reviewCount).toFixed(1))
-          : 0;
+          const reviewCount = visibleReviews.length;
+          const averageRating = reviewCount > 0
+            ? Number((visibleReviews.reduce((sum: number, review: any) => sum + (Number(review.rating) || 0), 0) / reviewCount).toFixed(1))
+            : 0;
 
-        // Calculate distribution
-        const distribution = [0, 0, 0, 0, 0];
-        visibleReviews.forEach((review: any) => {
-          const normalized = Math.max(1, Math.min(5, Math.round(Number(review.rating) || 0)));
-          distribution[5 - normalized] += 1;
-        });
-        const ratingDistribution = distribution.map((count) => 
-          reviewCount > 0 ? Math.round((count / reviewCount) * 100) : 0
-        );
+          // Calculate distribution
+          const distribution = [0, 0, 0, 0, 0];
+          visibleReviews.forEach((review: any) => {
+            const normalized = Math.max(1, Math.min(5, Math.round(Number(review.rating) || 0)));
+            distribution[5 - normalized] += 1;
+          });
+          const ratingDistribution = distribution.map((count) => 
+            reviewCount > 0 ? Math.round((count / reviewCount) * 100) : 0
+          );
 
-        await updateDoc(productRef, {
-          reviewCount,
-          averageRating,
-          ratingDistribution,
-        });
+          await updateDoc(productRef, {
+            reviewCount,
+            averageRating,
+            ratingDistribution,
+          });
+        } catch (statsError) {
+          console.warn('[ProductReviewForm] Failed to recalculate stats:', statsError);
+          // Don't fail the whole submission if stats update fails
+        }
       }
 
       toast({ title: 'Review Submitted', description: 'Thank you for your feedback!' });

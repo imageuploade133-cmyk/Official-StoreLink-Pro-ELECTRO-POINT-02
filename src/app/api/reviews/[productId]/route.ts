@@ -86,15 +86,20 @@ export async function GET(
     }
 
     if (storeId) {
-      const slugMatchQuery = query(
-        collection(db, 'products'),
-        where('store_id', '==', storeId),
-        where('slug', '==', productId),
-        limit(1)
-      );
-      const slugMatchSnapshot = await getDocs(slugMatchQuery);
-      if (!slugMatchSnapshot.empty) {
-        productIds.add(slugMatchSnapshot.docs[0].id);
+      try {
+        const slugMatchQuery = query(
+          collection(db, 'products'),
+          where('store_id', '==', storeId),
+          where('slug', '==', productId),
+          limit(1)
+        );
+        const slugMatchSnapshot = await getDocs(slugMatchQuery);
+        if (!slugMatchSnapshot.empty) {
+          productIds.add(slugMatchSnapshot.docs[0].id);
+        }
+      } catch (slugError) {
+        console.warn('[Reviews API] Slug match failed (likely missing index):', slugError);
+        // Continue without the resolved ID, the query might still find reviews by slug or ID
       }
     }
 
@@ -110,16 +115,12 @@ export async function GET(
       distribution: [0, 0, 0, 0, 0],
     };
 
-    // Always use the query pattern without store_id filter to avoid composite index requirement
-    // Store reviews by filtering in-memory after fetching by productId
-    
     try {
       // Query: where productId IN [...] orderBy createdAt desc
-      // This is a single-field query that doesn't require a composite index
       const constraints: QueryConstraint[] = [
         where('productId', 'in', productIdList),
         orderBy('createdAt', 'desc'),
-        limit(pageSize + 8)
+        limit(pageSize * 2 + 10) // Fetch more than requested to allow for in-memory filtering
       ];
 
       if (lastDocId) {
@@ -135,26 +136,31 @@ export async function GET(
         id: reviewDoc.id,
       })) as ProductReview[];
 
-      // Filter by store_id in-memory if storeId is provided (handles missing composite index)
+      // Filter by store_id in-memory if storeId is provided
       if (storeId) {
         fetched = fetched.filter(r => r.store_id === storeId);
       }
 
       const visibleFetched = fetched.filter(isVisibleReview);
       reviews = visibleFetched.slice(0, pageSize);
-      hasMore = visibleFetched.length > pageSize || pageSnapshot.docs.length > pageSize;
+      hasMore = visibleFetched.length > pageSize || pageSnapshot.docs.length > (pageSize * 2 + 9);
       lastVisibleId = reviews.length > 0 ? reviews[reviews.length - 1].id : null;
 
-      // For stats, fetch all reviews for the productIds and filter in-memory
-      const statsSnapshot = await getDocs(query(reviewsRef, where('productId', 'in', productIdList)));
-      let statsReviews = statsSnapshot.docs
-        .map((reviewDoc) => ({ ...reviewDoc.data(), id: reviewDoc.id } as ProductReview))
-        .filter(isVisibleReview);
-      
-      // Also filter stats by store_id in-memory if storeId is provided
-      if (storeId) {
-        statsReviews = statsReviews.filter(r => r.store_id === storeId);
+      // For stats, fetch reviews and filter
+      let statsReviews: ProductReview[] = [];
+      try {
+        const statsSnapshot = await getDocs(query(reviewsRef, where('productId', 'in', productIdList)));
+        statsReviews = statsSnapshot.docs
+          .map((reviewDoc) => ({ ...reviewDoc.data(), id: reviewDoc.id } as ProductReview))
+          .filter(isVisibleReview);
+        
+        if (storeId) {
+          statsReviews = statsReviews.filter(r => r.store_id === storeId);
+        }
+      } catch (statsError) {
+        console.warn('[Reviews API] Stats query failed:', statsError);
       }
+      
       stats = computeStats(statsReviews);
     } catch (queryError) {
       console.error('[Reviews API] Query failed, trying fallback:', queryError);
@@ -166,7 +172,15 @@ export async function GET(
         productIdList.map(async (id) => {
           try {
             const nestedReviewsRef = collection(db, 'products', id, 'reviews');
-            const nestedSnapshot = await getDocs(query(nestedReviewsRef, orderBy('createdAt', 'desc'), limit(200)));
+            // Try with orderBy, if it fails, try without it
+            let nestedSnapshot;
+            try {
+              nestedSnapshot = await getDocs(query(nestedReviewsRef, orderBy('createdAt', 'desc'), limit(100)));
+            } catch (e) {
+              console.warn(`[Reviews API] Fallback orderBy failed for ${id}, trying without orderBy`);
+              nestedSnapshot = await getDocs(query(nestedReviewsRef, limit(100)));
+            }
+            
             nestedSnapshot.docs.forEach((reviewDoc) => {
               allFallbackReviews.push({
                 ...reviewDoc.data(),
@@ -181,6 +195,7 @@ export async function GET(
 
       const merged = allFallbackReviews
         .filter(isVisibleReview)
+        .filter(r => !storeId || r.store_id === storeId) // Respect storeId in fallback
         .sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt));
 
       reviews = merged.slice(0, pageSize);
