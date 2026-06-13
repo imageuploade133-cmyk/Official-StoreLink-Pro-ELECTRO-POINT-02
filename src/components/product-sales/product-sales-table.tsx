@@ -36,10 +36,10 @@ export function ProductSalesTable({ products, onViewDetails, currencySymbol }: P
         <TableRow>
           <TableHead className="w-[80px]">Image</TableHead>
           <TableHead>Product Name</TableHead>
-          <TableHead className="text-right">Qty Sold</TableHead>
-          <TableHead className="text-right">Revenue</TableHead>
-          <TableHead className="text-right">Profit</TableHead>
-          <TableHead className="text-right">Stock Level</TableHead>
+          <TableHead className="text-left">Qty Sold</TableHead>
+          <TableHead className="text-left">Revenue</TableHead>
+          <TableHead className="text-left">Profit</TableHead>
+          <TableHead className="text-left">Stock Level</TableHead>
           <TableHead className="w-[100px] text-center">Actions</TableHead>
         </TableRow>
       </TableHeader>
@@ -60,10 +60,10 @@ export function ProductSalesTable({ products, onViewDetails, currencySymbol }: P
               <p className="font-medium">{product.name}</p>
               {product.sku && <p className="text-xs text-muted-foreground">SKU: {product.sku}</p>}
             </TableCell>
-            <TableCell className="text-right font-medium">{product.totalQuantitySold}</TableCell>
-            <TableCell className="text-right">{formatCurrency(product.totalRevenueGenerated, currencySymbol)}</TableCell>
-            <TableCell className="text-right text-green-600">{formatCurrency(product.totalProfit, currencySymbol)}</TableCell>
-            <TableCell className="text-right">
+            <TableCell className="text-left font-medium">{product.totalQuantitySold}</TableCell>
+            <TableCell className="text-left financial-value">{formatCurrency(product.totalRevenueGenerated, currencySymbol)}</TableCell>
+            <TableCell className="text-left text-green-600 financial-value">{formatCurrency(product.totalProfit, currencySymbol)}</TableCell>
+            <TableCell className="text-left">
               <Badge variant={product.currentStock <= 0 ? "destructive" : "secondary"}>
                 {product.currentStock}
               </Badge>

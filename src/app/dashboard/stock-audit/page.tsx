@@ -309,13 +309,13 @@ export default function StockAuditPage() {
             <Table className="min-w-[1000px] md:min-w-full">
               <TableHeader>
                 <TableRow className="bg-muted/50 hover:bg-transparent">
-                  <TableHead className="pl-6">Timestamp</TableHead>
-                  <TableHead>Product Identity</TableHead>
-                  <TableHead>Audit Event</TableHead>
-                  <TableHead className="text-center">Previous</TableHead>
-                  <TableHead className="text-center">Delta</TableHead>
-                  <TableHead className="text-center">Resulting</TableHead>
-                  <TableHead className="pr-6">Personnel</TableHead>
+                  <TableHead className="pl-6 text-left">Timestamp</TableHead>
+                  <TableHead className="text-left">Product Identity</TableHead>
+                  <TableHead className="text-left">Audit Event</TableHead>
+                  <TableHead className="text-left">Previous</TableHead>
+                  <TableHead className="text-left">Delta</TableHead>
+                  <TableHead className="text-left">Resulting</TableHead>
+                  <TableHead className="text-left pr-6">Personnel</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -360,19 +360,19 @@ export default function StockAuditPage() {
                         <TableCell>
                           {getTypeBadge(log.type)}
                         </TableCell>
-                        <TableCell className="text-center">
+                        <TableCell className="text-left">
                           <span className="text-xs font-mono bg-slate-100 px-2 py-1 rounded">{log.beforeStock}</span>
                         </TableCell>
-                        <TableCell className="text-center">
+                        <TableCell className="text-left">
                           <div className={cn(
-                            "flex items-center justify-center gap-1 font-black text-sm",
+                            "flex items-center justify-start gap-1 font-black text-sm",
                             isIncrease ? "text-green-600" : "text-rose-600"
                           )}>
                             {isIncrease ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
                             {isIncrease ? '+' : ''}{log.change}
                           </div>
                         </TableCell>
-                        <TableCell className="text-center">
+                        <TableCell className="text-left">
                           <span className="text-sm font-black text-primary">{log.afterStock}</span>
                         </TableCell>
                         <TableCell className="pr-6">

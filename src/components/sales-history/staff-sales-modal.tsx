@@ -159,19 +159,30 @@ export function StaffSalesModal({ isOpen, onOpenChange, allSales, staffMap, curr
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
             body { font-family: 'Inter', sans-serif; line-height: 1.5; color: #333; }
             h1, h2, h3 { color: #111; }
-            table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 0.9rem; }
-            th { background-color: #f7f7f7; }
-            .report-header { text-align: center; margin-bottom: 2rem; border-bottom: 2px solid #eee; padding-bottom: 1rem; }
-            .store-name { font-size: 1.8rem; font-weight: bold; margin: 0; }
-            .report-title { font-size: 1.5rem; margin: 0.5rem 0; }
-            .report-date { font-size: 1rem; color: #555; }
-            .staff-section { margin-bottom: 2rem; page-break-inside: avoid; }
-            .staff-header { background-color: #eef2ff; padding: 0.75rem; border-radius: 0.5rem; display: flex; justify-content: space-between; align-items: center; }
-            .staff-name { font-size: 1.2rem; font-weight: 600; }
-            .staff-summary { font-size: 1rem; font-weight: 500; }
+            table { width: 100%; border-collapse: collapse; margin-top: 1rem; table-layout: auto; }
+            th, td { border: 1px solid #ddd; padding: 12px 15px; text-align: left !important; font-size: 0.95rem; overflow: hidden; word-wrap: break-word; }
+            th { background-color: #f7f7f7; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+            td { vertical-align: middle; }
+            .financial-value { white-space: nowrap; font-weight: 700; }
+            .report-header { text-align: left; margin-bottom: 2.5rem; border-bottom: 3px solid #eee; padding-bottom: 1.5rem; }
+            .store-name { font-size: 2.2rem; font-weight: 900; margin: 0; color: #000; }
+            .report-title { font-size: 1.6rem; margin: 0.5rem 0; font-weight: 700; }
+            .report-date { font-size: 1.1rem; color: #666; font-weight: 500; }
+            .staff-section { margin-bottom: 3rem; page-break-inside: auto; border: 1px solid #eee; border-radius: 0.75rem; overflow: hidden; }
+            .staff-header { background-color: #f8fafc; padding: 1.25rem; border-bottom: 2px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
+            .staff-name { font-size: 1.4rem; font-weight: 800; color: #1e293b; }
+            .staff-summary { font-size: 1.1rem; font-weight: 700; color: #059669; }
             .no-print { display: none !important; }
-            @page { size: auto; margin: 20mm; }
+            @page { size: A3 landscape; margin: 15mm; }
+
+            /* Responsive table adjustments for print */
+            @media print {
+                body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                table { page-break-inside: auto; }
+                tr { page-break-inside: avoid; page-break-after: auto; }
+                thead { display: table-header-group; }
+                tfoot { display: table-footer-group; }
+            }
         </style>
     `;
 
@@ -320,19 +331,19 @@ export function StaffSalesModal({ isOpen, onOpenChange, allSales, staffMap, curr
                               <Table>
                                 <TableHeader className="bg-muted/50">
                                   <TableRow>
-                                    <TableHead className="pl-4 text-[10px] uppercase font-black">Product</TableHead>
-                                    <TableHead className="text-center text-[10px] uppercase font-black">Time</TableHead>
-                                    <TableHead className="text-center text-[10px] uppercase font-black">Qty</TableHead>
-                                    <TableHead className="text-right pr-4 text-[10px] uppercase font-black">Total</TableHead>
+                                    <TableHead className="pl-4 text-[10px] uppercase font-black text-left">Product</TableHead>
+                                    <TableHead className="text-left text-[10px] uppercase font-black">Time</TableHead>
+                                    <TableHead className="text-left text-[10px] uppercase font-black">Qty</TableHead>
+                                    <TableHead className="text-left pr-4 text-[10px] uppercase font-black">Total</TableHead>
                                   </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                   {paginatedItems.map((item, index) => (
                                     <TableRow key={`${item.productId}-${index}`} className="hover:bg-transparent">
-                                      <TableCell className="font-bold pl-4 text-xs">{item.productName}</TableCell>
-                                      <TableCell className="text-center text-[10px] font-medium">{formatDate(item.timestamp, 'p')}</TableCell>
-                                      <TableCell className="text-center text-xs font-bold">{item.quantity}</TableCell>
-                                      <TableCell className="text-right pr-4 text-xs font-black">{formatCurrency(item.totalPrice, currencySymbol)}</TableCell>
+                                      <TableCell className="font-bold pl-4 text-xs text-left">{item.productName}</TableCell>
+                                      <TableCell className="text-left text-[10px] font-medium">{formatDate(item.timestamp, 'p')}</TableCell>
+                                      <TableCell className="text-left text-xs font-bold">{item.quantity}</TableCell>
+                                      <TableCell className="text-left pr-4 text-xs font-black financial-value">{formatCurrency(item.totalPrice, currencySymbol)}</TableCell>
                                     </TableRow>
                                   ))}
                                 </TableBody>

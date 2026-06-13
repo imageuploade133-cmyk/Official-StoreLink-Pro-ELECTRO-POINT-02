@@ -616,50 +616,50 @@ export default function GenerateInvoicePage() {
                         <table className="w-full text-sm">
                         <thead>
                             <tr className="bg-muted/50 border-b">
-                            <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-500">Description</th>
-                            <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-500 text-center">Qty</th>
-                            <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">Unit Val</th>
-                            <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">Magnitude</th>
+                            <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-500 text-left">Description</th>
+                            <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-500 text-left">Qty</th>
+                            <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-500 text-left">Unit Val</th>
+                            <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-500 text-left">Magnitude</th>
                             <th className="w-12 px-4 no-print"></th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                             {items.map((item) => (
                             <tr key={item.id} className="group transition-colors hover:bg-muted/5">
-                                <td className="px-8 py-6">
+                                <td className="px-8 py-6 text-left">
                                 <div className="no-print">
                                     <Input 
                                     value={item.description} 
                                     onChange={(e) => handleItemChange(item.id, 'description', e.target.value)}
-                                    className="border-none bg-transparent p-0 h-auto font-black text-sm focus-visible:ring-0 shadow-none placeholder:text-slate-300"
+                                    className="border-none bg-transparent p-0 h-auto font-black text-sm focus-visible:ring-0 shadow-none placeholder:text-slate-300 text-left"
                                     placeholder="Product identifier..."
                                     />
                                 </div>
-                                <p className="hidden print:block font-black text-sm">{item.description}</p>
+                                <p className="hidden print:block font-black text-sm text-left">{item.description}</p>
                                 </td>
-                                <td className="px-8 py-6 text-center">
+                                <td className="px-8 py-6 text-left">
                                 <div className="no-print">
                                     <Input 
                                     type="number" 
                                     value={item.quantity} 
                                     onChange={(e) => handleItemChange(item.id, 'quantity', Number(e.target.value))}
-                                    className="border-none bg-transparent p-0 h-auto font-bold text-center focus-visible:ring-0 shadow-none w-16 mx-auto"
+                                    className="border-none bg-transparent p-0 h-auto font-bold text-left focus-visible:ring-0 shadow-none w-16"
                                     />
                                 </div>
-                                <p className="hidden print:block font-bold">{item.quantity}</p>
+                                <p className="hidden print:block font-bold text-left">{item.quantity}</p>
                                 </td>
-                                <td className="px-8 py-6 text-right font-medium text-slate-500">
+                                <td className="px-8 py-6 text-left font-medium text-slate-500">
                                 <div className="no-print">
                                     <Input 
                                     type="number" 
                                     value={item.unitPrice} 
                                     onChange={(e) => handleItemChange(item.id, 'unitPrice', Number(e.target.value))}
-                                    className="border-none bg-transparent p-0 h-auto font-bold text-right focus-visible:ring-0 shadow-none w-24 ml-auto"
+                                    className="border-none bg-transparent p-0 h-auto font-bold text-left focus-visible:ring-0 shadow-none w-24"
                                     />
                                 </div>
-                                <p className="hidden print:block font-bold">{formatCurrency(item.unitPrice, currencySymbol)}</p>
+                                <p className="hidden print:block font-bold text-left financial-value">{formatCurrency(item.unitPrice, currencySymbol)}</p>
                                 </td>
-                                <td className="px-8 py-6 text-right font-black text-slate-900 dark:text-white">
+                                <td className="px-8 py-6 text-left font-black text-slate-900 dark:text-white financial-value">
                                 {formatCurrency(item.quantity * item.unitPrice, currencySymbol)}
                                 </td>
                                 <td className="px-4 no-print text-center">
@@ -736,7 +736,7 @@ export default function GenerateInvoicePage() {
 
       <style jsx global>{`
         @media print {
-          body { background: white !important; }
+          body { background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .no-print { display: none !important; }
           main, .layout-container { padding: 0 !important; margin: 0 !important; }
           .layout-content-container { border: none !important; box-shadow: none !important; padding: 0 !important; width: 100% !important; max-maxWidth: 100% !important; }
@@ -751,7 +751,13 @@ export default function GenerateInvoicePage() {
             border: none;
             box-shadow: none;
           }
-          @page { size: A4; margin: 0; }
+
+          table { width: 100%; border-collapse: collapse; table-layout: auto; }
+          th, td { text-align: left !important; padding: 12px 15px !important; border: 1px solid #e2e8f0 !important; }
+          th { background-color: #f8fafc !important; font-weight: 900 !important; text-transform: uppercase !important; }
+          .financial-value { white-space: nowrap !important; font-weight: 700 !important; }
+
+          @page { size: A3 landscape; margin: 10mm; }
         }
       `}</style>
     </div>

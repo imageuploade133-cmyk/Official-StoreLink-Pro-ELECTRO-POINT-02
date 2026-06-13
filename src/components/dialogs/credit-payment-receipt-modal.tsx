@@ -146,8 +146,10 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
       }
 
       @media print {
-        @page { size: auto; margin: 0; }
+        @page { size: A3 landscape; margin: 10mm; }
         .no-print { display: none !important; }
+        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .invoice-container { max-width: none; width: 100%; padding: 10mm; margin: 0; }
       }
     </style>`, [invoiceAccentColor, invoiceLogoHeight, terminalLogoHeight]);
 

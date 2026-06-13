@@ -66,15 +66,15 @@ export function PaymentMethodsBreakdown({ paymentMethodStats, salesByPaymentMeth
                                 <AccordionContent>
                                     <div className="border rounded-md mt-2">
                                       <Table>
-                                          <TableHeader><TableRow><TableHead>Sale ID</TableHead><TableHead>Date</TableHead><TableHead>Customer</TableHead><TableHead className="text-right">Amount</TableHead><TableHead className="text-center">Actions</TableHead></TableRow></TableHeader>
+                                          <TableHeader><TableRow><TableHead className="text-left">Sale ID</TableHead><TableHead className="text-left">Date</TableHead><TableHead className="text-left">Customer</TableHead><TableHead className="text-left">Amount</TableHead><TableHead className="text-left">Actions</TableHead></TableRow></TableHeader>
                                           <TableBody>
                                               {(salesByPaymentMethod[stat.method]?.sales || []).map(sale => (
                                                   <TableRow key={sale.id}>
-                                                      <TableCell className="font-mono text-xs">{sale.id.substring(0, 8)}...</TableCell>
-                                                      <TableCell>{sale.createdAt ? format(sale.createdAt as Date, 'PP p') : 'N/A'}</TableCell>
-                                                      <TableCell>{sale.customerName || 'Walk-in'}</TableCell>
-                                                      <TableCell className="text-right font-semibold">{formatCurrency((sale.grandTotal || 0) - (sale.returnedAmount || 0), currencySymbol)}</TableCell>
-                                                      <TableCell className="text-center">
+                                                      <TableCell className="font-mono text-xs text-left">{sale.id.substring(0, 8)}...</TableCell>
+                                                      <TableCell className="text-left">{sale.createdAt ? format(sale.createdAt as Date, 'PP p') : 'N/A'}</TableCell>
+                                                      <TableCell className="text-left">{sale.customerName || 'Walk-in'}</TableCell>
+                                                      <TableCell className="text-left font-semibold financial-value">{formatCurrency((sale.grandTotal || 0) - (sale.returnedAmount || 0), currencySymbol)}</TableCell>
+                                                      <TableCell className="text-left">
                                                           <DropdownMenu>
                                                               <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                                                               <DropdownMenuContent align="end">

@@ -43,17 +43,17 @@ export function StockLevelTable({ products, isLoading, onRestock, title, descrip
       <Table>
           <TableHeader>
               <TableRow>
-                  <TableHead className="w-[80px]">Image</TableHead>
-                  <TableHead>Product</TableHead>
-                  <TableHead className="text-center">Current Stock</TableHead>
-                  <TableHead className="text-center">Threshold</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="w-[80px] text-left">Image</TableHead>
+                  <TableHead className="text-left">Product</TableHead>
+                  <TableHead className="text-left">Current Stock</TableHead>
+                  <TableHead className="text-left">Threshold</TableHead>
+                  <TableHead className="text-left">Actions</TableHead>
               </TableRow>
           </TableHeader>
           <TableBody>
               {products.map(product => (
                   <TableRow key={product.id} className={product.stock <= 0 ? 'bg-red-50/50 dark:bg-red-900/20' : 'bg-orange-50/50 dark:bg-orange-900/20'}>
-                      <TableCell>
+                      <TableCell className="text-left">
                            <Image
                               src={product.imageUrl || defaultImageUrl}
                               alt={product.name}
@@ -63,16 +63,16 @@ export function StockLevelTable({ products, isLoading, onRestock, title, descrip
                               data-ai-hint={product.dataAiHint || product.name.toLowerCase().split(' ').slice(0,2).join(' ')}
                           />
                       </TableCell>
-                      <TableCell className="font-medium">{product.name}</TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="font-medium text-left">{product.name}</TableCell>
+                      <TableCell className="text-left">
                         {product.stock <= 0 ? (
                             <Badge variant="destructive">Out of Stock</Badge>
                         ) : (
                             <Badge variant="outline" className="text-orange-600 border-orange-500">{product.stock}</Badge>
                         )}
                       </TableCell>
-                      <TableCell className="text-center">{product.lowStockThreshold ?? globalLowStockThreshold}</TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-left">{product.lowStockThreshold ?? globalLowStockThreshold}</TableCell>
+                      <TableCell className="text-left">
                           <Button size="sm" onClick={() => onRestock(product)}>
                               <Truck className="mr-2 h-4 w-4"/>
                               Restock

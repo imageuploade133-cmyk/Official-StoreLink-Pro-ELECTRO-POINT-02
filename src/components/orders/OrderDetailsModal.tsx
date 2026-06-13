@@ -129,27 +129,26 @@ export function OrderDetailsModal({
     const styles = `
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;700;900&display=swap');
-            body { font-family: 'Public Sans', sans-serif; color: #111; line-height: 1.5; margin: 0; padding: 0; }
-            .invoice-container { max-width: 190mm; margin: auto; padding: 20mm; background: white; }
-            .header { display: flex; justify-content: space-between; border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 30px; }
-            .header-left img { max-height: 60px; margin-bottom: 10px; }
-            .header-left h1 { font-size: 24px; margin: 0; color: ${settings?.invoiceAccentColor || '#ec5b13'}; }
-            .header-right { text-align: right; }
-            .header-right h2 { font-size: 32px; font-weight: 900; margin: 0; color: #ddd; }
-            .meta-section { display: flex; justify-content: space-between; margin-bottom: 40px; }
-            .meta-item h3 { font-size: 10px; font-weight: 900; text-transform: uppercase; color: #9ca3af; margin-bottom: 5px; letter-spacing: 0.1em; }
-            .meta-item p { font-size: 14px; font-weight: 700; margin: 0; }
-            .table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-            .table th { background: #f9fafb; border: 1px solid #e5e7eb; padding: 12px; font-size: 11px; font-weight: 900; text-transform: uppercase; text-align: left; color: #6b7280; }
-            .table td { border: 1px solid #e5e7eb; padding: 12px; font-size: 13px; }
-            .table td.right { text-align: right; }
-            .table td.center { text-align: center; }
-            .summary { display: flex; justify-content: flex-end; }
-            .summary-box { width: 250px; }
-            .summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; }
-            .grand-total { border-top: 2px solid #111; padding-top: 15px; margin-top: 10px; font-weight: 900; font-size: 20px; }
-            .footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; font-size: 10px; color: #9ca3af; }
-            @media print { @page { size: A4; margin: 0; } .no-print { display: none !important; } }
+            body { font-family: 'Public Sans', sans-serif; color: #111; line-height: 1.5; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .invoice-container { max-width: none; width: 100%; padding: 15mm; background: white; }
+            .header { display: flex; justify-content: space-between; border-bottom: 3px solid #eee; padding-bottom: 20px; margin-bottom: 30px; }
+            .header-left img { max-height: 80px; margin-bottom: 10px; }
+            .header-left h1 { font-size: 28px; font-weight: 900; margin: 0; color: ${settings?.invoiceAccentColor || '#ec5b13'}; }
+            .header-right { text-align: left; }
+            .header-right h2 { font-size: 36px; font-weight: 900; margin: 0; color: #000; letter-spacing: -0.05em; }
+            .meta-section { display: flex; gap: 60px; margin-bottom: 40px; }
+            .meta-item h3 { font-size: 10px; font-weight: 900; text-transform: uppercase; color: #9ca3af; margin-bottom: 8px; letter-spacing: 0.15em; }
+            .meta-item p { font-size: 15px; font-weight: 700; margin: 0; text-align: left !important; }
+            .table { width: 100%; border-collapse: collapse; margin-bottom: 40px; table-layout: auto; }
+            .table th { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; font-size: 11px; font-weight: 900; text-transform: uppercase; text-align: left !important; color: #475569; letter-spacing: 0.05em; }
+            .table td { border: 1px solid #e2e8f0; padding: 15px; font-size: 14px; text-align: left !important; word-wrap: break-word; }
+            .financial-value { white-space: nowrap !important; font-weight: 800; }
+            .summary { display: flex; justify-content: flex-end; margin-top: 20px; }
+            .summary-box { width: 350px; }
+            .summary-row { display: flex; justify-content: space-between; padding: 12px 0; font-size: 15px; border-bottom: 1px solid #f1f5f9; }
+            .grand-total { border-top: 3px solid #000; padding-top: 20px; margin-top: 15px; font-weight: 900; font-size: 26px; border-bottom: none; }
+            .footer { margin-top: 80px; padding-top: 30px; border-top: 2px solid #f1f5f9; text-align: left; font-size: 11px; color: #64748b; }
+            @media print { @page { size: A3 landscape; margin: 10mm; } .no-print { display: none !important; } }
         </style>
     `;
 
@@ -448,12 +447,12 @@ export function OrderDetailsModal({
                     <div className="meta-item">
                         <h3>Customer Details</h3>
                         <p>{order.guestInfo?.name || 'Registered Customer'}</p>
-                        <p style={{ fontWeight: 'normal', fontSize: '12px' }}>{order.guestInfo?.email || 'Authenticated User'}</p>
-                        <p style={{ fontWeight: 'normal', fontSize: '12px' }}>{order.guestInfo?.phone || ''}</p>
+                        <p style={{ fontWeight: 'normal', fontSize: '13px' }}>{order.guestInfo?.email || 'Authenticated User'}</p>
+                        <p style={{ fontWeight: 'normal', fontSize: '13px' }}>{order.guestInfo?.phone || ''}</p>
                     </div>
-                    <div className="meta-item" style={{ textAlign: 'right' }}>
+                    <div className="meta-item">
                         <h3>{order.fulfillmentType === 'pickup' ? 'Fulfillment Type' : 'Delivery Address'}</h3>
-                        <p style={{ fontWeight: 'normal', whiteSpace: 'pre-wrap', maxWidth: '300px' }}>
+                        <p style={{ fontWeight: 'normal', whiteSpace: 'pre-wrap', maxWidth: '500px', textAlign: 'left' }}>
                             {order.fulfillmentType === 'pickup' 
                                 ? 'Store Pickup' 
                                 : (order.guestInfo?.address || 'Provided in account profile')}
@@ -464,10 +463,10 @@ export function OrderDetailsModal({
                 <table className="table">
                     <thead>
                         <tr>
-                            <th>Description</th>
-                            <th className="center">Qty</th>
-                            <th className="right">Unit Price</th>
-                            <th className="right">Total</th>
+                            <th style={{ textAlign: 'left' }}>Description</th>
+                            <th style={{ textAlign: 'left' }}>Qty</th>
+                            <th style={{ textAlign: 'left' }}>Unit Price</th>
+                            <th style={{ textAlign: 'left' }}>Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -476,13 +475,14 @@ export function OrderDetailsModal({
                             const options = item.selectedOptions ? Object.entries(item.selectedOptions).map(([k, v]) => `${k}: ${v}`).join(', ') : '';
                             return (
                                 <tr key={idx}>
-                                    <td>
-                                        <div>{item.productName || p?.name || 'Unknown Product'}</div>
-                                        {options && <div style={{ fontSize: '10px', color: '#666', marginTop: '2px' }}>{options}</div>}
+                                    <td style={{ textAlign: 'left' }}>
+                                        <div style={{ fontWeight: '700' }}>{item.productName || p?.name || 'Unknown Product'}</div>
+                                        {options && <div style={{ fontSize: '11px', color: '#64748b', marginTop: '4px', fontStyle: 'italic' }}>{options}</div>}
+                                        <div style={{ fontSize: '10px', color: '#94a3b8', marginTop: '2px' }}>ID: {item.productId.substring(0, 8)}</div>
                                     </td>
-                                    <td className="center">{item.quantity}</td>
-                                    <td className="right">{formatCurrency(item.price, currencySymbol)}</td>
-                                    <td className="right">{formatCurrency(item.price * item.quantity, currencySymbol)}</td>
+                                    <td style={{ textAlign: 'left' }}>{item.quantity}</td>
+                                    <td style={{ textAlign: 'left' }} className="financial-value">{formatCurrency(item.price, currencySymbol)}</td>
+                                    <td style={{ textAlign: 'left' }} className="financial-value">{formatCurrency(item.price * item.quantity, currencySymbol)}</td>
                                 </tr>
                             );
                         })}

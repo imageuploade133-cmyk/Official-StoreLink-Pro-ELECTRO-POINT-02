@@ -522,14 +522,14 @@ function SalesHistoryContent() {
             <Table>
               <TableHeader className="sticky top-0 bg-background z-10 shadow-sm">
                 <TableRow>
-                    <TableHead className="w-[80px]">Sale ID</TableHead>
-                    <TableHead className="w-[150px]">Date & Time</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Staff</TableHead>
-                    <TableHead className="text-right w-[120px]">Net Total</TableHead>
-                    <TableHead className="w-[100px]">Payment</TableHead>
-                    <TableHead className="w-[160px]">Status</TableHead>
-                    <TableHead className="w-[80px] text-right">Actions</TableHead>
+                    <TableHead className="w-[80px] text-left">Sale ID</TableHead>
+                    <TableHead className="w-[150px] text-left">Date & Time</TableHead>
+                    <TableHead className="text-left">Customer</TableHead>
+                    <TableHead className="text-left">Staff</TableHead>
+                    <TableHead className="text-left w-[120px]">Net Total</TableHead>
+                    <TableHead className="w-[100px] text-left">Payment</TableHead>
+                    <TableHead className="w-[160px] text-left">Status</TableHead>
+                    <TableHead className="w-[80px] text-left">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -577,11 +577,11 @@ function SalesHistoryContent() {
                             <span className="truncate max-w-[100px] font-medium">{processedByStaff?.name || 'Admin'}</span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-right font-black text-sm">
-                          <div className="flex flex-col items-end">
-                            {formatCurrency(netTotal, currencySymbol)}
+                        <TableCell className="text-left font-black text-sm">
+                          <div className="flex flex-col items-start">
+                            <span className="financial-value">{formatCurrency(netTotal, currencySymbol)}</span>
                             {sale.returnedAmount && sale.returnedAmount > 0 ? (
-                                <span className="text-[8px] text-orange-600 font-bold uppercase tracking-tighter">Refunded: {formatCurrency(sale.returnedAmount, currencySymbol)}</span>
+                                <span className="text-[8px] text-orange-600 font-bold uppercase tracking-tighter financial-value">Refunded: {formatCurrency(sale.returnedAmount, currencySymbol)}</span>
                             ) : null}
                           </div>
                         </TableCell>

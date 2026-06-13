@@ -240,13 +240,13 @@ export default function ReturnsPage() {
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
-                <TableHead>Sale ID</TableHead>
-                <TableHead>Date & Time</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead className="text-right">Original Total</TableHead>
-                <TableHead className="text-right">Amt Refunded</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-center">Actions</TableHead>
+                <TableHead className="text-left">Sale ID</TableHead>
+                <TableHead className="text-left">Date & Time</TableHead>
+                <TableHead className="text-left">Customer</TableHead>
+                <TableHead className="text-left">Original Total</TableHead>
+                <TableHead className="text-left">Amt Refunded</TableHead>
+                <TableHead className="text-left">Status</TableHead>
+                <TableHead className="text-left">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -270,19 +270,19 @@ export default function ReturnsPage() {
                   const updatedAt = convertToDateSafely(sale.updatedAt);
                   return (
                     <TableRow key={sale.id} className="hover:bg-muted/30 transition-colors">
-                      <TableCell className="font-mono text-[10px] font-bold text-primary">#{sale.id.substring(0, 8).toUpperCase()}</TableCell>
-                      <TableCell className="text-xs">
+                      <TableCell className="font-mono text-[10px] font-bold text-primary text-left">#{sale.id.substring(0, 8).toUpperCase()}</TableCell>
+                      <TableCell className="text-left text-xs">
                         <div className="font-bold">{updatedAt ? format(updatedAt, 'PP') : 'N/A'}</div>
                         <div className="text-[10px] text-muted-foreground">{updatedAt ? format(updatedAt, 'p') : ''}</div>
                       </TableCell>
-                      <TableCell className="font-semibold text-sm">{sale.customerName || 'Walk-in'}</TableCell>
-                      <TableCell className="text-right font-medium text-xs">
+                      <TableCell className="text-left font-semibold text-sm">{sale.customerName || 'Walk-in'}</TableCell>
+                      <TableCell className="text-left font-medium text-xs financial-value">
                         {formatCurrency(sale.grandTotal, currencySymbol)}
                       </TableCell>
-                      <TableCell className="text-right font-black text-destructive text-sm">
+                      <TableCell className="text-left font-black text-destructive text-sm financial-value">
                         -{formatCurrency(sale.returnedAmount || 0, currencySymbol)}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-left">
                         <Badge variant={sale.returnStatus === 'fullyReturned' ? 'destructive' : 'secondary'} className="text-[9px] font-black uppercase tracking-tighter">
                           {sale.returnStatus === 'fullyReturned' ? 'Full Return' : 'Partial Return'}
                         </Badge>

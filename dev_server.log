@@ -1,0 +1,32 @@
+
+> storelink-pro@0.1.0 dev
+> next dev -p 9002
+
+   ▲ Next.js 15.5.9
+   - Local:        http://localhost:9002
+   - Network:      http://192.168.0.2:9002
+   - Experiments (use with caution):
+     · serverActions
+     · optimizePackageImports
+
+ ✓ Starting...
+ ✓ Ready in 2.1s
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 1039ms (160 modules)
+ ○ Compiling /login ...
+
+warn - The class `duration-[1200ms]` is ambiguous and matches multiple utilities.
+warn - If this is content and not a class, replace it with `duration-&lsqb;1200ms&rsqb;` to silence this warning.
+ ✓ Compiled /login in 14.7s (1233 modules)
+ GET /login 200 in 17408ms
+ ✓ Compiled in 2.8s (448 modules)
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 14s (4144 modules)
+ GET /dashboard 200 in 15870ms
+ ○ Compiling /login ...
+ ✓ Compiled /login in 584ms (2260 modules)
+ GET /login 200 in 955ms
+ GET /login 200 in 667ms
+ ✓ Compiled in 1676ms (1936 modules)
+ ✓ Compiled in 1248ms (1936 modules)
+ ✓ Compiled in 930ms (1936 modules)
