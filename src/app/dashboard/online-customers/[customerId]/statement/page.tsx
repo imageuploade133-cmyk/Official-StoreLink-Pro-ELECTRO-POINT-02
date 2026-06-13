@@ -476,13 +476,13 @@ export default function OnlineCustomerStatementPage() {
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50 dark:bg-slate-900/50 hover:bg-transparent">
-                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Date</TableHead>
-                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Ref ID</TableHead>
-                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Detail</TableHead>
-                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest text-center">Source</TableHead>
-                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest text-right">Debt Due (+)</TableHead>
-                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest text-right">Amount Paid (-)</TableHead>
-                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest text-right">Balance</TableHead>
+                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest text-left">Date</TableHead>
+                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest text-left">Ref ID</TableHead>
+                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest text-left">Detail</TableHead>
+                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest text-left">Source</TableHead>
+                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest text-left">Debt Due (+)</TableHead>
+                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest text-left">Amount Paid (-)</TableHead>
+                <TableHead className="text-[10px] font-black uppercase text-slate-500 tracking-widest text-left">Balance</TableHead>
                 <TableHead className="no-print text-center w-[100px] text-[10px] font-black uppercase text-slate-500 tracking-widest">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -507,12 +507,12 @@ export default function OnlineCustomerStatementPage() {
                   
                   return (
                     <TableRow key={entry.id} className="hover:bg-primary/5 transition-colors group">
-                      <TableCell className="text-xs font-bold whitespace-nowrap py-4">
+                      <TableCell className="text-xs font-bold whitespace-nowrap py-4 text-left">
                         {format(entry.date, 'EEEE - MMM- dd- yyyy')}
                       </TableCell>
-                      <TableCell className="font-mono text-[10px] font-bold text-primary">{entry.reference}</TableCell>
-                      <TableCell className="text-sm font-medium max-w-xs truncate" title={entry.description}>{entry.description}</TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="font-mono text-[10px] font-bold text-primary text-left">{entry.reference}</TableCell>
+                      <TableCell className="text-sm font-medium max-w-xs truncate text-left" title={entry.description}>{entry.description}</TableCell>
+                      <TableCell className="text-left">
                         <Badge variant="outline" className={cn(
                             "text-[9px] font-black uppercase tracking-tighter px-2", 
                             entry.type === 'order' ? "bg-blue-50 text-blue-700 border-blue-200" :
@@ -522,13 +522,13 @@ export default function OnlineCustomerStatementPage() {
                           {entry.type === 'order' ? 'Online' : entry.type === 'sale' ? (entry.isCreditSale ? 'Credit' : 'Store') : 'Payment'}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right font-bold text-slate-700">
+                      <TableCell className="text-left font-bold text-slate-700 financial-value">
                         {entry.debit > 0 ? formatCurrency(entry.debit, currencySymbol) : '-'}
                       </TableCell>
-                      <TableCell className="text-right font-bold text-emerald-600">
+                      <TableCell className="text-left font-bold text-emerald-600 financial-value">
                         {entry.credit > 0 ? `-${formatCurrency(entry.credit, currencySymbol)}` : '-'}
                       </TableCell>
-                      <TableCell className="text-right font-bold text-primary">
+                      <TableCell className="text-left font-bold text-primary financial-value">
                         {entry.type === 'sale' && entry.isCreditSale ? formatCurrency(Math.max(0, saleBalance), currencySymbol) : '-'}
                       </TableCell>
                       <TableCell className="no-print text-center">
@@ -610,10 +610,17 @@ export default function OnlineCustomerStatementPage() {
 
       <style jsx global>{`
         @media print {
-          body { background: white !important; }
+          body { background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .no-print { display: none !important; }
-          main, div { padding: 0 !important; margin: 0 !important; max-width: 100% !important; box-shadow: none !important; border: none !important; }
-          @page { size: A4; margin: 15mm; }
+          main, div { box-shadow: none !important; border: none !important; }
+
+          table { width: 100%; border-collapse: collapse; table-layout: auto; }
+          th, td { text-align: left !important; padding: 12px 15px !important; border: 1px solid #e2e8f0 !important; font-size: 10pt !important; }
+          th { background-color: #f8fafc !important; font-weight: 900 !important; text-transform: uppercase !important; }
+
+          .financial-value { white-space: nowrap !important; font-weight: 700 !important; }
+
+          @page { size: A3 landscape; margin: 10mm; }
         }
       `}</style>
     </div>

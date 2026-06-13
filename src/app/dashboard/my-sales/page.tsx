@@ -441,12 +441,12 @@ export default function MySalesHistoryPage() {
             <Table>
                 <TableHeader>
                 <TableRow>
-                    <TableHead className="w-[120px]">Date & Time</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead className="text-right">Net Total</TableHead>
-                    <TableHead>Method</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="w-[120px] text-left">Date & Time</TableHead>
+                    <TableHead className="text-left">Customer</TableHead>
+                    <TableHead className="text-left">Net Total</TableHead>
+                    <TableHead className="text-left">Method</TableHead>
+                    <TableHead className="text-left">Status</TableHead>
+                    <TableHead className="text-left">Actions</TableHead>
                 </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -486,7 +486,7 @@ export default function MySalesHistoryPage() {
                             <div className="font-semibold text-sm truncate max-w-[180px]">{sale.customerName || 'Walk-in'}</div>
                             <div className="text-[10px] font-mono text-muted-foreground uppercase">#{sale.id.substring(0, 8)}</div>
                         </TableCell>
-                        <TableCell className="text-right font-bold text-sm">
+                        <TableCell className="text-left font-bold text-sm financial-value">
                             {formatCurrency(net, currencySymbol)}
                         </TableCell>
                         <TableCell className="text-[10px] font-black uppercase text-muted-foreground tracking-tighter">{sale.paymentMethod}</TableCell>

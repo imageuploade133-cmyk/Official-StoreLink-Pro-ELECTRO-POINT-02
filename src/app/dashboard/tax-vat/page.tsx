@@ -531,12 +531,12 @@ export default function TaxVatPage() {
             <Table>
               <TableHeader className="sticky top-0 bg-background z-10 shadow-sm">
                 <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Transaction ID</TableHead>
-                    <TableHead className="text-right">Tax Rate</TableHead>
-                    <TableHead className="text-right">Tax Amount</TableHead>
-                    <TableHead className="text-right">Total Amount</TableHead>
+                    <TableHead className="text-left">Date</TableHead>
+                    <TableHead className="text-left">Type</TableHead>
+                    <TableHead className="text-left">Transaction ID</TableHead>
+                    <TableHead className="text-left">Tax Rate</TableHead>
+                    <TableHead className="text-left">Tax Amount</TableHead>
+                    <TableHead className="text-left">Total Amount</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -561,24 +561,24 @@ export default function TaxVatPage() {
                     
                     return (
                       <TableRow key={item.id} className="hover:bg-muted/30 transition-colors">
-                        <TableCell className="text-xs">
+                        <TableCell className="text-left text-xs">
                           {date ? format(date, 'MMM dd, yyyy HH:mm') : 'N/A'}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-left">
                           <Badge variant={item.type === 'POS' ? 'default' : 'outline'} className="text-[10px]">
                             {item.type}
                           </Badge>
                         </TableCell>
-                        <TableCell className="font-mono text-[10px]">
+                        <TableCell className="text-left font-mono text-[10px]">
                           #{item.id.substring(0, 8).toUpperCase()}
                         </TableCell>
-                        <TableCell className="text-right text-xs">
+                        <TableCell className="text-left text-xs">
                           {taxRate}%
                         </TableCell>
-                        <TableCell className="text-right font-bold">
+                        <TableCell className="text-left font-bold financial-value">
                           {formatCurrency(taxAmount, currencySymbol)}
                         </TableCell>
-                        <TableCell className="text-right font-medium">
+                        <TableCell className="text-left font-medium financial-value">
                           {formatCurrency(totalAmount, currencySymbol)}
                         </TableCell>
                       </TableRow>

@@ -132,21 +132,21 @@ export function ExpenseHistory({ expenses, isLoading, isAdmin, onReturnExpense }
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-                <TableHead className="text-center">Actions</TableHead>
+                <TableHead className="text-left">Date</TableHead>
+                <TableHead className="text-left">Description</TableHead>
+                <TableHead className="text-left">Category</TableHead>
+                <TableHead className="text-left">Amount</TableHead>
+                <TableHead className="text-left">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {currentExpensesForPage.map(expense => (
                 <TableRow key={expense.id} className={expense.status === 'Returned' ? 'bg-gray-100 text-muted-foreground line-through' : ''}>
-                  <TableCell className="text-xs">{expense.expenseDate instanceof Date ? formatDate(expense.expenseDate, 'PP') : 'N/A'}</TableCell>
-                  <TableCell className="font-medium text-sm">{expense.description}</TableCell>
-                  <TableCell><Badge variant="outline">{expense.category}</Badge></TableCell>
-                  <TableCell className="text-right font-semibold text-red-600">{formatCurrency(expense.amount, settings?.currency || '$')}</TableCell>
-                  <TableCell className="text-center">
+                  <TableCell className="text-left text-xs">{expense.expenseDate instanceof Date ? formatDate(expense.expenseDate, 'PP') : 'N/A'}</TableCell>
+                  <TableCell className="text-left font-medium text-sm">{expense.description}</TableCell>
+                  <TableCell className="text-left"><Badge variant="outline">{expense.category}</Badge></TableCell>
+                  <TableCell className="text-left font-semibold text-red-600 financial-value">{formatCurrency(expense.amount, settings?.currency || '$')}</TableCell>
+                  <TableCell className="text-left">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="h-8 w-8" disabled={!isAdmin || expense.status === 'Returned' || expense.category === 'Cash Deposit'}>

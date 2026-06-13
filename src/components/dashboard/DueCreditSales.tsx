@@ -48,11 +48,11 @@ export function DueCreditSales({ isLoading, dueCreditSales }: DueCreditSalesProp
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Customer</TableHead>
-                  <TableHead className="text-right">Amt Due</TableHead>
-                  <TableHead>Due Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-center">Actions</TableHead>
+                  <TableHead className="text-left">Customer</TableHead>
+                  <TableHead className="text-left">Amt Due</TableHead>
+                  <TableHead className="text-left">Due Date</TableHead>
+                  <TableHead className="text-left">Status</TableHead>
+                  <TableHead className="text-left">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -61,11 +61,11 @@ export function DueCreditSales({ isLoading, dueCreditSales }: DueCreditSalesProp
                     const safeDueDate = convertToDateSafely(sale.dueDate);
                     return (
                       <TableRow key={sale.id} className={cn(sale.isOverdue && "bg-red-50/70 dark:bg-red-900/20")}>
-                        <TableCell className="font-medium text-sm">{sale.customerName || 'N/A'}</TableCell>
-                        <TableCell className="text-right font-semibold text-sm">{formatCurrency(sale.amountActuallyDue, currencySymbol)}</TableCell>
-                        <TableCell className="text-xs">{safeDueDate ? format(safeDueDate, 'PP') : 'N/A'}</TableCell>
-                        <TableCell>{sale.isOverdue ? (<Badge variant="destructive">Overdue</Badge>) : (<Badge variant="outline">Upcoming</Badge>)}</TableCell>
-                        <TableCell className="text-center">
+                        <TableCell className="font-medium text-sm text-left">{sale.customerName || 'N/A'}</TableCell>
+                        <TableCell className="text-left font-semibold text-sm financial-value">{formatCurrency(sale.amountActuallyDue, currencySymbol)}</TableCell>
+                        <TableCell className="text-xs text-left">{safeDueDate ? format(safeDueDate, 'PP') : 'N/A'}</TableCell>
+                        <TableCell className="text-left">{sale.isOverdue ? (<Badge variant="destructive">Overdue</Badge>) : (<Badge variant="outline">Upcoming</Badge>)}</TableCell>
+                        <TableCell className="text-left">
                           <Button variant="ghost" size="sm" asChild>
                             <Link href={`/dashboard/sales-history?search=${sale.id}`}><Eye className="mr-1 h-3.5 w-3.5" /> Details</Link>
                           </Button>

@@ -274,19 +274,19 @@ export function DailySalesPerformanceTab({ transactions, products, currencySymbo
                  <Table>
                     <TableHeader className="sticky top-0 bg-muted/95 z-10">
                         <TableRow>
-                            <TableHead>Date</TableHead>
-                            <TableHead className="text-right">Sales Count</TableHead>
-                            <TableHead className="text-right">Total Revenue</TableHead>
-                            <TableHead className="text-right">Total Profit</TableHead>
+                                    <TableHead className="text-left">Date</TableHead>
+                                    <TableHead className="text-left">Sales Count</TableHead>
+                                    <TableHead className="text-left">Total Revenue</TableHead>
+                                    <TableHead className="text-left">Total Profit</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {dailyAggregatedData.length > 0 ? [...dailyAggregatedData].reverse().map((day) => (
                             <TableRow key={day.date}>
-                                <TableCell>{day.date}</TableCell>
-                                <TableCell className="text-right">{day.salesCount}</TableCell>
-                                <TableCell className="text-right">{formatCurrency(day.revenue, currencySymbol)}</TableCell>
-                                <TableCell className="text-right">{formatCurrency(day.profit, currencySymbol)}</TableCell>
+                                        <TableCell className="text-left">{day.date}</TableCell>
+                                        <TableCell className="text-left">{day.salesCount}</TableCell>
+                                        <TableCell className="text-left financial-value">{formatCurrency(day.revenue, currencySymbol)}</TableCell>
+                                        <TableCell className="text-left financial-value">{formatCurrency(day.profit, currencySymbol)}</TableCell>
                             </TableRow>
                         )) : (
                             <TableRow>

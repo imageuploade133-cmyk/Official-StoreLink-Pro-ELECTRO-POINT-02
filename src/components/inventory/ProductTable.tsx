@@ -147,14 +147,14 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[80px]">Preview</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Category</TableHead>
-            <TableHead>Supplier</TableHead>
-            <TableHead>SKU</TableHead>
-            <TableHead className="text-right">Price</TableHead>
-            <TableHead className="text-right">Stock</TableHead>
-            <TableHead className="w-[100px] text-center">Actions</TableHead>
+            <TableHead className="w-[80px] text-left">Preview</TableHead>
+            <TableHead className="text-left">Name</TableHead>
+            <TableHead className="text-left">Category</TableHead>
+            <TableHead className="text-left">Supplier</TableHead>
+            <TableHead className="text-left">SKU</TableHead>
+            <TableHead className="text-left">Price</TableHead>
+            <TableHead className="text-left">Stock</TableHead>
+            <TableHead className="w-[100px] text-left">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -261,24 +261,24 @@ export function ProductTable({ products, categories, onOpenActions, currencySymb
                         <span className="text-xs text-slate-300 italic">No Supplier</span>
                     )}
                 </TableCell>
-                <TableCell className="font-mono text-xs">{product.sku || 'N/A'}</TableCell>
-                <TableCell className="text-right font-black">
-                    <div className="flex flex-col items-end">
+                <TableCell className="font-mono text-xs text-left">{product.sku || 'N/A'}</TableCell>
+                <TableCell className="text-left font-black">
+                    <div className="flex flex-col items-start">
                         {product.newPrice ? (
                             <>
-                                <span className="text-[10px] text-muted-foreground line-through decoration-destructive/50">
+                                <span className="text-[10px] text-muted-foreground line-through decoration-destructive/50 financial-value">
                                     {formatCurrency(displayPrice, currencySymbol)}
                                 </span>
-                                <span className="text-green-600">
+                                <span className="text-green-600 financial-value">
                                     {formatCurrency(product.newPrice, currencySymbol)}
                                 </span>
                             </>
                         ) : (
-                            formatCurrency(displayPrice, currencySymbol)
+                            <span className="financial-value">{formatCurrency(displayPrice, currencySymbol)}</span>
                         )}
                     </div>
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-left">
                   {isOutOfStock ? (
                     <Badge variant="destructive" className="font-black uppercase tracking-tighter text-[10px]">Out of Stock</Badge>
                   ) : isLowStock ? (

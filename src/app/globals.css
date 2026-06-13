@@ -458,6 +458,11 @@
   @apply transition-all duration-300;
 }
 
+.financial-value {
+  white-space: nowrap !important;
+  display: inline-block;
+}
+
 .dark [class*="StatCard"]:hover,
 .dark [class*="stat-card"]:hover {
   @apply -translate-y-1 shadow-lg shadow-primary/10;

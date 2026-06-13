@@ -219,11 +219,11 @@ export function ReceiptModal({ isOpen, onClose, saleTransaction, staffMap }: Rec
       .meta-label { font-size: 10px; font-weight: 900; text-transform: uppercase; color: #9ca3af; letter-spacing: 0.1em; margin-bottom: 4px; }
       .meta-value { font-size: 14px; font-weight: 700; color: #111827; }
 
-      .table { width: 100%; border-collapse: collapse; margin-bottom: 40px; }
+      .table { width: 100%; border-collapse: collapse; margin-bottom: 40px; table-layout: auto; }
       .table th { 
         background-color: #f9fafb;
         padding: 12px 15px;
-        text-align: left;
+        text-align: left !important;
         font-size: 11px;
         font-weight: 900;
         text-transform: uppercase;
@@ -231,10 +231,13 @@ export function ReceiptModal({ isOpen, onClose, saleTransaction, staffMap }: Rec
         border: 1px solid #e5e7eb;
       }
       .table td { 
-        padding: 15px;
+        padding: 12px 15px;
         border: 1px solid #e5e7eb;
         font-size: 13px;
+        text-align: left !important;
+        word-wrap: break-word;
       }
+      .financial-value { white-space: nowrap !important; font-weight: 700; }
 
       .summary-area { display: flex; justify-content: flex-end; }
       .summary-box { width: 300px; }
@@ -250,8 +253,10 @@ export function ReceiptModal({ isOpen, onClose, saleTransaction, staffMap }: Rec
       }
 
       @media print {
-        @page { size: auto; margin: 0; }
+        @page { size: A3 landscape; margin: 10mm; }
         .no-print { display: none !important; }
+        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .invoice-container { max-width: none; width: 100%; padding: 10mm; margin: 0; }
       }
     </style>
     `;
@@ -560,16 +565,16 @@ export function ReceiptModal({ isOpen, onClose, saleTransaction, staffMap }: Rec
                         <table className="table">
                             <thead>
                                 <tr>
-                                    <th>Description</th>
-                                    <th style={{ textAlign: 'center' }}>Qty</th>
-                                    <th style={{ textAlign: 'right' }}>Unit Price</th>
-                                    <th style={{ textAlign: 'right' }}>Total</th>
+                                    <th style={{ textAlign: 'left' }}>Description</th>
+                                    <th style={{ textAlign: 'left' }}>Qty</th>
+                                    <th style={{ textAlign: 'left' }}>Unit Price</th>
+                                    <th style={{ textAlign: 'left' }}>Total</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {transactionDetails.items.map((item, idx) => (
                                     <tr key={idx}>
-                                        <td>
+                                        <td style={{ textAlign: 'left' }}>
                                             <p className="font-bold text-gray-900">{item.productName}</p>
                                             {item.selectedOptions && (
                                                 <p className="text-xs text-gray-600 italic">
@@ -578,9 +583,9 @@ export function ReceiptModal({ isOpen, onClose, saleTransaction, staffMap }: Rec
                                             )}
                                             <p className="text-[10px] text-gray-400 mt-0.5 uppercase tracking-wide">ID: {item.productId.substring(0, 8)}</p>
                                         </td>
-                                        <td style={{ textAlign: 'center' }} className="text-gray-700 font-medium">{item.quantity}</td>
-                                        <td style={{ textAlign: 'right' }} className="text-gray-700 font-medium">{formatCurrency(item.unitPrice, currencySymbol)}</td>
-                                        <td style={{ textAlign: 'right' }} className="font-black text-gray-900">{formatCurrency(item.totalPrice, currencySymbol)}</td>
+                                        <td style={{ textAlign: 'left' }} className="text-gray-700 font-medium">{item.quantity}</td>
+                                        <td style={{ textAlign: 'left' }} className="text-gray-700 font-medium financial-value">{formatCurrency(item.unitPrice, currencySymbol)}</td>
+                                        <td style={{ textAlign: 'left' }} className="font-black text-gray-900 financial-value">{formatCurrency(item.totalPrice, currencySymbol)}</td>
                                     </tr>
                                 ))}
                             </tbody>

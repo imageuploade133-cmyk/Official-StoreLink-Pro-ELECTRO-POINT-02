@@ -120,31 +120,34 @@ export function CreditPaymentReceiptModal({ isOpen, onClose, paymentInfo, curren
 
       /* A4 Invoice Print Styles */
       @media print {
-        body { font-family: 'Lato', sans-serif; font-size: 10pt; color: #333; line-height: 1.5; }
-        @page { size: A4; margin: 20mm; }
-        .invoice-container { max-width: 190mm; margin: auto; padding: 0; border: none; box-shadow: none; position: relative; }
+        body { font-family: 'Lato', sans-serif; font-size: 10pt; color: #333; line-height: 1.5; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        @page { size: A3 landscape; margin: 10mm; }
+        .invoice-container { max-width: none; width: 100%; margin: auto; padding: 15mm; border: none; box-shadow: none; position: relative; background: white; }
         .invoice-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 2px solid #eee; }
         .invoice-header-left { flex-grow: 1; }
-        .invoice-header img { max-height: 50px; max-width: 140px; object-fit: contain; margin-bottom: 12px; }
-        .invoice-header h1 { font-family: 'Montserrat', sans-serif; font-size: 26pt; margin: 0; color: #222; font-weight: 700; }
+        .invoice-header img { max-height: 80px; max-width: 140px; object-fit: contain; margin-bottom: 12px; }
+        .invoice-header h1 { font-family: 'Montserrat', sans-serif; font-size: 26pt; margin: 0; color: #222; font-weight: 900; text-transform: uppercase; }
         .invoice-header p { margin: 2px 0; font-size: 9.5pt; color: #555; }
-        .invoice-title-main { font-family: 'Montserrat', sans-serif; font-size: 24pt; font-weight: 900; text-align: right; margin-left: 20px; line-height: 1.2; display: block; color: #1A73E8; }
-        .invoice-meta { display: flex; justify-content: space-between; margin-bottom: 30px; font-size: 10pt; }
-        .invoice-meta > div { flex-basis: 48%; }
-        .invoice-meta strong { display: inline-block; width: 120px; margin-right: 10px; color: #555; font-weight: 700; }
+        .invoice-title-main { font-family: 'Montserrat', sans-serif; font-size: 32pt; font-weight: 900; text-align: left !important; margin-left: 0; line-height: 1.2; display: block; color: #1A73E8; letter-spacing: -0.05em; }
+        .invoice-meta { display: flex; justify-content: flex-start; gap: 80px; margin-bottom: 40px; font-size: 11pt; }
+        .invoice-meta > div { flex-basis: auto; text-align: left !important; }
+        .invoice-meta h3 { text-align: left !important; }
+        .invoice-meta p { text-align: left !important; }
+        .invoice-meta strong { display: inline-block; width: auto; margin-right: 10px; color: #555; font-weight: 700; }
         .invoice-meta span { color: #333; font-weight: 600; }
-        .invoice-summary { font-size: 10pt; background: #f9f9f9; border-radius: 8px; padding: 20px; border: 1px solid #eee; margin-top: 20px;}
-        .invoice-summary h4 { font-family: 'Montserrat', sans-serif; font-size: 16pt; margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 8px; color: #222; font-weight: 700;}
-        .invoice-summary p { display: flex; justify-content: space-between; margin: 8px 0; line-height: 1.4; }
-        .invoice-summary strong { flex-basis: 60%; text-align: left; color: #555; font-weight: 700; }
-        .invoice-summary span { flex-basis: 40%; text-align: right; color: #333; font-weight: 600; }
-        .invoice-summary .grand-total { font-size: 1.2em; border-top: 2px solid #bbb; padding-top: 10px; margin-top: 10px; }
-        .invoice-summary .grand-total strong, .invoice-summary .grand-total span { font-size: 1.2em; color: #222;}
-        .invoice-items-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-        .invoice-items-table th, .invoice-items-table td { border-bottom: 1px solid #eee; padding: 10px 5px; text-align: left; }
-        .invoice-items-table th { background-color: #f9f9f9; font-weight: 700; color: #555; text-transform: uppercase; font-size: 9pt;}
-        .invoice-items-table td:nth-child(2), .invoice-items-table td:nth-child(3), .invoice-items-table td:nth-child(4) { text-align: right; }
-        .invoice-footer { text-align: center; margin-top: 50px; padding-top: 10px; border-top: 1px solid #eee; font-size: 9pt; color: #777; }
+        .invoice-summary { font-size: 11pt; background: #f8fafc; border-radius: 12px; padding: 25px; border: 1px solid #e2e8f0; margin-top: 30px; width: 400px; margin-left: auto; }
+        .invoice-summary h4 { font-family: 'Montserrat', sans-serif; font-size: 18pt; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; color: #222; font-weight: 800; text-align: left !important; }
+        .invoice-summary p { display: flex; justify-content: space-between; margin: 10px 0; line-height: 1.4; }
+        .invoice-summary strong { flex-basis: 60%; text-align: left !important; color: #475569; font-weight: 700; }
+        .invoice-summary span { flex-basis: 40%; text-align: left !important; color: #1e293b; font-weight: 800; white-space: nowrap; }
+        .invoice-summary .grand-total { font-size: 1.4em; border-top: 3px solid #1e293b; padding-top: 15px; margin-top: 15px; }
+        .invoice-summary .grand-total strong, .invoice-summary .grand-total span { font-size: 1.3em; color: #000;}
+        .invoice-items-table { width: 100%; border-collapse: collapse; margin-bottom: 40px; table-layout: auto; }
+        .invoice-items-table th, .invoice-items-table td { border: 1px solid #e2e8f0; padding: 15px; text-align: left !important; }
+        .invoice-items-table th { background-color: #f8fafc; font-weight: 900; color: #475569; text-transform: uppercase; font-size: 10pt; letter-spacing: 0.05em; }
+        .invoice-items-table td { font-size: 11pt; vertical-align: middle; word-wrap: break-word; }
+        .financial-value { white-space: nowrap !important; font-weight: 800; }
+        .invoice-footer { text-align: left !important; margin-top: 80px; padding-top: 20px; border-top: 2px solid #f1f5f9; font-size: 10pt; color: #64748b; }
         .invoice-watermark-logo { position: absolute; top: ${invoiceWatermarkLogoPosition === 'top' ? '5%' : '50%'}; left: 50%; transform: translate(-50%, ${invoiceWatermarkLogoPosition === 'top' ? '0' : '-50%'}); opacity: ${invoiceWatermarkLogoOpacity}; pointer-events: none; z-index: -1; }
         .invoice-watermark-logo img { display: block; width: ${invoiceWatermarkLogoSize}; height: auto; object-fit: contain; margin: auto; }
       }

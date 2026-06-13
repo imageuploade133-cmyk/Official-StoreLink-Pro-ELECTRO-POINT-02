@@ -396,11 +396,11 @@ export default function InstallmentOrdersPage() {
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
-                <TableHead className="font-black uppercase text-[10px] tracking-widest pl-6">Customer & Product</TableHead>
-                <TableHead className="font-black uppercase text-[10px] tracking-widest">Financials</TableHead>
-                <TableHead className="font-black uppercase text-[10px] tracking-widest">Progress</TableHead>
-                <TableHead className="font-black uppercase text-[10px] tracking-widest">Next Due Date</TableHead>
-                <TableHead className="font-black uppercase text-[10px] tracking-widest text-right pr-6">Actions</TableHead>
+                <TableHead className="font-black uppercase text-[10px] tracking-widest pl-6 text-left">Customer & Product</TableHead>
+                <TableHead className="font-black uppercase text-[10px] tracking-widest text-left">Financials</TableHead>
+                <TableHead className="font-black uppercase text-[10px] tracking-widest text-left">Progress</TableHead>
+                <TableHead className="font-black uppercase text-[10px] tracking-widest text-left">Next Due Date</TableHead>
+                <TableHead className="font-black uppercase text-[10px] tracking-widest text-left pr-6">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -424,7 +424,7 @@ export default function InstallmentOrdersPage() {
                   
                   return (
                     <TableRow key={record.id} className="group hover:bg-muted/30 transition-colors">
-                      <TableCell className="py-4 pl-6">
+                      <TableCell className="py-4 pl-6 text-left">
                         <div>
                             <div className="flex items-center gap-2">
                                 <p className="font-black text-gray-900">{record.customerName}</p>
@@ -434,26 +434,26 @@ export default function InstallmentOrdersPage() {
                             <div className="mt-1">{getStatusBadge(record.status)}</div>
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-left">
                         <div className="space-y-1">
-                            <p className="text-sm font-bold">Total: {formatCurrency(record.totalAmount, currencySymbol)}</p>
-                            <p className="text-xs text-muted-foreground">Owed: {formatCurrency(record.remainingBalance, currencySymbol)}</p>
+                            <p className="text-sm font-bold">Total: <span className="financial-value">{formatCurrency(record.totalAmount, currencySymbol)}</span></p>
+                            <p className="text-xs text-muted-foreground">Owed: <span className="financial-value">{formatCurrency(record.remainingBalance, currencySymbol)}</span></p>
                         </div>
                       </TableCell>
-                      <TableCell className="min-w-[150px]">
+                      <TableCell className="min-w-[150px] text-left">
                         <div className="space-y-1.5">
-                            <div className="flex justify-between text-[10px] font-black uppercase">
+                            <div className="flex justify-between text-[10px] font-black uppercase gap-4">
                                 <span>{Math.round(progress)}% Paid</span>
-                                <span>{formatCurrency(paidAmount, currencySymbol)}</span>
+                                <span className="financial-value">{formatCurrency(paidAmount, currencySymbol)}</span>
                             </div>
                             <Progress value={progress} className="h-1.5" />
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-left">
                         <div className="flex items-center gap-2">
                             <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground" />
                             <span className={cn(
-                                "text-sm font-bold",
+                                "text-sm font-bold whitespace-nowrap",
                                 record.status === 'overdue' ? "text-red-600" : ""
                             )}>
                                 {record.nextDueDate?.toDate ? format(record.nextDueDate.toDate(), 'PPP') : 'N/A'}
