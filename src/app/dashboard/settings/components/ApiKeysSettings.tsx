@@ -18,6 +18,7 @@ import { Loader2, KeyRound, Eye, EyeOff, RotateCcw } from 'lucide-react';
 
 const apiKeysSchema = z.object({
   imgbbApiKey: z.string().optional(),
+  integrationApiKey: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof apiKeysSchema>;
@@ -47,6 +48,7 @@ export function ApiKeysSettings({ settingsData, isLoading, storeId }: ApiKeysSet
     if (settingsData) {
       form.reset({
         imgbbApiKey: settingsData.imgbbApiKey || '',
+        integrationApiKey: settingsData.integrationApiKey || '',
       });
     }
   }, [settingsData, form]);
@@ -56,9 +58,15 @@ export function ApiKeysSettings({ settingsData, isLoading, storeId }: ApiKeysSet
     setIsSaving(true);
     try {
       if (storeId) {
-        await saveStoreSettings(firestore, storeId, { imgbbApiKey: data.imgbbApiKey });
+        await saveStoreSettings(firestore, storeId, { 
+          imgbbApiKey: data.imgbbApiKey,
+          integrationApiKey: data.integrationApiKey
+        });
       } else {
-        await saveGlobalSettings(firestore, { imgbbApiKey: data.imgbbApiKey });
+        await saveGlobalSettings(firestore, { 
+          imgbbApiKey: data.imgbbApiKey,
+          integrationApiKey: data.integrationApiKey
+        });
       }
       toast({ title: 'Success', description: 'API Key settings have been updated.' });
     } catch (e) {
@@ -92,6 +100,63 @@ export function ApiKeysSettings({ settingsData, isLoading, storeId }: ApiKeysSet
               </p>
             </div>
             
+            <FormField
+              control={form.control}
+              name="integrationApiKey"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-primary font-bold">
+                      v9 POS Integration API Key
+                      <span className="text-[10px] font-normal px-2 py-0.5 bg-primary/10 rounded-full">Secure</span>
+                    </div>
+                    {field.value && (
+                       <Button 
+                       type="button"
+                       variant="ghost" 
+                       size="sm" 
+                       className="h-6 px-2 text-[10px] gap-1 text-muted-foreground hover:text-primary"
+                       onClick={() => {
+                         const newKey = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                         form.setValue('integrationApiKey', newKey);
+                       }}
+                     >
+                       Regenerate
+                     </Button>
+                    )}
+                  </FormLabel>
+                  <div className="relative">
+                    <FormControl>
+                      <Input 
+                        placeholder="Enter or generate a secure key for v9 POS sync" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    {!field.value && (
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7"
+                        onClick={() => {
+                          const newKey = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                          form.setValue('integrationApiKey', newKey);
+                        }}
+                      >
+                        Generate Key
+                      </Button>
+                    )}
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    Use this key in your v9 POS settings to connect this store. Keep it secret.
+                  </p>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Separator className="my-4" />
+
             <FormField
               control={form.control}
               name="imgbbApiKey"

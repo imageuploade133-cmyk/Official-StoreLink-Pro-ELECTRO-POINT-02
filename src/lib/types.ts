@@ -548,6 +548,7 @@ export interface Settings {
   invoiceWatermarkLogoPosition?: string;
   invoiceWatermarkLogoSize?: number;
   storeContact?: string;
+  integrationApiKey?: string;
 }
 
 export type AppSettings = Settings;
