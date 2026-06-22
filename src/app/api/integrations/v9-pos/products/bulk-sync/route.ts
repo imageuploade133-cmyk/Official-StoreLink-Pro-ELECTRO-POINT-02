@@ -2,6 +2,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateApiKey, upsertProduct } from '@/lib/integrations/v9-pos/service';
 
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { apiKey, products } = await req.json();
@@ -26,7 +37,6 @@ export async function POST(req: NextRequest) {
     let failedCount = 0;
 
     // Process in sequence to avoid hitting Firestore limits or overwhelming the server
-    // For large catalogs, v9 POS should batch requests
     for (const product of products) {
       try {
         const result = await upsertProduct(auth.storeId, product);
@@ -48,7 +58,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ 
+    const response = NextResponse.json({ 
       success: true, 
       processedCount: products.length,
       createdCount,
@@ -56,8 +66,14 @@ export async function POST(req: NextRequest) {
       failedCount,
       results
     });
+
+    response.headers.set('Access-Control-Allow-Origin', '*');
+    return response;
   } catch (error: any) {
     console.error('Bulk sync error:', error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: error.message }, { 
+      status: 500,
+      headers: { 'Access-Control-Allow-Origin': '*' }
+    });
   }
 }
