@@ -92,10 +92,14 @@ export default function V9SyncPage() {
     orderBy('created_at', 'desc'),
     limit(20)
   ), [db]);
-  const events = useCollection<any>(eventsQuery);
+  
+  const eventsResult = useCollection<any>(eventsQuery);
+  // useCollection returns { data, isLoading, error } or just data depending on implementation
+  // Based on your error, it seems 'events' is being treated as the object and you are trying to filter it.
+  const events = Array.isArray(eventsResult) ? eventsResult : (eventsResult as any)?.data || [];
 
   const stats = useMemo(() => {
-    if (!events) return { pending: 0, failed: 0, success: 0 };
+    if (!Array.isArray(events)) return { pending: 0, failed: 0, success: 0 };
     return {
         pending: events.filter(e => e.status === 'pending').length,
         failed: events.filter(e => e.status === 'failed').length,
@@ -257,14 +261,14 @@ export default function V9SyncPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {events && events.length === 0 && (
+                  {(!events || events.length === 0) && (
                     <TableRow>
                       <TableCell colSpan={5} className="text-center py-12 text-muted-foreground italic">
                         No events received yet. Webhook is active and waiting.
                       </TableCell>
                     </TableRow>
                   )}
-                  {events?.map((event: any) => (
+                  {Array.isArray(events) && events.map((event: any) => (
                     <TableRow key={event.id} className="hover:bg-muted/30">
                       <TableCell className="text-[11px] font-mono whitespace-nowrap">
                         {event.created_at ? format(event.created_at.toDate(), 'HH:mm:ss') : 'Pending'}
