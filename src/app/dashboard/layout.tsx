@@ -56,7 +56,7 @@ import {
   Palette,
   CalendarClock,
   Star,
-  ArrowRightLeft,
+  ArrowLeftRight,
   Image as ImageIcon
 } from 'lucide-react';
 import { PageSpinner } from '@/components/ui/spinner';
@@ -195,7 +195,7 @@ export default function DashboardLayout({
     { href: '/dashboard/restock-history', icon: ListChecks, label: 'Restock History', perm: 'transfer_stock' },
     { href: '/dashboard/print-barcodes', icon: Printer, label: 'Print Barcodes', perm: 'canPrintBarcodes' },
     { href: '/dashboard/bulk-add-products', icon: List, label: 'Bulk Import', perm: 'canBulkAddProducts' },
-    { href: '/dashboard/integrations/v9-pos-sync', icon: ArrowRightLeft, label: 'V9 POS Sync', perm: 'manage_settings' },
+    { href: '/dashboard/integrations/v9-pos-sync', icon: ArrowLeftRight, label: 'V9 POS Sync', perm: 'manage_settings' },
     { heading: 'Management' },
     { href: '/dashboard/customers', icon: Users, label: 'Customers', perm: 'canViewCustomers' },
     { href: '/dashboard/staff', icon: Users, label: 'Staff', perm: 'manage_staff' },

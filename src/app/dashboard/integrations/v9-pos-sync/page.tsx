@@ -18,14 +18,15 @@ import {
   Settings,
   ShieldCheck,
   Zap,
-  ArrowRightLeft,
+  Globe,
   Package,
   Activity,
   Server,
   CloudZap,
   Loader2,
   RotateCcw,
-  Play
+  Play,
+  ArrowLeftRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -42,7 +43,6 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
-import { PageHeader } from '@/components/PageHeader';
 import { format } from 'date-fns';
 
 export default function V9SyncPage() {
@@ -94,19 +94,22 @@ export default function V9SyncPage() {
   ), [db]);
   
   const eventsResult = useCollection<any>(eventsQuery);
+  
   const events = useMemo(() => {
     if (!eventsResult) return [];
     if (Array.isArray(eventsResult)) return eventsResult;
-    if ((eventsResult as any).data && Array.isArray((eventsResult as any).data)) return (eventsResult as any).data;
+    if (eventsResult && typeof eventsResult === 'object' && 'data' in eventsResult) {
+        return Array.isArray(eventsResult.data) ? eventsResult.data : [];
+    }
     return [];
   }, [eventsResult]);
 
   const stats = useMemo(() => {
     const safeEvents = Array.isArray(events) ? events : [];
     return {
-        pending: safeEvents.filter(e => e.status === 'pending').length,
-        failed: safeEvents.filter(e => e.status === 'failed').length,
-        success: safeEvents.filter(e => e.status === 'success').length,
+        pending: safeEvents.filter(e => e?.status === 'pending').length,
+        failed: safeEvents.filter(e => e?.status === 'failed').length,
+        success: safeEvents.filter(e => e?.status === 'success').length,
     };
   }, [events]);
 
@@ -174,12 +177,14 @@ export default function V9SyncPage() {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <div className="mb-8">
-        <PageHeader 
-          icon={ArrowRightLeft}
-          title="V9 POS Integration" 
-          description="Manage incoming product synchronization from V9 POS systems."
-        />
+      <div className="flex items-center gap-4 mb-8">
+        <div className="p-3 bg-primary/10 rounded-xl">
+          <ArrowLeftRight className="h-6 w-6 text-primary" />
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">V9 POS Integration</h1>
+          <p className="text-muted-foreground">Manage incoming product synchronization from V9 POS systems.</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -318,7 +323,7 @@ export default function V9SyncPage() {
         <div className="space-y-6">
           <Card className="bg-slate-900 text-white border-none shadow-lg relative overflow-hidden">
             <div className="absolute top-0 right-0 p-4 opacity-10">
-                <ArrowRightLeft className="h-24 w-24" />
+                <Globe className="h-24 w-24" />
             </div>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
