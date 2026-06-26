@@ -92,15 +92,11 @@ export default function V9SyncPage() {
     limit(20)
   ), [db]);
   
-  const eventsResult = useCollection<any>(eventsQuery);
-  const events = useMemo(() => {
-    if (!eventsResult) return [];
-    if (Array.isArray(eventsResult)) return eventsResult;
-    return (eventsResult as any).data || [];
-  }, [eventsResult]);
+  const { data: eventsData } = useCollection<any>(eventsQuery);
+  const events = useMemo(() => eventsData || [], [eventsData]);
 
   const stats = useMemo(() => {
-    const safeEvents = Array.isArray(events) ? events : [];
+    const safeEvents = events || [];
     return {
         pending: safeEvents.filter(e => e.status === 'pending').length,
         failed: safeEvents.filter(e => e.status === 'failed').length,
