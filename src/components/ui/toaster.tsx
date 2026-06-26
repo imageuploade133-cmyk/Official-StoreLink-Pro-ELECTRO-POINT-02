@@ -10,7 +10,7 @@ import {
   ToastTitle,
   ToastViewport,
 } from "@/components/ui/toast"
-import { AlertCircle, CheckCircle2, Info, XCircle, AlertTriangle, X, CircleX, XSquare, Minus } from "lucide-react"
+import { AlertCircle, CheckCircle2, Info, CircleAlert, AlertTriangle, X, CircleX, SquareX, Minus } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export function Toaster() {
