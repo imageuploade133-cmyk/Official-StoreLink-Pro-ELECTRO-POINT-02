@@ -9,7 +9,7 @@ import {
   Timestamp,
   doc,
   setDoc,
-  onSnapshot,
+  getDoc,
   getCountFromServer
 } from 'firebase/firestore';
 import { useFirestore, useCollection } from '@/firebase';
@@ -29,7 +29,8 @@ import {
   EyeOff,
   Copy,
   Check,
-  WandSparkles
+  WandSparkles,
+  AlertTriangle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -68,17 +69,23 @@ export default function V9SyncPage() {
   });
 
   useEffect(() => {
-    const configRef = doc(db, 'sync_settings', 'global');
-    const unsubscribe = onSnapshot(configRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        setConfig(data);
-        setFormData({
-          clientId: data.clientId || '',
-          sharedSecret: data.sharedSecret || ''
-        });
+    const loadConfig = async () => {
+      try {
+        const configRef = doc(db, 'sync_settings', 'global');
+        const configSnap = await getDoc(configRef);
+        if (configSnap.exists()) {
+          const data = configSnap.data();
+          setConfig(data);
+          setFormData({
+            clientId: data.clientId || '',
+            sharedSecret: data.sharedSecret || ''
+          });
+        }
+      } catch (e) {
+        console.error('Failed to load sync config:', e);
       }
-    });
+    };
+    loadConfig();
 
     const getCounts = async () => {
         try {
@@ -90,8 +97,6 @@ export default function V9SyncPage() {
         }
     };
     getCounts();
-
-    return () => unsubscribe();
   }, [db]);
 
   const eventsQuery = useMemo(() => query(
@@ -100,7 +105,7 @@ export default function V9SyncPage() {
     limit(20)
   ), [db]);
   
-  const { data: eventsData } = useCollection<any>(eventsQuery);
+  const { data: eventsData, isLoading: isLoadingEvents, error: eventsError } = useCollection<any>(eventsQuery);
   const events = useMemo(() => eventsData || [], [eventsData]);
 
   const stats = useMemo(() => {
@@ -120,7 +125,8 @@ export default function V9SyncPage() {
   const handleSaveConfig = async () => {
     setIsSaving(true);
     try {
-      await setDoc(doc(db, 'sync_settings', 'global'), {
+      const configRef = doc(db, 'sync_settings', 'global');
+      await setDoc(configRef, {
         ...formData,
         updatedAt: Timestamp.now()
       }, { merge: true });
@@ -132,9 +138,16 @@ export default function V9SyncPage() {
         });
       }
       
+      // Reload config to sync state with Firestore
+      const configSnap = await getDoc(configRef);
+      if (configSnap.exists()) {
+        setConfig(configSnap.data());
+      }
+      
       toast({ title: "Configuration Saved", description: "V9 POS sync credentials updated." });
     } catch (error) {
-      toast({ variant: "destructive", title: "Error", description: "Failed to save configuration." });
+      console.error('Save config error:', error);
+      toast({ variant: "destructive", title: "Error", description: "Failed to save configuration. Please try again." });
     } finally {
       setIsSaving(false);
     }
@@ -367,14 +380,41 @@ export default function V9SyncPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {(!events || events.length === 0) && (
+                  {isLoadingEvents && (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center py-12 text-muted-foreground italic">
+                        <div className="flex items-center justify-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Loading events...
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {eventsError && !isLoadingEvents && (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center py-12">
+                        <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                          <AlertTriangle className="h-6 w-6 text-amber-500" />
+                          <p className="text-sm font-medium">Unable to load events</p>
+                          <p className="text-xs text-muted-foreground/70">
+                            {eventsError.code === 'failed-precondition' 
+                              ? 'The events collection requires a composite index. Please create it in Firebase Console.' 
+                              : eventsError.code === 'permission-denied'
+                                ? 'You do not have permission to access the events collection.'
+                                : 'An unexpected error occurred. Please try refreshing the page.'}
+                          </p>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {!isLoadingEvents && !eventsError && (!events || events.length === 0) && (
                     <TableRow>
                       <TableCell colSpan={5} className="text-center py-12 text-muted-foreground italic">
                         No events received yet. Webhook is active and waiting.
                       </TableCell>
                     </TableRow>
                   )}
-                  {Array.isArray(events) && events.map((event: any) => (
+                  {!isLoadingEvents && !eventsError && Array.isArray(events) && events.map((event: any) => (
                     <TableRow key={event.id} className="hover:bg-muted/30">
                       <TableCell className="text-[11px] font-mono whitespace-nowrap">
                         {event.created_at ? format(event.created_at.toDate(), 'HH:mm:ss') : 'Pending'}
