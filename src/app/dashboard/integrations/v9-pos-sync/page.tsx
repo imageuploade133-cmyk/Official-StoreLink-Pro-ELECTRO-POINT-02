@@ -92,14 +92,20 @@ export default function V9SyncPage() {
     orderBy('created_at', 'desc'),
     limit(20)
   ), [db]);
-  const events = useCollection<any>(eventsQuery);
+  
+  const eventsResult = useCollection<any>(eventsQuery);
+  const events = useMemo(() => {
+    if (!eventsResult) return [];
+    if (Array.isArray(eventsResult)) return eventsResult;
+    return (eventsResult as any).data || [];
+  }, [eventsResult]);
 
   const stats = useMemo(() => {
-    if (!events) return { pending: 0, failed: 0, success: 0 };
+    const safeEvents = Array.isArray(events) ? events : [];
     return {
-        pending: events.filter(e => e.status === 'pending').length,
-        failed: events.filter(e => e.status === 'failed').length,
-        success: events.filter(e => e.status === 'success').length,
+        pending: safeEvents.filter(e => e.status === 'pending').length,
+        failed: safeEvents.filter(e => e.status === 'failed').length,
+        success: safeEvents.filter(e => e.status === 'success').length,
     };
   }, [events]);
 
@@ -257,14 +263,14 @@ export default function V9SyncPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {events && events.length === 0 && (
+                  {(!events || events.length === 0) && (
                     <TableRow>
                       <TableCell colSpan={5} className="text-center py-12 text-muted-foreground italic">
                         No events received yet. Webhook is active and waiting.
                       </TableCell>
                     </TableRow>
                   )}
-                  {events?.map((event: any) => (
+                  {Array.isArray(events) && events.map((event: any) => (
                     <TableRow key={event.id} className="hover:bg-muted/30">
                       <TableCell className="text-[11px] font-mono whitespace-nowrap">
                         {event.created_at ? format(event.created_at.toDate(), 'HH:mm:ss') : 'Pending'}
