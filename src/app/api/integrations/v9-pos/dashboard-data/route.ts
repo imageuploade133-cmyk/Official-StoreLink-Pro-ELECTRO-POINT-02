@@ -15,8 +15,14 @@ export async function GET(req: NextRequest) {
     console.log(`[V9 Sync Dashboard] Querying dashboard data for user: ${user.uid}`);
 
     // Fetch sync config
-    const configSnap = await adminDb.collection('sync_settings').doc('global').get();
-    const config = configSnap.exists ? configSnap.data() : null;
+    let config = null;
+    try {
+      const configSnap = await adminDb.collection('sync_settings').doc('global').get();
+      config = configSnap.exists ? configSnap.data() : null;
+    } catch (configError) {
+      console.error('[V9 Sync Dashboard] Error fetching config:', configError);
+      // Return a partial response since config might not exist yet
+    }
 
     // Fetch product sync map count
     let mappingCount = 0;
@@ -24,19 +30,12 @@ export async function GET(req: NextRequest) {
         const mappingCountSnap = await adminDb.collection('product_sync_map').count().get();
         mappingCount = mappingCountSnap.data().count;
     } catch (countError) {
-        console.warn('[V9 Sync Dashboard] count() query failed, falling back to size:', countError);
-        try {
-            const mappingSnap = await adminDb.collection('product_sync_map').limit(1).get();
-            // If we can't get count, maybe we just don't show it or show it differently
-            // but for now let's just use 0 if it fails or try a slightly better fallback
-            mappingCount = 0; 
-        } catch (innerError) {
-            mappingCount = 0;
-        }
+        console.warn('[V9 Sync Dashboard] count() query failed, falling back:', countError);
+        mappingCount = 0;
     }
 
     // Fetch recent integration events
-    let events = [];
+    let events: any[] = [];
     try {
         const eventsSnap = await adminDb.collection('integration_events')
           .orderBy('created_at', 'desc')
@@ -63,7 +62,6 @@ export async function GET(req: NextRequest) {
         });
     } catch (eventsError) {
         console.error('[V9 Sync Dashboard] Error fetching events:', eventsError);
-        // Don't fail the whole request if only events fail (could be missing index)
         events = [];
     }
 

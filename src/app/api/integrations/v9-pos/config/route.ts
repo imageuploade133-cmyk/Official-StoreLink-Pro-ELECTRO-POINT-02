@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase-admin';
 import { verifyAuth } from '@/lib/auth-admin-utils';
-import { FieldValue } from 'firebase-admin/firestore';
+import admin from 'firebase-admin';
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,14 +26,14 @@ export async function POST(req: NextRequest) {
         batch.set(configRef, {
           clientId: clientId || '',
           sharedSecret: sharedSecret || '',
-          updatedAt: FieldValue.serverTimestamp()
+          updatedAt: admin.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
     
         if (clientId && clientId !== 'global') {
           const clientRef = adminDb.collection('sync_settings').doc(clientId);
           batch.set(clientRef, {
             sharedSecret: sharedSecret || '',
-            updatedAt: FieldValue.serverTimestamp()
+            updatedAt: admin.firestore.FieldValue.serverTimestamp()
           }, { merge: true });
         }
     
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
         console.error('[V9 Sync Config] Database error:', dbError);
         return NextResponse.json({ 
             error: 'Database Error', 
-            details: dbError.message 
+            details: dbError.message || String(dbError) 
         }, { status: 500 });
     }
   } catch (error) {
