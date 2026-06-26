@@ -174,6 +174,7 @@ export default function V9SyncPage() {
   return (
     <div className="container mx-auto py-6 space-y-6">
       <PageHeader 
+        icon={ArrowRightLeft}
         title="V9 POS Integration" 
         description="Manage incoming product synchronization from V9 POS systems."
       />
