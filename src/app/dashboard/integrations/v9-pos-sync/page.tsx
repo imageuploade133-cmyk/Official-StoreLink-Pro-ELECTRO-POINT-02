@@ -24,7 +24,12 @@ import {
   Server,
   Loader2,
   RotateCcw,
-  Play
+  Play,
+  Eye,
+  EyeOff,
+  Copy,
+  Check,
+  WandSparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -51,8 +56,11 @@ export default function V9SyncPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [config, setConfig] = useState<any>(null);
   const [mappingCount, setMappingCount] = useState<number | null>(null);
+  const [showSecret, setShowSecret] = useState(false);
+  const [copied, setCopied] = useState(false);
   
   const [formData, setFormData] = useState({
     clientId: '',
@@ -166,6 +174,45 @@ export default function V9SyncPage() {
     }
   };
 
+  const generateSecureToken = (length: number): string => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{}|;:,.<>?';
+    const array = new Uint32Array(length);
+    crypto.getRandomValues(array);
+    return Array.from(array, (v) => chars[v % chars.length]).join('');
+  };
+
+  const handleGenerateCredentials = () => {
+    setIsGenerating(true);
+    try {
+      const timestamp = Date.now().toString(36);
+      const randomSuffix = Math.random().toString(36).substring(2, 8);
+      const newClientId = `v9_pos_${timestamp}${randomSuffix}`;
+      const newSecret = generateSecureToken(48);
+
+      setFormData({
+        clientId: newClientId,
+        sharedSecret: newSecret
+      });
+      setShowSecret(true);
+      toast({ title: "Credentials Generated", description: "New Client ID and Shared Secret have been generated. Save them now." });
+    } catch (error) {
+      toast({ variant: "destructive", title: "Generation Failed", description: "Failed to generate credentials." });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleCopySecret = async () => {
+    try {
+      await navigator.clipboard.writeText(formData.sharedSecret);
+      setCopied(true);
+      toast({ title: "Copied", description: "Shared Secret copied to clipboard." });
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast({ variant: "destructive", title: "Copy Failed", description: "Unable to copy to clipboard." });
+    }
+  };
+
   return (
     <div className="container mx-auto py-6 space-y-6">
       <PageHeader 
@@ -178,38 +225,99 @@ export default function V9SyncPage() {
         <div className="lg:col-span-2 space-y-6">
           <Card className="shadow-md overflow-hidden border-none">
             <CardHeader className="bg-slate-900 text-white">
-              <CardTitle className="flex items-center gap-2">
-                <ShieldCheck className="h-5 w-5 text-emerald-400" /> Webhook Authorization
-              </CardTitle>
-              <CardDescription className="text-slate-300">
-                Define the credentials that V9 POS must use to sign and send product data.
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <ShieldCheck className="h-5 w-5 text-emerald-400" /> Webhook Authorization
+                  </CardTitle>
+                  <CardDescription className="text-slate-300">
+                    Define the credentials that V9 POS must use to sign and send product data.
+                  </CardDescription>
+                </div>
+                <Button 
+                  variant="secondary" 
+                  size="sm" 
+                  onClick={handleGenerateCredentials}
+                  disabled={isGenerating}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white border-none shadow-lg"
+                >
+                  {isGenerating ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <WandSparkles className="h-4 w-4 mr-2" />
+                  )}
+                  Generate Credentials
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4 pt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="clientId" className="text-xs uppercase font-bold text-muted-foreground">V9 Client ID</Label>
-                  <Input 
-                    id="clientId"
-                    name="clientId"
-                    className="bg-muted/50 font-mono"
-                    placeholder="e.g. v9_pos_main"
-                    value={formData.clientId}
-                    onChange={handleInputChange}
-                  />
+                  <div className="relative">
+                    <Input 
+                      id="clientId"
+                      name="clientId"
+                      className="bg-muted/50 font-mono pr-10"
+                      placeholder="e.g. v9_pos_main"
+                      value={formData.clientId}
+                      onChange={handleInputChange}
+                    />
+                    {formData.clientId && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground hover:text-foreground"
+                        onClick={() => {
+                          navigator.clipboard.writeText(formData.clientId);
+                          toast({ title: "Copied", description: "Client ID copied to clipboard." });
+                        }}
+                      >
+                        <Copy className="h-3.5 w-3.5" />
+                        <span className="sr-only">Copy Client ID</span>
+                      </Button>
+                    )}
+                  </div>
                   <p className="text-[10px] text-muted-foreground">Used as the primary identifier in request headers.</p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="sharedSecret" className="text-xs uppercase font-bold text-muted-foreground">Shared Secret (HMAC Key)</Label>
-                  <Input 
-                    id="sharedSecret"
-                    name="sharedSecret"
-                    type="password"
-                    className="bg-muted/50 font-mono"
-                    placeholder="Enter Shared Secret"
-                    value={formData.sharedSecret}
-                    onChange={handleInputChange}
-                  />
+                  <div className="relative">
+                    <Input 
+                      id="sharedSecret"
+                      name="sharedSecret"
+                      type={showSecret ? 'text' : 'password'}
+                      className="bg-muted/50 font-mono pr-20"
+                      placeholder="Enter Shared Secret"
+                      value={formData.sharedSecret}
+                      onChange={handleInputChange}
+                    />
+                    {formData.sharedSecret && (
+                      <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                          onClick={handleCopySecret}
+                        >
+                          {copied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
+                          <span className="sr-only">{copied ? 'Copied' : 'Copy Shared Secret'}</span>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                          onClick={() => setShowSecret(!showSecret)}
+                        >
+                          {showSecret ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                          <span className="sr-only">{showSecret ? 'Hide Shared Secret' : 'Show Shared Secret'}</span>
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                   <p className="text-[10px] text-muted-foreground">Critical for verifying request signatures. Keep this private.</p>
                 </div>
               </div>
