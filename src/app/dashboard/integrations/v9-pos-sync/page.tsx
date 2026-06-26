@@ -10,9 +10,10 @@ import {
   doc,
   setDoc,
   getDoc,
+  getDocs,
   getCountFromServer
 } from 'firebase/firestore';
-import { useFirestore, useCollection } from '@/firebase';
+import { useFirestore } from '@/firebase';
 import { 
   History, 
   Settings,
@@ -99,14 +100,45 @@ export default function V9SyncPage() {
     getCounts();
   }, [db]);
 
-  const eventsQuery = useMemo(() => query(
-    collection(db, 'integration_events'),
-    orderBy('created_at', 'desc'),
-    limit(20)
-  ), [db]);
-  
-  const { data: eventsData, isLoading: isLoadingEvents, error: eventsError } = useCollection<any>(eventsQuery);
-  const events = useMemo(() => eventsData || [], [eventsData]);
+  const [events, setEvents] = useState<any[]>([]);
+  const [isLoadingEvents, setIsLoadingEvents] = useState(true);
+  const [eventsError, setEventsError] = useState<any>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadEvents = async () => {
+      try {
+        const eventsRef = collection(db, 'integration_events');
+        const eventsQuery = query(eventsRef, orderBy('created_at', 'desc'), limit(20));
+        const snapshot = await getDocs(eventsQuery);
+        if (!cancelled) {
+          const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+          setEvents(docs);
+          setEventsError(null);
+        }
+      } catch (e: any) {
+        if (!cancelled) {
+          console.error('Failed to load events:', e);
+          setEventsError(e);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingEvents(false);
+        }
+      }
+    };
+
+    loadEvents();
+
+    // Poll every 15 seconds to keep events fresh without using watch stream listeners
+    const interval = setInterval(loadEvents, 15000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [db]);
 
   const stats = useMemo(() => {
     const safeEvents = events || [];
@@ -126,10 +158,12 @@ export default function V9SyncPage() {
     setIsSaving(true);
     try {
       const configRef = doc(db, 'sync_settings', 'global');
-      await setDoc(configRef, {
+      const writeData = {
         ...formData,
         updatedAt: Timestamp.now()
-      }, { merge: true });
+      };
+      
+      await setDoc(configRef, writeData, { merge: true });
       
       if (formData.clientId) {
         await setDoc(doc(db, 'sync_settings', formData.clientId), {
@@ -145,7 +179,30 @@ export default function V9SyncPage() {
       }
       
       toast({ title: "Configuration Saved", description: "V9 POS sync credentials updated." });
-    } catch (error) {
+    } catch (error: any) {
+      // Firestore SDK (11.9.0) has a known bug where internal assertion errors from
+      // the WebChannel watch stream (e.g., "INTERNAL ASSERTION FAILED: Unexpected state")
+      // can incorrectly propagate to unrelated write operations. The write itself succeeds,
+      // so we verify by reading back the data.
+      const isFirestoreAssertion = error?.message?.includes?.('INTERNAL ASSERTION FAILED') || 
+                                   error?.message?.includes?.('Unexpected state');
+      
+      if (isFirestoreAssertion) {
+        console.warn('Firestore assertion error caught (non-fatal, write completed):', error);
+        // Verify the write actually persisted
+        try {
+          const configRef = doc(db, 'sync_settings', 'global');
+          const verifySnap = await getDoc(configRef);
+          if (verifySnap.exists() && verifySnap.data()?.clientId === formData.clientId) {
+            setConfig(verifySnap.data());
+            toast({ title: "Configuration Saved", description: "V9 POS sync credentials updated." });
+            return;
+          }
+        } catch {
+          // Verification failed, fall through to error toast
+        }
+      }
+      
       console.error('Save config error:', error);
       toast({ variant: "destructive", title: "Error", description: "Failed to save configuration. Please try again." });
     } finally {
