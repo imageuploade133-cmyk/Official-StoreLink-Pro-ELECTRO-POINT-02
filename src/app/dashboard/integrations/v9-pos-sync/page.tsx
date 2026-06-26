@@ -12,7 +12,7 @@ import {
   onSnapshot,
   getCountFromServer
 } from 'firebase/firestore';
-import { useFirestore, useCollection } from '@/firebase';
+import { useFirestore } from '@/firebase';
 import { 
   History, 
   Settings,
@@ -26,7 +26,7 @@ import {
   Loader2,
   RotateCcw,
   Play,
-  ArrowLeftRight
+  RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -54,6 +54,8 @@ export default function V9SyncPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [config, setConfig] = useState<any>(null);
   const [mappingCount, setMappingCount] = useState<number | null>(null);
+  const [events, setEvents] = useState<any[]>([]);
+  const [isEventsLoading, setIsEventsLoading] = useState(true);
   
   const [formData, setFormData] = useState({
     clientId: '',
@@ -61,6 +63,7 @@ export default function V9SyncPage() {
   });
 
   useEffect(() => {
+    if (!db) return;
     const configRef = doc(db, 'sync_settings', 'global');
     const unsubscribe = onSnapshot(configRef, (docSnap) => {
       if (docSnap.exists()) {
@@ -71,6 +74,20 @@ export default function V9SyncPage() {
           sharedSecret: data.sharedSecret || ''
         });
       }
+    });
+
+    const eventsQuery = query(
+      collection(db, 'integration_events'),
+      orderBy('created_at', 'desc'),
+      limit(20)
+    );
+    const unsubscribeEvents = onSnapshot(eventsQuery, (snap) => {
+      const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      setEvents(docs);
+      setIsEventsLoading(false);
+    }, (err) => {
+      console.error("Events listener error:", err);
+      setIsEventsLoading(false);
     });
 
     const getCounts = async () => {
@@ -84,32 +101,17 @@ export default function V9SyncPage() {
     };
     getCounts();
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      unsubscribeEvents();
+    };
   }, [db]);
 
-  const eventsQuery = useMemo(() => query(
-    collection(db, 'integration_events'),
-    orderBy('created_at', 'desc'),
-    limit(20)
-  ), [db]);
-  
-  const eventsResult = useCollection<any>(eventsQuery);
-  
-  const events = useMemo(() => {
-    if (!eventsResult) return [];
-    if (Array.isArray(eventsResult)) return eventsResult;
-    if (eventsResult && typeof eventsResult === 'object' && 'data' in eventsResult) {
-        return Array.isArray(eventsResult.data) ? eventsResult.data : [];
-    }
-    return [];
-  }, [eventsResult]);
-
   const stats = useMemo(() => {
-    const safeEvents = Array.isArray(events) ? events : [];
     return {
-        pending: safeEvents.filter(e => e?.status === 'pending').length,
-        failed: safeEvents.filter(e => e?.status === 'failed').length,
-        success: safeEvents.filter(e => e?.status === 'success').length,
+        pending: events.filter(e => e.status === 'pending').length,
+        failed: events.filter(e => e.status === 'failed').length,
+        success: events.filter(e => e.status === 'success').length,
     };
   }, [events]);
 
@@ -179,11 +181,11 @@ export default function V9SyncPage() {
     <div className="container mx-auto py-6 space-y-6">
       <div className="flex items-center gap-4 mb-8">
         <div className="p-3 bg-primary/10 rounded-xl">
-          <ArrowLeftRight className="h-6 w-6 text-primary" />
+          <RefreshCw className="h-6 w-6 text-primary" />
         </div>
         <div>
           <h1 className="text-3xl font-bold tracking-tight">V9 POS Integration</h1>
-          <p className="text-muted-foreground">Manage incoming product synchronization from V9 POS systems.</p>
+          <p className="text-muted-foreground text-sm">Manage incoming product synchronization from V9 POS systems.</p>
         </div>
       </div>
 
@@ -191,7 +193,7 @@ export default function V9SyncPage() {
         <div className="lg:col-span-2 space-y-6">
           <Card className="shadow-md overflow-hidden border-none">
             <CardHeader className="bg-slate-900 text-white">
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-lg">
                 <ShieldCheck className="h-5 w-5 text-emerald-400" /> Webhook Authorization
               </CardTitle>
               <CardDescription className="text-slate-300">
@@ -210,7 +212,6 @@ export default function V9SyncPage() {
                     value={formData.clientId}
                     onChange={handleInputChange}
                   />
-                  <p className="text-[10px] text-muted-foreground">Used as the primary identifier in request headers.</p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="sharedSecret" className="text-xs uppercase font-bold text-muted-foreground">Shared Secret (HMAC Key)</Label>
@@ -223,7 +224,6 @@ export default function V9SyncPage() {
                     value={formData.sharedSecret}
                     onChange={handleInputChange}
                   />
-                  <p className="text-[10px] text-muted-foreground">Critical for verifying request signatures. Keep this private.</p>
                 </div>
               </div>
             </CardContent>
@@ -242,7 +242,7 @@ export default function V9SyncPage() {
           <Card className="shadow-md">
             <CardHeader className="flex flex-row items-center justify-between border-b bg-muted/10">
               <div>
-                <CardTitle className="flex items-center gap-2 text-xl">
+                <CardTitle className="flex items-center gap-2 text-xl font-bold">
                   <History className="h-5 w-5" /> Inbound Event Queue
                 </CardTitle>
                 <CardDescription>
@@ -279,7 +279,7 @@ export default function V9SyncPage() {
                       </TableCell>
                     </TableRow>
                   )}
-                  {Array.isArray(events) && events.map((event: any) => (
+                  {events.map((event: any) => (
                     <TableRow key={event.id} className="hover:bg-muted/30">
                       <TableCell className="text-[11px] font-mono whitespace-nowrap">
                         {event.created_at ? format(event.created_at.toDate(), 'HH:mm:ss') : 'Pending'}
@@ -385,13 +385,13 @@ export default function V9SyncPage() {
                 <div className="flex justify-between text-xs items-center">
                     <span>Recent Success Rate</span>
                     <span className="font-bold text-emerald-600">
-                        {events?.length ? Math.round((stats.success / events.length) * 100) : 0}%
+                        {events.length ? Math.round((stats.success / events.length) * 100) : 0}%
                     </span>
                 </div>
                 <div className="w-full bg-muted h-1 rounded-full overflow-hidden">
                     <div 
                         className="bg-emerald-500 h-full transition-all duration-500" 
-                        style={{ width: `${events?.length ? (stats.success / events.length) * 100 : 0}%` }}
+                        style={{ width: `${events.length ? (stats.success / events.length) * 100 : 0}%` }}
                     />
                 </div>
               </div>
