@@ -97,7 +97,8 @@ export default function V9SyncPage() {
   const events = useMemo(() => {
     if (!eventsResult) return [];
     if (Array.isArray(eventsResult)) return eventsResult;
-    return (eventsResult as any).data || [];
+    if ((eventsResult as any).data && Array.isArray((eventsResult as any).data)) return (eventsResult as any).data;
+    return [];
   }, [eventsResult]);
 
   const stats = useMemo(() => {
@@ -173,11 +174,13 @@ export default function V9SyncPage() {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <PageHeader 
-        icon={ArrowRightLeft}
-        title="V9 POS Integration" 
-        description="Manage incoming product synchronization from V9 POS systems."
-      />
+      <div className="mb-8">
+        <PageHeader 
+          icon={ArrowRightLeft}
+          title="V9 POS Integration" 
+          description="Manage incoming product synchronization from V9 POS systems."
+        />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
