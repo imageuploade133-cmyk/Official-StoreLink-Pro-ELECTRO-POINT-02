@@ -9,10 +9,11 @@ import {
   Timestamp,
   doc,
   setDoc,
-  onSnapshot,
+  getDoc,
+  getDocs,
   getCountFromServer
 } from 'firebase/firestore';
-import { useFirestore, useCollection } from '@/firebase';
+import { useFirestore } from '@/firebase';
 import { 
   History, 
   Settings,
@@ -24,7 +25,13 @@ import {
   Server,
   Loader2,
   RotateCcw,
-  Play
+  Play,
+  Eye,
+  EyeOff,
+  Copy,
+  Check,
+  WandSparkles,
+  AlertTriangle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -51,8 +58,11 @@ export default function V9SyncPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [config, setConfig] = useState<any>(null);
   const [mappingCount, setMappingCount] = useState<number | null>(null);
+  const [showSecret, setShowSecret] = useState(false);
+  const [copied, setCopied] = useState(false);
   
   const [formData, setFormData] = useState({
     clientId: '',
@@ -60,17 +70,23 @@ export default function V9SyncPage() {
   });
 
   useEffect(() => {
-    const configRef = doc(db, 'sync_settings', 'global');
-    const unsubscribe = onSnapshot(configRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        setConfig(data);
-        setFormData({
-          clientId: data.clientId || '',
-          sharedSecret: data.sharedSecret || ''
-        });
+    const loadConfig = async () => {
+      try {
+        const configRef = doc(db, 'sync_settings', 'global');
+        const configSnap = await getDoc(configRef);
+        if (configSnap.exists()) {
+          const data = configSnap.data();
+          setConfig(data);
+          setFormData({
+            clientId: data.clientId || '',
+            sharedSecret: data.sharedSecret || ''
+          });
+        }
+      } catch (e) {
+        console.error('Failed to load sync config:', e);
       }
-    });
+    };
+    loadConfig();
 
     const getCounts = async () => {
         try {
@@ -82,25 +98,50 @@ export default function V9SyncPage() {
         }
     };
     getCounts();
-
-    return () => unsubscribe();
   }, [db]);
 
-  const eventsQuery = useMemo(() => query(
-    collection(db, 'integration_events'),
-    orderBy('created_at', 'desc'),
-    limit(20)
-  ), [db]);
-  
-  const eventsResult = useCollection<any>(eventsQuery);
-  const events = useMemo(() => {
-    if (!eventsResult) return [];
-    if (Array.isArray(eventsResult)) return eventsResult;
-    return (eventsResult as any).data || [];
-  }, [eventsResult]);
+  const [events, setEvents] = useState<any[]>([]);
+  const [isLoadingEvents, setIsLoadingEvents] = useState(true);
+  const [eventsError, setEventsError] = useState<any>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadEvents = async () => {
+      try {
+        const eventsRef = collection(db, 'integration_events');
+        const eventsQuery = query(eventsRef, orderBy('created_at', 'desc'), limit(20));
+        const snapshot = await getDocs(eventsQuery);
+        if (!cancelled) {
+          const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+          setEvents(docs);
+          setEventsError(null);
+        }
+      } catch (e: any) {
+        if (!cancelled) {
+          console.error('Failed to load events:', e);
+          setEventsError(e);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingEvents(false);
+        }
+      }
+    };
+
+    loadEvents();
+
+    // Poll every 15 seconds to keep events fresh without using watch stream listeners
+    const interval = setInterval(loadEvents, 15000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [db]);
 
   const stats = useMemo(() => {
-    const safeEvents = Array.isArray(events) ? events : [];
+    const safeEvents = events || [];
     return {
         pending: safeEvents.filter(e => e.status === 'pending').length,
         failed: safeEvents.filter(e => e.status === 'failed').length,
@@ -116,10 +157,13 @@ export default function V9SyncPage() {
   const handleSaveConfig = async () => {
     setIsSaving(true);
     try {
-      await setDoc(doc(db, 'sync_settings', 'global'), {
+      const configRef = doc(db, 'sync_settings', 'global');
+      const writeData = {
         ...formData,
         updatedAt: Timestamp.now()
-      }, { merge: true });
+      };
+      
+      await setDoc(configRef, writeData, { merge: true });
       
       if (formData.clientId) {
         await setDoc(doc(db, 'sync_settings', formData.clientId), {
@@ -128,9 +172,39 @@ export default function V9SyncPage() {
         });
       }
       
+      // Reload config to sync state with Firestore
+      const configSnap = await getDoc(configRef);
+      if (configSnap.exists()) {
+        setConfig(configSnap.data());
+      }
+      
       toast({ title: "Configuration Saved", description: "V9 POS sync credentials updated." });
-    } catch (error) {
-      toast({ variant: "destructive", title: "Error", description: "Failed to save configuration." });
+    } catch (error: any) {
+      // Firestore SDK (11.9.0) has a known bug where internal assertion errors from
+      // the WebChannel watch stream (e.g., "INTERNAL ASSERTION FAILED: Unexpected state")
+      // can incorrectly propagate to unrelated write operations. The write itself succeeds,
+      // so we verify by reading back the data.
+      const isFirestoreAssertion = error?.message?.includes?.('INTERNAL ASSERTION FAILED') || 
+                                   error?.message?.includes?.('Unexpected state');
+      
+      if (isFirestoreAssertion) {
+        console.warn('Firestore assertion error caught (non-fatal, write completed):', error);
+        // Verify the write actually persisted
+        try {
+          const configRef = doc(db, 'sync_settings', 'global');
+          const verifySnap = await getDoc(configRef);
+          if (verifySnap.exists() && verifySnap.data()?.clientId === formData.clientId) {
+            setConfig(verifySnap.data());
+            toast({ title: "Configuration Saved", description: "V9 POS sync credentials updated." });
+            return;
+          }
+        } catch {
+          // Verification failed, fall through to error toast
+        }
+      }
+      
+      console.error('Save config error:', error);
+      toast({ variant: "destructive", title: "Error", description: "Failed to save configuration. Please try again." });
     } finally {
       setIsSaving(false);
     }
@@ -170,6 +244,45 @@ export default function V9SyncPage() {
     }
   };
 
+  const generateSecureToken = (length: number): string => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{}|;:,.<>?';
+    const array = new Uint32Array(length);
+    crypto.getRandomValues(array);
+    return Array.from(array, (v) => chars[v % chars.length]).join('');
+  };
+
+  const handleGenerateCredentials = () => {
+    setIsGenerating(true);
+    try {
+      const timestamp = Date.now().toString(36);
+      const randomSuffix = Math.random().toString(36).substring(2, 8);
+      const newClientId = `v9_pos_${timestamp}${randomSuffix}`;
+      const newSecret = generateSecureToken(48);
+
+      setFormData({
+        clientId: newClientId,
+        sharedSecret: newSecret
+      });
+      setShowSecret(true);
+      toast({ title: "Credentials Generated", description: "New Client ID and Shared Secret have been generated. Save them now." });
+    } catch (error) {
+      toast({ variant: "destructive", title: "Generation Failed", description: "Failed to generate credentials." });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleCopySecret = async () => {
+    try {
+      await navigator.clipboard.writeText(formData.sharedSecret);
+      setCopied(true);
+      toast({ title: "Copied", description: "Shared Secret copied to clipboard." });
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast({ variant: "destructive", title: "Copy Failed", description: "Unable to copy to clipboard." });
+    }
+  };
+
   return (
     <div className="container mx-auto py-6 space-y-6">
       <PageHeader 
@@ -182,38 +295,99 @@ export default function V9SyncPage() {
         <div className="lg:col-span-2 space-y-6">
           <Card className="shadow-md overflow-hidden border-none">
             <CardHeader className="bg-slate-900 text-white">
-              <CardTitle className="flex items-center gap-2">
-                <ShieldCheck className="h-5 w-5 text-emerald-400" /> Webhook Authorization
-              </CardTitle>
-              <CardDescription className="text-slate-300">
-                Define the credentials that V9 POS must use to sign and send product data.
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <ShieldCheck className="h-5 w-5 text-emerald-400" /> Webhook Authorization
+                  </CardTitle>
+                  <CardDescription className="text-slate-300">
+                    Define the credentials that V9 POS must use to sign and send product data.
+                  </CardDescription>
+                </div>
+                <Button 
+                  variant="secondary" 
+                  size="sm" 
+                  onClick={handleGenerateCredentials}
+                  disabled={isGenerating}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white border-none shadow-lg"
+                >
+                  {isGenerating ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <WandSparkles className="h-4 w-4 mr-2" />
+                  )}
+                  Generate Credentials
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4 pt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="clientId" className="text-xs uppercase font-bold text-muted-foreground">V9 Client ID</Label>
-                  <Input 
-                    id="clientId"
-                    name="clientId"
-                    className="bg-muted/50 font-mono"
-                    placeholder="e.g. v9_pos_main"
-                    value={formData.clientId}
-                    onChange={handleInputChange}
-                  />
+                  <div className="relative">
+                    <Input 
+                      id="clientId"
+                      name="clientId"
+                      className="bg-muted/50 font-mono pr-10"
+                      placeholder="e.g. v9_pos_main"
+                      value={formData.clientId}
+                      onChange={handleInputChange}
+                    />
+                    {formData.clientId && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground hover:text-foreground"
+                        onClick={() => {
+                          navigator.clipboard.writeText(formData.clientId);
+                          toast({ title: "Copied", description: "Client ID copied to clipboard." });
+                        }}
+                      >
+                        <Copy className="h-3.5 w-3.5" />
+                        <span className="sr-only">Copy Client ID</span>
+                      </Button>
+                    )}
+                  </div>
                   <p className="text-[10px] text-muted-foreground">Used as the primary identifier in request headers.</p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="sharedSecret" className="text-xs uppercase font-bold text-muted-foreground">Shared Secret (HMAC Key)</Label>
-                  <Input 
-                    id="sharedSecret"
-                    name="sharedSecret"
-                    type="password"
-                    className="bg-muted/50 font-mono"
-                    placeholder="Enter Shared Secret"
-                    value={formData.sharedSecret}
-                    onChange={handleInputChange}
-                  />
+                  <div className="relative">
+                    <Input 
+                      id="sharedSecret"
+                      name="sharedSecret"
+                      type={showSecret ? 'text' : 'password'}
+                      className="bg-muted/50 font-mono pr-20"
+                      placeholder="Enter Shared Secret"
+                      value={formData.sharedSecret}
+                      onChange={handleInputChange}
+                    />
+                    {formData.sharedSecret && (
+                      <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                          onClick={handleCopySecret}
+                        >
+                          {copied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
+                          <span className="sr-only">{copied ? 'Copied' : 'Copy Shared Secret'}</span>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                          onClick={() => setShowSecret(!showSecret)}
+                        >
+                          {showSecret ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                          <span className="sr-only">{showSecret ? 'Hide Shared Secret' : 'Show Shared Secret'}</span>
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                   <p className="text-[10px] text-muted-foreground">Critical for verifying request signatures. Keep this private.</p>
                 </div>
               </div>
@@ -263,14 +437,41 @@ export default function V9SyncPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {(!events || events.length === 0) && (
+                  {isLoadingEvents && (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center py-12 text-muted-foreground italic">
+                        <div className="flex items-center justify-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Loading events...
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {eventsError && !isLoadingEvents && (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center py-12">
+                        <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                          <AlertTriangle className="h-6 w-6 text-amber-500" />
+                          <p className="text-sm font-medium">Unable to load events</p>
+                          <p className="text-xs text-muted-foreground/70">
+                            {eventsError.code === 'failed-precondition' 
+                              ? 'The events collection requires a composite index. Please create it in Firebase Console.' 
+                              : eventsError.code === 'permission-denied'
+                                ? 'You do not have permission to access the events collection.'
+                                : 'An unexpected error occurred. Please try refreshing the page.'}
+                          </p>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {!isLoadingEvents && !eventsError && (!events || events.length === 0) && (
                     <TableRow>
                       <TableCell colSpan={5} className="text-center py-12 text-muted-foreground italic">
                         No events received yet. Webhook is active and waiting.
                       </TableCell>
                     </TableRow>
                   )}
-                  {Array.isArray(events) && events.map((event: any) => (
+                  {!isLoadingEvents && !eventsError && Array.isArray(events) && events.map((event: any) => (
                     <TableRow key={event.id} className="hover:bg-muted/30">
                       <TableCell className="text-[11px] font-mono whitespace-nowrap">
                         {event.created_at ? format(event.created_at.toDate(), 'HH:mm:ss') : 'Pending'}
