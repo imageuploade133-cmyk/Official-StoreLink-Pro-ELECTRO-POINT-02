@@ -11,30 +11,41 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
+    if (!body) {
+      return NextResponse.json({ error: 'Missing request body' }, { status: 400 });
+    }
+
     const { clientId, sharedSecret } = body;
 
     console.log(`[V9 Sync Config] Updating config by user: ${user.uid}`);
 
-    const batch = adminDb.batch();
+    try {
+        const batch = adminDb.batch();
+        
+        const configRef = adminDb.collection('sync_settings').doc('global');
+        batch.set(configRef, {
+          clientId: clientId || '',
+          sharedSecret: sharedSecret || '',
+          updatedAt: FieldValue.serverTimestamp()
+        }, { merge: true });
     
-    const configRef = adminDb.collection('sync_settings').doc('global');
-    batch.set(configRef, {
-      clientId,
-      sharedSecret,
-      updatedAt: FieldValue.serverTimestamp()
-    }, { merge: true });
-
-    if (clientId) {
-      const clientRef = adminDb.collection('sync_settings').doc(clientId);
-      batch.set(clientRef, {
-        sharedSecret,
-        updatedAt: FieldValue.serverTimestamp()
-      }, { merge: true });
+        if (clientId && clientId !== 'global') {
+          const clientRef = adminDb.collection('sync_settings').doc(clientId);
+          batch.set(clientRef, {
+            sharedSecret: sharedSecret || '',
+            updatedAt: FieldValue.serverTimestamp()
+          }, { merge: true });
+        }
+    
+        await batch.commit();
+        return NextResponse.json({ success: true });
+    } catch (dbError: any) {
+        console.error('[V9 Sync Config] Database error:', dbError);
+        return NextResponse.json({ 
+            error: 'Database Error', 
+            details: dbError.message 
+        }, { status: 500 });
     }
-
-    await batch.commit();
-
-    return NextResponse.json({ success: true });
   } catch (error) {
     console.error('[V9 Sync Config] Error saving config:', error);
     return NextResponse.json({ 

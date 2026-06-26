@@ -428,7 +428,13 @@ export default function V9SyncPage() {
                   {!isLoadingEvents && !eventsError && Array.isArray(events) && events.map((event: any) => (
                     <TableRow key={event.id} className="hover:bg-muted/30">
                       <TableCell className="text-[11px] font-mono whitespace-nowrap">
-                        {event.created_at ? format(event.created_at.toDate(), 'HH:mm:ss') : 'Pending'}
+                        {event.created_at ? (
+                          typeof event.created_at === 'string' 
+                            ? format(new Date(event.created_at), 'HH:mm:ss')
+                            : typeof event.created_at.toDate === 'function'
+                              ? format(event.created_at.toDate(), 'HH:mm:ss')
+                              : 'Invalid Date'
+                        ) : 'Pending'}
                       </TableCell>
                       <TableCell className="text-[10px] font-bold">
                         <Badge variant="outline" className="uppercase border-slate-300">
