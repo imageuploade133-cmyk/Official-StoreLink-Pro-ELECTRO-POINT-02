@@ -58,6 +58,9 @@ export default function V9SyncPage() {
   const [mappingCount, setMappingCount] = useState<number | null>(null);
   const [showSecret, setShowSecret] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [events, setEvents] = useState<any[]>([]);
+  const [eventsError, setEventsError] = useState<any>(null);
+  const [isLoadingEvents, setIsLoadingEvents] = useState(true);
   
   const [formData, setFormData] = useState({
     clientId: '',
