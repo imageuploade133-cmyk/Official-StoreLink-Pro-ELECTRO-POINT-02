@@ -99,6 +99,22 @@ service cloud.firestore {
       allow write: if isSignedIn() && hasStoreAccess();
     }
 
+    match /sync_settings/{docId=**} {
+      allow read, write: if false;
+    }
+
+    match /product_sync_map/{docId=**} {
+      allow read, write: if false;
+    }
+
+    match /integration_events/{docId=**} {
+      allow read, write: if false;
+    }
+
+    match /processed_sync_events/{docId=**} {
+      allow read, write: if false;
+    }
+
     match /payment_providers/{docId=**} {
       allow read, write: if false;
     }

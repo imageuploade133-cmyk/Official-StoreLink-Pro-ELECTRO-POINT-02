@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase-admin';
 import { processSyncEvent } from '@/lib/integrations/v9-pos/processor';
+import { verifyAuth } from '@/lib/auth-admin-utils';
 
 export async function POST(req: NextRequest) {
   try {
+    const user = await verifyAuth(req);
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const pendingEvents = await adminDb.collection('integration_events')
       .where('status', '==', 'pending')
       .orderBy('created_at', 'asc')

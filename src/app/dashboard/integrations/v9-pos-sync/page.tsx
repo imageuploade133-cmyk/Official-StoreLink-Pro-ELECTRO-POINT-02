@@ -7,13 +7,8 @@ import {
   orderBy, 
   limit, 
   Timestamp,
-  doc,
-  setDoc,
-  getDoc,
-  getDocs,
-  getCountFromServer
 } from 'firebase/firestore';
-import { useFirestore } from '@/firebase';
+import { useFirestore, useUser } from '@/firebase';
 import { 
   History, 
   Settings,
@@ -69,76 +64,46 @@ export default function V9SyncPage() {
     sharedSecret: ''
   });
 
-  useEffect(() => {
-    const loadConfig = async () => {
-      try {
-        const configRef = doc(db, 'sync_settings', 'global');
-        const configSnap = await getDoc(configRef);
-        if (configSnap.exists()) {
-          const data = configSnap.data();
-          setConfig(data);
-          setFormData({
-            clientId: data.clientId || '',
-            sharedSecret: data.sharedSecret || ''
-          });
+  const { user } = useUser();
+  
+  const loadDashboardData = async () => {
+    if (!user) return;
+    try {
+      const token = await user.getIdToken();
+      const response = await fetch('/api/integrations/v9-pos/dashboard-data', {
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-      } catch (e) {
-        console.error('Failed to load sync config:', e);
+      });
+      const data = await response.json();
+      if (data.error) {
+          throw new Error(data.error);
       }
-    };
-    loadConfig();
-
-    const getCounts = async () => {
-        try {
-            const coll = collection(db, 'product_sync_map');
-            const snapshot = await getCountFromServer(coll);
-            setMappingCount(snapshot.data().count);
-        } catch (e) {
-            console.error(e);
-        }
-    };
-    getCounts();
-  }, [db]);
-
-  const [events, setEvents] = useState<any[]>([]);
-  const [isLoadingEvents, setIsLoadingEvents] = useState(true);
-  const [eventsError, setEventsError] = useState<any>(null);
+      
+      if (data.config) {
+        setConfig(data.config);
+        setFormData({
+          clientId: data.config.clientId || '',
+          sharedSecret: data.config.sharedSecret || ''
+        });
+      }
+      setMappingCount(data.mappingCount);
+      setEvents(data.events || []);
+      setEventsError(null);
+    } catch (e: any) {
+      console.error('Failed to load sync dashboard data:', e);
+      setEventsError(e);
+    } finally {
+      setIsLoadingEvents(false);
+    }
+  };
 
   useEffect(() => {
-    let cancelled = false;
-
-    const loadEvents = async () => {
-      try {
-        const eventsRef = collection(db, 'integration_events');
-        const eventsQuery = query(eventsRef, orderBy('created_at', 'desc'), limit(20));
-        const snapshot = await getDocs(eventsQuery);
-        if (!cancelled) {
-          const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-          setEvents(docs);
-          setEventsError(null);
-        }
-      } catch (e: any) {
-        if (!cancelled) {
-          console.error('Failed to load events:', e);
-          setEventsError(e);
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoadingEvents(false);
-        }
-      }
-    };
-
-    loadEvents();
-
-    // Poll every 15 seconds to keep events fresh without using watch stream listeners
-    const interval = setInterval(loadEvents, 15000);
-
-    return () => {
-      cancelled = true;
-      clearInterval(interval);
-    };
-  }, [db]);
+    loadDashboardData();
+    // Poll every 15 seconds to keep events fresh
+    const interval = setInterval(loadDashboardData, 15000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   const stats = useMemo(() => {
     const safeEvents = events || [];
@@ -157,54 +122,26 @@ export default function V9SyncPage() {
   const handleSaveConfig = async () => {
     setIsSaving(true);
     try {
-      const configRef = doc(db, 'sync_settings', 'global');
-      const writeData = {
-        ...formData,
-        updatedAt: Timestamp.now()
-      };
+      const token = await user?.getIdToken();
+      const response = await fetch('/api/integrations/v9-pos/config', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
+      });
       
-      await setDoc(configRef, writeData, { merge: true });
-      
-      if (formData.clientId) {
-        await setDoc(doc(db, 'sync_settings', formData.clientId), {
-          sharedSecret: formData.sharedSecret,
-          updatedAt: Timestamp.now()
-        });
+      const result = await response.json();
+      if (result.success) {
+        toast({ title: "Configuration Saved", description: "V9 POS sync credentials updated." });
+        loadDashboardData();
+      } else {
+        throw new Error(result.error || "Failed to save configuration");
       }
-      
-      // Reload config to sync state with Firestore
-      const configSnap = await getDoc(configRef);
-      if (configSnap.exists()) {
-        setConfig(configSnap.data());
-      }
-      
-      toast({ title: "Configuration Saved", description: "V9 POS sync credentials updated." });
     } catch (error: any) {
-      // Firestore SDK (11.9.0) has a known bug where internal assertion errors from
-      // the WebChannel watch stream (e.g., "INTERNAL ASSERTION FAILED: Unexpected state")
-      // can incorrectly propagate to unrelated write operations. The write itself succeeds,
-      // so we verify by reading back the data.
-      const isFirestoreAssertion = error?.message?.includes?.('INTERNAL ASSERTION FAILED') || 
-                                   error?.message?.includes?.('Unexpected state');
-      
-      if (isFirestoreAssertion) {
-        console.warn('Firestore assertion error caught (non-fatal, write completed):', error);
-        // Verify the write actually persisted
-        try {
-          const configRef = doc(db, 'sync_settings', 'global');
-          const verifySnap = await getDoc(configRef);
-          if (verifySnap.exists() && verifySnap.data()?.clientId === formData.clientId) {
-            setConfig(verifySnap.data());
-            toast({ title: "Configuration Saved", description: "V9 POS sync credentials updated." });
-            return;
-          }
-        } catch {
-          // Verification failed, fall through to error toast
-        }
-      }
-      
       console.error('Save config error:', error);
-      toast({ variant: "destructive", title: "Error", description: "Failed to save configuration. Please try again." });
+      toast({ variant: "destructive", title: "Error", description: error.message || "Failed to save configuration. Please try again." });
     } finally {
       setIsSaving(false);
     }
@@ -213,12 +150,19 @@ export default function V9SyncPage() {
   const handleProcessPending = async () => {
     setIsProcessing(true);
     try {
-      const response = await fetch('/api/integrations/v9-pos/process-pending', { method: 'POST' });
+      const token = await user?.getIdToken();
+      const response = await fetch('/api/integrations/v9-pos/process-pending', { 
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       const result = await response.json();
       if (result.success) {
         toast({ title: "Processing Complete", description: `Processed ${result.processedCount} events.` });
+        loadDashboardData();
       } else {
-        toast({ variant: "destructive", title: "Processing Failed", description: result.message });
+        toast({ variant: "destructive", title: "Processing Failed", description: result.message || result.error });
       }
     } catch (error) {
       toast({ variant: "destructive", title: "Error", description: "Failed to trigger processing." });
@@ -230,12 +174,19 @@ export default function V9SyncPage() {
   const handleRetryFailed = async () => {
     setIsRetrying(true);
     try {
-      const response = await fetch('/api/integrations/v9-pos/retry-failed', { method: 'POST' });
+      const token = await user?.getIdToken();
+      const response = await fetch('/api/integrations/v9-pos/retry-failed', { 
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       const result = await response.json();
       if (result.success) {
         toast({ title: "Retry Complete", description: `Processed ${result.processedCount} failed events.` });
+        loadDashboardData();
       } else {
-        toast({ variant: "destructive", title: "Retry Failed", description: result.message });
+        toast({ variant: "destructive", title: "Retry Failed", description: result.message || result.error });
       }
     } catch (error) {
       toast({ variant: "destructive", title: "Error", description: "Failed to trigger retry." });
