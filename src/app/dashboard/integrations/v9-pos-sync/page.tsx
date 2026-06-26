@@ -94,16 +94,18 @@ export default function V9SyncPage() {
   ), [db]);
   
   const eventsResult = useCollection<any>(eventsQuery);
-  // useCollection returns { data, isLoading, error } or just data depending on implementation
-  // Based on your error, it seems 'events' is being treated as the object and you are trying to filter it.
-  const events = Array.isArray(eventsResult) ? eventsResult : (eventsResult as any)?.data || [];
+  const events = useMemo(() => {
+    if (!eventsResult) return [];
+    if (Array.isArray(eventsResult)) return eventsResult;
+    return (eventsResult as any).data || [];
+  }, [eventsResult]);
 
   const stats = useMemo(() => {
-    if (!Array.isArray(events)) return { pending: 0, failed: 0, success: 0 };
+    const safeEvents = Array.isArray(events) ? events : [];
     return {
-        pending: events.filter(e => e.status === 'pending').length,
-        failed: events.filter(e => e.status === 'failed').length,
-        success: events.filter(e => e.status === 'success').length,
+        pending: safeEvents.filter(e => e.status === 'pending').length,
+        failed: safeEvents.filter(e => e.status === 'failed').length,
+        success: safeEvents.filter(e => e.status === 'success').length,
     };
   }, [events]);
 
