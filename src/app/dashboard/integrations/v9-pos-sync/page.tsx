@@ -22,7 +22,6 @@ import {
   Package,
   Activity,
   Server,
-  CloudZap,
   Loader2,
   RotateCcw,
   Play
@@ -221,7 +220,7 @@ export default function V9SyncPage() {
             </CardContent>
             <CardFooter className="border-t px-6 py-4 bg-muted/20 flex justify-between">
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <CloudZap className="h-3 w-3" />
+                <Zap className="h-3 w-3" />
                 <span>Endpoint: <code className="bg-muted px-1 rounded">/api/integrations/v9-pos/events</code></span>
               </div>
               <Button onClick={handleSaveConfig} disabled={isSaving} className="bg-slate-900 hover:bg-slate-800 text-white">
