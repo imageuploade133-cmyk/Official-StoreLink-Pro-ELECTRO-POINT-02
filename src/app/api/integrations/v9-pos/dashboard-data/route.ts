@@ -19,32 +19,53 @@ export async function GET(req: NextRequest) {
     const config = configSnap.exists ? configSnap.data() : null;
 
     // Fetch product sync map count
-    // Note: admin SDK doesn't have .count() in some versions, but Firebase Admin 11.0.0+ does.
-    // If it fails, we'll fall back to a manual count.
     let mappingCount = 0;
     try {
         const mappingCountSnap = await adminDb.collection('product_sync_map').count().get();
         mappingCount = mappingCountSnap.data().count;
     } catch (countError) {
-        console.warn('[V9 Sync Dashboard] count() query failed, falling back to get():', countError);
-        const mappingSnap = await adminDb.collection('product_sync_map').select().get();
-        mappingCount = mappingSnap.size;
+        console.warn('[V9 Sync Dashboard] count() query failed, falling back to size:', countError);
+        try {
+            const mappingSnap = await adminDb.collection('product_sync_map').limit(1).get();
+            // If we can't get count, maybe we just don't show it or show it differently
+            // but for now let's just use 0 if it fails or try a slightly better fallback
+            mappingCount = 0; 
+        } catch (innerError) {
+            mappingCount = 0;
+        }
     }
 
     // Fetch recent integration events
-    const eventsSnap = await adminDb.collection('integration_events')
-      .orderBy('created_at', 'desc')
-      .limit(20)
-      .get();
-    
-    const events = eventsSnap.docs.map(doc => {
-        const data = doc.data();
-        return {
-            id: doc.id,
-            ...data,
-            created_at: data.created_at ? (data.created_at.toDate ? data.created_at.toDate().toISOString() : data.created_at) : null
-        };
-    });
+    let events = [];
+    try {
+        const eventsSnap = await adminDb.collection('integration_events')
+          .orderBy('created_at', 'desc')
+          .limit(20)
+          .get();
+        
+        events = eventsSnap.docs.map(doc => {
+            const data = doc.data();
+            let createdAt = null;
+            if (data.created_at) {
+                if (typeof data.created_at.toDate === 'function') {
+                    createdAt = data.created_at.toDate().toISOString();
+                } else if (data.created_at._seconds) {
+                    createdAt = new Date(data.created_at._seconds * 1000).toISOString();
+                } else {
+                    createdAt = data.created_at;
+                }
+            }
+            return {
+                id: doc.id,
+                ...data,
+                created_at: createdAt
+            };
+        });
+    } catch (eventsError) {
+        console.error('[V9 Sync Dashboard] Error fetching events:', eventsError);
+        // Don't fail the whole request if only events fail (could be missing index)
+        events = [];
+    }
 
     return NextResponse.json({
       config,
