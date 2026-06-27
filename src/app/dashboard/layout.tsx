@@ -231,6 +231,7 @@ export default function DashboardLayout({
     { href: '/dashboard/our-collection', icon: Sparkles, label: 'Manage Our Collection', perm: 'manage_settings' },
     { heading: 'Administration' },
     { href: '/dashboard/settings', icon: Settings, label: 'Settings', perm: 'manage_settings' },
+    { href: '/dashboard/invitations', icon: Ticket, label: 'Invitations', perm: 'view_permissions' },
     { href: '/dashboard/permissions', icon: Shield, label: 'Permissions', perm: 'view_permissions' },
   ], []);
 
