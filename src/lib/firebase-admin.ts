@@ -5,7 +5,7 @@ import * as path from 'path';
 /**
  * Singleton Firebase Admin instance management for Next.js
  */
-function getAdminApp() {
+function getAdminApp(): admin.app.App {
   // Check if Firebase Admin is already initialized
   if (admin.apps.length > 0) {
     return admin.apps[0]!;
@@ -132,12 +132,32 @@ function getAdminApp() {
   }
 }
 
-// Ensure singleton instance is exported
-const app = getAdminApp();
+// Lazy initialization state
+let _app: admin.app.App;
 
-// Use the initialized app for Firestore, Auth, etc.
-export const adminDb = admin.firestore(app);
-export const adminAuth = admin.auth(app);
-export const adminStorage = admin.storage(app);
+function getCachedApp() {
+  if (!_app) _app = getAdminApp();
+  return _app;
+}
 
-export default app;
+/**
+ * Creates a proxy that delays initialization until a property is accessed
+ */
+function createLazyProxy<T extends object>(initFn: () => T): T {
+  let instance: T;
+  return new Proxy({} as T, {
+    get(target, prop, receiver) {
+      if (!instance) instance = initFn();
+      const val = Reflect.get(instance, prop, receiver);
+      return typeof val === 'function' ? val.bind(instance) : val;
+    }
+  });
+}
+
+// Export lazy versions of the admin services
+export const adminDb = createLazyProxy(() => admin.firestore(getCachedApp()));
+export const adminAuth = createLazyProxy(() => admin.auth(getCachedApp()));
+export const adminStorage = createLazyProxy(() => admin.storage(getCachedApp()));
+
+// Default export is the lazy app
+export default createLazyProxy(() => getCachedApp());
