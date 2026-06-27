@@ -21,6 +21,12 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: 'StoreLink Pro',
   description: 'Modern Point of Sale System',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
   icons: {
     icon: [
       { url: '/favicon.ico', type: 'image/x-icon', sizes: 'any' },
