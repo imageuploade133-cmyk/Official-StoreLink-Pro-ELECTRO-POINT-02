@@ -17,7 +17,7 @@ function getAdminApp() {
   let serviceAccount: any = null;
   let initMethod = '';
 
-  // 1. Try parsing from FIREBASE_SERVICE_ACCOUNT_KEY environment variable
+  // 1. Try parsing from FIREBASE_SERVICE_ACCOUNT_KEY environment variable (full JSON key)
   if (serviceAccountKeyEnv && serviceAccountKeyEnv !== 'undefined' && serviceAccountKeyEnv !== 'null') {
     const cleanedKey = serviceAccountKeyEnv.trim();
     
@@ -57,7 +57,23 @@ function getAdminApp() {
     }
   }
 
-  // 2. Fallback: Try reading from serviceAccountKey.json in the project root
+  // 2. Try constructing from individual env vars: FIREBASE_CLIENT_EMAIL + FIREBASE_PRIVATE_KEY
+  if (!serviceAccount) {
+    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+    const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+
+    if (clientEmail && privateKey && projectId) {
+      const formattedPrivateKey = privateKey.replace(/\\n/g, '\n');
+      serviceAccount = {
+        project_id: projectId,
+        client_email: clientEmail,
+        private_key: formattedPrivateKey,
+      };
+      initMethod = 'individual env vars (FIREBASE_CLIENT_EMAIL + FIREBASE_PRIVATE_KEY)';
+    }
+  }
+
+  // 3. Fallback: Try reading from serviceAccountKey.json in the project root
   if (!serviceAccount) {
     try {
       const rootPath = process.cwd();
@@ -96,12 +112,14 @@ function getAdminApp() {
       console.log(`Firebase Admin initialized successfully via ${initMethod}`);
       return initializedApp;
     } else {
-      // 3. Last resort: Application Default Credentials (ADC)
-      console.warn('Firebase Admin: No valid service account key found. Falling back to Application Default Credentials.');
-      
-      return admin.initializeApp({
-        projectId: projectId,
-      });
+      // No valid credentials found - throw a clear error instead of falling back to ADC
+      throw new Error(
+        'Could not load Firebase Admin credentials. ' +
+        'Please configure one of the following:\n' +
+        '  - FIREBASE_SERVICE_ACCOUNT_KEY (full JSON service account key)\n' +
+        '  - FIREBASE_CLIENT_EMAIL + FIREBASE_PRIVATE_KEY + FIREBASE_PROJECT_ID\n' +
+        '  - A serviceAccountKey.json file in the project root'
+      );
     }
   } catch (initError: any) {
     // Handle the case where another process/hot-reload initialized it just now
