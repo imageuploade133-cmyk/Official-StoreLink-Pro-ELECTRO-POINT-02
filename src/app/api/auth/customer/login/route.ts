@@ -2,6 +2,12 @@ import { NextResponse } from 'next/server';
 import { adminDb, adminAuth } from '@/lib/firebase-admin';
 import * as bcrypt from 'bcryptjs';
 
+/**
+ * API Route for Customer Login
+ *
+ * Verifies credentials against the 'customerAuth' collection.
+ * If valid, generates a Custom Token for client-side authentication.
+ */
 export async function POST(request: Request) {
   try {
     const { email, password, storeId } = await request.json();
@@ -10,6 +16,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    // Attempt to locate the store-specific auth record
     const authId = `${storeId}_${email.toLowerCase()}`;
     const authRef = adminDb.collection('customerAuth').doc(authId);
     let authDoc = await authRef.get();
@@ -36,13 +43,17 @@ export async function POST(request: Request) {
     }
 
     const userData = authDoc.data();
+    // Compare provided password with hashed password in Firestore
     const isPasswordValid = bcrypt.compareSync(password, userData?.password);
 
     if (!isPasswordValid) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
-    // Create a custom token for the user
+    /**
+     * Generate Custom Token
+     * Scoped to the specific store via the composite UID.
+     */
     const customToken = await adminAuth.createCustomToken(authId, {
         storeId,
         email: email.toLowerCase(),
