@@ -8,7 +8,9 @@ import {
   limit, 
   Timestamp,
 } from 'firebase/firestore';
-import { useFirestore, useUser } from '@/firebase';
+import { useFirestore } from '@/firebase';
+import { useAuth } from '@/contexts/auth-context';
+import { getStoreUrl } from '@/lib/domain';
 import { 
   History, 
   Settings,
@@ -26,7 +28,8 @@ import {
   Copy,
   Check,
   WandSparkles,
-  AlertTriangle
+  AlertTriangle,
+  Link2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -67,7 +70,24 @@ export default function V9SyncPage() {
     sharedSecret: ''
   });
 
-  const { user } = useUser();
+  const { user, store } = useAuth();
+  
+  const storeUrl = useMemo(() => {
+    if (store) {
+      return getStoreUrl(
+        store.id, 
+        store.plan || 'free', 
+        store.customDomain, 
+        store.subdomain, 
+        store.primaryDomainType, 
+        store.slug
+      );
+    }
+    if (typeof window !== 'undefined') {
+      return window.location.origin;
+    }
+    return '';
+  }, [store]);
   
   const loadDashboardData = async () => {
     if (!user) return;
@@ -247,6 +267,108 @@ export default function V9SyncPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
+          <Card className="shadow-md border-none overflow-hidden">
+            <CardHeader className="bg-slate-900 text-white">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Link2 className="h-5 w-5 text-blue-400" /> Connection Settings
+              </CardTitle>
+              <CardDescription className="text-slate-300">
+                Configure the secure bridge between V9 POS and StoreLink Pro.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-4">
+              <div className="grid grid-cols-1 gap-6">
+                <div className="space-y-1">
+                  <Label className="text-[10px] uppercase font-bold text-muted-foreground">StoreLink Base URL</Label>
+                  <div className="flex items-center gap-2 bg-muted/50 p-2 rounded-md group">
+                    <code className="text-sm font-mono flex-1 break-all">{storeUrl || 'https://app.storelink.pro'}</code>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => {
+                        navigator.clipboard.writeText(storeUrl || 'https://app.storelink.pro');
+                        toast({ title: "Copied", description: "Base URL copied to clipboard." });
+                      }}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <Label className="text-[10px] uppercase font-bold text-muted-foreground">Store ID</Label>
+                    <div className="flex items-center gap-2 bg-muted/50 p-2 rounded-md group">
+                      <code className="text-sm font-mono flex-1">{store?.id || '...'}</code>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => {
+                          if (store?.id) {
+                            navigator.clipboard.writeText(store.id);
+                            toast({ title: "Copied", description: "Store ID copied to clipboard." });
+                          }
+                        }}
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label className="text-[10px] uppercase font-bold text-muted-foreground">Client ID / Integration Key</Label>
+                    <div className="flex items-center gap-2 bg-muted/50 p-2 rounded-md group">
+                      <code className="text-sm font-mono flex-1 truncate">{formData.clientId || user?.email || '...'}</code>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => {
+                          const val = formData.clientId || user?.email;
+                          if (val) {
+                            navigator.clipboard.writeText(val);
+                            toast({ title: "Copied", description: "Integration key copied to clipboard." });
+                          }
+                        }}
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-[10px] uppercase font-bold text-muted-foreground">Shared Secret (HMAC Key)</Label>
+                  <div className="flex items-center gap-2 bg-muted/50 p-2 rounded-md group">
+                    <code className="text-sm font-mono flex-1">
+                      {showSecret ? (formData.sharedSecret || '...') : '••••••••••••••••••••••••'}
+                    </code>
+                    <div className="flex items-center">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={() => setShowSecret(!showSecret)}
+                      >
+                        {showSecret ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={handleCopySecret}
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card className="shadow-md overflow-hidden border-none">
             <CardHeader className="bg-slate-900 text-white">
               <div className="flex items-center justify-between">
