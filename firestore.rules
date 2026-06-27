@@ -163,6 +163,11 @@ service cloud.firestore {
       }
     }
 
+    match /customerAuth/{authId} {
+      // customerAuth should only be accessible by the Admin API
+      allow read, write: if false;
+    }
+
     match /stores/{storeId} {
       allow read: if true;
       allow create: if isSignedIn() && request.resource.data.owner_id == request.auth.uid;

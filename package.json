@@ -47,6 +47,7 @@
     "@tailwindcss/typography": "^0.5.16",
     "@upstash/ratelimit": "^1.2.0",
     "@vercel/kv": "^2.0.0",
+    "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
@@ -84,6 +85,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
+    "@types/bcryptjs": "^2.4.6",
     "@types/jsbarcode": "^3.1.5",
     "@types/lodash": "^4.17.6",
     "@types/node": "^20",

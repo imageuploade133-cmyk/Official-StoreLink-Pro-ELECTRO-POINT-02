@@ -37,7 +37,7 @@ import { useToast } from "@/hooks/use-toast";
 import placeholderImages from '@/lib/placeholder-images.json';
 import { useAuth, useUser, useFirestore } from "@/firebase";
 import { useRouter } from "next/navigation";
-import { createUserWithEmailAndPassword, updateProfile, AuthError } from "firebase/auth";
+import { signInWithCustomToken, updateProfile, AuthError } from "firebase/auth";
 import { doc, setDoc, collection, writeBatch, serverTimestamp, getDoc } from "firebase/firestore";
 import { useSettings } from "@/contexts/settings-context";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -154,7 +154,25 @@ export default function StoreSignupPage() {
                 ? activeSettings.welcomeCreditAmount 
                 : 0;
 
-            const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
+            // Custom signup via API to allow per-store accounts
+            const signupResponse = await fetch('/api/auth/customer/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: values.email,
+                    password: values.password,
+                    name: values.name,
+                    storeId: settings?.store_id || 'global',
+                }),
+            });
+
+            const signupData = await signupResponse.json();
+
+            if (!signupResponse.ok) {
+                throw { code: 'custom/signup-failed', message: signupData.error };
+            }
+
+            const userCredential = await signInWithCustomToken(auth, signupData.customToken);
             const newUser = userCredential.user;
 
             await updateProfile(newUser, { displayName: values.name });
@@ -163,7 +181,7 @@ export default function StoreSignupPage() {
 
             batch.set(doc(firestore, 'users', newUser.uid), {
                 uid: newUser.uid,
-                email: newUser.email,
+                email: values.email,
                 displayName: values.name,
                 photoURL: '',
             });
@@ -215,11 +233,13 @@ export default function StoreSignupPage() {
                 router.replace(getStoreUrl('/store/account'));
             }
         } catch (error: any) {
-            let description = "An unknown error occurred. Please try again.";
+            let description = error.message || "An unknown error occurred. Please try again.";
             if (error.code === 'auth/email-already-in-use') {
                 description = "This email is already registered.";
             } else if (error.code === 'auth/weak-password') {
                 description = "The password must be at least 6 characters.";
+            } else if (error.code === 'custom/signup-failed') {
+                description = error.message;
             }
             toast({ variant: "destructive", title: "Signup Failed", description: description });
         }

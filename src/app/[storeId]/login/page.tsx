@@ -14,7 +14,7 @@ import placeholderImages from '@/lib/placeholder-images.json';
 import { useAuth as useFirebaseAuth } from "@/firebase";
 import { useAuth } from "@/contexts/auth-context";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signInWithEmailAndPassword, AuthError } from "firebase/auth";
+import { signInWithCustomToken, AuthError } from "firebase/auth";
 import { useSettings } from "@/contexts/settings-context";
 import { useStoreUrl } from "@/hooks/use-store-url";
 import { ResetPasswordModal } from "@/components/auth/ResetPasswordModal";
@@ -60,27 +60,40 @@ export default function StoreLoginPage() {
         const email = (document.getElementById('email') as HTMLInputElement).value.trim();
         const password = (document.getElementById('password') as HTMLInputElement).value;
 
-        signInWithEmailAndPassword(auth, email, password)
-            .then(() => {
-                toast({
-                    title: "Login Successful",
-                    description: "Redirecting to your account...",
-                });
-            })
-            .catch((error: AuthError) => {
-                let description = "An unknown error occurred. Please try again.";
-                if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-                    description = "Invalid email or password. Please try again.";
-                }
-                toast({
-                    variant: "destructive",
-                    title: "Login Failed",
-                    description: description,
-                });
-            })
-            .finally(() => {
-                setIsLoading(false);
+        fetch('/api/auth/customer/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email,
+                password,
+                storeId: settings?.store_id || 'global',
+            }),
+        })
+        .then(async (res) => {
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Login failed');
+            return signInWithCustomToken(auth, data.customToken);
+        })
+        .then(() => {
+            toast({
+                title: "Login Successful",
+                description: "Redirecting to your account...",
             });
+        })
+        .catch((error: any) => {
+            let description = error.message || "An unknown error occurred. Please try again.";
+            if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                description = "Invalid email or password. Please try again.";
+            }
+            toast({
+                variant: "destructive",
+                title: "Login Failed",
+                description: description,
+            });
+        })
+        .finally(() => {
+            setIsLoading(false);
+        });
     }
 
     const buttonStyle = useMemo(() => {
