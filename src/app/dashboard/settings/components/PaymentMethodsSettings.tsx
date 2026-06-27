@@ -159,6 +159,7 @@ export function PaymentMethodsSettings({ settingsData, isLoading, storeId }: Pay
         onSubmit={handleFormSubmit}
         isSaving={isSaving}
         defaultValues={editingMethod}
+        storeId={storeId}
       />
       <DeleteConfirmationDialog
         isOpen={!!methodToDelete}
@@ -180,9 +181,10 @@ interface PaymentMethodFormDialogProps {
     onSubmit: (values: FormValues) => Promise<void>;
     isSaving: boolean;
     defaultValues: PaymentMethod | null;
+    storeId?: string | null;
 }
 
-function PaymentMethodFormDialog({ isOpen, onOpenChange, onSubmit, isSaving, defaultValues }: PaymentMethodFormDialogProps) {
+function PaymentMethodFormDialog({ isOpen, onOpenChange, onSubmit, isSaving, defaultValues, storeId }: PaymentMethodFormDialogProps) {
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
 
