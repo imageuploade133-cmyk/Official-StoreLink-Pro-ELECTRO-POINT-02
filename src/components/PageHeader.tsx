@@ -20,7 +20,7 @@ export function PageHeader({
   return (
     <div className={cn('flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8', className)}>
       <div className="flex items-start gap-4">
-        <div className="rounded-2xl border bg-white dark:bg-card p-3 shadow-sm dark:border-border/50 transition-all duration-300 hover:shadow-md">
+        <div className="rounded-2xl border-2 bg-white dark:bg-card p-3 shadow-none dark:border-border/50 transition-all duration-300 hover:border-primary/50">
           <Icon className="h-6 w-6 text-primary" />
         </div>
         <div className="space-y-1">
