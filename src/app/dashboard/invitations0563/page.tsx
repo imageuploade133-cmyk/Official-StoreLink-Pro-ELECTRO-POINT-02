@@ -19,7 +19,6 @@ import {
   Users,
   Sparkles,
   AlertTriangle,
-  ExternalLink,
   History,
   TrendingUp
 } from 'lucide-react';
@@ -56,6 +55,18 @@ import { useAuth as useFirebaseAuth } from '@/firebase';
 import { usePathname } from 'next/navigation';
 import { format, isToday } from 'date-fns';
 import { Spinner } from '@/components/ui/spinner';
+import * as z from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+    FormDescription
+} from '@/components/ui/form';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { ShieldCheck, Lock } from 'lucide-react';
 
@@ -86,8 +97,6 @@ export default function InvitationManagerPage() {
   const [isViewCodeModalOpen, setIsViewCodeModalOpen] = useState(false);
   const [generatedCode, setGeneratedCode] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [maxUses, setMaxUses] = useState(1);
-  const [expiryDate, setExpiryDate] = useState('');
   const [passphrase, setPassphrase] = useState('');
   const [isAuthorized, setIsAuthorized] = useState(false);
   const { user, isLoading: isAuthLoading } = useAuth();
@@ -97,6 +106,19 @@ export default function InvitationManagerPage() {
 
   // Automatically derive the required PIN from the URL path (e.g., '0563' from 'invitations0563')
   const requiredPin = pathname.match(/\d+$/)?.[0] || '0563';
+
+  const InvitationSchema = z.object({
+    maxUses: z.number().min(1, 'At least 1 use is required.'),
+    expiresAt: z.string().optional().or(z.literal('')),
+  });
+
+  const form = useForm<z.infer<typeof InvitationSchema>>({
+    resolver: zodResolver(InvitationSchema),
+    defaultValues: {
+      maxUses: 1,
+      expiresAt: '',
+    }
+  });
 
   const fetchInvitations = async () => {
     setIsLoading(true);
@@ -176,7 +198,7 @@ export default function InvitationManagerPage() {
     );
   }
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (values: z.infer<typeof InvitationSchema>) => {
     try {
       const idToken = await auth.currentUser?.getIdToken();
       const response = await fetch('/api/admin/invitations', {
@@ -187,8 +209,8 @@ export default function InvitationManagerPage() {
         },
         body: JSON.stringify({
           createdBy: user?.displayName || user?.email || 'Admin',
-          maxUses,
-          expiresAt: expiryDate || null
+          maxUses: values.maxUses,
+          expiresAt: values.expiresAt || null
         })
       });
 
@@ -198,6 +220,7 @@ export default function InvitationManagerPage() {
         setIsCreateModalOpen(false);
         setIsViewCodeModalOpen(true);
         fetchInvitations();
+        form.reset();
         toast({ title: "Invitation Generated", description: "The code is ready to use." });
       }
     } catch (error) {
@@ -460,60 +483,82 @@ export default function InvitationManagerPage() {
               Create a secure, random invitation code for merchant signup. These codes are one-time visible and cryptographically secure.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-6 py-6">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-semibold flex items-center gap-2">
-                  <Users className="size-4 text-muted-foreground" />
-                  Maximum Usage Limit
-                </label>
-                <Badge variant="outline" className="font-mono text-xs">{maxUses} {maxUses === 1 ? 'use' : 'uses'}</Badge>
-              </div>
-              <Input
-                type="number"
-                min="1"
-                value={maxUses}
-                onChange={(e) => setMaxUses(parseInt(e.target.value))}
-                className="h-12 text-lg font-medium rounded-xl border-2 focus-visible:ring-primary/20 transition-all"
-              />
-              <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 px-1">
-                <AlertTriangle className="size-3" />
-                Defines how many different merchants can sign up using this same code.
-              </p>
-            </div>
 
-            <div className="space-y-3">
-              <label className="text-sm font-semibold flex items-center gap-2">
-                <Calendar className="size-4 text-muted-foreground" />
-                Expiration Date (Optional)
-              </label>
-              <Input
-                type="date"
-                value={expiryDate}
-                onChange={(e) => setExpiryDate(e.target.value)}
-                className="h-12 text-lg font-medium rounded-xl border-2 focus-visible:ring-primary/20 transition-all"
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleGenerate)} className="space-y-6 py-6">
+              <FormField
+                control={form.control}
+                name="maxUses"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <FormLabel className="text-sm font-semibold flex items-center gap-2">
+                        <Users className="size-4 text-muted-foreground" />
+                        Maximum Usage Limit
+                      </FormLabel>
+                      <Badge variant="outline" className="font-mono text-xs">{field.value} {field.value === 1 ? 'use' : 'uses'}</Badge>
+                    </div>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="1"
+                        {...field}
+                        onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                        className="h-12 text-lg font-medium rounded-xl border-2 focus-visible:ring-primary/20 transition-all"
+                      />
+                    </FormControl>
+                    <FormDescription className="text-[11px] flex items-center gap-1.5 px-1">
+                      <AlertTriangle className="size-3" />
+                      Defines how many different merchants can sign up using this same code.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 px-1">
-                <Clock className="size-3" />
-                Leave empty for a code that never expires.
-              </p>
-            </div>
-          </div>
-          <DialogFooter className="gap-3 sm:gap-0">
-            <Button
-              variant="ghost"
-              onClick={() => setIsCreateModalOpen(false)}
-              className="rounded-xl h-12 font-semibold"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleGenerate}
-              className="h-12 rounded-xl px-8 font-bold shadow-lg shadow-primary/20"
-            >
-              Generate Invitation Code <Sparkles className="ml-2 size-4" />
-            </Button>
-          </DialogFooter>
+
+              <FormField
+                control={form.control}
+                name="expiresAt"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel className="text-sm font-semibold flex items-center gap-2">
+                      <Calendar className="size-4 text-muted-foreground" />
+                      Expiration Date (Optional)
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        {...field}
+                        className="h-12 text-lg font-medium rounded-xl border-2 focus-visible:ring-primary/20 transition-all"
+                      />
+                    </FormControl>
+                    <FormDescription className="text-[11px] flex items-center gap-1.5 px-1">
+                      <Clock className="size-3" />
+                      Leave empty for a code that never expires.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <DialogFooter className="gap-3 sm:gap-0 pt-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setIsCreateModalOpen(false)}
+                  className="rounded-xl h-12 font-semibold"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="h-12 rounded-xl px-8 font-bold shadow-lg shadow-primary/20"
+                >
+                  Generate Invitation Code <Sparkles className="ml-2 size-4" />
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
 
@@ -551,9 +596,9 @@ export default function InvitationManagerPage() {
             </div>
           </div>
 
-          <DialogFooter className="mt-6">
+          <DialogFooter className="mt-6 pt-4 border-t">
             <Button
-                className="w-full h-12 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-900/20"
+                className="w-full h-12 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-900/20 transition-all active:scale-[0.98]"
                 onClick={() => setIsViewCodeModalOpen(false)}
             >
                 I've Saved the Code <CheckCircle className="ml-2 size-4" />
