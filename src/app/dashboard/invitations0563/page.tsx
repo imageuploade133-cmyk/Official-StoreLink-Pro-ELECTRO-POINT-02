@@ -20,7 +20,9 @@ import {
   Sparkles,
   AlertTriangle,
   History,
-  TrendingUp
+  TrendingUp,
+  ShieldCheck,
+  Lock
 } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
@@ -68,7 +70,6 @@ import {
     FormDescription
 } from '@/components/ui/form';
 import AccessDenied from '@/components/staff-management/AccessDenied';
-import { ShieldCheck, Lock } from 'lucide-react';
 
 interface Invitation {
   id: string;
@@ -479,178 +480,183 @@ export default function InvitationManagerPage() {
 
       {/* Create Modal */}
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+        <DialogContent className="w-[100vw] h-[100dvh] sm:w-full sm:max-w-lg sm:h-auto sm:max-h-[90vh] p-0 flex flex-col overflow-hidden border-none sm:border left-0 top-0 translate-x-0 translate-y-0 sm:left-[50%] sm:top-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%]">
+          <DialogHeader className="p-4 sm:p-6 border-b shrink-0">
+            <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2">
               <div className="p-2 rounded-lg bg-primary/10">
                 <Sparkles className="size-5 text-primary" />
               </div>
               Generate Invitation
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-xs sm:text-sm">
               Create a secure, random invitation code for merchant signup. These codes are one-time visible and cryptographically secure.
             </DialogDescription>
           </DialogHeader>
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleGenerate)} className="space-y-6 py-6">
-              <FormField
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem className="space-y-3">
-                    <FormLabel className="text-sm font-semibold flex items-center gap-2">
-                      <Ticket className="size-4 text-muted-foreground" />
-                      Invitation Type
-                    </FormLabel>
-                    <div className="grid grid-cols-2 gap-4">
-                      <Button
-                        type="button"
-                        variant={field.value === 'single' ? 'default' : 'outline'}
-                        className={`h-20 rounded-2xl flex flex-col gap-1 items-center justify-center transition-all ${field.value === 'single' ? 'border-b-4 border-primary-foreground/20' : 'border-2'}`}
-                        onClick={() => {
-                          field.onChange('single');
-                          form.setValue('maxUses', 1);
-                        }}
-                      >
-                        <UserIcon className="size-5" />
-                        <span className="font-bold">Single Use</span>
-                        <span className="text-[10px] opacity-70">Deactivates after 1 use</span>
-                      </Button>
-                      <Button
-                        type="button"
-                        variant={field.value === 'multiple' ? 'default' : 'outline'}
-                        className={`h-20 rounded-2xl flex flex-col gap-1 items-center justify-center transition-all ${field.value === 'multiple' ? 'border-b-4 border-primary-foreground/20' : 'border-2'}`}
-                        onClick={() => field.onChange('multiple')}
-                      >
-                        <Users className="size-5" />
-                        <span className="font-bold">Multiple Use</span>
-                        <span className="text-[10px] opacity-70">Custom usage limit</span>
-                      </Button>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {invitationType === 'multiple' && (
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(handleGenerate)} id="generate-invitation-form" className="space-y-6 py-2 sm:py-4">
                 <FormField
-                  control={form.control}
-                  name="maxUses"
-                  render={({ field }) => (
+                    control={form.control}
+                    name="type"
+                    render={({ field }) => (
                     <FormItem className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <FormLabel className="text-sm font-semibold flex items-center gap-2">
-                          <Users className="size-4 text-muted-foreground" />
-                          Usage Limit
+                        <FormLabel className="text-sm font-bold flex items-center gap-2 text-foreground">
+                        <Ticket className="size-4 text-muted-foreground" />
+                        Invitation Type
                         </FormLabel>
-                        <Badge variant="outline" className="font-mono text-xs">{field.value} uses</Badge>
-                      </div>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min="2"
-                          {...field}
-                          onChange={(e) => field.onChange(parseInt(e.target.value) || 2)}
-                          className="h-12 text-lg font-medium rounded-xl border-2 focus-visible:ring-primary/20 transition-all"
-                        />
-                      </FormControl>
-                      <FormDescription className="text-[11px] flex items-center gap-1.5 px-1">
-                        <AlertTriangle className="size-3" />
-                        Defines how many different merchants can sign up using this same code.
-                      </FormDescription>
-                      <FormMessage />
+                        <div className="grid grid-cols-2 gap-4">
+                        <Button
+                            type="button"
+                            variant={field.value === 'single' ? 'default' : 'outline'}
+                            className={`h-24 rounded-2xl flex flex-col gap-1 items-center justify-center transition-all ${field.value === 'single' ? 'border-b-4 border-primary-foreground/20' : 'border-2'}`}
+                            onClick={() => {
+                            field.onChange('single');
+                            form.setValue('maxUses', 1);
+                            }}
+                        >
+                            <UserIcon className="size-5" />
+                            <span className="font-bold">Single Use</span>
+                            <span className="text-[10px] opacity-70">Deactivates after 1 use</span>
+                        </Button>
+                        <Button
+                            type="button"
+                            variant={field.value === 'multiple' ? 'default' : 'outline'}
+                            className={`h-24 rounded-2xl flex flex-col gap-1 items-center justify-center transition-all ${field.value === 'multiple' ? 'border-b-4 border-primary-foreground/20' : 'border-2'}`}
+                            onClick={() => field.onChange('multiple')}
+                        >
+                            <Users className="size-5" />
+                            <span className="font-bold">Multiple Use</span>
+                            <span className="text-[10px] opacity-70">Custom usage limit</span>
+                        </Button>
+                        </div>
+                        <FormMessage />
                     </FormItem>
-                  )}
+                    )}
                 />
-              )}
 
-              <FormField
-                control={form.control}
-                name="expiresAt"
-                render={({ field }) => (
-                  <FormItem className="space-y-3">
-                    <FormLabel className="text-sm font-semibold flex items-center gap-2">
-                      <Calendar className="size-4 text-muted-foreground" />
-                      Expiration Date (Optional)
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="date"
-                        {...field}
-                        className="h-12 text-lg font-medium rounded-xl border-2 focus-visible:ring-primary/20 transition-all"
-                      />
-                    </FormControl>
-                    <FormDescription className="text-[11px] flex items-center gap-1.5 px-1">
-                      <Clock className="size-3" />
-                      Leave empty for a code that never expires.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
+                {invitationType === 'multiple' && (
+                    <FormField
+                    control={form.control}
+                    name="maxUses"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                        <div className="flex items-center justify-between">
+                            <FormLabel className="text-sm font-bold flex items-center gap-2 text-foreground">
+                            <Users className="size-4 text-muted-foreground" />
+                            Usage Limit
+                            </FormLabel>
+                            <Badge variant="outline" className="font-mono text-xs border-2">{field.value} uses</Badge>
+                        </div>
+                        <FormControl>
+                            <Input
+                            type="number"
+                            min="2"
+                            {...field}
+                            onChange={(e) => field.onChange(parseInt(e.target.value) || 2)}
+                            className="h-12 text-lg font-medium rounded-xl border-2 focus-visible:ring-primary/20 transition-all shadow-none"
+                            />
+                        </FormControl>
+                        <FormDescription className="text-[11px] flex items-center gap-1.5 px-1 font-medium">
+                            <AlertTriangle className="size-3 text-amber-500" />
+                            Defines how many different merchants can sign up using this same code.
+                        </FormDescription>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
                 )}
-              />
 
-              <DialogFooter className="gap-3 sm:gap-0 pt-2">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => setIsCreateModalOpen(false)}
-                  className="rounded-xl h-12 font-semibold"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  className="h-12 rounded-xl px-8 font-bold shadow-none border-b-4 border-primary-foreground/20 active:border-b-0 transition-all"
-                >
-                  Generate Invitation Code <Sparkles className="ml-2 size-4" />
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
+                <FormField
+                    control={form.control}
+                    name="expiresAt"
+                    render={({ field }) => (
+                    <FormItem className="space-y-3">
+                        <FormLabel className="text-sm font-bold flex items-center gap-2 text-foreground">
+                        <Calendar className="size-4 text-muted-foreground" />
+                        Expiration Date (Optional)
+                        </FormLabel>
+                        <FormControl>
+                        <Input
+                            type="date"
+                            {...field}
+                            className="h-12 text-lg font-medium rounded-xl border-2 focus-visible:ring-primary/20 transition-all shadow-none"
+                        />
+                        </FormControl>
+                        <FormDescription className="text-[11px] flex items-center gap-1.5 px-1 font-medium">
+                        <Clock className="size-3 text-blue-500" />
+                        Leave empty for a code that never expires.
+                        </FormDescription>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                </form>
+            </Form>
+          </div>
+
+          <DialogFooter className="p-4 sm:p-6 border-t mt-auto flex flex-col gap-2">
+            <Button
+                type="submit"
+                form="generate-invitation-form"
+                className="w-full sm:w-auto h-12 rounded-xl px-8 font-bold shadow-none border-b-4 border-primary-foreground/20 active:border-b-0 transition-all"
+            >
+                Generate Invitation Code <Sparkles className="ml-2 size-4" />
+            </Button>
+            <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsCreateModalOpen(false)}
+                className="w-full sm:w-auto rounded-xl h-12 font-bold border-2 shadow-none"
+            >
+                Cancel
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* View Code Modal (Show Only Once) */}
       <Dialog open={isViewCodeModalOpen} onOpenChange={setIsViewCodeModalOpen}>
-        <DialogContent className="sm:max-w-lg overflow-hidden border-emerald-500/20">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+        <DialogContent className="w-[100vw] h-[100dvh] sm:w-full sm:max-w-lg sm:h-auto sm:max-h-[90vh] p-0 flex flex-col overflow-hidden border-none sm:border left-0 top-0 translate-x-0 translate-y-0 sm:left-[50%] sm:top-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%]">
+          <DialogHeader className="p-4 sm:p-6 border-b shrink-0">
+            <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2">
               <CheckCircle className="size-6 text-emerald-500" />
               Invitation Ready
             </DialogTitle>
-            <div className="mt-4 bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 p-4 rounded-xl flex items-start gap-3">
+            <div className="mt-4 bg-amber-500/10 border-2 border-amber-500/20 text-amber-600 dark:text-amber-400 p-4 rounded-xl flex items-start gap-3">
                 <AlertTriangle className="size-5 shrink-0 mt-0.5" />
                 <div className="text-sm">
                     <p className="font-bold uppercase tracking-tight">Security Warning</p>
-                    <p className="opacity-90">This code is encrypted and will <b>only be shown once</b>. If you close this window without copying, you'll need to generate a new one.</p>
+                    <p className="opacity-90 font-medium">This code is encrypted and will <b>only be shown once</b>. If you close this window without copying, you'll need to generate a new one.</p>
                 </div>
             </div>
           </DialogHeader>
 
-          <div className="relative mt-6 group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-            <div className="relative flex flex-col items-center justify-center space-y-4 bg-zinc-950 dark:bg-zinc-950 p-8 rounded-2xl border border-white/10 shadow-none">
-                <code className="text-3xl font-mono tracking-[0.2em] text-emerald-400 font-bold break-all text-center">
-                    {generatedCode}
-                </code>
-                <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => copyToClipboard(generatedCode)}
-                    className="mt-2 bg-white/10 hover:bg-white/20 text-white border-white/10"
-                >
-                    <Copy className="mr-2 h-4 w-4" /> Copy to Clipboard
-                </Button>
+          <div className="flex-1 overflow-y-auto p-4 sm:p-8">
+            <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+                <div className="relative flex flex-col items-center justify-center space-y-6 bg-zinc-950 dark:bg-zinc-950 p-10 rounded-2xl border border-white/10 shadow-none">
+                    <code className="text-3xl sm:text-4xl font-mono tracking-[0.2em] text-emerald-400 font-bold break-all text-center">
+                        {generatedCode}
+                    </code>
+                    <Button
+                        size="lg"
+                        variant="secondary"
+                        onClick={() => copyToClipboard(generatedCode)}
+                        className="bg-white/10 hover:bg-white/20 text-white border-white/10 h-12 px-8 rounded-xl font-bold"
+                    >
+                        <Copy className="mr-2 h-5 w-5" /> Copy to Clipboard
+                    </Button>
+                </div>
             </div>
           </div>
 
-          <DialogFooter className="mt-6 pt-4 border-t">
+          <DialogFooter className="p-4 sm:p-6 border-t mt-auto">
             <Button
-                className="w-full h-12 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700 shadow-none border-b-4 border-emerald-900/40 active:border-b-0 transition-all active:scale-[0.98]"
+                className="w-full h-14 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700 shadow-none border-b-4 border-emerald-900/40 active:border-b-0 transition-all active:scale-[0.98] text-lg"
                 onClick={() => setIsViewCodeModalOpen(false)}
             >
-                I've Saved the Code <CheckCircle className="ml-2 size-4" />
+                I've Saved the Code <CheckCircle className="ml-2 size-5" />
             </Button>
           </DialogFooter>
         </DialogContent>
