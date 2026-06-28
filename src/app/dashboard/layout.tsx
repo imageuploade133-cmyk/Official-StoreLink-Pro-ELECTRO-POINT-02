@@ -294,7 +294,7 @@ export default function DashboardLayout({
       } else if (isCustomer) {
         // Explicitly block customers from the dashboard
         router.replace('/store/account');
-      } else if (!store && !staffMember && !isSuperAdmin && isGracePeriodExpired && pathname !== '/signup-merchant') {
+      } else if (!store && !staffMember && !isSuperAdmin && isGracePeriodExpired && pathname !== '/signup-merchant' && !pathname.includes('invitations')) {
         // No store or staff record yet, and grace period has expired
         console.log("No store found after grace period, redirecting to signup-merchant");
         router.replace('/signup-merchant');
@@ -302,7 +302,7 @@ export default function DashboardLayout({
     }
   }, [user, isLoading, isCustomer, store, staffMember, router, pathname, isGracePeriodExpired, isSuperAdmin]);
 
-  if (isLoading || !user || isCustomer || (!store && !staffMember && !isSuperAdmin)) {
+  if (isLoading || !user || isCustomer || (!store && !staffMember && !isSuperAdmin && !pathname.includes('invitations'))) {
     const subLabel = (!store && !staffMember && !isSuperAdmin) ? "Locating your store..." : "Authenticating your account…";
     return <PageSpinner label="StoreLink Pro" subLabel={subLabel} />;
   }

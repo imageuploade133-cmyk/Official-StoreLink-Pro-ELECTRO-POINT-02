@@ -47,7 +47,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
 import { useAuth as useFirebaseAuth } from '@/firebase';
-import { useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { format } from 'date-fns';
 import { Spinner } from '@/components/ui/spinner';
 import AccessDenied from '@/components/staff-management/AccessDenied';
@@ -68,7 +68,7 @@ interface Invitation {
 
 export default function InvitationManagerPage() {
   const auth = useFirebaseAuth();
-  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -83,6 +83,9 @@ export default function InvitationManagerPage() {
   const { toast } = useToast();
 
   const isSuperAdmin = user?.email === 'abdulkadir123shaba@gmail.com';
+
+  // Automatically derive the required PIN from the URL path (e.g., '0563' from 'invitations0563')
+  const requiredPin = pathname.match(/\d+$/)?.[0] || '0563';
 
   const fetchInvitations = async () => {
     setIsLoading(true);
@@ -103,13 +106,6 @@ export default function InvitationManagerPage() {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    const pin = searchParams.get('pin');
-    if (pin === '12356') {
-        setIsAuthorized(true);
-    }
-  }, [searchParams]);
 
   useEffect(() => {
     if (isSuperAdmin && isAuthorized) {
@@ -147,13 +143,13 @@ export default function InvitationManagerPage() {
                             value={passphrase}
                             onChange={(e) => setPassphrase(e.target.value)}
                             onKeyDown={(e) => {
-                                if (e.key === 'Enter' && passphrase === '12356') setIsAuthorized(true);
+                                if (e.key === 'Enter' && passphrase === requiredPin) setIsAuthorized(true);
                             }}
                         />
                         <Button
                             className="w-full h-14 rounded-2xl font-bold text-lg shadow-lg hover:shadow-primary/20 transition-all active:scale-95"
                             onClick={() => {
-                                if (passphrase === '12356') {
+                                if (passphrase === requiredPin) {
                                     setIsAuthorized(true);
                                 } else {
                                     toast({ variant: "destructive", title: "Access Denied", description: "Invalid administrative code." });
