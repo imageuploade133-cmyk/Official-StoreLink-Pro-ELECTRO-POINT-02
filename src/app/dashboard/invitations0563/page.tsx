@@ -15,7 +15,13 @@ import {
   Clock,
   Ban,
   MoreVertical,
-  Ticket
+  Ticket,
+  Users,
+  Sparkles,
+  AlertTriangle,
+  ExternalLink,
+  History,
+  TrendingUp
 } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
@@ -48,7 +54,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
 import { useAuth as useFirebaseAuth } from '@/firebase';
 import { usePathname } from 'next/navigation';
-import { format } from 'date-fns';
+import { format, isToday } from 'date-fns';
 import { Spinner } from '@/components/ui/spinner';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { ShieldCheck, Lock } from 'lucide-react';
@@ -64,6 +70,11 @@ interface Invitation {
   usedAt?: string;
   maxUses: number;
   usedCount: number;
+  history?: {
+    action: string;
+    userId: string;
+    timestamp: string;
+  }[];
 }
 
 export default function InvitationManagerPage() {
@@ -221,15 +232,40 @@ export default function InvitationManagerPage() {
   };
 
   const getStatusBadge = (status: string, expiresAt: string | null, usedCount: number, maxUses: number) => {
-    if (status === 'revoked') return <Badge variant="destructive"><Ban className="w-3 h-3 mr-1" /> Revoked</Badge>;
-    if (expiresAt && new Date(expiresAt) < new Date()) return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" /> Expired</Badge>;
-    if (usedCount >= maxUses) return <Badge className="bg-emerald-500 hover:bg-emerald-600"><CheckCircle className="w-3 h-3 mr-1" /> Used</Badge>;
-    return <Badge className="bg-blue-500 hover:bg-blue-600"><Ticket className="w-3 h-3 mr-1" /> Unused</Badge>;
+    if (status === 'revoked') return (
+      <Badge variant="outline" className="bg-rose-500/5 text-rose-600 border-rose-500/20 px-3 py-1 rounded-full font-bold">
+        <Ban className="w-3.5 h-3.5 mr-1.5" /> Revoked
+      </Badge>
+    );
+
+    if (expiresAt && new Date(expiresAt) < new Date()) return (
+      <Badge variant="outline" className="bg-zinc-500/5 text-zinc-600 border-zinc-500/20 px-3 py-1 rounded-full font-bold">
+        <Clock className="w-3.5 h-3.5 mr-1.5" /> Expired
+      </Badge>
+    );
+
+    if (usedCount >= maxUses) return (
+      <Badge variant="outline" className="bg-emerald-500/5 text-emerald-600 border-emerald-500/20 px-3 py-1 rounded-full font-bold">
+        <CheckCircle className="w-3.5 h-3.5 mr-1.5" /> Used Up
+      </Badge>
+    );
+
+    return (
+      <Badge variant="outline" className="bg-blue-500/5 text-blue-600 border-blue-500/20 px-3 py-1 rounded-full font-bold">
+        <Ticket className="w-3.5 h-3.5 mr-1.5" /> Active
+      </Badge>
+    );
   };
 
   const filteredInvitations = invitations.filter(inv =>
     inv.createdBy.toLowerCase().includes(searchTerm.toLowerCase()) ||
     inv.id.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalGenerated = invitations.length;
+  const totalUsed = invitations.reduce((acc, inv) => acc + (inv.usedCount || 0), 0);
+  const todayUsed = invitations.reduce((acc, inv) =>
+    acc + (inv.history?.filter(h => isToday(new Date(h.timestamp))).length || 0), 0
   );
 
   return (
@@ -239,10 +275,67 @@ export default function InvitationManagerPage() {
         title="Invitation Manager"
         description="Generate and manage secure invitation codes for new merchant registration."
       >
-        <Button onClick={() => setIsCreateModalOpen(true)}>
+        <Button onClick={() => setIsCreateModalOpen(true)} className="shadow-lg shadow-primary/20 bg-primary hover:bg-primary/90">
           <Plus className="w-4 h-4 mr-2" /> Generate Invitation
         </Button>
       </PageHeader>
+
+      {/* Stats Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="overflow-hidden border-none shadow-xl relative group">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-blue-600/5 to-transparent transition-transform group-hover:scale-105 duration-500" />
+          <CardContent className="p-6 relative">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-blue-600/80 dark:text-blue-400/80 uppercase tracking-wider">Total Generated</p>
+                <h3 className="text-3xl font-bold tracking-tight">{totalGenerated}</h3>
+              </div>
+              <div className="size-12 rounded-2xl bg-blue-600/10 flex items-center justify-center border border-blue-600/20 shadow-inner">
+                <Ticket className="size-6 text-blue-600" />
+              </div>
+            </div>
+            <div className="mt-4 flex items-center text-xs text-blue-600/60 font-medium bg-blue-600/5 w-fit px-2 py-1 rounded-full border border-blue-600/10">
+              <History className="size-3 mr-1" /> All-time records
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="overflow-hidden border-none shadow-xl relative group">
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/20 via-emerald-600/5 to-transparent transition-transform group-hover:scale-105 duration-500" />
+          <CardContent className="p-6 relative">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-emerald-600/80 dark:text-emerald-400/80 uppercase tracking-wider">Total Used</p>
+                <h3 className="text-3xl font-bold tracking-tight">{totalUsed}</h3>
+              </div>
+              <div className="size-12 rounded-2xl bg-emerald-600/10 flex items-center justify-center border border-emerald-600/20 shadow-inner">
+                <CheckCircle className="size-6 text-emerald-600" />
+              </div>
+            </div>
+            <div className="mt-4 flex items-center text-xs text-emerald-600/60 font-medium bg-emerald-600/5 w-fit px-2 py-1 rounded-full border border-emerald-600/10">
+              <TrendingUp className="size-3 mr-1" /> Overall activation rate
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="overflow-hidden border-none shadow-xl relative group">
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-600/20 via-orange-600/5 to-transparent transition-transform group-hover:scale-105 duration-500" />
+          <CardContent className="p-6 relative">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-orange-600/80 dark:text-orange-400/80 uppercase tracking-wider">Used Today</p>
+                <h3 className="text-3xl font-bold tracking-tight">{todayUsed}</h3>
+              </div>
+              <div className="size-12 rounded-2xl bg-orange-600/10 flex items-center justify-center border border-orange-600/20 shadow-inner">
+                <Clock className="size-6 text-orange-600" />
+              </div>
+            </div>
+            <div className="mt-4 flex items-center text-xs text-orange-600/60 font-medium bg-orange-600/5 w-fit px-2 py-1 rounded-full border border-orange-600/10">
+              <Sparkles className="size-3 mr-1" /> Real-time activity
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       <div className="flex items-center gap-4 max-w-md">
         <div className="relative flex-1">
@@ -262,14 +355,14 @@ export default function InvitationManagerPage() {
       <Card>
         <CardContent className="p-0">
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-muted/50">
               <TableRow>
-                <TableHead>Created At</TableHead>
-                <TableHead>Created By</TableHead>
-                <TableHead>Usage</TableHead>
-                <TableHead>Expires At</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="font-bold text-xs uppercase tracking-wider text-muted-foreground py-4">Created At</TableHead>
+                <TableHead className="font-bold text-xs uppercase tracking-wider text-muted-foreground py-4">Created By</TableHead>
+                <TableHead className="font-bold text-xs uppercase tracking-wider text-muted-foreground py-4 text-center">Usage</TableHead>
+                <TableHead className="font-bold text-xs uppercase tracking-wider text-muted-foreground py-4">Expires At</TableHead>
+                <TableHead className="font-bold text-xs uppercase tracking-wider text-muted-foreground py-4">Status</TableHead>
+                <TableHead className="text-right font-bold text-xs uppercase tracking-wider text-muted-foreground py-4">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -287,33 +380,51 @@ export default function InvitationManagerPage() {
                 </TableRow>
               ) : (
                 filteredInvitations.map((inv) => (
-                  <TableRow key={inv.id}>
-                    <TableCell className="font-medium">
-                      {format(new Date(inv.createdAt), 'MMM dd, yyyy HH:mm')}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <UserIcon className="w-3 h-3 text-muted-foreground" />
-                        {inv.createdBy}
+                  <TableRow key={inv.id} className="hover:bg-muted/30 transition-colors border-b last:border-0 group">
+                    <TableCell className="font-medium py-5 align-middle">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-semibold">{format(new Date(inv.createdAt), 'MMM dd, yyyy')}</span>
+                        <span className="text-[10px] text-muted-foreground uppercase">{format(new Date(inv.createdAt), 'HH:mm:ss')}</span>
                       </div>
                     </TableCell>
-                    <TableCell>
-                        <span className="text-xs font-semibold">{inv.usedCount} / {inv.maxUses}</span>
+                    <TableCell className="py-5 align-middle">
+                      <div className="flex items-center gap-2.5">
+                        <div className="size-8 rounded-full bg-primary/5 flex items-center justify-center border border-primary/10">
+                            <UserIcon className="size-4 text-primary" />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-sm font-medium">{inv.createdBy}</span>
+                            <span className="text-[10px] text-muted-foreground font-mono">ID: {inv.id.substring(0, 8)}...</span>
+                        </div>
+                      </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="py-5 align-middle text-center">
+                        <div className="inline-flex flex-col items-center">
+                            <span className="text-sm font-bold text-primary">{inv.usedCount} <span className="text-muted-foreground font-normal">/</span> {inv.maxUses}</span>
+                            <div className="w-16 h-1 bg-muted rounded-full mt-1.5 overflow-hidden">
+                                <div
+                                    className={`h-full transition-all duration-500 ${inv.usedCount >= inv.maxUses ? 'bg-emerald-500' : 'bg-primary'}`}
+                                    style={{ width: `${Math.min(100, (inv.usedCount / inv.maxUses) * 100)}%` }}
+                                />
+                            </div>
+                        </div>
+                    </TableCell>
+                    <TableCell className="py-5 align-middle">
                       {inv.expiresAt ? (
-                        <div className="flex items-center gap-2 text-zinc-500">
-                          <Calendar className="w-3 h-3" />
+                        <div className="flex items-center gap-2 text-zinc-600 font-medium text-sm">
+                          <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
                           {format(new Date(inv.expiresAt), 'MMM dd, yyyy')}
                         </div>
                       ) : (
-                        <span className="text-zinc-400">Never</span>
+                        <Badge variant="outline" className="text-zinc-400 font-normal px-2 border-transparent hover:bg-transparent">
+                            <XCircle className="size-3 mr-1.5" /> No Expiry
+                        </Badge>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="py-5 align-middle">
                       {getStatusBadge(inv.status, inv.expiresAt, inv.usedCount, inv.maxUses)}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right py-5 align-middle">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
@@ -337,56 +448,116 @@ export default function InvitationManagerPage() {
 
       {/* Create Modal */}
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Generate New Invitation</DialogTitle>
+            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Sparkles className="size-5 text-primary" />
+              </div>
+              Generate Invitation
+            </DialogTitle>
             <DialogDescription>
-              Create a secure, random invitation code for merchant signup.
+              Create a secure, random invitation code for merchant signup. These codes are one-time visible and cryptographically secure.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Max Uses</label>
+          <div className="space-y-6 py-6">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-semibold flex items-center gap-2">
+                  <Users className="size-4 text-muted-foreground" />
+                  Maximum Usage Limit
+                </label>
+                <Badge variant="outline" className="font-mono text-xs">{maxUses} {maxUses === 1 ? 'use' : 'uses'}</Badge>
+              </div>
               <Input
                 type="number"
                 min="1"
                 value={maxUses}
                 onChange={(e) => setMaxUses(parseInt(e.target.value))}
+                className="h-12 text-lg font-medium rounded-xl border-2 focus-visible:ring-primary/20 transition-all"
               />
+              <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 px-1">
+                <AlertTriangle className="size-3" />
+                Defines how many different merchants can sign up using this same code.
+              </p>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Expiration Date (Optional)</label>
+
+            <div className="space-y-3">
+              <label className="text-sm font-semibold flex items-center gap-2">
+                <Calendar className="size-4 text-muted-foreground" />
+                Expiration Date (Optional)
+              </label>
               <Input
                 type="date"
                 value={expiryDate}
                 onChange={(e) => setExpiryDate(e.target.value)}
+                className="h-12 text-lg font-medium rounded-xl border-2 focus-visible:ring-primary/20 transition-all"
               />
+              <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 px-1">
+                <Clock className="size-3" />
+                Leave empty for a code that never expires.
+              </p>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancel</Button>
-            <Button onClick={handleGenerate}>Generate Code</Button>
+          <DialogFooter className="gap-3 sm:gap-0">
+            <Button
+              variant="ghost"
+              onClick={() => setIsCreateModalOpen(false)}
+              className="rounded-xl h-12 font-semibold"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleGenerate}
+              className="h-12 rounded-xl px-8 font-bold shadow-lg shadow-primary/20"
+            >
+              Generate Invitation Code <Sparkles className="ml-2 size-4" />
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* View Code Modal (Show Only Once) */}
       <Dialog open={isViewCodeModalOpen} onOpenChange={setIsViewCodeModalOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg overflow-hidden border-emerald-500/20">
           <DialogHeader>
-            <DialogTitle>Invitation Generated</DialogTitle>
-            <DialogDescription className="text-rose-500 font-bold">
-              IMPORTANT: This code will only be displayed once. Copy it now.
-            </DialogDescription>
+            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+              <CheckCircle className="size-6 text-emerald-500" />
+              Invitation Ready
+            </DialogTitle>
+            <div className="mt-4 bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 p-4 rounded-xl flex items-start gap-3">
+                <AlertTriangle className="size-5 shrink-0 mt-0.5" />
+                <div className="text-sm">
+                    <p className="font-bold uppercase tracking-tight">Security Warning</p>
+                    <p className="opacity-90">This code is encrypted and will <b>only be shown once</b>. If you close this window without copying, you'll need to generate a new one.</p>
+                </div>
+            </div>
           </DialogHeader>
-          <div className="flex items-center space-x-2 bg-zinc-100 dark:bg-zinc-800 p-4 rounded-xl">
-            <code className="flex-1 text-lg font-mono break-all">{generatedCode}</code>
-            <Button size="icon" variant="ghost" onClick={() => copyToClipboard(generatedCode)}>
-              <Copy className="h-4 w-4" />
-            </Button>
+
+          <div className="relative mt-6 group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+            <div className="relative flex flex-col items-center justify-center space-y-4 bg-zinc-950 dark:bg-zinc-950 p-8 rounded-2xl border border-white/10 shadow-2xl">
+                <code className="text-3xl font-mono tracking-[0.2em] text-emerald-400 font-bold break-all text-center">
+                    {generatedCode}
+                </code>
+                <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => copyToClipboard(generatedCode)}
+                    className="mt-2 bg-white/10 hover:bg-white/20 text-white border-white/10"
+                >
+                    <Copy className="mr-2 h-4 w-4" /> Copy to Clipboard
+                </Button>
+            </div>
           </div>
-          <DialogFooter>
-            <Button className="w-full" onClick={() => setIsViewCodeModalOpen(false)}>I have copied the code</Button>
+
+          <DialogFooter className="mt-6">
+            <Button
+                className="w-full h-12 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-900/20"
+                onClick={() => setIsViewCodeModalOpen(false)}
+            >
+                I've Saved the Code <CheckCircle className="ml-2 size-4" />
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
