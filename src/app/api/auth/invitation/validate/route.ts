@@ -4,6 +4,9 @@ import { hashInvitationCode } from '@/lib/invitations';
 
 export async function POST(request: Request) {
   try {
+    // Add artificial delay to mitigate brute-force guessing
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
     const { code } = await request.json();
 
     if (!code) {

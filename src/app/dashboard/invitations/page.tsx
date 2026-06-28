@@ -50,6 +50,7 @@ import { useAuth as useFirebaseAuth } from '@/firebase';
 import { format } from 'date-fns';
 import { Spinner } from '@/components/ui/spinner';
 import AccessDenied from '@/components/staff-management/AccessDenied';
+import { ShieldCheck, Lock } from 'lucide-react';
 
 interface Invitation {
   id: string;
@@ -74,6 +75,8 @@ export default function InvitationManagerPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [maxUses, setMaxUses] = useState(1);
   const [expiryDate, setExpiryDate] = useState('');
+  const [passphrase, setPassphrase] = useState('');
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const { user, isLoading: isAuthLoading } = useAuth();
   const { toast } = useToast();
 
@@ -100,10 +103,10 @@ export default function InvitationManagerPage() {
   };
 
   useEffect(() => {
-    if (isSuperAdmin) {
+    if (isSuperAdmin && isAuthorized) {
       fetchInvitations();
     }
-  }, [isSuperAdmin]);
+  }, [isSuperAdmin, isAuthorized]);
 
   if (isAuthLoading) {
     return <div className="p-8 flex justify-center"><Spinner /></div>;
@@ -111,6 +114,50 @@ export default function InvitationManagerPage() {
 
   if (!isSuperAdmin) {
     return <AccessDenied />;
+  }
+
+  if (!isAuthorized) {
+    return (
+        <div className="min-h-[60vh] flex items-center justify-center p-6">
+            <Card className="w-full max-w-md border-2 border-primary/20 shadow-xl">
+                <CardContent className="pt-10 pb-10 space-y-6 text-center">
+                    <div className="size-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-primary/20">
+                        <Lock className="size-10 text-primary" strokeWidth={2.5} />
+                    </div>
+                    <div className="space-y-2">
+                        <h2 className="text-2xl font-bold tracking-tight">Restricted Access</h2>
+                        <p className="text-muted-foreground text-sm px-4">
+                            Please enter your administrative passphrase to manage invitations.
+                        </p>
+                    </div>
+                    <div className="space-y-4 px-4">
+                        <Input
+                            type="password"
+                            placeholder="Enter administrative code"
+                            className="h-14 text-center text-lg rounded-2xl bg-muted/50 focus:bg-background transition-all"
+                            value={passphrase}
+                            onChange={(e) => setPassphrase(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && passphrase === '12356') setIsAuthorized(true);
+                            }}
+                        />
+                        <Button
+                            className="w-full h-14 rounded-2xl font-bold text-lg shadow-lg hover:shadow-primary/20 transition-all active:scale-95"
+                            onClick={() => {
+                                if (passphrase === '12356') {
+                                    setIsAuthorized(true);
+                                } else {
+                                    toast({ variant: "destructive", title: "Access Denied", description: "Invalid administrative code." });
+                                }
+                            }}
+                        >
+                            Verify & Unlock <ShieldCheck className="ml-2 h-5 w-5" />
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    );
   }
 
   const handleGenerate = async () => {
