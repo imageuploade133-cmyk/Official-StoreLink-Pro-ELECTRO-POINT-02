@@ -168,6 +168,11 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    match /invitations/{invitationId} {
+      // invitations should only be accessible by the Super Admin via API or Direct Firestore
+      allow read, write: if isSignedIn() && request.auth.token.email == 'abdulkadir123shaba@gmail.com';
+    }
+
     match /stores/{storeId} {
       allow read: if true;
       allow create: if isSignedIn() && request.resource.data.owner_id == request.auth.uid;
