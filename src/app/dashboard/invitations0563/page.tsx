@@ -108,6 +108,7 @@ export default function InvitationManagerPage() {
   const requiredPin = pathname.match(/\d+$/)?.[0] || '0563';
 
   const InvitationSchema = z.object({
+    type: z.enum(['single', 'multiple']),
     maxUses: z.number().min(1, 'At least 1 use is required.'),
     expiresAt: z.string().optional().or(z.literal('')),
   });
@@ -115,10 +116,13 @@ export default function InvitationManagerPage() {
   const form = useForm<z.infer<typeof InvitationSchema>>({
     resolver: zodResolver(InvitationSchema),
     defaultValues: {
+      type: 'single',
       maxUses: 1,
       expiresAt: '',
     }
   });
+
+  const invitationType = form.watch('type');
 
   const fetchInvitations = async () => {
     setIsLoading(true);
@@ -157,7 +161,7 @@ export default function InvitationManagerPage() {
   if (!isAuthorized) {
     return (
         <div className="min-h-[60vh] flex items-center justify-center p-6">
-            <Card className="w-full max-w-md border-2 border-primary/20 shadow-xl">
+            <Card className="w-full max-w-md border-2 border-primary/20 shadow-none">
                 <CardContent className="pt-10 pb-10 space-y-6 text-center">
                     <div className="size-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-primary/20">
                         <Lock className="size-10 text-primary" strokeWidth={2.5} />
@@ -180,7 +184,7 @@ export default function InvitationManagerPage() {
                             }}
                         />
                         <Button
-                            className="w-full h-14 rounded-2xl font-bold text-lg shadow-lg hover:shadow-primary/20 transition-all active:scale-95"
+                            className="w-full h-14 rounded-2xl font-bold text-lg shadow-none transition-all active:scale-95"
                             onClick={() => {
                                 if (passphrase === requiredPin) {
                                     setIsAuthorized(true);
@@ -298,14 +302,14 @@ export default function InvitationManagerPage() {
         title="Invitation Manager"
         description="Generate and manage secure invitation codes for new merchant registration."
       >
-        <Button onClick={() => setIsCreateModalOpen(true)} className="shadow-lg shadow-primary/20 bg-primary hover:bg-primary/90">
+        <Button onClick={() => setIsCreateModalOpen(true)} className="bg-primary hover:bg-primary/90 border-b-4 border-primary-foreground/20 active:border-b-0 transition-all shadow-none">
           <Plus className="w-4 h-4 mr-2" /> Generate Invitation
         </Button>
       </PageHeader>
 
       {/* Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="overflow-hidden border-none shadow-xl relative group">
+        <Card className="overflow-hidden border border-blue-600/20 shadow-none relative group hover:border-blue-600/40 transition-colors duration-300">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-blue-600/5 to-transparent transition-transform group-hover:scale-105 duration-500" />
           <CardContent className="p-6 relative">
             <div className="flex items-center justify-between">
@@ -313,7 +317,7 @@ export default function InvitationManagerPage() {
                 <p className="text-sm font-medium text-blue-600/80 dark:text-blue-400/80 uppercase tracking-wider">Total Generated</p>
                 <h3 className="text-3xl font-bold tracking-tight">{totalGenerated}</h3>
               </div>
-              <div className="size-12 rounded-2xl bg-blue-600/10 flex items-center justify-center border border-blue-600/20 shadow-inner">
+              <div className="size-12 rounded-2xl bg-blue-600/10 flex items-center justify-center border border-blue-600/20">
                 <Ticket className="size-6 text-blue-600" />
               </div>
             </div>
@@ -323,7 +327,7 @@ export default function InvitationManagerPage() {
           </CardContent>
         </Card>
 
-        <Card className="overflow-hidden border-none shadow-xl relative group">
+        <Card className="overflow-hidden border border-emerald-600/20 shadow-none relative group hover:border-emerald-600/40 transition-colors duration-300">
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/20 via-emerald-600/5 to-transparent transition-transform group-hover:scale-105 duration-500" />
           <CardContent className="p-6 relative">
             <div className="flex items-center justify-between">
@@ -331,7 +335,7 @@ export default function InvitationManagerPage() {
                 <p className="text-sm font-medium text-emerald-600/80 dark:text-emerald-400/80 uppercase tracking-wider">Total Used</p>
                 <h3 className="text-3xl font-bold tracking-tight">{totalUsed}</h3>
               </div>
-              <div className="size-12 rounded-2xl bg-emerald-600/10 flex items-center justify-center border border-emerald-600/20 shadow-inner">
+              <div className="size-12 rounded-2xl bg-emerald-600/10 flex items-center justify-center border border-emerald-600/20">
                 <CheckCircle className="size-6 text-emerald-600" />
               </div>
             </div>
@@ -341,7 +345,7 @@ export default function InvitationManagerPage() {
           </CardContent>
         </Card>
 
-        <Card className="overflow-hidden border-none shadow-xl relative group">
+        <Card className="overflow-hidden border border-orange-600/20 shadow-none relative group hover:border-orange-600/40 transition-colors duration-300">
           <div className="absolute inset-0 bg-gradient-to-br from-orange-600/20 via-orange-600/5 to-transparent transition-transform group-hover:scale-105 duration-500" />
           <CardContent className="p-6 relative">
             <div className="flex items-center justify-between">
@@ -349,7 +353,7 @@ export default function InvitationManagerPage() {
                 <p className="text-sm font-medium text-orange-600/80 dark:text-orange-400/80 uppercase tracking-wider">Used Today</p>
                 <h3 className="text-3xl font-bold tracking-tight">{todayUsed}</h3>
               </div>
-              <div className="size-12 rounded-2xl bg-orange-600/10 flex items-center justify-center border border-orange-600/20 shadow-inner">
+              <div className="size-12 rounded-2xl bg-orange-600/10 flex items-center justify-center border border-orange-600/20">
                 <Clock className="size-6 text-orange-600" />
               </div>
             </div>
@@ -365,17 +369,21 @@ export default function InvitationManagerPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search by creator..."
-            className="pl-10"
+            className="pl-10 h-11 rounded-xl border-2 focus-visible:ring-primary/20 transition-all bg-background shadow-none"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <Button variant="outline" onClick={fetchInvitations}>
+        <Button
+          variant="outline"
+          onClick={fetchInvitations}
+          className="h-11 w-11 rounded-xl border-2 hover:bg-muted active:scale-95 transition-all p-0 shadow-none"
+        >
           <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
         </Button>
       </div>
 
-      <Card>
+      <Card className="shadow-none border-zinc-200 dark:border-zinc-800">
         <CardContent className="p-0">
           <Table>
             <TableHeader className="bg-muted/50">
@@ -488,33 +496,74 @@ export default function InvitationManagerPage() {
             <form onSubmit={form.handleSubmit(handleGenerate)} className="space-y-6 py-6">
               <FormField
                 control={form.control}
-                name="maxUses"
+                name="type"
                 render={({ field }) => (
                   <FormItem className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <FormLabel className="text-sm font-semibold flex items-center gap-2">
-                        <Users className="size-4 text-muted-foreground" />
-                        Maximum Usage Limit
-                      </FormLabel>
-                      <Badge variant="outline" className="font-mono text-xs">{field.value} {field.value === 1 ? 'use' : 'uses'}</Badge>
+                    <FormLabel className="text-sm font-semibold flex items-center gap-2">
+                      <Ticket className="size-4 text-muted-foreground" />
+                      Invitation Type
+                    </FormLabel>
+                    <div className="grid grid-cols-2 gap-4">
+                      <Button
+                        type="button"
+                        variant={field.value === 'single' ? 'default' : 'outline'}
+                        className={`h-20 rounded-2xl flex flex-col gap-1 items-center justify-center transition-all ${field.value === 'single' ? 'border-b-4 border-primary-foreground/20' : 'border-2'}`}
+                        onClick={() => {
+                          field.onChange('single');
+                          form.setValue('maxUses', 1);
+                        }}
+                      >
+                        <UserIcon className="size-5" />
+                        <span className="font-bold">Single Use</span>
+                        <span className="text-[10px] opacity-70">Deactivates after 1 use</span>
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={field.value === 'multiple' ? 'default' : 'outline'}
+                        className={`h-20 rounded-2xl flex flex-col gap-1 items-center justify-center transition-all ${field.value === 'multiple' ? 'border-b-4 border-primary-foreground/20' : 'border-2'}`}
+                        onClick={() => field.onChange('multiple')}
+                      >
+                        <Users className="size-5" />
+                        <span className="font-bold">Multiple Use</span>
+                        <span className="text-[10px] opacity-70">Custom usage limit</span>
+                      </Button>
                     </div>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="1"
-                        {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
-                        className="h-12 text-lg font-medium rounded-xl border-2 focus-visible:ring-primary/20 transition-all"
-                      />
-                    </FormControl>
-                    <FormDescription className="text-[11px] flex items-center gap-1.5 px-1">
-                      <AlertTriangle className="size-3" />
-                      Defines how many different merchants can sign up using this same code.
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              {invitationType === 'multiple' && (
+                <FormField
+                  control={form.control}
+                  name="maxUses"
+                  render={({ field }) => (
+                    <FormItem className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <FormLabel className="text-sm font-semibold flex items-center gap-2">
+                          <Users className="size-4 text-muted-foreground" />
+                          Usage Limit
+                        </FormLabel>
+                        <Badge variant="outline" className="font-mono text-xs">{field.value} uses</Badge>
+                      </div>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="2"
+                          {...field}
+                          onChange={(e) => field.onChange(parseInt(e.target.value) || 2)}
+                          className="h-12 text-lg font-medium rounded-xl border-2 focus-visible:ring-primary/20 transition-all"
+                        />
+                      </FormControl>
+                      <FormDescription className="text-[11px] flex items-center gap-1.5 px-1">
+                        <AlertTriangle className="size-3" />
+                        Defines how many different merchants can sign up using this same code.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <FormField
                 control={form.control}
@@ -552,7 +601,7 @@ export default function InvitationManagerPage() {
                 </Button>
                 <Button
                   type="submit"
-                  className="h-12 rounded-xl px-8 font-bold shadow-lg shadow-primary/20"
+                  className="h-12 rounded-xl px-8 font-bold shadow-none border-b-4 border-primary-foreground/20 active:border-b-0 transition-all"
                 >
                   Generate Invitation Code <Sparkles className="ml-2 size-4" />
                 </Button>
@@ -581,7 +630,7 @@ export default function InvitationManagerPage() {
 
           <div className="relative mt-6 group">
             <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-            <div className="relative flex flex-col items-center justify-center space-y-4 bg-zinc-950 dark:bg-zinc-950 p-8 rounded-2xl border border-white/10 shadow-2xl">
+            <div className="relative flex flex-col items-center justify-center space-y-4 bg-zinc-950 dark:bg-zinc-950 p-8 rounded-2xl border border-white/10 shadow-none">
                 <code className="text-3xl font-mono tracking-[0.2em] text-emerald-400 font-bold break-all text-center">
                     {generatedCode}
                 </code>
@@ -598,7 +647,7 @@ export default function InvitationManagerPage() {
 
           <DialogFooter className="mt-6 pt-4 border-t">
             <Button
-                className="w-full h-12 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-900/20 transition-all active:scale-[0.98]"
+                className="w-full h-12 rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700 shadow-none border-b-4 border-emerald-900/40 active:border-b-0 transition-all active:scale-[0.98]"
                 onClick={() => setIsViewCodeModalOpen(false)}
             >
                 I've Saved the Code <CheckCircle className="ml-2 size-4" />
