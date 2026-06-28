@@ -102,6 +102,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { user, permissions, isLoading, isCustomer, store, staffMember } = useAuth();
+  const isSuperAdmin = user?.email === 'abdulkadir123shaba@gmail.com';
   const router = useRouter();
   const pathname = usePathname();
   const [isMinimized, setIsMinimized] = useState(false);
@@ -231,7 +232,6 @@ export default function DashboardLayout({
     { href: '/dashboard/our-collection', icon: Sparkles, label: 'Manage Our Collection', perm: 'manage_settings' },
     { heading: 'Administration' },
     { href: '/dashboard/settings', icon: Settings, label: 'Settings', perm: 'manage_settings' },
-    { href: '/dashboard/invitations', icon: Ticket, label: 'Invitations', perm: 'view_permissions' },
     { href: '/dashboard/permissions', icon: Shield, label: 'Permissions', perm: 'view_permissions' },
   ], []);
 
@@ -294,16 +294,16 @@ export default function DashboardLayout({
       } else if (isCustomer) {
         // Explicitly block customers from the dashboard
         router.replace('/store/account');
-      } else if (!store && !staffMember && isGracePeriodExpired && pathname !== '/signup-merchant') {
+      } else if (!store && !staffMember && !isSuperAdmin && isGracePeriodExpired && pathname !== '/signup-merchant') {
         // No store or staff record yet, and grace period has expired
         console.log("No store found after grace period, redirecting to signup-merchant");
         router.replace('/signup-merchant');
       }
     }
-  }, [user, isLoading, isCustomer, store, staffMember, router, pathname, isGracePeriodExpired]);
+  }, [user, isLoading, isCustomer, store, staffMember, router, pathname, isGracePeriodExpired, isSuperAdmin]);
 
-  if (isLoading || !user || isCustomer || (!store && !staffMember)) {
-    const subLabel = (!store && !staffMember) ? "Locating your store..." : "Authenticating your account…";
+  if (isLoading || !user || isCustomer || (!store && !staffMember && !isSuperAdmin)) {
+    const subLabel = (!store && !staffMember && !isSuperAdmin) ? "Locating your store..." : "Authenticating your account…";
     return <PageSpinner label="StoreLink Pro" subLabel={subLabel} />;
   }
 

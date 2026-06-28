@@ -1,9 +1,28 @@
 import { NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase-admin';
+import { adminDb, adminAuth } from '@/lib/firebase-admin';
 import { hashInvitationCode, generateInvitationCode } from '@/lib/invitations';
+
+const AUTHORIZED_EMAIL = 'abdulkadir123shaba@gmail.com';
+
+async function verifySuperAdmin(request: Request) {
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) return false;
+
+    try {
+        const token = authHeader.split('Bearer ')[1];
+        const decodedToken = await adminAuth.verifyIdToken(token!);
+        return decodedToken.email === AUTHORIZED_EMAIL;
+    } catch (e) {
+        return false;
+    }
+}
 
 export async function POST(request: Request) {
   try {
+    if (!await verifySuperAdmin(request)) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
+
     const { createdBy, expiresAt, maxUses = 1 } = await request.json();
 
     if (!createdBy) {
@@ -38,6 +57,9 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
     try {
+        if (!await verifySuperAdmin(request)) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+        }
         const snapshot = await adminDb.collection('invitations').orderBy('createdAt', 'desc').get();
         const invitations = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         return NextResponse.json(invitations);
@@ -48,6 +70,9 @@ export async function GET(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
+    if (!await verifySuperAdmin(request)) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
     const { id, status } = await request.json();
 
     if (!id || !status) {

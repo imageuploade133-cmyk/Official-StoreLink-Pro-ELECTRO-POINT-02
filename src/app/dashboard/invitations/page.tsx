@@ -46,8 +46,10 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
+import { useAuth as useFirebaseAuth } from '@/firebase';
 import { format } from 'date-fns';
 import { Spinner } from '@/components/ui/spinner';
+import AccessDenied from '@/components/staff-management/AccessDenied';
 
 interface Invitation {
   id: string;
@@ -63,6 +65,7 @@ interface Invitation {
 }
 
 export default function InvitationManagerPage() {
+  const auth = useFirebaseAuth();
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -71,13 +74,20 @@ export default function InvitationManagerPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [maxUses, setMaxUses] = useState(1);
   const [expiryDate, setExpiryDate] = useState('');
-  const { user } = useAuth();
+  const { user, isLoading: isAuthLoading } = useAuth();
   const { toast } = useToast();
+
+  const isSuperAdmin = user?.email === 'abdulkadir123shaba@gmail.com';
 
   const fetchInvitations = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/admin/invitations');
+      const idToken = await auth.currentUser?.getIdToken();
+      const response = await fetch('/api/admin/invitations', {
+        headers: {
+            'Authorization': `Bearer ${idToken}`
+        }
+      });
       if (response.ok) {
         const data = await response.ok ? await response.json() : [];
         setInvitations(Array.isArray(data) ? data : []);
@@ -90,14 +100,28 @@ export default function InvitationManagerPage() {
   };
 
   useEffect(() => {
-    fetchInvitations();
-  }, []);
+    if (isSuperAdmin) {
+      fetchInvitations();
+    }
+  }, [isSuperAdmin]);
+
+  if (isAuthLoading) {
+    return <div className="p-8 flex justify-center"><Spinner /></div>;
+  }
+
+  if (!isSuperAdmin) {
+    return <AccessDenied />;
+  }
 
   const handleGenerate = async () => {
     try {
+      const idToken = await auth.currentUser?.getIdToken();
       const response = await fetch('/api/admin/invitations', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`
+        },
         body: JSON.stringify({
           createdBy: user?.displayName || user?.email || 'Admin',
           maxUses,
@@ -120,9 +144,13 @@ export default function InvitationManagerPage() {
 
   const handleRevoke = async (id: string) => {
     try {
+      const idToken = await auth.currentUser?.getIdToken();
       const response = await fetch('/api/admin/invitations', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`
+        },
         body: JSON.stringify({ id, status: 'revoked' })
       });
 

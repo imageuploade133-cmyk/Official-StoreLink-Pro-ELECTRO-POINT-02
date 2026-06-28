@@ -328,6 +328,28 @@ export default function DashboardPage() {
   if (totalLoading) {
     return <div className="flex h-screen w-full items-center justify-center"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>;
   }
+
+  // Super Admin view for invitation management
+  if (user?.email === 'abdulkadir123shaba@gmail.com' && !currentStoreId) {
+    return (
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
+            <div className="p-4 bg-primary/10 rounded-full">
+                <LayoutDashboard className="w-12 h-12 text-primary" />
+            </div>
+            <h1 className="text-2xl font-bold">Platform Super Admin</h1>
+            <p className="text-muted-foreground max-w-md">
+                Welcome back. You are currently in platform management mode.
+                Use the direct URL to access the invitation manager.
+            </p>
+            <div className="pt-4">
+                <Link href="/dashboard/invitations">
+                    <Button>Open Invitation Manager</Button>
+                </Link>
+            </div>
+        </div>
+    );
+  }
+
   if (!permissions.view_dashboard) {
     return <AccessDenied />;
   }

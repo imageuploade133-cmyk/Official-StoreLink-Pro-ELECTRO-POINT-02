@@ -169,8 +169,8 @@ service cloud.firestore {
     }
 
     match /invitations/{invitationId} {
-      // invitations should only be accessible by the Admin API
-      allow read, write: if false;
+      // invitations should only be accessible by the Super Admin via API or Direct Firestore
+      allow read, write: if isSignedIn() && request.auth.token.email == 'abdulkadir123shaba@gmail.com';
     }
 
     match /stores/{storeId} {
