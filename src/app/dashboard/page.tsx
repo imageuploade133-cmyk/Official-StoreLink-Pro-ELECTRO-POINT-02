@@ -342,7 +342,7 @@ export default function DashboardPage() {
                 Use the direct URL to access the invitation manager.
             </p>
             <div className="pt-4">
-                <Link href="/dashboard/invitations">
+                <Link href="/dashboard/invitations0563">
                     <Button>Open Invitation Manager</Button>
                 </Link>
             </div>
