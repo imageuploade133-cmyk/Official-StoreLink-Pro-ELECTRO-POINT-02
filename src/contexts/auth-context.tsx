@@ -18,6 +18,7 @@ interface AuthContextType {
   isAdmin: boolean;
   isCustomer: boolean;
   roleId: string | null;
+  isSubscriptionExpired: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -31,6 +32,7 @@ const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
   isCustomer: false,
   roleId: null,
+  isSubscriptionExpired: false,
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -213,6 +215,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { permissions: defaultPermissions, isAdmin: false, roleId: null };
   }, [user, staffMember, store, isCustomer, isLoading]);
 
+  const isSubscriptionExpired = useMemo(() => {
+    if (!store?.planExpiresAt) return false;
+
+    try {
+        const expiryDate = typeof store.planExpiresAt === 'string'
+            ? new Date(store.planExpiresAt)
+            : (store.planExpiresAt as any).toDate();
+
+        return expiryDate < new Date();
+    } catch (e) {
+        console.error("Error parsing planExpiresAt:", e);
+        return false;
+    }
+  }, [store]);
+
 
   const value = {
     user,
@@ -225,6 +242,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isAdmin,
     isCustomer,
     roleId,
+    isSubscriptionExpired,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

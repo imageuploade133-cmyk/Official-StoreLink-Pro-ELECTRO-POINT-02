@@ -51,6 +51,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
 import { useAuth as useFirebaseAuth } from '@/firebase';
@@ -82,6 +83,8 @@ interface Invitation {
   usedAt?: string;
   maxUses: number;
   usedCount: number;
+  plan?: 'free' | 'pro' | 'premium';
+  planDurationDays?: number;
   history?: {
     action: string;
     userId: string;
@@ -112,6 +115,8 @@ export default function InvitationManagerPage() {
     type: z.enum(['single', 'multiple']),
     maxUses: z.number().min(1, 'At least 1 use is required.'),
     expiresAt: z.string().optional().or(z.literal('')),
+    plan: z.enum(['free', 'pro', 'premium']),
+    planDurationDays: z.number().min(1, 'Duration must be at least 1 day.'),
   });
 
   const form = useForm<z.infer<typeof InvitationSchema>>({
@@ -120,6 +125,8 @@ export default function InvitationManagerPage() {
       type: 'single',
       maxUses: 1,
       expiresAt: '',
+      plan: 'free',
+      planDurationDays: 30,
     }
   });
 
@@ -215,7 +222,9 @@ export default function InvitationManagerPage() {
         body: JSON.stringify({
           createdBy: user?.displayName || user?.email || 'Admin',
           maxUses: values.maxUses,
-          expiresAt: values.expiresAt || null
+          expiresAt: values.expiresAt || null,
+          plan: values.plan,
+          planDurationDays: values.planDurationDays
         })
       });
 
@@ -391,6 +400,7 @@ export default function InvitationManagerPage() {
               <TableRow>
                 <TableHead className="font-bold text-xs uppercase tracking-wider text-muted-foreground py-4">Created At</TableHead>
                 <TableHead className="font-bold text-xs uppercase tracking-wider text-muted-foreground py-4">Created By</TableHead>
+                <TableHead className="font-bold text-xs uppercase tracking-wider text-muted-foreground py-4">Plan / Duration</TableHead>
                 <TableHead className="font-bold text-xs uppercase tracking-wider text-muted-foreground py-4 text-center">Usage</TableHead>
                 <TableHead className="font-bold text-xs uppercase tracking-wider text-muted-foreground py-4">Expires At</TableHead>
                 <TableHead className="font-bold text-xs uppercase tracking-wider text-muted-foreground py-4">Status</TableHead>
@@ -428,6 +438,19 @@ export default function InvitationManagerPage() {
                             <span className="text-sm font-medium">{inv.createdBy}</span>
                             <span className="text-[10px] text-muted-foreground font-mono">ID: {inv.id.substring(0, 8)}...</span>
                         </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-5 align-middle">
+                      <div className="flex flex-col">
+                        <Badge variant="outline" className={cn(
+                            "w-fit uppercase text-[10px] font-bold px-2 py-0",
+                            inv.plan === 'premium' ? "bg-amber-500/10 text-amber-600 border-amber-500/20" :
+                            inv.plan === 'pro' ? "bg-blue-500/10 text-blue-600 border-blue-500/20" :
+                            "bg-zinc-500/10 text-zinc-600 border-zinc-500/20"
+                        )}>
+                            {inv.plan || 'free'}
+                        </Badge>
+                        <span className="text-[10px] text-muted-foreground mt-1 font-medium">{inv.planDurationDays || 30} days access</span>
                       </div>
                     </TableCell>
                     <TableCell className="py-5 align-middle text-center">
@@ -566,6 +589,54 @@ export default function InvitationManagerPage() {
                     )}
                     />
                 )}
+
+                <div className="grid grid-cols-2 gap-6">
+                    <FormField
+                        control={form.control}
+                        name="plan"
+                        render={({ field }) => (
+                        <FormItem className="space-y-3">
+                            <FormLabel className="text-sm font-bold flex items-center gap-2 text-foreground">
+                            <ShieldCheck className="size-4 text-muted-foreground" />
+                            Subscription Plan
+                            </FormLabel>
+                            <FormControl>
+                            <select
+                                {...field}
+                                className="w-full h-12 px-3 rounded-xl border-2 bg-background font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                            >
+                                <option value="free">Free Plan</option>
+                                <option value="pro">Pro Plan</option>
+                                <option value="premium">Premium Plan</option>
+                            </select>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="planDurationDays"
+                        render={({ field }) => (
+                        <FormItem className="space-y-3">
+                            <FormLabel className="text-sm font-bold flex items-center gap-2 text-foreground">
+                            <Calendar className="size-4 text-muted-foreground" />
+                            Duration (Days)
+                            </FormLabel>
+                            <FormControl>
+                            <Input
+                                type="number"
+                                {...field}
+                                onChange={(e) => field.onChange(parseInt(e.target.value) || 30)}
+                                className="h-12 text-lg font-medium rounded-xl border-2 focus-visible:ring-primary/20 transition-all shadow-none"
+                            />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                </div>
 
                 <FormField
                     control={form.control}
