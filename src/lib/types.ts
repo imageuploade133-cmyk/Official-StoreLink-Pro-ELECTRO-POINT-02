@@ -870,6 +870,7 @@ export interface Store {
   domainActivatedAt?: Timestamp;
   primaryDomainType?: 'free' | 'subdomain' | 'custom';
   redirectEnabled?: boolean;
+  planExpiresAt?: string | Timestamp;
 }
 
 export interface StaffMember {

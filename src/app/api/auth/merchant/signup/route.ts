@@ -87,6 +87,11 @@ export async function POST(request: Request) {
 
         // 5. Setup Store Data
         const storeRef = adminDb.collection('stores').doc(storeSlug);
+        const plan = invitation.plan || 'free';
+        const planDurationDays = invitation.planDurationDays || 30;
+        const planExpiresAt = new Date();
+        planExpiresAt.setDate(planExpiresAt.getDate() + planDurationDays);
+
         transaction.set(storeRef, {
             id: storeSlug,
             slug: storeSlug,
@@ -95,6 +100,8 @@ export async function POST(request: Request) {
             address: storeAddress,
             phone: storePhone,
             databaseId: databaseId || '(default)',
+            plan,
+            planExpiresAt: planExpiresAt.toISOString(),
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
         });

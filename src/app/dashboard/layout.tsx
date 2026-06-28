@@ -57,7 +57,9 @@ import {
   CalendarClock,
   Star,
   ArrowRightLeft,
-  Image as ImageIcon
+  Image as ImageIcon,
+  CreditCard as CreditCardIcon,
+  ShieldAlert
 } from 'lucide-react';
 import { PageSpinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
@@ -88,6 +90,7 @@ import { collection, query, where } from 'firebase/firestore';
 import type { Order, InstallmentRecord, ProductReview } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Popover,
   PopoverContent,
@@ -101,7 +104,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, permissions, isLoading, isCustomer, store, staffMember } = useAuth();
+  const { user, permissions, isLoading, isCustomer, store, staffMember, isSubscriptionExpired } = useAuth();
   const isSuperAdmin = user?.email === 'abdulkadir123shaba@gmail.com';
   const router = useRouter();
   const pathname = usePathname();
@@ -641,7 +644,34 @@ export default function DashboardLayout({
         </header>
 
         {/* Main Content */}
-        <div className="flex-1 dark:bg-black overflow-x-auto">
+        <div className="flex-1 dark:bg-black overflow-x-auto relative">
+          {isSubscriptionExpired && !isSuperAdmin && (
+            <div className="absolute inset-0 z-[100] bg-background/80 backdrop-blur-md flex items-center justify-center p-6 text-center">
+              <Card className="max-w-md w-full border-2 border-destructive/20 shadow-2xl animate-in zoom-in-95 duration-300">
+                <CardContent className="pt-10 pb-10 space-y-6">
+                  <div className="size-20 bg-destructive/10 rounded-full flex items-center justify-center mx-auto border-2 border-destructive/20">
+                    <ShieldAlert className="size-10 text-destructive" strokeWidth={2.5} />
+                  </div>
+                  <div className="space-y-2">
+                    <h2 className="text-2xl font-bold tracking-tight">Access Restricted</h2>
+                    <p className="text-muted-foreground font-medium">
+                      Your store&apos;s subscription plan has expired. Please renew your access to continue managing your business.
+                    </p>
+                  </div>
+                  <div className="pt-4 flex flex-col gap-3">
+                    <Button className="h-12 text-lg font-bold bg-primary shadow-lg active:scale-95 transition-all" asChild>
+                        <Link href="/dashboard/settings">
+                            Renew Subscription <CreditCardIcon className="ml-2 size-5" />
+                        </Link>
+                    </Button>
+                    <p className="text-xs text-muted-foreground">
+                        Need help? Contact <span className="font-bold text-foreground">abdulkadir123shaba@gmail.com</span>
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
           <main className="p-4 lg:p-6 pb-20 dark:bg-black">
             {children}
           </main>

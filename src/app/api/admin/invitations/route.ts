@@ -23,7 +23,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    const { createdBy, expiresAt, maxUses = 1 } = await request.json();
+    const { createdBy, expiresAt, maxUses = 1, plan = 'free', planDurationDays = 30 } = await request.json();
 
     if (!createdBy) {
       return NextResponse.json({ error: 'CreatedBy is required' }, { status: 400 });
@@ -40,6 +40,8 @@ export async function POST(request: Request) {
       status: 'unused',
       usedCount: 0,
       maxUses,
+      plan,
+      planDurationDays,
       history: []
     };
 

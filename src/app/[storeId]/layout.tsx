@@ -10,6 +10,9 @@ import { useSettings } from '@/contexts/settings-context';
 import { BackgroundVideoPlayer } from '@/components/store/BackgroundVideoPlayer';
 import { cn, getCollectionBackgroundStyle } from "@/lib/utils";
 import { AdSystem } from '@/components/store/AdSystem';
+import { Card, CardContent } from "@/components/ui/card";
+import { ShieldAlert, Mail } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { BannerAd } from '@/components/ads/BannerAd';
 import { useEffect, useMemo } from 'react';
 import { useFirestore } from '@/firebase';
@@ -135,7 +138,19 @@ export default function PublicLayout({
   children: React.ReactNode;
 }>) {
   const { isInitialLoadComplete } = useGlobalLoading();
-  const { settings } = useSettings();
+  const { settings, store } = useSettings();
+
+  const isExpired = useMemo(() => {
+    if (!store?.planExpiresAt) return false;
+    try {
+        const expiryDate = typeof store.planExpiresAt === 'string'
+            ? new Date(store.planExpiresAt)
+            : (store.planExpiresAt as any).toDate();
+        return expiryDate < new Date();
+    } catch (e) {
+        return false;
+    }
+  }, [store]);
 
   const storeLogoWidth = settings?.storeLogoWidth || 120;
   const logoContainerHeight = Math.max(32, Math.round(storeLogoWidth * 0.33));
@@ -167,6 +182,35 @@ export default function PublicLayout({
   return (
     <OfflineDetector>
       <WebsiteTracker />
+      {isExpired && (
+        <div className="fixed inset-0 z-[200] bg-background flex items-center justify-center p-6 text-center">
+            <Card className="max-w-md w-full border-2 border-primary/20 shadow-none animate-in fade-in zoom-in duration-500">
+                <CardContent className="pt-12 pb-12 space-y-8">
+                    <div className="size-24 bg-primary/10 rounded-[2.5rem] flex items-center justify-center mx-auto border-2 border-primary/20 rotate-3 hover:rotate-0 transition-transform duration-500">
+                        <ShieldAlert className="size-12 text-primary" strokeWidth={2} />
+                    </div>
+                    <div className="space-y-3">
+                        <h2 className="text-3xl font-black tracking-tight uppercase">Store Suspended</h2>
+                        <div className="h-1.5 w-16 bg-primary mx-auto rounded-full" />
+                        <p className="text-muted-foreground font-medium text-lg px-4 leading-relaxed">
+                            This store is temporarily unavailable. We&apos;ll be back shortly!
+                        </p>
+                    </div>
+                    <div className="pt-4 space-y-4">
+                        <div className="p-4 bg-muted/50 rounded-2xl border border-border/50">
+                            <p className="text-sm font-bold text-foreground mb-1">Store Owner?</p>
+                            <p className="text-xs text-muted-foreground">Please renew your subscription plan via the dashboard to reactivate your website.</p>
+                        </div>
+                        <Button variant="outline" className="w-full h-14 rounded-2xl font-bold border-2 text-base hover:bg-primary hover:text-primary-foreground transition-all duration-300" asChild>
+                            <a href={`mailto:abdulkadir123shaba@gmail.com?subject=Inquiry about Store: ${store?.name || 'Unknown'}`}>
+                                <Mail className="mr-2 size-5" /> Contact Administrator
+                            </a>
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+      )}
       <CanonicalLink />
       <AdSystem />
       {settings?.backgroundStyle === 'video' && settings.backgroundVideoUrl && <BackgroundVideoPlayer />}
