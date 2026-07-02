@@ -6,13 +6,27 @@ const AUTHORIZED_EMAIL = 'abdulkadir123shaba@gmail.com';
 
 async function verifySuperAdmin(request: Request) {
     const authHeader = request.headers.get('Authorization');
-    if (!authHeader?.startsWith('Bearer ')) return false;
+    if (!authHeader?.startsWith('Bearer ')) {
+        console.warn('verifySuperAdmin: Missing or invalid Authorization header');
+        return false;
+    }
 
     try {
         const token = authHeader.split('Bearer ')[1];
         const decodedToken = await adminAuth.verifyIdToken(token!);
-        return decodedToken.email === AUTHORIZED_EMAIL;
-    } catch (e) {
+
+        const userEmail = decodedToken.email?.toLowerCase();
+        const authorizedEmail = AUTHORIZED_EMAIL.toLowerCase();
+
+        const isAuthorized = userEmail === authorizedEmail;
+
+        if (!isAuthorized) {
+            console.warn(`verifySuperAdmin: Email mismatch. Expected ${authorizedEmail}, got ${userEmail}`);
+        }
+
+        return isAuthorized;
+    } catch (e: any) {
+        console.error('verifySuperAdmin: Token verification failed:', e.message);
         return false;
     }
 }
@@ -70,7 +84,7 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
     try {
         if (!await verifySuperAdmin(request)) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+            return NextResponse.json({ error: 'Unauthorized: Super Admin access required' }, { status: 403 });
         }
         const snapshot = await adminDb.collection('invitations').orderBy('createdAt', 'desc').get();
         const invitations = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -83,7 +97,7 @@ export async function GET(request: Request) {
 export async function PATCH(request: Request) {
   try {
     if (!await verifySuperAdmin(request)) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+        return NextResponse.json({ error: 'Unauthorized: Super Admin access required' }, { status: 403 });
     }
     const { id, status } = await request.json();
 
