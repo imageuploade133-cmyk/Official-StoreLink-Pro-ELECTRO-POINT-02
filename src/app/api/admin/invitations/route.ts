@@ -13,6 +13,7 @@ async function verifySuperAdmin(request: Request) {
 
     try {
         const token = authHeader.split('Bearer ')[1];
+        // If adminAuth is not properly initialized, this will throw a configuration error
         const decodedToken = await adminAuth.verifyIdToken(token!);
 
         const userEmail = decodedToken.email?.toLowerCase();
@@ -26,7 +27,12 @@ async function verifySuperAdmin(request: Request) {
 
         return isAuthorized;
     } catch (e: any) {
-        console.error('verifySuperAdmin: Token verification failed:', e.message);
+        console.error('verifySuperAdmin: Error:', e.message);
+        // If it's a configuration error from our firebase-admin.ts, rethrow it to trigger a 500
+        if (e.message.includes('Could not load Firebase Admin credentials')) {
+            throw e;
+        }
+        // Otherwise, it's a token verification failure (e.g., expired, malformed), so return false (403)
         return false;
     }
 }
