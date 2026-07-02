@@ -148,7 +148,15 @@ export default function InvitationManagerPage() {
         const data = await response.json();
         setInvitations(Array.isArray(data) ? data : []);
       } else {
-        console.error('Failed to fetch invitations:', await response.text());
+        const errorText = await response.text();
+        console.error('Failed to fetch invitations:', errorText);
+        if (errorText.includes('Could not load Firebase Admin credentials')) {
+            toast({
+                variant: "destructive",
+                title: "Server Configuration Error",
+                description: "Firebase Admin SDK is not properly configured on the server. Please check FIREBASE_ADMIN_SETUP.md."
+            });
+        }
       }
     } catch (error) {
       console.error('Error fetching invitations:', error);
@@ -249,11 +257,20 @@ export default function InvitationManagerPage() {
         form.reset();
         toast({ title: "Invitation Generated", description: "The code is ready to use." });
       } else {
-        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
+        const errorData = await response.json().catch(async () => ({ error: "Unknown error" }));
+
+        let errorMsg = errorData.error || "Server returned an error. Please try again.";
+        let title = "Generation Failed";
+
+        if (errorMsg.includes('Could not load Firebase Admin credentials')) {
+            title = "Configuration Error";
+            errorMsg = "Firebase Admin SDK is not configured. Check the FIREBASE_ADMIN_SETUP.md file.";
+        }
+
         toast({
           variant: "destructive",
-          title: "Generation Failed",
-          description: errorData.error || "Server returned an error. Please try again."
+          title,
+          description: errorMsg
         });
       }
     } catch (error: any) {
