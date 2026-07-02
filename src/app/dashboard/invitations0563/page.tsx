@@ -97,6 +97,7 @@ export default function InvitationManagerPage() {
   const pathname = usePathname();
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isViewCodeModalOpen, setIsViewCodeModalOpen] = useState(false);
   const [generatedCode, setGeneratedCode] = useState('');
@@ -136,14 +137,18 @@ export default function InvitationManagerPage() {
     setIsLoading(true);
     try {
       const idToken = await auth.currentUser?.getIdToken();
+      if (!idToken) throw new Error("No ID token found");
+
       const response = await fetch('/api/admin/invitations', {
         headers: {
             'Authorization': `Bearer ${idToken}`
         }
       });
       if (response.ok) {
-        const data = await response.ok ? await response.json() : [];
+        const data = await response.json();
         setInvitations(Array.isArray(data) ? data : []);
+      } else {
+        console.error('Failed to fetch invitations:', await response.text());
       }
     } catch (error) {
       console.error('Error fetching invitations:', error);
@@ -211,8 +216,15 @@ export default function InvitationManagerPage() {
   }
 
   const handleGenerate = async (values: z.infer<typeof InvitationSchema>) => {
+    if (isGenerating) return;
+    setIsGenerating(true);
+
     try {
       const idToken = await auth.currentUser?.getIdToken();
+      if (!idToken) {
+        throw new Error("You must be logged in to perform this action.");
+      }
+
       const response = await fetch('/api/admin/invitations', {
         method: 'POST',
         headers: {
@@ -236,9 +248,23 @@ export default function InvitationManagerPage() {
         fetchInvitations();
         form.reset();
         toast({ title: "Invitation Generated", description: "The code is ready to use." });
+      } else {
+        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
+        toast({
+          variant: "destructive",
+          title: "Generation Failed",
+          description: errorData.error || "Server returned an error. Please try again."
+        });
       }
-    } catch (error) {
-      toast({ variant: "destructive", title: "Error", description: "Failed to generate invitation." });
+    } catch (error: any) {
+      console.error("Invitation generation error:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "An unexpected error occurred."
+      });
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -295,8 +321,8 @@ export default function InvitationManagerPage() {
   };
 
   const filteredInvitations = invitations.filter(inv =>
-    inv.createdBy.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    inv.id.toLowerCase().includes(searchTerm.toLowerCase())
+    (inv.createdBy || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (inv.id || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const totalGenerated = invitations.length;
@@ -518,7 +544,18 @@ export default function InvitationManagerPage() {
 
           <div className="flex-1 overflow-y-auto p-4 sm:p-6">
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleGenerate)} id="generate-invitation-form" className="space-y-6 py-2 sm:py-4">
+                <form
+                  onSubmit={form.handleSubmit(handleGenerate, (errors) => {
+                    console.error("Form validation errors:", errors);
+                    toast({
+                      variant: "destructive",
+                      title: "Validation Error",
+                      description: "Please check the form for errors."
+                    });
+                  })}
+                  id="generate-invitation-form"
+                  className="space-y-6 py-2 sm:py-4"
+                >
                 <FormField
                     control={form.control}
                     name="type"
@@ -670,13 +707,19 @@ export default function InvitationManagerPage() {
             <Button
                 type="submit"
                 form="generate-invitation-form"
+                disabled={isGenerating}
                 className="w-full sm:w-auto h-12 rounded-xl px-8 font-bold shadow-none border-b-4 border-primary-foreground/20 active:border-b-0 transition-all"
             >
-                Generate Invitation Code <Sparkles className="ml-2 size-4" />
+                {isGenerating ? (
+                  <>Processing... <RefreshCw className="ml-2 size-4 animate-spin" /></>
+                ) : (
+                  <>Generate Invitation Code <Sparkles className="ml-2 size-4" /></>
+                )}
             </Button>
             <Button
                 type="button"
                 variant="outline"
+                disabled={isGenerating}
                 onClick={() => setIsCreateModalOpen(false)}
                 className="w-full sm:w-auto rounded-xl h-12 font-bold border-2 shadow-none"
             >

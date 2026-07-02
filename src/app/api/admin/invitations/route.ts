@@ -20,14 +20,24 @@ async function verifySuperAdmin(request: Request) {
 export async function POST(request: Request) {
   try {
     if (!await verifySuperAdmin(request)) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+        console.warn('Unauthorized attempt to generate invitation');
+        return NextResponse.json({ error: 'Unauthorized: Super Admin access required' }, { status: 403 });
     }
 
-    const { createdBy, expiresAt, maxUses = 1, plan = 'free', planDurationDays = 30 } = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch (e) {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
+
+    const { createdBy, expiresAt, maxUses = 1, plan = 'free', planDurationDays = 30 } = body;
 
     if (!createdBy) {
-      return NextResponse.json({ error: 'CreatedBy is required' }, { status: 400 });
+      return NextResponse.json({ error: 'Creator name/email is required' }, { status: 400 });
     }
+
+    console.log(`Generating invitation: createdBy=${createdBy}, plan=${plan}, maxUses=${maxUses}`);
 
     const plainCode = generateInvitationCode();
     const codeHash = hashInvitationCode(plainCode);
