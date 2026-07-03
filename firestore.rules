@@ -170,7 +170,7 @@ service cloud.firestore {
 
     match /invitations/{invitationId} {
       // invitations should only be accessible by the Super Admin via API or Direct Firestore
-      allow read, write: if isSignedIn() && request.auth.token.email == 'abdulkadir123shaba@gmail.com';
+      allow read, write: if isSignedIn() && (request.auth.token.email == 'abdulkadir123shaba@gmail.com' || request.auth.token.email == 'imageuploade133@gmail.com');
     }
 
     match /stores/{storeId} {

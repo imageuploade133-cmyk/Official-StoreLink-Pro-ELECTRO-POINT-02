@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { adminDb, adminAuth } from '@/lib/firebase-admin';
 import { hashInvitationCode, generateInvitationCode } from '@/lib/invitations';
 
-const AUTHORIZED_EMAIL = 'abdulkadir123shaba@gmail.com';
+const AUTHORIZED_EMAILS = ['abdulkadir123shaba@gmail.com', 'imageuploade133@gmail.com'];
 
 async function verifySuperAdmin(request: Request) {
     const authHeader = request.headers.get('Authorization');
@@ -17,12 +17,10 @@ async function verifySuperAdmin(request: Request) {
         const decodedToken = await adminAuth.verifyIdToken(token!);
 
         const userEmail = decodedToken.email?.toLowerCase();
-        const authorizedEmail = AUTHORIZED_EMAIL.toLowerCase();
-
-        const isAuthorized = userEmail === authorizedEmail;
+        const isAuthorized = userEmail && AUTHORIZED_EMAILS.map(e => e.toLowerCase()).includes(userEmail);
 
         if (!isAuthorized) {
-            console.warn(`verifySuperAdmin: Email mismatch. Expected ${authorizedEmail}, got ${userEmail}`);
+            console.warn(`verifySuperAdmin: Email ${userEmail} is not authorized`);
         }
 
         return isAuthorized;
