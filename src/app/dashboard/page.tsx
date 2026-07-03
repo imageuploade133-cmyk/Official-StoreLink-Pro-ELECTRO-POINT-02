@@ -24,6 +24,8 @@ import {
 import type { SaleTransaction, Product, StockTransfer as StockTransferType, SaleReturn, WebsiteTraffic, Order, Settings, AdLink } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/contexts/auth-context';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import { convertToDateSafely } from "@/lib/utils";
 import { useSettings } from '@/contexts/settings-context';
 import { PageHeader } from '@/components/PageHeader';
@@ -44,7 +46,7 @@ import { RecentTransfers } from '@/components/dashboard/RecentTransfers';
 import { type DateRange } from 'react-day-picker';
 
 export default function DashboardPage() {
-  const { permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
+  const { user, permissions, isLoading: isAuthLoading, store, staffMember } = useAuth();
   const firestore = useFirestore();
   const { settings, isLoadingSettings } = useSettings();
   const currencySymbol = settings?.currency || '$';
