@@ -142,7 +142,7 @@ export function SiteIdentitySettings({ settingsData, isLoading }: SiteIdentitySe
                     <FormItem>
                     <FormLabel>Public Store Name</FormLabel>
                     <FormControl>
-                        <Input {...field} disabled={isSaving}/>
+                        <Input {...field} />
                     </FormControl>
                     {field.value && field.value.length > 20 && (
                       <FormDescription className="text-amber-600 dark:text-amber-400 font-medium italic">
@@ -168,7 +168,7 @@ export function SiteIdentitySettings({ settingsData, isLoading }: SiteIdentitySe
                                 {...field}
                                 value={field.value ?? ''}
                                 onChange={(e) => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
-                                disabled={isSaving}
+
                                 />
                             </FormControl>
                             <FormMessage />
@@ -187,7 +187,7 @@ export function SiteIdentitySettings({ settingsData, isLoading }: SiteIdentitySe
                         <FormControl><Input {...field} value={field.value ?? ''} placeholder="https://example.com/logo-large.png" disabled={isSaving || !!uploadingField} /></FormControl>
                          <Button asChild variant="outline" size="icon" disabled={isSaving || !!uploadingField}>
                             <label htmlFor="invoice-logo-upload" className="cursor-pointer">
-                              {uploadingField === 'invoiceLogoUrl' ? <Loader2 className="h-4 w-4 animate-spin"/> : <Upload className="h-4 w-4" />}
+                              <Upload className="h-4 w-4" />
                               <span className="sr-only">Upload Invoice Logo</span>
                             </label>
                         </Button>
@@ -208,7 +208,7 @@ export function SiteIdentitySettings({ settingsData, isLoading }: SiteIdentitySe
                         <FormControl><Input {...field} value={field.value ?? ''} placeholder="https://example.com/logo-small.png" disabled={isSaving || !!uploadingField} /></FormControl>
                         <Button asChild variant="outline" size="icon" disabled={isSaving || !!uploadingField}>
                             <label htmlFor="receipt-logo-upload" className="cursor-pointer">
-                              {uploadingField === 'storeLogoUrl' ? <Loader2 className="h-4 w-4 animate-spin"/> : <Upload className="h-4 w-4" />}
+                              <Upload className="h-4 w-4" />
                               <span className="sr-only">Upload Receipt Logo</span>
                             </label>
                         </Button>
@@ -341,7 +341,7 @@ export function SiteIdentitySettings({ settingsData, isLoading }: SiteIdentitySe
                 <FormItem>
                   <FormLabel>Footer Description</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="A short description of your store for the footer..." {...field} value={field.value ?? ''} disabled={isSaving}/>
+                    <Textarea placeholder="A short description of your store for the footer..." {...field} value={field.value ?? ''} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -362,7 +362,7 @@ export function SiteIdentitySettings({ settingsData, isLoading }: SiteIdentitySe
                     <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
-                      disabled={isSaving}
+
                     />
                   </FormControl>
                 </FormItem>
@@ -371,7 +371,7 @@ export function SiteIdentitySettings({ settingsData, isLoading }: SiteIdentitySe
           </CardContent>
           <CardFooter>
             <Button type="submit" disabled={isSaving || !!uploadingField}>
-              {(isSaving || !!uploadingField) && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
+
               Save Site Identity
             </Button>
           </CardFooter>

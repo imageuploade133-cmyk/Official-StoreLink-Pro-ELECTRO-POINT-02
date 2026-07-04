@@ -195,8 +195,7 @@ export default function StoreLoginPage() {
                 </button>
               </div>
             </div>
-            <Button type="submit" style={buttonStyle} className="w-full border-none font-bold" disabled={isLoading}>
-                {isLoading && <Spinner size="sm" className="mr-2 text-primary-foreground" />}
+            <Button type="submit" style={buttonStyle} className="w-full border-none font-bold" loading={isLoading}>
               Login
             </Button>
             <div className="text-center text-sm">

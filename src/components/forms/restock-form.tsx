@@ -576,7 +576,7 @@ export function RestockForm({
                 className="flex-[2] h-12 rounded-xl text-base font-bold shadow-lg shadow-primary/20" 
                 disabled={isSubmitting || isFormInvalid}
               >
-                {isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Plus className="mr-2 h-5 w-5" />}
+                <Plus className="mr-2 h-5 w-5" />
                 Add Stock
               </Button>
             </div>
@@ -619,7 +619,7 @@ export function RestockForm({
             disabled={isSubmitting || isFormInvalid}
             className="h-11 px-8 rounded-xl font-bold shadow-lg shadow-primary/20"
           >
-            {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
+            <Plus className="mr-2 h-4 w-4" />
             Add Stock Entry
           </Button>
         </DialogFooter>

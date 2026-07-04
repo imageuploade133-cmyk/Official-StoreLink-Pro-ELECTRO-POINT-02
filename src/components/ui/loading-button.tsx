@@ -1,6 +1,4 @@
 import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { Loader2 } from "lucide-react"
 import { Button, ButtonProps } from "./button"
 
 interface LoadingButtonProps extends ButtonProps {
@@ -10,13 +8,12 @@ interface LoadingButtonProps extends ButtonProps {
 }
 
 const LoadingButton = React.forwardRef<HTMLButtonElement, LoadingButtonProps>(
-  ({ isLoading = false, loadingText, disabled, children, className, ...props }, ref) => {
+  ({ isLoading = false, loadingText, disabled, children, ...props }, ref) => {
     return (
       <Button
         ref={ref}
         loading={isLoading}
         disabled={disabled}
-        className={className}
         {...props}
       >
         {isLoading && loadingText ? loadingText : children}

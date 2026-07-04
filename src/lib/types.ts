@@ -1198,6 +1198,7 @@ export type PaymentStatus = 'PAID' | 'UNPAID' | 'PENDING' | 'REFUNDED';
 
 export interface Order {
   id: string;
+  store_id?: string;
   user_id: string; // "GUEST" for walking customers
   items: {
     productId: string;

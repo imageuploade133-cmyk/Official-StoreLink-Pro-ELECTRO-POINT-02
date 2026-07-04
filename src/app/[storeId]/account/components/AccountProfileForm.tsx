@@ -153,8 +153,7 @@ export function AccountProfileForm({ user, userProfile }: ProfileUpdateFormProps
             />
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isSaving}>
-              {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button type="submit" loading={isSaving}>
               Save Changes
             </Button>
           </CardFooter>

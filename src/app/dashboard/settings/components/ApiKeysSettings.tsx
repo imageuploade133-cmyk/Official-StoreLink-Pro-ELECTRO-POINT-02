@@ -211,15 +211,8 @@ export function ApiKeysSettings({ settingsData, isLoading, storeId }: ApiKeysSet
             />
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isSaving}>
-              {isSaving ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                'Save API Keys'
-              )}
+            <Button type="submit" loading={isSaving}>
+              Save API Keys
             </Button>
           </CardFooter>
         </form>

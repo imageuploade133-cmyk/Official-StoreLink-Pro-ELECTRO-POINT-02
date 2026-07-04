@@ -188,7 +188,7 @@ export function BulkStockUpdateDialog({
           disabled={isSubmitting || selectedProducts.length === 0} 
           className="flex-[2] sm:flex-none h-11 px-8 rounded-xl font-bold shadow-lg shadow-primary/20"
         >
-          {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
+          <Plus className="mr-2 h-4 w-4" />
           Update {selectedProducts.length} Products
         </Button>
       </div>

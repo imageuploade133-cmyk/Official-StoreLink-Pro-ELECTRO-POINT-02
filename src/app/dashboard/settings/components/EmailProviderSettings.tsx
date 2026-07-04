@@ -319,9 +319,9 @@ export function EmailProviderSettings({ storeId }: EmailProviderSettingsProps) {
                                     variant="outline" 
                                     className="rounded-2xl h-12 px-6 border-gray-200 hover:bg-gray-50 transition-all"
                                     onClick={handleSendTest}
-                                    disabled={isSendingTest}
+                                    loading={isSendingTest}
                                 >
-                                    {isSendingTest ? <Loader2 className="h-4 w-4 animate-spin"/> : <Send className="h-4 w-4 mr-2"/>}
+                                    <Send className="h-4 w-4 mr-2"/>
                                     Send Test
                                 </Button>
                             </div>
@@ -337,10 +337,10 @@ export function EmailProviderSettings({ storeId }: EmailProviderSettingsProps) {
           <CardFooter className="px-8 py-8 border-t border-gray-50 dark:border-border/50 bg-gray-50/30 dark:bg-muted/10">
             <Button 
                 type="submit" 
-                disabled={isSaving} 
+                loading={isSaving}
                 className="w-full md:w-auto ml-auto rounded-2xl h-12 px-10 bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-200 dark:shadow-none transition-all active:scale-[0.98]"
             >
-              {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
+
               Save Email Settings
             </Button>
           </CardFooter>

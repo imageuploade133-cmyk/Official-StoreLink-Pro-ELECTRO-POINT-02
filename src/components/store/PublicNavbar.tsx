@@ -469,7 +469,7 @@ function UserButton({ isLoading, user, staffMember, router, handleLogout, getIni
     getStoreUrl: (path: string) => string
 }) {
     if (isLoading) {
-        return <Button variant="ghost" size="icon" className="hidden sm:inline-flex text-slate-600 dark:text-slate-300"><Loader2 className="h-5 w-5 animate-spin" /></Button>
+        return <Button variant="ghost" size="icon" className="hidden sm:inline-flex text-slate-600 dark:text-slate-300" loading={true} />
     }
     if (user) {
         return (

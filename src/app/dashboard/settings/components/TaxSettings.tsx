@@ -146,8 +146,8 @@ export function TaxSettings({ settingsData, isLoading, storeId }: TaxSettingsPro
             )}
           </CardContent>
           <CardFooter className="bg-muted/30 border-t p-6">
-            <Button type="submit" disabled={isSaving} className="font-bold h-11 px-8">
-              {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
+            <Button type="submit" loading={isSaving} className="font-bold h-11 px-8">
+
               Save Tax Settings
             </Button>
           </CardFooter>

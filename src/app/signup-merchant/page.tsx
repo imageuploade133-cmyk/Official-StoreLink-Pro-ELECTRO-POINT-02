@@ -365,11 +365,10 @@ export default function MerchantSignupPage() {
                                     }
                                 }}
                                 className="w-full h-12 bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-xl font-semibold shadow-sm transition-all flex items-center justify-center gap-2"
-                                disabled={isValidatingCode || !invitationCode}
+                                loading={isValidatingCode}
+                                disabled={!invitationCode}
                             >
-                                {isValidatingCode ? <Spinner size="sm" /> : (
-                                    <>Verify Invitation <ArrowRight className="w-4 h-4" /></>
-                                )}
+                                Verify Invitation <ArrowRight className="w-4 h-4" />
                             </Button>
                         </div>
                     ) : (
@@ -561,14 +560,12 @@ export default function MerchantSignupPage() {
                                     <Button 
                                         type="submit" 
                                         className="flex-1 h-12 bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-xl font-semibold shadow-sm transition-all group" 
-                                        disabled={isLoading}
+                                        loading={isLoading}
                                     >
-                                        {isLoading ? <Spinner size="sm" className="mr-2" /> : (
-                                            <span className="flex items-center">
-                                                Create My Store
-                                                <Sparkles className="ml-2 h-4 w-4 group-hover:rotate-12 transition-transform" />
-                                            </span>
-                                        )}
+                                        <span className="flex items-center">
+                                            Create My Store
+                                            <Sparkles className="ml-2 h-4 w-4 group-hover:rotate-12 transition-transform" />
+                                        </span>
                                     </Button>
                                 )}
                             </div>

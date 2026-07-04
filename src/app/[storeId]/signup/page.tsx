@@ -482,8 +482,8 @@ export default function StoreSignupPage() {
                             Next <ChevronRight className="ml-2 h-4 w-4" />
                         </Button>
                     ) : (
-                        <Button type="submit" style={buttonStyle} className="flex-1 h-12 font-bold border-none" disabled={isSubmitting}>
-                            {isSubmitting ? <><Spinner size="sm" className="mr-2 text-primary-foreground" />Creating Account…</> : 'Create Account'}
+                        <Button type="submit" style={buttonStyle} className="flex-1 h-12 font-bold border-none" loading={isSubmitting}>
+                            Create Account
                         </Button>
                     )}
                 </div>

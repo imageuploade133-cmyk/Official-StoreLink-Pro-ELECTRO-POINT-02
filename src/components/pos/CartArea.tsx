@@ -254,8 +254,8 @@ export function CartArea({
                         {!selectedCustomer && cartItems.length > 0 && (<TooltipContent><p>Please select an active customer for a credit sale.</p></TooltipContent>)}
                         {selectedCustomer && selectedCustomer.status !== 'active' && cartItems.length > 0 && (<TooltipContent><p>Customer {selectedCustomer.name} is {selectedCustomer.status} and cannot make credit purchases.</p></TooltipContent>)}
                     </Tooltip>
-                    <Button className="h-11 col-span-1 btn-confirm-pos" onClick={onInitiatePayment} disabled={cartItems.length === 0 || isProcessingSale}>{isProcessingSale && (<Loader2 className="mr-1.5 h-4 w-4 animate-spin" />)}<CheckIconLucide className="mr-1.5 h-4 w-4" /> Pay Now</Button>
-                    <Button variant="outline" className="h-11" onClick={onInitiateHoldSale} disabled={cartItems.length === 0 || isProcessingSale}>{isProcessingSale && (<Loader2 className="mr-1.5 h-4 w-4 animate-spin" />)}<PauseCircle className="mr-1.5 h-4 w-4" /> Hold Sale</Button>
+                    <Button className="h-11 col-span-1 btn-confirm-pos" onClick={onInitiatePayment} disabled={cartItems.length === 0} loading={isProcessingSale}>{!isProcessingSale && <CheckIconLucide className="mr-1.5 h-4 w-4" />} Pay Now</Button>
+                    <Button variant="outline" className="h-11" onClick={onInitiateHoldSale} disabled={cartItems.length === 0} loading={isProcessingSale}>{!isProcessingSale && <PauseCircle className="mr-1.5 h-4 w-4" />} Hold Sale</Button>
                 </div>
             </div>
             </CardContent>

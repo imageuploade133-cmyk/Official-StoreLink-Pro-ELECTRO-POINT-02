@@ -165,7 +165,7 @@ export function BulkRestockDialog({ isOpen, onOpenChange, products, isSubmitting
             <DialogFooter className="p-6 pt-4 border-t mt-auto">
               <DialogClose asChild><Button type="button" variant="outline">Cancel</Button></DialogClose>
               <Button type="submit" disabled={isSubmitting || fields.length === 0}>
-                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+
                 Submit Bulk Adjustment
               </Button>
             </DialogFooter>

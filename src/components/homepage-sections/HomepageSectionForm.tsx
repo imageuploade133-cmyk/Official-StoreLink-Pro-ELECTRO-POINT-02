@@ -1348,7 +1348,7 @@ export function HomepageSectionForm({ defaultValues, onSubmit, isSaving }: Homep
 
                 <div className="flex justify-end gap-4">
                     <Button type="submit" disabled={isSaving} size="lg" className="min-w-[200px] h-14 text-lg font-black shadow-lg shadow-primary/20">
-                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                        <Save className="mr-2 h-4 w-4" />
                         {isSaving ? 'Syncing...' : 'Save Configuration'}
                     </Button>
                 </div>

@@ -254,7 +254,7 @@ export function CashDepositDialog({
                 <TooltipTrigger asChild>
                     <div> 
                         <Button onClick={handleSubmit} disabled={isSubmitDisabled}>
-                            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
+
                             Confirm Deposit
                         </Button>
                     </div>

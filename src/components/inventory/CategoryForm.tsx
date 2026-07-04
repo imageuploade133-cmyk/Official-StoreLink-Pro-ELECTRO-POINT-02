@@ -294,7 +294,7 @@ export function CategoryForm({
               </Button>
             )}
             <Button type="submit" disabled={isSubmitting || isUploading} className="min-w-[150px] font-bold shadow-lg shadow-primary/20 h-11">
-              {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              <Save className="mr-2 h-4 w-4" />
               Create Category
             </Button>
           </div>
@@ -612,7 +612,7 @@ export function CategoryForm({
 
           <CardFooter className="bg-muted/30 border-t p-6 shrink-0 flex justify-between items-center gap-4 flex-wrap">
             <Button type="submit" disabled={isSubmitting || isUploading} size="lg" className="px-8 h-12 font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20">
-              {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              <Save className="mr-2 h-4 w-4" />
               {isEditMode ? "Update Collection" : "Publish Category"}
             </Button>
             {onCancel ? (

@@ -66,38 +66,41 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       }
     }
 
-    // Heuristic for back button: check children for "Back" text
-    const getText = (node: React.ReactNode): string => {
+    // Auto-apply special styles based on children text or button type
+    const getTextContent = (node: React.ReactNode): string => {
       if (typeof node === 'string') return node;
       if (typeof node === 'number') return String(node);
-      if (Array.isArray(node)) return node.map(getText).join('');
-      if (React.isValidElement(node)) return getText((node as any).props.children);
+      if (Array.isArray(node)) return node.map(getTextContent).join('');
+      if (React.isValidElement(node)) return getTextContent((node as any).props.children);
       return '';
     };
     
-    // Auto-apply special styles for Save buttons (submit type or "Save"/"Pay"/"Confirm" text)
-    // Back buttons (containing "Back" text)
-    // and Add buttons (containing "Add" text)
-    const textContent = getText(children);
+    const textContent = getTextContent(children);
     const isSave = props.type === "submit" || (/\b(save|pay|confirm|update|create)\b/i.test(textContent) && !/wishlist/i.test(textContent));
-
     const isBack = /\b(back|cancel|close)\b/i.test(textContent) || (typeof className === 'string' && className.includes("btn-back"));
-
     const isAdd = /\badd\b/i.test(textContent) || (typeof className === 'string' && className.includes("btn-add"));
-
     const isDelete = /\b(delete|remove|clear)\b/i.test(textContent) || variant === 'destructive';
 
     const specialClass = isSave ? "btn-save" : (isBack ? "btn-back" : (isAdd ? "btn-add" : (isDelete ? "btn-destructive-action" : "")));
 
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }), specialClass)}
+        className={cn(buttonVariants({ variant, size, className }), specialClass, "relative")}
         ref={ref}
         disabled={loading || disabled}
         onClick={handleClick}
         {...props}
       >
-        {asChild ? children : (
+        {asChild ? (
+          <>
+            {loading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-inherit rounded-inherit">
+                <Spinner size="sm" />
+              </div>
+            )}
+            <div className={cn(loading && "opacity-0")}>{children}</div>
+          </>
+        ) : (
           <>
             {loading && <Spinner size="sm" className="mr-2" />}
             {children}

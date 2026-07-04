@@ -318,7 +318,7 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
                                     onClick={handleValidateConnection}
                                     disabled={isValidating}
                                 >
-                                    {isValidating ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Key className="h-3 w-3 mr-1" />}
+                                    <Key className="h-3 w-3 mr-1" />
                                     Test Connection
                                 </Button>
                             </FormLabel>
@@ -454,15 +454,15 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
                 onClick={handleSendTest}
                 disabled={isSendingTest || !form.watch('enabled')}
             >
-                {isSendingTest ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Send className="mr-2 h-4 w-4"/>}
+                <Send className="mr-2 h-4 w-4"/>
                 Test Message
             </Button>
             <Button 
                 type="submit" 
-                disabled={isSaving} 
+                loading={isSaving}
                 className="rounded-xl px-8 h-12 font-semibold shadow-lg shadow-[#25D366]/20 transition-all hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] bg-[#25D366] hover:bg-[#128C7E] text-white"
             >
-              {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Save className="mr-2 h-4 w-4" />}
+              {!isSaving && <Save className="mr-2 h-4 w-4" />}
               Save Settings
             </Button>
           </CardFooter>

@@ -286,7 +286,7 @@ export function RecordDepositDialog({
               <Button type="button" variant="outline" className="h-11 font-bold">Cancel</Button>
             </DialogClose>
             <Button type="submit" disabled={isSubmitting || !amount} className="h-11 px-8 font-black uppercase tracking-widest shadow-lg shadow-primary/20">
-              {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              <Save className="mr-2 h-4 w-4" />
               Post Payment
             </Button>
           </DialogFooter>

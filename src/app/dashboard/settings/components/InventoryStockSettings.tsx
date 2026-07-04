@@ -200,12 +200,12 @@ export function InventoryStockSettings({ settingsData, isLoading, storeId }: Inv
                 <FormItem>
                   <FormLabel>Default Product Image URL</FormLabel>
                   <div className="flex items-center gap-2">
-                    <FormControl><Input {...field} placeholder="https://example.com/default-image.png" disabled={isSaving || isUploading} /></FormControl>
-                    <Button asChild variant="outline" disabled={isSaving || isUploading}>
+                    <FormControl><Input {...field} placeholder="https://example.com/default-image.png"  /></FormControl>
+                    <Button asChild variant="outline" loading={isSaving || isUploading}>
                         <label htmlFor="product-image-upload" className="cursor-pointer">
-                            {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Upload className="mr-2 h-4 w-4" />}
+                            <Upload className="mr-2 h-4 w-4" />
                             Upload
-                            <Input id="product-image-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isSaving || isUploading} />
+                            <Input id="product-image-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload}  />
                         </label>
                     </Button>
                   </div>
@@ -275,8 +275,8 @@ export function InventoryStockSettings({ settingsData, isLoading, storeId }: Inv
             )}
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isSaving || isUploading}>
-              {(isSaving || isUploading) && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
+            <Button type="submit" loading={isSaving || isUploading}>
+
               Save Inventory & Alert Settings
             </Button>
           </CardFooter>

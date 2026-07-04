@@ -214,15 +214,11 @@ export default function AdminLoginPage() {
                                     </Label>
                                 </div>
 
-                                <Button type="submit" className="w-full h-12 rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold transition-all shadow-sm group mt-2" disabled={isLoading}>
-                                    {isLoading ? (
-                                        <Spinner size="sm" className="text-white" />
-                                    ) : (
-                                        <span className="flex items-center justify-center gap-2">
-                                            Sign In
-                                            <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
-                                        </span>
-                                    )}
+                                <Button type="submit" className="w-full h-12 rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold transition-all shadow-sm group mt-2" loading={isLoading}>
+                                    <span className="flex items-center justify-center gap-2">
+                                        Sign In
+                                        <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+                                    </span>
                                 </Button>
 
                                 <div className="pt-6 text-center lg:text-left">

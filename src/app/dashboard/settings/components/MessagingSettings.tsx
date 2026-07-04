@@ -231,8 +231,8 @@ export function MessagingSettings({ settingsData, isLoading, storeId }: Messagin
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isSaving}>
-              {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
+            <Button type="submit" loading={isSaving}>
+
               Save Messaging Settings
             </Button>
           </CardFooter>

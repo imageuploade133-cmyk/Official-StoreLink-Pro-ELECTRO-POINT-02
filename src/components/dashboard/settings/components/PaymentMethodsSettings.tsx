@@ -238,7 +238,7 @@ function PaymentMethodFormDialog({ isOpen, onOpenChange, onSubmit, isSaving, def
                 <FormItem>
                   <FormLabel>Method Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Cash or Bank Transfer" {...field} disabled={isSaving || isUploading} />
+                    <Input placeholder="e.g., Cash or Bank Transfer" {...field}  />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -252,24 +252,24 @@ function PaymentMethodFormDialog({ isOpen, onOpenChange, onSubmit, isSaving, def
                   <FormLabel>Icon URL (Optional)</FormLabel>
                    <div className="flex items-center gap-2">
                     <FormControl>
-                      <Input placeholder="https://example.com/icon.png" {...field} value={field.value || ''} disabled={isSaving || isUploading} />
+                      <Input placeholder="https://example.com/icon.png" {...field} value={field.value || ''}  />
                     </FormControl>
-                    <Button asChild variant="outline" disabled={isSaving || isUploading}>
+                    <Button asChild variant="outline" loading={isSaving || isUploading}>
                       <label htmlFor="icon-upload" className="cursor-pointer">
-                        {isUploading ? <Loader2 className="h-4 w-4 animate-spin"/> : <Upload className="h-4 w-4" />}
+                        <Upload className="h-4 w-4" />
                         <span className="sr-only">Upload Icon</span>
                       </label>
                     </Button>
-                    <Input id="icon-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isSaving || isUploading} />
+                    <Input id="icon-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload}  />
                   </div>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <DialogFooter>
-              <DialogClose asChild><Button type="button" variant="outline" disabled={isSaving || isUploading}>Cancel</Button></DialogClose>
-              <Button type="submit" disabled={isSaving || isUploading}>
-                {(isSaving || isUploading) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <DialogClose asChild><Button type="button" variant="outline" loading={isSaving || isUploading}>Cancel</Button></DialogClose>
+              <Button type="submit" loading={isSaving || isUploading}>
+
                 Save Method
               </Button>
             </DialogFooter>

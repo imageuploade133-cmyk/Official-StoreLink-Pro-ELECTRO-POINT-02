@@ -181,7 +181,7 @@ export function CustomerFormDialog({ open, onOpenChange, onSubmit, defaultValues
         </div>
         <DialogFooter className="p-4 sm:p-6 border-t mt-auto flex flex-col gap-2">
             <Button type="submit" form="customer-form" disabled={isSaving} className="w-full sm:w-auto h-11 font-bold">
-                {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+
                 {isEditing ? 'Save Changes' : 'Create Customer'}
             </Button>
             <DialogClose asChild>
