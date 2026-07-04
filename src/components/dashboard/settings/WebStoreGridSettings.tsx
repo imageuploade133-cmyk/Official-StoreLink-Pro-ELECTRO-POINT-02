@@ -336,19 +336,14 @@ export function WebStoreGridSettings({ settingsData, isLoading, storeId }: WebSt
         <div className="flex flex-col sm:flex-row gap-4 pt-4">
           <Button 
             onClick={handleSave} 
-            disabled={isSaving || isLoading}
+
             className={cn(
               "flex-1 transition-all",
               saveStatus === 'success' && 'bg-green-600 hover:bg-green-700',
               saveStatus === 'error' && 'bg-red-600 hover:bg-red-700'
             )}
           >
-            {isSaving ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Saving Grid Layout...
-              </>
-            ) : saveStatus === 'success' ? (
+            {saveStatus === 'success' ? (
               <>
                 <Check className="h-4 w-4 mr-2" />
                 Saved
@@ -360,7 +355,7 @@ export function WebStoreGridSettings({ settingsData, isLoading, storeId }: WebSt
           <Button
             variant="outline"
             onClick={handleReset}
-            disabled={isSaving || isLoading}
+
           >
             <RotateCcw className="h-4 w-4 mr-2" />
             Reset to Default

@@ -331,7 +331,7 @@ export function ColorSettings({ settingsData, isLoading, storeId }: ColorSetting
                             className="w-full sm:w-auto"
                           >
                             <label htmlFor="image-upload" className="cursor-pointer justify-center">
-                              {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Upload className="mr-2 h-4 w-4" />}
+                              <Upload className="mr-2 h-4 w-4" />
                               {isUploading ? 'Uploading...' : 'Upload'}
                               <Input 
                                 id="image-upload" 
@@ -364,11 +364,11 @@ export function ColorSettings({ settingsData, isLoading, storeId }: ColorSetting
             
           </CardContent>
           <CardFooter className="flex flex-col sm:flex-row gap-4 justify-between items-center">
-            <Button type="submit" disabled={isSaving || isUploading}>
-              {(isSaving || isUploading) && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
+            <Button type="submit" loading={isSaving || isUploading}>
+
               {isSaving ? 'Saving...' : isUploading ? 'Uploading...' : 'Save Theme Settings'}
             </Button>
-            <Button type="button" variant="outline" onClick={handleReset} disabled={isSaving || isUploading}>
+            <Button type="button" variant="outline" onClick={handleReset} loading={isSaving || isUploading}>
               <RotateCcw className="mr-2 h-4 w-4"/>
               Reset to Default
             </Button>

@@ -1691,18 +1691,15 @@ export default function ProductDetailsPage() {
                 <Button
                   onClick={isOutOfStock ? () => setIsOutOfDataDrawerOpen(true) : handleAddToCart}
                   style={isOutOfStock ? { backgroundColor: '#e2e8f0', color: '#94a3b8' } : buttonStyle}
-                  disabled={isChangingVariant || isAddingToCart}
+                  loading={isAddingToCart}
+                  disabled={isChangingVariant}
                   className={cn(
                       "flex-1 font-semibold tracking-tight shadow-sm transition-all active:scale-[0.98] group",
                       buttonClasses,
                       (isOutOfStock || isChangingVariant) && "cursor-pointer"
                   )}
                 >
-                  {isAddingToCart ? (
-                    <Loader2 className="mr-2 md:mr-3 h-4 md:h-5 w-4 md:w-5 animate-spin" />
-                  ) : (
-                    <AddToCartIcon className="mr-2 md:mr-3 h-4 md:h-5 w-4 md:w-5" />
-                  )}
+                  {!isAddingToCart && <AddToCartIcon className="mr-2 md:mr-3 h-4 md:h-5 w-4 md:w-5" />}
                   {isOutOfStock ? "Out of Stock" : (isChangingVariant ? "Updating.." : addToCartText)}
                 </Button>
               </div>
@@ -1796,20 +1793,11 @@ export default function ProductDetailsPage() {
                           router.push(getStoreUrl(`/store/checkout/installment?productId=${product.id}&qty=${quantity}&variantId=${selectedVariant?.id || ''}`));
                         }, 300);
                       }}
-                      disabled={isLoadingInstallment}
+                      loading={isLoadingInstallment}
                       className="w-full h-16 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-slate-200 dark:shadow-none group"
                     >
-                      {isLoadingInstallment ? (
-                        <>
-                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                          <span className="text-lg font-black tracking-tight">Loading...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span className="text-lg font-black tracking-tight">Choose Installment Plan</span>
-                          <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                        </>
-                      )}
+                      <span className="text-lg font-black tracking-tight">Choose Installment Plan</span>
+                      <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                     </Button>
                     
                     {product.installmentTerms && (
@@ -2160,10 +2148,9 @@ export default function ProductDetailsPage() {
 	                          <Button 
 	                            variant="outline" 
 	                            onClick={loadMore} 
-	                            disabled={isLoadingReviews}
+	                            loading={isLoadingReviews}
 	                            className="rounded-full px-8"
 	                          >
-	                            {isLoadingReviews ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
 	                            Load More Reviews
 	                          </Button>
 	                        </div>

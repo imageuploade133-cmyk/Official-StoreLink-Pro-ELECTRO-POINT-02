@@ -76,7 +76,7 @@ export function AdminAuthDialog({ isOpen, onOpenChange, userEmail, onConfirm, is
       <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 gap-2 mt-4">
         <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isProcessing}>Cancel</Button>
         <Button onClick={handleConfirm} disabled={isProcessing}>
-          {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+
           {confirmButtonText || 'Confirm Action'}
         </Button>
       </div>

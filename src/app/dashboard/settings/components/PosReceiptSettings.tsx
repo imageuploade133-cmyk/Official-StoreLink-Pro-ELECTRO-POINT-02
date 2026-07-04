@@ -170,8 +170,8 @@ export function PosReceiptSettings({ settingsData, isLoading, storeId }: PosRece
             </div>
           </CardContent>
           <CardFooter className="flex-col items-start gap-4">
-            <Button type="submit" disabled={isSaving}>
-              {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
+            <Button type="submit" loading={isSaving}>
+
               Save POS Settings
             </Button>
             <Button variant="outline" type="button" onClick={() => setIsPreviewOpen(true)}>

@@ -546,7 +546,7 @@ export function OrderDetailsModal({
                 disabled={isPrinting || !!updatingStatus}
                 className="h-9 px-3 sm:px-4 font-bold border-[#25D366] text-[#25D366] hover:bg-[#25D366]/5 text-[10px] sm:text-xs flex-1 sm:flex-none"
             >
-                <MessageSquare className="mr-1.5 sm:mr-2 h-3.5 sm:h-4 w-3.5 sm:w-4" />
+                {!isResendingWhatsApp && <MessageSquare className="mr-1.5 sm:mr-2 h-3.5 sm:h-4 w-3.5 sm:w-4" />}
                 Resend Alert
             </Button>
             <Button 

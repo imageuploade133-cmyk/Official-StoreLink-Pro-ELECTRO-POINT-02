@@ -184,7 +184,7 @@ export function ExpenseForm({ onAddExpense, isSubmitting, balanceByMethod }: Exp
                         <FormField name="expenseDate" control={form.control} render={({ field }) => (<FormItem className="flex flex-col"><FormLabel>Expense Date</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant="outline" className={cn("w-full justify-start text-left font-normal", !field.value && "text-muted-foreground")}><CalendarIcon className="mr-2 h-4 w-4" />{field.value ? formatDate(field.value, "PPP") : "Pick a date"}</Button></FormControl></PopoverTrigger><PopoverContent><Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date()}/></PopoverContent></Popover><FormMessage /></FormItem>)} />
                         <FormField name="notes" control={form.control} render={({ field }) => (<FormItem><FormLabel>Notes (Optional)</FormLabel><FormControl><Textarea placeholder="Any additional details..." {...field} /></FormControl><FormMessage /></FormItem>)} />
                         <Button type="submit" className="w-full" disabled={isSubmitting || (isInsufficientForSingle && !useMultipleAccounts) || (useMultipleAccounts && !isMultiAccountSumValid)}>
-                            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
+
                             <PlusCircle className="mr-2 h-4 w-4"/> Add Expense
                         </Button>
                     </form>

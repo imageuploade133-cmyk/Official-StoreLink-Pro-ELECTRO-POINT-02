@@ -394,7 +394,7 @@ export default function StaffFormDialog({
             <Button variant="outline" disabled={isSubmitting}>Cancel</Button>
           </DialogClose>
           <Button type="submit" form="staff-form" disabled={isSubmitting}>
-            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+
             {existingStaff ? 'Save Changes' : 'Create Staff Account'}
           </Button>
         </DialogFooter>

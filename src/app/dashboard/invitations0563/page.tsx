@@ -724,14 +724,10 @@ export default function InvitationManagerPage() {
             <Button
                 type="submit"
                 form="generate-invitation-form"
-                disabled={isGenerating}
+                loading={isGenerating}
                 className="w-full sm:w-auto h-12 rounded-xl px-8 font-bold shadow-none border-b-4 border-primary-foreground/20 active:border-b-0 transition-all"
             >
-                {isGenerating ? (
-                  <>Processing... <RefreshCw className="ml-2 size-4 animate-spin" /></>
-                ) : (
-                  <>Generate Invitation Code <Sparkles className="ml-2 size-4" /></>
-                )}
+                Generate Invitation Code <Sparkles className="ml-2 size-4" />
             </Button>
             <Button
                 type="button"

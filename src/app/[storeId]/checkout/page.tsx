@@ -711,11 +711,11 @@ export default function CheckoutPage() {
                                                     </div>
                                                 ) : (
                                                     <div className="flex items-center gap-2">
-                                                        <Button asChild variant="outline" className="w-full h-12" disabled={isUploadingReceipt}>
+                                                        <Button asChild variant="outline" className="w-full h-12" loading={isUploadingReceipt}>
                                                             <label className="cursor-pointer">
-                                                                {isUploadingReceipt ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-                                                                {isUploadingReceipt ? 'Uploading...' : 'Upload Payment Receipt'}
-                                                                <input type="file" accept="image/*" className="hidden" onChange={handleReceiptUpload} disabled={isUploadingReceipt} />
+                                                                <Upload className="mr-2 h-4 w-4" />
+                                                                Upload Payment Receipt
+                                                                <input type="file" accept="image/*" className="hidden" onChange={handleReceiptUpload}  />
                                                             </label>
                                                         </Button>
                                                     </div>

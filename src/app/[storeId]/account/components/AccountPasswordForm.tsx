@@ -209,8 +209,8 @@ export function AccountPasswordForm({ user }: PasswordChangeFormProps) {
             </div>
           </CardContent>
           <CardFooter className="bg-muted/5 border-t py-4">
-            <Button type="submit" disabled={isSaving} className="w-full sm:w-auto h-11 px-8 rounded-xl font-bold shadow-md shadow-primary/10 active:scale-95 transition-all">
-              {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ShieldCheck className="mr-2 h-4 w-4" />}
+            <Button type="submit" loading={isSaving} className="w-full sm:w-auto h-11 px-8 rounded-xl font-bold shadow-md shadow-primary/10 active:scale-95 transition-all">
+              <ShieldCheck className="mr-2 h-4 w-4" />
               Update Password
             </Button>
           </CardFooter>

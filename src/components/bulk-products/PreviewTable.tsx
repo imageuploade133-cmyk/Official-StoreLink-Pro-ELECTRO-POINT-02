@@ -58,7 +58,7 @@ export function PreviewTable({ parsedData, currencySymbol, onImport, isProcessin
       </CardContent>
       <CardFooter>
         <Button onClick={onImport} disabled={parsedData.length === 0 || isProcessing}>
-          {isProcessing ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <CheckCircle className="mr-2 h-4 w-4" />}
+          <CheckCircle className="mr-2 h-4 w-4" />
           {isProcessing ? 'Processing...' : `Import ${parsedData.length} Products`}
         </Button>
       </CardFooter>

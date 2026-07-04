@@ -1062,14 +1062,14 @@ export default function WebsitePaymentSettings() {
                       </div>
                       <PaymentMethodLogoUpload form={paystackForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={paystackForm.control} name="allowedLocations" />
-                      <PaymentRegionSelector control={paystackForm.control} name="paymentRegion" disabled={isSaving} />
+                      <PaymentRegionSelector control={paystackForm.control} name="paymentRegion" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
-                      <Button type="submit" disabled={isSaving}>
-                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                      <Button type="submit" loading={isSaving}>
+                        <Save className="mr-2 h-4 w-4" />
                         Save Paystack Settings
                       </Button>
-                      <Button type="button" variant="outline" onClick={() => testConnection('paystack')} disabled={isSaving}>
+                      <Button type="button" variant="outline" onClick={() => testConnection('paystack')} loading={isSaving}>
                         Test Connection
                       </Button>
                     </CardFooter>
@@ -1229,14 +1229,14 @@ export default function WebsitePaymentSettings() {
                       />
                       <PaymentMethodLogoUpload form={flutterwaveForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={flutterwaveForm.control} name="allowedLocations" />
-                      <PaymentRegionSelector control={flutterwaveForm.control} name="paymentRegion" disabled={isSaving} />
+                      <PaymentRegionSelector control={flutterwaveForm.control} name="paymentRegion" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
-                      <Button type="submit" disabled={isSaving}>
-                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                      <Button type="submit" loading={isSaving}>
+                        <Save className="mr-2 h-4 w-4" />
                         Save Flutterwave Settings
                       </Button>
-                      <Button type="button" variant="outline" onClick={() => testConnection('flutterwave')} disabled={isSaving}>
+                      <Button type="button" variant="outline" onClick={() => testConnection('flutterwave')} loading={isSaving}>
                         Test Connection
                       </Button>
                     </CardFooter>
@@ -1367,14 +1367,14 @@ export default function WebsitePaymentSettings() {
                       </div>
                       <PaymentMethodLogoUpload form={stripeForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={stripeForm.control} name="allowedLocations" />
-                      <PaymentRegionSelector control={stripeForm.control} name="paymentRegion" disabled={isSaving} />
+                      <PaymentRegionSelector control={stripeForm.control} name="paymentRegion" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
-                      <Button type="submit" disabled={isSaving}>
-                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                      <Button type="submit" loading={isSaving}>
+                        <Save className="mr-2 h-4 w-4" />
                         Save Stripe Settings
                       </Button>
-                      <Button type="button" variant="outline" onClick={() => testConnection('stripe')} disabled={isSaving}>
+                      <Button type="button" variant="outline" onClick={() => testConnection('stripe')} loading={isSaving}>
                         Test Connection
                       </Button>
                     </CardFooter>
@@ -1505,14 +1505,14 @@ export default function WebsitePaymentSettings() {
                       </div>
                       <PaymentMethodLogoUpload form={paypalForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={paypalForm.control} name="allowedLocations" />
-                      <PaymentRegionSelector control={paypalForm.control} name="paymentRegion" disabled={isSaving} />
+                      <PaymentRegionSelector control={paypalForm.control} name="paymentRegion" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
-                      <Button type="submit" disabled={isSaving}>
-                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                      <Button type="submit" loading={isSaving}>
+                        <Save className="mr-2 h-4 w-4" />
                         Save PayPal Settings
                       </Button>
-                      <Button type="button" variant="outline" onClick={() => testConnection('paypal')} disabled={isSaving}>
+                      <Button type="button" variant="outline" onClick={() => testConnection('paypal')} loading={isSaving}>
                         Test Connection
                       </Button>
                     </CardFooter>
@@ -1667,14 +1667,14 @@ export default function WebsitePaymentSettings() {
                       />
                       <PaymentMethodLogoUpload form={opayForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={opayForm.control} name="allowedLocations" />
-                      <PaymentRegionSelector control={opayForm.control} name="paymentRegion" disabled={isSaving} />
+                      <PaymentRegionSelector control={opayForm.control} name="paymentRegion" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
-                      <Button type="submit" disabled={isSaving}>
-                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                      <Button type="submit" loading={isSaving}>
+                        <Save className="mr-2 h-4 w-4" />
                         Save OPay Settings
                       </Button>
-                      <Button type="button" variant="outline" onClick={() => testConnection('opay')} disabled={isSaving}>
+                      <Button type="button" variant="outline" onClick={() => testConnection('opay')} loading={isSaving}>
                         Test Connection
                       </Button>
                     </CardFooter>
@@ -1829,14 +1829,14 @@ export default function WebsitePaymentSettings() {
                       />
                       <PaymentMethodLogoUpload form={palmpayForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={palmpayForm.control} name="allowedLocations" />
-                      <PaymentRegionSelector control={palmpayForm.control} name="paymentRegion" disabled={isSaving} />
+                      <PaymentRegionSelector control={palmpayForm.control} name="paymentRegion" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
-                      <Button type="submit" disabled={isSaving}>
-                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                      <Button type="submit" loading={isSaving}>
+                        <Save className="mr-2 h-4 w-4" />
                         Save PalmPay Settings
                       </Button>
-                      <Button type="button" variant="outline" onClick={() => testConnection('palmpay')} disabled={isSaving}>
+                      <Button type="button" variant="outline" onClick={() => testConnection('palmpay')} loading={isSaving}>
                         Test Connection
                       </Button>
                     </CardFooter>
@@ -1903,11 +1903,11 @@ export default function WebsitePaymentSettings() {
                       />
                       <PaymentMethodLogoUpload form={payOnDeliveryForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={payOnDeliveryForm.control} name="allowedLocations" />
-                      <PaymentRegionSelector control={payOnDeliveryForm.control} name="paymentRegion" disabled={isSaving} />
+                      <PaymentRegionSelector control={payOnDeliveryForm.control} name="paymentRegion" />
                     </CardContent>
                     <CardFooter className="border-t pt-6">
-                      <Button type="submit" disabled={isSaving}>
-                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                      <Button type="submit" loading={isSaving}>
+                        <Save className="mr-2 h-4 w-4" />
                         Save Settings
                       </Button>
                     </CardFooter>
@@ -2045,14 +2045,14 @@ export default function WebsitePaymentSettings() {
                       </div>
                       <PaymentMethodLogoUpload form={nowpaymentsForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={nowpaymentsForm.control} name="allowedLocations" />
-                      <PaymentRegionSelector control={nowpaymentsForm.control} name="paymentRegion" disabled={isSaving} />
+                      <PaymentRegionSelector control={nowpaymentsForm.control} name="paymentRegion" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
-                      <Button type="submit" disabled={isSaving}>
-                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                      <Button type="submit" loading={isSaving}>
+                        <Save className="mr-2 h-4 w-4" />
                         Save NOWPayments Settings
                       </Button>
-                      <Button type="button" variant="outline" onClick={() => testConnection('nowpayments')} disabled={isSaving}>
+                      <Button type="button" variant="outline" onClick={() => testConnection('nowpayments')} loading={isSaving}>
                         Test Connection
                       </Button>
                     </CardFooter>
@@ -2227,14 +2227,14 @@ export default function WebsitePaymentSettings() {
                       </div>
                       <PaymentMethodLogoUpload form={monnifyForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={monnifyForm.control} name="allowedLocations" />
-                      <PaymentRegionSelector control={monnifyForm.control} name="paymentRegion" disabled={isSaving} />
+                      <PaymentRegionSelector control={monnifyForm.control} name="paymentRegion" />
                     </CardContent>
                     <CardFooter className="border-t pt-6 flex gap-2">
-                      <Button type="submit" disabled={isSaving}>
-                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                      <Button type="submit" loading={isSaving}>
+                        <Save className="mr-2 h-4 w-4" />
                         Save Monnify Settings
                       </Button>
-                      <Button type="button" variant="outline" onClick={() => testConnection('monnify')} disabled={isSaving}>
+                      <Button type="button" variant="outline" onClick={() => testConnection('monnify')} loading={isSaving}>
                         Test Connection
                       </Button>
                     </CardFooter>
@@ -2372,7 +2372,7 @@ export default function WebsitePaymentSettings() {
                             <FormDescription>
                               Your Adyen API Key for checkout service.
                       <PaymentMethodLogoUpload form={adyenForm} isSaving={isSaving} />
-                      <PaymentRegionSelector control={adyenForm.control} name="paymentRegion" disabled={isSaving} />
+                      <PaymentRegionSelector control={adyenForm.control} name="paymentRegion" />
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -2414,11 +2414,11 @@ export default function WebsitePaymentSettings() {
                       />
                     </CardContent>
                     <CardFooter className="flex gap-2 border-t pt-6">
-                      <Button type="submit" disabled={isSaving}>
-                        {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      <Button type="submit" loading={isSaving}>
+
                         Save Adyen Settings
                       </Button>
-                      <Button type="button" variant="outline" onClick={() => testConnection('adyen')} disabled={isSaving}>
+                      <Button type="button" variant="outline" onClick={() => testConnection('adyen')} loading={isSaving}>
                         Test Connection
                       </Button>
                     </CardFooter>
@@ -2543,11 +2543,11 @@ export default function WebsitePaymentSettings() {
                       </div>
                       <PaymentMethodLogoUpload form={fastCheckoutForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={fastCheckoutForm.control} name="allowedLocations" />
-                      <PaymentRegionSelector control={fastCheckoutForm.control} name="paymentRegion" disabled={isSaving} />
+                      <PaymentRegionSelector control={fastCheckoutForm.control} name="paymentRegion" />
                     </CardContent>
                     <CardFooter className="border-t pt-6">
-                      <Button type="submit" disabled={isSaving}>
-                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                      <Button type="submit" loading={isSaving}>
+                        <Save className="mr-2 h-4 w-4" />
                         Save Fast Checkout Settings
                       </Button>
                     </CardFooter>
@@ -2609,11 +2609,11 @@ export default function WebsitePaymentSettings() {
                     <CardContent>
                       <PaymentMethodLogoUpload form={manualForm} isSaving={isSaving} />
                       <LocationVisibilitySelector deliveryLocations={deliveryLocations} control={manualForm.control} name="allowedLocations" />
-                      <PaymentRegionSelector control={manualForm.control} name="paymentRegion" disabled={isSaving} />
+                      <PaymentRegionSelector control={manualForm.control} name="paymentRegion" />
                     </CardContent>
                     <CardFooter className="border-t pt-6">
-                      <Button type="submit" disabled={isSaving}>
-                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                      <Button type="submit" loading={isSaving}>
+                        <Save className="mr-2 h-4 w-4" />
                         Save Manual Payment Settings
                       </Button>
                     </CardFooter>
@@ -2689,8 +2689,8 @@ export default function WebsitePaymentSettings() {
                       />
                     </CardContent>
                     <CardFooter className="border-t pt-6">
-                      <Button type="submit" disabled={isSaving}>
-                        {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                      <Button type="submit" loading={isSaving}>
+                        <Save className="mr-2 h-4 w-4" />
                         Save Instructions
                       </Button>
                     </CardFooter>
@@ -2800,13 +2800,13 @@ function AccountForm({ onSubmit, isSaving, defaultValues }: { onSubmit: (values:
               </div>
               <div className="flex-grow space-y-2">
                 <div className="flex items-center gap-2">
-                  <FormControl><Input placeholder="https://example.com/logo.png" {...field} value={field.value || ''} disabled={isSaving || isUploading} /></FormControl>
-                  <Button asChild variant="outline" size="icon" disabled={isSaving || isUploading}>
+                  <FormControl><Input placeholder="https://example.com/logo.png" {...field} value={field.value || ''}  /></FormControl>
+                  <Button asChild variant="outline" size="icon" loading={isSaving || isUploading}>
                     <label htmlFor="bank-logo-upload" className="cursor-pointer">
-                      {isUploading ? <Loader2 className="h-4 w-4 animate-spin"/> : <Upload className="h-4 w-4" />}
+                      <Upload className="h-4 w-4" />
                     </label>
                   </Button>
-                  <Input id="bank-logo-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isSaving || isUploading} />
+                  <Input id="bank-logo-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload}  />
                 </div>
               </div>
             </div>
@@ -2823,8 +2823,8 @@ function AccountForm({ onSubmit, isSaving, defaultValues }: { onSubmit: (values:
           <FormItem><FormLabel>Account Number</FormLabel><FormControl><Input placeholder="e.g., 1234567890" {...field} /></FormControl><FormMessage /></FormItem>
         )} />
         <DialogFooter className="pt-4">
-          <DialogClose asChild><Button variant="outline" disabled={isSaving || isUploading}>Cancel</Button></DialogClose>
-          <Button type="submit" disabled={isSaving || isUploading}>{isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Save Account</Button>
+          <DialogClose asChild><Button variant="outline" loading={isSaving || isUploading}>Cancel</Button></DialogClose>
+          <Button type="submit" loading={isSaving || isUploading}>  Save Account</Button>
         </DialogFooter>
       </form>
     </Form>
@@ -2932,11 +2932,11 @@ function PaymentMethodLogoUpload({ form, isSaving, label = "Payment Method Logo"
           </div>
           <div className="flex-grow space-y-2">
             <div className="flex items-center gap-2">
-              <FormControl><Input placeholder="https://example.com/logo.png" {...field} value={field.value || ''} disabled={isSaving || isUploading} /></FormControl>
-              <Button asChild variant="outline" size="icon" disabled={isSaving || isUploading}>
+              <FormControl><Input placeholder="https://example.com/logo.png" {...field} value={field.value || ''}  /></FormControl>
+              <Button asChild variant="outline" size="icon" loading={isSaving || isUploading}>
                 <label className="cursor-pointer">
-                  {isUploading ? <Loader2 className="h-4 w-4 animate-spin"/> : <Upload className="h-4 w-4" />}
-                  <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={isSaving || isUploading} />
+                  <Upload className="h-4 w-4" />
+                  <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload}  />
                 </label>
               </Button>
             </div>

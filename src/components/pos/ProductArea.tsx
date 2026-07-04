@@ -268,8 +268,8 @@ export function ProductArea({ onAddToCart, onProductsLoaded, isScannerEnabled = 
             />
 
             <ProductGrid
-                products={currentProductsOnGrid}
-                loading={loadingProducts}
+                products={currentProductsOnGrid} loading={loadingProducts}
+
                 error={productError}
                 onAddToCart={onAddToCart}
                 currencySymbol={currencySymbol}

@@ -164,8 +164,8 @@ export function PosProductSizeSettings({ settingsData, isLoading, storeId }: Pos
             </div>
           </CardContent>
           <CardFooter className="bg-muted/30 border-t p-6">
-            <Button type="submit" disabled={isSaving} className="font-bold min-w-[180px]">
-              {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Save className="mr-2 h-4 w-4" />}
+            <Button type="submit" loading={isSaving} className="font-bold min-w-[180px]">
+              <Save className="mr-2 h-4 w-4" />
               Save Layout Changes
             </Button>
           </CardFooter>
