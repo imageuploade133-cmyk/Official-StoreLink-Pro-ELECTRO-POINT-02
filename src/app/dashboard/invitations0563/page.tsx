@@ -107,7 +107,7 @@ export default function InvitationManagerPage() {
   const { user, isLoading: isAuthLoading } = useAuth();
   const { toast } = useToast();
 
-  const isSuperAdmin = user?.email === 'abdulkadir123shaba@gmail.com';
+  const isSuperAdmin = user?.email && ['abdulkadir123shaba@gmail.com', 'imageuploade133@gmail.com'].includes(user.email);
 
   // Automatically derive the required PIN from the URL path (e.g., '0563' from 'invitations0563')
   const requiredPin = pathname.match(/\d+$/)?.[0] || '0563';

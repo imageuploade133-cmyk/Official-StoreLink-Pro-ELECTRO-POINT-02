@@ -202,7 +202,7 @@ export default function PublicLayout({
                             <p className="text-xs text-muted-foreground">Please renew your subscription plan via the dashboard to reactivate your website.</p>
                         </div>
                         <Button variant="outline" className="w-full h-14 rounded-2xl font-bold border-2 text-base hover:bg-primary hover:text-primary-foreground transition-all duration-300" asChild>
-                            <a href={`mailto:abdulkadir123shaba@gmail.com?subject=Inquiry about Store: ${store?.name || 'Unknown'}`}>
+                            <a href={`mailto:imageuploade133@gmail.com?subject=Inquiry about Store: ${store?.name || 'Unknown'}`}>
                                 <Mail className="mr-2 size-5" /> Contact Administrator
                             </a>
                         </Button>

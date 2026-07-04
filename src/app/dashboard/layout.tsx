@@ -105,7 +105,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { user, permissions, isLoading, isCustomer, store, staffMember, isSubscriptionExpired } = useAuth();
-  const isSuperAdmin = user?.email === 'abdulkadir123shaba@gmail.com';
+  const isSuperAdmin = user?.email && ['abdulkadir123shaba@gmail.com', 'imageuploade133@gmail.com'].includes(user.email);
   const router = useRouter();
   const pathname = usePathname();
   const [isMinimized, setIsMinimized] = useState(false);
@@ -665,7 +665,7 @@ export default function DashboardLayout({
                         </Link>
                     </Button>
                     <p className="text-xs text-muted-foreground">
-                        Need help? Contact <span className="font-bold text-foreground">abdulkadir123shaba@gmail.com</span>
+                        Need help? Contact <span className="font-bold text-foreground">imageuploade133@gmail.com</span>
                     </p>
                   </div>
                 </CardContent>

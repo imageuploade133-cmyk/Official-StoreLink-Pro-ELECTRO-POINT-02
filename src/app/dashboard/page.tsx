@@ -332,7 +332,7 @@ export default function DashboardPage() {
   }
 
   // Super Admin view for invitation management
-  if (user?.email === 'abdulkadir123shaba@gmail.com' && !currentStoreId) {
+  if (user?.email && ['abdulkadir123shaba@gmail.com', 'imageuploade133@gmail.com'].includes(user.email) && !currentStoreId) {
     return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
             <div className="p-4 bg-primary/10 rounded-full">
