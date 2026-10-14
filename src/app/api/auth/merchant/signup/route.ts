@@ -54,22 +54,23 @@ export async function POST(request: Request) {
             throw new Error('Store URL already taken.');
         }
 
-        // 3. Create User in Firebase Auth
-        let userRecord;
+        // 3. Create or Get User in Firebase Auth
+        let uid: string;
         try {
-            userRecord = await adminAuth.createUser({
+            const userRecord = await adminAuth.createUser({
                 email,
                 password,
                 displayName: name,
             });
+            uid = userRecord.uid;
         } catch (authError: any) {
             if (authError.code === 'auth/email-already-in-use') {
-                throw new Error('Email already in use.');
+                const existingUser = await adminAuth.getUserByEmail(email);
+                uid = existingUser.uid;
+            } else {
+                throw authError;
             }
-            throw authError;
         }
-
-        const uid = userRecord.uid;
 
         // 5. Setup Store Data
         const storeRef = adminDb.collection('stores').doc(storeSlug);
