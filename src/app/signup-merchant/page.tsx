@@ -211,9 +211,22 @@ export default function MerchantSignupPage() {
                 throw new Error(data.error || 'Signup failed');
             }
 
-            toast({ title: "Welcome to StoreLink Pro", description: "Your account is ready." });
+            // Automatically sign in user and select the new store
+            try {
+                if (auth) {
+                    await signInWithEmailAndPassword(auth, values.email, values.password);
+                }
+            } catch (loginErr) {
+                console.warn("Auto sign-in error after store creation:", loginErr);
+            }
+
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('selectedStoreId', values.storeSlug);
+            }
+
+            toast({ title: "Workspace Created", description: "Taking you to your workspace dashboard..." });
             setIsSuccessfullySubmitted(true);
-            router.push('/login');
+            router.replace('/dashboard');
         } catch (error: any) {
             toast({ variant: "destructive", title: "Signup Failed", description: error.message });
         } finally {
