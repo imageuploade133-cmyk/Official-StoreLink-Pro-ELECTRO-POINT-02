@@ -81,6 +81,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsCustomerLoading(!!user);
   }
 
+  // Safety fallback: Ensure store/staff loading states auto-resolve if Firestore listener delays
+  useEffect(() => {
+    if (!user) return;
+    const fallbackTimer = setTimeout(() => {
+      setIsStaffLoading(false);
+      setIsStoreLoading(false);
+      setIsCustomerLoading(false);
+    }, 2500);
+    return () => clearTimeout(fallbackTimer);
+  }, [user]);
+
   // Monitor Staff Record
   useEffect(() => {
     if (!user || !firestore) {
@@ -181,8 +192,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { permissions: defaultPermissions, isAdmin: false, roleId: null };
     }
     
-    // NEW LOGIC: Check if user is a Store Owner
-    if (store) {
+    // Check if user is a Store Owner or has owned stores
+    if (store || stores.length > 0) {
         const allPerms = { ...defaultPermissions };
         allPermissions.forEach(p => { allPerms[p.id] = true; });
         return { permissions: allPerms, isAdmin: true, roleId: 'admin' };
