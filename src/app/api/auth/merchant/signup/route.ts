@@ -16,36 +16,36 @@ export async function POST(request: Request) {
         invitationCode
     } = await request.json();
 
-    if (!email || !password || !invitationCode || !storeSlug) {
+    if (!email || !password || !storeSlug) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const codeHash = hashInvitationCode(invitationCode);
-
-    // We must use a transaction to ensure atomic check and update of the invitation
+    // We must use a transaction to ensure atomic account & store creation
     const result = await adminDb.runTransaction(async (transaction) => {
-        // 1. Validate Invitation
-        const invitationQuery = adminDb.collection('invitations').where('codeHash', '==', codeHash).limit(1);
-        const invitationSnapshot = await transaction.get(invitationQuery);
+        let plan = 'pro';
+        let planDurationDays = 365;
 
-        if (invitationSnapshot.empty) {
-            throw new Error('Invalid or Expired Invitation Code.');
-        }
+        // 1. Validate Invitation if code is provided
+        if (invitationCode && invitationCode.trim() !== '') {
+            const codeHash = hashInvitationCode(invitationCode);
+            const invitationQuery = adminDb.collection('invitations').where('codeHash', '==', codeHash).limit(1);
+            const invitationSnapshot = await transaction.get(invitationQuery);
 
-        const invitationDoc = invitationSnapshot.docs[0];
-        const invitation = invitationDoc.data();
+            if (!invitationSnapshot.empty) {
+                const invitationDoc = invitationSnapshot.docs[0];
+                const invitation = invitationDoc.data();
 
-        if (invitation.status === 'revoked' || invitation.status === 'expired') {
-            throw new Error('Invalid or Expired Invitation Code.');
-        }
-
-        if (invitation.expiresAt && new Date(invitation.expiresAt) < new Date()) {
-            transaction.update(invitationDoc.ref, { status: 'expired' });
-            throw new Error('Invalid or Expired Invitation Code.');
-        }
-
-        if (invitation.usedCount >= invitation.maxUses) {
-            throw new Error('Invalid or Expired Invitation Code.');
+                if (invitation.status !== 'revoked' && invitation.status !== 'expired' && (!invitation.expiresAt || new Date(invitation.expiresAt) >= new Date()) && invitation.usedCount < invitation.maxUses) {
+                    const newUsedCount = (invitation.usedCount || 0) + 1;
+                    transaction.update(invitationDoc.ref, {
+                        status: newUsedCount >= invitation.maxUses ? 'used' : 'unused',
+                        usedAt: new Date().toISOString(),
+                        usedCount: newUsedCount,
+                    });
+                    if (invitation.plan) plan = invitation.plan;
+                    if (invitation.planDurationDays) planDurationDays = invitation.planDurationDays;
+                }
+            }
         }
 
         // 2. Check if store slug is available
@@ -71,24 +71,8 @@ export async function POST(request: Request) {
 
         const uid = userRecord.uid;
 
-        // 4. Update Invitation
-        const newUsedCount = invitation.usedCount + 1;
-        transaction.update(invitationDoc.ref, {
-            status: newUsedCount >= invitation.maxUses ? 'used' : 'unused',
-            usedBy: uid,
-            usedAt: new Date().toISOString(),
-            usedCount: newUsedCount,
-            history: [...(invitation.history || []), {
-                action: 'used',
-                userId: uid,
-                timestamp: new Date().toISOString()
-            }]
-        });
-
         // 5. Setup Store Data
         const storeRef = adminDb.collection('stores').doc(storeSlug);
-        const plan = invitation.plan || 'free';
-        const planDurationDays = invitation.planDurationDays || 30;
         const planExpiresAt = new Date();
         planExpiresAt.setDate(planExpiresAt.getDate() + planDurationDays);
 

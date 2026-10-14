@@ -75,7 +75,7 @@ export default function MerchantSignupPage() {
     const { store, staffMember, isLoading: isAuthContextLoading } = useAuth();
     const [isSuccessfullySubmitted, setIsSuccessfullySubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [currentStep, setCurrentStep] = useState(0); // Start with step 0 (Invitation Code)
+    const [currentStep, setCurrentStep] = useState(1); // Start with step 1 (Account Details)
     const [invitationCode, setInvitationCode] = useState('');
     const [isValidatingCode, setIsValidatingCode] = useState(false);
     const totalSteps = 3;
@@ -270,21 +270,19 @@ export default function MerchantSignupPage() {
             <div className="w-full max-w-[500px] py-12">
                 <div className="mb-10 text-center lg:text-left">
                     <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 mb-3">
-                        {currentStep === 0 ? 'Invitation Required' :
-                         currentStep === 1 ? 'Create your account' :
-                         currentStep === 2 ? 'Create store' : 
+                        {currentStep === 1 ? 'Create your account' :
+                         currentStep === 2 ? 'Create workspace / store' :
                          'Confirm details'}
                     </h1>
                     <p className="mt-3 text-zinc-500 dark:text-zinc-400 font-medium">
-                        {currentStep === 0 ? 'Enter your invitation code to access the registration form.' :
-                         currentStep === 1 ? 'Tell us who you are to get started.' :
-                         currentStep === 2 ? 'Provide details about your business.' : 
+                        {currentStep === 1 ? 'Tell us who you are to get started.' :
+                         currentStep === 2 ? 'Provide details about your business or workspace.' :
                          'Review everything before we launch.'}
                     </p>
                 </div>
 
                 {/* Progress Stages */}
-                <div className={cn("flex justify-center lg:justify-start gap-2 sm:gap-4 mb-8", currentStep === 0 && "opacity-50 pointer-events-none")}>
+                <div className="flex justify-center lg:justify-start gap-2 sm:gap-4 mb-8">
                     {[
                         { id: 1, label: 'Account' },
                         { id: 2, label: 'Store' },
@@ -322,56 +320,6 @@ export default function MerchantSignupPage() {
                 </div>
 
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-                    {currentStep === 0 ? (
-                        <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
-                            <div className="space-y-2">
-                                <Label htmlFor="invitation-code" className="text-sm font-medium text-zinc-700 dark:text-zinc-300 ml-1">
-                                    Invitation Code
-                                </Label>
-                                <Input
-                                    id="invitation-code"
-                                    placeholder="Enter your 16+ character code"
-                                    className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-[#0071e3]/20 focus:border-[#0071e3] transition-all bg-white dark:bg-zinc-900"
-                                    value={invitationCode}
-                                    onChange={(e) => setInvitationCode(e.target.value)}
-                                    disabled={isValidatingCode}
-                                />
-                                <p className="text-[11px] text-zinc-500 ml-1">
-                                    Only merchants with a valid invitation can join the platform.
-                                </p>
-                            </div>
-                            <Button
-                                type="button"
-                                onClick={async () => {
-                                    if (!invitationCode) return;
-                                    setIsValidatingCode(true);
-                                    try {
-                                        const res = await fetch('/api/auth/invitation/validate', {
-                                            method: 'POST',
-                                            headers: { 'Content-Type': 'application/json' },
-                                            body: JSON.stringify({ code: invitationCode })
-                                        });
-                                        const data = await res.json();
-                                        if (data.valid) {
-                                            setCurrentStep(1);
-                                            toast({ title: "Access Granted", description: "Your invitation code is valid." });
-                                        } else {
-                                            toast({ variant: "destructive", title: "Invalid Code", description: data.error || "Please check your invitation code." });
-                                        }
-                                    } catch (e) {
-                                        toast({ variant: "destructive", title: "Error", description: "Failed to validate invitation." });
-                                    } finally {
-                                        setIsValidatingCode(false);
-                                    }
-                                }}
-                                className="w-full h-12 bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-xl font-semibold shadow-sm transition-all flex items-center justify-center gap-2"
-                                loading={isValidatingCode}
-                                disabled={!invitationCode}
-                            >
-                                Verify Invitation <ArrowRight className="w-4 h-4" />
-                            </Button>
-                        </div>
-                    ) : (
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                             {currentStep === 1 && (
@@ -571,7 +519,6 @@ export default function MerchantSignupPage() {
                             </div>
                         </form>
                     </Form>
-                    )}
 
                     <div className="pt-6 text-center lg:text-left">
                         <p className="text-sm text-zinc-500 dark:text-zinc-400">
