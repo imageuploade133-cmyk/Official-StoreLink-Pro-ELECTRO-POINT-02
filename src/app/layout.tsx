@@ -52,27 +52,7 @@ export default async function RootLayout({
       suppressHydrationWarning
       data-scroll-behavior="smooth"
     >
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  const savedZoom = localStorage.getItem('dashboard-zoom');
-                  if (savedZoom) {
-                    const zoomLevel = parseInt(savedZoom, 10);
-                    const baseFontSize = 16;
-                    const newFontSize = (baseFontSize * zoomLevel) / 100;
-                    document.documentElement.style.fontSize = newFontSize + 'px';
-                  }
-                } catch (e) {
-                  console.error('LocalStorage access denied:', e);
-                }
-              })();
-            `,
-          }}
-        />
-      </head>
+      <head />
       <body
         className="bg-background text-foreground antialiased font-display min-h-screen overflow-x-auto"
         suppressHydrationWarning={true}
