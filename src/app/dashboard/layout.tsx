@@ -313,7 +313,7 @@ export default function DashboardLayout({
     <div
       id="dashboard-main-container"
       className={cn(
-        'grid min-h-screen w-full transition-transform duration-200 ease-out origin-top-left',
+        'grid min-h-screen w-full transition-[grid-template-columns] duration-300 ease-in-out origin-top-left',
         showSidebar && (isMinimized
           ? 'md:grid-cols-[80px_1fr]'
           : 'md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]'),
@@ -322,7 +322,7 @@ export default function DashboardLayout({
     >
       {/* Sidebar */}
       {showSidebar && (
-        <aside className="hidden border-r bg-sidebar-background md:flex md:flex-col sticky top-0 h-screen overflow-hidden dark:bg-sidebar-background dark:border-sidebar-border z-30 transition-width duration-200 ease-out">
+        <aside className="hidden border-r bg-sidebar-background md:flex md:flex-col sticky top-0 h-screen overflow-hidden dark:bg-sidebar-background dark:border-sidebar-border z-30 transition-all duration-300 ease-in-out">
           <div
             className={cn(
               'flex h-14 shrink-0 items-center border-b dark:border-sidebar-border lg:h-[60px]',
@@ -332,13 +332,13 @@ export default function DashboardLayout({
             <Link
               href="/dashboard"
               className={cn(
-                "flex items-center font-semibold transition-opacity duration-200",
+                "flex items-center font-semibold transition-all duration-300",
                 isMinimized ? "justify-center" : "gap-2"
               )}
             >
               <StoreLinkLogo className="h-6 w-6 shrink-0" />
               <span className={cn(
-                "text-lg transition-opacity duration-200 truncate",
+                "text-lg transition-all duration-300 truncate",
                 isMinimized ? "w-0 opacity-0 pointer-events-none absolute" : "w-auto opacity-100"
               )}>
                 StoreLink Pro
@@ -350,7 +350,7 @@ export default function DashboardLayout({
             <TooltipProvider delayDuration={0}>
               <nav
                 className={cn(
-                  'grid items-start gap-1 py-4 text-sm font-medium',
+                  'grid items-start gap-1 py-4 text-sm font-medium transition-all duration-300',
                   isMinimized ? 'justify-center px-2' : 'px-4'
                 )}
               >
