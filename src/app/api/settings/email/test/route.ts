@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { provider, apiKey, senderName, senderEmail, testEmail, storeId } = body;
+    const { provider, apiKey, senderName, senderEmail, apiBaseUrl, testEmail, storeId } = body;
 
     if (!storeId) {
       return NextResponse.json({ error: 'Store ID is required' }, { status: 400 });
@@ -72,6 +72,7 @@ export async function POST(request: Request) {
 
     const { success, error: providerError } = await sendViaProvider(provider, finalApiKey, from, testEmail, subject, html, {
         storeId,
+        apiBaseUrl: apiBaseUrl || 'https://whatsapp-b5os.onrender.com',
         type: 'test_email'
     });
 

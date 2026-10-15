@@ -21,10 +21,11 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 
 const emailProviderSchema = z.object({
-  provider: z.enum(['brevo', 'resend', 'smtp']),
+  provider: z.enum(['brevo', 'resend', 'smtp', 'email_gateway']),
   apiKey: z.string().min(1, { message: "API Key or Config is required." }),
   senderName: z.string().min(1, { message: "Sender name is required." }),
   senderEmail: z.string().email({ message: "Please enter a valid sender email." }),
+  apiBaseUrl: z.string().url({ message: "Please enter a valid API URL." }).optional().or(z.literal('')),
   testEmail: z.string().email({ message: "Please enter a valid test email." }).optional().or(z.literal('')),
   enabled: z.boolean().default(false),
 });
@@ -56,10 +57,11 @@ export function EmailProviderSettings({ storeId }: EmailProviderSettingsProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(emailProviderSchema),
     defaultValues: {
-      provider: 'brevo',
+      provider: 'email_gateway',
       apiKey: '',
       senderName: '',
       senderEmail: '',
+      apiBaseUrl: 'https://whatsapp-b5os.onrender.com',
       testEmail: '',
       enabled: false,
     },
@@ -68,10 +70,11 @@ export function EmailProviderSettings({ storeId }: EmailProviderSettingsProps) {
   useEffect(() => {
     if (settingsData) {
       form.reset({
-        provider: settingsData.provider || 'brevo',
+        provider: settingsData.provider || 'email_gateway',
         apiKey: settingsData.maskedKey || '',
         senderName: settingsData.senderName || '',
         senderEmail: settingsData.senderEmail || '',
+        apiBaseUrl: settingsData.apiBaseUrl || 'https://whatsapp-b5os.onrender.com',
         testEmail: form.getValues('testEmail') || '',
         enabled: settingsData.enabled || false,
       });
@@ -213,6 +216,7 @@ export function EmailProviderSettings({ storeId }: EmailProviderSettingsProps) {
                                     </SelectTrigger>
                                 </FormControl>
                                 <SelectContent className="rounded-2xl">
+                                    <SelectItem value="email_gateway">WhatsAPI Hub REST Email Gateway</SelectItem>
                                     <SelectItem value="brevo">Brevo (Sendinblue)</SelectItem>
                                     <SelectItem value="resend">Resend</SelectItem>
                                     <SelectItem value="smtp">Custom SMTP</SelectItem>
@@ -229,14 +233,14 @@ export function EmailProviderSettings({ storeId }: EmailProviderSettingsProps) {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel className="font-semibold">
-                                {form.watch('provider') === 'smtp' ? 'SMTP Config (JSON)' : 'API Key'}
+                                {form.watch('provider') === 'smtp' ? 'SMTP Config (JSON)' : 'API Key (x-api-key)'}
                             </FormLabel>
                             <div className="relative">
                                 <FormControl>
                                     <Input 
                                         {...field} 
                                         type={showApiKey ? "text" : "password"}
-                                        placeholder={form.watch('provider') === 'smtp' ? '{"host":"...","port":465,...}' : "Enter your API key"} 
+                                        placeholder={form.watch('provider') === 'smtp' ? '{"host":"...","port":465,...}' : "Enter your x-api-key"}
                                         className="rounded-2xl h-12 bg-gray-50/50 dark:bg-muted/50 border-gray-100 dark:border-border/50 pr-12"
                                     />
                                 </FormControl>
@@ -253,12 +257,35 @@ export function EmailProviderSettings({ storeId }: EmailProviderSettingsProps) {
                             <FormDescription className="text-xs">
                                 {form.watch('provider') === 'smtp' 
                                     ? 'JSON: {"host":"...","port":465,"user":"...","pass":"..."}' 
-                                    : 'Your secret API key will be encrypted.'}
+                                    : 'Your secret API key will be encrypted and sent as x-api-key header.'}
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
+
+                {form.watch('provider') === 'email_gateway' && (
+                    <FormField
+                        control={form.control}
+                        name="apiBaseUrl"
+                        render={({ field }) => (
+                            <FormItem className="md:col-span-2">
+                                <FormLabel className="font-semibold">Email API Gateway Base URL</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        {...field}
+                                        placeholder="https://whatsapp-b5os.onrender.com"
+                                        className="rounded-2xl h-12 bg-gray-50/50 dark:bg-muted/50 border-gray-100 dark:border-border/50"
+                                    />
+                                </FormControl>
+                                <FormDescription className="text-xs">
+                                    Base REST Endpoint URL for dispatching /api/email/send, /api/email/send-template, and /api/email/otp
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                )}
 
                 <FormField
                     control={form.control}

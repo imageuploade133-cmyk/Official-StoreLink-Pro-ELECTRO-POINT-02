@@ -145,11 +145,12 @@ export interface EmailAlertSettings {
 }
 
 export interface EmailProviderSettings {
-  provider: 'brevo' | 'resend' | 'smtp';
+  provider: 'brevo' | 'resend' | 'smtp' | 'email_gateway';
   apiKeyEncrypted: string;
   maskedKey: string;
   senderName: string;
   senderEmail: string;
+  apiBaseUrl?: string;
   enabled: boolean;
   updatedAt: Timestamp;
 }
