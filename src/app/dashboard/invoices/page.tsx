@@ -42,6 +42,7 @@ import {
   FileWarning,
   Eye
 } from 'lucide-react';
+import { EmptyTableState } from '@/components/ui/empty-table-state';
 import { format } from 'date-fns';
 import { formatCurrency } from '@/lib/formatUtils';
 import { useSettings } from '@/contexts/settings-context';
@@ -252,8 +253,14 @@ export default function ManageInvoicesPage() {
                   ))
                 ) : filteredInvoices.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="h-48 text-center text-muted-foreground italic">
-                      No invoices found matching the current criteria.
+                    <TableCell colSpan={6} className="p-8 text-center">
+                      <EmptyTableState
+                        title="No Invoices Found"
+                        description="There are no invoices matching your current filter criteria or search query."
+                        actionLabel="Generate New Invoice"
+                        onAction={() => window.location.href = '/dashboard/invoices/generate'}
+                        icon={FileText}
+                      />
                     </TableCell>
                   </TableRow>
                 ) : (

@@ -28,6 +28,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Loader2, Undo2, Info, Eye, DollarSign, Package, ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
+import { EmptyTableState } from '@/components/ui/empty-table-state';
 import { ReceiptModal } from '@/components/dialogs/receipt-modal';
 import { PageHeader } from '@/components/PageHeader';
 import { StatCard } from '@/components/StatCard';
@@ -258,11 +259,12 @@ export default function ReturnsPage() {
                 ))
               ) : returnedSales.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-48 text-center text-muted-foreground">
-                    <div className="flex flex-col items-center gap-2">
-                      <Info className="h-10 w-10 opacity-10" />
-                      <span className="font-bold">No returned sales found.</span>
-                    </div>
+                  <TableCell colSpan={7} className="p-8 text-center">
+                    <EmptyTableState
+                      title="No Returns Recorded"
+                      description="There are currently no return transactions registered in this period."
+                      icon={Undo2}
+                    />
                   </TableCell>
                 </TableRow>
               ) : (

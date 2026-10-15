@@ -58,6 +58,7 @@ import { useAuth as useFirebaseAuth } from '@/firebase';
 import { usePathname } from 'next/navigation';
 import { format, isToday } from 'date-fns';
 import { Spinner } from '@/components/ui/spinner';
+import { EmptyTableState } from '@/components/ui/empty-table-state';
 import * as z from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -459,8 +460,14 @@ export default function InvitationManagerPage() {
                 </TableRow>
               ) : filteredInvitations.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
-                    No invitations found.
+                  <TableCell colSpan={7} className="p-8 text-center">
+                    <EmptyTableState
+                      title="No Invitations Found"
+                      description="No invitation codes match your current search criteria."
+                      actionLabel="Generate Invitation"
+                      onAction={() => setIsCreateModalOpen(true)}
+                      icon={Ticket}
+                    />
                   </TableCell>
                 </TableRow>
               ) : (
