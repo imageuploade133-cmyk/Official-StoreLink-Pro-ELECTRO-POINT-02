@@ -153,13 +153,12 @@ export default function DashboardLayout({
   const { data: reviews } = useCollection<ProductReview>(reviewsQuery);
   const unreadReviewsCount = reviews?.filter(r => r.isRead !== true && !r.reply).length || 0;
 
-  // Apply zoom level using font-size scaling (affects all rem/em units proportionally)
+  // Apply zoom level safely using CSS zoom / transform to prevent DOM layout lockup
   useEffect(() => {
-    const baseFontSize = 16;
-    const newFontSize = (baseFontSize * zoomLevel) / 100;
-    document.documentElement.style.fontSize = newFontSize + 'px';
-    
-    // Persist to localStorage
+    const dashboardContainer = document.getElementById('dashboard-main-container');
+    if (dashboardContainer) {
+      (dashboardContainer.style as any).zoom = `${zoomLevel}%`;
+    }
     safeStorage.setItem('dashboard-zoom', zoomLevel.toString());
   }, [zoomLevel]);
   
@@ -312,9 +311,9 @@ export default function DashboardLayout({
 
   return (
     <div
+      id="dashboard-main-container"
       className={cn(
-        'grid min-h-screen w-full',
-        showSidebar && 'transition-[grid-template-columns] duration-300 ease-in-out',
+        'grid min-h-screen w-full transition-transform duration-200 ease-out origin-top-left',
         showSidebar && (isMinimized
           ? 'md:grid-cols-[80px_1fr]'
           : 'md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]'),
@@ -323,7 +322,7 @@ export default function DashboardLayout({
     >
       {/* Sidebar */}
       {showSidebar && (
-        <aside className="hidden border-r bg-sidebar-background md:flex md:flex-col sticky top-0 h-screen overflow-hidden dark:bg-sidebar-background dark:border-sidebar-border z-30 transition-all duration-300">
+        <aside className="hidden border-r bg-sidebar-background md:flex md:flex-col sticky top-0 h-screen overflow-hidden dark:bg-sidebar-background dark:border-sidebar-border z-30 transition-width duration-200 ease-out">
           <div
             className={cn(
               'flex h-14 shrink-0 items-center border-b dark:border-sidebar-border lg:h-[60px]',
@@ -333,13 +332,13 @@ export default function DashboardLayout({
             <Link
               href="/dashboard"
               className={cn(
-                "flex items-center font-semibold transition-all duration-300",
+                "flex items-center font-semibold transition-opacity duration-200",
                 isMinimized ? "justify-center" : "gap-2"
               )}
             >
               <StoreLinkLogo className="h-6 w-6 shrink-0" />
               <span className={cn(
-                "text-lg transition-all duration-300 truncate",
+                "text-lg transition-opacity duration-200 truncate",
                 isMinimized ? "w-0 opacity-0 pointer-events-none absolute" : "w-auto opacity-100"
               )}>
                 StoreLink Pro
@@ -351,7 +350,7 @@ export default function DashboardLayout({
             <TooltipProvider delayDuration={0}>
               <nav
                 className={cn(
-                  'grid items-start gap-1 py-4 text-sm font-medium transition-all duration-300',
+                  'grid items-start gap-1 py-4 text-sm font-medium',
                   isMinimized ? 'justify-center px-2' : 'px-4'
                 )}
               >
