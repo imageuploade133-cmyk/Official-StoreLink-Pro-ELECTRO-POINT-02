@@ -163,26 +163,26 @@ export function EmailProviderSettings({ storeId }: EmailProviderSettingsProps) {
     <Card className="border-none shadow-lg rounded-3xl overflow-hidden bg-white dark:bg-card">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardHeader className="pb-8 border-b border-gray-50 dark:border-border/50">
-            <div className="flex items-center justify-between">
+          <CardHeader className="pb-6 border-b border-gray-100 dark:border-border/50 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-950/10 dark:to-indigo-950/10">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="space-y-1">
-                    <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                        <Mail className="h-6 w-6 text-blue-500"/> Email Provider
-                    </CardTitle>
-                    <CardDescription>
-                        Configure your custom email sending provider for order notifications
+                    <div className="flex items-center gap-2">
+                      <CardTitle className="flex items-center gap-2 text-2xl font-bold text-blue-600 dark:text-blue-400">
+                          <Mail className="h-6 w-6 text-blue-500"/> Email Channel Setup
+                      </CardTitle>
+                      <Badge className="bg-blue-600 text-white font-bold text-xs rounded-full px-3">
+                        Global Email API
+                      </Badge>
+                    </div>
+                    <CardDescription className="text-sm">
+                        Select your preferred email service provider to send customer order receipts, notifications, and marketing broadcasts.
                     </CardDescription>
                 </div>
-                <div className="flex items-center gap-3">
-                    {isConfigured ? (
-                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 gap-1 px-3 py-1 rounded-full text-xs font-medium dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">
-                            <ShieldCheck className="h-3.5 w-3.5" /> Active
-                        </Badge>
-                    ) : (
-                        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 gap-1 px-3 py-1 rounded-full text-xs font-medium dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800">
-                            <Info className="h-3.5 w-3.5" /> Not Configured
-                        </Badge>
-                    )}
+                <div className="flex items-center gap-4 bg-white dark:bg-card p-3 rounded-2xl shadow-sm border border-gray-100 dark:border-border/50">
+                    <div className="text-right hidden sm:block">
+                      <p className="text-xs font-bold">Enable Email Channel</p>
+                      <p className="text-[10px] text-muted-foreground">{form.watch('enabled') ? 'Active globally' : 'Disabled'}</p>
+                    </div>
                     <FormField
                         control={form.control}
                         name="enabled"
@@ -192,7 +192,7 @@ export function EmailProviderSettings({ storeId }: EmailProviderSettingsProps) {
                                     <Switch 
                                         checked={field.value} 
                                         onCheckedChange={field.onChange} 
-                                        className="data-[state=checked]:bg-blue-500"
+                                        className="data-[state=checked]:bg-blue-600"
                                     />
                                 </FormControl>
                             </FormItem>
