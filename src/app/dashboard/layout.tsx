@@ -120,7 +120,7 @@ export default function DashboardLayout({
         }
       }
     }
-    return 100;
+    return 80;
   });
 
   const firestore = useFirestore();
