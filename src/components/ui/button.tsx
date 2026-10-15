@@ -76,12 +76,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
     
     const textContent = getTextContent(children);
-    const isSave = props.type === "submit" || (/\b(save|pay|confirm|update|create)\b/i.test(textContent) && !/wishlist/i.test(textContent));
+    const isActionAdd = /\b(generate|create|add|new|plus|launch|submit|save|confirm|pay)\b/i.test(textContent) && !/wishlist|back|cancel|close/i.test(textContent);
     const isBack = /\b(back|cancel|close)\b/i.test(textContent) || (typeof className === 'string' && className.includes("btn-back"));
-    const isAdd = /\badd\b/i.test(textContent) || (typeof className === 'string' && className.includes("btn-add"));
     const isDelete = /\b(delete|remove|clear)\b/i.test(textContent) || variant === 'destructive';
 
-    const specialClass = isSave ? "btn-save" : (isBack ? "btn-back" : (isAdd ? "btn-add" : (isDelete ? "btn-destructive-action" : "")));
+    const specialClass = (variant === 'default' || !variant) && isActionAdd
+      ? "btn-action-primary"
+      : (isBack ? "btn-back" : (isDelete ? "btn-destructive-action" : ""));
 
     return (
       <Comp

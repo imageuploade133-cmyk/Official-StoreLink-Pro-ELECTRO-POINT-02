@@ -387,6 +387,35 @@
 }
 
 /* Buttons with Enhanced Hover Effects */
+.btn-action-primary {
+  background: linear-gradient(135deg, #0071e3 0%, #005bb5 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 4px 14px 0 rgba(0, 113, 227, 0.35) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.btn-action-primary:hover {
+  background: linear-gradient(135deg, #0077ed 0%, #0062c4 100%) !important;
+  box-shadow: 0 6px 20px 0 rgba(0, 113, 227, 0.45) !important;
+  transform: translateY(-1px) scale(1.01);
+}
+
+.btn-action-primary:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 8px 0 rgba(0, 113, 227, 0.3) !important;
+}
+
+.dark .btn-action-primary {
+  background: linear-gradient(135deg, #0071e3 0%, #0052ad 100%) !important;
+  box-shadow: 0 4px 16px 0 rgba(0, 113, 227, 0.4) !important;
+}
+
+.dark .btn-action-primary:hover {
+  background: linear-gradient(135deg, #0077ed 0%, #005cc0 100%) !important;
+  box-shadow: 0 6px 22px 0 rgba(0, 113, 227, 0.55) !important;
+}
+
 .btn-save {
   @apply shadow-sm transition-all duration-200 hover:shadow-primary/20 hover:brightness-110 active:scale-[0.98];
 }
