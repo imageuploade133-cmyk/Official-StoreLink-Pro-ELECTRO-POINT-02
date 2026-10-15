@@ -16,7 +16,11 @@ import {
   Filter,
   Code,
   FileText,
-  AlertCircle
+  AlertCircle,
+  Plus,
+  Upload,
+  Trash2,
+  FileSpreadsheet
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -103,11 +107,15 @@ export default function EmailMarketingPage() {
   const { data: staffData, isLoading: isLoadingStaff } = useCollection<StaffMember>(staffQuery);
   const { data: campaignLogs } = useCollection<any>(campaignLogsQuery);
 
-  const [activeTab, setActiveTab] = useState<'customers' | 'staff'>('customers');
+  const [activeTab, setActiveTab] = useState<'customers' | 'staff' | 'custom'>('customers');
   const [subject, setSubject] = useState('');
   const [content, setContent] = useState('');
   const [searchFilter, setSearchFilter] = useState('');
   const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
+  const [customRecipients, setCustomRecipients] = useState<{ id: string; name: string; email: string }[]>([]);
+  const [newManualName, setNewManualName] = useState('');
+  const [newManualEmail, setNewManualEmail] = useState('');
+  const [isAddManualOpen, setIsAddManualOpen] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
@@ -126,7 +134,15 @@ export default function EmailMarketingPage() {
     );
   }, [staffData, searchFilter]);
 
-  const currentRecipientList = activeTab === 'customers' ? filteredCustomers : filteredStaff;
+  const filteredCustomRecipients = useMemo(() => {
+    return customRecipients.filter(c =>
+      c.name.toLowerCase().includes(searchFilter.toLowerCase()) || c.email.toLowerCase().includes(searchFilter.toLowerCase())
+    );
+  }, [customRecipients, searchFilter]);
+
+  const currentRecipientList = activeTab === 'customers'
+    ? filteredCustomers
+    : (activeTab === 'staff' ? filteredStaff : filteredCustomRecipients);
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -141,6 +157,103 @@ export default function EmailMarketingPage() {
     setSelectedEmails(prev =>
       prev.includes(email) ? prev.filter(e => e !== email) : [...prev, email]
     );
+  };
+
+  const handleAddManualEmail = () => {
+    if (!newManualEmail || !newManualEmail.includes('@')) {
+      toast({ variant: 'destructive', title: 'Invalid Email', description: 'Please enter a valid email address.' });
+      return;
+    }
+
+    const name = newManualName.trim() || newManualEmail.split('@')[0];
+    const newEntry = {
+      id: `manual_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      name,
+      email: newManualEmail.trim().toLowerCase()
+    };
+
+    setCustomRecipients(prev => {
+      if (prev.some(r => r.email === newEntry.email)) {
+        toast({ variant: 'destructive', title: 'Duplicate Email', description: 'This email address is already added.' });
+        return prev;
+      }
+      return [newEntry, ...prev];
+    });
+
+    setSelectedEmails(prev => [...prev, newEntry.email]);
+    setNewManualName('');
+    setNewManualEmail('');
+    setIsAddManualOpen(false);
+    toast({ title: 'Email Added', description: `Added ${newEntry.email} to recipient list.` });
+  };
+
+  const handleBulkFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      if (!text) return;
+
+      const lines = text.split(/\r?\n/);
+      const extracted: { id: string; name: string; email: string }[] = [];
+      const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+
+      lines.forEach((line, idx) => {
+        const lineEmails = line.match(emailRegex);
+        if (lineEmails) {
+          lineEmails.forEach(email => {
+            const cleanEmail = email.trim().toLowerCase();
+            let name = cleanEmail.split('@')[0];
+
+            // If CSV line has name, e.g. "John Doe,john@example.com"
+            const parts = line.split(/[,;\t]/);
+            if (parts.length >= 2) {
+              const possibleName = parts[0].trim().replace(/['"]/g, '');
+              if (possibleName && !possibleName.includes('@')) {
+                name = possibleName;
+              }
+            }
+
+            extracted.push({
+              id: `bulk_${Date.now()}_${idx}_${Math.random().toString(36).substring(2, 5)}`,
+              name,
+              email: cleanEmail
+            });
+          });
+        }
+      });
+
+      if (extracted.length === 0) {
+        toast({ variant: 'destructive', title: 'No Emails Found', description: 'Could not extract valid email addresses from file.' });
+        return;
+      }
+
+      setCustomRecipients(prev => {
+        const existingEmails = new Set(prev.map(r => r.email));
+        const uniqueNew = extracted.filter(r => !existingEmails.has(r.email));
+        return [...uniqueNew, ...prev];
+      });
+
+      const newEmails = extracted.map(r => r.email);
+      setSelectedEmails(prev => Array.from(new Set([...prev, ...newEmails])));
+      setActiveTab('custom');
+
+      toast({
+        title: 'Bulk Emails Uploaded',
+        description: `Successfully parsed and added ${extracted.length} recipient emails.`
+      });
+    };
+
+    reader.readAsText(file);
+    // Reset file input value
+    event.target.value = '';
+  };
+
+  const handleRemoveCustomRecipient = (id: string, email: string) => {
+    setCustomRecipients(prev => prev.filter(r => r.id !== id));
+    setSelectedEmails(prev => prev.filter(e => e !== email));
   };
 
   const handleInsertVariable = (variable: string) => {
@@ -271,19 +384,81 @@ export default function EmailMarketingPage() {
         {/* Left Column: Target Audience Tabs */}
         <Card className="lg:col-span-5 rounded-3xl border-none shadow-lg overflow-hidden">
           <CardHeader className="border-b border-gray-100 dark:border-border/50 pb-4">
-            <CardTitle className="text-xl font-bold flex items-center gap-2">
-              <Users className="h-5 w-5 text-blue-500" /> Select Audience
-            </CardTitle>
-            <CardDescription>Choose recipients for your email campaign</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-xl font-bold flex items-center gap-2">
+                  <Users className="h-5 w-5 text-blue-500" /> Select Audience
+                </CardTitle>
+                <CardDescription>Choose or import recipients for your campaign</CardDescription>
+              </div>
+
+              {/* Action Buttons for Custom/Bulk Imports */}
+              <div className="flex gap-2">
+                <Dialog open={isAddManualOpen} onOpenChange={setIsAddManualOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm" className="rounded-xl h-9 px-3">
+                      <Plus className="h-3.5 w-3.5 mr-1" /> Single
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="rounded-3xl max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Add Single Recipient Email</DialogTitle>
+                      <DialogDescription>Manually enter name and email to include in custom broadcasts.</DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 pt-2">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold">Recipient Name (Optional)</label>
+                        <Input
+                          placeholder="e.g. John Doe"
+                          value={newManualName}
+                          onChange={(e) => setNewManualName(e.target.value)}
+                          className="h-11 rounded-xl"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold">Recipient Email</label>
+                        <Input
+                          placeholder="e.g. john@example.com"
+                          type="email"
+                          value={newManualEmail}
+                          onChange={(e) => setNewManualEmail(e.target.value)}
+                          className="h-11 rounded-xl"
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        onClick={handleAddManualEmail}
+                        className="w-full h-11 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        Add Recipient
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+
+                <label className="cursor-pointer inline-flex items-center justify-center rounded-xl text-xs font-bold border border-input bg-background hover:bg-accent h-9 px-3 transition-colors">
+                  <Upload className="h-3.5 w-3.5 mr-1" /> Bulk CSV
+                  <input
+                    type="file"
+                    accept=".csv, .txt"
+                    onChange={handleBulkFileUpload}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            </div>
           </CardHeader>
           <CardContent className="pt-6 space-y-4">
             <Tabs value={activeTab} onValueChange={(val: any) => { setActiveTab(val); setSelectedEmails([]); }}>
-              <TabsList className="grid grid-cols-2 rounded-2xl h-12 bg-gray-100 dark:bg-muted p-1">
+              <TabsList className="grid grid-cols-3 rounded-2xl h-12 bg-gray-100 dark:bg-muted p-1 text-xs">
                 <TabsTrigger value="customers" className="rounded-xl font-bold">
                   Customers ({customersData?.length || 0})
                 </TabsTrigger>
                 <TabsTrigger value="staff" className="rounded-xl font-bold">
                   Staffs ({staffData?.length || 0})
+                </TabsTrigger>
+                <TabsTrigger value="custom" className="rounded-xl font-bold">
+                  Custom ({customRecipients.length})
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -311,7 +486,14 @@ export default function EmailMarketingPage() {
 
             <div className="max-h-96 overflow-y-auto space-y-2 pr-1">
               {currentRecipientList.length === 0 ? (
-                <p className="text-center text-sm text-muted-foreground py-8">No matching {activeTab} with email addresses found.</p>
+                <div className="text-center py-8 space-y-2">
+                  <p className="text-sm text-muted-foreground">No matching {activeTab} with email addresses found.</p>
+                  {activeTab === 'custom' && (
+                    <p className="text-xs text-muted-foreground">
+                      Use the <span className="font-bold text-foreground">"+ Single"</span> or <span className="font-bold text-foreground">"Bulk CSV"</span> buttons above to import emails.
+                    </p>
+                  )}
+                </div>
               ) : (
                 currentRecipientList.map((item) => (
                   <div
@@ -327,7 +509,24 @@ export default function EmailMarketingPage() {
                       <p className="text-sm font-bold leading-none">{item.name}</p>
                       <p className="text-xs text-muted-foreground">{item.email}</p>
                     </div>
-                    <Checkbox checked={selectedEmails.includes(item.email!)} />
+
+                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                      {activeTab === 'custom' && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30"
+                          onClick={() => handleRemoveCustomRecipient(item.id, item.email!)}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
+                      <Checkbox
+                        checked={selectedEmails.includes(item.email!)}
+                        onCheckedChange={() => handleToggleEmail(item.email!)}
+                      />
+                    </div>
                   </div>
                 ))
               )}
