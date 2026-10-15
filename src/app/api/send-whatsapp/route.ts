@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase-admin';
 import { getWhatsAppSettings, sendWhatsAppViaEBulkSMS } from '@/lib/whatsapp-ebulk';
+import { sendWhatsApiText } from '@/lib/whatsapp-whatsapi';
 
 export async function POST(request: Request) {
   try {
@@ -18,7 +19,7 @@ export async function POST(request: Request) {
     // Fetch credentials
     let settings = await getWhatsAppSettings(storeId || 'global') as any;
     
-    if (!settings || !settings.username || !settings.apiKey) {
+    if (!settings || (!settings.username && !settings.whatsApiApiKey)) {
       // Fallback to legacy AppSettings if not found in whatsappAlerts
       const settingsRef = storeId && storeId !== 'global' 
         ? adminDb.collection('stores').doc(storeId).collection('settings').doc('config')
@@ -32,19 +33,40 @@ export async function POST(request: Request) {
       }
 
       if (!settings) settings = {};
+      settings.provider = 'ebulksms';
       settings.username = legacyData.eBulkUsername;
       settings.apiKey = legacyData.eBulkApiKey;
     }
 
-    const responseData = await sendWhatsAppViaEBulkSMS(
-        settings.username,
-        settings.apiKey,
-        recipients,
-        "POS Notification",
-        message,
-        2,
-        settings.senderNumber
-    );
+    const provider = settings.provider || 'ebulksms';
+    let responseData: any;
+
+    if (provider === 'whatsapi') {
+      if (!settings.whatsApiGatewayUrl || !settings.whatsApiApiKey || !settings.whatsApiInstanceId) {
+        return NextResponse.json({ error: 'WhatsAPI Gateway credentials (URL, API Key, or Instance ID) are missing.' }, { status: 400 });
+      }
+
+      const sendPromises = recipients.map(rec => sendWhatsApiText({
+        gatewayUrl: settings.whatsApiGatewayUrl,
+        apiKey: settings.whatsApiApiKey,
+        instanceId: settings.whatsApiInstanceId,
+        recipient: rec,
+        message: message,
+      }));
+
+      const results = await Promise.all(sendPromises);
+      responseData = results[0];
+    } else {
+      responseData = await sendWhatsAppViaEBulkSMS(
+          settings.username,
+          settings.apiKey,
+          recipients,
+          "POS Notification",
+          message,
+          2,
+          settings.senderNumber
+      );
+    }
 
     const status = responseData?.response?.status || responseData?.status;
     const statusdetail = responseData?.response?.statusdetail || responseData?.statusdetail;

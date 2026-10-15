@@ -538,15 +538,31 @@ export async function updateOrderStatusAction(orderId: string, storeId: string, 
             }
 
             if (message && adminRecipients.length > 0) {
-                sendWhatsAppViaEBulkSMS(
-                    whatsappAlertSettings.username,
-                    whatsappAlertSettings.apiKey,
-                    adminRecipients,
-                    `Order Status Updated: ${newStatus}`,
-                    message,
-                    2,
-                    whatsappAlertSettings.senderNumber
-                ).then(result => {
+                (async () => {
+                    const provider = whatsappAlertSettings.provider || 'ebulksms';
+                    if (provider === 'whatsapi') {
+                        if (whatsappAlertSettings.whatsApiGatewayUrl && whatsappAlertSettings.whatsApiApiKey && whatsappAlertSettings.whatsApiInstanceId) {
+                            const { sendWhatsApiText } = await import('@/lib/whatsapp-whatsapi');
+                            const results = await Promise.all(adminRecipients.map((rec: string) => sendWhatsApiText({
+                                gatewayUrl: whatsappAlertSettings.whatsApiGatewayUrl,
+                                apiKey: whatsappAlertSettings.whatsApiApiKey,
+                                instanceId: whatsappAlertSettings.whatsApiInstanceId,
+                                recipient: rec,
+                                message: message,
+                            })));
+                            return results[0];
+                        }
+                    }
+                    return sendWhatsAppViaEBulkSMS(
+                        whatsappAlertSettings.username,
+                        whatsappAlertSettings.apiKey,
+                        adminRecipients,
+                        `Order Status Updated: ${newStatus}`,
+                        message,
+                        2,
+                        whatsappAlertSettings.senderNumber
+                    );
+                })().then(result => {
                     const status = result?.response?.status || result?.status;
                     const statusdetail = result?.response?.statusdetail || result?.statusdetail;
                     
