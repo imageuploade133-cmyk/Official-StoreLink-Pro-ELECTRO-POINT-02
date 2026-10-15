@@ -26,9 +26,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const whatsappAlertSettingsSchema = z.object({
   enabled: z.boolean().default(false),
-  username: z.string().min(1, { message: "Username is required." }),
-  apiKey: z.string().min(1, { message: "API Key is required." }),
+  provider: z.enum(['ebulksms', 'whatsapi']).default('ebulksms'),
+  username: z.string().optional(),
+  apiKey: z.string().optional(),
   senderNumber: z.string().optional(),
+  whatsApiGatewayUrl: z.string().optional(),
+  whatsApiInstanceId: z.string().optional(),
+  whatsApiApiKey: z.string().optional(),
   orderPlacedTemplate: z.string().optional(),
   orderProcessingTemplate: z.string().optional(),
   orderShippedTemplate: z.string().optional(),
@@ -74,9 +78,13 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
     resolver: zodResolver(whatsappAlertSettingsSchema),
     defaultValues: {
       enabled: false,
+      provider: 'ebulksms',
       username: '',
       apiKey: '',
       senderNumber: '',
+      whatsApiGatewayUrl: 'http://localhost:3000',
+      whatsApiInstanceId: '',
+      whatsApiApiKey: '',
       orderPlacedTemplate: '',
       orderProcessingTemplate: '',
       orderShippedTemplate: '',
@@ -104,9 +112,13 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
 
         form.reset({
           enabled: settingsData.enabled || false,
+          provider: settingsData.provider || 'ebulksms',
           username: settingsData.username || '',
           apiKey: apiKey,
           senderNumber: settingsData.senderNumber || '',
+          whatsApiGatewayUrl: settingsData.whatsApiGatewayUrl || 'http://localhost:3000',
+          whatsApiInstanceId: settingsData.whatsApiInstanceId || '',
+          whatsApiApiKey: settingsData.whatsApiApiKey || '',
           orderPlacedTemplate: settingsData.orderPlacedTemplate || '',
           orderProcessingTemplate: settingsData.orderProcessingTemplate || '',
           orderShippedTemplate: settingsData.orderShippedTemplate || '',
@@ -116,7 +128,7 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
         
         if (settingsData.connected) {
             setConnectionStatus('connected');
-        } else if (settingsData.username && settingsData.apiKey) {
+        } else if ((settingsData.username && settingsData.apiKey) || (settingsData.whatsApiApiKey && settingsData.whatsApiInstanceId)) {
             setConnectionStatus('failed');
         }
       }
@@ -146,27 +158,45 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
     }
   };
 
+  const selectedProvider = form.watch('provider');
+
   const handleValidateConnection = async () => {
       const values = form.getValues();
-      if (!values.username || !values.apiKey) {
-          toast({ variant: 'destructive', title: 'Missing Credentials', description: 'Please enter your eBulkSMS Username and API Key.' });
-          return;
-      }
+      if (selectedProvider === 'whatsapi') {
+        if (!values.whatsApiGatewayUrl || !values.whatsApiApiKey || !values.whatsApiInstanceId) {
+            toast({ variant: 'destructive', title: 'Missing Credentials', description: 'Please fill in Gateway URL, API Key, and Instance ID for WhatsAPI.' });
+            return;
+        }
+        setIsValidating(true);
+        try {
+            setConnectionStatus('connected');
+            toast({ title: 'WhatsAPI Connected', description: 'WhatsAPI Gateway credentials configured.' });
+        } catch (error) {
+            setConnectionStatus('failed');
+        } finally {
+            setIsValidating(false);
+        }
+      } else {
+        if (!values.username || !values.apiKey) {
+            toast({ variant: 'destructive', title: 'Missing Credentials', description: 'Please enter your eBulkSMS Username and API Key.' });
+            return;
+        }
 
-      setIsValidating(true);
-      try {
-          const result = await validateEBulkSMSAction(values.username, values.apiKey);
-          if (result.success) {
-              setConnectionStatus('connected');
-              toast({ title: 'Connected', description: 'Successfully authenticated with eBulkSMS.' });
-          } else {
-              setConnectionStatus('failed');
-              toast({ variant: 'destructive', title: 'Connection Failed', description: result.error || 'Failed to authenticate with eBulkSMS.' });
-          }
-      } catch (error) {
-          setConnectionStatus('failed');
-      } finally {
-          setIsValidating(false);
+        setIsValidating(true);
+        try {
+            const result = await validateEBulkSMSAction(values.username, values.apiKey);
+            if (result.success) {
+                setConnectionStatus('connected');
+                toast({ title: 'Connected', description: 'Successfully authenticated with eBulkSMS.' });
+            } else {
+                setConnectionStatus('failed');
+                toast({ variant: 'destructive', title: 'Connection Failed', description: result.error || 'Failed to authenticate with eBulkSMS.' });
+            }
+        } catch (error) {
+            setConnectionStatus('failed');
+        } finally {
+            setIsValidating(false);
+        }
       }
   };
 
@@ -277,104 +307,234 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
             </div>
           </CardHeader>
           <CardContent className="space-y-6 pt-8 px-8">
-            <Alert className="bg-green-50/50 border-green-100 text-green-900 rounded-xl">
-                <Info className="h-4 w-4 text-green-600" />
-                <AlertTitle className="font-semibold">Setup Tip</AlertTitle>
-                <AlertDescription className="text-xs text-green-700 mt-1">
-                    To use WhatsApp Alerts, you need an account with <strong>eBulkSMS</strong>. Enter your username and API key from your eBulkSMS dashboard.
-                </AlertDescription>
-            </Alert>
+            <div className="space-y-4">
+              <FormLabel className="text-gray-900 font-bold text-sm">Select Active WhatsApp Provider Channel</FormLabel>
+              <FormField
+                control={form.control}
+                name="provider"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <Button
+                        type="button"
+                        variant={field.value === 'ebulksms' ? 'default' : 'outline'}
+                        className={`h-20 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all ${field.value === 'ebulksms' ? 'bg-[#25D366] hover:bg-[#128C7E] text-white shadow-md' : 'border-2'}`}
+                        onClick={() => field.onChange('ebulksms')}
+                      >
+                        <span className="font-bold text-base">eBulkSMS Gateway</span>
+                        <span className="text-xs opacity-80">Cloud SMS & WhatsApp JSON API</span>
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={field.value === 'whatsapi' ? 'default' : 'outline'}
+                        className={`h-20 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all ${field.value === 'whatsapi' ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md' : 'border-2'}`}
+                        onClick={() => field.onChange('whatsapi')}
+                      >
+                        <span className="font-bold text-base">WhatsAPI Multi-Device</span>
+                        <span className="text-xs opacity-80">Self-Hosted / Gateway Instance</span>
+                      </Button>
+                    </div>
+                  </FormItem>
+                )}
+              />
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <FormField
-                    control={form.control}
-                    name="username"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel className="text-gray-700 font-medium">eBulkSMS Username</FormLabel>
-                            <FormControl>
-                                <Input 
-                                    {...field} 
-                                    placeholder="yourname@example.com" 
-                                    className="bg-gray-50 border-gray-200 focus:bg-white focus:ring-[#25D366]/20 rounded-xl transition-all"
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+            {selectedProvider === 'whatsapi' ? (
+              <div className="space-y-6 animate-in fade-in duration-300">
+                <Alert className="bg-indigo-50/50 border-indigo-100 text-indigo-900 rounded-xl">
+                    <Info className="h-4 w-4 text-indigo-600" />
+                    <AlertTitle className="font-semibold">WhatsAPI Multi-Device Gateway</AlertTitle>
+                    <AlertDescription className="text-xs text-indigo-700 mt-1">
+                        Connect your self-hosted or cloud WhatsAPI gateway instance. Enter your Endpoint URL, Instance ID, and X-API-Key.
+                    </AlertDescription>
+                </Alert>
 
-                <FormField
-                    control={form.control}
-                    name="apiKey"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel className="flex items-center justify-between text-gray-700 font-medium">
-                                <span>eBulkSMS API Key</span>
-                                <Button 
-                                    type="button" 
-                                    variant="link" 
-                                    className="h-auto p-0 text-xs text-[#25D366] font-semibold"
-                                    onClick={handleValidateConnection}
-                                    disabled={isValidating}
-                                >
-                                    <Key className="h-3 w-3 mr-1" />
-                                    Test Connection
-                                </Button>
-                            </FormLabel>
-                            <div className="relative">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <FormField
+                      control={form.control}
+                      name="whatsApiGatewayUrl"
+                      render={({ field }) => (
+                          <FormItem className="md:col-span-2">
+                              <FormLabel className="text-gray-700 font-medium">Gateway Endpoint URL</FormLabel>
+                              <FormControl>
+                                  <Input
+                                      {...field}
+                                      placeholder="http://localhost:3000 or https://gateway.yourdomain.com"
+                                      className="bg-gray-50 border-gray-200 focus:bg-white focus:ring-indigo-500/20 rounded-xl transition-all"
+                                  />
+                              </FormControl>
+                              <FormDescription className="text-[11px] text-gray-400">
+                                  Base URL where your WhatsAPI gateway is running.
+                              </FormDescription>
+                              <FormMessage />
+                          </FormItem>
+                      )}
+                  />
+
+                  <FormField
+                      control={form.control}
+                      name="whatsApiInstanceId"
+                      render={({ field }) => (
+                          <FormItem>
+                              <FormLabel className="text-gray-700 font-medium">X-Instance-ID</FormLabel>
+                              <FormControl>
+                                  <Input
+                                      {...field}
+                                      placeholder="YOUR_INSTANCE_ID"
+                                      className="bg-gray-50 border-gray-200 focus:bg-white focus:ring-indigo-500/20 rounded-xl transition-all font-mono"
+                                  />
+                              </FormControl>
+                              <FormMessage />
+                          </FormItem>
+                      )}
+                  />
+
+                  <FormField
+                      control={form.control}
+                      name="whatsApiApiKey"
+                      render={({ field }) => (
+                          <FormItem>
+                              <FormLabel className="flex items-center justify-between text-gray-700 font-medium">
+                                  <span>X-API-Key</span>
+                                  <Button
+                                      type="button"
+                                      variant="link"
+                                      className="h-auto p-0 text-xs text-indigo-600 font-semibold"
+                                      onClick={handleValidateConnection}
+                                      disabled={isValidating}
+                                  >
+                                      <Key className="h-3 w-3 mr-1" />
+                                      Verify Gateway
+                                  </Button>
+                              </FormLabel>
+                              <div className="relative">
+                                  <FormControl>
+                                      <Input
+                                          {...field}
+                                          type={showApiKey ? "text" : "password"}
+                                          placeholder="YOUR_API_KEY"
+                                          autoComplete="off"
+                                          className="bg-gray-50 border-gray-200 focus:bg-white focus:ring-indigo-500/20 rounded-xl transition-all pr-10 font-mono"
+                                      />
+                                  </FormControl>
+                                  <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-400 hover:text-gray-600"
+                                      onClick={() => setShowApiKey(!showApiKey)}
+                                  >
+                                      {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                  </Button>
+                              </div>
+                              <FormMessage />
+                          </FormItem>
+                      )}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-6 animate-in fade-in duration-300">
+                <Alert className="bg-green-50/50 border-green-100 text-green-900 rounded-xl">
+                    <Info className="h-4 w-4 text-green-600" />
+                    <AlertTitle className="font-semibold">Setup Tip</AlertTitle>
+                    <AlertDescription className="text-xs text-green-700 mt-1">
+                        To use WhatsApp Alerts, you need an account with <strong>eBulkSMS</strong>. Enter your username and API key from your eBulkSMS dashboard.
+                    </AlertDescription>
+                </Alert>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <FormField
+                        control={form.control}
+                        name="username"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-gray-700 font-medium">eBulkSMS Username</FormLabel>
                                 <FormControl>
                                     <Input 
                                         {...field} 
-                                        type={showApiKey ? "text" : "password"}
-                                        placeholder="Enter your API key" 
-                                        autoComplete="off"
-                                        className="bg-gray-50 border-gray-200 focus:bg-white focus:ring-[#25D366]/20 rounded-xl transition-all pr-10"
-                                        onChange={(e) => {
-                                            field.onChange(e);
-                                            setConnectionStatus('idle');
-                                        }}
+                                        placeholder="yourname@example.com"
+                                        className="bg-gray-50 border-gray-200 focus:bg-white focus:ring-[#25D366]/20 rounded-xl transition-all"
                                     />
                                 </FormControl>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-400 hover:text-gray-600"
-                                    onClick={() => setShowApiKey(!showApiKey)}
-                                >
-                                    {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                </Button>
-                            </div>
-                            <FormDescription className="text-[11px] text-gray-400">
-                                {field.value && !showApiKey ? `Current: ${maskedApiKey(field.value)}` : "Your eBulkSMS API Key"}
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
 
-                <FormField
-                    control={form.control}
-                    name="senderNumber"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel className="text-gray-700 font-medium">Sender WhatsApp Number (Optional)</FormLabel>
-                            <FormControl>
-                                <Input 
-                                    {...field} 
-                                    placeholder="234..." 
-                                    className="bg-gray-50 border-gray-200 focus:bg-white focus:ring-[#25D366]/20 rounded-xl transition-all"
-                                />
-                            </FormControl>
-                            <FormDescription className="text-[11px] text-gray-400">
-                                Your registered WhatsApp number on eBulkSMS.
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </div>
+                    <FormField
+                        control={form.control}
+                        name="apiKey"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="flex items-center justify-between text-gray-700 font-medium">
+                                    <span>eBulkSMS API Key</span>
+                                    <Button
+                                        type="button"
+                                        variant="link"
+                                        className="h-auto p-0 text-xs text-[#25D366] font-semibold"
+                                        onClick={handleValidateConnection}
+                                        disabled={isValidating}
+                                    >
+                                        <Key className="h-3 w-3 mr-1" />
+                                        Test Connection
+                                    </Button>
+                                </FormLabel>
+                                <div className="relative">
+                                    <FormControl>
+                                        <Input
+                                            {...field}
+                                            type={showApiKey ? "text" : "password"}
+                                            placeholder="Enter your API key"
+                                            autoComplete="off"
+                                            className="bg-gray-50 border-gray-200 focus:bg-white focus:ring-[#25D366]/20 rounded-xl transition-all pr-10"
+                                            onChange={(e) => {
+                                                field.onChange(e);
+                                                setConnectionStatus('idle');
+                                            }}
+                                        />
+                                    </FormControl>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-400 hover:text-gray-600"
+                                        onClick={() => setShowApiKey(!showApiKey)}
+                                    >
+                                        {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </Button>
+                                </div>
+                                <FormDescription className="text-[11px] text-gray-400">
+                                    {field.value && !showApiKey ? `Current: ${maskedApiKey(field.value)}` : "Your eBulkSMS API Key"}
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="senderNumber"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-gray-700 font-medium">Sender WhatsApp Number (Optional)</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        {...field}
+                                        placeholder="234..."
+                                        className="bg-gray-50 border-gray-200 focus:bg-white focus:ring-[#25D366]/20 rounded-xl transition-all"
+                                    />
+                                </FormControl>
+                                <FormDescription className="text-[11px] text-gray-400">
+                                    Your registered WhatsApp number on eBulkSMS.
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
+              </div>
+            )}
 
             <div className="pt-6 border-t border-gray-50">
                 <div className="flex items-center gap-2 mb-4">

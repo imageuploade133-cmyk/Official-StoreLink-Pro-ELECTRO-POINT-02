@@ -156,9 +156,13 @@ export interface EmailProviderSettings {
 
 export interface WhatsAppAlertSettings {
   enabled: boolean;
-  username: string;
-  apiKey: string;
+  provider?: 'ebulksms' | 'whatsapi';
+  username?: string;
+  apiKey?: string;
   senderNumber?: string;
+  whatsApiGatewayUrl?: string;
+  whatsApiInstanceId?: string;
+  whatsApiApiKey?: string;
   orderNotificationNumbers?: string[];
   connected: boolean;
   updatedAt: Timestamp;
