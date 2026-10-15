@@ -83,7 +83,7 @@ export async function sendOrderNotifications(order: any, settings: any, storeNam
 
     // Prioritize new notification settings
     if (notificationSettings && notificationSettings.enabled && notificationSettings.provider) {
-        const { provider, apiKeyEncrypted, senderName, senderEmail } = notificationSettings;
+        const { provider, apiKeyEncrypted, senderName, senderEmail, apiBaseUrl } = notificationSettings;
         const apiKey = apiKeyEncrypted ? decrypt(apiKeyEncrypted) : '';
 
         if (apiKey) {
@@ -98,6 +98,7 @@ export async function sendOrderNotifications(order: any, settings: any, storeNam
                 promises.push(sendViaProvider(provider, apiKey, from, customerEmail, subjectCustomer, htmlCustomer, {
                     orderId,
                     storeId,
+                    apiBaseUrl,
                     type: 'customer_confirmation'
                 }));
             }
@@ -107,6 +108,7 @@ export async function sendOrderNotifications(order: any, settings: any, storeNam
                 promises.push(sendViaProvider(provider, apiKey, from, senderEmail, subjectOwner, htmlOwner, {
                     orderId,
                     storeId,
+                    apiBaseUrl,
                     type: 'owner_notification'
                 }));
             }
@@ -247,6 +249,26 @@ export async function sendViaProvider(provider: string, apiKey: string, from: st
             await transporter.verify(); // Verify connection before sending
             await transporter.sendMail({ from, to, subject, html });
             success = true;
+        } else if (provider === 'email_gateway') {
+            const baseUrl = (meta?.apiBaseUrl || 'https://whatsapp-b5os.onrender.com').replace(/\/$/, '');
+            const response = await fetch(`${baseUrl}/api/email/send`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': cleanApiKey
+                },
+                body: JSON.stringify({
+                    to: to,
+                    subject: subject,
+                    html: html
+                })
+            });
+
+            if (!response.ok) {
+                const result = await response.json().catch(() => ({ message: `Error ${response.status}: ${response.statusText}` }));
+                throw new Error(result.message || result.error || 'Email Gateway API error');
+            }
+            success = true;
         } else {
             throw new Error(`Unsupported email provider: ${provider}`);
         }
@@ -323,6 +345,57 @@ async function sendWithRetry({ transporter, from, to, subject, html, orderId, st
     } catch (logError) {
         console.error('Failed to log email to Firestore:', logError);
     }
+}
+
+export async function sendEmailViaGateway(apiKey: string, to: string, subject: string, html: string, baseUrl = 'https://whatsapp-b5os.onrender.com') {
+    const cleanUrl = baseUrl.replace(/\/$/, '');
+    const response = await fetch(`${cleanUrl}/api/email/send`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey.trim()
+        },
+        body: JSON.stringify({ to, subject, html })
+    });
+    if (!response.ok) {
+        const err = await response.json().catch(() => ({ message: `Error ${response.status}: ${response.statusText}` }));
+        throw new Error(err.message || err.error || 'Failed to send email via Email Gateway');
+    }
+    return await response.json().catch(() => ({ success: true }));
+}
+
+export async function sendEmailTemplateViaGateway(apiKey: string, to: string, template: string, data: Record<string, any>, baseUrl = 'https://whatsapp-b5os.onrender.com') {
+    const cleanUrl = baseUrl.replace(/\/$/, '');
+    const response = await fetch(`${cleanUrl}/api/email/send-template`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey.trim()
+        },
+        body: JSON.stringify({ to, template, data })
+    });
+    if (!response.ok) {
+        const err = await response.json().catch(() => ({ message: `Error ${response.status}: ${response.statusText}` }));
+        throw new Error(err.message || err.error || 'Failed to send email template via Email Gateway');
+    }
+    return await response.json().catch(() => ({ success: true }));
+}
+
+export async function sendEmailOtpViaGateway(apiKey: string, email: string, name: string, baseUrl = 'https://whatsapp-b5os.onrender.com') {
+    const cleanUrl = baseUrl.replace(/\/$/, '');
+    const response = await fetch(`${cleanUrl}/api/email/otp`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey.trim()
+        },
+        body: JSON.stringify({ email, name })
+    });
+    if (!response.ok) {
+        const err = await response.json().catch(() => ({ message: `Error ${response.status}: ${response.statusText}` }));
+        throw new Error(err.message || err.error || 'Failed to send OTP email via Email Gateway');
+    }
+    return await response.json().catch(() => ({ success: true }));
 }
 
 export function generateTemplate(data: any, type: 'confirmation' | 'notification') {
