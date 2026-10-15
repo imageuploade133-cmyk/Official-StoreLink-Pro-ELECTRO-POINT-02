@@ -33,20 +33,20 @@ export function StatCard({
 }: StatCardProps) {
   const content = (
     <Card className={cn(
-      "relative overflow-hidden transition-all duration-300 border-2",
-      href && "cursor-pointer hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]",
+      "relative overflow-hidden transition-all duration-300 border-2 shadow-sm hover:shadow-md",
+      href && "cursor-pointer hover:scale-[1.02] active:scale-[0.98]",
       className
     )}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-        <CardTitle className={cn("text-sm font-medium", titleClassName)}>{title}</CardTitle>
-        <div className={cn("p-2 rounded-xl bg-background/50 backdrop-blur-sm shadow-sm", iconClassName)}>
+        <CardTitle className={cn("text-sm font-bold", titleClassName)}>{title}</CardTitle>
+        <div className={cn("p-2 rounded-xl shadow-sm", iconClassName)}>
           <Icon className="h-4 w-4" />
         </div>
       </CardHeader>
       <CardContent className="relative z-10">
-        <div className={cn("text-2xl font-bold tracking-tight", valueClassName)}>{value}</div>
+        <div className={cn("text-2xl font-black tracking-tight", valueClassName)}>{value}</div>
         {description && (
-          <p className="text-xs text-muted-foreground mt-1">{description}</p>
+          <p className="text-xs font-medium opacity-90 mt-1">{description}</p>
         )}
       </CardContent>
     </Card>

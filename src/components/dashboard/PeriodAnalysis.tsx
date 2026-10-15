@@ -115,55 +115,55 @@ export function PeriodAnalysis({ dateRange, onDateChange, stats, currencySymbol 
       </Card>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="relative overflow-hidden transition-all duration-300 group bg-white dark:bg-card border-border/50 dark:border-border/20">
+        <Card className="relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent dark:from-blue-950/40 dark:via-blue-900/10 dark:to-background border-2 border-blue-500/20 hover:border-blue-500/40">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-medium">Revenue (Period)</CardTitle>
-            <div className="p-2 rounded-xl bg-primary/10 shadow-sm">
-              <DollarSign className="h-4 w-4 text-primary" />
+            <CardTitle className="text-sm font-bold text-blue-600 dark:text-blue-400">Revenue (Period)</CardTitle>
+            <div className="p-2 rounded-xl bg-blue-500/10 dark:bg-blue-900/40 shadow-sm">
+              <DollarSign className="h-4 w-4 text-blue-600 dark:text-blue-400" />
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
-            <div className="text-2xl font-bold tracking-tight">{formatCurrency(stats.totalRevenue, currencySymbol)}</div>
-            <p className="text-xs text-muted-foreground mt-1">{getDateRangeTitle()}</p>
+            <div className="text-2xl font-black tracking-tight text-blue-700 dark:text-blue-300">{formatCurrency(stats.totalRevenue, currencySymbol)}</div>
+            <p className="text-xs font-medium text-blue-600/80 dark:text-blue-400/80 mt-1">{getDateRangeTitle()}</p>
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden transition-all duration-300 group bg-white dark:bg-card border-border/50 dark:border-border/20">
+        <Card className="relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent dark:from-emerald-950/40 dark:via-emerald-900/10 dark:to-background border-2 border-emerald-500/20 hover:border-emerald-500/40">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-medium">Profit (Period)</CardTitle>
-            <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 shadow-sm">
+            <CardTitle className="text-sm font-bold text-emerald-600 dark:text-emerald-400">Profit (Period)</CardTitle>
+            <div className="p-2 rounded-xl bg-emerald-500/10 dark:bg-emerald-900/40 shadow-sm">
               <TrendingUp className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
-            <div className="text-2xl font-bold tracking-tight">{formatCurrency(stats.totalProfit, currencySymbol)}</div>
-            <p className="text-xs text-muted-foreground mt-1">Net profit in selected period</p>
+            <div className="text-2xl font-black tracking-tight text-emerald-700 dark:text-emerald-300">{formatCurrency(stats.totalProfit, currencySymbol)}</div>
+            <p className="text-xs font-medium text-emerald-600/80 dark:text-emerald-400/80 mt-1">Net profit in selected period</p>
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden transition-all duration-300 group bg-white dark:bg-card border-border/50 dark:border-border/20">
+        <Card className="relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent dark:from-amber-950/40 dark:via-amber-900/10 dark:to-background border-2 border-amber-500/20 hover:border-amber-500/40">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-medium text-orange-600 dark:text-orange-500">Returns (Period)</CardTitle>
-            <div className="p-2 rounded-xl bg-orange-100 dark:bg-orange-900/50 shadow-sm">
-              <Undo2 className="h-4 w-4 text-orange-600 dark:text-orange-500" />
+            <CardTitle className="text-sm font-bold text-amber-600 dark:text-amber-400">Returns (Period)</CardTitle>
+            <div className="p-2 rounded-xl bg-amber-500/10 dark:bg-amber-900/40 shadow-sm">
+              <Undo2 className="h-4 w-4 text-amber-600 dark:text-amber-400" />
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
-            <div className="text-2xl font-bold tracking-tight">{formatCurrency(stats.totalReturns, currencySymbol)}</div>
-            <p className="text-xs text-muted-foreground mt-1">Value of returns in period</p>
+            <div className="text-2xl font-black tracking-tight text-amber-700 dark:text-amber-300">{formatCurrency(stats.totalReturns, currencySymbol)}</div>
+            <p className="text-xs font-medium text-amber-600/80 dark:text-amber-400/80 mt-1">Value of returns in period</p>
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden transition-all duration-300 group bg-white dark:bg-card border-border/50 dark:border-border/20">
+        <Card className="relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-transparent dark:from-purple-950/40 dark:via-purple-900/10 dark:to-background border-2 border-purple-500/20 hover:border-purple-500/40">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-medium">Transactions (Period)</CardTitle>
-            <div className="p-2 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 shadow-sm">
-              <ListChecks className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+            <CardTitle className="text-sm font-bold text-purple-600 dark:text-purple-400">Transactions (Period)</CardTitle>
+            <div className="p-2 rounded-xl bg-purple-500/10 dark:bg-purple-900/40 shadow-sm">
+              <ListChecks className="h-4 w-4 text-purple-600 dark:text-purple-400" />
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
-            <div className="text-2xl font-bold tracking-tight">{stats.totalTransactions.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground mt-1">Number of sales in period</p>
+            <div className="text-2xl font-black tracking-tight text-purple-700 dark:text-purple-300">{stats.totalTransactions.toLocaleString()}</div>
+            <p className="text-xs font-medium text-purple-600/80 dark:text-purple-400/80 mt-1">Number of sales in period</p>
           </CardContent>
         </Card>
       </div>
