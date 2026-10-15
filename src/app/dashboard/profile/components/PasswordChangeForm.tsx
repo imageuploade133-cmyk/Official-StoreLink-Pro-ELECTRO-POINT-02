@@ -156,14 +156,14 @@ export function PasswordChangeForm({ user }: PasswordChangeFormProps) {
                                 type={showPassword ? "text" : "password"} 
                                 {...field} 
                                 disabled={isSaving} 
-                                className="pl-11 pr-11 h-12 rounded-xl bg-muted/30 border-transparent focus:bg-background transition-all"
+                                className="pl-11 pr-12 h-12 rounded-xl bg-muted/30 border-transparent focus:bg-background transition-all w-full"
                                 placeholder="Min. 6 characters"
                             />
                         </FormControl>
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center text-muted-foreground hover:text-primary transition-colors focus:outline-none z-10"
                         >
                             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
