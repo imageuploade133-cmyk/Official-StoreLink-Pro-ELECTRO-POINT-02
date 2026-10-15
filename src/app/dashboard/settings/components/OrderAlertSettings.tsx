@@ -274,14 +274,14 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
                                     Test Connection
                                 </Button>
                             </FormLabel>
-                            <div className="relative">
+                            <div className="relative flex items-center w-full">
                                 <FormControl>
                                     <Input 
                                         {...field} 
                                         type={showAppPassword ? "text" : "password"}
                                         placeholder="abcd efgh ijkl mnop" 
                                         autoComplete="off"
-                                        className="bg-gray-50 border-gray-200 focus:bg-white focus:ring-primary/20 rounded-xl transition-all pr-10"
+                                        className="bg-gray-50 border-gray-200 focus:bg-white focus:ring-primary/20 rounded-xl transition-all pr-12 w-full"
                                         onChange={(e) => {
                                             field.onChange(e);
                                             setConnectionStatus('idle');
@@ -292,7 +292,7 @@ export function OrderAlertSettings({ storeId }: OrderAlertSettingsProps) {
                                     type="button"
                                     variant="ghost"
                                     size="icon"
-                                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-400 hover:text-gray-600"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-400 hover:text-gray-600 focus:outline-none z-10"
                                     onClick={() => setShowAppPassword(!showAppPassword)}
                                 >
                                     {showAppPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}

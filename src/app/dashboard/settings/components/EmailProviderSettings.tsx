@@ -235,20 +235,20 @@ export function EmailProviderSettings({ storeId }: EmailProviderSettingsProps) {
                             <FormLabel className="font-semibold">
                                 {form.watch('provider') === 'smtp' ? 'SMTP Config (JSON)' : 'API Key (x-api-key)'}
                             </FormLabel>
-                            <div className="relative">
+                            <div className="relative flex items-center w-full">
                                 <FormControl>
                                     <Input 
                                         {...field} 
                                         type={showApiKey ? "text" : "password"}
                                         placeholder={form.watch('provider') === 'smtp' ? '{"host":"...","port":465,...}' : "Enter your x-api-key"}
-                                        className="rounded-2xl h-12 bg-gray-50/50 dark:bg-muted/50 border-gray-100 dark:border-border/50 pr-12"
+                                        className="rounded-2xl h-12 bg-gray-50/50 dark:bg-muted/50 border-gray-100 dark:border-border/50 pr-12 w-full"
                                     />
                                 </FormControl>
                                 <Button
                                     type="button"
                                     variant="ghost"
                                     size="icon"
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-400"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-400 hover:text-gray-600 focus:outline-none z-10"
                                     onClick={() => setShowApiKey(!showApiKey)}
                                 >
                                     {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}

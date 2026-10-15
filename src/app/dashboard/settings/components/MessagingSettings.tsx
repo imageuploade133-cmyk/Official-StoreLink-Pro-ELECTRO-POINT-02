@@ -154,9 +154,9 @@ export function MessagingSettings({ settingsData, isLoading, storeId }: Messagin
                 render={({ field }) => (
                     <FormItem>
                     <FormLabel>eBulkSMS API Key</FormLabel>
-                    <div className="relative">
-                        <FormControl><Input type={showApiKey ? 'text' : 'password'} {...field} placeholder="Your eBulkSMS API Key" /></FormControl>
-                        <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7" onClick={() => setShowApiKey(!showApiKey)}>
+                    <div className="relative flex items-center w-full">
+                        <FormControl><Input type={showApiKey ? 'text' : 'password'} className="pr-12 w-full" {...field} placeholder="Your eBulkSMS API Key" /></FormControl>
+                        <Button type="button" variant="ghost" size="icon" className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-400 hover:text-gray-600 focus:outline-none z-10" onClick={() => setShowApiKey(!showApiKey)}>
                             {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </Button>
                     </div>
