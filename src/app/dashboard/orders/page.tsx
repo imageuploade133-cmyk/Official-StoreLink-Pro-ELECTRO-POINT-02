@@ -67,6 +67,7 @@ import { format, startOfDay, endOfDay } from 'date-fns';
 import { formatCurrency } from '@/lib/formatUtils';
 import { cn, convertToDateSafely } from '@/lib/utils';
 import AccessDenied from '@/components/staff-management/AccessDenied';
+import { EmptyTableState } from '@/components/ui/empty-table-state';
 import { OrderDetailsModal } from '@/components/orders/OrderDetailsModal';
 import { OrderAuditTab } from '@/components/orders/OrderAuditTab';
 import { useToast } from '@/hooks/use-toast';
@@ -627,11 +628,12 @@ export default function WebsiteOrdersPage() {
                         ))
                       ) : filteredOrders.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={8} className="h-48 text-center text-muted-foreground">
-                            <div className="flex flex-col items-center gap-2">
-                              <ShoppingBasket className="h-12 w-12 opacity-10" />
-                              <p className="font-bold">No orders found.</p>
-                            </div>
+                          <TableCell colSpan={8} className="p-8 text-center">
+                            <EmptyTableState
+                              title="No Orders Found"
+                              description="There are no website orders matching your current search or status filter."
+                              icon={ShoppingBasket}
+                            />
                           </TableCell>
                         </TableRow>
                       ) : (
