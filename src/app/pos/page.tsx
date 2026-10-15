@@ -57,7 +57,7 @@ import type {
 } from '@/lib/types';
 
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { Loader2, Store } from 'lucide-react';
+import { Loader2, Store, ArrowLeft } from 'lucide-react';
 import { PageSpinner } from '@/components/ui/spinner';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
@@ -812,6 +812,16 @@ export default function POSPage() {
       <div className="min-h-screen lg:h-dvh flex flex-col overflow-x-auto lg:overflow-hidden bg-muted/30 dark:bg-black">
         <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6 dark:bg-black/50 dark:backdrop-blur-md">
             <div className="flex items-center gap-3">
+                <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => router.back()}
+                    className="h-9 w-9 rounded-xl border-2 hover:bg-muted active:scale-95 transition-all shadow-none"
+                    title="Go Back"
+                >
+                    <ArrowLeft className="h-5 w-5" />
+                    <span className="sr-only">Go Back</span>
+                </Button>
                 <div className="p-2 bg-muted rounded-md dark:bg-zinc-900">
                     <Store className="h-6 w-6 text-primary" />
                 </div>
