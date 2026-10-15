@@ -407,21 +407,21 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
                                       Verify Gateway
                                   </Button>
                               </FormLabel>
-                              <div className="relative">
+                              <div className="relative flex items-center w-full">
                                   <FormControl>
                                       <Input
                                           {...field}
                                           type={showApiKey ? "text" : "password"}
                                           placeholder="YOUR_API_KEY"
                                           autoComplete="off"
-                                          className="bg-gray-50 border-gray-200 focus:bg-white focus:ring-indigo-500/20 rounded-xl transition-all pr-10 font-mono"
+                                          className="bg-gray-50 border-gray-200 focus:bg-white focus:ring-indigo-500/20 rounded-xl transition-all pr-12 font-mono w-full"
                                       />
                                   </FormControl>
                                   <Button
                                       type="button"
                                       variant="ghost"
                                       size="icon"
-                                      className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-400 hover:text-gray-600"
+                                      className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-400 hover:text-gray-600 focus:outline-none z-10"
                                       onClick={() => setShowApiKey(!showApiKey)}
                                   >
                                       {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -480,14 +480,14 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
                                         Test Connection
                                     </Button>
                                 </FormLabel>
-                                <div className="relative">
+                                <div className="relative flex items-center w-full">
                                     <FormControl>
                                         <Input
                                             {...field}
                                             type={showApiKey ? "text" : "password"}
                                             placeholder="Enter your API key"
                                             autoComplete="off"
-                                            className="bg-gray-50 border-gray-200 focus:bg-white focus:ring-[#25D366]/20 rounded-xl transition-all pr-10"
+                                            className="bg-gray-50 border-gray-200 focus:bg-white focus:ring-[#25D366]/20 rounded-xl transition-all pr-12 w-full"
                                             onChange={(e) => {
                                                 field.onChange(e);
                                                 setConnectionStatus('idle');
@@ -498,7 +498,7 @@ export function WhatsAppAlertSettings({ storeId }: WhatsAppAlertSettingsProps) {
                                         type="button"
                                         variant="ghost"
                                         size="icon"
-                                        className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-400 hover:text-gray-600"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-400 hover:text-gray-600 focus:outline-none z-10"
                                         onClick={() => setShowApiKey(!showApiKey)}
                                     >
                                         {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
