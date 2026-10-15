@@ -16,36 +16,36 @@ export async function POST(request: Request) {
         invitationCode
     } = await request.json();
 
-    if (!email || !password || !storeSlug) {
+    if (!email || !password || !invitationCode || !storeSlug) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // We must use a transaction to ensure atomic account & store creation
+    const codeHash = hashInvitationCode(invitationCode);
+
+    // We must use a transaction to ensure atomic check and update of the invitation
     const result = await adminDb.runTransaction(async (transaction) => {
-        let plan = 'pro';
-        let planDurationDays = 365;
+        // 1. Validate Invitation
+        const invitationQuery = adminDb.collection('invitations').where('codeHash', '==', codeHash).limit(1);
+        const invitationSnapshot = await transaction.get(invitationQuery);
 
-        // 1. Validate Invitation if code is provided
-        if (invitationCode && invitationCode.trim() !== '') {
-            const codeHash = hashInvitationCode(invitationCode);
-            const invitationQuery = adminDb.collection('invitations').where('codeHash', '==', codeHash).limit(1);
-            const invitationSnapshot = await transaction.get(invitationQuery);
+        if (invitationSnapshot.empty) {
+            throw new Error('Invalid or Expired Invitation Code.');
+        }
 
-            if (!invitationSnapshot.empty) {
-                const invitationDoc = invitationSnapshot.docs[0];
-                const invitation = invitationDoc.data();
+        const invitationDoc = invitationSnapshot.docs[0];
+        const invitation = invitationDoc.data();
 
-                if (invitation.status !== 'revoked' && invitation.status !== 'expired' && (!invitation.expiresAt || new Date(invitation.expiresAt) >= new Date()) && invitation.usedCount < invitation.maxUses) {
-                    const newUsedCount = (invitation.usedCount || 0) + 1;
-                    transaction.update(invitationDoc.ref, {
-                        status: newUsedCount >= invitation.maxUses ? 'used' : 'unused',
-                        usedAt: new Date().toISOString(),
-                        usedCount: newUsedCount,
-                    });
-                    if (invitation.plan) plan = invitation.plan;
-                    if (invitation.planDurationDays) planDurationDays = invitation.planDurationDays;
-                }
-            }
+        if (invitation.status === 'revoked' || invitation.status === 'expired') {
+            throw new Error('Invalid or Expired Invitation Code.');
+        }
+
+        if (invitation.expiresAt && new Date(invitation.expiresAt) < new Date()) {
+            transaction.update(invitationDoc.ref, { status: 'expired' });
+            throw new Error('Invalid or Expired Invitation Code.');
+        }
+
+        if (invitation.usedCount >= invitation.maxUses) {
+            throw new Error('Invalid or Expired Invitation Code.');
         }
 
         // 2. Check if store slug is available
@@ -54,26 +54,41 @@ export async function POST(request: Request) {
             throw new Error('Store URL already taken.');
         }
 
-        // 3. Create or Get User in Firebase Auth
-        let uid: string;
+        // 3. Create User in Firebase Auth
+        let userRecord;
         try {
-            const userRecord = await adminAuth.createUser({
+            userRecord = await adminAuth.createUser({
                 email,
                 password,
                 displayName: name,
             });
-            uid = userRecord.uid;
         } catch (authError: any) {
             if (authError.code === 'auth/email-already-in-use') {
-                const existingUser = await adminAuth.getUserByEmail(email);
-                uid = existingUser.uid;
-            } else {
-                throw authError;
+                throw new Error('Email already in use.');
             }
+            throw authError;
         }
+
+        const uid = userRecord.uid;
+
+        // 4. Update Invitation
+        const newUsedCount = invitation.usedCount + 1;
+        transaction.update(invitationDoc.ref, {
+            status: newUsedCount >= invitation.maxUses ? 'used' : 'unused',
+            usedBy: uid,
+            usedAt: new Date().toISOString(),
+            usedCount: newUsedCount,
+            history: [...(invitation.history || []), {
+                action: 'used',
+                userId: uid,
+                timestamp: new Date().toISOString()
+            }]
+        });
 
         // 5. Setup Store Data
         const storeRef = adminDb.collection('stores').doc(storeSlug);
+        const plan = invitation.plan || 'free';
+        const planDurationDays = invitation.planDurationDays || 30;
         const planExpiresAt = new Date();
         planExpiresAt.setDate(planExpiresAt.getDate() + planDurationDays);
 

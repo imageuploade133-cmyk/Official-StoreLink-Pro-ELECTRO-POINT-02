@@ -305,8 +305,8 @@ export default function DashboardLayout({
     }
   }, [user, isLoading, isCustomer, store, staffMember, router, pathname, isGracePeriodExpired, isSuperAdmin]);
 
-  if (isLoading || !user || isCustomer || (!store && stores.length === 0 && !staffMember && !isSuperAdmin && !pathname.includes('invitations'))) {
-    const subLabel = (!store && stores.length === 0 && !staffMember && !isSuperAdmin) ? "Locating your store..." : "Authenticating your account…";
+  if (isLoading || !user || isCustomer || (!store && !staffMember && !isSuperAdmin && !pathname.includes('invitations'))) {
+    const subLabel = (!store && !staffMember && !isSuperAdmin) ? "Locating your store..." : "Authenticating your account…";
     return <PageSpinner label="StoreLink Pro" subLabel={subLabel} />;
   }
 

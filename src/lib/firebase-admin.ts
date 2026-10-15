@@ -11,7 +11,7 @@ function getAdminApp(): admin.app.App {
     return admin.apps[0]!;
   }
 
-  const projectId = process.env.FIREBASE_PROJECT_ID || 'studio-8326245272-397a9';
+  const projectId = process.env.FIREBASE_PROJECT_ID || 'valentino-ice-cream';
   const serviceAccountKeyEnv = process.env.FIREBASE_SERVICE_ACCOUNT_KEY || process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
 
   let serviceAccount: any = null;
