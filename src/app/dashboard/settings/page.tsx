@@ -161,12 +161,37 @@ export default function SettingsPage() {
             </>
         )}
         {visibleSections.inventory && <InventoryStockSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />}
-        {visibleSections.messaging && <MessagingSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />}
-        {visibleSections.orderAlerts && (
-          <div className="space-y-6">
+        {visibleSections.messaging && (
+          <div className="space-y-8">
+            <div className="space-y-2">
+              <h2 className="text-xl font-bold tracking-tight text-blue-600 dark:text-blue-400">
+                ✉️ Email Integration Section
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Dedicated configuration for sending global email notifications, receipts, and customer broadcasts.
+              </p>
+            </div>
             <EmailProviderSettings storeId={currentStoreId} />
-            <OrderAlertSettings storeId={currentStoreId} />
+
+            <div className="space-y-2 pt-4">
+              <h2 className="text-xl font-bold tracking-tight text-green-600 dark:text-green-400">
+                💬 WhatsApp Integration Section
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Dedicated configuration for sending WhatsApp receipt alerts, automated session messages, and broadcasts.
+              </p>
+            </div>
             <WhatsAppAlertSettings storeId={currentStoreId} />
+
+            <MessagingSettings settingsData={settingsData} isLoading={isLoading} storeId={currentStoreId} />
+          </div>
+        )}
+        {visibleSections.orderAlerts && (
+          <div className="space-y-6 pt-4">
+            <h2 className="text-xl font-bold tracking-tight">
+              🔔 Store Owner Notifications
+            </h2>
+            <OrderAlertSettings storeId={currentStoreId} />
           </div>
         )}
         
