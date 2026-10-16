@@ -128,10 +128,10 @@ export function CartArea({
                 )}
             </div>
             <div className="grid grid-cols-4 gap-2">
-                <Tooltip><TooltipTrigger asChild><Button variant="ghost" className="h-12 flex-col" onClick={onOpenSalesHistory}><ListChecks className="h-5 w-5 mb-1" /><span className="text-xs">History</span></Button></TooltipTrigger><TooltipContent>Sales History</TooltipContent></Tooltip>
-                <Tooltip><TooltipTrigger asChild><Button variant="ghost" className="h-12 flex-col" onClick={onOpenHeldSales}><Clock className="h-5 w-5 mb-1" /><span className="text-xs">Held Sales</span></Button></TooltipTrigger><TooltipContent>Held Sales</TooltipContent></Tooltip>
-                <Tooltip><TooltipTrigger asChild><Button variant="ghost" className="h-12 flex-col" onClick={onOpenCustomerManagement}><UserPlus className="h-5 w-5 mb-1" /><span className="text-xs">Customer</span></Button></TooltipTrigger><TooltipContent>Customer Management</TooltipContent></Tooltip>
-                <Tooltip><TooltipTrigger asChild><Button variant="ghost" className="h-12 flex-col" onClick={onOpenCalculator}><Calculator className="h-5 w-5 mb-1" /><span className="text-xs">Calculator</span></Button></TooltipTrigger><TooltipContent>Calculator</TooltipContent></Tooltip>
+                <Tooltip><TooltipTrigger asChild><Button variant="outline" className="h-12 flex-col border border-border hover:border-primary/50 dark:border-zinc-700 dark:hover:border-primary/50 shadow-sm" onClick={onOpenSalesHistory}><ListChecks className="h-5 w-5 mb-1" /><span className="text-xs">History</span></Button></TooltipTrigger><TooltipContent>Sales History</TooltipContent></Tooltip>
+                <Tooltip><TooltipTrigger asChild><Button variant="outline" className="h-12 flex-col border border-border hover:border-primary/50 dark:border-zinc-700 dark:hover:border-primary/50 shadow-sm" onClick={onOpenHeldSales}><Clock className="h-5 w-5 mb-1" /><span className="text-xs">Held Sales</span></Button></TooltipTrigger><TooltipContent>Held Sales</TooltipContent></Tooltip>
+                <Tooltip><TooltipTrigger asChild><Button variant="outline" className="h-12 flex-col border border-border hover:border-primary/50 dark:border-zinc-700 dark:hover:border-primary/50 shadow-sm" onClick={onOpenCustomerManagement}><UserPlus className="h-5 w-5 mb-1" /><span className="text-xs">Customer</span></Button></TooltipTrigger><TooltipContent>Customer Management</TooltipContent></Tooltip>
+                <Tooltip><TooltipTrigger asChild><Button variant="outline" className="h-12 flex-col border border-border hover:border-primary/50 dark:border-zinc-700 dark:hover:border-primary/50 shadow-sm" onClick={onOpenCalculator}><Calculator className="h-5 w-5 mb-1" /><span className="text-xs">Calculator</span></Button></TooltipTrigger><TooltipContent>Calculator</TooltipContent></Tooltip>
             </div>
             {selectedCustomer ? (
                 <div className="p-2 mt-3 text-sm border rounded-md bg-muted/50">
@@ -249,7 +249,7 @@ export function CartArea({
                 <div className="grid grid-cols-3 gap-2">
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <div className="w-full"><Button variant="outline" className="h-11 w-full" onClick={onInitiateCreditSale} disabled={cartItems.length === 0 || isProcessingSale || !selectedCustomer || selectedCustomer.status !== 'active'}><CreditCardIconLucide className="mr-1.5 h-4 w-4" /> Credit Sale</Button></div>
+                            <div className="w-full"><Button className="h-11 w-full bg-red-600 hover:bg-red-700 text-white border border-red-600 dark:bg-red-600 dark:hover:bg-red-700 dark:text-white dark:border-red-500 shadow-sm shadow-red-500/20" onClick={onInitiateCreditSale} disabled={cartItems.length === 0 || isProcessingSale || !selectedCustomer || selectedCustomer.status !== 'active'}><CreditCardIconLucide className="mr-1.5 h-4 w-4" /> Credit Sale</Button></div>
                         </TooltipTrigger>
                         {!selectedCustomer && cartItems.length > 0 && (<TooltipContent><p>Please select an active customer for a credit sale.</p></TooltipContent>)}
                         {selectedCustomer && selectedCustomer.status !== 'active' && cartItems.length > 0 && (<TooltipContent><p>Customer {selectedCustomer.name} is {selectedCustomer.status} and cannot make credit purchases.</p></TooltipContent>)}
