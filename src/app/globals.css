@@ -306,15 +306,24 @@
   border-right: 1px solid #252525 !important;
 }
 
-/* Cards: Elevated Grey */
-.dark .card,
-.dark [class*="rounded-lg"]:not(button):not(a):not(nav *):not(input):not(.border-none) {
-  background-color: #1c1c1e;
-  border: 1px solid #323235;
+/* Cards: Explicit Border Hierarchy Across Light and Dark Modes */
+.card,
+[class*="rounded-2xl"]:not(button):not(a):not(nav *):not(input):not([class*="border-none"]),
+[class*="rounded-3xl"]:not(button):not(a):not(nav *):not(input):not([class*="border-none"]) {
+  border: 2px solid hsl(var(--border) / 0.8);
 }
 
-.dark .card:hover {
-  border-color: #424245;
+.dark .card,
+.dark [class*="rounded-lg"]:not(button):not(a):not(nav *):not(input):not([class*="border-none"]),
+.dark [class*="rounded-2xl"]:not(button):not(a):not(nav *):not(input):not([class*="border-none"]),
+.dark [class*="rounded-3xl"]:not(button):not(a):not(nav *):not(input):not([class*="border-none"]) {
+  background-color: #1c1c1e;
+  border: 2px solid #323235 !important;
+}
+
+.dark .card:hover,
+.dark [class*="rounded-3xl"]:hover {
+  border-color: #424245 !important;
 }
 
 /* Inputs: Recessed Dark with Permanent Gradient Border */
