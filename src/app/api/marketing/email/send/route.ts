@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { targetTab, subject, content, recipientEmails, storeId } = body;
+    const { targetTab, subject, content, recipientEmails, recipients: rawRecipients, storeId } = body;
 
     if (!storeId) {
       return NextResponse.json({ error: 'Store ID is required' }, { status: 400 });
@@ -72,8 +72,16 @@ export async function POST(request: Request) {
     // 3. Resolve Target Recipients List
     let recipients: { name: string; email: string }[] = [];
 
-    if (Array.isArray(recipientEmails) && recipientEmails.length > 0) {
-      recipients = recipientEmails.map((e: string) => ({ name: 'Recipient', email: e }));
+    if (Array.isArray(rawRecipients) && rawRecipients.length > 0) {
+      recipients = rawRecipients.map((r: any) => ({
+        name: r.name || r.email.split('@')[0],
+        email: typeof r === 'string' ? r : r.email
+      }));
+    } else if (Array.isArray(recipientEmails) && recipientEmails.length > 0) {
+      recipients = recipientEmails.map((e: string) => ({
+        name: e.split('@')[0],
+        email: e
+      }));
     } else if (targetTab === 'staff') {
       const staffQuery = storeId === 'global'
         ? adminDb.collection('staff')
@@ -83,6 +91,17 @@ export async function POST(request: Request) {
         const d = doc.data();
         if (d.email) {
           recipients.push({ name: d.name || 'Staff Member', email: d.email });
+        }
+      });
+    } else if (targetTab === 'custom') {
+      const customQuery = storeId === 'global'
+        ? adminDb.collection('customEmailRecipients')
+        : adminDb.collection('customEmailRecipients').where('storeId', '==', storeId);
+      const customSnap = await customQuery.get();
+      customSnap.forEach((doc) => {
+        const d = doc.data();
+        if (d.email) {
+          recipients.push({ name: d.name || d.email.split('@')[0], email: d.email });
         }
       });
     } else {

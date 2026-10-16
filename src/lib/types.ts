@@ -144,6 +144,14 @@ export interface EmailAlertSettings {
   updatedAt: Timestamp;
 }
 
+export interface CustomEmailRecipient {
+  id: string;
+  storeId: string;
+  name: string;
+  email: string;
+  createdAt: Timestamp;
+}
+
 export interface EmailProviderSettings {
   provider: 'brevo' | 'resend' | 'smtp' | 'email_gateway';
   apiKeyEncrypted: string;
