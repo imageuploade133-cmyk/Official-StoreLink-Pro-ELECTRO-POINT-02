@@ -84,6 +84,20 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       ? "btn-action-primary"
       : (isBack ? "btn-back" : (isDelete ? "btn-destructive-action" : ""));
 
+    if (asChild) {
+      return (
+        <Comp
+          className={cn(buttonVariants({ variant, size, className }), specialClass)}
+          ref={ref}
+          disabled={loading || disabled}
+          onClick={handleClick}
+          {...props}
+        >
+          {children}
+        </Comp>
+      )
+    }
+
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }), specialClass, "relative")}
@@ -92,21 +106,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         onClick={handleClick}
         {...props}
       >
-        {asChild ? (
-          <>
-            {loading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-inherit rounded-inherit">
-                <Spinner size="sm" />
-              </div>
-            )}
-            <div className={cn(loading && "opacity-0")}>{children}</div>
-          </>
-        ) : (
-          <>
-            {loading && <Spinner size="sm" className="mr-2" />}
-            {children}
-          </>
-        )}
+        {loading && <Spinner size="sm" className="mr-2" />}
+        {children}
       </Comp>
     )
   }
