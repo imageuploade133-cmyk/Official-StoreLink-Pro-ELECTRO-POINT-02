@@ -93,14 +93,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {asChild ? (
-          <>
-            {loading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-inherit rounded-inherit">
-                <Spinner size="sm" />
-              </div>
-            )}
-            <div className={cn(loading && "opacity-0")}>{children}</div>
-          </>
+          children
         ) : (
           <>
             {loading && <Spinner size="sm" className="mr-2" />}
