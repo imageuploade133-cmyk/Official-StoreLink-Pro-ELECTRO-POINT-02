@@ -60,7 +60,8 @@ import {
   Image as ImageIcon,
   CreditCard as CreditCardIcon,
   ShieldAlert,
-  Mail
+  Mail,
+  FileCode
 } from 'lucide-react';
 import { PageSpinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
@@ -206,6 +207,7 @@ export default function DashboardLayout({
     { heading: 'Marketing' },
     { href: '/dashboard/earn-money-ads', icon: Coins, label: 'Earn Money – Ads', perm: 'manage_ads' },
     { href: '/dashboard/welcome-credit-settings', icon: Coins, label: 'Welcome Bonus', perm: 'manage_settings' },
+    { href: '/dashboard/message-templates', icon: FileCode, label: 'Templates Manager', perm: 'canSendMarketingWhatsapp' },
     { href: '/dashboard/email-marketing', icon: Mail, label: 'Email Broadcasts', perm: 'canSendMarketingWhatsapp' },
     { href: '/dashboard/whatsapp', icon: MessageSquare, label: 'WhatsApp', perm: 'canSendMarketingWhatsapp' },
     { heading: 'Website' },
