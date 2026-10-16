@@ -34,8 +34,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
 import { useFirestore, useCollection } from '@/firebase';
-import { collection, query, where, orderBy, limit } from 'firebase/firestore';
-import type { Customer, StaffMember } from '@/lib/types';
+import { collection, query, where, orderBy, limit, addDoc, deleteDoc, doc, serverTimestamp, writeBatch } from 'firebase/firestore';
+import type { Customer, StaffMember, CustomEmailRecipient } from '@/lib/types';
 import AccessDenied from '@/components/staff-management/AccessDenied';
 import { EmptyTableState } from '@/components/ui/empty-table-state';
 
@@ -94,6 +94,13 @@ export default function EmailMarketingPage() {
       : query(collection(firestore, 'staff'), where('store_id', '==', currentStoreId));
   }, [firestore, currentStoreId]);
 
+  const customRecipientsQuery = useMemo(() => {
+    if (!firestore || !currentStoreId) return null;
+    return currentStoreId === 'global'
+      ? query(collection(firestore, 'customEmailRecipients'))
+      : query(collection(firestore, 'customEmailRecipients'), where('storeId', '==', currentStoreId));
+  }, [firestore, currentStoreId]);
+
   const campaignLogsQuery = useMemo(() => {
     if (!firestore || !currentStoreId) return null;
     return query(
@@ -105,6 +112,7 @@ export default function EmailMarketingPage() {
 
   const { data: customersData, isLoading: isLoadingCustomers } = useCollection<Customer>(customersQuery);
   const { data: staffData, isLoading: isLoadingStaff } = useCollection<StaffMember>(staffQuery);
+  const { data: customRecipientsData } = useCollection<CustomEmailRecipient>(customRecipientsQuery);
   const { data: campaignLogs } = useCollection<any>(campaignLogsQuery);
 
   const [activeTab, setActiveTab] = useState<'customers' | 'staff' | 'custom'>('customers');
@@ -112,7 +120,6 @@ export default function EmailMarketingPage() {
   const [content, setContent] = useState('');
   const [searchFilter, setSearchFilter] = useState('');
   const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
-  const [customRecipients, setCustomRecipients] = useState<{ id: string; name: string; email: string }[]>([]);
   const [newManualName, setNewManualName] = useState('');
   const [newManualEmail, setNewManualEmail] = useState('');
   const [isAddManualOpen, setIsAddManualOpen] = useState(false);
@@ -135,10 +142,11 @@ export default function EmailMarketingPage() {
   }, [staffData, searchFilter]);
 
   const filteredCustomRecipients = useMemo(() => {
-    return customRecipients.filter(c =>
-      c.name.toLowerCase().includes(searchFilter.toLowerCase()) || c.email.toLowerCase().includes(searchFilter.toLowerCase())
+    if (!customRecipientsData) return [];
+    return customRecipientsData.filter(c =>
+      c.email && (c.name.toLowerCase().includes(searchFilter.toLowerCase()) || c.email.toLowerCase().includes(searchFilter.toLowerCase()))
     );
-  }, [customRecipients, searchFilter]);
+  }, [customRecipientsData, searchFilter]);
 
   const currentRecipientList = activeTab === 'customers'
     ? filteredCustomers
@@ -159,55 +167,61 @@ export default function EmailMarketingPage() {
     );
   };
 
-  const handleAddManualEmail = () => {
+  const handleAddManualEmail = async () => {
     if (!newManualEmail || !newManualEmail.includes('@')) {
       toast({ variant: 'destructive', title: 'Invalid Email', description: 'Please enter a valid email address.' });
       return;
     }
 
-    const name = newManualName.trim() || newManualEmail.split('@')[0];
-    const newEntry = {
-      id: `manual_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-      name,
-      email: newManualEmail.trim().toLowerCase()
-    };
+    if (!firestore) return;
 
-    setCustomRecipients(prev => {
-      if (prev.some(r => r.email === newEntry.email)) {
-        toast({ variant: 'destructive', title: 'Duplicate Email', description: 'This email address is already added.' });
-        return prev;
-      }
-      return [newEntry, ...prev];
-    });
+    const cleanEmail = newManualEmail.trim().toLowerCase();
+    const name = newManualName.trim() || cleanEmail.split('@')[0];
 
-    setSelectedEmails(prev => [...prev, newEntry.email]);
-    setNewManualName('');
-    setNewManualEmail('');
-    setIsAddManualOpen(false);
-    toast({ title: 'Email Added', description: `Added ${newEntry.email} to recipient list.` });
+    if (customRecipientsData?.some(r => r.email === cleanEmail)) {
+      toast({ variant: 'destructive', title: 'Duplicate Email', description: 'This email address is already saved.' });
+      return;
+    }
+
+    try {
+      await addDoc(collection(firestore, 'customEmailRecipients'), {
+        storeId: currentStoreId,
+        name,
+        email: cleanEmail,
+        createdAt: serverTimestamp()
+      });
+
+      setSelectedEmails(prev => [...prev, cleanEmail]);
+      setNewManualName('');
+      setNewManualEmail('');
+      setIsAddManualOpen(false);
+      setActiveTab('custom');
+      toast({ title: 'Email Saved', description: `Saved ${cleanEmail} to recipient record.` });
+    } catch (e: any) {
+      toast({ variant: 'destructive', title: 'Error Saving Recipient', description: e.message });
+    }
   };
 
-  const handleBulkFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBulkFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       const text = e.target?.result as string;
       if (!text) return;
 
       const lines = text.split(/\r?\n/);
-      const extracted: { id: string; name: string; email: string }[] = [];
+      const extractedMap = new Map<string, string>();
       const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 
-      lines.forEach((line, idx) => {
+      lines.forEach((line) => {
         const lineEmails = line.match(emailRegex);
         if (lineEmails) {
           lineEmails.forEach(email => {
             const cleanEmail = email.trim().toLowerCase();
             let name = cleanEmail.split('@')[0];
 
-            // If CSV line has name, e.g. "John Doe,john@example.com"
             const parts = line.split(/[,;\t]/);
             if (parts.length >= 2) {
               const possibleName = parts[0].trim().replace(/['"]/g, '');
@@ -216,44 +230,69 @@ export default function EmailMarketingPage() {
               }
             }
 
-            extracted.push({
-              id: `bulk_${Date.now()}_${idx}_${Math.random().toString(36).substring(2, 5)}`,
-              name,
-              email: cleanEmail
-            });
+            if (!extractedMap.has(cleanEmail)) {
+              extractedMap.set(cleanEmail, name);
+            }
           });
         }
       });
 
-      if (extracted.length === 0) {
+      if (extractedMap.size === 0) {
         toast({ variant: 'destructive', title: 'No Emails Found', description: 'Could not extract valid email addresses from file.' });
         return;
       }
 
-      setCustomRecipients(prev => {
-        const existingEmails = new Set(prev.map(r => r.email));
-        const uniqueNew = extracted.filter(r => !existingEmails.has(r.email));
-        return [...uniqueNew, ...prev];
+      const existingEmails = new Set(customRecipientsData?.map(r => r.email) || []);
+      const newItemsToSave: { name: string; email: string }[] = [];
+
+      extractedMap.forEach((name, email) => {
+        if (!existingEmails.has(email)) {
+          newItemsToSave.push({ name, email });
+        }
       });
 
-      const newEmails = extracted.map(r => r.email);
-      setSelectedEmails(prev => Array.from(new Set([...prev, ...newEmails])));
+      if (newItemsToSave.length > 0) {
+        try {
+          const batch = writeBatch(firestore);
+          newItemsToSave.forEach(item => {
+            const docRef = doc(collection(firestore, 'customEmailRecipients'));
+            batch.set(docRef, {
+              storeId: currentStoreId,
+              name: item.name,
+              email: item.email,
+              createdAt: serverTimestamp()
+            });
+          });
+          await batch.commit();
+        } catch (e: any) {
+          toast({ variant: 'destructive', title: 'Error Saving Bulk Recipients', description: e.message });
+          return;
+        }
+      }
+
+      const uploadedEmails = Array.from(extractedMap.keys());
+      setSelectedEmails(prev => Array.from(new Set([...prev, ...uploadedEmails])));
       setActiveTab('custom');
 
       toast({
-        title: 'Bulk Emails Uploaded',
-        description: `Successfully parsed and added ${extracted.length} recipient emails.`
+        title: 'Bulk Emails Saved',
+        description: `Parsed and saved ${newItemsToSave.length} new custom email recipients to record.`
       });
     };
 
     reader.readAsText(file);
-    // Reset file input value
     event.target.value = '';
   };
 
-  const handleRemoveCustomRecipient = (id: string, email: string) => {
-    setCustomRecipients(prev => prev.filter(r => r.id !== id));
-    setSelectedEmails(prev => prev.filter(e => e !== email));
+  const handleRemoveCustomRecipient = async (id: string, email: string) => {
+    if (!firestore) return;
+    try {
+      await deleteDoc(doc(firestore, 'customEmailRecipients', id));
+      setSelectedEmails(prev => prev.filter(e => e !== email));
+      toast({ title: 'Recipient Deleted', description: `Removed ${email} from record.` });
+    } catch (e: any) {
+      toast({ variant: 'destructive', title: 'Delete Failed', description: e.message });
+    }
   };
 
   const handleInsertVariable = (variable: string) => {
@@ -283,6 +322,20 @@ export default function EmailMarketingPage() {
     setIsSending(true);
     try {
       const idToken = await user.getIdToken();
+
+      // Build explicit recipients payload with names and emails for proper personalization
+      let explicitRecipients: { name: string; email: string }[] | undefined = undefined;
+
+      if (selectedEmails.length > 0) {
+        explicitRecipients = selectedEmails.map(email => {
+          const match = currentRecipientList.find(r => r.email === email);
+          return {
+            name: match?.name || email.split('@')[0],
+            email
+          };
+        });
+      }
+
       const response = await fetch('/api/marketing/email/send', {
         method: 'POST',
         headers: {
@@ -293,7 +346,7 @@ export default function EmailMarketingPage() {
           targetTab: activeTab,
           subject,
           content,
-          recipientEmails: selectedEmails.length > 0 ? selectedEmails : undefined,
+          recipients: explicitRecipients,
           storeId: currentStoreId
         })
       });
@@ -458,7 +511,7 @@ export default function EmailMarketingPage() {
                   Staffs ({staffData?.length || 0})
                 </TabsTrigger>
                 <TabsTrigger value="custom" className="rounded-xl font-bold">
-                  Custom ({customRecipients.length})
+                  Custom ({customRecipientsData?.length || 0})
                 </TabsTrigger>
               </TabsList>
             </Tabs>
