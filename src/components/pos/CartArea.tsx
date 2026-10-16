@@ -143,16 +143,16 @@ export function CartArea({
                     <TooltipTrigger asChild>
                         <Button
                             variant="outline"
-                            className="h-14 flex-col items-center justify-center gap-1.5 p-2 border border-border hover:border-primary/60 dark:border-zinc-700 dark:hover:border-primary/60 shadow-xs transition-all rounded-xl"
+                            className="h-14 flex-col items-center justify-center gap-1.5 p-2 border-2 border-primary/30 hover:border-primary hover:bg-primary/5 text-foreground hover:text-primary dark:border-primary/40 dark:hover:border-primary dark:hover:bg-primary/10 shadow-xs transition-all rounded-xl"
                             disabled={actionLoading !== null}
                             onClick={() => handleQuickAction('history', onOpenSalesHistory)}
                         >
                             {actionLoading === 'history' ? (
                                 <Loader2 className="h-4.5 w-4.5 animate-spin text-primary" />
                             ) : (
-                                <ListChecks className="h-4.5 w-4.5 text-foreground" />
+                                <ListChecks className="h-4.5 w-4.5 text-primary" />
                             )}
-                            <span className="text-[11px] font-medium leading-none">History</span>
+                            <span className="text-[11px] font-semibold leading-none">History</span>
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent>Sales History</TooltipContent>
@@ -162,16 +162,16 @@ export function CartArea({
                     <TooltipTrigger asChild>
                         <Button
                             variant="outline"
-                            className="h-14 flex-col items-center justify-center gap-1.5 p-2 border border-border hover:border-primary/60 dark:border-zinc-700 dark:hover:border-primary/60 shadow-xs transition-all rounded-xl"
+                            className="h-14 flex-col items-center justify-center gap-1.5 p-2 border-2 border-primary/30 hover:border-primary hover:bg-primary/5 text-foreground hover:text-primary dark:border-primary/40 dark:hover:border-primary dark:hover:bg-primary/10 shadow-xs transition-all rounded-xl"
                             disabled={actionLoading !== null}
                             onClick={() => handleQuickAction('held_sales', onOpenHeldSales)}
                         >
                             {actionLoading === 'held_sales' ? (
                                 <Loader2 className="h-4.5 w-4.5 animate-spin text-primary" />
                             ) : (
-                                <Clock className="h-4.5 w-4.5 text-foreground" />
+                                <Clock className="h-4.5 w-4.5 text-primary" />
                             )}
-                            <span className="text-[11px] font-medium leading-none">Held Sales</span>
+                            <span className="text-[11px] font-semibold leading-none">Held Sales</span>
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent>Held Sales</TooltipContent>
@@ -181,16 +181,16 @@ export function CartArea({
                     <TooltipTrigger asChild>
                         <Button
                             variant="outline"
-                            className="h-14 flex-col items-center justify-center gap-1.5 p-2 border border-border hover:border-primary/60 dark:border-zinc-700 dark:hover:border-primary/60 shadow-xs transition-all rounded-xl"
+                            className="h-14 flex-col items-center justify-center gap-1.5 p-2 border-2 border-primary/30 hover:border-primary hover:bg-primary/5 text-foreground hover:text-primary dark:border-primary/40 dark:hover:border-primary dark:hover:bg-primary/10 shadow-xs transition-all rounded-xl"
                             disabled={actionLoading !== null}
                             onClick={() => handleQuickAction('customer', onOpenCustomerManagement)}
                         >
                             {actionLoading === 'customer' ? (
                                 <Loader2 className="h-4.5 w-4.5 animate-spin text-primary" />
                             ) : (
-                                <UserPlus className="h-4.5 w-4.5 text-foreground" />
+                                <UserPlus className="h-4.5 w-4.5 text-primary" />
                             )}
-                            <span className="text-[11px] font-medium leading-none">Customer</span>
+                            <span className="text-[11px] font-semibold leading-none">Customer</span>
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent>Customer Management</TooltipContent>
@@ -200,16 +200,16 @@ export function CartArea({
                     <TooltipTrigger asChild>
                         <Button
                             variant="outline"
-                            className="h-14 flex-col items-center justify-center gap-1.5 p-2 border border-border hover:border-primary/60 dark:border-zinc-700 dark:hover:border-primary/60 shadow-xs transition-all rounded-xl"
+                            className="h-14 flex-col items-center justify-center gap-1.5 p-2 border-2 border-primary/30 hover:border-primary hover:bg-primary/5 text-foreground hover:text-primary dark:border-primary/40 dark:hover:border-primary dark:hover:bg-primary/10 shadow-xs transition-all rounded-xl"
                             disabled={actionLoading !== null}
                             onClick={() => handleQuickAction('calculator', onOpenCalculator)}
                         >
                             {actionLoading === 'calculator' ? (
                                 <Loader2 className="h-4.5 w-4.5 animate-spin text-primary" />
                             ) : (
-                                <Calculator className="h-4.5 w-4.5 text-foreground" />
+                                <Calculator className="h-4.5 w-4.5 text-primary" />
                             )}
-                            <span className="text-[11px] font-medium leading-none">Calculator</span>
+                            <span className="text-[11px] font-semibold leading-none">Calculator</span>
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent>Calculator</TooltipContent>
