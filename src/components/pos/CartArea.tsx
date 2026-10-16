@@ -96,7 +96,18 @@ export function CartArea({
 
     const [localDiscountType, setLocalDiscountType] = useState<'percentage' | 'fixed'>('percentage');
     const [localDiscountValue, setLocalDiscountValue] = useState('');
+    const [actionLoading, setActionLoading] = useState<string | null>(null);
 
+    const handleQuickAction = async (key: string, actionFn: () => void | Promise<void>) => {
+        setActionLoading(key);
+        try {
+            await actionFn();
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setTimeout(() => setActionLoading(null), 400);
+        }
+    };
 
     const handleQuantityChange = (productId: string, value: string, variantId?: string) => {
         const newQuantity = parseInt(value, 10);
@@ -128,10 +139,81 @@ export function CartArea({
                 )}
             </div>
             <div className="grid grid-cols-4 gap-2">
-                <Tooltip><TooltipTrigger asChild><Button variant="outline" className="h-12 flex-col border border-border hover:border-primary/50 dark:border-zinc-700 dark:hover:border-primary/50 shadow-sm" onClick={onOpenSalesHistory}><ListChecks className="h-5 w-5 mb-1" /><span className="text-xs">History</span></Button></TooltipTrigger><TooltipContent>Sales History</TooltipContent></Tooltip>
-                <Tooltip><TooltipTrigger asChild><Button variant="outline" className="h-12 flex-col border border-border hover:border-primary/50 dark:border-zinc-700 dark:hover:border-primary/50 shadow-sm" onClick={onOpenHeldSales}><Clock className="h-5 w-5 mb-1" /><span className="text-xs">Held Sales</span></Button></TooltipTrigger><TooltipContent>Held Sales</TooltipContent></Tooltip>
-                <Tooltip><TooltipTrigger asChild><Button variant="outline" className="h-12 flex-col border border-border hover:border-primary/50 dark:border-zinc-700 dark:hover:border-primary/50 shadow-sm" onClick={onOpenCustomerManagement}><UserPlus className="h-5 w-5 mb-1" /><span className="text-xs">Customer</span></Button></TooltipTrigger><TooltipContent>Customer Management</TooltipContent></Tooltip>
-                <Tooltip><TooltipTrigger asChild><Button variant="outline" className="h-12 flex-col border border-border hover:border-primary/50 dark:border-zinc-700 dark:hover:border-primary/50 shadow-sm" onClick={onOpenCalculator}><Calculator className="h-5 w-5 mb-1" /><span className="text-xs">Calculator</span></Button></TooltipTrigger><TooltipContent>Calculator</TooltipContent></Tooltip>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            variant="outline"
+                            className="h-14 flex-col items-center justify-center gap-1.5 p-2 border border-border hover:border-primary/60 dark:border-zinc-700 dark:hover:border-primary/60 shadow-xs transition-all rounded-xl"
+                            disabled={actionLoading !== null}
+                            onClick={() => handleQuickAction('history', onOpenSalesHistory)}
+                        >
+                            {actionLoading === 'history' ? (
+                                <Loader2 className="h-4.5 w-4.5 animate-spin text-primary" />
+                            ) : (
+                                <ListChecks className="h-4.5 w-4.5 text-foreground" />
+                            )}
+                            <span className="text-[11px] font-medium leading-none">History</span>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Sales History</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            variant="outline"
+                            className="h-14 flex-col items-center justify-center gap-1.5 p-2 border border-border hover:border-primary/60 dark:border-zinc-700 dark:hover:border-primary/60 shadow-xs transition-all rounded-xl"
+                            disabled={actionLoading !== null}
+                            onClick={() => handleQuickAction('held_sales', onOpenHeldSales)}
+                        >
+                            {actionLoading === 'held_sales' ? (
+                                <Loader2 className="h-4.5 w-4.5 animate-spin text-primary" />
+                            ) : (
+                                <Clock className="h-4.5 w-4.5 text-foreground" />
+                            )}
+                            <span className="text-[11px] font-medium leading-none">Held Sales</span>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Held Sales</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            variant="outline"
+                            className="h-14 flex-col items-center justify-center gap-1.5 p-2 border border-border hover:border-primary/60 dark:border-zinc-700 dark:hover:border-primary/60 shadow-xs transition-all rounded-xl"
+                            disabled={actionLoading !== null}
+                            onClick={() => handleQuickAction('customer', onOpenCustomerManagement)}
+                        >
+                            {actionLoading === 'customer' ? (
+                                <Loader2 className="h-4.5 w-4.5 animate-spin text-primary" />
+                            ) : (
+                                <UserPlus className="h-4.5 w-4.5 text-foreground" />
+                            )}
+                            <span className="text-[11px] font-medium leading-none">Customer</span>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Customer Management</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            variant="outline"
+                            className="h-14 flex-col items-center justify-center gap-1.5 p-2 border border-border hover:border-primary/60 dark:border-zinc-700 dark:hover:border-primary/60 shadow-xs transition-all rounded-xl"
+                            disabled={actionLoading !== null}
+                            onClick={() => handleQuickAction('calculator', onOpenCalculator)}
+                        >
+                            {actionLoading === 'calculator' ? (
+                                <Loader2 className="h-4.5 w-4.5 animate-spin text-primary" />
+                            ) : (
+                                <Calculator className="h-4.5 w-4.5 text-foreground" />
+                            )}
+                            <span className="text-[11px] font-medium leading-none">Calculator</span>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Calculator</TooltipContent>
+                </Tooltip>
             </div>
             {selectedCustomer ? (
                 <div className="p-2 mt-3 text-sm border rounded-md bg-muted/50">
