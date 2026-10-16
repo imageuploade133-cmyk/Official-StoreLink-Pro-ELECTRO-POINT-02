@@ -426,7 +426,7 @@
 }
 
 .btn-back {
-  @apply shadow-sm transition-all duration-200 hover:bg-muted/80 active:scale-[0.98];
+  @apply shadow-sm transition-all duration-200 border-2 border-primary/30 text-primary hover:bg-primary/10 hover:border-primary active:scale-[0.98];
 }
 
 .btn-destructive-action {
@@ -434,15 +434,15 @@
 }
 
 .dark .btn-back {
-  background-color: #1c1c1e !important;
-  border: 1px solid #424245 !important;
-  color: #ffffff !important;
+  background-color: transparent !important;
+  border: 2px solid hsl(var(--primary) / 0.4) !important;
+  color: hsl(var(--primary)) !important;
 }
 
 .dark .btn-back:hover {
-  background-color: #2c2c2e !important;
-  border-color: #525255 !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  background-color: hsl(var(--primary) / 0.15) !important;
+  border-color: hsl(var(--primary)) !important;
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.25) !important;
 }
 
 .dark .btn-destructive-action {
