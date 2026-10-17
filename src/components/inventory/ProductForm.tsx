@@ -306,6 +306,24 @@ export function ProductForm({
   const [isVideosTitleLocked, setIsVideosTitleLocked] = useState(true);
   const [isBarcodeScannerOpen, setIsBarcodeScannerOpen] = useState(false);
   const [isPhotoCaptureOpen, setIsPhotoCaptureOpen] = useState(false);
+  const [showFloatingBar, setShowFloatingBar] = useState(false);
+  const submitButtonRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Show floating bar when main submit button is NOT visible in viewport
+        setShowFloatingBar(!entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    if (submitButtonRef.current) {
+      observer.observe(submitButtonRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   const { playSuccessSound, vibrate } = useBarcodeScanner({
     onScan: (barcode) => {
@@ -817,16 +835,52 @@ const categorySelectionFooter = (
   );
 
   const onFormError = (errors: any) => {
-    if (errors.stock || errors.variants || errors.variantOptions) {
-      const element = document.getElementById('inventory-stock-section');
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        toast({
-          variant: 'destructive',
-          title: 'Inventory Stock Required',
-          description: 'Please enter the product stock quantity before saving.',
-        });
+    const errorList: string[] = [];
+    let firstErrorElementId: string | null = null;
+
+    if (errors.name) {
+      errorList.push('Product Name');
+    }
+    if (errors.categoryId) {
+      errorList.push('Category');
+    }
+    if (errors.stock) {
+      errorList.push('Current Stock');
+      if (!firstErrorElementId) firstErrorElementId = 'inventory-stock-section';
+    }
+    if (errors.purchasePrice) {
+      errorList.push('Internal Cost');
+      if (!firstErrorElementId) firstErrorElementId = 'inventory-stock-section';
+    }
+    if (errors.sellingPrice) {
+      errorList.push('Selling Price');
+      if (!firstErrorElementId) firstErrorElementId = 'inventory-stock-section';
+    }
+    if (errors.imageUrl) {
+      errorList.push('Product Image');
+    }
+
+    if (errorList.length > 0) {
+      toast({
+        variant: 'destructive',
+        title: 'Please Complete Required Fields',
+        description: `Missing required field(s): ${errorList.join(', ')}.`,
+      });
+
+      if (firstErrorElementId) {
+        const element = document.getElementById(firstErrorElementId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Validation Failed',
+        description: 'Please check the form for any invalid entries.',
+      });
     }
   };
 
@@ -2492,7 +2546,7 @@ const categorySelectionFooter = (
               <CardContent className="pt-6">
                   <StoreMerchandisingSettings />
               </CardContent>
-              <CardFooter className="flex flex-col gap-4 border-t pt-6 bg-muted/10">
+              <CardFooter className="flex flex-col gap-4 border-t pt-6 bg-muted/10" ref={submitButtonRef}>
                   <Button type="submit" disabled={isSubmitting || isUploadingSizeGuide || isUploadingPoster} className="w-full h-14 text-lg font-bold shadow-lg shadow-primary/20 btn-save">
                   {isSubmitting ? (
                     <>
@@ -2514,6 +2568,46 @@ const categorySelectionFooter = (
           </Card>
         </div>
       </form>
+
+      {/* Floating Sticky Bottom Action Bar when Scrolled Down */}
+      {showFloatingBar && (
+        <div className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-4xl animate-in slide-in-from-bottom-5 fade-in duration-300">
+          <div className="flex items-center justify-between gap-4 rounded-2xl border border-primary/20 bg-background/95 p-4 shadow-2xl backdrop-blur-xl ring-1 ring-black/5 dark:ring-white/10">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="hidden sm:flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Package className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-bold text-foreground">
+                  {watchName || (isEditing ? 'Edit Product' : 'New Product')}
+                </p>
+                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                  {isEditing ? 'Editing Catalog Entry' : 'Creating New Product'}
+                </p>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              disabled={isSubmitting || isUploadingSizeGuide || isUploadingPoster}
+              onClick={form.handleSubmit(handleFormSubmit, onFormError)}
+              className="h-12 shrink-0 rounded-xl px-6 text-sm font-extrabold shadow-lg shadow-primary/20 btn-save"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Syncing...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  {isEditing ? 'Sync Changes' : 'Publish Product'}
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
     </FormProvider>
 
     {/* Change Category Modal */}
