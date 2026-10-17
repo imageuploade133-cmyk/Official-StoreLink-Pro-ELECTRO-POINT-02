@@ -2,22 +2,38 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Home, LayoutGrid, Search, ShoppingCart, User, Zap } from 'lucide-react';
+import { usePathname, useParams } from 'next/navigation';
+import { Home, LayoutGrid, Search, ShoppingCart, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useStoreUrl } from '@/hooks/use-store-url';
 import { useCart } from '@/contexts/cart-context';
 
 export function MobileBottomNav() {
-  const pathname = usePathname();
-  const { getStoreUrl } = useStoreUrl();
+  const pathname = usePathname() || '';
+  const params = useParams();
+  const { storeId, getStoreUrl } = useStoreUrl();
   const { cartCount } = useCart();
 
-  const isHome = pathname.endsWith('/store') || pathname.endsWith('/store/') || pathname === '/' || pathname.split('/').pop() === 'store';
-  const isCategories = pathname.includes('/store/categories') || (pathname.includes('/store/shop') && !pathname.includes('/store/search'));
-  const isSearch = pathname.includes('/store/search');
-  const isCart = pathname.includes('/store/cart');
-  const isAccount = pathname.includes('/store/account') || pathname.includes('/store/login') || pathname.includes('/store/signup');
+  const currentStoreId = (params?.storeId as string) || storeId;
+
+  // Extract relative path by stripping currentStoreId prefix if present
+  let subPath = pathname;
+  if (currentStoreId && subPath.startsWith(`/${currentStoreId}`)) {
+    subPath = subPath.substring(currentStoreId.length + 1);
+  }
+  if (!subPath) subPath = '/';
+
+  const isHome = subPath === '/';
+  const isCategories = subPath.startsWith('/categories') || (subPath.startsWith('/shop') && !subPath.startsWith('/search'));
+  const isSearch = subPath.startsWith('/search');
+  const isCart = subPath.startsWith('/cart') || subPath.startsWith('/checkout');
+  const isAccount =
+    subPath.startsWith('/account') ||
+    subPath.startsWith('/login') ||
+    subPath.startsWith('/signup') ||
+    subPath.startsWith('/wishlist') ||
+    subPath.startsWith('/recently-viewed') ||
+    subPath.startsWith('/orders');
 
   const navItems = [
     {
