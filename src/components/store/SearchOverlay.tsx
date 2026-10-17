@@ -63,6 +63,7 @@ const RECENT_SEARCHES_KEY = 'store_recent_searches';
 export function SearchOverlay({ open, onOpenChange }: SearchOverlayProps) {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [activeTab, setActiveTab] = useState<'all' | 'products' | 'categories'>('all');
   const [isSearching, setIsSearching] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
     if (typeof window === 'undefined') return [];
@@ -96,6 +97,13 @@ export function SearchOverlay({ open, onOpenChange }: SearchOverlayProps) {
   const clearRecentSearches = () => {
     setRecentSearches([]);
     localStorage.removeItem(RECENT_SEARCHES_KEY);
+  };
+
+  const removeRecentSearch = (termToRemove: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    const updated = recentSearches.filter(s => s !== termToRemove);
+    setRecentSearches(updated);
+    localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
   };
 
   // Debounce search input
@@ -230,39 +238,84 @@ export function SearchOverlay({ open, onOpenChange }: SearchOverlayProps) {
   const searchContent = (
     <div className="flex flex-col h-full overflow-hidden bg-background">
       {/* Search Input Header - Premium Look */}
-      <div className="relative flex items-center px-4 py-6 border-b border-black/5 dark:border-white/5 bg-background/80 backdrop-blur-xl sticky top-0 z-20">
-        <Search className={cn(
-          "h-6 w-6 shrink-0 transition-colors duration-300",
-          isSearching ? "text-primary animate-pulse" : "text-muted-foreground"
-        )} strokeWidth={2} />
-        <form onSubmit={handleSearch} className="flex-1 ml-4">
-          <input
-            ref={inputRef}
-            value={search}
-            onChange={handleSearchChange}
-            className="w-full bg-transparent text-xl font-medium outline-none placeholder:text-muted-foreground/40 disabled:cursor-not-allowed"
-            placeholder="Search for anything..."
-            autoComplete="off"
-            spellCheck="false"
-          />
-        </form>
-        <div className="flex items-center gap-2">
-          {search && (
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-9 w-9 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-200" 
-              onClick={() => setSearch('')}
-            >
-              <X className="h-5 w-5 text-muted-foreground" />
-            </Button>
-          )}
-          {!isMobile && (
-            <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-md border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/[0.03] text-[10px] font-mono font-medium text-muted-foreground">
-              <span className="text-xs">ESC</span>
-            </div>
-          )}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-2xl border-b border-border/50">
+        <div className="relative flex items-center px-5 py-5">
+          <Search className={cn(
+            "h-6 w-6 shrink-0 transition-colors duration-300",
+            isSearching ? "text-primary animate-pulse" : "text-muted-foreground"
+          )} strokeWidth={2.5} />
+          <form onSubmit={handleSearch} className="flex-1 ml-4">
+            <input
+              ref={inputRef}
+              value={search}
+              onChange={handleSearchChange}
+              className="w-full bg-transparent text-lg sm:text-xl font-bold outline-none placeholder:text-muted-foreground/40 disabled:cursor-not-allowed text-foreground"
+              placeholder="Search products, collections, tags..."
+              autoComplete="off"
+              spellCheck="false"
+            />
+          </form>
+          <div className="flex items-center gap-2">
+            {search && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 rounded-full hover:bg-muted transition-all duration-200"
+                onClick={() => setSearch('')}
+              >
+                <X className="h-5 w-5 text-muted-foreground" />
+              </Button>
+            )}
+            {!isMobile && (
+              <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-xl border border-border bg-muted/50 text-[10px] font-mono font-bold text-muted-foreground">
+                <span>ESC</span>
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Category / Scope Filter Tabs */}
+        {search && (
+          <div className="flex items-center gap-2 px-5 pb-3 pt-1 border-t border-border/30 overflow-x-auto scrollbar-none">
+            <button
+              type="button"
+              onClick={() => setActiveTab('all')}
+              className={cn(
+                "px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 whitespace-nowrap",
+                activeTab === 'all'
+                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                  : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+              )}
+            >
+              All ({searchResults.length + categoryMatches.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('products')}
+              className={cn(
+                "px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 whitespace-nowrap",
+                activeTab === 'products'
+                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                  : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+              )}
+            >
+              Products ({searchResults.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('categories')}
+              className={cn(
+                "px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 whitespace-nowrap",
+                activeTab === 'categories'
+                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                  : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+              )}
+            >
+              Collections ({categoryMatches.length})
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Search Results Container */}
@@ -323,14 +376,21 @@ export function SearchOverlay({ open, onOpenChange }: SearchOverlayProps) {
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {recentSearches.map((term) => (
-                        <button
+                        <div
                           key={term}
                           onClick={() => setSearch(term)}
-                          className="group flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/50 hover:bg-primary/10 hover:text-primary transition-all duration-300 text-sm font-medium border border-transparent hover:border-primary/20"
+                          className="group flex items-center gap-2 px-4 py-2 rounded-full bg-muted/60 hover:bg-primary/10 hover:text-primary cursor-pointer transition-all duration-300 text-sm font-bold border border-transparent hover:border-primary/20"
                         >
                           <span>{term}</span>
-                          <ArrowRight className="h-3 w-3 opacity-0 -ml-2 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
-                        </button>
+                          <button
+                            type="button"
+                            onClick={(e) => removeRecentSearch(term, e)}
+                            className="text-muted-foreground/50 hover:text-destructive p-0.5 rounded-full transition-colors ml-1"
+                            title="Remove item"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -402,25 +462,25 @@ export function SearchOverlay({ open, onOpenChange }: SearchOverlayProps) {
 
             {/* Search Results */}
             {search && (
-              <div className="pb-6">
+              <div className="pb-6 space-y-4">
                 {/* Category Results */}
-                {categoryMatches.length > 0 && (
+                {categoryMatches.length > 0 && (activeTab === 'all' || activeTab === 'categories') && (
                   <CommandGroup heading="Collections" className="px-4">
                     {categoryMatches.map((cat) => (
                       <CommandItem
                         key={cat.id}
                         onSelect={() => handleItemClick(`/store/shop?category=${cat.id}`, search)}
-                        className="rounded-xl p-2 mb-1"
+                        className="rounded-2xl p-2.5 mb-1 cursor-pointer transition-colors hover:bg-primary/5"
                       >
                         <div className="flex items-center gap-4 w-full p-1">
-                          <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                            <LayoutGrid className="h-5 w-5" />
+                          <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                            <LayoutGrid className="h-6 w-6" />
                           </div>
-                          <div className="flex-1">
-                            <p className="font-semibold text-sm">{highlightMatch(cat.name, search)}</p>
-                            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Collection</p>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-extrabold text-sm text-foreground truncate">{highlightMatch(cat.name, search)}</p>
+                            <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mt-0.5">Explore Collection</p>
                           </div>
-                          <ChevronRight className="h-4 w-4 text-muted-foreground/40" />
+                          <ChevronRight className="h-4 w-4 text-muted-foreground/40 shrink-0" />
                         </div>
                       </CommandItem>
                     ))}
@@ -428,23 +488,23 @@ export function SearchOverlay({ open, onOpenChange }: SearchOverlayProps) {
                 )}
 
                 {/* Product Results */}
-                {searchResults.length > 0 && (
+                {searchResults.length > 0 && (activeTab === 'all' || activeTab === 'products') && (
                   <CommandGroup heading="Products" className="px-4">
-                    <div className="grid grid-cols-1 gap-1">
+                    <div className="grid grid-cols-1 gap-2">
                       {searchResults.map((product) => {
                         const effectivePrice = calculateEffectivePrice(product as any, new Date());
-                        const originalPrice = product.price;
+                        const originalPrice = product.price || product.sellingPrice;
                         const hasDiscount = effectivePrice < originalPrice && originalPrice > 0;
-                        const categoryName = categories?.find(c => c.id === product.category_id)?.name;
+                        const categoryName = categories?.find(c => c.id === product.category_id || c.id === product.categoryId)?.name;
                         
                         return (
                           <CommandItem
                             key={product.id}
                             onSelect={() => handleItemClick(`/store/product/${product.slug || product.id}`, search)}
-                            className="rounded-xl p-2 mb-1 group"
+                            className="rounded-2xl p-2.5 cursor-pointer group transition-all border border-transparent hover:border-primary/20 hover:bg-primary/5"
                           >
                             <div className="flex items-center gap-4 w-full">
-                              <div className="relative h-16 w-16 rounded-xl overflow-hidden bg-background shadow-sm shrink-0 border border-black/5 dark:border-white/5">
+                              <div className="relative h-16 w-16 rounded-2xl overflow-hidden bg-muted shadow-sm shrink-0 border border-border">
                                 <Image 
                                   src={product.imageUrl || 'https://placehold.co/100x100.png'} 
                                   alt={product.name} 
@@ -453,7 +513,7 @@ export function SearchOverlay({ open, onOpenChange }: SearchOverlayProps) {
                                   unoptimized 
                                 />
                                 {hasDiscount && (
-                                  <div className="absolute top-1 left-1 bg-rose-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tighter">
+                                  <div className="absolute top-1 left-1 bg-rose-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tighter shadow-sm">
                                     Sale
                                   </div>
                                 )}
@@ -461,30 +521,30 @@ export function SearchOverlay({ open, onOpenChange }: SearchOverlayProps) {
                               <div className="flex flex-col flex-1 min-w-0">
                                 <div className="flex items-center gap-2">
                                   {categoryName && (
-                                    <span className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest">{categoryName}</span>
+                                    <span className="text-[9px] font-black text-primary/80 uppercase tracking-widest">{categoryName}</span>
                                   )}
                                   {product.sku && (
-                                    <span className="text-[9px] font-medium text-muted-foreground/40 font-mono">SKU: {highlightMatch(product.sku, search)}</span>
+                                    <span className="text-[9px] font-medium text-muted-foreground/60 font-mono">SKU: {highlightMatch(product.sku, search)}</span>
                                   )}
                                 </div>
-                                <span className="font-bold text-sm truncate group-hover:text-primary transition-colors">
+                                <span className="font-extrabold text-sm truncate text-foreground group-hover:text-primary transition-colors">
                                   {highlightMatch(product.name, search)}
                                 </span>
-                                <div className="flex items-center gap-2 mt-0.5">
+                                <div className="flex items-center gap-2 mt-1">
                                   <span className="text-sm font-black text-foreground">
                                     {formatCurrency(effectivePrice, settings?.currency || '$')}
                                   </span>
                                   {hasDiscount && (
-                                    <span className="text-xs text-muted-foreground line-through decoration-rose-500/30">
+                                    <span className="text-xs text-muted-foreground line-through decoration-rose-500/40">
                                       {formatCurrency(originalPrice, settings?.currency || '$')}
                                     </span>
                                   )}
                                   <div className="ml-auto">
                                     {product.stock !== undefined && (
                                       <span className={cn(
-                                        "text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter",
-                                        product.stock > 10 ? "bg-emerald-500/10 text-emerald-600" : 
-                                        product.stock > 0 ? "bg-amber-500/10 text-amber-600" : "bg-rose-500/10 text-rose-600"
+                                        "text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider border",
+                                        product.stock > 10 ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400" :
+                                        product.stock > 0 ? "bg-amber-500/10 text-amber-600 border-amber-500/20 dark:bg-amber-500/20 dark:text-amber-400" : "bg-rose-500/10 text-rose-600 border-rose-500/20 dark:bg-rose-500/20 dark:text-rose-400"
                                       )}>
                                         {product.stock > 10 ? 'In Stock' : 
                                          product.stock > 0 ? `${product.stock} Left` : 'Out of Stock'}

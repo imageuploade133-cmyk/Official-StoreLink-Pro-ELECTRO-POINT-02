@@ -49,6 +49,9 @@ export function ConfirmationModal({
     }
   };
 
+  const TitleComponent = isMobile ? DrawerTitle : AlertDialogTitle;
+  const DescriptionComponent = isMobile ? DrawerDescription : AlertDialogDescription;
+
   const Content = () => (
     <div className="relative overflow-hidden p-1">
       {/* Background Ambient Glows */}
@@ -115,12 +118,12 @@ export function ConfirmationModal({
         </div>
 
         {/* Title & Description */}
-        <AlertDialogTitle className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
+        <TitleComponent className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
           {title}
-        </AlertDialogTitle>
-        <AlertDialogDescription className="mt-3 text-sm font-medium leading-relaxed text-muted-foreground px-2">
+        </TitleComponent>
+        <DescriptionComponent className="mt-3 text-sm font-medium leading-relaxed text-muted-foreground px-2">
           {description}
-        </AlertDialogDescription>
+        </DescriptionComponent>
 
         {/* Buttons */}
         <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:gap-4">
@@ -160,8 +163,6 @@ export function ConfirmationModal({
       <Drawer open={isOpen} onOpenChange={onOpenChange}>
         <DrawerContent className="rounded-t-[2.5rem] border-t-2 border-primary/20 bg-background/95 backdrop-blur-2xl p-6 pb-10">
           <div className="mx-auto mb-6 h-1.5 w-12 rounded-full bg-muted-foreground/30" />
-          <DrawerTitle className="sr-only">{title}</DrawerTitle>
-          <DrawerDescription className="sr-only">{description}</DrawerDescription>
           <Content />
         </DrawerContent>
       </Drawer>

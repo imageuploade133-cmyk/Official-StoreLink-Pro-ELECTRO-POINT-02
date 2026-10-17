@@ -1228,7 +1228,7 @@ export default function ProductDetailsPage() {
                 ) : (
                     <div 
                       ref={mainImageContainerRef}
-                      className="relative w-full h-full cursor-zoom-in"
+                      className="relative w-full h-full cursor-zoom-in overflow-hidden"
                       onMouseMove={handleImageMouseMove}
                       onMouseEnter={handleImageMouseEnter}
                       onMouseLeave={handleImageMouseLeave}
@@ -1250,28 +1250,39 @@ export default function ProductDetailsPage() {
                         {/* Zoom Lens */}
                         <div
                           className={cn(
-                            "absolute border-2 border-white/50 dark:border-white/50 rounded-xl shadow-2xl pointer-events-none transition-opacity duration-200 bg-no-repeat",
+                            "absolute border-2 border-primary/60 dark:border-primary/80 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] pointer-events-none transition-opacity duration-200 bg-no-repeat ring-4 ring-black/10 dark:ring-white/10",
                             isZoomed ? "opacity-100" : "opacity-0"
                           )}
                           style={{
-                            width: "150px",
-                            height: "150px",
-                            left: `calc(${zoomPosition.x}% - 75px)`,
-                            top: `calc(${zoomPosition.y}% - 75px)`,
+                            width: "180px",
+                            height: "180px",
+                            left: `calc(${zoomPosition.x}% - 90px)`,
+                            top: `calc(${zoomPosition.y}% - 90px)`,
                             backgroundImage: `url(${activeImage || product.imageUrl || defaultImageUrl})`,
-                            backgroundSize: "250%",
+                            backgroundSize: "300%",
                             backgroundPosition: `${zoomPosition.x}% ${zoomPosition.y}%`,
                             zIndex: 50,
                           }}
                         />
                         {/* Image Counter Badge */}
                         {galleryImages.length > 1 && (
-                          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-sm text-white px-4 py-1.5 rounded-full flex items-center gap-2 pointer-events-none">
-                            <span className="text-xs font-medium">
+                          <div className="absolute bottom-4 left-4 z-20 bg-black/60 dark:bg-slate-950/80 backdrop-blur-md text-white px-3.5 py-1.5 rounded-full flex items-center gap-2 border border-white/10 shadow-lg pointer-events-none">
+                            <span className="text-[11px] font-black tracking-wider uppercase">
                               {activeImageIndex + 1} / {galleryImages.length}
                             </span>
                           </div>
                         )}
+                        {/* Floating Control Toolbar */}
+                        <div className="absolute bottom-4 right-4 z-20 flex items-center gap-2 opacity-90 group-hover/main:opacity-100 transition-opacity">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setIsLightboxOpen(true); }}
+                            className="h-10 px-3.5 rounded-full bg-black/60 dark:bg-slate-950/80 backdrop-blur-md text-white border border-white/10 shadow-lg flex items-center gap-2 text-xs font-bold hover:bg-black/80 hover:scale-105 active:scale-95 transition-all"
+                            title="Expand Gallery"
+                          >
+                            <Maximize2 className="h-4 w-4" />
+                            <span className="hidden sm:inline">Enlarge</span>
+                          </button>
+                        </div>
                         {/* Navigation Arrows */}
                         {galleryImages.length > 1 && (
                           <>
@@ -1279,9 +1290,9 @@ export default function ProductDetailsPage() {
                               onClick={(e) => { e.stopPropagation(); goPrevImage(); }}
                               disabled={activeImageIndex === 0}
                               className={cn(
-                                "absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 rounded-full",
-                                "bg-white/80 dark:bg-black/60 backdrop-blur-md border border-black/10 dark:border-white/10",
-                                "flex items-center justify-center",
+                                "absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 rounded-full z-20",
+                                "bg-white/80 dark:bg-black/80 backdrop-blur-md border border-black/10 dark:border-white/10",
+                                "flex items-center justify-center text-black dark:text-white shadow-xl",
                                 "opacity-0 group-hover/main:opacity-100 transition-all duration-300",
                                 "hover:scale-110 active:scale-95",
                                 "disabled:opacity-30 disabled:cursor-not-allowed"
@@ -1294,9 +1305,9 @@ export default function ProductDetailsPage() {
                               onClick={(e) => { e.stopPropagation(); goNextImage(); }}
                               disabled={activeImageIndex === galleryImages.length - 1}
                               className={cn(
-                                "absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 rounded-full",
-                                "bg-white/80 dark:bg-black/60 backdrop-blur-md border border-black/10 dark:border-white/10",
-                                "flex items-center justify-center",
+                                "absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 rounded-full z-20",
+                                "bg-white/80 dark:bg-black/80 backdrop-blur-md border border-black/10 dark:border-white/10",
+                                "flex items-center justify-center text-black dark:text-white shadow-xl",
                                 "opacity-0 group-hover/main:opacity-100 transition-all duration-300",
                                 "hover:scale-110 active:scale-95",
                                 "disabled:opacity-30 disabled:cursor-not-allowed"
@@ -1307,19 +1318,6 @@ export default function ProductDetailsPage() {
                             </button>
                           </>
                         )}
-                        {/* Zoom Hint */}
-                        <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm text-white px-3 py-1.5 rounded-full flex items-center gap-2 opacity-0 group-hover/main:opacity-100 transition-opacity pointer-events-none">
-                          <ZoomIn className="h-4 w-4" />
-                          <span className="text-xs font-medium">Click to enlarge</span>
-                        </div>
-                        {/* Fullscreen Button */}
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); setIsLightboxOpen(true); }}
-                          className="absolute top-4 right-4 h-10 w-10 rounded-full bg-black/40 backdrop-blur-md text-white border-none shadow-xl transition-all hover:scale-110 active:scale-95 opacity-0 group-hover/main:opacity-100 flex items-center justify-center"
-                          aria-label="View fullscreen"
-                        >
-                          <Maximize2 className="h-5 w-5" />
-                        </button>
                         {isChangingVariant && (
                             <div className="absolute inset-0 bg-white/20 dark:bg-black/20 backdrop-blur-[2px] flex items-center justify-center z-10 animate-in fade-in duration-300">
                                 <div className="flex flex-col items-center gap-3">

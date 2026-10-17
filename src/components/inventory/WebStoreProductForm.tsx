@@ -260,6 +260,23 @@ export function WebStoreProductForm() {
   const [isUploadingStockDoc, setIsUploadingStockDoc] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isBarcodeScannerOpen, setIsBarcodeScannerOpen] = useState(false);
+  const [showFloatingBar, setShowFloatingBar] = useState(false);
+  const submitButtonRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowFloatingBar(!entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    if (submitButtonRef.current) {
+      observer.observe(submitButtonRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   // Paginated category loading state
   const CATEGORY_BATCH_SIZE = 20;
@@ -704,6 +721,34 @@ export function WebStoreProductForm() {
     }
   };
 
+  const onFormError = (errors: any) => {
+    const errorKeys = Object.keys(errors);
+    if (errorKeys.length > 0) {
+      const fieldNames = errorKeys.map(key => {
+        switch (key) {
+          case 'name': return 'Product Name';
+          case 'categoryId': return 'Category';
+          case 'sellingPrice': return 'Selling Price';
+          case 'purchasePrice': return 'Purchase/Cost Price';
+          case 'stock': return 'Stock Quantity';
+          case 'newPrice': return 'Discount Price';
+          default: return key;
+        }
+      }).join(', ');
+
+      toast({
+        variant: "destructive",
+        title: "Validation Failed",
+        description: `Please fill in all required fields: ${fieldNames}`
+      });
+
+      const firstErrorField = document.querySelector(`[name="${errorKeys[0]}"]`);
+      if (firstErrorField) {
+        firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  };
+
   const currentCategoryName = useMemo(() => {
     return categories?.find(c => c.id === watchCategory)?.name || 'Select Category...';
   }, [categories, watchCategory]);
@@ -846,7 +891,7 @@ export function WebStoreProductForm() {
   return (
     <>
     <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <form onSubmit={form.handleSubmit(onSubmit, onFormError)} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-primary/5 border border-primary/10 p-3 rounded-xl flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-primary animate-in fade-in slide-in-from-top-2">
@@ -2095,8 +2140,8 @@ export function WebStoreProductForm() {
               <CardContent className="pt-6">
                   <StoreMerchandisingSettings />
               </CardContent>
-              <CardFooter className="flex flex-col gap-4 border-t pt-6 bg-muted/10">
-                  <Button type="submit" disabled={isSaving || isUploadingSizeGuide || isUploadingPoster} className="w-full h-14 text-lg font-bold shadow-lg shadow-primary/20">
+              <CardFooter className="flex flex-col gap-4 border-t pt-6 bg-muted/10" ref={submitButtonRef}>
+                  <Button type="submit" disabled={isSaving || isUploadingSizeGuide || isUploadingPoster} className="w-full h-14 text-lg font-bold shadow-lg shadow-primary/20 btn-save">
                   {isSaving ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -2117,6 +2162,46 @@ export function WebStoreProductForm() {
           </Card>
         </div>
       </form>
+
+      {/* Floating Sticky Bottom Action Bar when Scrolled Down */}
+      {showFloatingBar && (
+        <div className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-4xl animate-in slide-in-from-bottom-5 fade-in duration-300">
+          <div className="flex items-center justify-between gap-4 rounded-2xl border border-primary/20 bg-background/95 p-4 shadow-2xl backdrop-blur-xl ring-1 ring-black/5 dark:ring-white/10">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="hidden sm:flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Package className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-bold text-foreground">
+                  {watchName || 'New Web Store Product'}
+                </p>
+                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                  Creating Web Catalog Entry
+                </p>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              disabled={isSaving || isUploadingSizeGuide || isUploadingPoster}
+              onClick={form.handleSubmit(onSubmit, onFormError)}
+              className="h-12 shrink-0 rounded-xl px-6 text-sm font-extrabold shadow-lg shadow-primary/20 btn-save"
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Syncing...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Publish Product
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
     </FormProvider>
 
     {/* Change Category Modal */}

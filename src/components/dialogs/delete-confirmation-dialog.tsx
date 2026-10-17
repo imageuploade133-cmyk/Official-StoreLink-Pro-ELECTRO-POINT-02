@@ -56,6 +56,9 @@ export function DeleteConfirmationDialog({
   const titleText =
     dialogTitle || `Are you sure you want to delete this ${itemType}?`;
 
+  const TitleComponent = isMobile ? DrawerTitle : AlertDialogTitle;
+  const DescriptionComponent = isMobile ? DrawerDescription : AlertDialogDescription;
+
   const DialogInnerContent = () => (
     <div className="relative overflow-hidden p-1">
       {/* Background Ambient Glow Gradients */}
@@ -98,12 +101,12 @@ export function DeleteConfirmationDialog({
         </div>
 
         {/* Title */}
-        <AlertDialogTitle className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
+        <TitleComponent className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
           {titleText}
-        </AlertDialogTitle>
+        </TitleComponent>
 
         {/* Description & Item Highlight */}
-        <AlertDialogDescription className="mt-3 text-sm font-medium leading-relaxed text-muted-foreground px-2">
+        <DescriptionComponent className="mt-3 text-sm font-medium leading-relaxed text-muted-foreground px-2">
           {dialogDescription ? (
             <span
               className="block"
@@ -122,7 +125,7 @@ export function DeleteConfirmationDialog({
               . This step cannot be undone.
             </span>
           )}
-        </AlertDialogDescription>
+        </DescriptionComponent>
 
         {/* Warning Callout Box */}
         <div className="mt-5 w-full rounded-2xl bg-gradient-to-r from-red-500/10 via-rose-500/5 to-transparent p-3.5 border border-red-500/20 text-left flex items-start gap-3">
@@ -175,10 +178,6 @@ export function DeleteConfirmationDialog({
       <Drawer open={isOpen} onOpenChange={onOpenChange}>
         <DrawerContent className="rounded-t-[2.5rem] border-t-2 border-red-500/20 bg-background/95 backdrop-blur-2xl p-6 pb-10">
           <div className="mx-auto mb-6 h-1.5 w-12 rounded-full bg-muted-foreground/30" />
-          <DrawerTitle className="sr-only">{titleText}</DrawerTitle>
-          <DrawerDescription className="sr-only">
-            Delete confirmation modal
-          </DrawerDescription>
           <DialogInnerContent />
         </DrawerContent>
       </Drawer>
