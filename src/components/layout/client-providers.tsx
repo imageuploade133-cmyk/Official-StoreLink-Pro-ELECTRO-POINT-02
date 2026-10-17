@@ -13,6 +13,7 @@ import { GlobalLoadingProvider } from '@/contexts/global-loading-context';
 import { RecentlyViewedProvider } from '@/contexts/recently-viewed-context';
 import { AdProvider } from '@/contexts/ad-context';
 import { UIBackgroundShadowManager } from './UIBackgroundShadowManager';
+import { NavigationLoadingOverlay } from './NavigationLoadingOverlay';
 
 export function ClientProviders({ children, storeId }: { children: React.ReactNode, storeId?: string | null }) {
   return (
@@ -26,6 +27,7 @@ export function ClientProviders({ children, storeId }: { children: React.ReactNo
                   <CartProvider>
                     <WishlistProvider>
                       <RecentlyViewedProvider>
+                        <NavigationLoadingOverlay />
                         <UIBackgroundShadowManager />
                         <ThemeProvider>{children}</ThemeProvider>
                       </RecentlyViewedProvider>

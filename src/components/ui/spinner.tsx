@@ -73,75 +73,72 @@ interface PageSpinnerProps {
 }
 
 export function PageSpinner({
-  label = 'Loading StoreLink Pro',
-  subLabel = 'Setting up your workspace…',
+  label = 'Loading...',
+  subLabel,
 }: PageSpinnerProps) {
   return (
     <div
       role="status"
-      aria-label="Loading application"
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-black"
+      aria-label="Loading page"
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-5 bg-background/60 dark:bg-black/60 backdrop-blur-md transition-all duration-300 animate-in fade-in-0"
     >
-      {/* Subtle radial gradient glow */}
+      {/* Subtle radial glow overlay */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            'radial-gradient(ellipse 80% 50% at 50% 40%, rgba(0, 113, 227, 0.05) 0%, transparent 60%)',
+            'radial-gradient(ellipse 60% 40% at 50% 50%, rgba(0, 113, 227, 0.12) 0%, transparent 70%)',
         }}
       />
 
       {/* Spinner with centered logo */}
-      <div className="relative flex items-center justify-center" style={{ width: 120, height: 120 }}>
-        {/* Main spinner ring - rotates around logo */}
+      <div className="relative flex items-center justify-center" style={{ width: 100, height: 100 }}>
+        {/* Animated gradient spinning ring around logo */}
         <svg
           aria-hidden="true"
           className="absolute inset-0"
           style={{
-            animation: 'spin 2s linear infinite',
+            animation: 'spin 1.5s linear infinite',
           }}
-          viewBox="0 0 120 120"
+          viewBox="0 0 100 100"
           fill="none"
         >
           <circle
-            cx="60"
-            cy="60"
-            r="55"
+            cx="50"
+            cy="50"
+            r="44"
             stroke="currentColor"
-            strokeWidth="2"
-            strokeOpacity="0.1"
+            strokeWidth="3"
+            className="text-primary/15"
           />
           <circle
-            cx="60"
-            cy="60"
-            r="55"
-            stroke="url(#gradient)"
-            strokeWidth="2.5"
-            strokeDasharray="172.7 172.7"
+            cx="50"
+            cy="50"
+            r="44"
+            stroke="url(#page-spinner-gradient)"
+            strokeWidth="3"
+            strokeDasharray="138.2 138.2"
             strokeLinecap="round"
           />
           <defs>
-            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#0071e3" stopOpacity="1" />
-              <stop offset="100%" stopColor="#0071e3" stopOpacity="0.2" />
+            <linearGradient id="page-spinner-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="1" />
+              <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.15" />
             </linearGradient>
           </defs>
         </svg>
 
-        {/* Logo perfectly centered inside spinner */}
-        <div
-          className="absolute flex items-center justify-center rounded-xl bg-black/30 backdrop-blur-md border border-white/10"
-          style={{ width: 56, height: 56 }}
-        >
-          <StoreLinkLogo className="h-7 w-7 text-blue-500" />
+        {/* Project Logo centered inside ring */}
+        <div className="absolute flex items-center justify-center p-3 rounded-2xl bg-background/80 dark:bg-black/80 shadow-lg border border-primary/20 backdrop-blur-sm animate-pulse">
+          <StoreLinkLogo className="h-9 w-9 text-primary" />
         </div>
       </div>
 
-      {/* Text section */}
-      <div className="flex flex-col items-center gap-3 text-center">
-        <p className="text-base font-semibold tracking-normal text-white/95">{label}</p>
-        <p className="text-xs text-white/60">{subLabel}</p>
+      {/* Text Feedback */}
+      <div className="flex flex-col items-center gap-1 text-center max-w-xs px-4">
+        <p className="text-sm font-bold tracking-tight text-foreground">{label}</p>
+        {subLabel && <p className="text-xs font-medium text-muted-foreground">{subLabel}</p>}
       </div>
     </div>
   );
