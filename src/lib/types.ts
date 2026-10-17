@@ -378,6 +378,13 @@ export interface Settings {
   flashHubIconColor?: string;
   flashHubIconUrl?: string;
   flashHubCornerRadius?: number;
+  // Top Category Bar Config (Under Slideshow)
+  showTopCategoryBar?: boolean;
+  topCategoryBarShape?: 'circle' | 'rounded' | 'square';
+  topCategoryBarBackgroundColor?: string;
+  topCategoryBarTextColor?: string;
+  topCategoryBarCategoryIds?: string[];
+
   // Category Section Config
   showCategorySection?: boolean;
   showCategorySectionPreTitle?: boolean;
