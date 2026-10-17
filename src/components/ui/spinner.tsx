@@ -70,106 +70,31 @@ export function SectionSpinner({ className, label }: SectionSpinnerProps) {
 interface PageSpinnerProps {
   label?: string;
   subLabel?: string;
+  className?: string;
 }
 
 export function PageSpinner({
   label = 'StoreLink Pro',
-  subLabel = 'Loading workspace...',
+  className,
 }: PageSpinnerProps) {
   return (
     <div
       role="status"
       aria-label="Loading page"
-      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-6 bg-black/40 dark:bg-black/60 backdrop-blur-2xl transition-all duration-300 animate-in fade-in-0"
+      className={cn(
+        'fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-3 bg-background/80 backdrop-blur-md transition-all duration-300 animate-in fade-in-0',
+        className
+      )}
     >
-      {/* Dynamic ambient background glow */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 overflow-hidden"
-      >
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+      {/* Slowly bouncing logo */}
+      <div style={{ animation: 'bounce 2s infinite' }}>
+        <StoreLinkLogo className="h-14 w-14 text-primary drop-shadow-md" />
       </div>
 
-      {/* Premium Glass Box containing Logo and Multi-ring Spinner */}
-      <div className="relative flex flex-col items-center justify-center p-8 rounded-3xl bg-white/70 dark:bg-zinc-900/80 border border-white/40 dark:border-zinc-800 shadow-2xl backdrop-blur-xl">
-        <div className="relative flex items-center justify-center" style={{ width: 110, height: 110 }}>
-          {/* Outer primary spinning ring */}
-          <svg
-            aria-hidden="true"
-            className="absolute inset-0"
-            style={{ animation: 'spin 1.8s linear infinite' }}
-            viewBox="0 0 110 110"
-            fill="none"
-          >
-            <circle
-              cx="55"
-              cy="55"
-              r="48"
-              stroke="currentColor"
-              strokeWidth="3.5"
-              className="text-primary/10 dark:text-primary/20"
-            />
-            <circle
-              cx="55"
-              cy="55"
-              r="48"
-              stroke="url(#outer-spinner-gradient)"
-              strokeWidth="3.5"
-              strokeDasharray="150.7 150.7"
-              strokeLinecap="round"
-            />
-            <defs>
-              <linearGradient id="outer-spinner-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#0071e3" stopOpacity="1" />
-                <stop offset="100%" stopColor="#0071e3" stopOpacity="0.1" />
-              </linearGradient>
-            </defs>
-          </svg>
-
-          {/* Inner counter-rotating ring */}
-          <svg
-            aria-hidden="true"
-            className="absolute inset-3"
-            style={{ animation: 'spin 1.2s linear infinite reverse' }}
-            viewBox="0 0 86 86"
-            fill="none"
-          >
-            <circle
-              cx="43"
-              cy="43"
-              r="36"
-              stroke="currentColor"
-              strokeWidth="2"
-              className="text-primary/10 dark:text-primary/20"
-            />
-            <circle
-              cx="43"
-              cy="43"
-              r="36"
-              stroke="#0071e3"
-              strokeWidth="2"
-              strokeDasharray="56.5 56.5"
-              strokeLinecap="round"
-              strokeOpacity="0.6"
-            />
-          </svg>
-
-          {/* Logo center badge with subtle zoom effect */}
-          <div className="relative z-10 flex items-center justify-center p-3.5 rounded-2xl bg-white dark:bg-black shadow-md border border-primary/20 dark:border-primary/30 transition-transform duration-300 hover:scale-105">
-            <StoreLinkLogo className="h-10 w-10 text-primary drop-shadow-[0_0_12px_rgba(0,113,227,0.4)]" />
-          </div>
-        </div>
-
-        {/* Labels & Progress indicator */}
-        <div className="mt-5 flex flex-col items-center gap-1 text-center">
-          <p className="text-base font-extrabold tracking-tight text-foreground">{label}</p>
-          {subLabel && (
-            <p className="text-xs font-medium text-muted-foreground animate-pulse">
-              {subLabel}
-            </p>
-          )}
-        </div>
-      </div>
+      {/* Project Name Only */}
+      <p className="text-base font-bold tracking-tight text-foreground">
+        {label || 'StoreLink Pro'}
+      </p>
     </div>
   );
 }
