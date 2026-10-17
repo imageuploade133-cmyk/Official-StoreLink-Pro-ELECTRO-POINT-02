@@ -56,10 +56,5 @@ export function NavigationLoadingOverlay() {
 
   if (!isNavigating) return null;
 
-  return (
-    <PageSpinner
-      label="Loading page..."
-      subLabel="Please wait while page content loads"
-    />
-  );
+  return <PageSpinner label="StoreLink Pro" />;
 }
