@@ -82,7 +82,7 @@ export function PageSpinner({
       role="status"
       aria-label="Loading page"
       className={cn(
-        'fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-3 bg-background/80 backdrop-blur-md transition-all duration-300 animate-in fade-in-0',
+        'fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-3 bg-background/30 backdrop-blur-sm transition-all duration-300 animate-in fade-in-0',
         className
       )}
     >
