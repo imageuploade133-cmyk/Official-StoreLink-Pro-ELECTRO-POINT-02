@@ -13,61 +13,88 @@ export function MobileBottomNav() {
   const { getStoreUrl } = useStoreUrl();
   const { cartCount } = useCart();
 
+  const isHome = pathname.endsWith('/store') || pathname.endsWith('/store/') || pathname === '/' || pathname.split('/').pop() === 'store';
+  const isCategories = pathname.includes('/store/categories') || (pathname.includes('/store/shop') && !pathname.includes('/store/search'));
+  const isSearch = pathname.includes('/store/search');
+  const isCart = pathname.includes('/store/cart');
+  const isAccount = pathname.includes('/store/account') || pathname.includes('/store/login') || pathname.includes('/store/signup');
+
   const navItems = [
     {
       label: 'Home',
       icon: Home,
       href: getStoreUrl('/store'),
-      active: pathname.endsWith('/store') || pathname.endsWith('/store/'),
+      active: isHome,
     },
     {
       label: 'Categories',
       icon: LayoutGrid,
       href: getStoreUrl('/store/categories'),
-      active: pathname.includes('/store/categories') || pathname.includes('/store/shop'),
+      active: isCategories,
     },
     {
-        label: 'Search',
-        icon: Search,
-        href: getStoreUrl('/store/search'),
-        active: pathname.includes('/store/search'),
+      label: 'Search',
+      icon: Search,
+      href: getStoreUrl('/store/search'),
+      active: isSearch,
     },
     {
       label: 'Cart',
       icon: ShoppingCart,
       href: getStoreUrl('/store/cart'),
-      active: pathname.includes('/store/cart'),
+      active: isCart,
       badge: cartCount,
     },
     {
       label: 'Me',
       icon: User,
       href: getStoreUrl('/store/account'),
-      active: pathname.includes('/store/account'),
+      active: isAccount,
     },
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-black/95 backdrop-blur-xl border-t border-black/5 dark:border-white/5 pb-2">
-      <div className="flex items-center justify-around h-16">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/90 dark:bg-slate-950/90 backdrop-blur-2xl border-t border-slate-200/60 dark:border-slate-800/60 pb-safe shadow-[0_-10px_30px_rgba(0,0,0,0.08)]">
+      <div className="flex items-center justify-around h-16 px-1 relative">
         {navItems.map((item) => (
           <Link
             key={item.label}
             href={item.href}
             className={cn(
-              "flex flex-col items-center justify-center flex-1 gap-1 transition-all duration-300",
-              item.active ? "text-primary scale-110" : "text-slate-500 dark:text-slate-400"
+              "flex flex-col items-center justify-center flex-1 h-full py-1 gap-1 relative transition-all duration-300 rounded-2xl group",
+              item.active
+                ? "text-primary font-black scale-105"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
             )}
           >
-            <div className="relative">
-              <item.icon className={cn("h-6 w-6", item.active && "fill-current")} strokeWidth={item.active ? 2.5 : 2} />
+            {/* Top Active Glow Line Indicator */}
+            {item.active && (
+              <div className="absolute -top-[1px] left-1/2 -translate-x-1/2 w-8 h-1 bg-primary rounded-full shadow-[0_0_12px_rgba(59,130,246,0.8)] animate-in fade-in zoom-in-50 duration-300" />
+            )}
+
+            {/* Active Pill Container */}
+            <div className={cn(
+              "relative px-3 py-1 rounded-xl transition-all duration-300 flex items-center justify-center",
+              item.active && "bg-primary/10 dark:bg-primary/20 shadow-inner"
+            )}>
+              <item.icon className={cn(
+                "h-5 w-5 transition-all duration-300",
+                item.active ? "fill-primary stroke-primary scale-110" : "stroke-current"
+              )} strokeWidth={item.active ? 2.5 : 2} />
+
               {item.badge !== undefined && item.badge > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 h-4 w-4 bg-primary text-white text-[10px] flex items-center justify-center rounded-full font-bold border-2 border-white dark:border-black animate-in zoom-in duration-300">
-                  {item.badge}
+                <span className="absolute -top-1.5 -right-1.5 h-4 w-4 bg-red-600 text-white text-[9px] flex items-center justify-center rounded-full font-black border-2 border-white dark:border-slate-950 animate-in zoom-in-75 duration-300 shadow-md">
+                  {item.badge > 99 ? '99+' : item.badge}
                 </span>
               )}
             </div>
-            <span className="text-[10px] font-bold tracking-tight uppercase">{item.label}</span>
+
+            <span className={cn(
+              "text-[9px] font-extrabold tracking-tight uppercase transition-all duration-300",
+              item.active ? "text-primary" : "text-slate-500 dark:text-slate-400"
+            )}>
+              {item.label}
+            </span>
           </Link>
         ))}
       </div>
