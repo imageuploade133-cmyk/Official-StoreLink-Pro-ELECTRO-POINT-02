@@ -11,7 +11,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useFirestore } from '@/firebase';
 import { useAuth } from '@/contexts/auth-context';
-import { addDoc, collection, Timestamp } from 'firebase/firestore';
+import { addDoc, collection, Timestamp, getDocs, query, where } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -83,9 +83,50 @@ export default function CreateSlidePage() {
     },
   });
 
+  const placement = form.watch('placement');
   const mediaType = form.watch('mediaType');
   const imageUrl = form.watch('imageUrl');
   const videoPosterUrl = form.watch('videoPosterUrl');
+
+  // Auto calculate and set Carousel Sequence Order based on existing slides
+  useEffect(() => {
+    if (!firestore || !currentStoreId) return;
+
+    let isMounted = true;
+    const calculateNextOrder = async () => {
+      try {
+        const q = query(
+          collection(firestore, 'slideShows'),
+          where('store_id', '==', currentStoreId),
+          where('placement', '==', placement)
+        );
+        const snapshot = await getDocs(q);
+        if (!isMounted) return;
+
+        if (snapshot.empty) {
+          form.setValue('order', 1, { shouldValidate: true });
+        } else {
+          let maxOrder = 0;
+          snapshot.docs.forEach((d) => {
+            const data = d.data();
+            const ord = typeof data.order === 'number' ? data.order : parseInt(data.order || '0', 10);
+            if (!isNaN(ord) && ord >= maxOrder) {
+              maxOrder = ord + 1;
+            }
+          });
+          form.setValue('order', maxOrder, { shouldValidate: true });
+        }
+      } catch (err) {
+        console.error('Error auto-calculating next slide order:', err);
+      }
+    };
+
+    calculateNextOrder();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [firestore, currentStoreId, placement, form]);
 
   useEffect(() => {
     if (mediaType === 'image') {
