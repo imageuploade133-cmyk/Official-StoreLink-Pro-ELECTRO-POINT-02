@@ -10,13 +10,10 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const storeId = searchParams.get('storeId') || 'global';
 
-    const providersRef = adminDb.collection('payment_providers');
-    
     let querySnapshot;
     try {
-      if (!adminDb) {
-        throw new Error('Firebase Admin DB not initialized');
-      }
+      const providersRef = adminDb.collection('payment_providers');
+
       // Try querying by storeId (new format)
       querySnapshot = await providersRef.where('storeId', '==', storeId).where('isActive', '==', true).get();
       
@@ -27,19 +24,24 @@ export async function GET(request: Request) {
     } catch (dbError: any) {
       console.error('Database error fetching payment providers:', dbError);
       
-      // FALLBACK: If database fails (e.g. missing credentials), return Paystack if keys are in env
-      if (process.env.PAYSTACK_PUBLIC_KEY) {
+      // FALLBACK: If database fails (e.g. missing credentials in production), return Paystack or Bank Transfer method
+      const paystackKey = process.env.PAYSTACK_PUBLIC_KEY || process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY;
+      if (paystackKey) {
         return NextResponse.json([{
           id: 'paystack',
           name: 'Pay with Card (Paystack)',
           provider: 'paystack',
-          publicKey: process.env.PAYSTACK_PUBLIC_KEY,
-          mode: (process.env.PAYSTACK_PUBLIC_KEY || '').startsWith('pk_live') ? 'live' : 'test',
-        }]);
+          publicKey: paystackKey,
+          mode: paystackKey.startsWith('pk_live') ? 'live' : 'test',
+        }], { status: 200 });
       }
       
-      // Return empty array instead of throwing to prevent 500 and keep frontend stable
-      return NextResponse.json([], { status: 200 });
+      return NextResponse.json([{
+        id: 'manual',
+        name: 'Bank Transfer',
+        provider: 'manual',
+        mode: 'live',
+      }], { status: 200 });
     }
 
     const methods: any[] = [];
@@ -83,13 +85,35 @@ export async function GET(request: Request) {
         });
     }
 
-    return NextResponse.json(methods);
+    // Fallback if empty
+    if (methods.length === 0) {
+      const paystackKey = process.env.PAYSTACK_PUBLIC_KEY || process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY;
+      if (paystackKey) {
+        methods.push({
+          id: 'paystack',
+          name: 'Pay with Card (Paystack)',
+          provider: 'paystack',
+          publicKey: paystackKey,
+          mode: paystackKey.startsWith('pk_live') ? 'live' : 'test',
+        });
+      } else {
+        methods.push({
+          id: 'manual',
+          name: 'Bank Transfer',
+          provider: 'manual',
+          mode: 'live',
+        });
+      }
+    }
+
+    return NextResponse.json(methods, { status: 200 });
   } catch (error: any) {
     console.error('Error fetching payment methods:', error);
-    const message = error.message || 'Unknown error';
-    if (message.includes('Could not load the default credentials')) {
-        return NextResponse.json({ error: 'Missing Google Cloud credentials. Please ensure FIREBASE_SERVICE_ACCOUNT_KEY is set in your environment or serviceAccountKey.json exists. See FIREBASE_ADMIN_SETUP.md for instructions.' }, { status: 500 });
-    }
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json([{
+      id: 'manual',
+      name: 'Bank Transfer',
+      provider: 'manual',
+      mode: 'live',
+    }], { status: 200 });
   }
 }

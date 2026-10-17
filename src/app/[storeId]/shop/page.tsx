@@ -544,13 +544,7 @@ function ShopPageContent() {
                     </div>
 
                     <div className="w-full">
-                        {isLoading && products.length === 0 ? (
-                            <div className={cn("grid gap-6 sm:gap-10", gridClasses)}>
-                                {Array.from({ length: 8 }).map((_, i) => (
-                                   <ProductCardSkeleton key={i} />
-                                ))}
-                            </div>
-                        ) : products.length > 0 ? (
+                        {products.length > 0 ? (
                             <div className="space-y-20">
                                 <div className={cn("grid gap-6 sm:gap-10", gridClasses)}>
                                     {products.map((product, idx) => (

@@ -5,7 +5,6 @@ import { PublicNavbar } from '@/components/store/PublicNavbar';
 import { PublicFooter } from '@/components/store/PublicFooter';
 import { MobileBottomNav } from '@/components/store/MobileBottomNav';
 import { useGlobalLoading } from '@/contexts/global-loading-context';
-import { PublicPageSkeleton } from '@/components/store/PublicPageSkeleton';
 import { useSettings } from '@/contexts/settings-context';
 import { BackgroundVideoPlayer } from '@/components/store/BackgroundVideoPlayer';
 import { cn, getCollectionBackgroundStyle } from "@/lib/utils";
@@ -137,7 +136,6 @@ export default function PublicLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { isInitialLoadComplete } = useGlobalLoading();
   const { settings, store } = useSettings();
 
   const isExpired = useMemo(() => {
@@ -174,10 +172,6 @@ export default function PublicLayout({
   }, [settings]);
 
   const hasGlobalBg = !!(globalBgStyle.backgroundColor || globalBgStyle.backgroundImage || globalBgStyle.background);
-
-  if (!isInitialLoadComplete) {
-    return <PublicPageSkeleton />;
-  }
 
   return (
     <OfflineDetector>

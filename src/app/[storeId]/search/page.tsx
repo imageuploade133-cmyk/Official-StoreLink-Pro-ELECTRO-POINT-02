@@ -387,11 +387,7 @@ function SearchPageContent() {
 
           {/* Product Grid */}
           <main className="flex-1">
-            {isLoading ? (
-              <div className={cn("grid gap-6 sm:gap-8", gridClasses)}>
-                {[...Array(8)].map((_, i) => <ProductCardSkeleton key={i} />)}
-              </div>
-            ) : products.length > 0 ? (
+            {products.length > 0 ? (
               <div className="space-y-12">
                 <div className={cn("grid gap-6 sm:gap-8", gridClasses)}>
                   {products.map(product => (

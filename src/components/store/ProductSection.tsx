@@ -769,25 +769,17 @@ export function ProductSection({ section, categories, excludeCategoryIds }: Prod
             {section.layout === 'carousel' ? (
                 <>
                     <CarouselContent className="-ml-4 md:-ml-8">
-                    {isLoading && displayProducts.length === 0 ? (
-                        Array.from({ length: 6 }).map((_, i) => (
-                            <CarouselItem key={i} className="pl-4 md:pl-8 basis-[75%] md:basis-1/3 lg:basis-1/4 xl:basis-1/5 2xl:basis-1/6">
-                                <ProductCardSkeleton />
-                            </CarouselItem>
-                        ))
-                    ) : (
-                        displayProducts.map(product => (
-                            <CarouselItem key={product.id} className="pl-4 md:pl-8 basis-[75%] md:basis-1/3 lg:basis-1/4 xl:basis-1/5 2xl:basis-1/6">
-                                <div className="h-full py-2">
-                                    <ProductCard 
-                                    product={product} 
-                                    category={categories?.find(c => c.id === product.categoryId)}
-                                    currencySymbol={currencySymbol} 
-                                    />
-                                </div>
-                            </CarouselItem>
-                        ))
-                    )}
+                    {displayProducts.map(product => (
+                        <CarouselItem key={product.id} className="pl-4 md:pl-8 basis-[75%] md:basis-1/3 lg:basis-1/4 xl:basis-1/5 2xl:basis-1/6">
+                            <div className="h-full py-2">
+                                <ProductCard
+                                product={product}
+                                category={categories?.find(c => c.id === product.categoryId)}
+                                currencySymbol={currencySymbol}
+                                />
+                            </div>
+                        </CarouselItem>
+                    ))}
                     </CarouselContent>
                     
                     {!isLoading && displayProducts.length > 0 && (
@@ -811,18 +803,14 @@ export function ProductSection({ section, categories, excludeCategoryIds }: Prod
             ) : (
               <div className="space-y-16">
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-10">
-                    {isLoading ? (
-                        Array.from({ length: BATCH_SIZE }).map((_, i) => <ProductCardSkeleton key={i} />)
-                    ) : (
-                        displayProducts.map(product => (
-                            <ProductCard 
-                              key={product.id} 
-                              product={product} 
-                              category={categories?.find(c => c.id === product.categoryId)}
-                              currencySymbol={currencySymbol} 
-                            />
-                        ))
-                    )}
+                    {displayProducts.map(product => (
+                        <ProductCard
+                          key={product.id}
+                          product={product}
+                          category={categories?.find(c => c.id === product.categoryId)}
+                          currencySymbol={currencySymbol}
+                        />
+                    ))}
                 </div>
                 
                 {!isLoading && (section.productIds?.length || 0) > BATCH_SIZE && (

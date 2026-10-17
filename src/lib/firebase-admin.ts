@@ -11,39 +11,58 @@ function getAdminApp(): admin.app.App {
     return admin.apps[0]!;
   }
 
-  const projectId = process.env.FIREBASE_PROJECT_ID || 'studio-8326245272-397a9';
-  const serviceAccountKeyEnv = process.env.FIREBASE_SERVICE_ACCOUNT_KEY || process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+  const projectId =
+    process.env.FIREBASE_PROJECT_ID ||
+    process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ||
+    'studio-8326245272-397a9';
+
+  const serviceAccountKeyEnv =
+    process.env.FIREBASE_SERVICE_ACCOUNT_KEY ||
+    process.env.FIREBASE_SERVICE_ACCOUNT_JSON ||
+    process.env.FIREBASE_SERVICE_ACCOUNT ||
+    process.env.FIREBASE_ADMIN_SERVICE_ACCOUNT ||
+    process.env.FIREBASE_CREDENTIALS ||
+    process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
 
   let serviceAccount: any = null;
   let initMethod = '';
 
   console.log(`Firebase Admin: Attempting initialization for project ${projectId}`);
 
-  // 1. Try parsing from FIREBASE_SERVICE_ACCOUNT_KEY or FIREBASE_SERVICE_ACCOUNT_JSON environment variable (full JSON key)
+  // Helper to parse JSON string safely
+  const tryParseJson = (rawStr: string) => {
+    try {
+      let str = rawStr.trim();
+      if ((str.startsWith('"') && str.endsWith('"')) || (str.startsWith("'") && str.endsWith("'"))) {
+        str = str.slice(1, -1);
+      }
+      str = str.replace(/\\\\n/g, '\n').replace(/\\n/g, '\n');
+      return JSON.parse(str);
+    } catch (e) {
+      return null;
+    }
+  };
+
+  // 1. Try parsing from FIREBASE_SERVICE_ACCOUNT_KEY or aliases (JSON or Base64 or File Path)
   if (serviceAccountKeyEnv && serviceAccountKeyEnv !== 'undefined' && serviceAccountKeyEnv !== 'null') {
     const cleanedKey = serviceAccountKeyEnv.trim();
     
     // Check if it's a JSON string
-    if (cleanedKey.startsWith('{') || cleanedKey.replace(/^['"](.*)['"]$/, '$1').startsWith('{')) {
-      try {
-        // Remove surrounding quotes and handle potential double-escaped newlines
-        const jsonStr = cleanedKey.replace(/^['"](.*)['"]$/, '$1').replace(/\\n/g, '\n');
-        serviceAccount = JSON.parse(jsonStr);
-        initMethod = 'environment variable (JSON)';
-      } catch (e: any) {
-        console.error('Firebase Admin: Failed to parse service account JSON from env:', e.message);
-      }
-    } 
+    serviceAccount = tryParseJson(cleanedKey);
+    if (serviceAccount) {
+      initMethod = 'environment variable (JSON)';
+    }
+
     // Check if it might be Base64
-    else {
+    if (!serviceAccount) {
       try {
         const decoded = Buffer.from(cleanedKey, 'base64').toString('utf8');
-        if (decoded.trim().startsWith('{')) {
-          serviceAccount = JSON.parse(decoded);
+        serviceAccount = tryParseJson(decoded);
+        if (serviceAccount) {
           initMethod = 'environment variable (Base64)';
         }
       } catch (e) {
-        // Not Base64 or failed to parse
+        // Not Base64
       }
     }
 
@@ -62,13 +81,16 @@ function getAdminApp(): admin.app.App {
 
   // 2. Try constructing from individual env vars: FIREBASE_CLIENT_EMAIL + FIREBASE_PRIVATE_KEY
   if (!serviceAccount) {
-    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL || process.env.NEXT_PUBLIC_FIREBASE_CLIENT_EMAIL;
+    let privateKey = process.env.FIREBASE_PRIVATE_KEY || process.env.NEXT_PUBLIC_FIREBASE_PRIVATE_KEY;
 
     console.log(`Firebase Admin: Checking individual env vars. Email: ${clientEmail ? 'SET' : 'MISSING'}, PrivateKey: ${privateKey ? 'SET' : 'MISSING'}`);
 
     if (clientEmail && privateKey && projectId) {
-      const formattedPrivateKey = privateKey.replace(/\\n/g, '\n');
+      if ((privateKey.startsWith('"') && privateKey.endsWith('"')) || (privateKey.startsWith("'") && privateKey.endsWith("'"))) {
+        privateKey = privateKey.slice(1, -1);
+      }
+      const formattedPrivateKey = privateKey.replace(/\\\\n/g, '\n').replace(/\\n/g, '\n');
       serviceAccount = {
         project_id: projectId,
         client_email: clientEmail,
@@ -106,7 +128,7 @@ function getAdminApp(): admin.app.App {
       // Standardize private key field name and format
       const privateKey = serviceAccount.private_key || serviceAccount.privateKey;
       if (typeof privateKey === 'string') {
-        serviceAccount.private_key = privateKey.replace(/\\n/g, '\n');
+        serviceAccount.private_key = privateKey.replace(/\\\\n/g, '\n').replace(/\\n/g, '\n');
       }
 
       const initializedApp = admin.initializeApp({
@@ -117,23 +139,31 @@ function getAdminApp(): admin.app.App {
       console.log(`Firebase Admin initialized successfully via ${initMethod}`);
       return initializedApp;
     } else {
-      const diag = {
-          FIREBASE_SERVICE_ACCOUNT_KEY: process.env.FIREBASE_SERVICE_ACCOUNT_KEY ? 'SET' : 'MISSING',
-          FIREBASE_SERVICE_ACCOUNT_JSON: process.env.FIREBASE_SERVICE_ACCOUNT_JSON ? 'SET' : 'MISSING',
-          FIREBASE_CLIENT_EMAIL: process.env.FIREBASE_CLIENT_EMAIL ? 'SET' : 'MISSING',
-          FIREBASE_PRIVATE_KEY: process.env.FIREBASE_PRIVATE_KEY ? 'SET' : 'MISSING',
-          FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID ? 'SET' : 'MISSING',
-          cwd: process.cwd(),
-          filesChecked: ['serviceAccountKey.json', 'config/serviceAccountKey.json', 'src/lib/serviceAccountKey.json']
-      };
+      console.warn('Firebase Admin: No cert credentials found. Attempting ADC initialization for project:', projectId);
+      try {
+        const initializedApp = admin.initializeApp({
+          projectId: projectId,
+        });
+        console.log('Firebase Admin initialized with default ADC');
+        return initializedApp;
+      } catch (adcError) {
+        const diag = {
+            FIREBASE_SERVICE_ACCOUNT_KEY: process.env.FIREBASE_SERVICE_ACCOUNT_KEY ? 'SET' : 'MISSING',
+            FIREBASE_SERVICE_ACCOUNT_JSON: process.env.FIREBASE_SERVICE_ACCOUNT_JSON ? 'SET' : 'MISSING',
+            FIREBASE_CLIENT_EMAIL: process.env.FIREBASE_CLIENT_EMAIL ? 'SET' : 'MISSING',
+            FIREBASE_PRIVATE_KEY: process.env.FIREBASE_PRIVATE_KEY ? 'SET' : 'MISSING',
+            FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID ? 'SET' : 'MISSING',
+            cwd: process.cwd(),
+            filesChecked: ['serviceAccountKey.json', 'config/serviceAccountKey.json', 'src/lib/serviceAccountKey.json']
+        };
 
-      console.error('Firebase Admin: Initialization failed. Diagnostics:', JSON.stringify(diag, null, 2));
+        console.error('Firebase Admin: Initialization failed. Diagnostics:', JSON.stringify(diag, null, 2));
 
-      // No valid credentials found - throw a clear error instead of falling back to ADC
-      throw new Error(
-        'Could not load Firebase Admin credentials. Please ensure FIREBASE_SERVICE_ACCOUNT_KEY or ' +
-        'FIREBASE_CLIENT_EMAIL/PRIVATE_KEY environment variables are set correctly in your production environment.'
-      );
+        throw new Error(
+          'Could not load Firebase Admin credentials. Please ensure FIREBASE_SERVICE_ACCOUNT_KEY or ' +
+          'FIREBASE_CLIENT_EMAIL/PRIVATE_KEY environment variables are set correctly in your production environment.'
+        );
+      }
     }
   } catch (initError: any) {
     // Handle the case where another process/hot-reload initialized it just now
