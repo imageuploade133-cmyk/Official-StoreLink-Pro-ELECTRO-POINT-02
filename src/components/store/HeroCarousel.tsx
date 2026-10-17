@@ -182,11 +182,7 @@ export function HeroCarousel() {
   }, [settings]);
 
   if (isLoading || isLoadingSettings) {
-    return (
-      <div className="w-full aspect-[21/7]">
-        <Skeleton className="w-full h-full" />
-      </div>
-    );
+    return <HeroCarouselSkeleton />;
   }
 
   if (settings?.showGlobalSlideShow === false) {
